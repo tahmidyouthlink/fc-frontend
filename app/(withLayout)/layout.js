@@ -1,8 +1,5 @@
-import { Inter, Leckerli_One } from "next/font/google";
-import "./globals.css";
-
-const inter = Inter({ subsets: ["latin"] });
-const leckerliOne = Leckerli_One({ subsets: ["latin"], weight: "400" });
+import Footer from "../components/layout/Footer";
+import Header from "../components/layout/Header";
 
 export const metadata = {
   title: "Fashion Commerce",
@@ -11,11 +8,10 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="icon" href="/favicon.ico" />
-      </head>
-      <body className={inter.className}>{children}</body>
-    </html>
+    <>
+      <Header />
+      {children}
+      <Footer />
+    </>
   );
 }
