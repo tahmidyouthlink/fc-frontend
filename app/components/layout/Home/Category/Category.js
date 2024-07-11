@@ -11,7 +11,7 @@ import Image from 'next/image';
 
 const Category = () => {
   return (
-    <div className='bg-[#FBEDE2] mt-16 md:mt-20 xl:mt-40 relative w-full'>
+    <div className='bg-[#FBEDE2] mt-16 md:mt-20 lg:mt-28 xl:mt-32 2xl:mt-40 relative w-full'>
       <div
         style={{
           backgroundImage: `url(${categoriesSvgImage.src})`,

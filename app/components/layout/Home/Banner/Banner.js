@@ -10,7 +10,7 @@ import Image from 'next/image';
 
 const Banner = () => {
   return (
-    <div className='pt-20 relative max-w-[1200px] mx-auto'>
+    <div className='pt-20 lg:pt-[60px] xl:pt-20 relative max-w-[1200px] mx-auto'>
       <div className='z-[-1]'>
         <div className='w-[150px] h-[150px] xl:w-[214px] xl:h-[187px] bg-[#FEDCBF] rounded-[100%] absolute md:left-[90%] top-[80%] left-[76%] md:top-[50%] 2xl:left-[100%] translate-x-[-50%] translate-y-[-50%] blur-[40px]'></div>
         <div className='w-[150px] h-[150px] xl:w-[214px] xl:h-[187px] bg-[#FEDCBF] rounded-[100%] absolute top-[40%] lg:top-[30%] left-[10%] md:left-[20%] translate-x-[-50%] translate-y-[-50%] blur-[60px] md:blur-[40px]'></div>
@@ -20,16 +20,16 @@ const Banner = () => {
         <div className='max-w-[1200px] mx-auto'>
           <div className='px-5 2xl:px-0'>
             <div className='flex items-center justify-center lg:px-12 xl:px-24'>
-              <Image src={vector1} alt='vector1' className='hidden md:block' />
+              <Image src={vector1} alt='vector1' className='hidden lg:block' />
               <div className='max-w-screen-sm mx-auto'>
-                <h1 className='font-semibold text-3xl md:text-4xl lg:text-5xl text-center pt-5 md:pt-10'>
+                <h1 className='font-semibold text-3xl md:text-4xl 2xl:text-5xl text-center pt-5 md:pt-10'>
                   Discover <span className='text-[#9F5216]'>Unique</span> Styles for Every Season
                 </h1>
-                <p className='text-[#383838] text-center py-6'>
+                <p className='text-[#383838] text-center py-6 text-sm 2xl:text-base'>
                   Uncover the latest trends with our one-of-a-kind men’s fashion. Each item is uniquely designed and available in limited numbers.
                 </p>
               </div>
-              <Image src={vector2} alt='vector2' className='hidden md:block' />
+              <Image src={vector2} alt='vector2' className='hidden lg:block' />
             </div>
             <div className='flex justify-center gap-8 items-center'>
               <Link href="/" className='font-semibold flex items-center gap-2 text-sm'>
@@ -40,8 +40,8 @@ const Banner = () => {
               </Link>
             </div>
           </div>
-          <div className='flex items-center justify-center xl:justify-between gap-2 md:gap-4 lg:gap-6 pt-12 md:pt-8 px-5 2xl:px-0'>
-            <div className='w-[100px] h-[150px] sm:w-[150px] sm:h-[200px] md:w-[200px] md:h-[300px] lg:w-[305px] lg:h-[400px]'>
+          <div className='flex items-center justify-center 2xl:justify-between gap-2 md:gap-4 lg:gap-6 pt-12 md:pt-8 lg:pt-0 2xl:pt-8 px-5 2xl:px-0'>
+            <div className='w-[100px] h-[150px] sm:w-[150px] sm:h-[200px] md:w-[200px] md:h-[300px] 2xl:w-[305px] 2xl:h-[400px]'>
               <Image
                 src={bannerImage1}
                 alt='banner-full-image'
@@ -51,7 +51,7 @@ const Banner = () => {
                 className='object-cover rounded-xl'
               />
             </div>
-            <div className='pt-[30px] sm:pt-[40px] md:pt-[50px] lg:pt-[90px] w-[200px] h-[150px] sm:w-[300px] sm:h-[200px] md:w-[450px] md:h-[300px] lg:w-[632px] lg:h-[441px]'>
+            <div className='pt-[30px] md:pt-[50px] lg:pt-[46px] 2xl:pt-[90px] w-[200px] h-[150px] sm:w-[300px] sm:h-[200px] md:w-[450px] md:h-[300px] 2xl:w-[632px] 2xl:h-[441px]'>
               <Image
                 src={bannerImage2}
                 alt='banner-full-image'
@@ -61,7 +61,7 @@ const Banner = () => {
                 className='object-cover rounded-xl'
               />
             </div>
-            <div className='w-[100px] h-[150px] sm:w-[150px] sm:h-[200px] md:w-[200px] md:h-[300px] lg:w-[305px] lg:h-[400px]'>
+            <div className='w-[100px] h-[150px] sm:w-[150px] sm:h-[200px] md:w-[200px] md:h-[300px] 2xl:w-[305px] 2xl:h-[400px]'>
               <Image
                 src={bannerImage3}
                 alt='banner-full-image'
