@@ -18,23 +18,23 @@ export default function Header() {
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false); // State for tracking nav menu open/close
 
   return (
-    <header className="absolute z-10 w-full px-5 py-4 text-black sm:px-8 sm:py-5 lg:px-12 lg:py-6">
+    <header className="absolute z-[1000] w-full px-5 py-4 text-black sm:px-8 sm:py-5 lg:px-12 lg:py-6">
       {/* Header wrapper */}
-      <div className="mx-auto flex items-center justify-between max-w-[1200px]">
+      <div className="mx-auto flex items-center justify-between gap-2 max-w-[1200px]">
         {/* Logo */}
         <Link href="/">
           <div className="flex items-center gap-2">
             <Image
-              className="h-4 md:h-6 w-auto"
+              className="h-[14px] md:h-6 w-auto"
               src={logoWhiteImage}
               alt="YouthLink logo with white text"
             />
-            <h1 className="font-leckerli text-sm md:text-lg">F-Commerce</h1>
+            <h1 className="font-leckerli text-xs md:text-lg">F-Commerce</h1>
           </div>
         </Link>
         {/* Search Icon */}
-        <div className="flex items-center relative group lg:hidden">
-          <svg className="absolute left-4 fill-[#9e9ea7] w-3 h-3 lg:w-4 lg:h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
+        <li className="flex items-center relative group lg:hidden">
+          <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
             <g>
               <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
             </g>
@@ -42,9 +42,9 @@ export default function Header() {
           <input
             placeholder="Search Products"
             type="search"
-            className="w-[150px] md:w-full h-7 lg:h-10 lg:px-4 pl-[2.5rem] text-xs lg:text-base border-2 border-transparent rounded-lg outline-none bg-[#f3f3f4] text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30"
+            className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-[#f3f3f4] text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
           />
-        </div>
+        </li>
         {/* Navigation button */}
         <CgMenuRight
           className="h-5 w-auto cursor-pointer sm:h-6 lg:hidden"
