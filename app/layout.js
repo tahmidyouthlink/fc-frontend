@@ -1,7 +1,7 @@
-import { Inter, Leckerli_One } from "next/font/google";
+import { Oxygen, Leckerli_One } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const oxygen = Oxygen({ subsets: ["latin"], weight: ["300", "400", "700"] });
 const leckerliOne = Leckerli_One({ subsets: ["latin"], weight: "400" });
 
 export const metadata = {
@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={oxygen.className}>{children}</body>
     </html>
   );
 }

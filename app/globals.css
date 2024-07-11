@@ -3,3 +3,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* For normal and on hover footer links (except for the social ones) */
+footer div:not(:has(.social-icons)) a {
+  @apply relative text-neutral-500 transition-all duration-1000 ease-in-out after:absolute after:-bottom-1.5 after:left-0 after:h-[3px] after:w-0 after:bg-gradient-to-r after:from-orange-600 after:to-yellow-500 after:transition-all after:duration-[700ms] after:ease-in-out hover:after:w-full;
+}
+
+/* For social icon links */
+.social-icons a {
+  @apply flex size-6 items-center justify-center rounded-md bg-neutral-200 text-neutral-500 transition-colors duration-[400ms] ease-out min-[450px]:size-7 [&>svg]:h-auto [&>svg]:w-3.5 min-[450px]:[&>svg]:w-4;
+}
+
+/* For mobile nav links and their icons */
+nav.mobile div:first-child a {
+  @apply flex items-center gap-x-2.5 rounded-md p-2.5 font-normal transition-all duration-100 ease-in-out [&>svg]:h-4 [&>svg]:w-auto;
+}
+
+/* For on hover and active mobile nav links */
+nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
+  @apply bg-[#9f5116ef] text-white;
+}

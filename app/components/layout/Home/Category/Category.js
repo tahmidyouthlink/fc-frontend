@@ -24,7 +24,7 @@ const Category = () => {
         }}
         className='absolute inset-0 z-0 top-2 md:top-5 bg-[length:60px_30px] left-[60%] md:bg-[length:200px_100px] md:left-[58%] lg:left-[68%] 2xl:left-[60%] bg-no-repeat'
       />
-      <div className='max-w-screen-xl mx-auto px-5 2xl:px-0 py-8 md:py-10 lg:py-12 relative z-10'>
+      <div className='max-w-[1200px] mx-auto px-5 2xl:px-0 py-8 md:py-10 lg:py-12 relative z-10'>
         <div className='flex justify-between items-center'>
           <h1 className='font-bold text-xl md:text-2xl lg:text-4xl'>Browse Our Categories</h1>
           <Link className='flex items-center gap-2 text-[10px] md:text-base' href="/">View All <span className='border border-black rounded-full p-1 md:p-2'><FaArrowRightLong /></span></Link>

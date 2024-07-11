@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import React from 'react';
-import { GoChevronRight } from 'react-icons/go';
 import { FaArrowRightLong } from "react-icons/fa6";
 import bannerImage1 from "../../../../../public/bg-banner/banner-image-1.jpg";
 import bannerImage2 from "../../../../../public/bg-banner/banner-image-2.jpg";
@@ -11,14 +10,14 @@ import Image from 'next/image';
 
 const Banner = () => {
   return (
-    <div className='pt-20 relative max-w-screen-xl mx-auto'>
+    <div className='pt-20 relative max-w-[1200px] mx-auto'>
       <div className='z-[-1]'>
         <div className='w-[150px] h-[150px] xl:w-[214px] xl:h-[187px] bg-[#FEDCBF] rounded-[100%] absolute md:left-[90%] top-[80%] left-[76%] md:top-[50%] 2xl:left-[100%] translate-x-[-50%] translate-y-[-50%] blur-[40px]'></div>
         <div className='w-[150px] h-[150px] xl:w-[214px] xl:h-[187px] bg-[#FEDCBF] rounded-[100%] absolute top-[40%] lg:top-[30%] left-[10%] md:left-[20%] translate-x-[-50%] translate-y-[-50%] blur-[60px] md:blur-[40px]'></div>
         <div className='w-[150px] h-[150px] xl:w-[214px] xl:h-[187px] bg-[#E0FCDC] rounded-[100%] absolute top-[20%] left-[60%] translate-x-[-50%] translate-y-[-50%] blur-[60px] md:blur-[40px]'></div>
       </div>
       <div className='relative'>
-        <div className='max-w-screen-xl mx-auto'>
+        <div className='max-w-[1200px] mx-auto'>
           <div className='px-5 2xl:px-0'>
             <div className='flex items-center justify-center lg:px-12 xl:px-24'>
               <Image src={vector1} alt='vector1' className='hidden md:block' />
@@ -37,7 +36,7 @@ const Banner = () => {
                 Shop Now <span className='border border-black rounded-full p-2'><FaArrowRightLong size={12} /></span>
               </Link>
               <Link href="/" className='font-semibold flex items-center gap-1 text-sm bg-[#FBEDE2] px-4 py-2 rounded-md'>
-                Join Us<span className='font-bold'><GoChevronRight /></span>
+                Join Us
               </Link>
             </div>
           </div>

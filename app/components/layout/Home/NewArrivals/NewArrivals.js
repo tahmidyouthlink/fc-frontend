@@ -30,34 +30,34 @@ const NewArrivals = () => {
         }}
         className='absolute inset-0 z-0 top-2 md:top-5 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
-      <div className='max-w-screen-xl mx-auto px-5 2xl:px-0 py-8 md:py-10 lg:py-12 relative z-10'>
+      <div className='max-w-[1200px] mx-auto px-5 2xl:px-0 py-8 md:py-10 lg:py-12 relative z-10'>
         <div className='flex justify-between items-center'>
           <h1 className='font-bold text-xl md:text-2xl lg:text-4xl'>Look at Our New Arrivals</h1>
           <Link className='flex items-center gap-2 text-[10px] md:text-base' href="/">View All <span className='border border-black rounded-full p-1 md:p-2'><FaArrowRightLong /></span></Link>
         </div>
-        <div className='pt-6 grid grid-cols-3 gap-6 lg:gap-3 lg:pt-16 xl:pt-28'>
+        <div className='pt-6 grid grid-cols-3 gap-6 lg:gap-3 lg:pt-16'>
           <div>
             <Image src={newArrivals1} alt='card-image-1' className='rounded-2xl' />
             <div className='pt-4 space-y-1'>
-              <h1 className='font-semibold'>৳ 1,200</h1>
-              <p className='font-medium text-sm'>University Limited Polo</p>
-              <p className='text-[#696969] text-xs'>Polo T-shirt</p>
+              <h1 className='font-semibold text-sm md:text-base'>৳ 1,200</h1>
+              <p className='font-medium text-xs md:text-sm'>University Limited Polo</p>
+              <p className='text-[#696969] text-[10px] md:text-xs'>Polo T-shirt</p>
             </div>
           </div>
           <div>
             <Image src={newArrivals2} alt='card-image-1' className='rounded-2xl' />
             <div className='pt-4 space-y-1'>
-              <h1 className='font-semibold'>৳ 2,600</h1>
-              <p className='font-medium text-sm'>Night shed Blue Set</p>
-              <p className='text-[#696969] text-xs'>Night Dress</p>
+              <h1 className='font-semibold text-sm md:text-base'>৳ 2,600</h1>
+              <p className='font-medium text-xs md:text-sm'>Night shed Blue Set</p>
+              <p className='text-[#696969] text-[10px] md:text-xs'>Night Dress</p>
             </div>
           </div>
           <div>
             <Image src={newArrivals3} alt='card-image-1' className='rounded-2xl' />
             <div className='pt-4 space-y-1'>
-              <h1 className='font-semibold'>৳ 800</h1>
-              <p className='font-medium text-sm'>Office Classic</p>
-              <p className='text-[#696969] text-xs'>Formal Shirt</p>
+              <h1 className='font-semibold text-sm md:text-base'>৳ 800</h1>
+              <p className='font-medium text-xs md:text-sm'>Office Classic</p>
+              <p className='text-[#696969] text-[10px] md:text-xs'>Formal Shirt</p>
             </div>
           </div>
         </div>
