@@ -22,6 +22,7 @@ const AddProduct = () => {
   const axiosPublic = useAxiosPublic();
   const [selectedCategory, setSelectedCategory] = useState("");
   const [groupSelected, setGroupSelected] = React.useState([]);
+  const [sizeError, setSizeError] = useState(false);
 
   useEffect(() => {
     setGroupSelected([]);
@@ -29,10 +30,15 @@ const AddProduct = () => {
 
   const onSubmit = async (data) => {
     try {
+      if (groupSelected.length === 0) {
+        setSizeError(true);
+        return;
+      }
+      setSizeError(false);
       const productTitle = data.productTitle;
-      const regularPrice = parseFloat(data.regularPrice);
-      const flatDiscount = parseFloat(data.flatDiscount);
-      const discountPercentage = parseFloat(data.discountPercentage);
+      const regularPrice = parseFloat(data.regularPrice) || 0;
+      const flatDiscount = parseFloat(data.flatDiscount) || 0;
+      const discountPercentage = parseFloat(data.discountPercentage) || 0;
 
       const photos = data.photos;
       const imageUrls = [];
@@ -49,7 +55,10 @@ const AddProduct = () => {
       }
 
 
-      const availableColors = data.availableColors.map(option => option.value);
+      const availableColors = data?.availableColors?.map(color => ({
+        value: color.value,
+        color: color.color
+      }));
       const category = data.category;
       const currentDate = new Date();
       const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -160,16 +169,20 @@ const AddProduct = () => {
               )}
             />
 
-            {selectedCategory &&
+            {selectedCategory && (
               <div className="flex flex-col gap-1 w-full">
                 <CheckboxGroup
                   className="gap-1"
                   label="Select sizes"
                   orientation="horizontal"
                   value={groupSelected}
-                  onChange={setGroupSelected}
+                  onChange={(sizes) => {
+                    setGroupSelected(sizes);
+                    if (sizes.length > 0) {
+                      setSizeError(false);
+                    }
+                  }}
                 >
-
                   {sizeOptions[selectedCategory]?.map((size) => (
                     <CustomCheckbox key={size} value={size}>{size}</CustomCheckbox>
                   ))}
@@ -177,8 +190,11 @@ const AddProduct = () => {
                 <p className="mt-4 ml-1 text-default-500">
                   Selected: {groupSelected.join(", ")}
                 </p>
+                {sizeError && (
+                  <p className="text-red-600 text-left">Please select at least one size.</p>
+                )}
               </div>
-            }
+            )}
 
             <label htmlFor='availableColors' className='flex justify-start font-medium text-[#9F5216]'>Select Available Colors *</label>
             <Controller
