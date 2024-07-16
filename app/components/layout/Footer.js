@@ -63,14 +63,14 @@ const Footer = () => {
                 <FaInstagram />
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link
                 className="hover:bg-[#c8ecff] hover:text-[#0075b4]"
                 href="https://www.linkedin.com/fashion-commerce/" target="_blank"
               >
                 <FaLinkedin />
               </Link>
-            </li>
+            </li> */}
             <li>
               <Link
                 className="hover:bg-black hover:text-white"

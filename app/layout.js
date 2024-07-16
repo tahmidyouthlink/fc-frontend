@@ -1,11 +1,12 @@
-import { Oxygen, Leckerli_One } from "next/font/google";
-import "./globals.css";
+import { Oxygen } from 'next/font/google';
+import './globals.css';
+import { Toaster } from 'react-hot-toast';
+import { NextUIProvider } from '@nextui-org/react';
 
-const oxygen = Oxygen({ subsets: ["latin"], weight: ["300", "400", "700"] });
-const leckerliOne = Leckerli_One({ subsets: ["latin"], weight: "400" });
+const oxygen = Oxygen({ subsets: ['latin'], weight: ['300', '400', '700'] });
 
 export const metadata = {
-  title: "Fashion Commerce",
+  title: 'Fashion Commerce',
   description: "Discover the latest trends in men's fashion at Fashion Commerce. Shop our extensive collection of stylish clothing, footwear, and accessories. Enjoy exclusive deals, fast shipping, and top-notch customer service. Elevate your wardrobe with our curated selection of high-quality men's products.",
 };
 
@@ -15,7 +16,12 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className={oxygen.className}>{children}</body>
+      <body className={oxygen.className}>
+        <NextUIProvider>
+          {children}
+        </NextUIProvider>
+        <Toaster />
+      </body>
     </html>
   );
 }
