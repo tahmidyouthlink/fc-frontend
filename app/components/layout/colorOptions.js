@@ -16,7 +16,6 @@ const colorOptions = [
   { value: 'Lilac', label: 'Lilac', color: '#C8A2C8' },
   { value: 'Gold', label: 'Gold', color: '#FFD700' },
   { value: 'Silver', label: 'Silver', color: '#C0C0C0' },
-  { value: 'Multi-coloured', label: 'Multi-coloured', color: 'linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)' },
   { value: 'Aqua', label: 'Aqua', color: '#00FFFF' },
   { value: 'Aquamarine', label: 'Aquamarine', color: '#7FFFD4' },
   { value: 'Azure', label: 'Azure', color: '#F0FFFF' },
@@ -140,7 +139,8 @@ const colorOptions = [
   { value: 'Tomato', label: 'Tomato', color: '#FF6347' },
   { value: 'Violet', label: 'Violet', color: '#EE82EE' },
   { value: 'Wheat', label: 'Wheat', color: '#F5DEB3' },
-  { value: 'YellowGreen', label: 'Yellow Green', color: '#9ACD32' }
+  { value: 'YellowGreen', label: 'Yellow Green', color: '#9ACD32' },
+  { value: 'Multi-coloured', label: 'Multi-coloured', color: 'linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)' },
 ];
 
 

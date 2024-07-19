@@ -29,7 +29,7 @@ export default function Header() {
               src={logoWhiteImage}
               alt="YouthLink logo with white text"
             />
-            <h1 className="font-leckerli text-xs md:text-lg">F-Commerce</h1>
+            <h1 className="text-xs md:text-lg">F-Commerce</h1>
           </div>
         </Link>
         {/* Search Icon */}
@@ -142,7 +142,7 @@ export default function Header() {
                     src={logoWhiteImage}
                     alt="YouthLink logo with white text"
                   />
-                  <h1 className="font-leckerli text-lg text-black">F-Commerce</h1>
+                  <h1 className="text-lg text-black">F-Commerce</h1>
                 </div>
               </Link>
               {/* Navigation links */}

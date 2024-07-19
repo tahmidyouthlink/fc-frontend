@@ -10,19 +10,26 @@ const checkbox = tv({
   variants: {
     isSelected: {
       true: {
+        base: "",
+        content: "pl-1"
+      },
+      false: {
         base: "border-[#9F5216] bg-[#9F5216] hover:bg-[#9F5216] hover:border-[#9F5216]",
         content: "text-primary-foreground pl-1"
       }
     },
     isFocusVisible: {
       true: {
-        base: "outline-none ring-2 ring-focus ring-offset-2 ring-offset-background",
+        base: "outline-none ring-focus ring-offset-2 ring-offset-background",
+      },
+      false: {
+        base: "outline-none ring-focus ring-offset-2 ring-offset-background",
       }
     }
   }
 })
 
-export const CustomCheckbox = (props) => {
+export const CustomCheckbox2 = (props) => {
   const {
     children,
     isSelected,
@@ -47,11 +54,11 @@ export const CustomCheckbox = (props) => {
           content: styles.content(),
         }}
         color="primary"
-        startContent={isSelected ? <CheckIcon className="ml-1" /> : null}
+        startContent={isSelected ? null : <CheckIcon className="ml-1" />}
         variant="faded"
         {...getLabelProps()}
       >
-        {children ? children : isSelected ? "Enabled" : "Disabled"}
+        {children ? children : isSelected ? "Disabled" : "Enabled"}
       </Chip>
     </label>
   );

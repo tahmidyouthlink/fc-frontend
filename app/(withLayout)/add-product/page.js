@@ -12,6 +12,11 @@ import 'react-quill/dist/quill.snow.css';
 import dynamic from 'next/dynamic';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { CustomCheckbox } from '@/app/components/layout/CustomCheckBox';
+import { Tabs, Tab } from "@nextui-org/react";
+import { subCategories } from '@/app/components/layout/subCategories';
+import sizeOptions2 from '@/app/components/layout/sizeOptions2';
+import { CustomCheckbox2 } from '@/app/components/layout/CustomCheckBox2';
+
 const Editor = dynamic(() => import('@/app/utils/Markdown/Editor'), { ssr: false });
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
@@ -22,11 +27,25 @@ const AddProduct = () => {
   const axiosPublic = useAxiosPublic();
   const [selectedCategory, setSelectedCategory] = useState("");
   const [groupSelected, setGroupSelected] = React.useState([]);
+  const [groupSelected2, setGroupSelected2] = React.useState([]);
   const [sizeError, setSizeError] = useState(false);
+  const [selected, setSelected] = React.useState("Percent");
+  const [menuPortalTarget, setMenuPortalTarget] = useState(null);
+  const [values, setValues] = React.useState(new Set([]));
+
+  console.log(groupSelected);
 
   useEffect(() => {
     setGroupSelected([]);
+    setGroupSelected2([]);
+    if (typeof document !== 'undefined') {
+      setMenuPortalTarget(document?.body);
+    }
   }, [selectedCategory]);
+
+  useEffect(() => {
+    reset({ percentage: '', flat: '' });
+  }, [selected, reset]);
 
   const onSubmit = async (data) => {
     try {
@@ -36,9 +55,10 @@ const AddProduct = () => {
       }
       setSizeError(false);
       const productTitle = data.productTitle;
+      const discountType = selected;
       const regularPrice = parseFloat(data.regularPrice) || 0;
-      const flatDiscount = parseFloat(data.flatDiscount) || 0;
-      const discountPercentage = parseFloat(data.discountPercentage) || 0;
+      const flatDiscount = parseFloat(data.flat) || 0;
+      const discountPercentage = parseFloat(data.percentage) || 0;
 
       const photos = data.photos;
       const imageUrls = [];
@@ -63,11 +83,11 @@ const AddProduct = () => {
       const currentDate = new Date();
       const options = { year: 'numeric', month: 'long', day: 'numeric' };
       const formattedDate = currentDate.toLocaleDateString('en-US', options);
-      const newArrival = data.newArrival === 'true';
+      const newArrival = data.newArrival;
       const productDetails = data.productDetails;
       const materialCare = data.materialCare;
       const sizeFit = data.sizeFit;
-      const productInfo = { productTitle, regularPrice, flatDiscount, discountPercentage, availableColors, formattedDate, newArrival, sizes: groupSelected, formattedDate, category, productDetails, materialCare, sizeFit, imageUrls };
+      const productInfo = { productTitle, discountType, regularPrice, flatDiscount, discountPercentage, availableColors, formattedDate, newArrival, sizes: groupSelected, formattedDate, category, productDetails, materialCare, sizeFit, imageUrls };
       // const res = await axiosPublic.post("/addProduct", productInfo);
       console.log(productInfo);
       // if (res?.data?.insertedId) {
@@ -112,29 +132,24 @@ const AddProduct = () => {
 
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
             <label htmlFor='regularPrice' className='flex justify-start font-medium text-[#9F5216] mt-4'>Regular Price ৳ *</label>
-            <input id='regularPrice' {...register("regularPrice", { required: true })} className="w-full p-3 border rounded-md  hide-spinners border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000" type="number" />
+            <input id='regularPrice' {...register("regularPrice", { required: true })} className="w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000" type="number" />
             {errors.regularPrice?.type === "required" && (
               <p className="text-red-600 text-left">Product Price is required</p>
             )}
 
-            <label htmlFor='flatDiscount' className='flex justify-start font-medium text-[#9F5216] mt-4'>Flat Discount ৳</label>
-            <input id='flatDiscount' {...register("flatDiscount")} className="w-full p-3 border rounded-md  hide-spinners border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000" type="number" />
-
-            <label htmlFor='discountPercentage' className='flex justify-start font-medium text-[#9F5216] mt-4'>Discount Percentage % </label>
-            <input id='discountPercentage' {...register("discountPercentage")} className="w-full p-3 border rounded-md  hide-spinners border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000" type="number" />
-            <div className="my-4">
-              <label className="flex justify-start font-medium text-[#9F5216] py-1">New Arrival *</label>
-              <div className="flex">
-                <label className="mr-4">
-                  <input type="radio" value="true" {...register("newArrival", { required: true })} className="mr-2" />True
-                </label>
-                <label>
-                  <input type="radio" value="false" {...register("newArrival", { required: true })} className="mr-2" /> False
-                </label>
-              </div>
-              {errors.newArrival && (
-                <p className="text-red-600 text-left">New Arrival Selection is required</p>
-              )}
+            <div className="flex w-full flex-col">
+              <Tabs
+                aria-label="Options"
+                selectedKey={selected}
+                onSelectionChange={setSelected}
+              >
+                <Tab key="percentage" title="Percent">
+                  <input id='percentage' {...register("percentage")} className="w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000" type="number" />
+                </Tab>
+                <Tab key="flat" title="Flat">
+                  <input id='flat' {...register("flat")} className="w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000" type="number" />
+                </Tab>
+              </Tabs>
             </div>
           </div>
 
@@ -173,7 +188,7 @@ const AddProduct = () => {
               <div className="flex flex-col gap-1 w-full">
                 <CheckboxGroup
                   className="gap-1"
-                  label="Select sizes"
+                  label="Select size"
                   orientation="horizontal"
                   value={groupSelected}
                   onChange={(sizes) => {
@@ -187,12 +202,55 @@ const AddProduct = () => {
                     <CustomCheckbox key={size} value={size}>{size}</CustomCheckbox>
                   ))}
                 </CheckboxGroup>
+                {sizeError && (
+                  <p className="text-red-600 text-left">Please select at least one size.</p>
+                )}
+              </div>
+            )}
+
+            {groupSelected.length > 0 && (
+              <div className="flex flex-col gap-1 w-full">
+                <CheckboxGroup
+                  className="gap-1"
+                  label="Unselect sizes"
+                  orientation="horizontal"
+                  value={groupSelected2}
+                  onChange={(sizes) => {
+                    setGroupSelected2(sizes);
+                    if (sizes.length > 0) {
+                      setSizeError(false);
+                    }
+                  }}
+                >
+                  {sizeOptions2[groupSelected]?.map((size) => (
+                    <CustomCheckbox2 key={size} value={size}>{size}</CustomCheckbox2>
+                  ))}
+                </CheckboxGroup>
                 <p className="mt-4 ml-1 text-default-500">
-                  Selected: {groupSelected.join(", ")}
+                  Selected: {groupSelected2.join(", ")}
                 </p>
                 {sizeError && (
                   <p className="text-red-600 text-left">Please select at least one size.</p>
                 )}
+              </div>
+            )}
+
+            {groupSelected2.length > 0 && (
+              <div className="flex w-full flex-col gap-2">
+                <Select
+                  label="Sub-Categories"
+                  selectionMode="multiple"
+                  placeholder="Select Sub-Categories"
+                  selectedKeys={values}
+                  className=""
+                  onSelectionChange={setValues}
+                >
+                  {subCategories.map((animal) => (
+                    <SelectItem key={animal.key}>
+                      {animal.label}
+                    </SelectItem>
+                  ))}
+                </Select>
               </div>
             )}
 
@@ -202,18 +260,39 @@ const AddProduct = () => {
               control={control}
               rules={{ required: true }}
               render={({ field }) => (
-                <CreatableSelect
-                  {...field}
-                  options={colorOptions}
-                  isMulti
-                  className="w-full border rounded-md "
-                  components={{ Option: ColorOption }}
-                />
+                <div className="parent-container">
+                  <CreatableSelect
+                    {...field}
+                    options={colorOptions}
+                    isMulti
+                    className="w-full border rounded-md creatable-select-container"
+                    components={{ Option: ColorOption }}
+                    menuPortalTarget={menuPortalTarget}
+                    styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                    menuPlacement="auto"
+                  />
+                </div>
               )}
             />
+
             {errors.availableColors && (
               <p className="text-red-600 text-left">Colors are required</p>
             )}
+
+            <div className="my-4">
+              <label className="flex justify-start font-medium text-[#9F5216] py-1">New Arrival *</label>
+              <div className="flex">
+                <label className="mr-4">
+                  <input type="radio" value="yes" {...register("newArrival", { required: true })} className="mr-2" />Yes
+                </label>
+                <label>
+                  <input type="radio" value="no" {...register("newArrival", { required: true })} className="mr-2" /> No
+                </label>
+              </div>
+              {errors.newArrival && (
+                <p className="text-red-600 text-left">New Arrival Selection is required</p>
+              )}
+            </div>
           </div>
 
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>

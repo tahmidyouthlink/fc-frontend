@@ -1,7 +1,9 @@
 const productCategoriesOptions = [
   { key: "T-Shirts and Polos", label: "T-Shirts and Polos" },
-  { key: "Shirts (Casual and Dress)", label: "Shirts (Casual and Dress)" },
-  { key: "Jeans and Trousers", label: "Jeans and Trousers" },
+  { key: "Shirts (Casual)", label: "Shirts (Casual)" },
+  { key: "Shirts (Dress)", label: "Shirts (Dress)" },
+  { key: "Jeans", label: "Jeans" },
+  { key: "Trousers", label: "Trousers" },
   { key: "Shorts", label: "Shorts" },
   { key: "Suits and Blazers", label: "Suits and Blazers" },
   { key: "Jackets and Coats", label: "Jackets and Coats" },
