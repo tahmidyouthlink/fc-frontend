@@ -1,0 +1,22 @@
+export const vendorOptions = [
+  { value: "Nike", label: "Nike" },
+  { value: "Adidas", label: "Adidas" },
+  { value: "Puma", label: "Puma" },
+  { value: "Under Armour", label: "Under Armour" },
+  { value: "Levi's", label: "Levi's" },
+  { value: "Ralph Lauren", label: "Ralph Lauren" },
+  { value: "Tommy Hilfiger", label: "Tommy Hilfiger" },
+  { value: "Calvin Klein", label: "Calvin Klein" },
+  { value: "Hugo Boss", label: "Hugo Boss" },
+  { value: "Dockers", label: "Dockers" },
+  { value: "Abercrombie & Fitch", label: "Abercrombie & Fitch" },
+  { value: "Gap", label: "Gap" },
+  { value: "Uniqlo", label: "Uniqlo" },
+  { value: "Jack & Jones", label: "Jack & Jones" },
+  { value: "Guess", label: "Guess" },
+  { value: "Superdry", label: "Superdry" },
+  { value: "Zara", label: "Zara" },
+  { value: "H&M", label: "H&M" },
+  { value: "Ben Sherman", label: "Ben Sherman" },
+  { value: "Diesel", label: "Diesel" }
+];

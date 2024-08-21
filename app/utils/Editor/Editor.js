@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css'; // Import default styles
 
@@ -10,17 +10,10 @@ const Editor = ({ value, onChange }) => {
       ['bold', 'italic', 'underline'],
       [{ 'align': [] }],
       [{ 'color': [] }, { 'background': [] }],
-      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      [{ 'list': 'bullet' }],
       ['link', 'image'],
     ],
   };
-
-  const formats = [
-    'bold', 'italic', 'underline', 'align',
-    'list', 'bullet',
-    'link', 'image', 'color',
-    'background'
-  ];
 
   return (
     <div className="custom-editor">
@@ -28,7 +21,6 @@ const Editor = ({ value, onChange }) => {
         value={value}
         onChange={onChange}
         modules={modules}
-        formats={formats}
       />
     </div>
   );

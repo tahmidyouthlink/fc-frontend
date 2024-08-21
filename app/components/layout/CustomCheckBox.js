@@ -47,7 +47,7 @@ export const CustomCheckbox = (props) => {
           content: styles.content(),
         }}
         color="primary"
-        startContent={isSelected ? <CheckIcon className="ml-1" /> : null}
+        startContent={isSelected ? <CheckIcon className="ml-1 text-white" /> : null}
         variant="faded"
         {...getLabelProps()}
       >

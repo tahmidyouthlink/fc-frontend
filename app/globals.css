@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -39,7 +40,7 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 
 .custom-editor .ql-editor {
   /* Custom styles for the editor input field */
-  min-height: 200px;
+  min-height: 160px;
   padding: 14px;
   font-size: 16px;
   line-height: 1.5;
@@ -51,4 +52,293 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
   background-color: #f5f5f5;
   border-bottom: 1px solid #ddd; /* Custom border */
   font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+}
+
+.image-container {
+  position: relative;
+  display: inline-block;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out;
+}
+
+.image-container img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+  transition:
+    opacity 0.2s ease-in-out,
+    filter 0.2s ease-in-out;
+  filter: blur(1px); /* Add blur effect */
+}
+
+.image-container.selected {
+  transform: scale(1.05);
+}
+
+.image-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(159, 82, 22, 0.5);
+  opacity: 0; /* Initially no overlay */
+  transition: opacity 0.2s ease-in-out;
+}
+
+.image-container.selected::after {
+  opacity: 0; /* No overlay when selected */
+}
+
+.image-container.selected img {
+  opacity: 1;
+  filter: blur(0); /* Remove blur effect */
+}
+
+.custom-number-input::-webkit-outer-spin-button,
+.custom-number-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.custom-number-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.modal-body-scroll {
+  max-height: 60vh; /* Control the maximum height of the modal body */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding-right: 1rem; /* Prevent scrollbar overlap */
+  scroll-behavior: smooth; /* Smooth scrolling behavior */
+  scrollbar-width: thin; /* For Firefox, makes the scrollbar thinner */
+  scrollbar-color: #888 #f1f1f1; /* Scrollbar color (thumb and track) */
+}
+
+/* Customize the scrollbar for Webkit browsers (Chrome, Safari) */
+.modal-body-scroll::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+.modal-body-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Background of the scrollbar track */
+}
+
+.modal-body-scroll::-webkit-scrollbar-thumb {
+  background-color: #888; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Rounded corners for the scrollbar thumb */
+  border: 2px solid #f1f1f1; /* Adds some space between the thumb and the track */
+}
+
+.modal-body-scroll::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Color of the scrollbar thumb on hover */
+}
+
+/* Base styles for small screens (mobile) */
+.custom-max-h {
+  max-height: calc(100vh - 220px); /* Adjusted for smaller screens */
+  overflow-y: auto; /* Ensure content can scroll within this area */
+}
+
+/* Medium screens (tablets) */
+@media (min-width: 768px) {
+  .custom-max-h {
+    max-height: calc(
+      100vh - 240px
+    ); /* Slightly more space for medium screens */
+  }
+}
+
+/* From Uiverse.io by 0xnihilism */
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* Common styles for both buttons */
+.brutalist-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 232px;
+  height: 232px;
+  color: #e5dede;
+  font-weight: bold;
+  text-decoration: none;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Styles for the first button */
+.button-1 {
+  background-color: #9f5116fe;
+  border: 3px solid #803f11;
+  border-radius: 12px;
+  box-shadow: 4px 4px 1px #000000;
+}
+
+.button-1:hover {
+  background-color: #9f5216;
+  border-color: #030504;
+  transform: translate(-6px, -6px) rotate(1deg);
+  box-shadow:
+    10px 10px 0 #000000,
+    15px 15px 20px rgba(64, 164, 122, 0.2);
+}
+
+.button-1::before,
+.button-1::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: 0.6s;
+}
+
+.button-1::before {
+  left: -100%;
+}
+.button-1::after {
+  left: 100%;
+}
+
+.button-1:hover::before {
+  animation: swipeRight 1.5s infinite;
+}
+.button-1:hover::after {
+  animation: swipeLeft 1.5s infinite;
+}
+
+@keyframes swipeRight {
+  100% {
+    transform: translateX(200%) skew(-45deg);
+  }
+}
+
+@keyframes swipeLeft {
+  100% {
+    transform: translateX(-200%) skew(-45deg);
+  }
+}
+
+/* Hover effects */
+.brutalist-button:hover .openai-logo {
+  transform: translateY(-10px);
+}
+
+.brutalist-button:hover .openai-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.bruta.brutalist-button:hover .openai-text {
+  opacity: 1;
+  max-height: 60px;
+  margin-top: 8px;
+}
+
+/* Styles for the OpenAI logo and text */
+.openai-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 3;
+}
+
+.openai-icon {
+  width: 64px;
+  height: 64px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.openai-text {
+  font-size: 24px;
+  letter-spacing: 0.5px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+}
+
+.button-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+  text-align: center;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 3;
+}
+
+.button-text span:first-child {
+  font-size: 12px;
+  font-weight: normal;
+}
+
+.button-text span:last-child {
+  font-size: 16px;
+}
+
+/* Hover effects */
+.brutalist-button:hover .openai-logo {
+  transform: translateY(-10px);
+}
+
+.brutalist-button:hover .openai-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.brutalist-button:hover .button-text,
+.brutalist-button:hover .openai-text {
+  opacity: 1;
+  max-height: 60px;
+  margin-top: 8px;
+}
+
+/* Animation for the OpenAI logo */
+@keyframes spin-and-zoom {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+.brutalist-button:hover .openai-icon {
+  animation: spin-and-zoom 4s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+}
+
+.brutalist-button:hover .openai-text {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.brutalist-button:active .openai-icon,
+.brutalist-button:active .openai-text,
+.brutalist-button:active .button-text {
+  transform: scale(0.95);
 }

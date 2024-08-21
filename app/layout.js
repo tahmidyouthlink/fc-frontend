@@ -2,6 +2,7 @@ import { Oxygen } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import { NextUIProvider } from '@nextui-org/react';
+import ReactTanstackProvider from './utils/Provider/ReactTanstackProvider';
 
 const oxygen = Oxygen({ subsets: ['latin'], weight: ['300', '400', '700'] });
 
@@ -17,10 +18,12 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={oxygen.className}>
-        <NextUIProvider>
-          {children}
-        </NextUIProvider>
-        <Toaster />
+        <ReactTanstackProvider>
+          <NextUIProvider>
+            {children}
+          </NextUIProvider>
+          <Toaster />
+        </ReactTanstackProvider>
       </body>
     </html>
   );

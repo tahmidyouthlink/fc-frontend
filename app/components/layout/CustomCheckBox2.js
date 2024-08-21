@@ -9,20 +9,20 @@ const checkbox = tv({
   },
   variants: {
     isSelected: {
-      true: {
+      false: {
         base: "",
         content: "pl-1"
       },
-      false: {
+      true: {
         base: "border-[#9F5216] bg-[#9F5216] hover:bg-[#9F5216] hover:border-[#9F5216]",
         content: "text-primary-foreground pl-1"
       }
     },
     isFocusVisible: {
-      true: {
+      false: {
         base: "outline-none ring-focus ring-offset-2 ring-offset-background",
       },
-      false: {
+      true: {
         base: "outline-none ring-focus ring-offset-2 ring-offset-background",
       }
     }
@@ -54,7 +54,7 @@ export const CustomCheckbox2 = (props) => {
           content: styles.content(),
         }}
         color="primary"
-        startContent={isSelected ? null : <CheckIcon className="ml-1" />}
+        startContent={isSelected ? <CheckIcon className="ml-1 text-white" /> : null}
         variant="faded"
         {...getLabelProps()}
       >
