@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from "react-hook-form";
 import toast from 'react-hot-toast';
-import CreatableSelect from "react-select/creatable";
+import ReactSelect from "react-select";
 import ColorOption from '@/app/components/layout/ColorOption';
 import colorOptions from '@/app/components/layout/colorOptions';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
@@ -563,7 +563,7 @@ const FirstStepOfAddProduct = () => {
                 rules={{ required: true }}
                 render={({ field }) => (
                   <div className="parent-container">
-                    <CreatableSelect
+                    <ReactSelect
                       {...field}
                       options={colorOptions}
                       isMulti
@@ -681,7 +681,7 @@ const FirstStepOfAddProduct = () => {
                   rules={{ required: true }}
                   render={({ field }) => (
                     <div className="parent-container">
-                      <CreatableSelect
+                      <ReactSelect
                         {...field}
                         options={vendorOptions}
                         isMulti
@@ -710,7 +710,7 @@ const FirstStepOfAddProduct = () => {
                   rules={{ required: true }}
                   render={({ field }) => (
                     <div className="parent-container">
-                      <CreatableSelect
+                      <ReactSelect
                         {...field}
                         options={tagOptions}
                         isMulti

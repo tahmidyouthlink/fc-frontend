@@ -166,8 +166,9 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 232px;
-  height: 232px;
+  width: 292px;
+  height: 292px;
+  gap: 20px;
   color: #e5dede;
   font-weight: bold;
   text-decoration: none;
@@ -175,6 +176,43 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
   cursor: pointer;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Media query for devices with screen width less than 768px */
+@media (max-width: 1023px) {
+  .brutalist-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 202px;
+    height: 202px;
+    color: #e5dede;
+    font-weight: bold;
+    text-decoration: none;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+}
+
+@media (max-width: 767px) {
+  .brutalist-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 132px;
+    height: 132px;
+    color: #e5dede;
+    font-weight: bold;
+    text-decoration: none;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
 }
 
 /* Styles for the first button */
@@ -185,8 +223,8 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
   box-shadow: 4px 4px 1px #000000;
 }
 
-.button-1:hover {
-  background-color: #9f5216;
+.button-1 {
+  background-color: #9f5116;
   border-color: #030504;
   transform: translate(-6px, -6px) rotate(1deg);
   box-shadow:
@@ -217,10 +255,10 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
   left: 100%;
 }
 
-.button-1:hover::before {
+.button-1::before {
   animation: swipeRight 1.5s infinite;
 }
-.button-1:hover::after {
+.button-1::after {
   animation: swipeLeft 1.5s infinite;
 }
 
@@ -237,16 +275,16 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 }
 
 /* Hover effects */
-.brutalist-button:hover .openai-logo {
+.brutalist-button .openai-logo {
   transform: translateY(-10px);
 }
 
-.brutalist-button:hover .openai-icon {
+.brutalist-button .openai-icon {
   width: 40px;
   height: 40px;
 }
 
-.bruta.brutalist-button:hover .openai-text {
+.bruta.brutalist-button .openai-text {
   opacity: 1;
   max-height: 60px;
   margin-top: 8px;
@@ -260,21 +298,6 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
   justify-content: center;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   z-index: 3;
-}
-
-.openai-icon {
-  width: 64px;
-  height: 64px;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-.openai-text {
-  font-size: 24px;
-  letter-spacing: 0.5px;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  opacity: 0;
-  max-height: 0;
-  overflow: hidden;
 }
 
 .button-text {
@@ -291,26 +314,55 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 }
 
 .button-text span:first-child {
-  font-size: 12px;
+  font-size: 24px;
   font-weight: normal;
 }
 
 .button-text span:last-child {
-  font-size: 16px;
+  font-size: 30px;
+}
+
+/* Media query for devices with screen width less than 768px */
+@media (max-width: 1023px) {
+  .button-text span:first-child {
+    font-size: 20px; /* Adjust size as needed */
+  }
+
+  .button-text span:last-child {
+    font-size: 24px; /* Adjust size as needed */
+  }
+}
+
+/* Media query for devices with screen width less than 768px */
+@media (max-width: 767px) {
+  .button-text span:first-child {
+    font-size: 12px; /* Adjust size as needed */
+  }
+
+  .button-text span:last-child {
+    font-size: 16px; /* Adjust size as needed */
+  }
 }
 
 /* Hover effects */
-.brutalist-button:hover .openai-logo {
+.brutalist-button .openai-logo {
   transform: translateY(-10px);
 }
 
-.brutalist-button:hover .openai-icon {
-  width: 40px;
-  height: 40px;
+.brutalist-button .openai-icon {
+  width: 36px;
+  height: 36px;
 }
 
-.brutalist-button:hover .button-text,
-.brutalist-button:hover .openai-text {
+@media (max-width: 767px) {
+  .brutalist-button .openai-icon {
+    width: 24px; /* Adjust size as needed */
+    height: 24px; /* Adjust size as needed */
+  }
+}
+
+.brutalist-button .button-text,
+.brutalist-button .openai-text {
   opacity: 1;
   max-height: 60px;
   margin-top: 8px;
@@ -329,11 +381,11 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
   }
 }
 
-.brutalist-button:hover .openai-icon {
+.brutalist-button .openai-icon {
   animation: spin-and-zoom 4s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
 }
 
-.brutalist-button:hover .openai-text {
+.brutalist-button .openai-text {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 

@@ -18,7 +18,7 @@ import PrintButton from '@/app/components/layout/PrintButton';
 const OrdersPage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [orderList, isOrderListPending] = useOrders();
+  const [orderList, isOrderListPending, refetchOrder] = useOrders();
   const axiosPublic = useAxiosPublic();
   const [page, setPage] = useState(0);
   const isAdmin = true;
@@ -39,6 +39,12 @@ const OrdersPage = () => {
       setSelectedColumns(defaultColumns);
     }
   }, [defaultColumns]);
+
+  useEffect(() => {
+    if (searchQuery) {
+      refetchOrder();  // RefetchOrders when search query changes
+    }
+  }, [searchQuery, refetchOrder]);
 
   const handleColumnChange = (selected) => {
     const combinedSelection = [...defaultColumns, ...selected.filter(col => !defaultColumns.includes(col))];
@@ -158,7 +164,8 @@ const OrdersPage = () => {
       (order.transactionId || '').toLowerCase().includes(query) ||
       (order.trackingNumber || '').toLowerCase().includes(query) ||
       (order.shippingMethod || '').toLowerCase().includes(query) ||
-      (order.paymentStatus || '').toLowerCase().includes(query)
+      (order.paymentStatus || '').toLowerCase().includes(query) ||
+      (order._id || '').toLowerCase().includes(query)
     );
 
     // Check if query parts match first and last names

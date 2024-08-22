@@ -77,7 +77,7 @@ const Categories = () => {
                 <div className='w-full flex items-center gap-2'>
                   <input
                     type="text"
-                    placeholder="Add Size Range"
+                    placeholder="Add Size Range (e.g., XXS-6XL)"
                     {...register(`sizes.${index}.size`, { required: 'Size Range is required' })}
                     className="w-full my-2 p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                   />
