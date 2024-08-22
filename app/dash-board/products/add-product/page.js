@@ -4,7 +4,6 @@ import { useForm, Controller } from "react-hook-form";
 import toast from 'react-hot-toast';
 import ReactSelect from "react-select";
 import ColorOption from '@/app/components/layout/ColorOption';
-import colorOptions from '@/app/components/layout/colorOptions';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { CheckboxGroup, Select, SelectItem, Tabs, Tab, RadioGroup, Radio } from "@nextui-org/react";
 import 'react-quill/dist/quill.snow.css';
@@ -16,14 +15,15 @@ import { FaArrowRight } from 'react-icons/fa6';
 import Image from 'next/image';
 import { RxCross2 } from 'react-icons/rx';
 import { MdOutlineFileUpload } from 'react-icons/md';
-import { vendorOptions } from '@/app/components/layout/vendorOptions';
-import { tagOptions } from '@/app/components/layout/tagOptions';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useCategories from '@/app/hooks/useCategories';
 import Loading from '@/app/components/shared/Loading/Loading';
 import useSizeRanges from '@/app/hooks/useSizeRanges';
 import { generateSizes } from '@/app/utils/GenerateSizes/GenerateSizes';
 import useSubCategories from '@/app/hooks/useSubCategories';
+import useTags from '@/app/hooks/useTags';
+import useVendors from '@/app/hooks/useVendors';
+import useColors from '@/app/hooks/useColors';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
@@ -34,6 +34,9 @@ const FirstStepOfAddProduct = () => {
   const { register, handleSubmit, control, formState: { errors }, setValue } = useForm();
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
+  const [tagList, isTagPending] = useTags();
+  const [vendorList, isVendorPending] = useVendors();
+  const [colorList, isColorPending] = useColors();
   const [selectedCategory, setSelectedCategory] = useState("");
   const [groupSelected, setGroupSelected] = React.useState();
   const [groupSelected2, setGroupSelected2] = React.useState();
@@ -410,7 +413,7 @@ const FirstStepOfAddProduct = () => {
     }
   }, [navigate, router]);
 
-  if (isCategoryPending || isSizeRangePending || isSubCategoryPending) {
+  if (isCategoryPending || isSizeRangePending || isSubCategoryPending || isTagPending || isVendorPending || isColorPending) {
     return <Loading />
   }
 
@@ -565,7 +568,7 @@ const FirstStepOfAddProduct = () => {
                   <div className="parent-container">
                     <ReactSelect
                       {...field}
-                      options={colorOptions}
+                      options={colorList}
                       isMulti
                       className="w-full border rounded-md creatable-select-container"
                       components={{ Option: ColorOption }}
@@ -683,7 +686,7 @@ const FirstStepOfAddProduct = () => {
                     <div className="parent-container">
                       <ReactSelect
                         {...field}
-                        options={vendorOptions}
+                        options={vendorList}
                         isMulti
                         className="w-full border rounded-md creatable-select-container"
                         value={selectedVendors}
@@ -712,7 +715,7 @@ const FirstStepOfAddProduct = () => {
                     <div className="parent-container">
                       <ReactSelect
                         {...field}
-                        options={tagOptions}
+                        options={tagList}
                         isMulti
                         className="w-full border rounded-md creatable-select-container"
                         value={selectedTags}
