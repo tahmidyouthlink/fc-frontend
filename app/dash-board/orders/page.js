@@ -341,7 +341,7 @@ const OrdersPage = () => {
 
       <h3 className='text-center font-medium md:font-semibold text-[13px] md:text-xl lg:text-2xl px-6 md:pt-6'>Order Management</h3>
 
-      <div className='flex items-center mt-3 mb-6 md:mb-8 max-w-screen-xl px-3 mx-auto justify-between md:gap-6'>
+      <div className='flex items-center mt-3 mb-6 md:mb-8 max-w-screen-2xl px-3 mx-auto justify-between md:gap-6'>
 
         {/* Button to export to CSV */}
         <button
@@ -455,7 +455,7 @@ const OrdersPage = () => {
         </ModalContent>
       </Modal>
 
-      <div className="max-w-screen-xl mx-auto px-4 lg:px-6 custom-max-h overflow-x-auto mb-6 modal-body-scroll">
+      <div className="max-w-screen-2xl mx-auto px-4 lg:px-6 custom-max-h overflow-x-auto mb-6 modal-body-scroll">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-100 sticky top-0 z-[1] shadow-md">
             <tr>
@@ -505,7 +505,7 @@ const OrdersPage = () => {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {(isFilterActive ? searchedOrders : result)?.map((order, index) => (
-              <tr key={order?.id || index} className="hover:bg-gray-50 transition-colors">
+              <tr key={order?._id || index} className="hover:bg-gray-50 transition-colors">
                 {selectedColumns.includes('Order Number') && (
                   <td className="text-xs p-3 font-mono cursor-pointer text-blue-600 hover:text-blue-800" onClick={() => handleOrderClick(order)}>
                     {order?.orderNumber}

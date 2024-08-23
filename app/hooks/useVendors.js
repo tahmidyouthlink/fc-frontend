@@ -6,7 +6,7 @@ const useVendors = () => {
 
   const axiosPublic = useAxiosPublic();
 
-  const { data: vendorList, isPending: isVendorPending } = useQuery({
+  const { data: vendorList, isPending: isVendorPending, refetch } = useQuery({
     queryKey: ["vendorList"],
     queryFn: async () => {
       const res = await axiosPublic.get("/allVendors");
@@ -14,7 +14,7 @@ const useVendors = () => {
     }
   })
 
-  return [vendorList, isVendorPending];
+  return [vendorList, isVendorPending, refetch];
 };
 
 export default useVendors;

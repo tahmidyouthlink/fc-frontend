@@ -140,17 +140,20 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 
 /* Base styles for small screens (mobile) */
 .custom-max-h {
-  max-height: calc(100vh - 220px); /* Adjusted for smaller screens */
-  overflow-y: auto; /* Ensure content can scroll within this area */
+  max-height: calc(100vh - 240px);
+  overflow-y: auto;
 }
 
 /* Medium screens (tablets) */
 @media (min-width: 768px) {
   .custom-max-h {
-    max-height: calc(
-      100vh - 240px
-    ); /* Slightly more space for medium screens */
+    max-height: calc(100vh - 260px);
   }
+}
+
+/* Base styles for small screens (mobile) */
+.custom-max-h-variant {
+  max-height: calc(100vh - 80px);
 }
 
 /* From Uiverse.io by 0xnihilism */

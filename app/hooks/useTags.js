@@ -6,7 +6,7 @@ const useTags = () => {
 
   const axiosPublic = useAxiosPublic();
 
-  const { data: tagList, isPending: isTagPending } = useQuery({
+  const { data: tagList, isPending: isTagPending, refetch } = useQuery({
     queryKey: ["tagList"],
     queryFn: async () => {
       const res = await axiosPublic.get("/allTags");
@@ -14,7 +14,7 @@ const useTags = () => {
     }
   })
 
-  return [tagList, isTagPending];
+  return [tagList, isTagPending, refetch];
 };
 
 export default useTags;

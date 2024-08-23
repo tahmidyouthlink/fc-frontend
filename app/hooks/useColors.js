@@ -6,7 +6,7 @@ const useColors = () => {
 
   const axiosPublic = useAxiosPublic();
 
-  const { data: colorList, isPending: isColorPending } = useQuery({
+  const { data: colorList, isPending: isColorPending, refetch } = useQuery({
     queryKey: ["colorList"],
     queryFn: async () => {
       const res = await axiosPublic.get("/allColors");
@@ -14,7 +14,7 @@ const useColors = () => {
     }
   })
 
-  return [colorList, isColorPending];
+  return [colorList, isColorPending, refetch];
 };
 
 export default useColors;
