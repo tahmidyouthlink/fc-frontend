@@ -47,14 +47,25 @@ const Variants = () => {
 
   return (
     <div className='min-h-screen w-full'>
-      <div className='grid grid-cols-3 max-w-screen-2xl mx-auto'>
+      <div className='grid grid-cols-3 max-w-screen-2xl mx-auto sticky top-0 z-10 bg-white py-2'>
+        <Button variant="light" color="primary">
+          <Link href={"/dash-board/variants/add-color"}>Add Colors</Link>
+        </Button>
+        <Button variant="light" color="primary">
+          <Link href={"/dash-board/variants/add-vendor"}>Add Vendors</Link>
+        </Button>
+        <Button variant="light" color="primary">
+          <Link href={"/dash-board/variants/add-tag"}>Add Tags</Link>
+        </Button>
+      </div>
+      <div className='grid grid-cols-1 lg:grid-cols-3 max-w-screen-2xl mx-auto'>
 
         <div className='w-full divide-y divide-gray-200 custom-max-h-variant modal-body-scroll'>
-          <h1 className='py-2 md:py-3 font-semibold px-6 md:px-9 md:text-lg lg:text-xl sticky top-0 z-[1] shadow-md bg-gray-50 rounded-lg'>Colors</h1>
+          <h1 className='py-2 md:py-3 font-semibold text-center md:text-lg lg:text-xl sticky top-0 z-[10] bg-white'>Colors</h1>
           <div className='flex flex-col items-center justify-center w-full divide-y divide-gray-200'>
             {colorList?.map((color, index) => (
               <div key={index} className='flex items-center justify-center w-full md:px-2 lg:px-6 hover:bg-gray-100 transition-colors  cursor-pointer'>
-                <p className='flex text-[11px] md:text-[15px] items-center gap-0.5 md:gap-1 p-2 w-full'>
+                <p className='flex text-[15px] items-center gap-0.5 md:gap-1 p-2 w-full'>
                   <span
                     style={{
                       display: 'inline-block',
@@ -74,11 +85,11 @@ const Variants = () => {
         </div>
 
         <div className='w-full divide-y divide-gray-200 custom-max-h-variant modal-body-scroll'>
-          <h1 className='py-2 md:py-3 font-semibold px-5 md:px-9 md:text-lg lg:text-xl sticky top-0 z-[1] shadow-md bg-gray-50 rounded-lg'>Vendors</h1>
+          <h1 className='py-2 md:py-3 font-semibold text-center md:text-lg lg:text-xl sticky top-0 z-[10] bg-white'>Vendors</h1>
           <div className='flex flex-col items-center justify-center w-full divide-y divide-gray-200'>
             {vendorList?.map((vendor, index) => (
               <div key={index} className='flex items-center justify-center w-full md:px-2 lg:px-6 hover:bg-gray-100 transition-colors cursor-pointer'>
-                <p className='flex text-[11px] md:text-[15px] items-center gap-0.5 md:gap-1 p-2 w-full'>
+                <p className='flex text-[15px] items-center gap-0.5 md:gap-1 p-2 w-full'>
                   {vendor?.value}
                 </p>
                 <MdDeleteOutline onClick={() => handleDeleteVendor(vendor?._id)} className='text-red-800 hover:text-red-950 text-2xl cursor-pointer' />
@@ -88,11 +99,11 @@ const Variants = () => {
         </div>
 
         <div className='w-full divide-y divide-gray-200 custom-max-h-variant modal-body-scroll'>
-          <h1 className='py-2 md:py-3 font-semibold px-6 md:px-9 md:text-lg lg:text-xl sticky top-0 z-[1] shadow-md bg-gray-50 rounded-lg'>Tags</h1>
+          <h1 className='py-2 md:py-3 font-semibold text-center md:text-lg lg:text-xl sticky top-0 z-[10] bg-white'>Tags</h1>
           <div className='flex flex-col items-center justify-center w-full divide-y divide-gray-200'>
             {tagList?.map((tag, index) => (
               <div key={index} className='flex items-center justify-center w-full md:px-2 lg:px-6 hover:bg-gray-100 transition-colors  cursor-pointer'>
-                <p className='flex text-[11px] md:text-[15px] items-center gap-0.5 md:gap-1 p-2 w-full'>
+                <p className='flex text-[15px] items-center gap-0.5 md:gap-1 p-2 w-full'>
                   {tag?.value}
                 </p>
                 <MdDeleteOutline onClick={() => handleDeleteTag(tag?._id)} className='text-red-800 hover:text-red-950 text-2xl cursor-pointer' />
@@ -102,17 +113,7 @@ const Variants = () => {
         </div>
 
       </div>
-      <div className='grid grid-cols-3 max-w-screen-2xl mx-auto'>
-        <Button variant="light" color="primary">
-          <Link href={"/dash-board/variants/add-color"}>Add Colors</Link>
-        </Button>
-        <Button variant="light" color="primary">
-          <Link href={"/dash-board/variants/add-vendor"}>Add Vendors</Link>
-        </Button>
-        <Button variant="light" color="primary">
-          <Link href={"/dash-board/variants/add-tag"}>Add Tags</Link>
-        </Button>
-      </div>
+
     </div>
   );
 };

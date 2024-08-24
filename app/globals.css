@@ -153,7 +153,14 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 
 /* Base styles for small screens (mobile) */
 .custom-max-h-variant {
-  max-height: calc(100vh - 80px);
+  max-height: calc(100vh - 120px);
+}
+
+/* Medium screens (tablets) */
+@media (min-width: 768px) {
+  .custom-max-h-variant {
+    max-height: calc(100vh - 80px);
+  }
 }
 
 /* From Uiverse.io by 0xnihilism */

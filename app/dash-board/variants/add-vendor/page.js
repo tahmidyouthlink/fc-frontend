@@ -42,7 +42,7 @@ const AddVendor = () => {
   };
 
   return (
-    <div className='max-w-screen-lg mx-auto'>
+    <div className='max-w-screen-lg mx-auto px-6'>
 
       <h3 className='text-center font-semibold text-xl md:text-2xl px-6 pt-6'>Add Vendors</h3>
 

@@ -1,132 +1,73 @@
 "use client";
+import React, { useState } from 'react';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { Button } from '@nextui-org/react';
-import React from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
+import useCategories from '@/app/hooks/useCategories';
+import Loading from '@/app/components/shared/Loading/Loading';
 
-const Categories = () => {
-
+const CategoriesOverview = () => {
   const axiosPublic = useAxiosPublic();
-  const { register, handleSubmit, reset, control, formState: { errors } } = useForm({
-    defaultValues: {
-      category: '',
-      sizes: [{ size: '' }],
-      subCategories: [{ subCategory: '' }],
-    }
-  });
+  const router = useRouter();
+  const [categoryList, isCategoryPending, refetch] = useCategories();
 
-  // Separate useFieldArray for sizes
-  const { fields: sizeFields, append: appendSize, remove: removeSize } = useFieldArray({
-    control,
-    name: 'sizes'
-  });
-
-  // Separate useFieldArray for subCategories
-  const { fields: subCategoryFields, append: appendSubCategory, remove: removeSubCategory } = useFieldArray({
-    control,
-    name: 'subCategories'
-  });
-
-  const onSubmit = async (data) => {
-    const { category, sizes, subCategories } = data;
-
-    const categoryData = {
-      key: category,
-      label: category,
-      sizes: sizes.map(s => s.size).filter(size => size),
-      subCategories: subCategories.map(sc => ({
-        key: sc.subCategory,
-        label: sc.subCategory
-      })),
-    };
-
+  const handleDelete = async (categoryId) => {
     try {
-      const response = await axiosPublic.post('/addCategory', categoryData);
-
-      if (response.status === 201) {
-        toast.success('Category, Sizes and Sub-categories added successfully!');
-        reset(); // Reset the form after successful submission
+      const res = await axiosPublic.delete(`/deleteCategory/${categoryId}`);
+      if (res?.data?.deletedCount) {
+        refetch();
+        toast.success('Category deleted successfully!');
       }
     } catch (error) {
-      toast.error('Failed to add category or sizes. Please try again.');
+      toast.error('Failed to delete category. Please try again.');
     }
   };
 
+  if (isCategoryPending) {
+    return <Loading />
+  }
+
   return (
-    <div className='bg-gray-50 min-h-screen'>
-      <h3 className='text-center font-semibold text-xl md:text-2xl px-6 pt-6'>Add Category, Sizes, and Sub-Categories</h3>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
-          <div className="category-field w-full">
-            <label className="flex justify-start font-medium text-[#9F5216] pb-2">Category</label>
-            <input
-              type="text"
-              placeholder="Add Category"
-              {...register('category', { required: 'Category is required' })}
-              className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-            />
-            {errors.category && (
-              <p className="text-red-600 text-left">{errors.category.message}</p>
-            )}
-          </div>
+    <div className='min-h-screen'>
 
-          <div className="sizes-field w-full">
-            <label className="flex justify-start font-medium text-[#9F5216]">Size Ranges</label>
-            {sizeFields.map((item, index) => (
-              <div key={item.id} className="flex flex-col">
-                <div className='w-full flex items-center gap-2'>
-                  <input
-                    type="text"
-                    placeholder="Add Size Range (e.g., XXS-6XL)"
-                    {...register(`sizes.${index}.size`, { required: 'Size Range is required' })}
-                    className="w-full my-2 p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                  />
-                  <Button type='button' color="danger" onClick={() => removeSize(index)} variant="light">
-                    Remove
-                  </Button>
-                </div>
-                {errors.sizes?.[index]?.size && (
-                  <p className="text-red-600 text-left">{errors.sizes[index].size.message}</p>
-                )}
-              </div>
-            ))}
-            <button type="button" onClick={() => appendSize({ size: '' })} className="mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2">
-              Add Size
-            </button>
-          </div>
+      <div className='sticky top-0 z-10 bg-white flex justify-center'>
+        <Button onClick={() => router.push('/dash-board/categories/add-category')} className='mt-6 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium'>
+          Add New Category
+        </Button>
+      </div>
 
-          <div className="subcategories-field w-full">
-            <label className="flex justify-start font-medium text-[#9F5216]">Sub-Category</label>
-            {subCategoryFields.map((item, index) => (
-              <div key={item.id} className="flex flex-col">
-                <div className='w-full flex items-center gap-2'>
-                  <input
-                    type="text"
-                    placeholder="Add Sub-Category"
-                    {...register(`subCategories.${index}.subCategory`, { required: 'Sub-Category is required' })}
-                    className="w-full my-2 p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                  />
-                  <Button type='button' color="danger" onClick={() => removeSubCategory(index)} variant="light">
-                    Remove
-                  </Button>
-                </div>
-                {errors.subCategories?.[index]?.subCategory && (
-                  <p className="text-red-600 text-left">{errors.subCategories[index].subCategory.message}</p>
-                )}
-              </div>
-            ))}
-            <button type="button" onClick={() => appendSubCategory({ subCategory: '' })} className="mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2">
-              Add Sub-Category
-            </button>
+      <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
+        {categoryList?.map(category => (
+          <div key={category?._id} className='category-item border p-4 rounded-md shadow-md'>
+            <h4 className='font-bold text-lg'>{category?.label}</h4>
+            <div className='sizes mt-2'>
+              <strong>Sizes:</strong> {category.sizes.join(', ')}
+            </div>
+            <div className='sub-categories mt-2'>
+              <strong>Sub-Categories:</strong> {category.subCategories.map(sub => sub.label).join(', ')}
+            </div>
+            <div className='flex gap-2 mt-4'>
+              {/* Edit Button */}
+              <Button
+                onClick={() => router.push(`/dash-board/categories/${category._id}`)}
+                className='bg-[#9F5216] text-white'>
+                Edit Category
+              </Button>
+              {/* Delete Button */}
+              <Button
+                onClick={() => handleDelete(category._id)}
+                color="danger"
+                variant="light">
+                Delete Category
+              </Button>
+            </div>
           </div>
+        ))}
+      </div>
 
-          <div className='px-6 flex justify-end items-center'>
-            <button type='submit' className='mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2'>Submit</button>
-          </div>
-        </div>
-      </form>
     </div>
   );
 };
 
-export default Categories;
+export default CategoriesOverview;
