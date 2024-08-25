@@ -418,7 +418,7 @@ const FirstStepOfAddProduct = () => {
   }
 
   return (
-    <div className='bg-gray-50'>
+    <div className='bg-gray-50 min-h-screen'>
       <h3 className='text-center font-semibold text-xl md:text-2xl px-6 pt-6'>Add Product Details</h3>
       <form className='2xl:max-w-screen-2xl 2xl:mx-auto' onSubmit={handleSubmit(onSubmit)}>
         <div className='grid grid-cols-1 lg:grid-cols-12'>

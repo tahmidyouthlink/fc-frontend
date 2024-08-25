@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Checkbox, CheckboxGroup, DateRangePicker } from "@nextui-org/react";
+import { Button, Checkbox, CheckboxGroup, DateRangePicker, Pagination } from "@nextui-org/react";
 import emailjs from '@emailjs/browser';
 import Loading from '@/app/components/shared/Loading/Loading';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
@@ -14,6 +14,7 @@ import { IoMdClose } from 'react-icons/io';
 import Papa from 'papaparse';
 import useOrders from '@/app/hooks/useOrders';
 import PrintButton from '@/app/components/layout/PrintButton';
+import CustomPagination from '@/app/components/layout/CustomPagination';
 
 const OrdersPage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -667,23 +668,16 @@ const OrdersPage = () => {
         </Modal>
       )}
 
-      {/* pagination button */}
+      {/* Pagination Button */}
       {!isFilterActive && (
         <div className="flex gap-3 justify-center items-center mb-0 md:mb-8">
-          {/* Render pagination controls here */}
-          {pages.map((pageNumber, index) => (
-            <button
-              className={`px-2 py-1 md:px-4 md:py-2 rounded-md border hover:bg-[#9F5216] hover:text-white ${page == index ? "bg-[#9F5216] text-white" : ""
-                }`}
-              key={index}
-              onClick={() => setPage(index)}
-            >
-              {index + 1}
-            </button>
-          ))}
+          <CustomPagination
+            totalPages={pages.length}
+            currentPage={page}
+            onPageChange={setPage}
+          />
         </div>
       )}
-
     </div>
   );
 };

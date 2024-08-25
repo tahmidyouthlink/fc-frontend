@@ -77,13 +77,12 @@ export default function EditCategory() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <button className='hidden md:flex fixed top-2 right-2 hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1'>
-        <Link href={"/dash-board/categories"}><RxCross2 size={28} /></Link>
-      </button>
+      <div className='w-full flex justify-end pt-3 md:pt-6 max-w-screen-lg mx-auto px-6'>
+        <button className='hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white px-1 py-0.5'>
+          <Link href={"/dash-board/categories"}><RxCross2 size={28} /></Link>
+        </button>
+      </div>
 
-      <button className='md:hidden fixed bottom-2 right-2 hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1'>
-        <Link href={"/dash-board/categories"}><RxCross2 size={28} /></Link>
-      </button>
       <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
 
         {/* Category Field */}
@@ -167,7 +166,7 @@ export default function EditCategory() {
             disabled={isSubmitting}
             className={`mt-4 mb-8 ${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium flex items-center gap-2`}
           >
-            {isSubmitting ? 'Submitting...' : 'Submit'}
+            {isSubmitting ? 'Save Changes...' : 'Saved'}
           </button>
         </div>
       </div>

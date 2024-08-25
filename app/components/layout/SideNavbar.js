@@ -82,11 +82,11 @@ const SideNavbar = ({ onClose }) => {
   ];
 
   return (
-    <div className="h-screen w-full md:w-[220px] lg:w-[250px] xl:w-[280px] 2xl:w-[300px] fixed z-50 overflow-y-auto bg-gradient-to-t from-[#9f511655] to-[#9f511616]">
+    <div className="h-screen w-full md:w-[220px] lg:w-[250px] xl:w-[280px] 2xl:w-[300px] fixed z-50 overflow-y-auto scroll-smooth bg-gradient-to-t from-[#9f511655] to-[#9f511616]">
       <button onClick={onClose} className="md:hidden p-2 absolute right-2 top-2">
         <ImCross size={20} />
       </button>
-      <div className="px-10 pt-12 md:pt-4">
+      <div className="px-10 pt-6 md:pt-4">
         <Link href="/" legacyBehavior>
           <a className="flex items-center gap-2">
             <Image
@@ -98,7 +98,7 @@ const SideNavbar = ({ onClose }) => {
           </a>
         </Link>
       </div>
-      <div className="flex flex-col mt-4 md:mt-8 gap-2">
+      <div className="flex flex-col text-sm lg:text-base mt-4 md:mt-8 gap-2">
         {adminList.map((item, index) => (
           <div key={index}>
             <div

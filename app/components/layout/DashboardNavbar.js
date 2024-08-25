@@ -24,6 +24,21 @@ const DashboardNavbar = () => {
     };
   }, [router?.events]);
 
+  useEffect(() => {
+    if (isToggle) {
+      // Disable scrolling on the body when sidebar is open
+      document.body.style.overflow = "hidden";
+    } else {
+      // Re-enable scrolling when sidebar is closed
+      document.body.style.overflow = "";
+    }
+
+    // Clean up when component unmounts
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isToggle]);
+
   return (
     <div>
       {/* Sidebar - hide from medium devices */}

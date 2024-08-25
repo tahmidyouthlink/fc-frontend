@@ -5,7 +5,6 @@ import { Button } from '@nextui-org/react';
 
 const PrintButton = ({ selectedOrder }) => {
 
-  // Create custom content using the selectedOrder data
   const handlePrint = async (selectedOrder) => {
     if (typeof window === 'undefined') {
       return;
@@ -60,21 +59,25 @@ const PrintButton = ({ selectedOrder }) => {
     const customerDetails = [
       `Name: ${selectedOrder.customerName}`,
       `Email: ${selectedOrder.email}`,
-      `Phone: ${selectedOrder.phoneNumber}${selectedOrder.phoneNumber2 ? `, ${selectedOrder.phoneNumber2}` : ''}`,
       `Address: ${selectedOrder.address1}${selectedOrder.address2 ? ', ' + selectedOrder.address2 : ''}, ${selectedOrder.city}, ${selectedOrder.postalCode}`,
     ].join('\n');
     pdf.text(customerDetails, margin, margin + 50);
 
-    // Clickable Customer Email and Phone
-    pdf.textWithLink(`Email: ${selectedOrder.email}`, margin, margin + 65, {
-      url: `mailto:${selectedOrder.email}`,
-    });
-    pdf.textWithLink(`Phone: ${selectedOrder.phoneNumber}`, margin, margin + 70, {
+    // Adjust vertical position for phone numbers
+    let currentY = margin + 70;
+
+    // Clickable Customer Phone Numbers
+    pdf.textWithLink(`Phone: ${selectedOrder.phoneNumber}`, margin, currentY, {
       url: `tel:${selectedOrder.phoneNumber}`,
+      align: 'left',
     });
-    if (selectedOrder.phoneNumber2) {
-      pdf.textWithLink(`Phone: ${selectedOrder.phoneNumber2}`, margin, margin + 75, {
+
+    currentY += 5; // Small gap between phone numbers
+
+    if (selectedOrder.phoneNumber2 && selectedOrder.phoneNumber2 !== '0') {
+      pdf.textWithLink(`Phone 2: ${selectedOrder.phoneNumber2}`, margin, currentY, {
         url: `tel:${selectedOrder.phoneNumber2}`,
+        align: 'left',
       });
     }
 
@@ -83,7 +86,7 @@ const PrintButton = ({ selectedOrder }) => {
     pdf.setTextColor(...primaryColor);
     pdf.text('INVOICE', pageWidth / 2, margin + 85, { align: 'center' });
 
-    // Product Table 
+    // Product Table with colored header
     pdf.setFontSize(12);
     pdf.setTextColor(...primaryColor);
     pdf.text('Product Details', margin, margin + 95);
@@ -110,26 +113,38 @@ const PrintButton = ({ selectedOrder }) => {
     const shippingCharge = parseFloat(selectedOrder.shippingCharge?.toFixed(2) || "0.00");
     const total = (subtotal - promoDiscount + shippingCharge).toFixed(2);
 
-    // Totals Section
-    const totalsYPosition = pdf.autoTable.previous.finalY + 10;
-    pdf.setFontSize(12);
-    pdf.setTextColor(...primaryColor);
-    pdf.text('Order Summary', margin, totalsYPosition);
-
-    pdf.setFontSize(10);
-    pdf.setTextColor(...secondaryColor);
-    const orderSummary = [
-      `Subtotal: ${subtotal.toFixed(2)}`,
-      `Promo Discount (${selectedOrder.promoCode || ''}) : -${promoDiscount.toFixed(2)}`,
-      `Shipping Charge: +${shippingCharge.toFixed(2)}`,
-      `Total: ${total}`,
-    ].join('\n');
-    pdf.text(orderSummary, margin, totalsYPosition + 5);
+    // Product Table with colored header and additional rows for Subtotal, Discounts, and Total
+    pdf.autoTable({
+      startY: margin + 100,
+      head: [['Product Title', 'Color', 'Size', 'Unit Price', 'SKU', 'Gross Amount']],
+      body: [
+        ...selectedOrder.productInformation.map(product => [
+          product.productTitle,
+          product.color?.label || '',
+          product.size || '',
+          `${product.unitPrice?.toFixed(2)}`,
+          product.sku,
+          `${(product.unitPrice * product.sku).toFixed(2)}`
+        ]),
+        // Subtotals and totals with table boxes only for the amounts
+        [{ content: 'Subtotal:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `£${subtotal.toFixed(2)}`],
+        [{ content: `Promo Discount (${selectedOrder.promoCode || ''}) :`, colSpan: 5, styles: { halign: 'right', border: 'none' } }, `-£${promoDiscount.toFixed(2)}`],
+        [{ content: 'Shipping Charge:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `+£${shippingCharge.toFixed(2)}`],
+        [{ content: 'Total:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `£${total}`],
+      ],
+      theme: 'grid',
+      headStyles: { fillColor: primaryColor, textColor: 255 },
+      styles: { fontSize: 10, valign: 'middle', halign: 'center' },
+      columnStyles: {
+        0: { cellWidth: 'auto' }, // Adjust the first column width if necessary
+        5: { fontStyle: 'bold', halign: 'right', fillColor: [255, 255, 255], textColor: [0, 0, 0] }, // Amount column styled with borders
+      }
+    });
 
     // Additional Details Section
     pdf.setFontSize(12);
     pdf.setTextColor(...primaryColor);
-    pdf.text('Additional Details', margin, totalsYPosition + 35);
+    pdf.text('Additional Details', margin, pdf.autoTable.previous.finalY + 10);
 
     pdf.setFontSize(10);
     pdf.setTextColor(...secondaryColor);
@@ -141,16 +156,27 @@ const PrintButton = ({ selectedOrder }) => {
       `Vendor: ${selectedOrder.vendor}`,
       `Tracking Number: ${selectedOrder.trackingNumber}`,
     ].join('\n');
-    pdf.text(additionalDetails, margin, totalsYPosition + 40);
+    pdf.text(additionalDetails, margin, pdf.autoTable.previous.finalY + 15);
 
-    // Footer Disclaimer
+    // Footer Disclaimer with centered text in the border
     pdf.setFontSize(8);
     pdf.setTextColor(128, 128, 128);
-    pdf.text(
-      'If this invoice is for ongoing services and you have requested us to take payment using the continuous authority credit or debit card details stored on our system, ' +
-      'then we will do so and no further action is required.',
-      margin, totalsYPosition + 75
-    );
+
+    const disclaimerText = 'If this invoice is for ongoing services and you have requested us to take payment using the continuous authority credit or debit card details stored on our system, then we will do so and no further action is required.';
+    const disclaimerWidth = pageWidth - 2 * margin; // Define the width of the text box
+    const disclaimerHeight = pdf.getTextDimensions(disclaimerText, { maxWidth: disclaimerWidth }).h + 4; // Calculate height of the text
+    const disclaimerX = margin; // X position
+    const disclaimerY = pdf.autoTable.previous.finalY + 45; // Adjust Y position to vertically center text
+
+    // Draw the border
+    pdf.rect(disclaimerX, disclaimerY, disclaimerWidth, disclaimerHeight, 'S');
+
+    // Add the text inside the border
+    pdf.text(disclaimerText, disclaimerX + disclaimerWidth / 2, disclaimerY + disclaimerHeight / 2, {
+      align: 'center',
+      maxWidth: disclaimerWidth,
+      lineHeightFactor: 1.5, // Adjust the line height for better vertical centering
+    });
 
     // Save the PDF
     pdf.save(`Fashion_Commerce_Order_${selectedOrder.orderNumber}.pdf`);

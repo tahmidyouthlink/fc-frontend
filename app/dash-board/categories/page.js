@@ -29,15 +29,15 @@ const CategoriesOverview = () => {
   }
 
   return (
-    <div className='min-h-screen'>
+    <div className='bg-gray-50 min-h-screen'>
 
-      <div className='sticky top-0 z-10 bg-white flex justify-center'>
+      <div className='sticky top-0 z-10 bg-gray-50 flex justify-center'>
         <Button onClick={() => router.push('/dash-board/categories/add-category')} className='mt-6 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium'>
           Add New Category
         </Button>
       </div>
 
-      <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
+      <div className='max-w-screen-2xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 px-6'>
         {categoryList?.map(category => (
           <div key={category?._id} className='category-item border p-4 rounded-md shadow-md'>
             <h4 className='font-bold text-lg'>{category?.label}</h4>

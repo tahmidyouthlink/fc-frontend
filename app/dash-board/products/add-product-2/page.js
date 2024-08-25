@@ -122,7 +122,7 @@ const SecondStepOfAddProduct = () => {
   }, [navigate, router]);
 
   return (
-    <div className='bg-gray-50'>
+    <div className='bg-gray-50 min-h-screen'>
       <h3 className='text-center font-semibold text-xl md:text-2xl px-6 pt-6'>Add Inventory Variants</h3>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 mt-6 px-6 lg:px-8 xl:px-10 2xl:px-12 py-3'>

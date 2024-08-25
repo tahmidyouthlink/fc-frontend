@@ -1,6 +1,6 @@
 "use client";
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
-import React from 'react';
+import React, { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { Button } from '@nextui-org/react';
@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 const AddColor = () => {
   const axiosPublic = useAxiosPublic();
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { register, handleSubmit, control, formState: { errors }, reset } = useForm({
     defaultValues: {
       colors: [{ colorName: '', colorCode: '#FFFFFF', colorFormat: 'Hex' }]
@@ -24,6 +25,7 @@ const AddColor = () => {
   });
 
   const onSubmit = async (data) => {
+    setIsSubmitting(true);
     const colorData = data.colors.map(color => ({
       value: color.colorName,
       label: color.colorName,
@@ -40,11 +42,18 @@ const AddColor = () => {
       }
     } catch (error) {
       toast.error('Failed to add colors. Please try again!');
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className='relative max-w-screen-lg mx-auto px-6'>
+
+      <div className='w-full flex justify-end pt-3 md:pt-6'>
+        <button className='hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white px-1 py-0.5'>
+          <Link href={"/dash-board/variants"}><RxCross2 size={28} /></Link>
+        </button>
+      </div>
 
       <h3 className='text-center font-semibold text-xl md:text-2xl px-6 pt-6'>Add Colors</h3>
 
@@ -89,17 +98,9 @@ const AddColor = () => {
           </button>
         </div>
         <div className='px-6 flex justify-end items-center'>
-          <button type='submit' className='mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2'>Submit Colors</button>
+          <button type='submit' className='mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2'>{isSubmitting ? 'Submitting...' : 'Submit Colors'}</button>
         </div>
       </form>
-
-      <button className='hidden md:flex fixed top-2 right-2 hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1'>
-        <Link href={"/dash-board/variants"}><RxCross2 size={28} /></Link>
-      </button>
-
-      <button className='md:hidden fixed bottom-2 right-2 hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1'>
-        <Link href={"/dash-board/variants"}><RxCross2 size={28} /></Link>
-      </button>
 
     </div>
   );

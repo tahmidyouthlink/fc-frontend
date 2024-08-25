@@ -63,13 +63,13 @@ const AddCategory = () => {
 
   return (
     <div className='bg-gray-50 min-h-screen'>
-      <button className='hidden md:flex fixed top-2 right-2 hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1'>
-        <Link href={"/dash-board/categories"}><RxCross2 size={28} /></Link>
-      </button>
 
-      <button className='md:hidden fixed bottom-2 right-2 hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1'>
-        <Link href={"/dash-board/categories"}><RxCross2 size={28} /></Link>
-      </button>
+      <div className='w-full flex justify-end pt-3 md:pt-6 max-w-screen-lg mx-auto px-6'>
+        <button className='hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white px-1 py-0.5'>
+          <Link href={"/dash-board/categories"}><RxCross2 size={28} /></Link>
+        </button>
+      </div>
+
       <h3 className='text-center font-semibold text-xl md:text-2xl px-6 pt-6'>Add Category, Sizes, and Sub-Categories</h3>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
@@ -139,7 +139,7 @@ const AddCategory = () => {
 
           <div className='px-6 flex justify-end items-center'>
             <button type='submit' disabled={isSubmitting} className={`mt-4 mb-8 ${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
-              {isSubmitting ? 'Submitting...' : 'Submit'}
+              {isSubmitting ? 'Submitting...' : 'Submit All'}
             </button>
           </div>
         </div>
