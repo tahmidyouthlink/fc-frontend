@@ -16,6 +16,7 @@ import { usePathname } from "next/navigation";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 import { useState } from "react";
 import { ImCross } from "react-icons/im";
+import { LiaUserLockSolid } from "react-icons/lia";
 
 const SideNavbar = ({ onClose }) => {
   const pathname = usePathname();
@@ -75,8 +76,9 @@ const SideNavbar = ({ onClose }) => {
       name: "Settings",
       icon: <MdOutlineSettings />,
       links: [
+        { label: 'Permissions', link: '/dash-board/permissions', icon: <LiaUserLockSolid /> },
         { label: 'Categories', link: '/dash-board/categories', icon: <BiCategory /> },
-        { label: 'Variants', link: '/dash-board/variants', icon: <PiResizeBold /> }
+        { label: 'Variants', link: '/dash-board/variants', icon: <PiResizeBold /> },
       ]
     },
   ];

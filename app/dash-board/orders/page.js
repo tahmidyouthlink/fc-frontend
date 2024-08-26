@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Checkbox, CheckboxGroup, DateRangePicker, Pagination } from "@nextui-org/react";
+import { Button, Checkbox, CheckboxGroup, DateRangePicker } from "@nextui-org/react";
 import emailjs from '@emailjs/browser';
 import Loading from '@/app/components/shared/Loading/Loading';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
@@ -22,6 +22,7 @@ const OrdersPage = () => {
   const [orderList, isOrderListPending, refetchOrder] = useOrders();
   const axiosPublic = useAxiosPublic();
   const [page, setPage] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
   const isAdmin = true;
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
@@ -85,16 +86,25 @@ const OrdersPage = () => {
   const toggleDropdown = () => setIsOpenDropdown(!isOpenDropdown);
 
   const { data: { result, totalOrderList } = [], isOrderPending, refetch } = useQuery({
-    queryKey: ["orderList", page],
+    queryKey: ["orderList", page, itemsPerPage],
     queryFn: async () => {
-      const res = await axiosPublic.get(`/orderList?page=${page}`);
+      const res = await axiosPublic.get(`/orderList?page=${page}&itemsPerPage=${itemsPerPage}`);
       return res?.data;
     },
   });
 
-  const totalPage = Math.ceil(totalOrderList / 25);
-  // Handle pagination logic
+  const totalPage = Math.ceil(totalOrderList / itemsPerPage);
   const pages = Array.from({ length: totalPage }, (_, i) => i);
+
+  const handleItemsPerPageChange = (e) => {
+    // Extracting only the value from the event
+    const value = Number(e.target.value);
+
+    setItemsPerPage(value); // Set the number of items per page
+    setPage(0); // Reset to the first page
+    refetch(); // Refetch the data with updated items per page
+  };
+
   // Check if filters are applied
   const isFilterActive = searchQuery || (selectedDateRange?.start && selectedDateRange?.end);
 
@@ -166,7 +176,7 @@ const OrdersPage = () => {
       (order.trackingNumber || '').toLowerCase().includes(query) ||
       (order.shippingMethod || '').toLowerCase().includes(query) ||
       (order.paymentStatus || '').toLowerCase().includes(query) ||
-      (order._id || '').toLowerCase().includes(query)
+      (order.customerId || '').toLowerCase().includes(query)
     );
 
     // Check if query parts match first and last names
@@ -338,95 +348,97 @@ const OrdersPage = () => {
   }
 
   return (
-    <div>
+    <div className='max-w-screen-2xl px-6 2xl:px-0 mx-auto'>
 
-      <h3 className='text-center font-medium md:font-semibold text-[13px] md:text-xl lg:text-2xl px-6 md:pt-6'>Order Management</h3>
+      <div className='flex flex-col md:flex-row items-center justify-between my-2 md:my-5'>
+        <h3 className='px-6 w-full text-center md:text-start font-medium md:font-semibold text-[13px] md:text-xl lg:text-2xl'>Order Management</h3>
 
-      <div className='flex items-center mt-3 mb-6 md:mb-8 max-w-screen-2xl px-3 mx-auto justify-between md:gap-6'>
+        <div className='flex w-full items-center max-w-screen-2xl px-3 mx-auto justify-center md:justify-end md:gap-6'>
 
-        {/* Button to export to CSV */}
-        <button
-          onClick={exportToCSV}
-          className="mt-3 mx-2 mb-1 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
-             md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
-          <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
-                   md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
-            Export CSV
-          </span>
-          <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
-                   md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 35 35"
-              className="w-[20px] fill-white"
-            >
-              <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
-              <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
-              <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
-            </svg>
-          </span>
-        </button>
+          {/* Button to export to CSV */}
+          <button
+            onClick={exportToCSV}
+            className="mt-3 mx-2 mb-1 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
+       md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+            <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
+             md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+              Export CSV
+            </span>
+            <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
+             md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 35 35"
+                className="w-[20px] fill-white"
+              >
+                <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
+                <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
+                <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
+              </svg>
+            </span>
+          </button>
 
-        <div ref={dropdownRef} className="relative inline-block text-left">
-          <Button onClick={toggleDropdown} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
-            Customize
-            <svg
-              className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${isOpenDropdown ? 'rotate-180' : ''}`}
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </Button>
+          <div ref={dropdownRef} className="relative inline-block text-left">
+            <Button onClick={toggleDropdown} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
+              Customize
+              <svg
+                className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${isOpenDropdown ? 'rotate-180' : ''}`}
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </Button>
 
-          {isOpenDropdown && (
-            <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-              <div className="p-1">
-                {/* Search Product Item */}
-                <li className="flex items-center relative group">
-                  <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
-                    <g>
-                      <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
-                    </g>
-                  </svg>
-                  <input
-                    type="search"
-                    placeholder="Search Product..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-[#f3f3f4] text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
-                  />
-                </li>
+            {isOpenDropdown && (
+              <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div className="p-1">
+                  {/* Search Product Item */}
+                  <li className="flex items-center relative group">
+                    <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
+                      <g>
+                        <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
+                      </g>
+                    </svg>
+                    <input
+                      type="search"
+                      placeholder="Search Product..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-[#f3f3f4] text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
+                    />
+                  </li>
 
-                {/* Choose Columns Button */}
-                <div className="py-1">
-                  <Button variant="light" color="primary" onClick={() => { setColumnModalOpen(true); setIsOpenDropdown(false) }} className="w-full">
-                    Choose Columns
-                  </Button>
+                  {/* Choose Columns Button */}
+                  <div className="py-1">
+                    <Button variant="light" color="primary" onClick={() => { setColumnModalOpen(true); setIsOpenDropdown(false) }} className="w-full">
+                      Choose Columns
+                    </Button>
+                  </div>
+
+                  <div className='flex items-center gap-2'>
+                    <DateRangePicker
+                      label="Order Duration"
+                      visibleMonths={1}
+                      onChange={(range) => setSelectedDateRange(range)} // Ensure range is an array
+                      value={selectedDateRange} // Ensure this matches the expected format
+                    />
+
+                    {selectedDateRange && selectedDateRange.start && selectedDateRange.end && (
+                      <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={handleReset}>
+                        <IoMdClose size={20} />
+                      </button>
+                    )}
+                  </div>
+
                 </div>
-
-                <div className='flex items-center gap-2'>
-                  <DateRangePicker
-                    label="Order Duration"
-                    visibleMonths={1}
-                    onChange={(range) => setSelectedDateRange(range)} // Ensure range is an array
-                    value={selectedDateRange} // Ensure this matches the expected format
-                  />
-
-                  {selectedDateRange && selectedDateRange.start && selectedDateRange.end && (
-                    <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={handleReset}>
-                      <IoMdClose size={20} />
-                    </button>
-                  )}
-                </div>
-
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
+        </div>
       </div>
 
       {/* Column Selection Modal */}
@@ -456,6 +468,7 @@ const OrdersPage = () => {
         </ModalContent>
       </Modal>
 
+      {/* table content */}
       <div className="max-w-screen-2xl mx-auto px-4 lg:px-6 custom-max-h overflow-x-auto mb-6 modal-body-scroll">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-100 sticky top-0 z-[1] shadow-md">
@@ -615,7 +628,7 @@ const OrdersPage = () => {
         <Modal className='mx-4 lg:mx-0' isOpen={isOpen} onOpenChange={onClose} size='xl'>
           <ModalContent>
             <ModalHeader className="text-sm md:text-base">Order Id - #{selectedOrder?.orderNumber}</ModalHeader>
-            <ModalHeader className='text-sm md:text-base'>Customer Id - {selectedOrder?._id}</ModalHeader>
+            <ModalHeader className='text-sm md:text-base'>Customer Id - {selectedOrder?.customerId}</ModalHeader>
             <ModalBody className="modal-body-scroll">
               <div className='flex justify-center'>
                 <Barcode selectedOrder={selectedOrder} />
@@ -670,12 +683,27 @@ const OrdersPage = () => {
 
       {/* Pagination Button */}
       {!isFilterActive && (
-        <div className="flex gap-3 justify-center items-center mb-0 md:mb-8">
+        <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
           <CustomPagination
             totalPages={pages.length}
             currentPage={page}
             onPageChange={setPage}
           />
+          <div className="relative inline-block">
+            <select
+              id="itemsPerPage"
+              value={itemsPerPage}
+              onChange={handleItemsPerPageChange}
+              className="cursor-pointer px-3 py-2 rounded-lg text-sm md:text-base text-gray-800 bg-white shadow-lg border border-gray-300 focus:outline-none hover:bg-gradient-to-tr hover:from-pink-400 hover:to-yellow-400 hover:text-white transition-colors duration-300 appearance-none w-16 md:w-20 lg:w-24"
+            >
+              <option className='bg-white text-black' value={25}>25</option>
+              <option className='bg-white text-black' value={50}>50</option>
+              <option className='bg-white text-black' value={100}>100</option>
+            </select>
+            <svg className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
         </div>
       )}
     </div>

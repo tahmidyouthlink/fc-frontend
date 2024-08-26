@@ -19,9 +19,9 @@ const PrintButton = ({ selectedOrder }) => {
     const pageWidth = pdf.internal.pageSize.width;
 
     // Set up fonts and colors
-    pdf.setFont('helvetica', 'normal');
-    const primaryColor = [0, 102, 204]; // Blue color for headings
-    const secondaryColor = [0, 0, 0]; // Black color for text
+    pdf.setFont('Oxygen', 'normal');
+    const primaryColor = [0, 102, 204];
+    const secondaryColor = [0, 0, 0];
 
     // Top Section - Order Details and Company Information
     pdf.setFontSize(10);
@@ -29,7 +29,7 @@ const PrintButton = ({ selectedOrder }) => {
 
     // Order Details on the left
     const orderDetails = [
-      `Customer ID: ${selectedOrder._id}`,
+      `Customer ID: ${selectedOrder.customerId}`,
       `Order Id: #${selectedOrder.orderNumber}`,
       `Order Date & Time: ${selectedOrder.dateTime}`,
     ].join('\n');
@@ -63,7 +63,6 @@ const PrintButton = ({ selectedOrder }) => {
     ].join('\n');
     pdf.text(customerDetails, margin, margin + 50);
 
-    // Adjust vertical position for phone numbers
     let currentY = margin + 70;
 
     // Clickable Customer Phone Numbers
@@ -72,7 +71,7 @@ const PrintButton = ({ selectedOrder }) => {
       align: 'left',
     });
 
-    currentY += 5; // Small gap between phone numbers
+    currentY += 5;
 
     if (selectedOrder.phoneNumber2 && selectedOrder.phoneNumber2 !== '0') {
       pdf.textWithLink(`Phone 2: ${selectedOrder.phoneNumber2}`, margin, currentY, {
@@ -81,19 +80,17 @@ const PrintButton = ({ selectedOrder }) => {
       });
     }
 
-    // Invoice Title - Centered between Customer Details and Product Details
     pdf.setFontSize(16);
     pdf.setTextColor(...primaryColor);
     pdf.text('INVOICE', pageWidth / 2, margin + 85, { align: 'center' });
 
-    // Product Table with colored header
     pdf.setFontSize(12);
     pdf.setTextColor(...primaryColor);
     pdf.text('Product Details', margin, margin + 95);
 
     pdf.autoTable({
       startY: margin + 100,
-      head: [['Product Title', 'Color', 'Size', 'Unit Price', 'SKU', 'Gross Amount']],
+      head: [['Product Title', 'Color', 'Size', 'Unit Price', 'SKU', 'Gross Amount (Tk)']],
       body: selectedOrder.productInformation.map(product => [
         product.productTitle,
         product.color?.label || '',
@@ -107,16 +104,14 @@ const PrintButton = ({ selectedOrder }) => {
       styles: { fontSize: 10, valign: 'middle', halign: 'center' },
     });
 
-    // Calculate Totals
     const subtotal = parseFloat(selectedOrder.productInformation.reduce((total, product) => total + (product.unitPrice * product.sku), 0).toFixed(2));
     const promoDiscount = parseFloat(selectedOrder.promoDiscount?.toFixed(2) || "0.00");
     const shippingCharge = parseFloat(selectedOrder.shippingCharge?.toFixed(2) || "0.00");
     const total = (subtotal - promoDiscount + shippingCharge).toFixed(2);
 
-    // Product Table with colored header and additional rows for Subtotal, Discounts, and Total
     pdf.autoTable({
       startY: margin + 100,
-      head: [['Product Title', 'Color', 'Size', 'Unit Price', 'SKU', 'Gross Amount']],
+      head: [['Product Title', 'Color', 'Size', 'Unit Price', 'SKU', 'Gross Amount (Tk)']],
       body: [
         ...selectedOrder.productInformation.map(product => [
           product.productTitle,
@@ -126,65 +121,78 @@ const PrintButton = ({ selectedOrder }) => {
           product.sku,
           `${(product.unitPrice * product.sku).toFixed(2)}`
         ]),
-        // Subtotals and totals with table boxes only for the amounts
-        [{ content: 'Subtotal:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `£${subtotal.toFixed(2)}`],
-        [{ content: `Promo Discount (${selectedOrder.promoCode || ''}) :`, colSpan: 5, styles: { halign: 'right', border: 'none' } }, `-£${promoDiscount.toFixed(2)}`],
-        [{ content: 'Shipping Charge:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `+£${shippingCharge.toFixed(2)}`],
-        [{ content: 'Total:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `£${total}`],
+        [{ content: 'Subtotal:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `${subtotal.toFixed(2)}`],
+        [{ content: `Promo Discount (${selectedOrder.promoCode || ''}) :`, colSpan: 5, styles: { halign: 'right', border: 'none' } }, `-${promoDiscount.toFixed(2)}`],
+        [{ content: 'Shipping Charge:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `+${shippingCharge.toFixed(2)}`],
+        [{ content: 'Total:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `${total}`],
       ],
       theme: 'grid',
       headStyles: { fillColor: primaryColor, textColor: 255 },
       styles: { fontSize: 10, valign: 'middle', halign: 'center' },
       columnStyles: {
-        0: { cellWidth: 'auto' }, // Adjust the first column width if necessary
-        5: { fontStyle: 'bold', halign: 'right', fillColor: [255, 255, 255], textColor: [0, 0, 0] }, // Amount column styled with borders
+        0: { cellWidth: 'auto' },
+        5: { fontStyle: 'bold', halign: 'right', fillColor: [255, 255, 255], textColor: [0, 0, 0] },
       }
     });
 
-    // Additional Details Section
     pdf.setFontSize(12);
     pdf.setTextColor(...primaryColor);
     pdf.text('Additional Details', margin, pdf.autoTable.previous.finalY + 10);
 
-    pdf.setFontSize(10);
-    pdf.setTextColor(...secondaryColor);
     const additionalDetails = [
-      `Shipping Zone: ${selectedOrder.shippingZone}`,
-      `Shipping Method: ${selectedOrder.shippingMethod}`,
-      `Payment Method: ${selectedOrder.paymentMethod}`,
-      `Payment Status: ${selectedOrder.paymentStatus}`,
-      `Vendor: ${selectedOrder.vendor}`,
-      `Tracking Number: ${selectedOrder.trackingNumber}`,
-    ].join('\n');
-    pdf.text(additionalDetails, margin, pdf.autoTable.previous.finalY + 15);
+      ['Shipping Zone:', selectedOrder.shippingZone, 'Shipping Method:', selectedOrder.shippingMethod],
+      ['Payment Method:', selectedOrder.paymentMethod, 'Payment Status:', selectedOrder.paymentStatus],
+      ['Vendor:', selectedOrder.vendor, 'Tracking Number:', selectedOrder.trackingNumber],
+    ];
 
-    // Footer Disclaimer with centered text in the border
+    pdf.autoTable({
+      startY: pdf.autoTable.previous.finalY + 15,
+      body: additionalDetails,
+      theme: 'grid',
+      styles: { fontSize: 10, valign: 'middle', halign: 'left' },
+      columnStyles: {
+        0: { cellWidth: pageWidth / 4 - 2 * margin },
+        1: { cellWidth: pageWidth / 4 - 2 * margin },
+        2: { cellWidth: pageWidth / 4 - 2 * margin },
+        3: { cellWidth: pageWidth / 4 - 2 * margin },
+      },
+    });
+
     pdf.setFontSize(8);
     pdf.setTextColor(128, 128, 128);
 
     const disclaimerText = 'If this invoice is for ongoing services and you have requested us to take payment using the continuous authority credit or debit card details stored on our system, then we will do so and no further action is required.';
-    const disclaimerWidth = pageWidth - 2 * margin; // Define the width of the text box
-    const disclaimerHeight = pdf.getTextDimensions(disclaimerText, { maxWidth: disclaimerWidth }).h + 4; // Calculate height of the text
-    const disclaimerX = margin; // X position
-    const disclaimerY = pdf.autoTable.previous.finalY + 45; // Adjust Y position to vertically center text
+    const disclaimerWidth = pageWidth - 2 * margin;
+    const disclaimerHeight = pdf.getTextDimensions(disclaimerText, { maxWidth: disclaimerWidth }).h + 4;
+    const disclaimerX = margin;
+    const disclaimerY = pdf.autoTable.previous.finalY + 45;
 
-    // Draw the border
     pdf.rect(disclaimerX, disclaimerY, disclaimerWidth, disclaimerHeight, 'S');
 
-    // Add the text inside the border
     pdf.text(disclaimerText, disclaimerX + disclaimerWidth / 2, disclaimerY + disclaimerHeight / 2, {
       align: 'center',
       maxWidth: disclaimerWidth,
-      lineHeightFactor: 1.5, // Adjust the line height for better vertical centering
+      baseline: 'middle',
     });
 
-    // Save the PDF
-    pdf.save(`Fashion_Commerce_Order_${selectedOrder.orderNumber}.pdf`);
+    const blob = pdf.output('blob');
+    const blobUrl = URL.createObjectURL(blob);
+
+    // Open the PDF in a new window
+    const printWindow = window.open(blobUrl);
+
+    // Automatically trigger print dialog
+    printWindow.onload = function () {
+      printWindow.focus(); // Make sure the window is focused
+      printWindow.print(); // Trigger the print dialog
+    };
   };
 
   return (
-    <Button color="primary" onPress={() => handlePrint(selectedOrder)}>
-      Print
+    <Button color="primary"
+      onPress={() => handlePrint(selectedOrder)}
+    >
+      Print Invoice
     </Button>
   );
 };

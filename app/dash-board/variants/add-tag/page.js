@@ -53,7 +53,7 @@ const AddTag = () => {
         </button>
       </div>
 
-      <h3 className='text-center font-semibold text-xl md:text-2xl px-6 pt-6'>Add Tags</h3>
+      <h3 className='text-center font-semibold text-xl md:text-2xl px-6 pt-6'>Create New Tags</h3>
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="tag-field w-full">

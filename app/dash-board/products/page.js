@@ -1,36 +1,31 @@
 import Link from 'next/link';
-import React from 'react';
-import { IoMdAdd } from "react-icons/io";
-import { FaRegEdit } from "react-icons/fa";
+import { FaListAlt, FaPlusCircle } from "react-icons/fa";
 
 const Products = () => {
   return (
     <>
-      <div className="min-h-screen justify-center items-center flex gap-6 md:gap-12">
-        <div className="button-container">
-          <Link href="/dash-board/products/add-product">
-            <button className="brutalist-button openai button-1 animate-ripple">
-              <IoMdAdd className="openai-icon animate-spin-and-zoom" />
-              <div className="button-text animate-fade-in">
-                <span>New </span>
-                <span>Product</span>
-              </div>
-            </button>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-10 py-8">
+        <div className="w-full max-w-screen-lg space-y-8 lg:space-y-10">
+          <Link
+            href="/dash-board/products/add-product"
+            className="relative w-full h-52 md:h-60 lg:h-72 xl:h-80 border-2 border-dashed border-gray-600 bg-white text-gray-600 text-2xl sm:text-3xl md:text-4xl font-extrabold rounded-lg shadow-lg flex items-center justify-center gap-4 sm:gap-5 md:gap-6 transition-all duration-300 group hover:bg-[#ffddc2] hover:text-gray-800 hover:border-transparent hover:shadow-xl"
+          >
+            <FaPlusCircle className="text-4xl sm:text-5xl md:text-6xl transition-transform transform group-hover:scale-110 group-hover:text-gray-800 animate-pulse" />
+            <span className="relative transition-transform duration-300 group-hover:text-gray-800 group-hover:translate-x-2">
+              New Product
+            </span>
           </Link>
-        </div>
-        <div className="button-container">
-          <Link href="/dash-board/products/edit-product">
-            <button className="brutalist-button openai button-1 animate-ripple">
-              <FaRegEdit className="openai-icon animate-spin-and-zoom" />
-              <div className="button-text animate-fade-in">
-                <span>Existing</span>
-                <span>Product</span>
-              </div>
-            </button>
+          <Link
+            href="/dash-board/products/edit-products"
+            className="relative w-full h-52 md:h-60 lg:h-72 xl:h-80 border-2 border-dashed border-gray-600 bg-white text-gray-600 text-2xl sm:text-3xl md:text-4xl font-extrabold rounded-lg shadow-lg flex items-center justify-center gap-4 sm:gap-5 md:gap-6 transition-all duration-300 group hover:bg-[#d4ffce] hover:text-gray-800 hover:border-transparent hover:shadow-xl"
+          >
+            <FaListAlt className="text-4xl sm:text-5xl md:text-6xl transition-transform transform group-hover:scale-110 group-hover:text-gray-800 animate-pulse" />
+            <span className="relative transition-transform duration-300 group-hover:text-gray-800 group-hover:translate-x-2">
+              Existing Products
+            </span>
           </Link>
         </div>
       </div>
-
     </>
   );
 };

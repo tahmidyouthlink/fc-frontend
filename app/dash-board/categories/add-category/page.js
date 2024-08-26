@@ -70,7 +70,6 @@ const AddCategory = () => {
         </button>
       </div>
 
-      <h3 className='text-center font-semibold text-xl md:text-2xl px-6 pt-6'>Add Category, Sizes, and Sub-Categories</h3>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
 

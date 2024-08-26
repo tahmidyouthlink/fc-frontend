@@ -47,15 +47,15 @@ const Variants = () => {
 
   return (
     <div className='min-h-screen w-full'>
-      <div className='grid grid-cols-3 max-w-screen-2xl mx-auto sticky top-0 z-10 bg-white py-2'>
-        <Button variant="light" color="primary">
-          <Link href={"/dash-board/variants/add-color"}>Add Colors</Link>
+      <div className='flex justify-between max-w-screen-2xl mx-auto sticky top-0 z-10 bg-white py-2 px-6'>
+        <Button className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg font-medium" variant="light" color="primary">
+          <Link href={"/dash-board/variants/add-color"}>New Colors</Link>
         </Button>
-        <Button variant="light" color="primary">
-          <Link href={"/dash-board/variants/add-vendor"}>Add Vendors</Link>
+        <Button className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg font-medium" variant="light" color="primary">
+          <Link href={"/dash-board/variants/add-vendor"}>New Vendors</Link>
         </Button>
-        <Button variant="light" color="primary">
-          <Link href={"/dash-board/variants/add-tag"}>Add Tags</Link>
+        <Button className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg font-medium" variant="light" color="primary">
+          <Link href={"/dash-board/variants/add-tag"}>New Tags</Link>
         </Button>
       </div>
       <div className='grid grid-cols-1 lg:grid-cols-3 max-w-screen-2xl mx-auto'>

@@ -31,9 +31,9 @@ const CategoriesOverview = () => {
   return (
     <div className='bg-gray-50 min-h-screen'>
 
-      <div className='sticky top-0 z-10 bg-gray-50 flex justify-center'>
-        <Button onClick={() => router.push('/dash-board/categories/add-category')} className='mt-6 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium'>
-          Add New Category
+      <div className='sticky top-0 z-10 bg-gray-50 flex justify-end max-w-screen-2xl mx-auto px-6'>
+        <Button onClick={() => router.push('/dash-board/categories/add-category')} className='mt-6 bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium'>
+          New Category
         </Button>
       </div>
 
