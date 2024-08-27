@@ -17,13 +17,13 @@ import PrintButton from '@/app/components/layout/PrintButton';
 import CustomPagination from '@/app/components/layout/CustomPagination';
 
 const OrdersPage = () => {
+  const isAdmin = true;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderList, isOrderListPending, refetchOrder] = useOrders();
   const axiosPublic = useAxiosPublic();
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(25);
-  const isAdmin = true;
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
   const dropdownRef = useRef(null);
@@ -96,17 +96,16 @@ const OrdersPage = () => {
   const totalPage = Math.ceil(totalOrderList / itemsPerPage);
   const pages = Array.from({ length: totalPage }, (_, i) => i);
 
+  // Check if filters are applied
+  const isFilterActive = searchQuery || (selectedDateRange?.start && selectedDateRange?.end);
+
   const handleItemsPerPageChange = (e) => {
     // Extracting only the value from the event
     const value = Number(e.target.value);
-
     setItemsPerPage(value); // Set the number of items per page
     setPage(0); // Reset to the first page
     refetch(); // Refetch the data with updated items per page
   };
-
-  // Check if filters are applied
-  const isFilterActive = searchQuery || (selectedDateRange?.start && selectedDateRange?.end);
 
   // Close dropdown when clicking outside
   const handleClickOutside = (event) => {
@@ -404,7 +403,7 @@ const OrdersPage = () => {
                     </svg>
                     <input
                       type="search"
-                      placeholder="Search Product..."
+                      placeholder="Search Order Details..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-[#f3f3f4] text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
@@ -600,7 +599,7 @@ const OrdersPage = () => {
                   <td className="text-xs p-3 text-gray-700">{order?.phoneNumber}</td>
                 )}
                 {selectedColumns.includes('Alternative Phone Number') && (
-                  <td className="text-xs p-3 text-gray-700">{order?.phoneNumber2}</td>
+                  <td className="text-xs p-3 text-gray-700">{order?.phoneNumber2 === 0 ? '--' : order?.phoneNumber2}</td>
                 )}
                 {selectedColumns.includes('Shipping Zone') && (
                   <td className="text-xs p-3 text-gray-700">{order?.shippingZone}</td>
@@ -635,7 +634,7 @@ const OrdersPage = () => {
               </div>
               <p className='text-xs md:text-base'>Address: {selectedOrder?.address1} {selectedOrder?.address2}, {selectedOrder?.city}, {selectedOrder?.postalCode}</p>
               <p className='text-xs md:text-base'>Transaction Id: {selectedOrder?.transactionId}</p>
-              <p className='text-xs md:text-base'>Tracking Number: {selectedOrder?.trackingNumber}</p>
+              <p className='text-xs md:text-base'>Tracking Number: {selectedOrder?.trackingNumber === "" ? '--' : selectedOrder?.trackingNumber}</p>
 
               {/* Display product information */}
               {selectedOrder.productInformation && selectedOrder.productInformation.length > 0 && (
