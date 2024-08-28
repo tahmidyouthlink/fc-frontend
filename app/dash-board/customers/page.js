@@ -1,21 +1,20 @@
 "use client";
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
 import CustomPagination from '@/app/components/layout/CustomPagination';
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
-import useCustomers from '@/app/hooks/useCustomers';
 import useOrders from '@/app/hooks/useOrders';
 import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import CustomerPrintButton from '@/app/components/layout/CustomerPrintButton';
+import RatingModal from '@/app/components/layout/RatingModal';
+import toast from 'react-hot-toast';
 
 const Customers = () => {
 
+  const isAdmin = true;
   const dropdownRef = useRef(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [customerDetails, isCustomerDetailsPending, refetchCustomerDetails] = useCustomers();
   const [orderList, isOrderListPending] = useOrders();
   const axiosPublic = useAxiosPublic();
   const [page, setPage] = useState(0);
@@ -27,6 +26,9 @@ const Customers = () => {
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
+  const [isRatingModalOpen, setRatingModalOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [ratings, setRatings] = useState({});
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedCustomerColumns'));
@@ -36,12 +38,6 @@ const Customers = () => {
       setSelectedColumns(defaultColumns);
     }
   }, [defaultColumns]);
-
-  // useEffect(() => {
-  //   if (searchQuery) {
-  //     refetchOrder();  // RefetchOrders when search query changes
-  //   }
-  // }, [searchQuery, refetchOrder]);
 
   const handleColumnChange = (selected) => {
     const combinedSelection = [...defaultColumns, ...selected.filter(col => !defaultColumns.includes(col))];
@@ -142,7 +138,81 @@ const Customers = () => {
     };
   });
 
-  if (isCustomerDetailsPending || isCustomerListPending || isOrderListPending) {
+  const filteredData = useMemo(() => {
+    const normalizeString = (value) => {
+      return value ? value.toString().toLowerCase() : '';
+    };
+
+    const doesCustomerMatchSearch = (customer, searchTerm) => {
+      return (
+        normalizeString(customer.customerId).includes(searchTerm) ||
+        normalizeString(customer.customerName).includes(searchTerm) ||
+        normalizeString(customer.email).includes(searchTerm) ||
+        normalizeString(customer.phoneNumber).includes(searchTerm) ||
+        normalizeString(customer.city).includes(searchTerm) ||
+        normalizeString(customer.postalCode).includes(searchTerm) ||
+        normalizeString(customer.streetAddress).includes(searchTerm) ||
+        normalizeString(customer.paymentMethods).includes(searchTerm) ||
+        normalizeString(customer.alternativePhoneNumber).includes(searchTerm)
+      );
+    };
+
+    if (!searchQuery) return combinedData;
+
+    const searchTerm = searchQuery.toLowerCase();
+
+    return combinedData?.filter((customer) => doesCustomerMatchSearch(customer, searchTerm));
+  }, [combinedData, searchQuery]);
+
+  const isFiltering = searchQuery.length > 0;
+
+  const handleRateClick = (customer) => {
+    setSelectedCustomer(customer);
+    setRatingModalOpen(true);
+  };
+
+  const handleSaveRating = async (rating) => {
+    if (selectedCustomer) {
+      try {
+        // Send the PATCH request to update the rating
+        const response = await axiosPublic.patch(`/addRatingToCustomer/${selectedCustomer.customerId}`, { rating });
+
+        if (response.status === 200) {
+          // Update local state with the new rating
+          setRatings({
+            ...ratings,
+            [selectedCustomer.customerId]: response.data.rating
+          });
+
+          // Show a success toast message
+          toast.success(`Rating updated successfully for customer ${selectedCustomer.customerId}`);
+        } else {
+          toast.error('Failed to save rating: ' + response.data.message);
+        }
+
+      } catch (error) {
+        console.error('Error saving rating:', error);
+        toast.error('Error saving rating. Please try again.');
+      }
+    }
+
+    // Close the modal after saving the rating
+    setRatingModalOpen(false);
+  };
+
+  const handleCloseModal = () => {
+    // Reset rating for the selected customer
+    if (selectedCustomer) {
+      setRatings({
+        ...ratings,
+        [selectedCustomer.customerId]: 0 // Or any default value
+      });
+    }
+    setSelectedCustomer(null);
+    setRatingModalOpen(false);
+  };
+
+  if (isCustomerListPending || isOrderListPending) {
     return <Loading />
   }
 
@@ -180,7 +250,7 @@ const Customers = () => {
                     </svg>
                     <input
                       type="search"
-                      placeholder="Search Customer Details..."
+                      placeholder="Search By Customer Details..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-[#f3f3f4] text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
@@ -281,7 +351,7 @@ const Customers = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {combinedData?.map((customer, index) => (
+            {filteredData?.map((customer, index) => (
               <tr key={customer?._id || index} className="hover:bg-gray-50 transition-colors">
                 {selectedColumns.includes('Customer ID') && (
                   <td className="text-xs p-3 text-gray-700 font-mono">
@@ -344,15 +414,28 @@ const Customers = () => {
                 )}
 
                 {selectedColumns.includes('Score') && (
-                  <td className="text-xs p-3 text-gray-700">
-                    Give Score
+                  <td>
+                    <Button onClick={() => handleRateClick(customer)} disabled={!isAdmin} color="danger" variant="flat" size='sm'>Rate</Button>
                   </td>
                 )}
+
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {/* Add Rating Modal */}
+      {selectedCustomer && (
+        <RatingModal
+          isOpen={isRatingModalOpen}
+          onClose={handleCloseModal}
+          onSave={handleSaveRating}
+          initialRating={ratings[selectedCustomer.customerId] || 0}
+          selectedCustomer={selectedCustomer}  // Pass customerId here
+        />
+      )}
+
 
       {selectedOrder && (
         <Modal className='mx-4 lg:mx-0' isOpen={isOpen} onOpenChange={onClose} size='2xl'>
@@ -398,28 +481,30 @@ const Customers = () => {
         </Modal>
       )}
 
-      <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
-        <CustomPagination
-          totalPages={pages.length}
-          currentPage={page}
-          onPageChange={setPage}
-        />
-        <div className="relative inline-block">
-          <select
-            id="itemsPerPage"
-            value={itemsPerPage}
-            onChange={handleItemsPerPageChange}
-            className="cursor-pointer px-3 py-2 rounded-lg text-sm md:text-base text-gray-800 bg-white shadow-lg border border-gray-300 focus:outline-none hover:bg-gradient-to-tr hover:from-pink-400 hover:to-yellow-400 hover:text-white transition-colors duration-300 appearance-none w-16 md:w-20 lg:w-24"
-          >
-            <option className='bg-white text-black' value={25}>25</option>
-            <option className='bg-white text-black' value={50}>50</option>
-            <option className='bg-white text-black' value={100}>100</option>
-          </select>
-          <svg className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-          </svg>
+      {!isFiltering && (
+        <div className="flex justify-center items-center gap-4 my-4">
+          <CustomPagination
+            totalPages={pages.length}
+            currentPage={page}
+            onPageChange={setPage}
+          />
+          <div className="relative inline-block">
+            <select
+              id="itemsPerPage"
+              value={itemsPerPage}
+              onChange={handleItemsPerPageChange}
+              className="cursor-pointer px-3 py-2 rounded-lg text-sm md:text-base text-gray-800 bg-white shadow-lg border border-gray-300 focus:outline-none hover:bg-gradient-to-tr hover:from-pink-400 hover:to-yellow-400 hover:text-white transition-colors duration-300 appearance-none w-16 md:w-20 lg:w-24"
+            >
+              <option className='bg-white text-black' value={25}>25</option>
+              <option className='bg-white text-black' value={50}>50</option>
+              <option className='bg-white text-black' value={100}>100</option>
+            </select>
+            <svg className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
         </div>
-      </div>
+      )}
 
     </div >
   );
