@@ -286,5 +286,11 @@
     "customerId": "FC1712345725",
     "email": "laura.ward48@example.com",
     "phoneNumber": "01712345725"
+  },
+  {
+    "customerName": "Frank Richardson",
+    "customerId": "FC1712345722",
+    "email": "frank.richardson45@example.com",
+    "phoneNumber": "01712345722"
   }
 ]

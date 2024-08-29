@@ -1873,5 +1873,44 @@
     "shippingCharge": 10,
     "promoCode": "BACKPACK10",
     "paymentStatus": "Pending"
+  },
+  {
+    "orderNumber": "24080601FR722",
+    "dateTime": "05-08-24 | 12:00",
+    "customerName": "Frank Richardson",
+    "customerId": "FC1712345722",
+    "email": "frank.richardson45@example.com",
+    "phoneNumber": "01712345722",
+    "phoneNumber2": 0,
+    "address1": "2424 Maple St",
+    "address2": "Apt 15A",
+    "city": "Gotham",
+    "postalCode": 24242,
+    "orderStatus": "Pending",
+    "totalAmount": 180.0,
+    "paymentMethod": "PayPal",
+    "vendor": "VendorZ",
+    "shippingZone": "Zone 3",
+    "promoDiscount": 10.0,
+    "productInformation": [
+      {
+        "productTitle": "Backpack",
+        "size": "One Size",
+        "color": {
+          "value": "Orange",
+          "label": "Orange",
+          "color": "#FFA500"
+        },
+        "batchCode": "BATCH229",
+        "sku": 1,
+        "unitPrice": 180
+      }
+    ],
+    "transactionId": "TXN1234568150",
+    "trackingNumber": "",
+    "shippingMethod": "Standard Shipping",
+    "shippingCharge": 10,
+    "promoCode": "BACKPACK10",
+    "paymentStatus": "Pending"
   }
 ]

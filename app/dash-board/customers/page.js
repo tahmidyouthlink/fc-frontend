@@ -77,6 +77,10 @@ const Customers = () => {
       const res = await axiosPublic.get(`/customerList?page=${page}&itemsPerPage=${itemsPerPage}`);
       return res?.data;
     },
+    refetchInterval: 1000 * 30, // Refetch every 30 seconds
+    onError: (err) => {
+      console.error('Error fetching customer list:', err);
+    }
   });
 
   const totalPage = Math.ceil(totalCustomerList / itemsPerPage);
@@ -91,24 +95,24 @@ const Customers = () => {
   };
 
   const handleViewClick = async (orderId) => {
-    const orderDetails = orderList.filter(order => order.customerId === orderId);
+    const orderDetails = orderList?.filter(order => order?.customerId === orderId);
     setSelectedOrder(orderDetails);
     onOpen();
   };
 
   const combinedData = result?.map((customer) => {
     // Ensure orderList is an array
-    const customerOrders = (orderList || []).filter(order => order.customerId === customer.customerId);
+    const customerOrders = (orderList || [])?.filter(order => order?.customerId === customer?.customerId);
 
     // Aggregating required fields from orders
-    const aggregatedOrderDetails = customerOrders.reduce((acc, order) => {
-      acc.city = order.city;
-      acc.postalCode = order.postalCode;
-      acc.streetAddress = `${order.address1} ${order.address2}`;
+    const aggregatedOrderDetails = customerOrders?.reduce((acc, order) => {
+      acc.city = order?.city;
+      acc.postalCode = order?.postalCode;
+      acc.streetAddress = `${order?.address1} ${order?.address2}`;
 
       // Collect unique payment methods
-      if (order.paymentMethod) {
-        acc.paymentMethods.add(order.paymentMethod);
+      if (order?.paymentMethod) {
+        acc?.paymentMethods?.add(order.paymentMethod);
       }
 
       // Set alternative phone number

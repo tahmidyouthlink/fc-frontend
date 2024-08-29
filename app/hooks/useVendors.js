@@ -11,6 +11,10 @@ const useVendors = () => {
     queryFn: async () => {
       const res = await axiosPublic.get("/allVendors");
       return res?.data;
+    },
+    refetchInterval: 1000 * 30, // Refetch every 30 seconds
+    onError: (err) => {
+      console.error(`Error fetching tags api`, err);
     }
   })
 

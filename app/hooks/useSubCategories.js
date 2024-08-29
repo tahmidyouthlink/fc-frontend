@@ -11,6 +11,10 @@ const useSubCategories = () => {
     queryFn: async () => {
       const res = await axiosPublic.get("/allSubCategories");
       return res?.data;
+    },
+    refetchInterval: 1000 * 30, // Refetch every 30 seconds
+    onError: (err) => {
+      console.error(`Error fetching sub-categories api`, err);
     }
   })
 
