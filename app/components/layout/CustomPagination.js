@@ -95,7 +95,7 @@ const CustomPagination = ({ totalPages, currentPage, onPageChange }) => {
   };
 
   return (
-    <div className="flex flex-wrap gap-2 md:gap-3 justify-center items-center mb-4 md:mb-8">
+    <div className="flex flex-wrap gap-2 md:gap-3 justify-center items-center">
       {/* Previous Button */}
       <button
         className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-gray-50 shadow-md   

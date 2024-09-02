@@ -351,7 +351,7 @@ const OrdersPage = () => {
   }
 
   return (
-    <div className='max-w-screen-2xl px-6 2xl:px-0 mx-auto'>
+    <div className='max-w-screen-2xl px-0 md:px-6 2xl:px-0 mx-auto'>
 
       <div className='flex flex-col md:flex-row items-center justify-between my-2 md:my-5'>
         <h3 className='px-6 w-full text-center md:text-start font-medium md:font-semibold text-[13px] md:text-xl lg:text-2xl'>Order Management</h3>
@@ -361,7 +361,7 @@ const OrdersPage = () => {
           {/* Button to export to CSV */}
           <button
             onClick={exportToCSV}
-            className="mt-3 mx-2 mb-1 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
+            className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
        md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
             <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
              md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
@@ -472,7 +472,7 @@ const OrdersPage = () => {
       </Modal>
 
       {/* table content */}
-      <div className="max-w-screen-2xl mx-auto px-4 lg:px-6 custom-max-h overflow-x-auto mb-6 modal-body-scroll">
+      <div className="max-w-screen-2xl mx-auto px-0 md:px-4 lg:px-6 custom-max-h overflow-x-auto modal-body-scroll">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-100 sticky top-0 z-[1] shadow-md">
             <tr>

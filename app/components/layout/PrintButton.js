@@ -39,15 +39,9 @@ const PrintButton = ({ selectedOrder }) => {
     pdf.text('Fashion Commerce', pageWidth - margin, margin + 10, { align: 'right' });
     pdf.text('Mirpur, Dhaka, 1100', pageWidth - margin, margin + 15, { align: 'right' });
 
-    // Clickable Email and Phone
-    pdf.textWithLink('Email: fashion@commerce.com', pageWidth - margin, margin + 20, {
-      url: 'mailto:fashion@commerce.com',
-      align: 'right',
-    });
-    pdf.textWithLink('Phone: +88 019 999 99999', pageWidth - margin, margin + 25, {
-      url: 'tel:+8801999999999',
-      align: 'right',
-    });
+    // Display Email and Phone as plain text (not clickable)
+    pdf.text('Email: fashion@commerce.com', pageWidth - margin, margin + 20, { align: 'right' });
+    pdf.text('Phone: +88 019 999 99999', pageWidth - margin, margin + 25, { align: 'right' });
 
     // Customer Info
     pdf.setFontSize(12);
@@ -58,27 +52,12 @@ const PrintButton = ({ selectedOrder }) => {
     pdf.setTextColor(...secondaryColor);
     const customerDetails = [
       `Name: ${selectedOrder.customerName}`,
-      `Email: ${selectedOrder.email}`,
+      `Email: ${selectedOrder.email}`, // Display email as plain text
+      `Phone: ${selectedOrder.phoneNumber}`,
+      selectedOrder.phoneNumber2 && selectedOrder.phoneNumber2 !== '0' ? `Phone 2: ${selectedOrder.phoneNumber2}` : null,
       `Address: ${selectedOrder.address1}${selectedOrder.address2 ? ', ' + selectedOrder.address2 : ''}, ${selectedOrder.city}, ${selectedOrder.postalCode}`,
-    ].join('\n');
+    ].filter(Boolean).join('\n'); // Filter out any null values
     pdf.text(customerDetails, margin, margin + 50);
-
-    let currentY = margin + 70;
-
-    // Clickable Customer Phone Numbers
-    pdf.textWithLink(`Phone: ${selectedOrder.phoneNumber}`, margin, currentY, {
-      url: `tel:${selectedOrder.phoneNumber}`,
-      align: 'left',
-    });
-
-    currentY += 5;
-
-    if (selectedOrder.phoneNumber2 && selectedOrder.phoneNumber2 !== '0') {
-      pdf.textWithLink(`Phone 2: ${selectedOrder.phoneNumber2}`, margin, currentY, {
-        url: `tel:${selectedOrder.phoneNumber2}`,
-        align: 'left',
-      });
-    }
 
     pdf.setFontSize(16);
     pdf.setTextColor(...primaryColor);

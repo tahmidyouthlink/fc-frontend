@@ -6,7 +6,7 @@
     "customerId": "FC1712345678",
     "email": "john.doe@example.com",
     "phoneNumber": "01712345678",
-    "phoneNumber2": 0,
+    "phoneNumber2": "01712345567",
     "address1": "123 Main St",
     "address2": "Apt 4B",
     "city": "Metropolis",

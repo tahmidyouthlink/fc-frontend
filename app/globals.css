@@ -140,14 +140,14 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 
 /* Base styles for small screens (mobile) */
 .custom-max-h {
-  max-height: calc(100vh - 280px);
+  max-height: calc(100vh - 180px);
   overflow-y: auto;
 }
 
 /* Medium screens (tablets) */
 @media (min-width: 768px) {
   .custom-max-h {
-    max-height: calc(100vh - 200px);
+    max-height: calc(100vh - 130px);
   }
 }
 

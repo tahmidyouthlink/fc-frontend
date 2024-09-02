@@ -3,294 +3,343 @@
     "customerName": "John Doe",
     "customerId": "FC1712345678",
     "email": "john.doe1@example.com",
-    "phoneNumber": "01712345678"
+    "phoneNumber": "01712345678",
+    "emailVerified": "Unverified"
   },
   {
     "customerName": "Jane Smith",
     "customerId": "FC1712345679",
     "email": "jane.smith2@example.com",
-    "phoneNumber": "01712345679"
+    "phoneNumber": "01712345679",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Robert Brown",
     "customerId": "FC1712345680",
     "email": "robert.brown3@example.com",
-    "phoneNumber": "01712345680"
+    "phoneNumber": "01712345680",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Emily Davis",
     "customerId": "FC1712345681",
     "email": "emily.davis4@example.com",
-    "phoneNumber": "01712345681"
+    "phoneNumber": "01712345681",
+    "emailVerified": "Unverified"
   },
   {
     "customerName": "Michael Johnson",
     "customerId": "FC1712345682",
     "email": "michael.johnson5@example.com",
-    "phoneNumber": "01712345682"
+    "phoneNumber": "01712345682",
+    "emailVerified": "Unverified"
   },
   {
     "customerName": "Mary Lee",
     "customerId": "FC1712345683",
     "email": "mary.lee6@example.com",
-    "phoneNumber": "01712345683"
+    "phoneNumber": "01712345683",
+    "emailVerified": "Unverified"
   },
   {
     "customerName": "David Wilson",
     "customerId": "FC1712345684",
     "email": "david.wilson7@example.com",
-    "phoneNumber": "01712345684"
+    "phoneNumber": "01712345684",
+    "emailVerified": "Unverified"
   },
   {
     "customerName": "Linda Martinez",
     "customerId": "FC1712345685",
     "email": "linda.martinez8@example.com",
-    "phoneNumber": "01712345685"
+    "phoneNumber": "01712345685",
+    "emailVerified": "Unverified"
   },
   {
     "customerName": "James Anderson",
     "customerId": "FC1712345686",
     "email": "james.anderson9@example.com",
-    "phoneNumber": "01712345686"
+    "phoneNumber": "01712345686",
+    "emailVerified": "Unverified"
   },
   {
     "customerName": "Barbara Clark",
     "customerId": "FC1712345687",
     "email": "barbara.clark10@example.com",
-    "phoneNumber": "01712345687"
+    "phoneNumber": "01712345687",
+    "emailVerified": "Unverified"
   },
   {
     "customerName": "William Rodriguez",
     "customerId": "FC1712345688",
     "email": "william.rodriguez11@example.com",
-    "phoneNumber": "01712345688"
+    "phoneNumber": "01712345688",
+    "emailVerified": "Unverified"
   },
   {
     "customerName": "Elizabeth Lewis",
     "customerId": "FC1712345689",
     "email": "elizabeth.lewis12@example.com",
-    "phoneNumber": "01712345689"
+    "phoneNumber": "01712345689",
+    "emailVerified": "Unverified"
   },
   {
     "customerName": "Christopher Walker",
     "customerId": "FC1712345690",
     "email": "christopher.walker13@example.com",
-    "phoneNumber": "01712345690"
+    "phoneNumber": "01712345690",
+    "emailVerified": "Unverified"
   },
   {
     "customerName": "Patricia Hall",
     "customerId": "FC1712345691",
     "email": "patricia.hall14@example.com",
-    "phoneNumber": "01712345691"
+    "phoneNumber": "01712345691",
+    "emailVerified": "Unverified"
   },
   {
     "customerName": "Daniel Young",
     "customerId": "FC1712345692",
     "email": "daniel.young15@example.com",
-    "phoneNumber": "01712345692"
+    "phoneNumber": "01712345692",
+    "emailVerified": "Unverified"
   },
   {
     "customerName": "Nancy King",
     "customerId": "FC1712345693",
     "email": "nancy.king16@example.com",
-    "phoneNumber": "01712345693"
+    "phoneNumber": "01712345693",
+    "emailVerified": "Unverified"
   },
   {
     "customerName": "Matthew Wright",
     "customerId": "FC1712345694",
     "email": "matthew.wright17@example.com",
-    "phoneNumber": "01712345694"
+    "phoneNumber": "01712345694",
+    "emailVerified": "Unverified"
   },
   {
     "customerName": "Karen Scott",
     "customerId": "FC1712345695",
     "email": "karen.scott18@example.com",
-    "phoneNumber": "01712345695"
+    "phoneNumber": "01712345695",
+    "emailVerified": "Unverified"
   },
   {
     "customerName": "Donald Green",
     "customerId": "FC1712345696",
     "email": "donald.green19@example.com",
-    "phoneNumber": "01712345696"
+    "phoneNumber": "01712345696",
+    "emailVerified": "Unverified"
   },
   {
     "customerName": "Sarah Baker",
     "customerId": "FC1712345697",
     "email": "sarah.baker20@example.com",
-    "phoneNumber": "01712345697"
+    "phoneNumber": "01712345697",
+    "emailVerified": "Unverified"
   },
   {
     "customerName": "Joshua Adams",
     "customerId": "FC1712345698",
     "email": "joshua.adams21@example.com",
-    "phoneNumber": "01712345698"
+    "phoneNumber": "01712345698",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Michelle Nelson",
     "customerId": "FC1712345699",
     "email": "michelle.nelson22@example.com",
-    "phoneNumber": "01712345699"
+    "phoneNumber": "01712345699",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Mark Carter",
     "customerId": "FC1712345700",
     "email": "mark.carter23@example.com",
-    "phoneNumber": "01712345700"
+    "phoneNumber": "01712345700",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Lisa Mitchell",
     "customerId": "FC1712345701",
     "email": "lisa.mitchell24@example.com",
-    "phoneNumber": "01712345701"
+    "phoneNumber": "01712345701",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Steven Perez",
     "customerId": "FC1712345702",
     "email": "steven.perez25@example.com",
-    "phoneNumber": "01712345702"
+    "phoneNumber": "01712345702",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Betty Roberts",
     "customerId": "FC1712345703",
     "email": "betty.roberts26@example.com",
-    "phoneNumber": "01712345703"
+    "phoneNumber": "01712345703",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Joseph Turner",
     "customerId": "FC1712345704",
     "email": "joseph.turner27@example.com",
-    "phoneNumber": "01712345704"
+    "phoneNumber": "01712345704",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Sandra Phillips",
     "customerId": "FC1712345705",
     "email": "sandra.phillips28@example.com",
-    "phoneNumber": "01712345705"
+    "phoneNumber": "01712345705",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Paul Campbell",
     "customerId": "FC1712345706",
     "email": "paul.campbell29@example.com",
-    "phoneNumber": "01712345706"
+    "phoneNumber": "01712345706",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Jessica Parker",
     "customerId": "FC1712345707",
     "email": "jessica.parker30@example.com",
-    "phoneNumber": "01712345707"
+    "phoneNumber": "01712345707",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Thomas Evans",
     "customerId": "FC1712345708",
     "email": "thomas.evans31@example.com",
-    "phoneNumber": "01712345708"
+    "phoneNumber": "01712345708",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Carol Edwards",
     "customerId": "FC1712345709",
     "email": "carol.edwards32@example.com",
-    "phoneNumber": "01712345709"
+    "phoneNumber": "01712345709",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Larry Collins",
     "customerId": "FC1712345710",
     "email": "larry.collins33@example.com",
-    "phoneNumber": "01712345710"
+    "phoneNumber": "01712345710",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Dorothy Stewart",
     "customerId": "FC1712345711",
     "email": "dorothy.stewart34@example.com",
-    "phoneNumber": "01712345711"
+    "phoneNumber": "01712345711",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Kevin Morris",
     "customerId": "FC1712345712",
     "email": "kevin.morris35@example.com",
-    "phoneNumber": "01712345712"
+    "phoneNumber": "01712345712",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Shirley Rogers",
     "customerId": "FC1712345713",
     "email": "shirley.rogers36@example.com",
-    "phoneNumber": "01712345713"
+    "phoneNumber": "01712345713",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Brian Reed",
     "customerId": "FC1712345714",
     "email": "brian.reed37@example.com",
-    "phoneNumber": "01712345714"
+    "phoneNumber": "01712345714",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Cynthia Cook",
     "customerId": "FC1712345715",
     "email": "cynthia.cook38@example.com",
-    "phoneNumber": "01712345715"
+    "phoneNumber": "01712345715",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Edward Morgan",
     "customerId": "FC1712345716",
     "email": "edward.morgan39@example.com",
-    "phoneNumber": "01712345716"
+    "phoneNumber": "01712345716",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Margaret Bell",
     "customerId": "FC1712345717",
     "email": "margaret.bell40@example.com",
-    "phoneNumber": "01712345717"
+    "phoneNumber": "01712345717",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Jason Murphy",
     "customerId": "FC1712345718",
     "email": "jason.murphy41@example.com",
-    "phoneNumber": "01712345718"
+    "phoneNumber": "01712345718",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Amy Bailey",
     "customerId": "FC1712345719",
     "email": "amy.bailey42@example.com",
-    "phoneNumber": "01712345719"
+    "phoneNumber": "01712345719",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Jeffrey Rivera",
     "customerId": "FC1712345720",
     "email": "jeffrey.rivera43@example.com",
-    "phoneNumber": "01712345720"
+    "phoneNumber": "01712345720",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Anna Cooper",
     "customerId": "FC1712345721",
     "email": "anna.cooper44@example.com",
-    "phoneNumber": "01712345721"
+    "phoneNumber": "01712345721",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Frank Richardson",
     "customerId": "FC1712345722",
     "email": "frank.richardson45@example.com",
-    "phoneNumber": "01712345722"
+    "phoneNumber": "01712345722",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Rebecca Cox",
     "customerId": "FC1712345723",
     "email": "rebecca.cox46@example.com",
-    "phoneNumber": "01712345723"
+    "phoneNumber": "01712345723",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Gary Howard",
     "customerId": "FC1712345724",
     "email": "gary.howard47@example.com",
-    "phoneNumber": "01712345724"
+    "phoneNumber": "01712345724",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Laura Ward",
     "customerId": "FC1712345725",
     "email": "laura.ward48@example.com",
-    "phoneNumber": "01712345725"
+    "phoneNumber": "01712345725",
+    "emailVerified": "Verified"
   },
   {
     "customerName": "Frank Richardson",
     "customerId": "FC1712345722",
     "email": "frank.richardson45@example.com",
-    "phoneNumber": "01712345722"
+    "phoneNumber": "01712345722",
+    "emailVerified": "Verified"
   }
 ]

@@ -140,7 +140,7 @@ const SideNavbar = ({ onClose }) => {
                 {item?.links?.map((linkItem, linkIndex) => (
                   <Link href={linkItem?.link} key={linkIndex} legacyBehavior>
                     <a
-                      className={`flex items-center gap-2 w-full hover:bg-[#F9FBFA] hover:text-black px-4 py-2 rounded-md ${pathname === linkItem.link ? "text-black bg-[#F9FBFA]" : ""
+                      className={`flex items-center gap-2 w-full hover:bg-[#F9FBFA] hover:text-black px-4 ml-12 py-2 rounded-md ${pathname === linkItem.link ? "text-black bg-[#F9FBFA]" : ""
                         }`}
                       onClick={onClose}
                     >

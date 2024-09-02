@@ -1,22 +1,16 @@
-// "use client";
-import React, { useEffect, useState } from 'react';
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
+import React, { useState, useEffect } from 'react';
+import { Button, Modal, ModalBody, ModalContent, ModalFooter } from '@nextui-org/react';
 import StarRating from './StarRating';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
-import toast from 'react-hot-toast';
 
 const RatingModal = ({ isOpen, onClose, onSave, initialRating, selectedCustomer }) => {
   const [rating, setRating] = useState(initialRating);
-  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [isLoading, setIsLoading] = useState(true);
   const axiosPublic = useAxiosPublic();
-
-  console.log(selectedCustomer);
 
   useEffect(() => {
     if (isOpen) {
-      setIsLoading(true); // Set loading state to true when modal opens
-
-      // Fetch current rating when modal opens
+      setIsLoading(true);
       const fetchRating = async () => {
         try {
           const response = await axiosPublic.get(`/getCustomerRating/${selectedCustomer?.customerId}`);
@@ -25,46 +19,35 @@ const RatingModal = ({ isOpen, onClose, onSave, initialRating, selectedCustomer 
           console.error('Error fetching rating:', error);
           toast.error('Error fetching rating.');
         } finally {
-          setIsLoading(false); // Set loading state to false after fetching
+          setIsLoading(false);
         }
       };
-
       fetchRating();
     }
   }, [isOpen, axiosPublic, selectedCustomer?.customerId, initialRating]);
 
   const handleSave = () => {
-    onSave(rating); // Call the save function with the current rating
+    onSave(rating);
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md">
+    <Modal isOpen={isOpen} onClose={onClose} size="xs">
       <ModalContent>
-        <ModalHeader>
-          <div className="flex flex-col items-start">
-            <h2 className="text-xl font-semibold">Customer Details</h2>
-            <p className="text-gray-500">ID: {selectedCustomer?.customerId}</p>
-            <p className="text-gray-500">Name: {selectedCustomer?.customerName}</p>
-            <p className="text-gray-500">Email: {selectedCustomer?.email}</p>
-            <p className="text-gray-500">Phone: {selectedCustomer?.phoneNumber}</p>
-          </div>
-        </ModalHeader>
         <ModalBody>
           <div className="flex flex-col items-center">
-            <h3 className="text-lg font-medium mb-2">Rate {selectedCustomer?.customerName}</h3>
             {!isLoading ? (
               <StarRating
-                rating={rating}
-                onRatingChange={(newRating) => setRating(newRating)}
+                rating={rating} // Show the selected color initially
+                onRatingChange={(newRating) => setRating(newRating)} // Update rating on click
               />
             ) : (
-              <p>Loading...</p> // Optionally, you can display a loading indicator
+              <p>Loading...</p>
             )}
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button onClick={handleSave} color="primary" disabled={isLoading}>
-            Save Rating
+          <Button onClick={handleSave} color="primary" disabled={isLoading} size='sm'>
+            Save
           </Button>
         </ModalFooter>
       </ModalContent>

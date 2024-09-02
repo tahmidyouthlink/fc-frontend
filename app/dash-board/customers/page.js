@@ -9,6 +9,9 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import CustomerPrintButton from '@/app/components/layout/CustomerPrintButton';
 import RatingModal from '@/app/components/layout/RatingModal';
 import toast from 'react-hot-toast';
+import { FaStar } from 'react-icons/fa';
+import { getColorClass } from '@/app/components/layout/getColorClass';
+import useCustomers from '@/app/hooks/useCustomers';
 
 const Customers = () => {
 
@@ -16,11 +19,12 @@ const Customers = () => {
   const dropdownRef = useRef(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [orderList, isOrderListPending] = useOrders();
+  const [customerDetails, isCustomerPending] = useCustomers();
   const axiosPublic = useAxiosPublic();
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const columns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Alternative Phone Number', 'Score'];
+  const columns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alternative Phone Number', 'Verification', 'Rate'];
   const defaultColumns = useMemo(() => ['Customer ID', 'Customer Name', 'Email', 'Phone Number'], []);
   const [selectedColumns, setSelectedColumns] = useState(columns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
@@ -115,6 +119,11 @@ const Customers = () => {
         acc?.paymentMethods?.add(order.paymentMethod);
       }
 
+      // Collect unique shipping methods
+      if (order?.shippingMethod) {
+        acc?.shippingMethods?.add(order.shippingMethod);
+      }
+
       // Set alternative phone number
       if (order.phoneNumber2 && !acc.alternativePhoneNumber) {
         acc.alternativePhoneNumber = order.phoneNumber2;
@@ -126,11 +135,13 @@ const Customers = () => {
       postalCode: '',
       streetAddress: '',
       paymentMethods: new Set(),
+      shippingMethods: new Set(),
       alternativePhoneNumber: ''
     });
 
     // Convert payment methods from Set to comma-separated string
     const paymentMethodsString = Array.from(aggregatedOrderDetails.paymentMethods).join(', ');
+    const shippingMethodsString = Array.from(aggregatedOrderDetails.shippingMethods).join(', ');
 
     return {
       ...customer,
@@ -138,6 +149,7 @@ const Customers = () => {
       postalCode: aggregatedOrderDetails.postalCode || "--",
       streetAddress: aggregatedOrderDetails.streetAddress || "--",
       paymentMethods: paymentMethodsString || "--",
+      shippingMethods: shippingMethodsString || "--",
       alternativePhoneNumber: aggregatedOrderDetails.alternativePhoneNumber || '--'
     };
   });
@@ -157,6 +169,8 @@ const Customers = () => {
         normalizeString(customer.postalCode).includes(searchTerm) ||
         normalizeString(customer.streetAddress).includes(searchTerm) ||
         normalizeString(customer.paymentMethods).includes(searchTerm) ||
+        normalizeString(customer.shippingMethods).includes(searchTerm) ||
+        normalizeString(customer.emailVerified).includes(searchTerm) ||
         normalizeString(customer.alternativePhoneNumber).includes(searchTerm)
       );
     };
@@ -175,32 +189,26 @@ const Customers = () => {
     setRatingModalOpen(true);
   };
 
-  const handleSaveRating = async (rating) => {
+  const handleSaveRating = async (ratingColor) => {
     if (selectedCustomer) {
       try {
-        // Send the PATCH request to update the rating
-        const response = await axiosPublic.patch(`/addRatingToCustomer/${selectedCustomer.customerId}`, { rating });
+        const response = await axiosPublic.patch(`/addRatingToCustomer/${selectedCustomer.customerId}`, { rating: ratingColor });
 
         if (response.status === 200) {
-          // Update local state with the new rating
           setRatings({
             ...ratings,
-            [selectedCustomer.customerId]: response.data.rating
+            [selectedCustomer.customerId]: ratingColor // Update with the selected color
           });
-
-          // Show a success toast message
           toast.success(`Rating updated successfully for customer ${selectedCustomer.customerId}`);
         } else {
           toast.error('Failed to save rating: ' + response.data.message);
         }
-
       } catch (error) {
         console.error('Error saving rating:', error);
         toast.error('Error saving rating. Please try again.');
       }
     }
 
-    // Close the modal after saving the rating
     setRatingModalOpen(false);
   };
 
@@ -216,7 +224,7 @@ const Customers = () => {
     setRatingModalOpen(false);
   };
 
-  if (isCustomerListPending || isOrderListPending) {
+  if (isCustomerListPending || isOrderListPending || isCustomerPending) {
     return <Loading />
   }
 
@@ -304,7 +312,7 @@ const Customers = () => {
       </Modal>
 
       {/* table content */}
-      <div className="max-w-screen-2xl mx-auto px-4 lg:px-6 custom-max-h overflow-x-auto mb-6 modal-body-scroll">
+      <div className="max-w-screen-2xl mx-auto px-0 md:px-4 lg:px-6 custom-max-h overflow-x-auto modal-body-scroll">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-100 sticky top-0 z-[1] shadow-md">
             <tr>
@@ -344,87 +352,118 @@ const Customers = () => {
                 <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Preferred Payment Method</th>
               )}
 
+              {selectedColumns.includes('Shipping Method') && (
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Shipping Method</th>
+              )}
+
               {selectedColumns.includes('Alternative Phone Number') && (
                 <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Alternative Phone Number</th>
               )}
 
-              {selectedColumns.includes('Score') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Score</th>
+              {selectedColumns.includes('Verification') && (
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Verification</th>
+              )}
+
+              {selectedColumns.includes('Rate') && (
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Rate</th>
               )}
 
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredData?.map((customer, index) => (
-              <tr key={customer?._id || index} className="hover:bg-gray-50 transition-colors">
-                {selectedColumns.includes('Customer ID') && (
-                  <td className="text-xs p-3 text-gray-700 font-mono">
-                    {customer?.customerId}
-                  </td>
-                )}
+            {filteredData?.map((customer, index) => {
+              // Determine the color class based on customer.rating or ratings[customer.customerId]
+              const ratingColorClass = getColorClass(ratings[customer.customerId] || customer.rating);
 
-                {selectedColumns.includes('Customer Name') && (
-                  <td className="text-xs p-3 text-gray-700">
-                    {customer?.customerName}
-                  </td>
-                )}
+              return (
+                <tr key={customer?._id || index} className="hover:bg-gray-50 transition-colors">
+                  {selectedColumns.includes('Customer ID') && (
+                    <td className={`text-xs p-3 font-mono ${customer?.emailVerified === "Verified" ? "text-green-600 font-bold" : "text-gray-700 font-bold"}`}>
+                      {customer?.customerId}
+                    </td>
+                  )}
 
-                {selectedColumns.includes('Email') && (
-                  <td className="text-xs p-3 text-gray-700">
-                    {customer?.email}
-                  </td>
-                )}
+                  {selectedColumns.includes('Customer Name') && (
+                    <td className="text-xs p-3 text-gray-700">
+                      {customer?.customerName}
+                    </td>
+                  )}
 
-                {selectedColumns.includes('Phone Number') && (
-                  <td className="text-xs p-3 text-gray-700">
-                    {customer?.phoneNumber}
-                  </td>
-                )}
+                  {selectedColumns.includes('Email') && (
+                    <td className="text-xs p-3 text-gray-700">
+                      {customer?.email}
+                    </td>
+                  )}
 
-                {selectedColumns.includes('Order History') && (
-                  <td onClick={() => handleViewClick(customer?.customerId)} className="text-xs p-3 cursor-pointer text-blue-600 hover:text-blue-800">
-                    View
-                  </td>
-                )}
+                  {selectedColumns.includes('Phone Number') && (
+                    <td className="text-xs p-3 text-gray-700">
+                      {customer?.phoneNumber}
+                    </td>
+                  )}
 
-                {selectedColumns.includes('City') && (
-                  <td className="text-xs p-3 text-gray-700">
-                    {customer?.city}
-                  </td>
-                )}
+                  {selectedColumns.includes('Order History') && (
+                    <td onClick={() => handleViewClick(customer?.customerId)} className="text-xs p-3 cursor-pointer text-blue-600 hover:text-blue-800">
+                      View
+                    </td>
+                  )}
 
-                {selectedColumns.includes('Postal Code') && (
-                  <td className="text-xs p-3 text-gray-700">
-                    {customer?.postalCode}
-                  </td>
-                )}
+                  {selectedColumns.includes('City') && (
+                    <td className="text-xs p-3 text-gray-700">
+                      {customer?.city}
+                    </td>
+                  )}
 
-                {selectedColumns.includes('Street Address') && (
-                  <td className="text-xs p-3 text-gray-700">
-                    {customer?.streetAddress}
-                  </td>
-                )}
+                  {selectedColumns.includes('Postal Code') && (
+                    <td className="text-xs p-3 text-gray-700">
+                      {customer?.postalCode}
+                    </td>
+                  )}
 
-                {selectedColumns.includes('Preferred Payment Method') && (
-                  <td className="text-xs p-3 text-gray-700">
-                    {customer?.paymentMethods}
-                  </td>
-                )}
+                  {selectedColumns.includes('Street Address') && (
+                    <td className="text-xs p-3 text-gray-700">
+                      {customer?.streetAddress}
+                    </td>
+                  )}
 
-                {selectedColumns.includes('Alternative Phone Number') && (
-                  <td className="text-xs p-3 text-gray-700">
-                    {customer?.alternativePhoneNumber}
-                  </td>
-                )}
+                  {selectedColumns.includes('Preferred Payment Method') && (
+                    <td className="text-xs p-3 text-gray-700">
+                      {customer?.paymentMethods}
+                    </td>
+                  )}
 
-                {selectedColumns.includes('Score') && (
-                  <td>
-                    <Button onClick={() => handleRateClick(customer)} disabled={!isAdmin} color="danger" variant="flat" size='sm'>Rate</Button>
-                  </td>
-                )}
+                  {selectedColumns.includes('Shipping Method') && (
+                    <td className="text-xs p-3 text-gray-700">
+                      {customer?.shippingMethods}
+                    </td>
+                  )}
 
-              </tr>
-            ))}
+                  {selectedColumns.includes('Alternative Phone Number') && (
+                    <td className="text-xs p-3 text-gray-700">
+                      {customer?.alternativePhoneNumber}
+                    </td>
+                  )}
+
+                  {selectedColumns.includes('Verification') && (
+                    <td className="text-xs p-3 text-gray-700">
+                      {customer?.emailVerified}
+                    </td>
+                  )}
+
+                  {selectedColumns.includes('Rate') && (
+                    <td>
+                      <button
+                        onClick={() => handleRateClick(customer)}
+                        disabled={!isAdmin}
+                        className={ratingColorClass} // Apply the color class
+                      >
+                        <FaStar size={24} />
+                      </button>
+                    </td>
+                  )}
+
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -435,11 +474,10 @@ const Customers = () => {
           isOpen={isRatingModalOpen}
           onClose={handleCloseModal}
           onSave={handleSaveRating}
-          initialRating={ratings[selectedCustomer.customerId] || 0}
-          selectedCustomer={selectedCustomer}  // Pass customerId here
+          initialRating={ratings[selectedCustomer.customerId] || 'default'}
+          selectedCustomer={selectedCustomer}
         />
       )}
-
 
       {selectedOrder && (
         <Modal className='mx-4 lg:mx-0' isOpen={isOpen} onOpenChange={onClose} size='2xl'>
@@ -450,22 +488,29 @@ const Customers = () => {
             <ModalBody className="modal-body-scroll p-4 space-y-6">
               {selectedOrder.length > 0 ? (
                 selectedOrder.map((order, index) => (
-                  <div key={index} className="bg-white p-5 rounded-lg shadow-md border border-gray-200">
-                    <p className='text-sm font-medium text-gray-700 flex items-center gap-1'>
-                      <strong>Order ID : </strong><CustomerPrintButton selectedOrder={order} />
-                    </p>
-                    <p className='text-sm font-medium text-gray-700'>
-                      <span className="font-semibold">Date & Time:</span> {order?.dateTime}
-                    </p>
-                    <p className='text-sm font-medium text-gray-700'>
-                      <span className="font-semibold">Order Amount:</span> ৳ {order?.totalAmount.toFixed(2)}
-                    </p>
-                    <p className='text-sm font-medium text-gray-700'>
-                      <span className="font-semibold">Payment Method:</span> {order?.paymentMethod}
-                    </p>
-                    <p className='text-sm font-medium text-gray-700'>
-                      <span className="font-semibold">Order Status:</span> {order?.orderStatus}
-                    </p>
+                  <div key={index} className="bg-white px-5 md:px-10 py-5 rounded-lg flex flex-col md:flex-row justify-between shadow-md border border-gray-200">
+                    <div>
+                      <p className='text-sm font-medium text-gray-700 flex items-center gap-1'>
+                        <strong>Order ID : </strong><CustomerPrintButton selectedOrder={order} />
+                      </p>
+                      <p className='text-sm font-medium text-gray-700'>
+                        <span className="font-semibold">Order Amount:</span> ৳ {order?.totalAmount.toFixed(2)}
+                      </p>
+                      <p className='text-sm font-medium text-gray-700'>
+                        <span className="font-semibold">Payment Method:</span> {order?.paymentMethod}
+                      </p>
+                      <p className='text-sm font-medium text-gray-700'>
+                        <span className="font-semibold">Shipping Method:</span> {order?.shippingMethod}
+                      </p>
+                    </div>
+                    <div>
+                      <p className='text-sm font-medium text-gray-700'>
+                        <span className="font-semibold">Date & Time:</span> {order?.dateTime}
+                      </p>
+                      <p className='text-sm font-medium text-gray-700'>
+                        <span className="font-semibold">Order Status:</span> {order?.orderStatus}
+                      </p>
+                    </div>
                   </div>
                 ))
               ) : (
@@ -486,7 +531,7 @@ const Customers = () => {
       )}
 
       {!isFiltering && (
-        <div className="flex justify-center items-center gap-4 my-4">
+        <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
           <CustomPagination
             totalPages={pages.length}
             currentPage={page}
