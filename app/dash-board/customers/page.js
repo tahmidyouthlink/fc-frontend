@@ -104,60 +104,41 @@ const Customers = () => {
     onOpen();
   };
 
-  const combinedData = result?.map((customer) => {
-    // Ensure orderList is an array
-    const customerOrders = (orderList || [])?.filter(order => order?.customerId === customer?.customerId);
+  const combinedData = useMemo(() => {
+    return customerDetails?.map((customer) => {
+      const customerOrders = (orderList || []).filter(order => order.customerId === customer.customerId);
 
-    // Aggregating required fields from orders
-    const aggregatedOrderDetails = customerOrders?.reduce((acc, order) => {
-      acc.city = order?.city;
-      acc.postalCode = order?.postalCode;
-      acc.streetAddress = `${order?.address1} ${order?.address2}`;
+      const aggregatedOrderDetails = customerOrders.reduce((acc, order) => {
+        acc.city = order.city || acc.city;
+        acc.postalCode = order.postalCode || acc.postalCode;
+        acc.streetAddress = `${order.address1} ${order.address2}` || acc.streetAddress;
+        acc.paymentMethods.add(order.paymentMethod);
+        acc.shippingMethods.add(order.shippingMethod);
+        acc.alternativePhoneNumber = order.phoneNumber2 || acc.alternativePhoneNumber;
+        return acc;
+      }, {
+        city: '',
+        postalCode: '',
+        streetAddress: '',
+        paymentMethods: new Set(),
+        shippingMethods: new Set(),
+        alternativePhoneNumber: '',
+      });
 
-      // Collect unique payment methods
-      if (order?.paymentMethod) {
-        acc?.paymentMethods?.add(order.paymentMethod);
-      }
-
-      // Collect unique shipping methods
-      if (order?.shippingMethod) {
-        acc?.shippingMethods?.add(order.shippingMethod);
-      }
-
-      // Set alternative phone number
-      if (order.phoneNumber2 && !acc.alternativePhoneNumber) {
-        acc.alternativePhoneNumber = order.phoneNumber2;
-      }
-
-      return acc;
-    }, {
-      city: '',
-      postalCode: '',
-      streetAddress: '',
-      paymentMethods: new Set(),
-      shippingMethods: new Set(),
-      alternativePhoneNumber: ''
+      return {
+        ...customer,
+        city: aggregatedOrderDetails.city || "--",
+        postalCode: aggregatedOrderDetails.postalCode || "--",
+        streetAddress: aggregatedOrderDetails.streetAddress || "--",
+        paymentMethods: Array.from(aggregatedOrderDetails.paymentMethods).join(', ') || "--",
+        shippingMethods: Array.from(aggregatedOrderDetails.shippingMethods).join(', ') || "--",
+        alternativePhoneNumber: aggregatedOrderDetails.alternativePhoneNumber || '--',
+      };
     });
-
-    // Convert payment methods from Set to comma-separated string
-    const paymentMethodsString = Array.from(aggregatedOrderDetails.paymentMethods).join(', ');
-    const shippingMethodsString = Array.from(aggregatedOrderDetails.shippingMethods).join(', ');
-
-    return {
-      ...customer,
-      city: aggregatedOrderDetails.city || "--",
-      postalCode: aggregatedOrderDetails.postalCode || "--",
-      streetAddress: aggregatedOrderDetails.streetAddress || "--",
-      paymentMethods: paymentMethodsString || "--",
-      shippingMethods: shippingMethodsString || "--",
-      alternativePhoneNumber: aggregatedOrderDetails.alternativePhoneNumber || '--'
-    };
-  });
+  }, [customerDetails, orderList]);
 
   const filteredData = useMemo(() => {
-    const normalizeString = (value) => {
-      return value ? value.toString().toLowerCase() : '';
-    };
+    const normalizeString = (value) => (value ? value.toString().toLowerCase() : '');
 
     const doesCustomerMatchSearch = (customer, searchTerm) => {
       return (
@@ -178,11 +159,20 @@ const Customers = () => {
     if (!searchQuery) return combinedData;
 
     const searchTerm = searchQuery.toLowerCase();
-
-    return combinedData?.filter((customer) => doesCustomerMatchSearch(customer, searchTerm));
+    return combinedData.filter((customer) => doesCustomerMatchSearch(customer, searchTerm));
   }, [combinedData, searchQuery]);
 
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+    setPage(0);  // Reset to the first page
+  };
+
   const isFiltering = searchQuery.length > 0;
+
+  const paginatedData = useMemo(() => {
+    const start = page * itemsPerPage;
+    return filteredData.slice(start, start + itemsPerPage);
+  }, [filteredData, page, itemsPerPage]);
 
   const handleRateClick = (customer) => {
     setSelectedCustomer(customer);
@@ -264,7 +254,7 @@ const Customers = () => {
                       type="search"
                       placeholder="Search By Customer Details..."
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={handleSearch}
                       className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-[#f3f3f4] text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
                     />
                   </li>
@@ -371,7 +361,7 @@ const Customers = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredData?.map((customer, index) => {
+            {paginatedData?.map((customer, index) => {
               // Determine the color class based on customer.rating or ratings[customer.customerId]
               const ratingColorClass = getColorClass(ratings[customer.customerId] || customer.rating);
 
