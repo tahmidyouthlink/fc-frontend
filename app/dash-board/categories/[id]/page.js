@@ -70,8 +70,8 @@ export default function EditCategory() {
         toast.error('No changes detected.');
       }
     } catch (error) {
-      console.error('Error saving category:', error);
-      toast.error('There was an error saving the category. Please try again.');
+      console.error('Error editing category:', error);
+      toast.error('There was an error editing the category. Please try again.');
     }
   };
 

@@ -140,6 +140,7 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 
 /* Base styles for small screens (mobile) */
 .custom-max-h {
+  min-height: calc(100vh - 180px);
   max-height: calc(100vh - 180px);
   overflow-y: auto;
 }
@@ -147,6 +148,7 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 /* Medium screens (tablets) */
 @media (min-width: 768px) {
   .custom-max-h {
+    min-height: calc(100vh - 130px);
     max-height: calc(100vh - 130px);
   }
 }

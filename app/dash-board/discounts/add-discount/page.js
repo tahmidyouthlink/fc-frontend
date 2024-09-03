@@ -1,59 +1,41 @@
 "use client";
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
-import { DateRangePicker, Tab, Tabs } from '@nextui-org/react';
+import { Tab, Tabs } from '@nextui-org/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { RxCross2 } from 'react-icons/rx';
+import { FaArrowLeft } from 'react-icons/fa6';
 
 const AddDiscount = () => {
 
-  const { register, handleSubmit, formState: { errors, isSubmitted } } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm();
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [discountType, setDiscountType] = useState('Percentage');
-  const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
-  const [dateRangeError, setDateRangeError] = useState('');
 
   const handleTabChange = (key) => {
     setDiscountType(key);
   };
 
-  const formatDate = (dateObj) => {
-    if (!dateObj) return null;
-    return new Date(dateObj.year, dateObj.month - 1, dateObj.day).toDateString(); // Convert to "Sat Aug 31 2024"
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    const month = (`0${date.getMonth() + 1}`).slice(-2); // Get month and pad with 0 if needed
+    const day = (`0${date.getDate()}`).slice(-2);       // Get day and pad with 0 if needed
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
   };
 
-  // Effect to handle date range error display
-  useEffect(() => {
-    if (isSubmitted) {
-      const startDate = formatDate(selectedDateRange?.start);
-      const endDate = formatDate(selectedDateRange?.end);
-
-      if (!startDate || !endDate) {
-        setDateRangeError("Date range is required.");
-      } else {
-        setDateRangeError("");
-      }
-    }
-  }, [selectedDateRange, isSubmitted]);
-
   const onSubmit = async (data) => {
-    const { promoCode, discountValue } = data;
+    const { promoCode, discountValue, expiryDate, maxAmount, minAmount } = data;
 
-    const startDate = formatDate(selectedDateRange?.start);
-    const endDate = formatDate(selectedDateRange?.end);
-
-    if (!startDate || !endDate) {
-      setDateRangeError("Date range is required.");
+    if (!expiryDate) {
       return;
-    } else {
-      setDateRangeError("");
     }
 
+    const formattedExpiryDate = formatDate(expiryDate);
     setIsSubmitting(true);
 
     try {
@@ -61,8 +43,9 @@ const AddDiscount = () => {
         promoCode,
         discountValue,
         discountType,
-        startDate,
-        endDate,
+        expiryDate: formattedExpiryDate,
+        maxAmount: maxAmount ? maxAmount : 0,
+        minAmount: minAmount ? minAmount : 0,
       };
 
       const response = await axiosPublic.post('/addPromoCode', discountData);
@@ -82,17 +65,14 @@ const AddDiscount = () => {
 
       <div className='max-w-screen-lg mx-auto flex items-center pt-3 md:pt-6'>
         <h3 className='w-full text-center font-medium md:font-semibold text-[13px] md:text-xl lg:text-2xl'>Create New Promo Code</h3>
-        <button className='hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white px-1 py-0.5'>
-          <Link href={"/dash-board/discounts"}><RxCross2 size={28} /></Link>
-        </button>
       </div>
 
 
       <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-lg mx-auto py-6 flex flex-col gap-6'>
 
         <div>
-          <label htmlFor='promoCode' className='flex justify-start font-medium text-[#9F5216]'>Promo Code *</label>
-          <input id='promoCode' {...register("promoCode", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="text" />
+          <label htmlFor='promoCode' className='flex justify-start font-medium text-[#9F5216] pb-2'>Promo Code *</label>
+          <input id='promoCode' placeholder='Enter Promo Code'  {...register("promoCode", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="text" />
           {errors.promoCode?.type === "required" && (
             <p className="text-red-600 text-left">Promo Code is required</p>
           )}
@@ -104,8 +84,8 @@ const AddDiscount = () => {
             selectedKey={discountType}
             onSelectionChange={handleTabChange}
           >
-            <Tab key="Percentage" title="Percentage">Percentage (%)</Tab>
-            <Tab key="Amount" title="Amount">Amount (Taka)</Tab>
+            <Tab className='text-[#9F5216]' key="Percentage" title="Percentage">Percentage (%) *</Tab>
+            <Tab className='text-[#9F5216]' key="Amount" title="Amount">Amount (Taka) *</Tab>
           </Tabs>
 
           <input
@@ -120,28 +100,38 @@ const AddDiscount = () => {
         </div>
 
         <div>
-          <DateRangePicker
-            label="Discount Duration"
-            visibleMonths={3}
-            onChange={(range) => {
-              setSelectedDateRange(range);
-              // Clear the error when a valid date range is selected
-              if (range?.start && range?.end) {
-                setDateRangeError("");
-              }
-            }}
-            value={selectedDateRange}
+          <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#9F5216] pb-2'>Maximum Capped Amount</label>
+          <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
+        </div>
+
+        <div>
+          <label htmlFor='minAmount' className='flex justify-start font-medium text-[#9F5216] pb-2'>Minimum Order Amount</label>
+          <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
+        </div>
+
+        <div>
+          <label htmlFor='expiryDate' className='flex justify-start font-medium text-[#9F5216] pb-2'>Promo Expire On *</label>
+          <input
+            id='expiryDate'
+            type="date"
+            {...register("expiryDate", { required: "Expiry Date is required" })}
+            className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
           />
-          {dateRangeError && (
-            <p className="text-red-600 text-left">{dateRangeError}</p> // Display date range error
+          {errors.expiryDate && (
+            <p className="text-red-600 text-left">{errors.expiryDate.message}</p>
           )}
         </div>
 
-        <div className='flex justify-end items-center'>
-          <button type='submit' disabled={isSubmitting} className={`mt-4 mb-8 ${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
+        <div className='flex justify-between items-center mt-4 mb-8'>
+
+          <Link className='flex items-center gap-2 font-medium text-white rounded-lg bg-[#9F5216] hover:bg-[#9f5116c9] py-2 px-4' href={"/dash-board/discounts"}> <FaArrowLeft /> Go Back</Link>
+
+          <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
             {isSubmitting ? 'Submitting...' : 'Submit'}
           </button>
+
         </div>
+
       </form>
 
     </div>

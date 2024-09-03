@@ -1,27 +1,35 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
-import { DateRangePicker, Tab, Tabs } from '@nextui-org/react';
+import { Tab, Tabs } from '@nextui-org/react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { RxCross2 } from 'react-icons/rx';
-
+import { FaArrowLeft } from 'react-icons/fa6';
 
 const EditPromo = () => {
 
   const { id } = useParams();
   const axiosPublic = useAxiosPublic();
-  const { register, handleSubmit, setValue, formState: { errors, isSubmitted } } = useForm();
+  const router = useRouter();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [discountType, setDiscountType] = useState('Percentage');
-  const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
 
   const handleTabChange = (key) => {
     setDiscountType(key);
+  };
+
+  // Format date to yyyy-mm-dd for date input field
+  const formatDateForInput = (dateStr) => {
+    const date = new Date(dateStr);
+    const day = (`0${date.getDate()}`).slice(-2);
+    const month = (`0${date.getMonth() + 1}`).slice(-2);
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
   };
 
   useEffect(() => {
@@ -30,18 +38,14 @@ const EditPromo = () => {
         const response = await axiosPublic.get(`/getSinglePromo/${id}`);
         const promo = response.data;
 
-        // Convert date strings to Date objects
-        const parsedStartDate = new Date(promo.startDate);
-        const parsedEndDate = new Date(promo.endDate);
-
         // Set form fields with fetched promo data
         setValue('promoCode', promo.promoCode);
         setValue('discountValue', promo.discountValue);
+        setValue('expiryDate', formatDateForInput(promo.expiryDate));
+        setValue('maxAmount', promo.maxAmount || 0);
+        setValue('minAmount', promo.minAmount || 0);
+
         setDiscountType(promo.discountType);
-
-        // Set DateRangePicker value using JavaScript Date objects
-        setSelectedDateRange([parsedStartDate, parsedEndDate]);
-
         setIsLoading(false);
       } catch (err) {
         console.error(err); // Log error to the console for debugging
@@ -53,21 +57,30 @@ const EditPromo = () => {
   }, [id, axiosPublic, setValue]);
 
   const onSubmit = async (data) => {
+    const { promoCode, discountValue, expiryDate, maxAmount, minAmount } = data;
     setIsSubmitting(true);
 
     try {
       const updatedDiscount = {
-        ...data,
-        discountType
+        promoCode,
+        discountValue,
+        discountType,
+        expiryDate,
+        maxAmount: maxAmount || 0,
+        minAmount: minAmount || 0,
       };
 
-      await axiosPublic.put(`/updatePromo/${params.id}`, updatedDiscount);
-
-      toast.success('Promo updated successfully!');
-      router.push('/dash-board/discounts');
+      const res = await axiosPublic.put(`/updatePromo/${id}`, updatedDiscount);
+      if (res.data.modifiedCount > 0) {
+        toast.success('Promo updated successfully!');
+        router.push('/dash-board/discounts');
+      } else {
+        toast.error('No changes detected.');
+        setIsSubmitting(false);
+      }
     } catch (error) {
+      console.error('Error editing promo:', error);
       toast.error('Failed to update promo. Please try again!');
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -79,10 +92,8 @@ const EditPromo = () => {
   return (
     <div className='max-w-screen-2xl px-0 md:px-6 2xl:px-0 mx-auto'>
 
-      <div className='flex justify-end pt-2 max-w-screen-lg mx-auto'>
-        <button className='hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white px-1 py-0.5'>
-          <Link href={"/dash-board/discounts"}><RxCross2 size={28} /></Link>
-        </button>
+      <div className='max-w-screen-lg mx-auto flex items-center pt-3 md:pt-6'>
+        <h3 className='w-full text-center font-medium md:font-semibold text-[13px] md:text-xl lg:text-2xl'>Edit Promo Code</h3>
       </div>
 
       {/* Your form code */}
@@ -117,18 +128,33 @@ const EditPromo = () => {
         </div>
 
         <div>
-          <DateRangePicker
-            label="Discount Duration"
-            visibleMonths={3}
-            onChange={(range) => setSelectedDateRange(range)}
-            value={selectedDateRange} // Ensure this is an array of [startDate, endDate]
-            calendar="gregorian" // Ensure the calendar type matches the expected type
-          />
-
+          <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#9F5216]'>Maximum Capped Amount</label>
+          <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
         </div>
 
-        <div className='flex justify-end items-center'>
-          <button type='submit' disabled={isSubmitting} className={`mt-4 mb-8 ${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
+        <div>
+          <label htmlFor='minAmount' className='flex justify-start font-medium text-[#9F5216]'>Minimum Order Amount</label>
+          <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
+        </div>
+
+        <div>
+          <label htmlFor='expiryDate' className='flex justify-start font-medium text-[#9F5216]'>Expiry Date *</label>
+          <input
+            id='expiryDate'
+            type="date"
+            {...register("expiryDate", { required: "Expiry Date is required" })}
+            className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+          />
+          {errors.expiryDate && (
+            <p className="text-red-600 text-left">{errors.expiryDate.message}</p>
+          )}
+        </div>
+
+        <div className='flex justify-between items-center mt-4 mb-8'>
+
+          <Link className='flex items-center gap-2 font-medium text-white rounded-lg bg-[#9F5216] hover:bg-[#9f5116c9] py-2 px-4' href={"/dash-board/discounts"}> <FaArrowLeft /> Go Back</Link>
+
+          <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
             {isSubmitting ? 'Submitting...' : 'Update Promo'}
           </button>
         </div>
