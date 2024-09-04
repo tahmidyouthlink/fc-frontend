@@ -84,9 +84,20 @@ const PrintButton = ({ selectedOrder }) => {
     });
 
     const subtotal = parseFloat(selectedOrder.productInformation.reduce((total, product) => total + (product.unitPrice * product.sku), 0).toFixed(2));
-    const promoDiscount = parseFloat(selectedOrder.promoDiscount?.toFixed(2) || "0.00");
+    const promoDiscountValue = parseFloat(selectedOrder.promoDiscountValue?.toFixed(2) || "0.00");
     const shippingCharge = parseFloat(selectedOrder.shippingCharge?.toFixed(2) || "0.00");
-    const total = (subtotal - promoDiscount + shippingCharge).toFixed(2);
+
+    // Calculate the discount based on its type
+    let discountAmount;
+    if (selectedOrder.promoDiscountType === 'Percentage') {
+      discountAmount = (subtotal * (promoDiscountValue / 100)).toFixed(2); // Calculate percentage discount
+    } else if (selectedOrder.promoDiscountType === 'Amount') {
+      discountAmount = promoDiscountValue.toFixed(2); // Direct amount discount
+    } else {
+      discountAmount = "0.00";
+    }
+
+    const total = (subtotal - discountAmount + shippingCharge).toFixed(2);
 
     pdf.autoTable({
       startY: margin + 100,
@@ -101,7 +112,7 @@ const PrintButton = ({ selectedOrder }) => {
           `${(product.unitPrice * product.sku).toFixed(2)}`
         ]),
         [{ content: 'Subtotal:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `${subtotal.toFixed(2)}`],
-        [{ content: `Promo Discount (${selectedOrder.promoCode || ''}) :`, colSpan: 5, styles: { halign: 'right', border: 'none' } }, `-${promoDiscount.toFixed(2)}`],
+        [{ content: `Promo Discount (${selectedOrder.promoCode || ''}) :`, colSpan: 5, styles: { halign: 'right', border: 'none' } }, `-${discountAmount}`],
         [{ content: 'Shipping Charge:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `+${shippingCharge.toFixed(2)}`],
         [{ content: 'Total:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `${total}`],
       ],
@@ -168,9 +179,7 @@ const PrintButton = ({ selectedOrder }) => {
   };
 
   return (
-    <Button color="primary"
-      onPress={() => handlePrint(selectedOrder)}
-    >
+    <Button color="primary" onPress={() => handlePrint(selectedOrder)}>
       Print Invoice
     </Button>
   );

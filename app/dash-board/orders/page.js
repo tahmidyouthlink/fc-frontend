@@ -174,7 +174,8 @@ const OrdersPage = () => {
       (order.paymentMethod || '').toLowerCase().includes(query) ||
       (order.vendor || '').toLowerCase().includes(query) ||
       (order.shippingZone || '').toLowerCase().includes(query) ||
-      (order.promoDiscount || '').toString().includes(query) ||
+      (order.promoDiscountValue || '').toString().includes(query) ||
+      (order.promoCode || '').toLowerCase().includes(query) ||
       (order.transactionId || '').toLowerCase().includes(query) ||
       (order.trackingNumber || '').toLowerCase().includes(query) ||
       (order.shippingMethod || '').toLowerCase().includes(query) ||
@@ -673,10 +674,22 @@ const OrdersPage = () => {
               <div className='flex items-center gap-1 text-xs md:text-sm'>
                 <p className=''>Total Amount:  ৳ {selectedOrder?.totalAmount.toFixed(2)}</p>,
                 <p className=''>
-                  Promo applied : {selectedOrder?.promoDiscount === 0
-                    ? "X"
-                    : `৳ ${selectedOrder.promoDiscount.toFixed(2)}`}
+                  Promo applied:
+                  {selectedOrder?.promoCode ? (
+                    selectedOrder.promoDiscountValue > 0 ? (
+                      selectedOrder.promoDiscountType === 'Percentage' ? (
+                        `${selectedOrder.promoDiscountValue.toFixed(2)}%`
+                      ) : (
+                        `৳ ${selectedOrder.promoDiscountValue.toFixed(2)}`
+                      )
+                    ) : (
+                      '৳ 0.00'
+                    )
+                  ) : (
+                    'X'
+                  )}
                 </p>
+
               </div>
               <PrintButton selectedOrder={selectedOrder} />
             </ModalFooter>

@@ -164,3 +164,48 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
     max-height: calc(100vh - 80px);
   }
 }
+
+.custom-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px; /* Increased size */
+  height: 26px; /* Increased size */
+}
+
+.custom-switch-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.custom-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc; /* Default off color */
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.custom-switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 22px; /* Increased size */
+  width: 22px; /* Increased size */
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+.custom-switch-input:checked + .custom-switch-slider {
+  background-color: #0072f5; /* Primary color when on */
+}
+
+.custom-switch-input:checked + .custom-switch-slider:before {
+  transform: translateX(24px); /* Adjusted for larger size */
+}

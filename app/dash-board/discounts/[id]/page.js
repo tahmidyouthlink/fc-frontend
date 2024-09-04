@@ -17,10 +17,10 @@ const EditPromo = () => {
   const { register, handleSubmit, setValue, formState: { errors } } = useForm();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [discountType, setDiscountType] = useState('Percentage');
+  const [promoDiscountType, setPromoDiscountType] = useState('Percentage');
 
   const handleTabChange = (key) => {
-    setDiscountType(key);
+    setPromoDiscountType(key);
   };
 
   // Format date to yyyy-mm-dd for date input field
@@ -40,12 +40,12 @@ const EditPromo = () => {
 
         // Set form fields with fetched promo data
         setValue('promoCode', promo.promoCode);
-        setValue('discountValue', promo.discountValue);
+        setValue('promoDiscountValue', promo.promoDiscountValue);
         setValue('expiryDate', formatDateForInput(promo.expiryDate));
         setValue('maxAmount', promo.maxAmount || 0);
         setValue('minAmount', promo.minAmount || 0);
 
-        setDiscountType(promo.discountType);
+        setPromoDiscountType(promo.promoDiscountType);
         setIsLoading(false);
       } catch (err) {
         console.error(err); // Log error to the console for debugging
@@ -57,14 +57,14 @@ const EditPromo = () => {
   }, [id, axiosPublic, setValue]);
 
   const onSubmit = async (data) => {
-    const { promoCode, discountValue, expiryDate, maxAmount, minAmount } = data;
+    const { promoCode, promoDiscountValue, expiryDate, maxAmount, minAmount } = data;
     setIsSubmitting(true);
 
     try {
       const updatedDiscount = {
         promoCode,
-        discountValue,
-        discountType,
+        promoDiscountValue,
+        promoDiscountType,
         expiryDate,
         maxAmount: maxAmount || 0,
         minAmount: minAmount || 0,
@@ -93,7 +93,7 @@ const EditPromo = () => {
     <div className='max-w-screen-2xl px-0 md:px-6 2xl:px-0 mx-auto'>
 
       <div className='max-w-screen-lg mx-auto flex items-center pt-3 md:pt-6'>
-        <h3 className='w-full text-center font-medium md:font-semibold text-[13px] md:text-xl lg:text-2xl'>Edit Promo Code</h3>
+        <h3 className='w-full text-center font-semibold text-xl lg:text-2xl'>Edit Promo Code</h3>
       </div>
 
       {/* Your form code */}
@@ -109,7 +109,7 @@ const EditPromo = () => {
         <div className="flex w-full flex-col">
           <Tabs
             aria-label="Discount Type"
-            selectedKey={discountType} // Default select based on fetched data
+            selectedKey={promoDiscountType} // Default select based on fetched data
             onSelectionChange={handleTabChange}
           >
             <Tab key="Percentage" title="Percentage">Percentage (%)</Tab>
@@ -118,11 +118,11 @@ const EditPromo = () => {
 
           <input
             type="number"
-            {...register('discountValue', { required: true })}
+            {...register('promoDiscountValue', { required: true })}
             className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
-            placeholder={`Enter ${discountType} Discount`} // Correct placeholder
+            placeholder={`Enter ${promoDiscountType} Discount`} // Correct placeholder
           />
-          {errors.discountValue?.type === "required" && (
+          {errors.promoDiscountValue?.type === "required" && (
             <p className="text-red-600 text-left">Discount Value is required</p>
           )}
         </div>

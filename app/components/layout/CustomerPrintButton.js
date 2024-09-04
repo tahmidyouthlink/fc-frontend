@@ -53,7 +53,7 @@ const CustomerPrintButton = ({ selectedOrder }) => {
       `Phone: ${selectedOrder.phoneNumber}`,
       selectedOrder.phoneNumber2 && selectedOrder.phoneNumber2 !== '0' ? `Phone 2: ${selectedOrder.phoneNumber2}` : null,
       `Address: ${selectedOrder.address1}${selectedOrder.address2 ? ', ' + selectedOrder.address2 : ''}, ${selectedOrder.city}, ${selectedOrder.postalCode}`,
-    ].filter(Boolean).join('\n'); // filter to remove null or undefined items
+    ].filter(Boolean).join('\n'); // Filter out any null values
     pdf.text(customerDetails, margin, margin + 50);
 
     pdf.setFontSize(16);
@@ -81,9 +81,20 @@ const CustomerPrintButton = ({ selectedOrder }) => {
     });
 
     const subtotal = parseFloat(selectedOrder.productInformation.reduce((total, product) => total + (product.unitPrice * product.sku), 0).toFixed(2));
-    const promoDiscount = parseFloat(selectedOrder.promoDiscount?.toFixed(2) || "0.00");
+    const promoDiscountValue = parseFloat(selectedOrder.promoDiscountValue?.toFixed(2) || "0.00");
     const shippingCharge = parseFloat(selectedOrder.shippingCharge?.toFixed(2) || "0.00");
-    const total = (subtotal - promoDiscount + shippingCharge).toFixed(2);
+
+    // Calculate the discount based on its type
+    let discountAmount;
+    if (selectedOrder.promoDiscountType === 'Percentage') {
+      discountAmount = (subtotal * (promoDiscountValue / 100)).toFixed(2); // Calculate percentage discount
+    } else if (selectedOrder.promoDiscountType === 'Amount') {
+      discountAmount = promoDiscountValue.toFixed(2); // Direct amount discount
+    } else {
+      discountAmount = "0.00";
+    }
+
+    const total = (subtotal - discountAmount + shippingCharge).toFixed(2);
 
     pdf.autoTable({
       startY: margin + 100,
@@ -98,7 +109,7 @@ const CustomerPrintButton = ({ selectedOrder }) => {
           `${(product.unitPrice * product.sku).toFixed(2)}`
         ]),
         [{ content: 'Subtotal:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `${subtotal.toFixed(2)}`],
-        [{ content: `Promo Discount (${selectedOrder.promoCode || ''}) :`, colSpan: 5, styles: { halign: 'right', border: 'none' } }, `-${promoDiscount.toFixed(2)}`],
+        [{ content: `Promo Discount (${selectedOrder.promoCode || ''}) :`, colSpan: 5, styles: { halign: 'right', border: 'none' } }, `-${discountAmount}`],
         [{ content: 'Shipping Charge:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `+${shippingCharge.toFixed(2)}`],
         [{ content: 'Total:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `${total}`],
       ],
@@ -166,7 +177,9 @@ const CustomerPrintButton = ({ selectedOrder }) => {
 
   return (
     <>
-      <span className="text-sm font-mono cursor-pointer text-blue-600 hover:text-blue-800" onClick={() => handlePrint(selectedOrder)}>{selectedOrder?.orderNumber}</span>
+      <span className="text-sm font-mono cursor-pointer text-blue-600 hover:text-blue-800" onClick={() => handlePrint(selectedOrder)}>
+        {selectedOrder?.orderNumber}
+      </span>
     </>
   );
 };

@@ -14,10 +14,10 @@ const AddDiscount = () => {
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [discountType, setDiscountType] = useState('Percentage');
+  const [promoDiscountType, setPromoDiscountType] = useState('Percentage');
 
   const handleTabChange = (key) => {
-    setDiscountType(key);
+    setPromoDiscountType(key);
   };
 
   const formatDate = (dateStr) => {
@@ -29,7 +29,7 @@ const AddDiscount = () => {
   };
 
   const onSubmit = async (data) => {
-    const { promoCode, discountValue, expiryDate, maxAmount, minAmount } = data;
+    const { promoCode, promoDiscountValue, expiryDate, maxAmount, minAmount } = data;
 
     if (!expiryDate) {
       return;
@@ -41,11 +41,12 @@ const AddDiscount = () => {
     try {
       const discountData = {
         promoCode,
-        discountValue,
-        discountType,
+        promoDiscountValue,
+        promoDiscountType,
         expiryDate: formattedExpiryDate,
         maxAmount: maxAmount ? maxAmount : 0,
         minAmount: minAmount ? minAmount : 0,
+        promoStatus: true
       };
 
       const response = await axiosPublic.post('/addPromoCode', discountData);
@@ -61,10 +62,10 @@ const AddDiscount = () => {
   };
 
   return (
-    <div className='max-w-screen-2xl px-0 md:px-6 2xl:px-0 mx-auto'>
+    <div className='max-w-screen-2xl px-6 2xl:px-0 mx-auto'>
 
       <div className='max-w-screen-lg mx-auto flex items-center pt-3 md:pt-6'>
-        <h3 className='w-full text-center font-medium md:font-semibold text-[13px] md:text-xl lg:text-2xl'>Create New Promo Code</h3>
+        <h3 className='w-full text-center font-semibold text-xl lg:text-2xl'>Create New Promo Code</h3>
       </div>
 
 
@@ -81,7 +82,7 @@ const AddDiscount = () => {
         <div className="flex w-full flex-col">
           <Tabs
             aria-label="Discount Type"
-            selectedKey={discountType}
+            selectedKey={promoDiscountType}
             onSelectionChange={handleTabChange}
           >
             <Tab className='text-[#9F5216]' key="Percentage" title="Percentage">Percentage (%) *</Tab>
@@ -90,11 +91,11 @@ const AddDiscount = () => {
 
           <input
             type="number"
-            {...register('discountValue', { required: true })}
+            {...register('promoDiscountValue', { required: true })}
             className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
-            placeholder={`Enter ${discountType} Discount`} // Correct placeholder
+            placeholder={`Enter ${promoDiscountType} Discount`} // Correct placeholder
           />
-          {errors.discountValue?.type === "required" && (
+          {errors.promoDiscountValue?.type === "required" && (
             <p className="text-red-600 text-left">Discount Value is required</p>
           )}
         </div>

@@ -1,19 +1,59 @@
 "use client";
+import React, { useMemo, useState } from 'react';
+import CustomSwitch from '@/app/components/layout/CustomSwitch';
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import usePromoCodes from '@/app/hooks/usePromoCodes';
-import { Button, Switch } from '@nextui-org/react';
+import { Button, Modal, ModalBody, ModalContent, ModalFooter } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
-import React from 'react';
 import toast from 'react-hot-toast';
-import { FaRegEdit } from "react-icons/fa";
+import { FaRegEdit, FaEye } from "react-icons/fa";
 import { RiDeleteBinLine } from "react-icons/ri";
+import useOrders from '@/app/hooks/useOrders';
+import PromoDetailsModal from '@/app/components/layout/PromoDetailsModal';
 
 const Discounts = () => {
-
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
+  const [orderList, isOrderPending] = useOrders();
   const [promoList, isPromoPending, refetch] = usePromoCodes();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPromo, setSelectedPromo] = useState(null);
+
+  // Memoized current date
+  const currentDate = useMemo(() => new Date(), []);
+
+  // Memoized active promos
+  const activePromos = useMemo(() => {
+    return promoList?.filter(promo => new Date(promo?.expiryDate) >= currentDate);
+  }, [promoList, currentDate]);
+
+  // Memoized expired promos
+  const expiredPromos = useMemo(() => {
+    return promoList?.filter(promo => new Date(promo?.expiryDate) < currentDate);
+  }, [promoList, currentDate]);
+
+  const handleViewClick = (promo) => {
+    setSelectedPromo(promo);
+    setIsModalOpen(true);
+  };
+
+  const totalPromoApplied = useMemo(() => {
+    return orderList?.filter(order => order?.promoCode === selectedPromo?.promoCode).length;
+  }, [orderList, selectedPromo]);
+
+  const totalAmountDiscounted = useMemo(() => {
+    return orderList?.reduce((total, order) => {
+      if (order?.promoCode === selectedPromo?.promoCode) {
+        if (order?.promoDiscountType === 'Percentage') {
+          return total + (order?.totalAmount * (order?.promoDiscountValue / 100));
+        } else if (order?.promoDiscountType === 'Amount') {
+          return total + order?.promoDiscountValue;
+        }
+      }
+      return total;
+    }, 0).toFixed(2);
+  }, [orderList, selectedPromo]);
 
   const handleDelete = async (id) => {
     try {
@@ -25,92 +65,156 @@ const Discounts = () => {
     } catch (error) {
       toast.error('Failed to delete promo. Please try again!');
     }
-  }
+  };
 
-  if (isPromoPending) {
-    return <Loading />
+  const handleStatusChange = async (id, currentStatus) => {
+    try {
+      // Find the discount that needs to be updated
+      const findDiscount = promoList.find(promo => promo?._id === id);
+      if (!findDiscount) {
+        toast.error('Promo not found.');
+        return;
+      }
+
+      // Exclude the _id field from the discount data
+      const { _id, ...rest } = findDiscount;
+      const discountData = { ...rest, promoStatus: !currentStatus };
+
+      // Send the update request
+      const res = await axiosPublic.put(`/updatePromo/${id}`, discountData);
+      if (res.data.modifiedCount > 0) {
+        toast.success('Status changed successfully!');
+        refetch(); // Refetch the promo list to get the updated data
+      } else {
+        toast.error('No changes detected.');
+      }
+    } catch (error) {
+      console.error('Error editing status:', error);
+      toast.error('Failed to update status. Please try again!');
+    }
+  };
+
+  if (isPromoPending || isOrderPending) {
+    return <Loading />;
   }
 
   return (
-    <div className='max-w-screen-2xl px-0 md:px-6 mx-auto'>
-
-      <div>
-
-        <div className='sticky top-0 z-10 flex justify-end mt-6'>
-
-          <h3 className='w-full text-center md:text-start font-medium md:font-semibold text-[13px] md:text-xl lg:text-2xl'>Active Promos</h3>
-
-          <Button onClick={() => router.push('/dash-board/discounts/add-discount')} className='bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium mx-6 md:mx-4'>
-            New Promo
-          </Button>
-
-        </div>
-
-        {/* table content */}
-        <div className="max-w-screen-2xl mx-auto custom-max-h overflow-x-auto my-6 modal-body-scroll">
-          <table className="w-full text-left border-collapse">
-            <thead className="bg-gray-100 sticky top-0 z-[1] shadow-md">
-              <tr>
-
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Promo Code</th>
-
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Discount Type</th>
-
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Discount Value</th>
-
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Expiry Date</th>
-
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Action</th>
-
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Status</th>
-
-
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {promoList?.map((promo, index) => (
-                <tr key={promo?._id || index} className="hover:bg-gray-50 transition-colors">
-
-                  <td className="text-xs p-3 text-gray-700 font-mono">
-                    {promo?.promoCode}
-                  </td>
-
-                  <td className="text-xs p-3 text-gray-700">
-                    {promo?.discountType}
-                  </td>
-
-                  <td className="text-xs p-3 text-gray-700">
-                    {promo?.discountValue}
-                  </td>
-
-                  <td className="text-xs p-3 text-gray-700">
-                    {promo?.expiryDate}
-                  </td>
-
-                  <td className="text-xs p-3 text-gray-700">
-                    <div className='flex items-center -ml-3'>
-                      {/* Edit Button */}
-                      <Button onClick={() => router.push(`/dash-board/discounts/${promo._id}`)} variant="light" color="primary" size='sm'>
-                        <FaRegEdit size={22} />
-                      </Button>
-                      {/* Delete Button */}
-                      <Button onClick={() => handleDelete(promo._id)} color="danger" variant="light" size='sm'>
-                        <RiDeleteBinLine size={22} />
-                      </Button>
-                    </div>
-                  </td>
-
-                  <td className="text-xs p-3 text-gray-700">
-                    <Switch defaultSelected aria-label="Automatic updates" />
-                  </td>
-
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
+    <div className='px-0 md:px-6 mx-auto'>
+      <div className='sticky top-0 z-10 bg-white flex justify-end max-w-screen-2xl mx-auto'>
+        <Button onClick={() => router.push('/dash-board/discounts/add-offer')} className='bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium my-2 mx-6 md:mx-4'>
+          New Offer
+        </Button>
+        <Button onClick={() => router.push('/dash-board/discounts/add-discount')} className='bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer my-2 font-medium mx-6 md:mx-4'>
+          New Promo
+        </Button>
       </div>
+
+      {/* table content */}
+      <div className="max-w-screen-2xl mx-auto custom-max-h overflow-x-auto px-2 md:px-6 my-4 modal-body-scroll">
+        <h4 className='text-[13px] md:text-xl font-semibold mb-4'>Active Promos</h4>
+        <table className="w-full text-left border-collapse">
+          <thead className="bg-gray-100 sticky top-0 z-[1] shadow-md">
+            <tr>
+              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Promo Code</th>
+              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Discount</th>
+              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Expiry Date</th>
+              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Action</th>
+              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Promo Status</th>
+              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">View</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {activePromos?.map((promo, index) => (
+              <tr key={promo?._id || index} className="hover:bg-gray-50 transition-colors">
+                <td className="text-xs p-3 text-gray-700 font-mono">
+                  {promo?.promoCode}
+                </td>
+                <td className="text-xs p-3 text-gray-700">
+                  {promo?.promoDiscountValue} {promo?.promoDiscountType === 'Amount' ? 'Tk' : '%'}
+                </td>
+                <td className="text-xs p-3 text-gray-700">
+                  {promo?.expiryDate}
+                </td>
+                <td className="text-xs p-3 text-gray-700">
+                  <div className="flex items-center gap-3 cursor-pointer">
+                    <FaRegEdit className="text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200" onClick={() => router.push(`/dash-board/discounts/${promo._id}`)} size={22} />
+                    <RiDeleteBinLine className="text-red-500 hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200" onClick={() => handleDelete(promo._id)} size={22} />
+                  </div>
+                </td>
+                <td className="text-xs p-3 text-gray-700">
+                  <CustomSwitch
+                    checked={promo?.promoStatus}
+                    onChange={() => handleStatusChange(promo?._id, promo?.promoStatus)}
+                    size="md"
+                    color="primary"
+                  />
+                </td>
+                <td className="text-xs p-3 text-gray-700 cursor-pointer">
+                  <FaEye className='hover:text-red-700 hover:transition hover:scale-105 hover:duration-200' size={22} onClick={() => handleViewClick(promo)} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="max-w-screen-2xl mx-auto custom-max-h overflow-x-auto px-2 md:px-6 my-4 modal-body-scroll">
+        <h4 className='text-[13px] md:text-xl font-semibold mb-4'>Used Promos</h4>
+        <table className="w-full text-left border-collapse">
+          <thead className="bg-gray-100 sticky top-0 z-[1] shadow-md">
+            <tr>
+              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Promo Code</th>
+              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Discount</th>
+              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Expiry Date</th>
+              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Action</th>
+              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Promo Status</th>
+              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">View</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {expiredPromos?.map((promo, index) => (
+              <tr key={promo?._id || index} className="hover:bg-gray-50 transition-colors">
+                <td className="text-xs p-3 text-gray-700 font-mono">
+                  {promo?.promoCode}
+                </td>
+                <td className="text-xs p-3 text-gray-700">
+                  {promo?.promoDiscountValue} {promo?.promoDiscountType === 'Amount' ? 'Tk' : '%'}
+                </td>
+                <td className="text-xs p-3 text-gray-700">
+                  {promo?.expiryDate}
+                </td>
+                <td className="text-xs p-3 text-gray-700">
+                  <div className="flex items-center gap-3 cursor-pointer">
+                    <FaRegEdit className="text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200" onClick={() => router.push(`/dash-board/discounts/${promo._id}`)} size={22} />
+                    <RiDeleteBinLine className="text-red-500 hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200" onClick={() => handleDelete(promo._id)} size={22} />
+                  </div>
+                </td>
+                <td className="text-xs p-3 text-gray-700">
+                  <CustomSwitch
+                    checked={promo?.promoStatus}
+                    onChange={() => handleStatusChange(promo?._id, promo?.promoStatus)}
+                    size="md"
+                    color="primary"
+                  />
+                </td>
+                <td className="text-xs p-3 text-gray-700 cursor-pointer">
+                  <FaEye className='hover:text-red-700 hover:transition hover:scale-105 hover:duration-200' size={22} onClick={() => handleViewClick(promo)} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+
+      {/* Promo Details Modal */}
+      <PromoDetailsModal
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        totalPromoApplied={totalPromoApplied}
+        totalAmountDiscounted={totalAmountDiscounted}
+        promo={selectedPromo}
+      />
 
     </div>
   );
