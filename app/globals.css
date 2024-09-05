@@ -168,8 +168,8 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 .custom-switch {
   position: relative;
   display: inline-block;
-  width: 50px; /* Increased size */
-  height: 26px; /* Increased size */
+  width: 40px; /* Reduced size */
+  height: 20px; /* Reduced size */
 }
 
 .custom-switch-input {
@@ -187,14 +187,14 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
   bottom: 0;
   background-color: #ccc; /* Default off color */
   transition: 0.4s;
-  border-radius: 34px;
+  border-radius: 20px; /* Adjusted for smaller height */
 }
 
 .custom-switch-slider:before {
   position: absolute;
   content: "";
-  height: 22px; /* Increased size */
-  width: 22px; /* Increased size */
+  height: 16px; /* Reduced size */
+  width: 16px; /* Reduced size */
   left: 2px;
   bottom: 2px;
   background-color: white;
@@ -207,5 +207,5 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 }
 
 .custom-switch-input:checked + .custom-switch-slider:before {
-  transform: translateX(24px); /* Adjusted for larger size */
+  transform: translateX(20px); /* Adjusted for smaller size */
 }

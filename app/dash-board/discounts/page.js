@@ -4,10 +4,11 @@ import CustomSwitch from '@/app/components/layout/CustomSwitch';
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import usePromoCodes from '@/app/hooks/usePromoCodes';
-import { Button, Modal, ModalBody, ModalContent, ModalFooter } from '@nextui-org/react';
+import { Button } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { FaRegEdit, FaEye } from "react-icons/fa";
+import { MdOutlineModeEdit } from "react-icons/md";
+import { FaRegEye } from "react-icons/fa6";
 import { RiDeleteBinLine } from "react-icons/ri";
 import useOrders from '@/app/hooks/useOrders';
 import PromoDetailsModal from '@/app/components/layout/PromoDetailsModal';
@@ -100,12 +101,12 @@ const Discounts = () => {
 
   return (
     <div className='px-0 md:px-6 mx-auto'>
-      <div className='sticky top-0 z-10 bg-white flex justify-end max-w-screen-2xl mx-auto'>
+      <div className='sticky top-0 z-10 bg-white flex justify-between max-w-screen-2xl mx-auto'>
         <Button onClick={() => router.push('/dash-board/discounts/add-offer')} className='bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium my-2 mx-6 md:mx-4'>
-          New Offer
+          Create a new Offer
         </Button>
         <Button onClick={() => router.push('/dash-board/discounts/add-discount')} className='bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer my-2 font-medium mx-6 md:mx-4'>
-          New Promo
+          Create a new Promo
         </Button>
       </div>
 
@@ -113,12 +114,12 @@ const Discounts = () => {
       <div className="max-w-screen-2xl mx-auto custom-max-h overflow-x-auto px-2 md:px-6 my-4 modal-body-scroll">
         <h4 className='text-[13px] md:text-xl font-semibold mb-4'>Active Promos</h4>
         <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-100 sticky top-0 z-[1] shadow-md">
+          <thead className="bg-gray-50 sticky top-0 z-[1] rounded-md">
             <tr>
               <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Promo Code</th>
               <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Discount</th>
               <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Expiry Date</th>
-              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Action</th>
+              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Actions</th>
               <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Promo Status</th>
               <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">View</th>
             </tr>
@@ -137,8 +138,25 @@ const Discounts = () => {
                 </td>
                 <td className="text-xs p-3 text-gray-700">
                   <div className="flex items-center gap-3 cursor-pointer">
-                    <FaRegEdit className="text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200" onClick={() => router.push(`/dash-board/discounts/${promo._id}`)} size={22} />
-                    <RiDeleteBinLine className="text-red-500 hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200" onClick={() => handleDelete(promo._id)} size={22} />
+                    <div class="group relative">
+                      <button>
+                        <MdOutlineModeEdit onClick={() => router.push(`/dash-board/discounts/${promo._id}`)} size={22} className="text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200" />
+                      </button>
+                      <span
+                        class="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100"
+                      >Edit <span> </span
+                      ></span>
+                    </div>
+                    <div class="group relative">
+                      <button>
+                        <RiDeleteBinLine onClick={() => handleDelete(promo._id)} size={22} className="text-red-500 hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200" />
+                      </button>
+                      <span
+                        class="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100"
+                      >Delete <span> </span
+                      ></span>
+                    </div>
+
                   </div>
                 </td>
                 <td className="text-xs p-3 text-gray-700">
@@ -150,7 +168,15 @@ const Discounts = () => {
                   />
                 </td>
                 <td className="text-xs p-3 text-gray-700 cursor-pointer">
-                  <FaEye className='hover:text-red-700 hover:transition hover:scale-105 hover:duration-200' size={22} onClick={() => handleViewClick(promo)} />
+                  <div class="group relative">
+                    <button>
+                      <FaRegEye onClick={() => handleViewClick(promo)} size={22} className='hover:text-red-700 hover:transition hover:scale-105 hover:duration-200' />
+                    </button>
+                    <span
+                      class="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100"
+                    >Preview <span> </span
+                    ></span>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -161,12 +187,12 @@ const Discounts = () => {
       <div className="max-w-screen-2xl mx-auto custom-max-h overflow-x-auto px-2 md:px-6 my-4 modal-body-scroll">
         <h4 className='text-[13px] md:text-xl font-semibold mb-4'>Used Promos</h4>
         <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-100 sticky top-0 z-[1] shadow-md">
+          <thead className="bg-gray-50 sticky top-0 z-[1] rounded-md">
             <tr>
               <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Promo Code</th>
               <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Discount</th>
               <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Expiry Date</th>
-              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Action</th>
+              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Actions</th>
               <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Promo Status</th>
               <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">View</th>
             </tr>
@@ -185,8 +211,25 @@ const Discounts = () => {
                 </td>
                 <td className="text-xs p-3 text-gray-700">
                   <div className="flex items-center gap-3 cursor-pointer">
-                    <FaRegEdit className="text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200" onClick={() => router.push(`/dash-board/discounts/${promo._id}`)} size={22} />
-                    <RiDeleteBinLine className="text-red-500 hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200" onClick={() => handleDelete(promo._id)} size={22} />
+                    <div class="group relative">
+                      <button>
+                        <MdOutlineModeEdit onClick={() => router.push(`/dash-board/discounts/${promo._id}`)} size={22} className="text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200" />
+                      </button>
+                      <span
+                        class="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100"
+                      >Edit <span> </span
+                      ></span>
+                    </div>
+                    <div class="group relative">
+                      <button>
+                        <RiDeleteBinLine onClick={() => handleDelete(promo._id)} size={22} className="text-red-500 hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200" />
+                      </button>
+                      <span
+                        class="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100"
+                      >Delete <span> </span
+                      ></span>
+                    </div>
+
                   </div>
                 </td>
                 <td className="text-xs p-3 text-gray-700">
@@ -198,7 +241,15 @@ const Discounts = () => {
                   />
                 </td>
                 <td className="text-xs p-3 text-gray-700 cursor-pointer">
-                  <FaEye className='hover:text-red-700 hover:transition hover:scale-105 hover:duration-200' size={22} onClick={() => handleViewClick(promo)} />
+                  <div class="group relative">
+                    <button>
+                      <FaRegEye onClick={() => handleViewClick(promo)} size={22} className='hover:text-red-700 hover:transition hover:scale-105 hover:duration-200' />
+                    </button>
+                    <span
+                      class="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100"
+                    >Preview <span> </span
+                    ></span>
+                  </div>
                 </td>
               </tr>
             ))}
