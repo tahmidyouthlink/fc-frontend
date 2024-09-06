@@ -68,7 +68,7 @@ const SideNavbar = ({ onClose }) => {
       name: "Discounts",
       icon: <TbRosetteDiscount />,
       links: [
-        { label: 'Promo', link: '/dash-board/discounts', icon: <RiCoupon4Line /> },
+        { label: 'Promo', link: '/dash-board/discounts/promo', icon: <RiCoupon4Line /> },
         { label: 'Offer', link: '/dash-board/discounts/offer', icon: <MdOutlineLocalOffer /> }
       ]
     },

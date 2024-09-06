@@ -73,7 +73,7 @@ const EditPromo = () => {
       const res = await axiosPublic.put(`/updatePromo/${id}`, updatedDiscount);
       if (res.data.modifiedCount > 0) {
         toast.success('Promo updated successfully!');
-        router.push('/dash-board/discounts');
+        router.push('/dash-board/discounts/promo');
       } else {
         toast.error('No changes detected.');
         setIsSubmitting(false);
@@ -152,7 +152,7 @@ const EditPromo = () => {
 
         <div className='flex justify-between items-center mt-4 mb-8'>
 
-          <Link className='flex items-center gap-2 font-medium text-white rounded-lg bg-[#9F5216] hover:bg-[#9f5116c9] py-2 px-4' href={"/dash-board/discounts"}> <FaArrowLeft /> Go Back</Link>
+          <Link className='flex items-center gap-2 font-medium text-white rounded-lg bg-[#9F5216] hover:bg-[#9f5116c9] py-2 px-4' href={"/dash-board/discounts/promo"}> <FaArrowLeft /> Go Back</Link>
 
           <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
             {isSubmitting ? 'Submitting...' : 'Update Promo'}

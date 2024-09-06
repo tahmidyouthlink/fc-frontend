@@ -13,7 +13,7 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import useOrders from '@/app/hooks/useOrders';
 import PromoDetailsModal from '@/app/components/layout/PromoDetailsModal';
 
-const Discounts = () => {
+const PromoPage = () => {
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
   const [orderList, isOrderPending] = useOrders();
@@ -123,7 +123,7 @@ const Discounts = () => {
               <div className="flex items-center gap-3 cursor-pointer">
                 <div class="group relative">
                   <button>
-                    <MdOutlineModeEdit onClick={() => router.push(`/dash-board/discounts/${promo._id}`)} size={22} className="text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200" />
+                    <MdOutlineModeEdit onClick={() => router.push(`/dash-board/discounts/promo/${promo._id}`)} size={22} className="text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200" />
                   </button>
                   <span
                     class="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100"
@@ -170,12 +170,9 @@ const Discounts = () => {
 
   return (
     <div className='px-0 md:px-6'>
-      <div className='flex items-center justify-between px-6 max-w-screen-2xl mx-auto my-6'>
-        {/* <Button onClick={() => router.push('/dash-board/discounts/add-offer')} className='bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium my-2 mx-6 md:mx-4'>
-          Create a new Offer
-        </Button> */}
+      <div className='flex flex-col-reverse lg:flex-row items-center justify-between px-6 max-w-screen-2xl mx-auto my-6 gap-6'>
 
-        <div className="flex space-x-4 border-b mb-4">
+        <div className="flex space-x-0 md:space-x-4 border-b mb-4 text-xs md:text-base">
           <button
             className={`relative py-2 px-4 font-medium transition-all duration-300
       ${activeTab === 'all' ? 'text-blue-600' : 'text-gray-600'}
@@ -213,7 +210,7 @@ const Discounts = () => {
           </button>
         </div>
 
-        <Button onClick={() => router.push('/dash-board/discounts/add-discount')} className='bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium'>
+        <Button onClick={() => router.push('/dash-board/discounts/promo/add-promo')} className='bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium'>
           Create a new Promo
         </Button>
 
@@ -251,4 +248,4 @@ const Discounts = () => {
   );
 };
 
-export default Discounts;
+export default PromoPage;
