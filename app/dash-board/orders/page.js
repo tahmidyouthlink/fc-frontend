@@ -631,8 +631,10 @@ const OrdersPage = () => {
       {selectedOrder && (
         <Modal className='mx-4 lg:mx-0' isOpen={isOpen} onOpenChange={onClose} size='xl'>
           <ModalContent>
-            <ModalHeader className="text-sm md:text-base">Order Id - #{selectedOrder?.orderNumber}</ModalHeader>
-            <ModalHeader className='text-sm md:text-base'>Customer Id - {selectedOrder?.customerId}</ModalHeader>
+            <div className='flex items-center'>
+              <ModalHeader className="text-sm md:text-base">Order Id - #{selectedOrder?.orderNumber}</ModalHeader>
+              <ModalHeader className='text-sm md:text-base'>Customer Id - {selectedOrder?.customerId}</ModalHeader>
+            </div>
             <ModalBody className="modal-body-scroll">
               <div className='flex justify-center'>
                 <Barcode selectedOrder={selectedOrder} />

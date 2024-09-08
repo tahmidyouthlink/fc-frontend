@@ -1,19 +1,19 @@
 "use client";
 import React, { useMemo, useState } from 'react';
-import CustomSwitch from '@/app/components/layout/CustomSwitch';
-import Loading from '@/app/components/shared/Loading/Loading';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
-import usePromoCodes from '@/app/hooks/usePromoCodes';
-import { Button } from '@nextui-org/react';
+import PromoDetailsModal from './PromoDetailsModal';
+import { FaRegEye } from 'react-icons/fa6';
+import CustomSwitch from './CustomSwitch';
+import { RiDeleteBinLine } from 'react-icons/ri';
+import { MdOutlineModeEdit } from 'react-icons/md';
+import Loading from '../shared/Loading/Loading';
 import { useRouter } from 'next/navigation';
-import toast from 'react-hot-toast';
-import { MdOutlineModeEdit } from "react-icons/md";
-import { FaRegEye } from "react-icons/fa6";
-import { RiDeleteBinLine } from "react-icons/ri";
+import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useOrders from '@/app/hooks/useOrders';
-import PromoDetailsModal from '@/app/components/layout/PromoDetailsModal';
+import usePromoCodes from '@/app/hooks/usePromoCodes';
+import toast from 'react-hot-toast';
 
-const PromoPage = () => {
+const RecentPromotions = () => {
+
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
   const [orderList, isOrderPending] = useOrders();
@@ -121,25 +121,34 @@ const PromoPage = () => {
             </td>
             <td className="text-xs p-3 text-gray-700">
               <div className="flex items-center gap-3 cursor-pointer">
-                <div class="group relative">
+                <div className="group relative">
                   <button>
-                    <MdOutlineModeEdit onClick={() => router.push(`/dash-board/discounts/promo/${promo._id}`)} size={22} className="text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200" />
+                    <MdOutlineModeEdit
+                      onClick={() => router.push(`/dash-board/marketing/promo/${promo._id}`)}
+                      size={22}
+                      className="text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200"
+                    />
                   </button>
                   <span
-                    class="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100"
-                  >Edit <span> </span
-                  ></span>
+                    className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100"
+                  >
+                    Edit
+                  </span>
                 </div>
-                <div class="group relative">
+                <div className="group relative">
                   <button>
-                    <RiDeleteBinLine onClick={() => handleDelete(promo._id)} size={22} className="text-red-500 hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200" />
+                    <RiDeleteBinLine
+                      onClick={() => handleDelete(promo._id)}
+                      size={22}
+                      className="text-red-500 hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200"
+                    />
                   </button>
                   <span
-                    class="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100"
-                  >Delete <span> </span
-                  ></span>
+                    className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100"
+                  >
+                    Delete
+                  </span>
                 </div>
-
               </div>
             </td>
             <td className="text-xs p-3 text-gray-700">
@@ -151,14 +160,19 @@ const PromoPage = () => {
               />
             </td>
             <td className="text-xs p-3 text-gray-700 cursor-pointer">
-              <div class="group relative">
+              <div className="group relative">
                 <button>
-                  <FaRegEye onClick={() => handleViewClick(promo)} size={22} className='hover:text-red-700 hover:transition hover:scale-105 hover:duration-200' />
+                  <FaRegEye
+                    onClick={() => handleViewClick(promo)}
+                    size={22}
+                    className="hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200"
+                  />
                 </button>
                 <span
-                  class="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100"
-                >Preview <span> </span
-                ></span>
+                  className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100"
+                >
+                  Preview
+                </span>
               </div>
             </td>
           </tr>
@@ -167,57 +181,52 @@ const PromoPage = () => {
     );
   };
 
-
   return (
-    <div className='px-0 md:px-6'>
-      <div className='flex flex-col-reverse lg:flex-row items-center justify-between px-6 max-w-screen-2xl mx-auto my-6 gap-6'>
+    <>
+      <div className='flex flex-col-reverse lg:flex-row items-center justify-between max-w-screen-2xl mx-auto gap-6'>
 
         <div className="flex space-x-0 md:space-x-4 border-b mb-4 text-xs md:text-base">
           <button
-            className={`relative py-2 px-4 font-medium transition-all duration-300
-      ${activeTab === 'all' ? 'text-blue-600' : 'text-gray-600'}
-      after:absolute after:left-0 after:right-0 after:bottom-0 
-      after:h-[2px] after:bg-blue-500 after:transition-all after:duration-300
-      ${activeTab === 'all' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
-    `}
+            className={`relative py-2 px-4 transition-all duration-300
+${activeTab === 'all' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
+after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
+        after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
+${activeTab === 'all' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
+`}
             onClick={() => setActiveTab('all')}
           >
             All ({allPromos?.length || 0})
           </button>
 
           <button
-            className={`relative py-2 px-4 font-medium transition-all duration-300
-      ${activeTab === 'active' ? 'text-blue-600' : 'text-gray-600'}
-      after:absolute after:left-0 after:right-0 after:bottom-0 
-      after:h-[2px] after:bg-blue-500 after:transition-all after:duration-300
-      ${activeTab === 'active' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
-    `}
+            className={`relative py-2 px-4 transition-all duration-300
+${activeTab === 'active' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
+after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
+        after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
+${activeTab === 'active' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
+`}
             onClick={() => setActiveTab('active')}
           >
             Active Promos ({activePromos?.length || 0})
           </button>
 
           <button
-            className={`relative py-2 px-4 font-medium transition-all duration-300
-      ${activeTab === 'expired' ? 'text-blue-600' : 'text-gray-600'}
-      after:absolute after:left-0 after:right-0 after:bottom-0 
-      after:h-[2px] after:bg-blue-500 after:transition-all after:duration-300
-      ${activeTab === 'expired' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
-    `}
+            className={`relative py-2 px-4 transition-all duration-300
+${activeTab === 'expired' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
+after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
+        after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
+${activeTab === 'expired' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
+`}
             onClick={() => setActiveTab('expired')}
           >
             Used Promos ({expiredPromos?.length || 0})
           </button>
         </div>
 
-        <Button onClick={() => router.push('/dash-board/discounts/promo/add-promo')} className='bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium'>
-          Create a new Promo
-        </Button>
-
       </div>
 
 
-      <div className="max-w-screen-2xl mx-auto custom-max-discount overflow-x-auto px-2 md:px-6 my-4 modal-body-scroll">
+      <div className="max-w-screen-2xl mx-auto custom-max-discount overflow-x-auto my-4 modal-body-scroll">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-50 sticky top-0 z-[1] rounded-md">
             <tr>
@@ -243,9 +252,8 @@ const PromoPage = () => {
         totalAmountDiscounted={totalAmountDiscounted}
         promo={selectedPromo}
       />
-
-    </div>
+    </>
   );
 };
 
-export default PromoPage;
+export default RecentPromotions;

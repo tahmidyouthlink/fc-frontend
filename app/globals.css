@@ -155,16 +155,16 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 
 /* Base styles for small screens (mobile) */
 .custom-max-discount {
-  min-height: calc(100vh - 180px);
-  max-height: calc(100vh - 180px);
+  min-height: calc(100vh - 380px);
+  max-height: calc(100vh - 380px);
   overflow-y: auto;
 }
 
 /* Medium screens (tablets) */
 @media (min-width: 768px) {
   .custom-max-discount {
-    min-height: calc(100vh - 107px);
-    max-height: calc(100vh - 107px);
+    min-height: calc(100vh - 430px);
+    max-height: calc(100vh - 430px);
   }
 }
 

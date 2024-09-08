@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaStar } from 'react-icons/fa';
+import { PiFlagPennantFill } from "react-icons/pi";
 
 const StarRating = ({ rating, onRatingChange }) => {
   const colors = {
@@ -11,11 +11,11 @@ const StarRating = ({ rating, onRatingChange }) => {
   };
 
   return (
-    <div className="flex space-x-2">
+    <div className="flex space-x-2 mt-6">
       {['Red', 'Yellow', 'Green', 'Purple'].map((color, index) => (
-        <FaStar
+        <PiFlagPennantFill
           key={index}
-          className={`cursor-pointer transition-transform duration-200 transform ${rating === color ? 'scale-125' : 'scale-100'} ${colors[color]}`}
+          className={`cursor-pointer transition-transform duration-200 transform ${rating === color ? 'scale-150' : 'scale-100'} ${colors[color]}`}
           onClick={() => onRatingChange(color)}
           size={24}
         />

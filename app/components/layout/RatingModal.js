@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter } from '@nextui-org/react';
-import StarRating from './StarRating';
+import FlagRating from './FlagRating';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 
 const RatingModal = ({ isOpen, onClose, onSave, initialRating, selectedCustomer }) => {
@@ -36,7 +36,7 @@ const RatingModal = ({ isOpen, onClose, onSave, initialRating, selectedCustomer 
         <ModalBody>
           <div className="flex flex-col items-center">
             {!isLoading ? (
-              <StarRating
+              <FlagRating
                 rating={rating} // Show the selected color initially
                 onRatingChange={(newRating) => setRating(newRating)} // Update rating on click
               />

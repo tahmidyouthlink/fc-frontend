@@ -50,11 +50,6 @@ const SideNavbar = ({ onClose }) => {
       path: "/dash-board/customers"
     },
     {
-      name: "Finances",
-      icon: <TbBuildingBank />,
-      path: "/dash-board/finances"
-    },
-    {
       name: "Analytics",
       icon: <TbBrandGoogleAnalytics />,
       path: "/dash-board/analytics"
@@ -63,14 +58,6 @@ const SideNavbar = ({ onClose }) => {
       name: "Marketing",
       icon: <FaBullhorn />,
       path: "/dash-board/marketing"
-    },
-    {
-      name: "Discounts",
-      icon: <TbRosetteDiscount />,
-      links: [
-        { label: 'Promo', link: '/dash-board/discounts/promo', icon: <RiCoupon4Line /> },
-        { label: 'Offer', link: '/dash-board/discounts/offer', icon: <MdOutlineLocalOffer /> }
-      ]
     },
     {
       name: "Shipping",
@@ -82,6 +69,7 @@ const SideNavbar = ({ onClose }) => {
       icon: <MdOutlineSettings />,
       links: [
         { label: 'Permissions', link: '/dash-board/permissions', icon: <LiaUserLockSolid /> },
+        { label: 'Finances', link: '/dash-board/finances', icon: <TbBuildingBank /> },
         { label: 'Categories', link: '/dash-board/categories', icon: <BiCategory /> },
         { label: 'Variants', link: '/dash-board/variants', icon: <PiResizeBold /> },
       ]

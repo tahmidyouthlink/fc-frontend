@@ -1,6 +1,6 @@
 "use client";
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
-import { Tab, Tabs } from '@nextui-org/react';
+import { DatePicker, Tab, Tabs } from '@nextui-org/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
@@ -10,7 +10,7 @@ import { FaArrowLeft } from 'react-icons/fa6';
 
 const AddPromo = () => {
 
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,11 +51,11 @@ const AddPromo = () => {
 
       const response = await axiosPublic.post('/addPromoCode', discountData);
       if (response.data.insertedId) {
-        toast.success('Discount published successfully!');
-        router.push("/dash-board/discounts/promo");
+        toast.success('Promo published successfully!');
+        router.push("/dash-board/marketing");
       }
     } catch (err) {
-      toast.error("Failed to publish discount!");
+      toast.error("Failed to publish promo!");
     } finally {
       setIsSubmitting(false);
     }
@@ -112,12 +112,20 @@ const AddPromo = () => {
 
         <div>
           <label htmlFor='expiryDate' className='flex justify-start font-medium text-[#9F5216] pb-2'>Promo Expire On *</label>
-          <input
+          <DatePicker
             id='expiryDate'
-            type="date"
-            {...register("expiryDate", { required: "Expiry Date is required" })}
-            className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+            placeholder="Select date"
+            aria-label="Select expiry date"
+            onChange={(date) => {
+              if (date instanceof Date && !isNaN(date)) {
+                setValue('expiryDate', date.toISOString().split('T')[0]); // Ensure it's a valid Date object and format it as YYYY-MM-DD
+              } else {
+                setValue('expiryDate', date); // If DatePicker returns something else, handle it here
+              }
+            }}
+            className="w-full outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
           />
+
           {errors.expiryDate && (
             <p className="text-red-600 text-left">{errors.expiryDate.message}</p>
           )}
@@ -125,7 +133,7 @@ const AddPromo = () => {
 
         <div className='flex justify-between items-center mt-4 mb-8'>
 
-          <Link className='flex items-center gap-2 font-medium text-white rounded-lg bg-[#9F5216] hover:bg-[#9f5116c9] py-2 px-4' href={"/dash-board/discounts/promo"}> <FaArrowLeft /> Go Back</Link>
+          <Link className='flex items-center gap-2 font-medium text-white rounded-lg bg-[#9F5216] hover:bg-[#9f5116c9] py-2 px-4' href={"/dash-board/marketing"}> <FaArrowLeft /> Go Back</Link>
 
           <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
             {isSubmitting ? 'Submitting...' : 'Submit'}

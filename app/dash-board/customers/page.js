@@ -9,7 +9,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import CustomerPrintButton from '@/app/components/layout/CustomerPrintButton';
 import RatingModal from '@/app/components/layout/RatingModal';
 import toast from 'react-hot-toast';
-import { FaStar } from 'react-icons/fa';
+import { PiFlagPennantFill } from "react-icons/pi";
 import { getColorClass } from '@/app/components/layout/getColorClass';
 import useCustomers from '@/app/hooks/useCustomers';
 
@@ -370,7 +370,7 @@ const Customers = () => {
               return (
                 <tr key={customer?._id || index} className="hover:bg-gray-50 transition-colors">
                   {selectedColumns.includes('Customer ID') && (
-                    <td className={`text-xs p-3 font-mono ${customer?.emailVerified === "Verified" ? "text-green-600 font-bold" : "text-gray-700 font-bold"}`}>
+                    <td className={`text-xs p-3 font-mono`}>
                       {customer?.customerId}
                     </td>
                   )}
@@ -382,7 +382,7 @@ const Customers = () => {
                   )}
 
                   {selectedColumns.includes('Email') && (
-                    <td className="text-xs p-3 text-gray-700">
+                    <td className={`text-xs p-3 ${customer?.emailVerified === "Verified" ? "text-green-600 font-semibold" : "text-gray-700"}`}>
                       {customer?.email}
                     </td>
                   )}
@@ -448,7 +448,7 @@ const Customers = () => {
                         disabled={!isAdmin}
                         className={ratingColorClass} // Apply the color class
                       >
-                        <FaStar size={24} />
+                        <PiFlagPennantFill size={24} />
                       </button>
                     </td>
                   )}
