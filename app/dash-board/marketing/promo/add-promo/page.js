@@ -15,10 +15,19 @@ const AddPromo = () => {
   const axiosPublic = useAxiosPublic();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [promoDiscountType, setPromoDiscountType] = useState('Percentage');
+  const [dateError, setDateError] = useState(false);
 
   const handleTabChange = (key) => {
     setPromoDiscountType(key);
   };
+
+  const handleShowDateError = (date) => {
+    if (date) {
+      setDateError(false);
+      return;
+    }
+    setDateError(true);
+  }
 
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
@@ -31,9 +40,25 @@ const AddPromo = () => {
   const onSubmit = async (data) => {
     const { promoCode, promoDiscountValue, expiryDate, maxAmount, minAmount } = data;
 
+    // Get today's date (ignoring time)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);  // Reset hours to make it a date-only comparison
+
+    // Check if expiryDate is selected
     if (!expiryDate) {
-      return;
+      setDateError(true);
+      return;  // Do not show toast here, just prevent submission
     }
+
+    // Check if expiryDate is in the past
+    const selectedExpiryDate = new Date(expiryDate);
+    if (selectedExpiryDate < today) {
+      toast.error("Expiry date cannot be in the past.");
+      return;  // Prevent form submission
+    }
+
+    // If date is valid, reset the date error
+    setDateError(false);
 
     const formattedExpiryDate = formatDate(expiryDate);
     setIsSubmitting(true);
@@ -65,7 +90,7 @@ const AddPromo = () => {
     <div className='max-w-screen-2xl px-6 2xl:px-0 mx-auto'>
 
       <div className='max-w-screen-lg mx-auto flex items-center pt-3 md:pt-6'>
-        <h3 className='w-full text-center font-semibold text-xl lg:text-2xl'>Create New Promo Code</h3>
+        <h3 className='w-full text-center font-semibold text-xl lg:text-2xl'>Create New Promo</h3>
       </div>
 
 
@@ -117,6 +142,7 @@ const AddPromo = () => {
             placeholder="Select date"
             aria-label="Select expiry date"
             onChange={(date) => {
+              handleShowDateError(date);
               if (date instanceof Date && !isNaN(date)) {
                 setValue('expiryDate', date.toISOString().split('T')[0]); // Ensure it's a valid Date object and format it as YYYY-MM-DD
               } else {
@@ -126,8 +152,8 @@ const AddPromo = () => {
             className="w-full outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
           />
 
-          {errors.expiryDate && (
-            <p className="text-red-600 text-left">{errors.expiryDate.message}</p>
+          {dateError && (
+            <p className="text-red-600 text-left">Please select Promo Expire Date.</p>
           )}
         </div>
 

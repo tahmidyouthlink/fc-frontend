@@ -57,7 +57,8 @@ export default function EditCategory() {
   const onSubmit = async (data) => {
     try {
       const updatedCategory = {
-        ...data,
+        key: data?.category,
+        label: data?.category,
         sizes: data.sizes.map(size => size.size),
         subCategories: data.subCategories.map(subCat => ({ key: subCat.subCategory, label: subCat.subCategory }))
       };

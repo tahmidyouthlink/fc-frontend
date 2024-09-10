@@ -472,12 +472,12 @@ const Customers = () => {
       )}
 
       {selectedOrder && (
-        <Modal className='mx-4 lg:mx-0' isOpen={isOpen} onOpenChange={onClose} size='2xl'>
+        <Modal className='mx-4 lg:mx-0 px-4' isOpen={isOpen} onOpenChange={onClose} size='2xl'>
           <ModalContent>
             <ModalHeader className="text-lg">
               Order History
             </ModalHeader>
-            <ModalBody className="modal-body-scroll p-4 space-y-6">
+            <ModalBody className="modal-body-scroll space-y-6">
               {selectedOrder.length > 0 ? (
                 selectedOrder.map((order, index) => (
                   <div key={index} className="bg-white px-5 md:px-10 py-5 rounded-lg flex flex-col md:flex-row justify-between shadow-md border border-gray-200">
@@ -513,7 +513,7 @@ const Customers = () => {
             </ModalBody>
             <ModalFooter className='flex justify-end border-gray-300 pt-2'>
               <Button
-                onClick={onClose} color="primary"
+                onClick={onClose} color="danger" size='sm'
               >
                 Close
               </Button>

@@ -14,7 +14,7 @@ const useCategories = () => {
     },
     refetchInterval: 1000 * 30, // Refetch every 30 seconds
     onError: (err) => {
-      console.error(`Error fetching ${endpoint}:`, err);
+      console.error(`Error fetching category:`, err);
     }
   })
 
