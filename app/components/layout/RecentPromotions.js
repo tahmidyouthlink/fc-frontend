@@ -11,6 +11,7 @@ import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useOrders from '@/app/hooks/useOrders';
 import usePromoCodes from '@/app/hooks/usePromoCodes';
 import toast from 'react-hot-toast';
+import useOffers from '@/app/hooks/useOffers';
 
 const RecentPromotions = () => {
 
@@ -18,9 +19,12 @@ const RecentPromotions = () => {
   const axiosPublic = useAxiosPublic();
   const [orderList, isOrderPending] = useOrders();
   const [promoList, isPromoPending, refetch] = usePromoCodes();
+  const [offerList, isOfferPending, refetchOffer] = useOffers();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPromo, setSelectedPromo] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
+  const [selectedOption, setSelectedOption] = useState('all'); // New state for dropdown
+  const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
   // Memoized current date
   const currentDate = useMemo(() => new Date(), []);
@@ -39,6 +43,38 @@ const RecentPromotions = () => {
   const allPromos = useMemo(() => {
     return [...(activePromos || []), ...(expiredPromos || [])];
   }, [activePromos, expiredPromos]);
+
+  // Memoized active offers
+  const activeOffers = useMemo(() => {
+    return offerList?.filter(promo => new Date(promo?.expiryDate) >= currentDate);
+  }, [offerList, currentDate]);
+
+  // Memoized expired offers
+  const expiredOffers = useMemo(() => {
+    return offerList?.filter(promo => new Date(promo?.expiryDate) < currentDate);
+  }, [offerList, currentDate]);
+
+  // Combined "All" offers
+  const allOffers = useMemo(() => {
+    return [...(activeOffers || []), ...(expiredOffers || [])];
+  }, [activeOffers, expiredOffers]);
+
+  const allItems = useMemo(() => [...(allPromos || []), ...(allOffers || [])], [allPromos, allOffers]);
+
+  // Function to filter based on the search query and tab/dropdown selection
+  const filterItems = (items) => {
+    if (!searchQuery) return items;
+    const query = searchQuery.toLowerCase();
+    return items.filter(item =>
+      item?.promoCode?.toLowerCase().includes(query) ||
+      item?.offerTitle?.toLowerCase().includes(query) ||
+      item?.expiryDate?.toLowerCase().includes(query) ||
+      (item?.promoDiscountValue && item.promoDiscountValue.toString().includes(query)) ||
+      (item?.promoDiscountType && item.promoDiscountType.toLowerCase().includes(query)) ||
+      (item?.offerDiscountValue && item.offerDiscountValue.toString().includes(query)) ||
+      (item?.offerDiscountType && item.offerDiscountType.toLowerCase().includes(query))
+    );
+  };
 
   const handleViewClick = (promo) => {
     setSelectedPromo(promo);
@@ -101,51 +137,62 @@ const RecentPromotions = () => {
     }
   };
 
-  if (isPromoPending || isOrderPending) {
+  if (isPromoPending || isOrderPending || isOfferPending) {
     return <Loading />;
   }
 
-  const renderPromos = (promos) => {
+  const filteredItems = selectedOption === 'all' ? filterItems(allItems) : (selectedOption === 'promos' ? filterItems(allPromos) : filterItems(allOffers));
+
+  // Render the promos/offers table
+  const renderItems = (items) => {
+    const filteredItems = filterItems(items);
+
+    if (!filteredItems.length) {
+      return (
+        <tbody>
+          <tr>
+            <td colSpan="6" className="text-center py-4">No items found</td>
+          </tr>
+        </tbody>
+      );
+    }
+
     return (
       <tbody className="bg-white divide-y divide-gray-200">
-        {promos?.map((promo, index) => (
-          <tr key={promo?._id || index} className="hover:bg-gray-50 transition-colors">
-            <td className="text-xs p-3 text-gray-700 font-mono">
-              {promo?.promoCode}
-            </td>
+        {filteredItems.map((item, index) => (
+          <tr key={item?._id || index} className="hover:bg-gray-50 transition-colors">
+            <td className="text-xs p-3 text-gray-700 font-mono">{item?.promoCode} {item?.offerTitle}</td>
             <td className="text-xs p-3 text-gray-700">
-              {promo?.promoDiscountValue} {promo?.promoDiscountType === 'Amount' ? 'Tk' : '%'}
+              {item?.promoDiscountType
+                ? `${item?.promoDiscountValue} ${item?.promoDiscountType === 'Amount' ? 'Tk' : '%'}`
+                : item?.offerDiscountType
+                  ? `${item?.offerDiscountValue} ${item?.offerDiscountType === 'Amount' ? 'Tk' : '%'}`
+                  : 'No Discount'}
             </td>
-            <td className="text-xs p-3 text-gray-700">
-              {promo?.expiryDate}
-            </td>
+            <td className="text-xs p-3 text-gray-700">{item?.expiryDate}</td>
             <td className="text-xs p-3 text-gray-700">
               <div className="flex items-center gap-3 cursor-pointer">
                 <div className="group relative">
                   <button>
                     <MdOutlineModeEdit
-                      onClick={() => router.push(`/dash-board/marketing/promo/${promo._id}`)}
+                      onClick={() => router.push(`/dash-board/marketing/promo/${item._id}`)}
                       size={22}
                       className="text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200"
                     />
                   </button>
-                  <span
-                    className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100"
-                  >
+                  <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
                     Edit
                   </span>
                 </div>
                 <div className="group relative">
                   <button>
                     <RiDeleteBinLine
-                      onClick={() => handleDelete(promo._id)}
+                      onClick={() => handleDelete(item._id)}
                       size={22}
                       className="text-red-500 hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200"
                     />
                   </button>
-                  <span
-                    className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100"
-                  >
+                  <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
                     Delete
                   </span>
                 </div>
@@ -153,8 +200,8 @@ const RecentPromotions = () => {
             </td>
             <td className="text-xs p-3 text-gray-700">
               <CustomSwitch
-                checked={promo?.promoStatus}
-                onChange={() => handleStatusChange(promo?._id, promo?.promoStatus)}
+                checked={item?.promoStatus}
+                onChange={() => handleStatusChange(item?._id, item?.promoStatus)}
                 size="md"
                 color="primary"
               />
@@ -163,14 +210,12 @@ const RecentPromotions = () => {
               <div className="group relative">
                 <button>
                   <FaRegEye
-                    onClick={() => handleViewClick(promo)}
+                    onClick={() => handleViewClick(item)}
                     size={22}
                     className="hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200"
                   />
                 </button>
-                <span
-                  className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100"
-                >
+                <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
                   Preview
                 </span>
               </div>
@@ -181,68 +226,104 @@ const RecentPromotions = () => {
     );
   };
 
+  // Handle the dropdown change
+  const handleOptionChange = (e) => {
+    setSelectedOption(e.target.value);
+    setActiveTab('all'); // Reset the active tab when switching between promos and offers
+  };
+
+  // Conditional rendering based on the selected tab and dropdown
+  const itemsToRender = () => {
+    if (selectedOption === 'all') {
+      return activeTab === 'all' ? allPromos : activeTab === 'active' ? activePromos : expiredPromos;
+    }
+    if (selectedOption === 'all') {
+      return activeTab === 'all' ? allOffers : activeTab === 'active' ? activeOffers : expiredOffers;
+    }
+    return [];
+  };
+
+  console.log(selectedOption);
+
+
   return (
     <>
-      <div className='flex flex-col-reverse lg:flex-row items-center justify-between max-w-screen-2xl mx-auto gap-6'>
-
-        <div className="flex space-x-0 md:space-x-4 border-b mb-4 text-xs md:text-base">
-          <button
-            className={`relative py-2 px-4 transition-all duration-300
-${activeTab === 'all' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
-after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
-        after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
-${activeTab === 'all' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
-`}
-            onClick={() => setActiveTab('all')}
+      <div className='flex justify-between items-center gap-6 mb-6'>
+        <div className="flex-1 flex flex-col gap-4">
+          <select
+            value={selectedOption}
+            onChange={handleOptionChange}
+            className="border p-2 rounded-lg max-w-sm text-lg h-[44px] md:h-12"
           >
-            All ({allPromos?.length || 0})
-          </button>
-
-          <button
-            className={`relative py-2 px-4 transition-all duration-300
-${activeTab === 'active' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
-after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
-        after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
-${activeTab === 'active' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
-`}
-            onClick={() => setActiveTab('active')}
-          >
-            Active Promos ({activePromos?.length || 0})
-          </button>
-
-          <button
-            className={`relative py-2 px-4 transition-all duration-300
-${activeTab === 'expired' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
-after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
-        after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
-${activeTab === 'expired' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
-`}
-            onClick={() => setActiveTab('expired')}
-          >
-            Used Promos ({expiredPromos?.length || 0})
-          </button>
+            <option value="all">All</option>
+            <option value="promos">Promos</option>
+            <option value="offers">Offers</option>
+          </select>
         </div>
 
+        {/* Search Product Item */}
+        <li className="flex-1 flex items-center relative group">
+          <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
+            <g>
+              <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
+            </g>
+          </svg>
+          <input
+            type="search"
+            placeholder="Search By Order Details..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-12 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-[#f3f3f4] text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
+          />
+        </li>
       </div>
+
+      {/* Conditionally render the tabs only if "All" is NOT selected */}
+      {selectedOption !== 'all' && (
+        <div className="flex space-x-4">
+          <button
+            className={`relative px-4 py-2 transition-all duration-300 ${activeTab === 'all' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 
+        after:h-[2px] after:bg-[#9F5216] hover:text-[#9F5216] after:transition-all after:duration-300 ${activeTab === 'all' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
+            onClick={() => setActiveTab('all')}
+          >
+            {selectedOption === 'promos' ? `All Promos (${allPromos.length})` : `All Offers (${allOffers.length})`}
+          </button>
+          <button
+            className={`relative px-4 py-2 transition-all duration-300 ${activeTab === 'active' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 
+        after:h-[2px] after:bg-[#9F5216] hover:text-[#9F5216] after:transition-all after:duration-300 ${activeTab === 'active' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
+            onClick={() => setActiveTab('active')}
+          >
+            {selectedOption === 'promos' ? `Active Promos (${activePromos.length})` : `Active Offers (${activeOffers.length})`}
+          </button>
+          <button
+            className={`relative px-4 py-2 transition-all duration-300 ${activeTab === 'expired' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 
+        after:h-[2px] after:bg-[#9F5216] hover:text-[#9F5216] after:transition-all after:duration-300 ${activeTab === 'expired' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
+            onClick={() => setActiveTab('expired')}
+          >
+            {selectedOption === 'promos' ? `Used Promos (${expiredPromos.length})` : `Used Offers (${expiredOffers.length})`}
+          </button>
+        </div>
+      )}
 
 
       <div className="max-w-screen-2xl mx-auto custom-max-discount overflow-x-auto my-4 modal-body-scroll">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-50 sticky top-0 z-[1] rounded-md">
             <tr>
-              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Promo Code</th>
+              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Code/Title</th>
               <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Discount</th>
               <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Expiry Date</th>
               <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Actions</th>
-              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Promo Status</th>
-              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">View</th>
+              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Status</th>
+              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Preview</th>
             </tr>
           </thead>
-          {activeTab === 'all' && renderPromos(allPromos)}
-          {activeTab === 'active' && renderPromos(activePromos)}
-          {activeTab === 'expired' && renderPromos(expiredPromos)}
+
+          {/* Conditional rendering based on the selected tab and dropdown */}
+          {renderItems(filteredItems)}
         </table>
       </div>
+
 
       {/* Promo Details Modal */}
       <PromoDetailsModal

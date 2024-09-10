@@ -13,12 +13,12 @@ const AddOffer = () => {
   const { register, handleSubmit, setValue, formState: { errors } } = useForm();
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
-  const [promoDiscountType, setPromoDiscountType] = useState('Percentage');
+  const [offerDiscountType, setOfferDiscountType] = useState('Percentage');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dateError, setDateError] = useState(false);
 
   const handleTabChange = (key) => {
-    setPromoDiscountType(key);
+    setOfferDiscountType(key);
   };
 
   const handleShowDateError = (date) => {
@@ -38,7 +38,7 @@ const AddOffer = () => {
   };
 
   const onSubmit = async (data) => {
-    const { offerTitle, promoDiscountValue, expiryDate, maxAmount, minAmount } = data;
+    const { offerTitle, offerDiscountValue, expiryDate, maxAmount, minAmount } = data;
 
     // Get today's date (ignoring time)
     const today = new Date();
@@ -66,21 +66,19 @@ const AddOffer = () => {
     try {
       const offerData = {
         offerTitle,
-        promoDiscountValue,
-        promoDiscountType,
+        offerDiscountValue,
+        offerDiscountType,
         expiryDate: formattedExpiryDate,
         maxAmount: maxAmount ? maxAmount : 0,
         minAmount: minAmount ? minAmount : 0,
         offerStatus: true
       };
 
-      console.log(offerData);
-
-      // const response = await axiosPublic.post('/addOffer', offerData);
-      // if (response.data.insertedId) {
-      //   toast.success('Offer published successfully!');
-      //   router.push("/dash-board/marketing");
-      // }
+      const response = await axiosPublic.post('/addOffer', offerData);
+      if (response.data.insertedId) {
+        toast.success('Offer published successfully!');
+        router.push("/dash-board/marketing");
+      }
     } catch (err) {
       toast.error("Failed to publish offer!");
     } finally {
@@ -108,7 +106,7 @@ const AddOffer = () => {
         <div className="flex w-full flex-col">
           <Tabs
             aria-label="Discount Type"
-            selectedKey={promoDiscountType}
+            selectedKey={offerDiscountType}
             onSelectionChange={handleTabChange}
           >
             <Tab className='text-[#9F5216]' key="Percentage" title="Percentage">Percentage (%) *</Tab>
@@ -117,11 +115,11 @@ const AddOffer = () => {
 
           <input
             type="number"
-            {...register('promoDiscountValue', { required: true })}
+            {...register('offerDiscountValue', { required: true })}
             className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
-            placeholder={`Enter ${promoDiscountType} Discount`} // Correct placeholder
+            placeholder={`Enter ${offerDiscountType} Discount`} // Correct placeholder
           />
-          {errors.promoDiscountValue?.type === "required" && (
+          {errors.offerDiscountValue?.type === "required" && (
             <p className="text-red-600 text-left">Discount Value is required</p>
           )}
         </div>
