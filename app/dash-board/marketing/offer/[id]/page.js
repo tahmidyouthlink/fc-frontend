@@ -34,58 +34,57 @@ const EditOffer = () => {
   };
 
   useEffect(() => {
-    const fetchOfferCode = async () => {
+    const fetchOfferData = async () => {
       try {
-        const response = await axiosPublic.get(`/getSinglePromo/${id}`);
-        const promo = response.data;
+        const response = await axiosPublic.get(`/getSingleOffer/${id}`);
+        const offer = response.data;
 
         // Ensure the expiry date is set to midnight to avoid timezone issues
-        const fetchedExpiryDate = formatDateForInput(promo.expiryDate);
-        console.log('Processed expiry date:', fetchedExpiryDate); // Debugging
+        const fetchedExpiryDate = formatDateForInput(offer.expiryDate);
 
-        // Set form fields with fetched promo data
-        setValue('promoCode', promo?.promoCode);
-        setValue('promoDiscountValue', promo?.promoDiscountValue);
+        // Set form fields with fetched offer data
+        setValue('offerTitle', offer?.offerTitle);
+        setValue('offerDiscountValue', offer?.offerDiscountValue);
         setExpiryDate(fetchedExpiryDate); // Ensure no time zone shift
-        setValue('maxAmount', promo?.maxAmount || 0);
-        setValue('minAmount', promo?.minAmount || 0);
+        setValue('maxAmount', offer?.maxAmount || 0);
+        setValue('minAmount', offer?.minAmount || 0);
 
-        setOfferDiscountType(promo?.offerDiscountType);
+        setOfferDiscountType(offer?.offerDiscountType);
         setIsLoading(false);
       } catch (err) {
         console.error(err); // Log error to the console for debugging
-        toast.error("Failed to fetch promo code details!");
+        toast.error("Failed to fetch offer code details!");
       }
     };
 
-    fetchOfferCode();
+    fetchOfferData();
   }, [id, axiosPublic, setValue]);
 
   const onSubmit = async (data) => {
-    const { promoCode, promoDiscountValue, maxAmount, minAmount } = data;
+    const { offerTitle, offerDiscountValue, maxAmount, minAmount } = data;
     setIsSubmitting(true);
 
     try {
       const updatedDiscount = {
-        promoCode,
-        promoDiscountValue,
+        offerTitle,
+        offerDiscountValue,
         offerDiscountType,
         expiryDate,
         maxAmount: maxAmount || 0,
         minAmount: minAmount || 0,
       };
 
-      const res = await axiosPublic.put(`/updatePromo/${id}`, updatedDiscount);
+      const res = await axiosPublic.put(`/updateOffer/${id}`, updatedDiscount);
       if (res.data.modifiedCount > 0) {
-        toast.success('Promo updated successfully!');
+        toast.success('offer updated successfully!');
         router.push('/dash-board/marketing');
       } else {
         toast.error('No changes detected.');
         setIsSubmitting(false);
       }
     } catch (error) {
-      console.error('Error editing promo:', error);
-      toast.error('Failed to update promo. Please try again!');
+      console.error('Error editing offer:', error);
+      toast.error('Failed to update offer. Please try again!');
       setIsSubmitting(false);
     }
   };
@@ -98,16 +97,16 @@ const EditOffer = () => {
     <div className='max-w-screen-2xl px-0 md:px-6 2xl:px-0 mx-auto'>
 
       <div className='max-w-screen-lg mx-auto flex items-center pt-3 md:pt-6'>
-        <h3 className='w-full text-center font-semibold text-xl lg:text-2xl'>Edit Promo Code</h3>
+        <h3 className='w-full text-center font-semibold text-xl lg:text-2xl'>Edit Offer Code</h3>
       </div>
 
       {/* Your form code */}
       <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-lg mx-auto p-6 flex flex-col gap-6'>
         <div>
-          <label htmlFor='promoCode' className='flex justify-start font-medium text-[#9F5216]'>Promo Code *</label>
-          <input id='promoCode' {...register("promoCode", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="text" />
-          {errors.promoCode?.type === "required" && (
-            <p className="text-red-600 text-left">Promo Code is required</p>
+          <label htmlFor='offerTitle' className='flex justify-start font-medium text-[#9F5216]'>Offer Title *</label>
+          <input id='offerTitle' {...register("offerTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="text" />
+          {errors.offerTitle?.type === "required" && (
+            <p className="text-red-600 text-left">Offer Title is required</p>
           )}
         </div>
 
@@ -123,11 +122,11 @@ const EditOffer = () => {
 
           <input
             type="number"
-            {...register('promoDiscountValue', { required: true })}
+            {...register('offerDiscountValue', { required: true })}
             className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
             placeholder={`Enter ${offerDiscountType} Discount`} // Correct placeholder
           />
-          {errors.promoDiscountValue?.type === "required" && (
+          {errors.offerDiscountValue?.type === "required" && (
             <p className="text-red-600 text-left">Discount Value is required</p>
           )}
         </div>
@@ -164,7 +163,7 @@ const EditOffer = () => {
           <Link className='flex items-center gap-2 font-medium text-white rounded-lg bg-[#9F5216] hover:bg-[#9f5116c9] py-2 px-4' href={"/dash-board/marketing"}> <FaArrowLeft /> Go Back</Link>
 
           <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
-            {isSubmitting ? 'Submitting...' : 'Update Promo'}
+            {isSubmitting ? 'Submitting...' : 'Update offer'}
           </button>
         </div>
       </form>

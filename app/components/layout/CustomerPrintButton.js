@@ -81,17 +81,34 @@ const CustomerPrintButton = ({ selectedOrder }) => {
     });
 
     const subtotal = parseFloat(selectedOrder.productInformation.reduce((total, product) => total + (product.unitPrice * product.sku), 0).toFixed(2));
-    const promoDiscountValue = parseFloat(selectedOrder.promoDiscountValue?.toFixed(2) || "0.00");
     const shippingCharge = parseFloat(selectedOrder.shippingCharge?.toFixed(2) || "0.00");
 
-    // Calculate the discount based on its type
-    let discountAmount;
-    if (selectedOrder.promoDiscountType === 'Percentage') {
-      discountAmount = (subtotal * (promoDiscountValue / 100)).toFixed(2); // Calculate percentage discount
-    } else if (selectedOrder.promoDiscountType === 'Amount') {
-      discountAmount = promoDiscountValue.toFixed(2); // Direct amount discount
-    } else {
-      discountAmount = "0.00";
+    // Check if Promo or Offer is applied
+    const promoCode = selectedOrder.promoCode;
+    const promoDiscountValue = parseFloat(selectedOrder?.promoDiscountValue?.toFixed(2) || "0.00");
+    const offerTitle = selectedOrder.offerTitle; // Use offerTitle instead of offerCode
+    const offerDiscountValue = parseFloat(selectedOrder?.offerDiscountValue?.toFixed(2) || "0.00");
+
+    // Determine if Promo or Offer is applied and calculate the discount accordingly
+    let discountAmount = 0;
+    let discountLabel = '';
+
+    if (promoCode) {
+      // Promo Discount
+      if (selectedOrder.promoDiscountType === 'Percentage') {
+        discountAmount = (subtotal * (promoDiscountValue / 100)).toFixed(2);
+      } else if (selectedOrder.promoDiscountType === 'Amount') {
+        discountAmount = promoDiscountValue.toFixed(2);
+      }
+      discountLabel = `Promo Discount (${promoCode}) :`;
+    } else if (offerTitle) {
+      // Offer Discount
+      if (selectedOrder.offerDiscountType === 'Percentage') {
+        discountAmount = (subtotal * (offerDiscountValue / 100)).toFixed(2);
+      } else if (selectedOrder.offerDiscountType === 'Amount') {
+        discountAmount = offerDiscountValue.toFixed(2);
+      }
+      discountLabel = `Offer Discount (${offerTitle}) :`;
     }
 
     const total = (subtotal - discountAmount + shippingCharge).toFixed(2);
@@ -109,7 +126,7 @@ const CustomerPrintButton = ({ selectedOrder }) => {
           `${(product.unitPrice * product.sku).toFixed(2)}`
         ]),
         [{ content: 'Subtotal:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `${subtotal.toFixed(2)}`],
-        [{ content: `Promo Discount (${selectedOrder.promoCode || ''}) :`, colSpan: 5, styles: { halign: 'right', border: 'none' } }, `-${discountAmount}`],
+        ...(discountAmount > 0 ? [[{ content: discountLabel, colSpan: 5, styles: { halign: 'right', border: 'none' } }, `-${discountAmount}`]] : []),
         [{ content: 'Shipping Charge:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `+${shippingCharge.toFixed(2)}`],
         [{ content: 'Total:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `${total}`],
       ],

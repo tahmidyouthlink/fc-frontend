@@ -5,13 +5,13 @@ import { FaRegEye } from 'react-icons/fa6';
 import CustomSwitch from './CustomSwitch';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { MdOutlineModeEdit } from 'react-icons/md';
-import Loading from '../shared/Loading/Loading';
 import { useRouter } from 'next/navigation';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useOrders from '@/app/hooks/useOrders';
 import usePromoCodes from '@/app/hooks/usePromoCodes';
 import toast from 'react-hot-toast';
 import useOffers from '@/app/hooks/useOffers';
+import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
 
 const RecentPromotions = () => {
 
@@ -22,6 +22,7 @@ const RecentPromotions = () => {
   const [offerList, isOfferPending, refetchOffer] = useOffers();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPromo, setSelectedPromo] = useState(null);
+  const [selectedOffer, setSelectedOffer] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
   const [selectedOption, setSelectedOption] = useState('all'); // New state for dropdown
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
@@ -76,10 +77,17 @@ const RecentPromotions = () => {
     );
   };
 
-  const handleViewClick = (promo) => {
+  const handleViewClickPromo = (promo) => {
     setSelectedPromo(promo);
+    setSelectedOffer(null);
     setIsModalOpen(true);
   };
+
+  const handleViewClickOffer = (offer) => {
+    setSelectedOffer(offer);
+    setSelectedPromo(null);
+    setIsModalOpen(true);
+  }
 
   const totalPromoApplied = useMemo(() => {
     return orderList?.filter(order => order?.promoCode === selectedPromo?.promoCode).length;
@@ -98,7 +106,24 @@ const RecentPromotions = () => {
     }, 0).toFixed(2);
   }, [orderList, selectedPromo]);
 
-  const handleDelete = async (id) => {
+  const totalOfferApplied = useMemo(() => {
+    return orderList?.filter(order => order?.offerTitle === selectedOffer?.offerTitle).length;
+  }, [orderList, selectedOffer]);
+
+  const totalOfferAmountDiscounted = useMemo(() => {
+    return orderList?.reduce((total, order) => {
+      if (order?.offerTitle === selectedOffer?.offerTitle) {
+        if (order?.offerDiscountType === 'Percentage') {
+          return total + (order?.totalAmount * (order?.offerDiscountValue / 100));
+        } else if (order?.offerDiscountType === 'Amount') {
+          return total + order?.offerDiscountValue;
+        }
+      }
+      return total;
+    }, 0).toFixed(2);
+  }, [orderList, selectedOffer]);
+
+  const handleDeletePromo = async (id) => {
     try {
       const res = await axiosPublic.delete(`/deletePromo/${id}`);
       if (res?.data?.deletedCount) {
@@ -110,7 +135,19 @@ const RecentPromotions = () => {
     }
   };
 
-  const handleStatusChange = async (id, currentStatus) => {
+  const handleDeleteOffer = async (id) => {
+    try {
+      const res = await axiosPublic.delete(`/deleteOffer/${id}`);
+      if (res?.data?.deletedCount) {
+        refetchOffer();
+        toast.success('Offer deleted successfully!');
+      }
+    } catch (error) {
+      toast.error('Failed to delete offer. Please try again!');
+    }
+  };
+
+  const handleStatusChangePromo = async (id, currentStatus) => {
     try {
       // Find the discount that needs to be updated
       const findDiscount = promoList.find(promo => promo?._id === id);
@@ -137,11 +174,32 @@ const RecentPromotions = () => {
     }
   };
 
-  if (isPromoPending || isOrderPending || isOfferPending) {
-    return <Loading />;
-  }
+  const handleStatusChangeOffer = async (id, currentStatus) => {
+    try {
+      // Find the discount that needs to be updated
+      const findDiscount = offerList.find(offer => offer?._id === id);
+      if (!findDiscount) {
+        toast.error('Offer not found.');
+        return;
+      }
 
-  const filteredItems = selectedOption === 'all' ? filterItems(allItems) : (selectedOption === 'promos' ? filterItems(allPromos) : filterItems(allOffers));
+      // Exclude the _id field from the discount data
+      const { _id, ...rest } = findDiscount;
+      const discountData = { ...rest, offerStatus: !currentStatus };
+
+      // Send the update request
+      const res = await axiosPublic.put(`/updateOffer/${id}`, discountData);
+      if (res.data.modifiedCount > 0) {
+        toast.success('Status changed successfully!');
+        refetchOffer(); // Refetch the promo list to get the updated data
+      } else {
+        toast.error('No changes detected.');
+      }
+    } catch (error) {
+      console.error('Error editing status:', error);
+      toast.error('Failed to update status. Please try again!');
+    }
+  };
 
   // Render the promos/offers table
   const renderItems = (items) => {
@@ -161,7 +219,7 @@ const RecentPromotions = () => {
       <tbody className="bg-white divide-y divide-gray-200">
         {filteredItems.map((item, index) => (
           <tr key={item?._id || index} className="hover:bg-gray-50 transition-colors">
-            <td className="text-xs p-3 text-gray-700 font-mono">{item?.promoCode} {item?.offerTitle}</td>
+            <td className="text-xs p-3 text-gray-700 font-mono">{item?.promoCode || item?.offerTitle}</td>
             <td className="text-xs p-3 text-gray-700">
               {item?.promoDiscountType
                 ? `${item?.promoDiscountValue} ${item?.promoDiscountType === 'Amount' ? 'Tk' : '%'}`
@@ -175,7 +233,11 @@ const RecentPromotions = () => {
                 <div className="group relative">
                   <button>
                     <MdOutlineModeEdit
-                      onClick={() => router.push(`/dash-board/marketing/promo/${item._id}`)}
+                      onClick={() =>
+                        item?.promoCode
+                          ? router.push(`/dash-board/marketing/promo/${item._id}`) // Edit promo
+                          : router.push(`/dash-board/marketing/offer/${item._id}`) // Edit offer
+                      }
                       size={22}
                       className="text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200"
                     />
@@ -187,7 +249,11 @@ const RecentPromotions = () => {
                 <div className="group relative">
                   <button>
                     <RiDeleteBinLine
-                      onClick={() => handleDelete(item._id)}
+                      onClick={() =>
+                        item?.promoCode
+                          ? handleDeletePromo(item._id) // Delete promo
+                          : handleDeleteOffer(item._id) // Delete offer
+                      }
                       size={22}
                       className="text-red-500 hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200"
                     />
@@ -200,8 +266,12 @@ const RecentPromotions = () => {
             </td>
             <td className="text-xs p-3 text-gray-700">
               <CustomSwitch
-                checked={item?.promoStatus}
-                onChange={() => handleStatusChange(item?._id, item?.promoStatus)}
+                checked={item?.promoStatus || item?.offerStatus}
+                onChange={() =>
+                  item?.promoCode
+                    ? handleStatusChangePromo(item?._id, item?.promoStatus)
+                    : handleStatusChangeOffer(item?._id, item?.offerStatus)
+                }
                 size="md"
                 color="primary"
               />
@@ -210,11 +280,16 @@ const RecentPromotions = () => {
               <div className="group relative">
                 <button>
                   <FaRegEye
-                    onClick={() => handleViewClick(item)}
+                    onClick={() =>
+                      item?.promoCode
+                        ? handleViewClickPromo(item) // Pass promo details if promoCode exists
+                        : handleViewClickOffer(item) // Pass offer details if promoCode does not exist
+                    }
                     size={22}
                     className="hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200"
                   />
                 </button>
+
                 <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
                   Preview
                 </span>
@@ -232,28 +307,42 @@ const RecentPromotions = () => {
     setActiveTab('all'); // Reset the active tab when switching between promos and offers
   };
 
-  // Conditional rendering based on the selected tab and dropdown
   const itemsToRender = () => {
-    if (selectedOption === 'all') {
+    if (selectedOption === 'promos') {
       return activeTab === 'all' ? allPromos : activeTab === 'active' ? activePromos : expiredPromos;
-    }
-    if (selectedOption === 'all') {
+    } else if (selectedOption === 'offers') {
       return activeTab === 'all' ? allOffers : activeTab === 'active' ? activeOffers : expiredOffers;
+    } else {
+      return allItems;  // "all" includes both promos and offers combined
     }
-    return [];
   };
 
-  console.log(selectedOption);
+  // Use the new itemsToRender function when rendering
+  const filteredItems = filterItems(itemsToRender());
 
+  const renderHeading = () => {
+    switch (selectedOption) {
+      case "offers":
+        return "Offer Title";
+      case "promos":
+        return "Promo Code";
+      default:
+        return "Promo Code / Offer Title";
+    }
+  };
+
+  if (isPromoPending || isOrderPending || isOfferPending) {
+    return <SmallHeightLoading />;
+  }
 
   return (
     <>
-      <div className='flex justify-between items-center gap-6 mb-6'>
+      <div className='flex justify-between items-center gap-6 mb-6 pr-4'>
         <div className="flex-1 flex flex-col gap-4">
           <select
             value={selectedOption}
             onChange={handleOptionChange}
-            className="border p-2 rounded-lg max-w-sm text-lg h-[44px] md:h-12"
+            className="border p-3 rounded-lg max-w-sm h-[44px] md:h-12 focus:outline-none"
           >
             <option value="all">All</option>
             <option value="promos">Promos</option>
@@ -310,7 +399,7 @@ const RecentPromotions = () => {
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-50 sticky top-0 z-[1] rounded-md">
             <tr>
-              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Code/Title</th>
+              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">{renderHeading()}</th>
               <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Discount</th>
               <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Expiry Date</th>
               <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Actions</th>
@@ -329,9 +418,12 @@ const RecentPromotions = () => {
       <PromoDetailsModal
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
-        totalPromoApplied={totalPromoApplied}
-        totalAmountDiscounted={totalAmountDiscounted}
+        totalPromoApplied={selectedPromo ? totalPromoApplied : null}
+        totalAmountDiscounted={selectedPromo ? totalAmountDiscounted : null}
+        totalOfferApplied={selectedOffer ? totalOfferApplied : null}  // New prop for total offers applied
+        totalOfferAmountDiscounted={selectedOffer ? totalOfferAmountDiscounted : null}  // New prop for total offer amount discounted
         promo={selectedPromo}
+        offer={selectedOffer}  // Passing the selected offer
       />
     </>
   );

@@ -49,6 +49,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "YOUTHLINK",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -64,7 +67,7 @@
     "city": "Gotham",
     "postalCode": 67890,
     "orderStatus": "Pending",
-    "totalAmount": 150.0,
+    "totalAmount": 350.0,
     "paymentMethod": "Debit Card",
     "vendor": "VendorB",
     "shippingZone": "Zone 2",
@@ -101,6 +104,9 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 20,
     "promoCode": "",
+    "offerTitle": "Eid Offer 30% Off",
+    "offerDiscountType": "Percentage",
+    "offerDiscountValue": 30,
     "paymentStatus": "Paid"
   },
   {
@@ -141,6 +147,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 15,
     "promoCode": "WINTERSALE",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -181,6 +190,9 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 25,
     "promoCode": "",
+    "offerTitle": "New Year 10% Off",
+    "offerDiscountType": "Percentage",
+    "offerDiscountValue": 10,
     "paymentStatus": "Refunded"
   },
   {
@@ -221,6 +233,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 30,
     "promoCode": "OFFICEWEAR",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
   },
   {
@@ -261,6 +276,9 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 35,
     "promoCode": "FORMALWEAR",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -301,6 +319,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 40,
     "promoCode": "WINTERDEAL",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -341,6 +362,9 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 20,
     "promoCode": "FALLDISCOUNT",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -393,6 +417,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "WINTERWARM",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
   },
   {
@@ -433,6 +460,9 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 50,
     "promoCode": "FOOTWEARSALE",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
   },
   {
@@ -485,6 +515,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 25,
     "promoCode": "SPRINGSALE",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
   },
   {
@@ -525,6 +558,9 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 75,
     "promoCode": "PREMIUMBUY",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -577,6 +613,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 50,
     "promoCode": "BUSINESSSTYLE",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -617,6 +656,9 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 20,
     "promoCode": "FITNESSDEAL",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -657,6 +699,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 30,
     "promoCode": "ATHLETIC",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -709,6 +754,9 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 40,
     "promoCode": "GLAMOUR",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
   },
   {
@@ -749,6 +797,9 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
     "promoCode": "RUNFAST",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -789,6 +840,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "DENIM10",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -829,6 +883,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 20,
     "promoCode": "JACKET20",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -868,7 +925,10 @@
     "trackingNumber": "TRA",
     "shippingMethod": "Express Shipping",
     "shippingCharge": 25,
-    "promoCode": "SUITUP",
+    "promoCode": "SUIT UP",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -908,7 +968,10 @@
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
-    "promoCode": "FREESHIP",
+    "promoCode": "FREE SHIP",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -961,6 +1024,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "SUMMER10",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1012,7 +1078,10 @@
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
-    "promoCode": "WINTERSALE",
+    "promoCode": "WINTER SALE",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1065,6 +1134,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 20,
     "promoCode": "BUY1GET1",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
   },
   {
@@ -1104,7 +1176,10 @@
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
     "shippingCharge": 10,
-    "promoCode": "FLASHSALE",
+    "promoCode": "FLASH SALE",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1145,6 +1220,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 12,
     "promoCode": "SAVE20",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1185,6 +1263,9 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
     "promoCode": "WINTER10",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1237,6 +1318,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 18,
     "promoCode": "BUY2GET10",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1277,6 +1361,9 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 12,
     "promoCode": "SUMMER15",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
   },
   {
@@ -1317,6 +1404,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 8,
     "promoCode": "CLEARANCE",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1357,6 +1447,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "FALL2024",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1397,6 +1490,9 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 20,
     "promoCode": "WINTER20",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1437,6 +1533,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 8,
     "promoCode": "SUMMER5",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
   },
   {
@@ -1477,6 +1576,9 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 12,
     "promoCode": "SPRING10",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1517,6 +1619,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "ACCESSORY5",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1557,6 +1662,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 12,
     "promoCode": "FALL2024",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1597,6 +1705,9 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
     "promoCode": "SUIT2024",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1637,6 +1748,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 8,
     "promoCode": "WINTER5",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1677,6 +1791,9 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 10,
     "promoCode": "ACCESSORY10",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1717,6 +1834,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 8,
     "promoCode": "SUMMER5",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
   },
   {
@@ -1757,6 +1877,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 12,
     "promoCode": "WINTER2024",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1797,6 +1920,9 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
     "promoCode": "BOOTS10",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1837,6 +1963,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 8,
     "promoCode": "SUMMER2024",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1877,6 +2006,9 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
     "promoCode": "TECH2024",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1917,6 +2049,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "BACKPACK10",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
   },
   {
@@ -1936,8 +2071,8 @@
     "paymentMethod": "PayPal",
     "vendor": "VendorZ",
     "shippingZone": "Zone 3",
-    "promoDiscountValue": 10.0,
-    "promoDiscountType": "Percentage",
+    "promoDiscountValue": 0.0,
+    "promoDiscountType": "",
     "productInformation": [
       {
         "productTitle": "Backpack",
@@ -1956,7 +2091,10 @@
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
-    "promoCode": "BACKPACK10",
+    "promoCode": "",
+    "offerTitle": "",
+    "offerDiscountType": "",
+    "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
   }
 ]

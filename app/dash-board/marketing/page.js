@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import promo from "../../../public/card-images/promo.jpg";
 import specialOffer from "../../../public/card-images/special-offer.jpg";
 import RecentPromotions from '@/app/components/layout/RecentPromotions';
+import PromotionPerformance from '@/app/components/layout/PromotionPerformance';
 
 const Marketing = () => {
 
@@ -117,10 +118,10 @@ const Marketing = () => {
 
       {activeTab === "view performance" && <div className='pt-6'>
         <h1 className='font-bold text-xl'>Promotion Performance</h1>
-        <p className='pt-1 pb-8 text-neutral-400 font-medium'>The data includes all active, ended, or canceled deals. This report represents unaudited data, please refer to your invoice for accurate settlement numbers.</p>
-        {/* here will be box and graphs */}
+        <p className='pt-1 text-neutral-400 font-medium'>The data includes all active, ended, or canceled deals. This report represents unaudited data, please refer to your invoice for accurate settlement numbers.</p>
+        <PromotionPerformance />
 
-        <h1 className='font-bold text-xl'>Recent Promotions</h1>
+        <h1 className='font-bold text-xl pt-8'>Recent Promotions</h1>
         <p className='pt-1 pb-8 text-neutral-400 font-medium'>Please use the following table to view your past and upcoming promotions.</p>
         <RecentPromotions />
       </div>}

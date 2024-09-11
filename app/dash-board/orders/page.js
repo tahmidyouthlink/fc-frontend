@@ -175,7 +175,9 @@ const OrdersPage = () => {
       (order.vendor || '').toLowerCase().includes(query) ||
       (order.shippingZone || '').toLowerCase().includes(query) ||
       (order.promoDiscountValue || '').toString().includes(query) ||
+      (order.offerDiscountValue || '').toString().includes(query) ||
       (order.promoCode || '').toLowerCase().includes(query) ||
+      (order.offerTitle || '').toLowerCase().includes(query) ||
       (order.transactionId || '').toLowerCase().includes(query) ||
       (order.trackingNumber || '').toLowerCase().includes(query) ||
       (order.shippingMethod || '').toLowerCase().includes(query) ||
@@ -676,21 +678,35 @@ const OrdersPage = () => {
               <div className='flex items-center gap-1 text-xs md:text-sm'>
                 <p className=''>Total Amount:  ৳ {selectedOrder?.totalAmount.toFixed(2)}</p>,
                 <p className=''>
-                  Promo applied:
                   {selectedOrder?.promoCode ? (
-                    selectedOrder.promoDiscountValue > 0 ? (
-                      selectedOrder.promoDiscountType === 'Percentage' ? (
-                        `${selectedOrder.promoDiscountValue.toFixed(2)}%`
+                    <>
+                      Promo applied: {selectedOrder.promoDiscountValue > 0 ? (
+                        selectedOrder.promoDiscountType === 'Percentage' ? (
+                          `${selectedOrder.promoDiscountValue.toFixed(2)}%`
+                        ) : (
+                          `৳ ${selectedOrder.promoDiscountValue.toFixed(2)}`
+                        )
                       ) : (
-                        `৳ ${selectedOrder.promoDiscountValue.toFixed(2)}`
-                      )
-                    ) : (
-                      '৳ 0.00'
-                    )
+                        '৳ 0.00'
+                      )}
+                    </>
+                  ) : selectedOrder?.offerTitle ? (
+                    <>
+                      Offer applied: {selectedOrder.offerDiscountValue > 0 ? (
+                        selectedOrder.offerDiscountType === 'Percentage' ? (
+                          `${selectedOrder.offerDiscountValue.toFixed(2)}%`
+                        ) : (
+                          `৳ ${selectedOrder.offerDiscountValue.toFixed(2)}`
+                        )
+                      ) : (
+                        '৳ 0.00'
+                      )}
+                    </>
                   ) : (
-                    'X'
+                    'Promo / Offer applied : X'
                   )}
                 </p>
+
 
               </div>
               <PrintButton selectedOrder={selectedOrder} />
