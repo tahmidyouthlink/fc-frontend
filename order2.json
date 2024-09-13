@@ -466,8 +466,8 @@
     "paymentStatus": "Pending"
   },
   {
-    "orderNumber": "24080111AL688",
-    "dateTime": "01-08-24 | 18:00",
+    "orderNumber": "24091311AL688",
+    "dateTime": "13-09-24 | 18:00",
     "customerName": "Alice Lee",
     "customerId": "AL688",
     "email": "alice.lee@example.com",
@@ -2012,8 +2012,8 @@
     "paymentStatus": "Paid"
   },
   {
-    "orderNumber": "24080505FR722",
-    "dateTime": "05-08-24 | 12:00",
+    "orderNumber": "24090505FR722",
+    "dateTime": "05-09-24 | 12:00",
     "customerName": "Frank Richardson",
     "customerId": "FC1712345722",
     "email": "frank.richardson45@example.com",
@@ -2024,7 +2024,7 @@
     "city": "Gotham",
     "postalCode": 24242,
     "orderStatus": "Pending",
-    "totalAmount": 80.0,
+    "totalAmount": 160.0,
     "paymentMethod": "PayPal",
     "vendor": "VendorZ",
     "shippingZone": "Zone 3",
@@ -2040,7 +2040,7 @@
           "color": "#FFA500"
         },
         "batchCode": "BATCH229",
-        "sku": 1,
+        "sku": 2,
         "unitPrice": 80
       }
     ],
@@ -2055,8 +2055,8 @@
     "paymentStatus": "Pending"
   },
   {
-    "orderNumber": "24080601FR722",
-    "dateTime": "05-08-24 | 12:00",
+    "orderNumber": "24090601FR722",
+    "dateTime": "12-09-24 | 12:00",
     "customerName": "Frank Richardson",
     "customerId": "FC1712345722",
     "email": "frank.richardson45@example.com",
@@ -2092,9 +2092,9 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "",
-    "offerTitle": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
+    "offerTitle": "Boishakh 5% Off",
+    "offerDiscountType": "Amount",
+    "offerDiscountValue": 50.0,
     "paymentStatus": "Pending"
   }
 ]

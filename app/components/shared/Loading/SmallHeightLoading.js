@@ -5,7 +5,7 @@ export default function SmallHeightLoading() {
 
   return (
     <div className="flex flex-col gap-3 justify-center items-center mt-6">
-      <Card className="w-[200px] md:w-[550px] space-y-5 p-4" radius="lg">
+      <Card className="w-[200px] md:w-[350px] space-y-5 p-4" radius="lg">
         <Skeleton className="rounded-lg">
           <div className="h-20 rounded-lg bg-secondary"></div>
         </Skeleton>

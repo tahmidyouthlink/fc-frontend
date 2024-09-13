@@ -1,4 +1,3 @@
-"use client";
 import React, { useMemo, useState } from 'react';
 import PromoDetailsModal from './PromoDetailsModal';
 import { FaRegEye } from 'react-icons/fa6';
@@ -18,7 +17,7 @@ const RecentPromotions = () => {
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
   const [orderList, isOrderPending] = useOrders();
-  const [promoList, isPromoPending, refetch] = usePromoCodes();
+  const [promoList, isPromoPending, refetchPromo] = usePromoCodes();
   const [offerList, isOfferPending, refetchOffer] = useOffers();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPromo, setSelectedPromo] = useState(null);
@@ -127,7 +126,7 @@ const RecentPromotions = () => {
     try {
       const res = await axiosPublic.delete(`/deletePromo/${id}`);
       if (res?.data?.deletedCount) {
-        refetch();
+        refetchPromo();
         toast.success('Promo deleted successfully!');
       }
     } catch (error) {
@@ -163,8 +162,8 @@ const RecentPromotions = () => {
       // Send the update request
       const res = await axiosPublic.put(`/updatePromo/${id}`, discountData);
       if (res.data.modifiedCount > 0) {
+        await refetchPromo(); // Refetch the promo list to get the updated data
         toast.success('Status changed successfully!');
-        refetch(); // Refetch the promo list to get the updated data
       } else {
         toast.error('No changes detected.');
       }
@@ -190,8 +189,8 @@ const RecentPromotions = () => {
       // Send the update request
       const res = await axiosPublic.put(`/updateOffer/${id}`, discountData);
       if (res.data.modifiedCount > 0) {
-        toast.success('Status changed successfully!');
         refetchOffer(); // Refetch the promo list to get the updated data
+        toast.success('Status changed successfully!');
       } else {
         toast.error('No changes detected.');
       }
@@ -265,16 +264,23 @@ const RecentPromotions = () => {
               </div>
             </td>
             <td className="text-xs p-3 text-gray-700">
-              <CustomSwitch
-                checked={item?.promoStatus || item?.offerStatus}
-                onChange={() =>
-                  item?.promoCode
-                    ? handleStatusChangePromo(item?._id, item?.promoStatus)
-                    : handleStatusChangeOffer(item?._id, item?.offerStatus)
-                }
-                size="md"
-                color="primary"
-              />
+
+              {item?.promoCode ? (
+                <CustomSwitch
+                  checked={item?.promoStatus}
+                  onChange={() => handleStatusChangePromo(item?._id, item?.promoStatus)}
+                  size="md"
+                  color="primary"
+                />
+              ) : (
+                <CustomSwitch
+                  checked={item?.offerStatus}
+                  onChange={() => handleStatusChangeOffer(item?._id, item?.offerStatus)}
+                  size="md"
+                  color="primary"
+                />
+              )}
+
             </td>
             <td className="text-xs p-3 text-gray-700 cursor-pointer">
               <div className="group relative">
