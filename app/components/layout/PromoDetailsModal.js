@@ -38,6 +38,7 @@ const PromoDetailsModal = ({
             )}
             {isOfferSelected && (
               <>
+                <p className="text-base"><strong>Offer Title :</strong> {offer?.offerTitle}</p>
                 <p className="text-base"><strong>Total Offer Applied :</strong> {totalOfferApplied}</p>
                 <p className="text-base"><strong>Total Amount Discounted :</strong> ৳ {totalOfferAmountDiscounted}</p>
                 <p className="text-base"><strong>Minimum Order Amount :</strong> ৳ {offer?.minAmount || '0'}</p>

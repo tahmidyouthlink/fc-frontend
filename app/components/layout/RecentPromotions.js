@@ -67,6 +67,7 @@ const RecentPromotions = () => {
     const query = searchQuery.toLowerCase();
     return items.filter(item =>
       item?.promoCode?.toLowerCase().includes(query) ||
+      item?.offerCode?.toLowerCase().includes(query) ||
       item?.offerTitle?.toLowerCase().includes(query) ||
       item?.expiryDate?.toLowerCase().includes(query) ||
       (item?.promoDiscountValue && item.promoDiscountValue.toString().includes(query)) ||
@@ -106,12 +107,12 @@ const RecentPromotions = () => {
   }, [orderList, selectedPromo]);
 
   const totalOfferApplied = useMemo(() => {
-    return orderList?.filter(order => order?.offerTitle === selectedOffer?.offerTitle).length;
+    return orderList?.filter(order => order?.offerCode === selectedOffer?.offerCode).length;
   }, [orderList, selectedOffer]);
 
   const totalOfferAmountDiscounted = useMemo(() => {
     return orderList?.reduce((total, order) => {
-      if (order?.offerTitle === selectedOffer?.offerTitle) {
+      if (order?.offerCode === selectedOffer?.offerCode) {
         if (order?.offerDiscountType === 'Percentage') {
           return total + (order?.totalAmount * (order?.offerDiscountValue / 100));
         } else if (order?.offerDiscountType === 'Amount') {
@@ -218,7 +219,7 @@ const RecentPromotions = () => {
       <tbody className="bg-white divide-y divide-gray-200">
         {filteredItems.map((item, index) => (
           <tr key={item?._id || index} className="hover:bg-gray-50 transition-colors">
-            <td className="text-xs p-3 text-gray-700 font-mono">{item?.promoCode || item?.offerTitle}</td>
+            <td className="text-xs p-3 text-gray-700 font-mono">{item?.promoCode || item?.offerCode}</td>
             <td className="text-xs p-3 text-gray-700">
               {item?.promoDiscountType
                 ? `${item?.promoDiscountValue} ${item?.promoDiscountType === 'Amount' ? 'Tk' : '%'}`
@@ -329,11 +330,11 @@ const RecentPromotions = () => {
   const renderHeading = () => {
     switch (selectedOption) {
       case "offers":
-        return "Offer Title";
+        return "Offer Code";
       case "promos":
         return "Promo Code";
       default:
-        return "Promo Code / Offer Title";
+        return "Promo Code / Offer Code";
     }
   };
 

@@ -49,7 +49,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "YOUTHLINK",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -104,7 +104,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 20,
     "promoCode": "",
-    "offerTitle": "Eid Offer 30% Off",
+    "offerCode": "EidSpecial",
     "offerDiscountType": "Percentage",
     "offerDiscountValue": 30,
     "paymentStatus": "Paid"
@@ -147,7 +147,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 15,
     "promoCode": "WINTERSALE",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -190,7 +190,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 25,
     "promoCode": "",
-    "offerTitle": "New Year 10% Off",
+    "offerCode": "Qurbani2024",
     "offerDiscountType": "Percentage",
     "offerDiscountValue": 10,
     "paymentStatus": "Refunded"
@@ -233,7 +233,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 30,
     "promoCode": "OFFICEWEAR",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
@@ -276,7 +276,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 35,
     "promoCode": "FORMALWEAR",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -319,7 +319,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 40,
     "promoCode": "WINTERDEAL",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -362,7 +362,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 20,
     "promoCode": "FALLDISCOUNT",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -417,7 +417,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "WINTERWARM",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
@@ -460,7 +460,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 50,
     "promoCode": "FOOTWEARSALE",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
@@ -515,7 +515,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 25,
     "promoCode": "SPRINGSALE",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
@@ -558,7 +558,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 75,
     "promoCode": "PREMIUMBUY",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -613,7 +613,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 50,
     "promoCode": "BUSINESSSTYLE",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -656,7 +656,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 20,
     "promoCode": "FITNESSDEAL",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -699,7 +699,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 30,
     "promoCode": "ATHLETIC",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -754,7 +754,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 40,
     "promoCode": "GLAMOUR",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
@@ -797,7 +797,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
     "promoCode": "RUNFAST",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -840,7 +840,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "DENIM10",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -883,7 +883,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 20,
     "promoCode": "JACKET20",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -926,7 +926,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 25,
     "promoCode": "SUIT UP",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -969,7 +969,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
     "promoCode": "FREE SHIP",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -1024,7 +1024,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "SUMMER10",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -1079,7 +1079,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
     "promoCode": "WINTER SALE",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -1134,7 +1134,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 20,
     "promoCode": "BUY1GET1",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
@@ -1177,7 +1177,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 10,
     "promoCode": "FLASH SALE",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -1220,7 +1220,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 12,
     "promoCode": "SAVE20",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -1263,7 +1263,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
     "promoCode": "WINTER10",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -1318,7 +1318,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 18,
     "promoCode": "BUY2GET10",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -1361,7 +1361,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 12,
     "promoCode": "SUMMER15",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
@@ -1404,7 +1404,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 8,
     "promoCode": "CLEARANCE",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -1447,7 +1447,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "FALL2024",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -1490,7 +1490,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 20,
     "promoCode": "WINTER20",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -1533,7 +1533,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 8,
     "promoCode": "SUMMER5",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
@@ -1576,7 +1576,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 12,
     "promoCode": "SPRING10",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -1619,7 +1619,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "ACCESSORY5",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -1662,7 +1662,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 12,
     "promoCode": "FALL2024",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -1705,7 +1705,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
     "promoCode": "SUIT2024",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -1748,7 +1748,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 8,
     "promoCode": "WINTER5",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -1791,7 +1791,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 10,
     "promoCode": "ACCESSORY10",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -1834,7 +1834,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 8,
     "promoCode": "SUMMER5",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
@@ -1877,7 +1877,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 12,
     "promoCode": "WINTER2024",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -1920,7 +1920,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
     "promoCode": "BOOTS10",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -1963,7 +1963,7 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 8,
     "promoCode": "SUMMER2024",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -2006,7 +2006,7 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
     "promoCode": "TECH2024",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
@@ -2049,13 +2049,13 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "BACKPACK10",
-    "offerTitle": "",
+    "offerCode": "",
     "offerDiscountType": "",
     "offerDiscountValue": 0.0,
     "paymentStatus": "Pending"
   },
   {
-    "orderNumber": "24090601FR722",
+    "orderNumber": "24091201FR722",
     "dateTime": "12-09-24 | 12:00",
     "customerName": "Frank Richardson",
     "customerId": "FC1712345722",
@@ -2092,9 +2092,52 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "",
-    "offerTitle": "Boishakh 5% Off",
+    "offerCode": "NewYear2025",
     "offerDiscountType": "Amount",
     "offerDiscountValue": 50.0,
+    "paymentStatus": "Pending"
+  },
+  {
+    "orderNumber": "24091401SH677",
+    "dateTime": "14-09-24 | 12:00",
+    "customerName": "Shakib Al Hasan",
+    "customerId": "FC1734545677",
+    "email": "shakibalhasan@example.com",
+    "phoneNumber": "01734545677",
+    "phoneNumber2": 0,
+    "address1": "2424 Maple St",
+    "address2": "Apt 15A",
+    "city": "Gotham",
+    "postalCode": 24242,
+    "orderStatus": "Pending",
+    "totalAmount": 580.0,
+    "paymentMethod": "PayPal",
+    "vendor": "VendorZ",
+    "shippingZone": "Zone 3",
+    "promoDiscountValue": 0.0,
+    "promoDiscountType": "",
+    "productInformation": [
+      {
+        "productTitle": "Backpack",
+        "size": "One Size",
+        "color": {
+          "value": "Orange",
+          "label": "Orange",
+          "color": "#FFA500"
+        },
+        "batchCode": "BATCH229",
+        "sku": 1,
+        "unitPrice": 580
+      }
+    ],
+    "transactionId": "TXN1234568150",
+    "trackingNumber": "",
+    "shippingMethod": "Standard Shipping",
+    "shippingCharge": 10,
+    "promoCode": "",
+    "offerCode": "SHA123",
+    "offerDiscountType": "Amount",
+    "offerDiscountValue": 100.0,
     "paymentStatus": "Pending"
   }
 ]

@@ -17,10 +17,12 @@ const PromotionPerformanceChart = () => {
   const [orderList, isOrderPending] = useOrders();
   const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
   const [activeFilter, setActiveFilter] = useState('today');
+  const [showDateRangePicker, setShowDateRangePicker] = useState(true); // New state
 
   useEffect(() => {
     // Set default date range to Today when the component mounts
     handleDateFilter('today');
+    setShowDateRangePicker(true);
   }, []);
 
   const { startDate, endDate } = useMemo(() => {
@@ -71,6 +73,7 @@ const PromotionPerformanceChart = () => {
     // Set active filter to 'custom' if a custom date range is selected
     if (startRange && endRange) {
       setActiveFilter('custom');
+      setShowDateRangePicker(false);
     }
   };
 
@@ -87,7 +90,7 @@ const PromotionPerformanceChart = () => {
         totalPromoAndOfferApplied += 1;
       }
 
-      if (order.offerTitle?.trim()) {
+      if (order.offerCode?.trim()) {
         offerDiscount = order.offerDiscountType === 'Percentage' ? (order.offerDiscountValue / 100) * order.totalAmount : order.offerDiscountValue;
         totalPromoAndOfferApplied += 1;
       }
@@ -114,7 +117,7 @@ const PromotionPerformanceChart = () => {
           promoDiscount = order.promoDiscountType === 'Percentage' ? (order.promoDiscountValue / 100) * order.totalAmount : order.promoDiscountValue;
         }
 
-        if (order.offerTitle?.trim()) {
+        if (order.offerCode?.trim()) {
           offerDiscount = order.offerDiscountType === 'Percentage' ? (order.offerDiscountValue / 100) * order.totalAmount : order.offerDiscountValue;
         }
 
@@ -157,6 +160,7 @@ const PromotionPerformanceChart = () => {
 
     // Set active filter to 'today'
     setActiveFilter('today');
+    setShowDateRangePicker(true);
   };
 
   const handleDateFilter = (filter) => {
@@ -189,6 +193,7 @@ const PromotionPerformanceChart = () => {
       end: end && { year: end.getFullYear(), month: end.getMonth() + 1, day: end.getDate() },
     });
     setActiveFilter(filter); // Set active filter
+    setShowDateRangePicker(true);
   };
 
   const formatXAxis = (tickItem) => {
@@ -233,23 +238,25 @@ const PromotionPerformanceChart = () => {
         </div>
 
         <div className='flex items-center gap-2'>
-          <DateRangePicker
-            label="Order Duration"
-            visibleMonths={2}
-            onChange={(range) => {
-              if (range && range.start && range.end) {
-                normalizeDateRange(range.start, range.end);
+          {showDateRangePicker && (
+            <DateRangePicker
+              label="Select Date Range"
+              visibleMonths={2}
+              onChange={(range) => {
+                if (range && range.start && range.end) {
+                  normalizeDateRange(range.start, range.end);
+                }
+              }}
+              // Ensure the picker clears after reset and updates after new selection
+              value={selectedDateRange.start && selectedDateRange.end
+                ? [
+                  new Date(selectedDateRange.start.year, selectedDateRange.start.month - 1, selectedDateRange.start.day),
+                  new Date(selectedDateRange.end.year, selectedDateRange.end.month - 1, selectedDateRange.end.day)
+                ]
+                : null
               }
-            }}
-            // Ensure the picker clears after reset and updates after new selection
-            value={selectedDateRange.start && selectedDateRange.end
-              ? [
-                new Date(selectedDateRange.start.year, selectedDateRange.start.month - 1, selectedDateRange.start.day),
-                new Date(selectedDateRange.end.year, selectedDateRange.end.month - 1, selectedDateRange.end.day)
-              ]
-              : undefined
-            }
-          />
+            />
+          )}
 
           {selectedDateRange.start && selectedDateRange.end && activeFilter === 'custom' && (
             <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={handleReset}>
@@ -274,21 +281,28 @@ const PromotionPerformanceChart = () => {
           </div>
         </div>
 
-        {dailyData.length === 0 ? (
-          <div className="text-center mt-10 text-gray-500 min-h-[100px] mx-auto w-full">No data available for this date.</div>
-        ) : (
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={dailyData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" tickFormatter={formatXAxis} />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="discountedAmount" radius={[8, 8, 0, 0]} fill="#9F5216" name="Total Discounted Amount (৳)" />
-              <Bar dataKey="discountedOrders" radius={[8, 8, 0, 0]} fill="#A3A3A3" name="Total Discounted Orders" />
-            </BarChart>
-          </ResponsiveContainer>
-        )}
+
+
+        <div className="w-full h-[250px] flex items-center justify-center">
+          {dailyData.length === 0 ? (
+            <div className="text-center text-gray-500">
+              <p className="text-lg font-medium text-gray-500">No data available for the selected day.<br /> Please choose a different date or date range to see results.</p>
+            </div>
+          ) : (
+            <ResponsiveContainer>
+              <BarChart data={dailyData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" tickFormatter={formatXAxis} />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="discountedAmount" radius={[8, 8, 0, 0]} fill="#9F5216" name="Total Discounted Amount (৳)" />
+                <Bar dataKey="discountedOrders" radius={[8, 8, 0, 0]} fill="#A3A3A3" name="Total Discounted Orders" />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+
       </div>
 
     </div>
