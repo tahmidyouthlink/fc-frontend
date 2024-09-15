@@ -3,6 +3,11 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { Button } from '@nextui-org/react';
 
+// Function to add gaps between every letter
+function addGaps(text, gap = ' ') {
+  return text.split('').join(gap);
+}
+
 const PrintButton = ({ selectedOrder }) => {
 
   const handlePrint = async (selectedOrder) => {
@@ -14,62 +19,132 @@ const PrintButton = ({ selectedOrder }) => {
       return;
     }
 
+    const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB8AAAAgCAYAAADqgqNBAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAHBSURBVHgB7Ze/TsJQFMa/cynqYlISSBjZdOQNxMlRou5AeAB8A19BZ2PwBSSQuDApg6ORQRKc7OCA0aEmDtXgPR4IyJ+2iUWQAX7LvXyc06/ntqe3BZbMAfL7o7gfK0BTViJMTArD1sQn+dLLOX5rXkybCaiVR0wLrbdz5dfrcVl5BlO4iGlCdOQpjwtSdVKqvsO08ajeXbkKFzADmCjtsnKHUQozgIgysqqmr3kxHcvKkMBsMLVazcLPXO6ADGaIYr07atdj6u3lh/6M5Mq23T2ZvtaGkXAFEhyPdBteeMV65hvJ/uzH3EC7LoM1HMYaVZcZUR3EzRGNUecv1MZc7F7+MJY4Wf0fof6k0nSc9MZ6hcERUh1jqrHCPZgfqHN1FL8z6JaBGxkbkvJBxG1m1RCtJmVYchJvRFiTsamBC0l76mqKOxaX0KFcrtyyBgvjwdle9FDcJn+muyA7X3o+HlcV5sjSfPHMDQSEmE1ppx2ZxXuSIz3TYs012bnsIMcKbq5oS3p3c0RkxGXXcqSbq0GOFXzZ2fedLo6ALO/2xTPvbiynB9GUodUV/ovem2y31Yy29Ceh/qevk0AM9vTF5Buk7I7utuWMlAAAAABJRU5ErkJggg==";
+
     const pdf = new jsPDF('p', 'mm', 'a4');
     const margin = 10;
     const pageWidth = pdf.internal.pageSize.width;
 
     // Set up fonts and colors
-    pdf.setFont('Oxygen', 'normal');
-    const primaryColor = [0, 102, 204];
-    const secondaryColor = [0, 0, 0];
+    pdf.setFont('helvetica', 'normal');
+    const primaryColor = [0, 0, 0];
+    const secondaryColor = [128, 128, 128];
+    const textColor = [0, 0, 0]; // Black color for text
 
     // Top Section - Order Details and Company Information
     pdf.setFontSize(10);
     pdf.setTextColor(...secondaryColor);
 
-    // Order Details on the left
-    const orderDetails = [
-      `Customer ID: ${selectedOrder.customerId}`,
-      `Order Id: #${selectedOrder.orderNumber}`,
-      `Order Date & Time: ${selectedOrder.dateTime}`,
-    ].join('\n');
-    pdf.text(orderDetails, margin, margin + 10);
+    const logoX = margin; // X position of the logo
+    const logoY = margin; // Y position of the logo
+    const textX = logoX + 12; // X position of the text, adjust to position relative to the logo
+    const textY = logoY + 8; // Y position of the text, adjust as needed
+
+    // Define sizes for the logo and text
+    const textSizeLogo = 20; // Font size for the logo text
+    const textSize = 10; // Font size for the company information text
+    const logoWidth = 10; // Width of the logo
+    const logoHeight = 10; // Height of the logo
+
+    // Add the logo image to the PDF
+    pdf.addImage(logoBase64, 'PNG', logoX, logoY, logoWidth, logoHeight);
+
+    // Add the logo text below or alongside the logo
+    pdf.setFontSize(textSizeLogo);
+    pdf.setTextColor(...textColor);
+    pdf.text('F-Commerce', textX, textY);
 
     // Company Information on the right
-    pdf.text('Fashion Commerce', pageWidth - margin, margin + 10, { align: 'right' });
-    pdf.text('Mirpur, Dhaka, 1100', pageWidth - margin, margin + 15, { align: 'right' });
+    pdf.setFontSize(textSize); // Set font size for company information
+    pdf.setTextColor(...textColor);
 
-    // Display Email and Phone as plain text (not clickable)
-    pdf.text('Email: fashion@commerce.com', pageWidth - margin, margin + 20, { align: 'right' });
-    pdf.text('Phone: +88 019 999 99999', pageWidth - margin, margin + 25, { align: 'right' });
+    // Right-align company information
+    pdf.text('Fashion Commerce', pageWidth - margin, margin, { align: 'right' });
+    pdf.text('Mirpur, Dhaka, 1100', pageWidth - margin, margin + 5, { align: 'right' });
+    pdf.text('Email: fashion@commerce.com', pageWidth - margin, margin + 10, { align: 'right' });
+    pdf.text('Phone: +88 019 999 99999', pageWidth - margin, margin + 15, { align: 'right' });
 
     // Customer Info
-    pdf.setFontSize(12);
-    pdf.setTextColor(...primaryColor);
-    pdf.text('Customer Details', margin, margin + 45);
-
     pdf.setFontSize(10);
-    pdf.setTextColor(...secondaryColor);
+    pdf.setTextColor(...primaryColor);
+    pdf.text('Delivery Address', margin, margin + 31);
+
+    const lineHeight = 7;
+    const charGap = ' '; // Gap between characters
+    // Define font sizes and styles
+    const largeFontSize = 14; // Font size for customer name and phone number
+    const smallFontSize = 10; // Font size for address
+    const boldFontStyle = 'normal'; // Bold style
+
+    // Define text color (replace ...secondaryColor with actual color values)
+
+    pdf.setTextColor(...textColor);
+
+    // Format the phone numbers with gaps between characters
+    const phoneNumberWithGaps = addGaps(selectedOrder.phoneNumber, charGap);
+    const phoneNumber2WithGaps = selectedOrder.phoneNumber2 && selectedOrder.phoneNumber2 !== '0'
+      ? addGaps(selectedOrder.phoneNumber2, charGap)
+      : null;
+
+    // Create an array of lines with different formatting
     const customerDetails = [
-      `Name: ${selectedOrder.customerName}`,
-      `Email: ${selectedOrder.email}`, // Display email as plain text
-      `Phone: ${selectedOrder.phoneNumber}`,
-      selectedOrder.phoneNumber2 && selectedOrder.phoneNumber2 !== '0' ? `Phone 2: ${selectedOrder.phoneNumber2}` : null,
-      `Address: ${selectedOrder.address1}${selectedOrder.address2 ? ', ' + selectedOrder.address2 : ''}, ${selectedOrder.city}, ${selectedOrder.postalCode}`,
-    ].filter(Boolean).join('\n'); // Filter out any null values
-    pdf.text(customerDetails, margin, margin + 50);
+      { text: selectedOrder.customerName, fontSize: largeFontSize, fontWeight: boldFontStyle },
+      { text: `${selectedOrder.address1}${selectedOrder.address2 ? ', ' + selectedOrder.address2 : ''}, ${selectedOrder.city}, ${selectedOrder.postalCode}`, fontSize: smallFontSize, fontWeight: '' },
+      { text: phoneNumberWithGaps, fontSize: largeFontSize, fontWeight: boldFontStyle },
+      { text: phoneNumber2WithGaps, fontSize: largeFontSize, fontWeight: boldFontStyle },
+    ].filter(item => item.text); // Filter out any null values
 
-    pdf.setFontSize(16);
-    pdf.setTextColor(...primaryColor);
-    pdf.text('INVOICE', pageWidth / 2, margin + 85, { align: 'center' });
+    // Calculate the starting Y position
+    let yPosition = margin + 37;
 
-    pdf.setFontSize(12);
-    pdf.setTextColor(...primaryColor);
-    pdf.text('Product Details', margin, margin + 95);
+    // Add each line of text to the PDF with specific formatting
+    customerDetails.forEach(({ text, fontSize, fontWeight }) => {
+      pdf.setFontSize(fontSize);
+      pdf.text(text, margin, yPosition);
+      yPosition += lineHeight; // Increment Y position for the next line
+    });
+
+    // Additional Info aligned to the right with smaller font size
+    pdf.setFontSize(10);
+    let yPositionInvoice = 41;
+
+    // Set constant xPosition for right alignment
+    const xPosition = pageWidth - margin;
+
+    // Bold "Invoice" text, aligned right
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Invoice', xPosition, yPositionInvoice, { align: 'right' });
+    yPositionInvoice += lineHeight;
+
+    // Normal font for the rest
+    pdf.setFont('helvetica', 'normal');
+
+    pdf.text(`Invoice ID: ${selectedOrder.orderNumber}`, xPosition, yPositionInvoice, { align: 'right' });
+    yPositionInvoice += lineHeight;
+
+    // Order date
+    pdf.text(`Order Date: ${selectedOrder.dateTime.trim()}`, xPosition, yPositionInvoice, { align: 'right' });
+    yPositionInvoice += lineHeight;
+
+    // Item count
+    const itemCount = selectedOrder.productInformation.length;
+    pdf.text(`Items Count: ${itemCount}`, xPosition, yPositionInvoice, { align: 'right' });
+    yPositionInvoice += lineHeight;
+
+    // Shipping method
+    pdf.text(`Shipping Method: ${selectedOrder.shippingMethod.trim()}`, xPosition, yPositionInvoice, { align: 'right' });
+    yPositionInvoice += lineHeight;
+
+    // Payment status
+    const paymentStatus = selectedOrder.paymentStatus
+      ? selectedOrder.paymentStatus.trim()
+      : `Payable: ${selectedOrder.paymentPayable.trim()}`;
+    pdf.text(`Payment Status: ${paymentStatus}`, xPosition, yPositionInvoice, { align: 'right' });
+    yPositionInvoice += lineHeight;
 
     pdf.autoTable({
-      startY: margin + 100,
-      head: [['Product Title', 'Color', 'Size', 'Unit Price', 'SKU', 'Gross Amount (Tk)']],
+      startY: margin + 80,
+      head: [['#Title', 'Color', 'Size', 'Price', 'QTY', 'Total']],
       body: selectedOrder.productInformation.map(product => [
         product.productTitle,
         product.color?.label || '',
@@ -117,8 +192,8 @@ const PrintButton = ({ selectedOrder }) => {
     const total = (subtotal - discountAmount + shippingCharge).toFixed(2);
 
     pdf.autoTable({
-      startY: margin + 100,
-      head: [['Product Title', 'Color', 'Size', 'Unit Price', 'SKU', 'Gross Amount (Tk)']],
+      startY: margin + 80,
+      head: [['#Title', 'Color', 'Size', 'Price', 'QTY', 'Total']],
       body: [
         ...selectedOrder.productInformation.map(product => [
           product.productTitle,
@@ -126,25 +201,21 @@ const PrintButton = ({ selectedOrder }) => {
           product.size || '',
           `${product.unitPrice?.toFixed(2)}`,
           product.sku,
-          `${(product.unitPrice * product.sku).toFixed(2)}`
+          `BDT ${(product.unitPrice * product.sku).toFixed(2)}`
         ]),
-        [{ content: 'Subtotal:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `${subtotal.toFixed(2)}`],
-        ...(discountAmount > 0 ? [[{ content: discountLabel, colSpan: 5, styles: { halign: 'right', border: 'none' } }, `-${discountAmount}`]] : []),
-        [{ content: 'Shipping Charge:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `+${shippingCharge.toFixed(2)}`],
-        [{ content: 'Total:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `${total}`]
+        [{ content: 'Sub Total:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `BDT ${subtotal.toFixed(2)}`],
+        ...(discountAmount > 0 ? [[{ content: discountLabel, colSpan: 5, styles: { halign: 'right', border: 'none' } }, `BDT -${discountAmount}`]] : []),
+        [{ content: 'Shipping Charge:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `BDT +${shippingCharge.toFixed(2)}`],
+        [{ content: 'Total:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `BDT ${total}`]
       ],
       theme: 'grid',
       headStyles: { fillColor: primaryColor, textColor: 255 },
       styles: { fontSize: 10, valign: 'middle', halign: 'center' },
       columnStyles: {
         0: { cellWidth: 'auto' },
-        5: { fontStyle: 'bold', halign: 'right', fillColor: [255, 255, 255], textColor: [0, 0, 0] },
+        5: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255], textColor: [0, 0, 0] },
       }
     });
-
-    pdf.setFontSize(12);
-    pdf.setTextColor(...primaryColor);
-    pdf.text('Additional Details', margin, pdf.autoTable.previous.finalY + 10);
 
     const additionalDetails = [
       ['Shipping Zone:', selectedOrder.shippingZone, 'Shipping Method:', selectedOrder.shippingMethod],
