@@ -366,7 +366,7 @@ const RecentPromotions = () => {
           </svg>
           <input
             type="search"
-            placeholder="Search By Order Details..."
+            placeholder="Search By Promo/Offer Details..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full h-12 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-[#f3f3f4] text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
@@ -401,7 +401,6 @@ const RecentPromotions = () => {
         </div>
       )}
 
-
       <div className="max-w-screen-2xl mx-auto custom-max-discount overflow-x-auto my-4 modal-body-scroll">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-50 sticky top-0 z-[1] rounded-md">
@@ -419,7 +418,6 @@ const RecentPromotions = () => {
           {renderItems(filteredItems)}
         </table>
       </div>
-
 
       {/* Promo Details Modal */}
       <PromoDetailsModal

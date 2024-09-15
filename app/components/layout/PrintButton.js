@@ -89,7 +89,7 @@ const PrintButton = ({ selectedOrder }) => {
     // Check if Promo or Offer is applied
     const promoCode = selectedOrder.promoCode;
     const promoDiscountValue = parseFloat(selectedOrder?.promoDiscountValue?.toFixed(2) || "0.00");
-    const offerTitle = selectedOrder.offerTitle; // Use offerTitle instead of offerCode
+    const offerCode = selectedOrder.offerCode; // Use offerCode instead of offerCode
     const offerDiscountValue = parseFloat(selectedOrder?.offerDiscountValue?.toFixed(2) || "0.00");
 
     // Determine if Promo or Offer is applied and calculate the discount accordingly
@@ -104,14 +104,14 @@ const PrintButton = ({ selectedOrder }) => {
         discountAmount = promoDiscountValue.toFixed(2);
       }
       discountLabel = `Promo Discount (${promoCode}) :`;
-    } else if (offerTitle) {
+    } else if (offerCode) {
       // Offer Discount
       if (selectedOrder.offerDiscountType === 'Percentage') {
         discountAmount = (subtotal * (offerDiscountValue / 100)).toFixed(2);
       } else if (selectedOrder.offerDiscountType === 'Amount') {
         discountAmount = offerDiscountValue.toFixed(2);
       }
-      discountLabel = `Offer Discount (${offerTitle}) :`;
+      discountLabel = `Offer Discount (${offerCode}) :`;
     }
 
     const total = (subtotal - discountAmount + shippingCharge).toFixed(2);

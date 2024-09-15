@@ -177,6 +177,7 @@ const OrdersPage = () => {
       (order.promoDiscountValue || '').toString().includes(query) ||
       (order.offerDiscountValue || '').toString().includes(query) ||
       (order.promoCode || '').toLowerCase().includes(query) ||
+      (order.offerCode || '').toLowerCase().includes(query) ||
       (order.offerTitle || '').toLowerCase().includes(query) ||
       (order.transactionId || '').toLowerCase().includes(query) ||
       (order.trackingNumber || '').toLowerCase().includes(query) ||
@@ -690,7 +691,7 @@ const OrdersPage = () => {
                         '৳ 0.00'
                       )}
                     </>
-                  ) : selectedOrder?.offerTitle ? (
+                  ) : selectedOrder?.offerCode ? (
                     <>
                       Offer applied: {selectedOrder.offerDiscountValue > 0 ? (
                         selectedOrder.offerDiscountType === 'Percentage' ? (
