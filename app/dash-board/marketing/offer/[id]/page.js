@@ -225,16 +225,16 @@ const EditOffer = () => {
             <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 mt-6 px-6 py-3'>
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                 <div>
-                  <label htmlFor='offerCode' className='flex justify-start font-medium text-[#9F5216]'>Offer Code *</label>
-                  <input id='offerCode' {...register("offerCode", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="text" />
+                  <label htmlFor='offerCode' className='flex justify-start font-medium text-[#D2016E]'>Offer Code *</label>
+                  <input id='offerCode' {...register("offerCode", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="text" />
                   {errors.offerCode?.type === "required" && (
                     <p className="text-red-600 text-left">Offer Code is required</p>
                   )}
                 </div>
 
                 <div>
-                  <label htmlFor='offerTitle' className='flex justify-start font-medium text-[#9F5216]'>Offer Title *</label>
-                  <input id='offerTitle' {...register("offerTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="text" />
+                  <label htmlFor='offerTitle' className='flex justify-start font-medium text-[#D2016E]'>Offer Title *</label>
+                  <input id='offerTitle' {...register("offerTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="text" />
                   {errors.offerTitle?.type === "required" && (
                     <p className="text-red-600 text-left">Offer Title is required</p>
                   )}
@@ -253,7 +253,7 @@ const EditOffer = () => {
                   <input
                     type="number"
                     {...register('offerDiscountValue', { required: true })}
-                    className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
+                    className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000'
                     placeholder={`Enter ${offerDiscountType} Discount`} // Correct placeholder
                   />
                   {errors.offerDiscountValue?.type === "required" && (
@@ -294,17 +294,17 @@ const EditOffer = () => {
 
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                 <div>
-                  <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#9F5216]'>Maximum Capped Amount</label>
-                  <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
+                  <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#D2016E]'>Maximum Capped Amount</label>
+                  <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="number" />
                 </div>
 
                 <div>
-                  <label htmlFor='minAmount' className='flex justify-start font-medium text-[#9F5216]'>Minimum Order Amount</label>
-                  <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
+                  <label htmlFor='minAmount' className='flex justify-start font-medium text-[#D2016E]'>Minimum Order Amount</label>
+                  <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="number" />
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor='expiryDate' className='block text-[#9F5216] font-medium text-sm'>
+                  <label htmlFor='expiryDate' className='block text-[#D2016E] font-medium text-sm'>
                     Expiry Date <span className="text-red-600">*</span>
                   </label>
                   <input
@@ -313,7 +313,7 @@ const EditOffer = () => {
                     {...register("expiryDate", { required: true })}
                     value={expiryDate}
                     onChange={(e) => setExpiryDate(e.target.value)} // Update state with the input value
-                    className="w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000"
+                    className="w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000"
                   />
                   {dateError && (
                     <p className="text-red-600 text-sm mt-1">Expiry Date is required</p>
@@ -326,7 +326,7 @@ const EditOffer = () => {
               <div className='flex flex-col gap-6 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
                 <div className='flex w-full flex-col gap-2'>
-                  <label htmlFor='offerDescription' className='flex justify-start font-medium text-[#9F5216] pb-2'>Offer Description</label>
+                  <label htmlFor='offerDescription' className='flex justify-start font-medium text-[#D2016E] pb-2'>Offer Description</label>
                   <Controller
                     control={control}
                     name="offerDescription"
@@ -389,9 +389,9 @@ const EditOffer = () => {
 
           <div className='flex justify-between items-center px-5'>
 
-            <Link className='flex items-center gap-2 font-medium text-white rounded-lg bg-[#9F5216] hover:bg-[#9f5116c9] py-2 px-4' href={"/dash-board/marketing"}> <FaArrowLeft /> Go Back</Link>
+            <Link className='flex items-center gap-2 font-medium text-white rounded-lg bg-[#D2016E] hover:bg-[#d2016dca] py-2 px-4' href={"/dash-board/marketing"}> <FaArrowLeft /> Go Back</Link>
 
-            <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
+            <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#D2016E] hover:bg-[#d2016dca]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
               {isSubmitting ? 'Submitting...' : 'Update offer'}
             </button>
           </div>

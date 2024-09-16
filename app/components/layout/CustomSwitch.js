@@ -1,6 +1,6 @@
 import React from 'react';
 
-const CustomSwitch = ({ checked, onChange }) => {
+const CustomSwitch = ({ checked, onChange, disabled }) => {
   return (
     <label className="custom-switch">
       <input
@@ -8,8 +8,11 @@ const CustomSwitch = ({ checked, onChange }) => {
         checked={checked}
         onChange={onChange}
         className="custom-switch-input"
+        disabled={disabled}
       />
-      <span className="custom-switch-slider" />
+      <span
+        className={`custom-switch-slider ${disabled ? 'expired' : ''}`}
+      />
     </label>
   );
 };

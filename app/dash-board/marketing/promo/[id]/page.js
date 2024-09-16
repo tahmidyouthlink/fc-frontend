@@ -104,8 +104,8 @@ const EditPromo = () => {
       {/* Your form code */}
       <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-lg mx-auto p-6 flex flex-col gap-6'>
         <div>
-          <label htmlFor='promoCode' className='flex justify-start font-medium text-[#9F5216]'>Promo Code *</label>
-          <input id='promoCode' {...register("promoCode", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="text" />
+          <label htmlFor='promoCode' className='flex justify-start font-medium text-[#D2016E]'>Promo Code *</label>
+          <input id='promoCode' {...register("promoCode", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="text" />
           {errors.promoCode?.type === "required" && (
             <p className="text-red-600 text-left">Promo Code is required</p>
           )}
@@ -124,7 +124,7 @@ const EditPromo = () => {
           <input
             type="number"
             {...register('promoDiscountValue', { required: true })}
-            className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
+            className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000'
             placeholder={`Enter ${promoDiscountType} Discount`} // Correct placeholder
           />
           {errors.promoDiscountValue?.type === "required" && (
@@ -133,17 +133,17 @@ const EditPromo = () => {
         </div>
 
         <div>
-          <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#9F5216]'>Maximum Capped Amount</label>
-          <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
+          <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#D2016E]'>Maximum Capped Amount</label>
+          <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="number" />
         </div>
 
         <div>
-          <label htmlFor='minAmount' className='flex justify-start font-medium text-[#9F5216]'>Minimum Order Amount</label>
-          <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
+          <label htmlFor='minAmount' className='flex justify-start font-medium text-[#D2016E]'>Minimum Order Amount</label>
+          <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="number" />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor='expiryDate' className='block text-[#9F5216] font-medium text-sm'>
+          <label htmlFor='expiryDate' className='block text-[#D2016E] font-medium text-sm'>
             Expiry Date <span className="text-red-600">*</span>
           </label>
           <input
@@ -152,7 +152,7 @@ const EditPromo = () => {
             {...register("expiryDate", { required: true })}
             value={expiryDate}
             onChange={(e) => setExpiryDate(e.target.value)} // Update state with the input value
-            className="w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000"
+            className="w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000"
           />
           {errors.expiryDate?.type === "required" && (
             <p className="text-red-600 text-sm mt-1">Expiry Date is required</p>
@@ -161,9 +161,9 @@ const EditPromo = () => {
 
         <div className='flex justify-between items-center mt-4 mb-8'>
 
-          <Link className='flex items-center gap-2 font-medium text-white rounded-lg bg-[#9F5216] hover:bg-[#9f5116c9] py-2 px-4' href={"/dash-board/marketing"}> <FaArrowLeft /> Go Back</Link>
+          <Link className='flex items-center gap-2 font-medium text-white rounded-lg bg-[#D2016E] hover:bg-[#d2016dca] py-2 px-4' href={"/dash-board/marketing"}> <FaArrowLeft /> Go Back</Link>
 
-          <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
+          <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#D2016E] hover:bg-[#d2016dca]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
             {isSubmitting ? 'Submitting...' : 'Update Promo'}
           </button>
         </div>

@@ -3,7 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import useOrders from '@/app/hooks/useOrders';
 import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
 import { format, startOfToday, endOfToday, startOfYesterday, endOfYesterday, subDays, subMonths, startOfMonth, endOfMonth, isValid } from 'date-fns';
-import { DateRangePicker } from '@nextui-org/react';
+import { Checkbox, CheckboxGroup, DateRangePicker } from '@nextui-org/react';
 import { IoMdClose } from 'react-icons/io';
 
 const parseDate = (dateString) => {
@@ -18,6 +18,13 @@ const PromotionPerformanceChart = () => {
   const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
   const [activeFilter, setActiveFilter] = useState('today');
   const [showDateRangePicker, setShowDateRangePicker] = useState(true); // New state
+  const [selected, setSelected] = useState(['totalDiscountedAmount', 'totalDiscountedOrders']);
+
+  const handleChange = (values) => {
+    // Ensure at least one checkbox is always selected
+    if (values.length === 0) return;
+    setSelected(values);
+  };
 
   useEffect(() => {
     // Set default date range to Today when the component mounts
@@ -315,23 +322,38 @@ const PromotionPerformanceChart = () => {
           </div>
         </div>
 
-        <div className="w-full h-[400px] flex items-center justify-center">
+        <div className="w-full h-[400px] flex items-center justify-center mt-12">
           {dailyData.length === 0 ? (
             <div className="text-center text-gray-500">
               <p className="text-lg font-medium text-gray-500">No data available for the selected day.<br /> Please choose a different date or date range to see results.</p>
             </div>
           ) : (
-            <ResponsiveContainer>
-              <BarChart data={dailyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" tickFormatter={formatXAxis} />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="discountedAmount" radius={[8, 8, 0, 0]} fill="#D2016E" name="Total Discounted Amount (৳)" />
-                <Bar dataKey="discountedOrders" radius={[8, 8, 0, 0]} fill="#3480A3" name="Total Discounted Orders" />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className='w-full'>
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart data={dailyData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" tickFormatter={formatXAxis} />
+                  <YAxis />
+                  <Tooltip />
+                  {selected.includes('totalDiscountedAmount') && (
+                    <Bar dataKey="discountedAmount" radius={[8, 8, 0, 0]} fill="#D2016E" name="Total Discounted Amount (৳)" />
+                  )}
+                  {selected.includes('totalDiscountedOrders') && (
+                    <Bar dataKey="discountedOrders" radius={[8, 8, 0, 0]} fill="#3480A3" name="Total Discounted Orders" />
+                  )}
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="flex gap-4 justify-center">
+                <CheckboxGroup
+                  value={selected}
+                  onChange={handleChange}
+                  orientation="horizontal"
+                >
+                  <Checkbox color="danger" value="totalDiscountedAmount"><span className='text-[#F53B7B]'>Total Discounted Amount (৳)</span></Checkbox>
+                  <Checkbox color="primary" value="totalDiscountedOrders"><span className='text-[#3480A3]'>Total Discounted Orders</span></Checkbox>
+                </CheckboxGroup>
+              </div>
+            </div>
           )}
         </div>
 

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import PromoDetailsModal from './PromoDetailsModal';
-import { FaRegEye } from 'react-icons/fa6';
+import { FaAngleUp, FaAngleDown } from "react-icons/fa";
 import CustomSwitch from './CustomSwitch';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { MdOutlineModeEdit } from 'react-icons/md';
@@ -217,93 +217,98 @@ const RecentPromotions = () => {
 
     return (
       <tbody className="bg-white divide-y divide-gray-200">
-        {filteredItems.map((item, index) => (
-          <tr key={item?._id || index} className="hover:bg-gray-50 transition-colors">
-            <td className="text-xs p-3 text-gray-700 font-mono">{item?.promoCode || item?.offerCode}</td>
-            <td className="text-xs p-3 text-gray-700">
-              {item?.promoDiscountType
-                ? `${item?.promoDiscountValue} ${item?.promoDiscountType === 'Amount' ? 'Tk' : '%'}`
-                : item?.offerDiscountType
-                  ? `${item?.offerDiscountValue} ${item?.offerDiscountType === 'Amount' ? 'Tk' : '%'}`
-                  : 'No Discount'}
-            </td>
-            <td className="text-xs p-3 text-gray-700">{item?.expiryDate}</td>
-            <td className="text-xs p-3 text-gray-700">
-              <div className="flex items-center gap-3 cursor-pointer">
-                <div className="group relative">
-                  <button>
-                    <MdOutlineModeEdit
-                      onClick={() =>
-                        item?.promoCode
-                          ? router.push(`/dash-board/marketing/promo/${item._id}`) // Edit promo
-                          : router.push(`/dash-board/marketing/offer/${item._id}`) // Edit offer
-                      }
-                      size={22}
-                      className="text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200"
-                    />
-                  </button>
-                  <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
-                    Edit
-                  </span>
+        {filteredItems.map((item, index) => {
+          const isExpired = new Date(item?.expiryDate) < currentDate;
+          return (
+            <tr key={item?._id || index} className="hover:bg-gray-50 transition-colors">
+              <td className="text-xs p-3 text-gray-700 font-mono">{item?.promoCode || item?.offerCode}</td>
+              <td className="text-xs p-3 text-gray-700">
+                {item?.promoDiscountType
+                  ? `${item?.promoDiscountValue} ${item?.promoDiscountType === 'Amount' ? 'Tk' : '%'}`
+                  : item?.offerDiscountType
+                    ? `${item?.offerDiscountValue} ${item?.offerDiscountType === 'Amount' ? 'Tk' : '%'}`
+                    : 'No Discount'}
+              </td>
+              <td className="text-xs p-3 text-gray-700">{item?.expiryDate}</td>
+              <td className="text-xs p-3 text-gray-700">
+                <div className="flex items-center gap-3 cursor-pointer">
+                  <div className="group relative">
+                    <button disabled={isExpired}>
+                      <MdOutlineModeEdit
+                        onClick={() =>
+                          item?.promoCode
+                            ? router.push(`/dash-board/marketing/promo/${item._id}`) // Edit promo
+                            : router.push(`/dash-board/marketing/offer/${item._id}`) // Edit offer
+                        }
+                        size={22}
+                        className={`text-blue-500 ${isExpired ? 'cursor-not-allowed' : 'hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
+                      />
+                    </button>
+                    {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
+                      Edit
+                    </span>}
+                  </div>
+                  <div className="group relative">
+                    <button disabled={isExpired}>
+                      <RiDeleteBinLine
+                        onClick={() =>
+                          item?.promoCode
+                            ? handleDeletePromo(item._id) // Delete promo
+                            : handleDeleteOffer(item._id) // Delete offer
+                        }
+                        size={22}
+                        className={`text-red-500 ${isExpired ? 'cursor-not-allowed' : 'hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
+                      />
+                    </button>
+                    {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
+                      Delete
+                    </span>}
+                  </div>
                 </div>
-                <div className="group relative">
-                  <button>
-                    <RiDeleteBinLine
-                      onClick={() =>
-                        item?.promoCode
-                          ? handleDeletePromo(item._id) // Delete promo
-                          : handleDeleteOffer(item._id) // Delete offer
-                      }
-                      size={22}
-                      className="text-red-500 hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200"
-                    />
-                  </button>
-                  <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
-                    Delete
-                  </span>
-                </div>
-              </div>
-            </td>
-            <td className="text-xs p-3 text-gray-700">
+              </td>
+              <td className="text-xs p-3 text-gray-700">
 
-              {item?.promoCode ? (
-                <CustomSwitch
-                  checked={item?.promoStatus}
-                  onChange={() => handleStatusChangePromo(item?._id, item?.promoStatus)}
-                  size="md"
-                  color="primary"
-                />
-              ) : (
-                <CustomSwitch
-                  checked={item?.offerStatus}
-                  onChange={() => handleStatusChangeOffer(item?._id, item?.offerStatus)}
-                  size="md"
-                  color="primary"
-                />
-              )}
-
-            </td>
-            <td className="text-xs p-3 text-gray-700 cursor-pointer">
-              <div className="group relative">
-                <button>
-                  <FaRegEye
-                    onClick={() =>
-                      item?.promoCode
-                        ? handleViewClickPromo(item) // Pass promo details if promoCode exists
-                        : handleViewClickOffer(item) // Pass offer details if promoCode does not exist
-                    }
-                    size={22}
-                    className="hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200"
+                {item?.promoCode ? (
+                  <CustomSwitch
+                    checked={item?.promoStatus}
+                    onChange={() => handleStatusChangePromo(item?._id, item?.promoStatus)}
+                    size="md"
+                    color="primary"
+                    disabled={isExpired}
                   />
-                </button>
+                ) : (
+                  <CustomSwitch
+                    checked={item?.offerStatus}
+                    onChange={() => handleStatusChangeOffer(item?._id, item?.offerStatus)}
+                    size="md"
+                    color="primary"
+                    disabled={isExpired}
+                  />
+                )}
 
-                <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
-                  Preview
-                </span>
-              </div>
-            </td>
-          </tr>
-        ))}
+              </td>
+              <td className="text-xs p-3 text-gray-700 cursor-pointer">
+                <div className="group relative">
+                  <button disabled={isExpired}>
+                    <FaAngleDown
+                      onClick={() =>
+                        item?.promoCode
+                          ? handleViewClickPromo(item) // Pass promo details if promoCode exists
+                          : handleViewClickOffer(item) // Pass offer details if promoCode does not exist
+                      }
+                      size={22}
+                      className={`${isExpired ? 'cursor-not-allowed' : 'hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
+                    />
+                  </button>
+
+                  {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
+                    See
+                  </span>}
+                </div>
+              </td>
+            </tr>
+          )
+        })}
       </tbody>
     );
   };

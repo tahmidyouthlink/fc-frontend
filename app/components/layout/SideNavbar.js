@@ -17,8 +17,6 @@ import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 import { useState } from "react";
 import { ImCross } from "react-icons/im";
 import { LiaUserLockSolid } from "react-icons/lia";
-import { RiCoupon4Line } from "react-icons/ri";
-import { MdOutlineLocalOffer } from "react-icons/md";
 
 const SideNavbar = ({ onClose }) => {
   const pathname = usePathname();

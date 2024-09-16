@@ -195,7 +195,7 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 
 .custom-switch-slider {
   position: absolute;
-  cursor: pointer;
+  cursor: pointer; /* Default cursor */
   top: 0;
   left: 0;
   right: 0;
@@ -223,4 +223,10 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 
 .custom-switch-input:checked + .custom-switch-slider:before {
   transform: translateX(20px); /* Adjusted for smaller size */
+}
+
+/* Styles for expired state */
+.custom-switch-slider.expired {
+  cursor: not-allowed; /* Cursor for expired state */
+  background-color: #e0e0e0; /* Disabled color */
 }
