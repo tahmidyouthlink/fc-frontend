@@ -30,8 +30,6 @@ const AddOffer = () => {
   const [offerDescription, setOfferDescription] = useState("");
   const [image, setImage] = useState(null);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [sizeError, setSizeError] = useState(false);
-  const [sizeError2, setSizeError2] = useState(false);
 
   const handleTabChange = (key) => {
     setOfferDiscountType(key);
@@ -56,9 +54,6 @@ const AddOffer = () => {
         src: URL.createObjectURL(file),
         file
       });
-      setSizeError(false);
-    } else {
-      setSizeError(true);
     }
   };
 
@@ -91,35 +86,16 @@ const AddOffer = () => {
   const handleCategoryArray = (keys) => {
     const selectedArray = [...keys];
     setSelectedCategories(selectedArray);
-    setSizeError2(selectedArray.length === 0);
   };
 
   const onSubmit = async (data) => {
     const { offerCode, offerTitle, offerDiscountValue, expiryDate, maxAmount, minAmount } = data;
 
-    // Initialize error state variables
-    let hasError = false;
-
-    // Check image
-    if (!image) {
-      setSizeError(true);
-      hasError = true;
-    } else {
-      setSizeError(false);
-    }
-
-    // Check category
-    if (selectedCategories.length === 0) {
-      setSizeError2(true);
-      hasError = true;
-    } else {
-      setSizeError2(false);
-    }
 
     // Check if expiryDate is selected
     if (!expiryDate) {
       setDateError(true);
-      hasError = true;
+      return;
     } else {
       setDateError(false);
 
@@ -130,13 +106,8 @@ const AddOffer = () => {
 
       if (selectedExpiryDate < today) {
         toast.error("Expiry date cannot be in the past.");
-        hasError = true;
+        return;
       }
-    }
-
-    // If any error is detected, stop form submission
-    if (hasError) {
-      return;
     }
 
     const formattedExpiryDate = formatDate(expiryDate);
@@ -196,16 +167,16 @@ const AddOffer = () => {
             <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 mt-6 px-6 py-3'>
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                 <div>
-                  <label htmlFor='offerCode' className='flex justify-start font-medium text-[#9F5216] pb-2'>Offer Code *</label>
-                  <input id='offerCode' placeholder='Enter Offer Code'  {...register("offerCode", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="text" />
+                  <label htmlFor='offerCode' className='flex justify-start font-medium text-[#D2016E] pb-2'>Offer Code *</label>
+                  <input id='offerCode' placeholder='Enter Offer Code'  {...register("offerCode", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="text" />
                   {errors.offerCode?.type === "required" && (
                     <p className="text-red-600 text-left">Offer Code is required</p>
                   )}
                 </div>
 
                 <div>
-                  <label htmlFor='offerTitle' className='flex justify-start font-medium text-[#9F5216] pb-2'>Offer Title *</label>
-                  <input id='offerTitle' placeholder='Enter Offer Title'  {...register("offerTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="text" />
+                  <label htmlFor='offerTitle' className='flex justify-start font-medium text-[#D2016E] pb-2'>Offer Title *</label>
+                  <input id='offerTitle' placeholder='Enter Offer Title'  {...register("offerTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="text" />
                   {errors.offerTitle?.type === "required" && (
                     <p className="text-red-600 text-left">Offer Title is required</p>
                   )}
@@ -217,14 +188,14 @@ const AddOffer = () => {
                     selectedKey={offerDiscountType}
                     onSelectionChange={handleTabChange}
                   >
-                    <Tab className='text-[#9F5216]' key="Percentage" title="Percentage">Percentage (%) *</Tab>
-                    <Tab className='text-[#9F5216]' key="Amount" title="Amount">Amount (Taka) *</Tab>
+                    <Tab className='text-[#D2016E]' key="Percentage" title="Percentage">Percentage (%) *</Tab>
+                    <Tab className='text-[#D2016E]' key="Amount" title="Amount">Amount (Taka) *</Tab>
                   </Tabs>
 
                   <input
                     type="number"
                     {...register('offerDiscountValue', { required: true })}
-                    className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
+                    className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000'
                     placeholder={`Enter ${offerDiscountType} Discount`} // Correct placeholder
                   />
                   {errors.offerDiscountValue?.type === "required" && (
@@ -237,7 +208,6 @@ const AddOffer = () => {
                     name="categories"
                     control={control}
                     defaultValue={selectedCategories}
-                    rules={{ required: 'Category is required' }}
                     render={({ field }) => (
                       <div>
                         <Select
@@ -257,9 +227,6 @@ const AddOffer = () => {
                             </SelectItem>
                           ))}
                         </Select>
-
-                        {/* Conditional Error Display */}
-                        {sizeError2 && <p className="text-red-600 text-left">Please select a category.</p>}
                       </div>
                     )}
                   />
@@ -269,17 +236,17 @@ const AddOffer = () => {
 
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                 <div>
-                  <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#9F5216] pb-2'>Maximum Capped Amount</label>
-                  <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
+                  <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#D2016E] pb-2'>Maximum Capped Amount</label>
+                  <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="number" />
                 </div>
 
                 <div>
-                  <label htmlFor='minAmount' className='flex justify-start font-medium text-[#9F5216] pb-2'>Minimum Order Amount</label>
-                  <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
+                  <label htmlFor='minAmount' className='flex justify-start font-medium text-[#D2016E] pb-2'>Minimum Order Amount</label>
+                  <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="number" />
                 </div>
 
                 <div>
-                  <label htmlFor='expiryDate' className='flex justify-start font-medium text-[#9F5216] pb-2'>Offer Expire On *</label>
+                  <label htmlFor='expiryDate' className='flex justify-start font-medium text-[#D2016E] pb-2'>Offer Expire On *</label>
                   <DatePicker
                     id='expiryDate'
                     placeholder="Select date"
@@ -292,7 +259,7 @@ const AddOffer = () => {
                         setValue('expiryDate', date); // If DatePicker returns something else, handle it here
                       }
                     }}
-                    className="w-full outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                    className="w-full outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md"
                   />
 
                   {dateError && (
@@ -305,7 +272,7 @@ const AddOffer = () => {
               <div className='flex flex-col gap-6 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
                 <div className='flex w-full flex-col gap-2'>
-                  <label htmlFor='offerDescription' className='flex justify-start font-medium text-[#9F5216]'>Offer Description</label>
+                  <label htmlFor='offerDescription' className='flex justify-start font-medium text-[#D2016E]'>Offer Description</label>
                   <Controller
                     name="offerDescription"
                     defaultValue=""
@@ -340,9 +307,6 @@ const AddOffer = () => {
                       </p>
                     </div>
                   </label>
-                  {sizeError && (
-                    <p className="text-red-600 text-left">Please select an image.</p>
-                  )}
 
                   {image && (
                     <div className='relative'>
@@ -369,9 +333,9 @@ const AddOffer = () => {
 
           <div className='flex justify-between items-center px-6'>
 
-            <Link className='flex items-center gap-2 font-medium text-white rounded-lg bg-[#9F5216] hover:bg-[#9f5116c9] py-2 px-4' href={"/dash-board/marketing"}> <FaArrowLeft /> Go Back</Link>
+            <Link className='flex items-center gap-2 font-medium text-white rounded-lg bg-[#D2016E] hover:bg-[#d2016dca] py-2 px-4' href={"/dash-board/marketing"}> <FaArrowLeft /> Go Back</Link>
 
-            <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
+            <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#D2016E] hover:bg-[#d2016dca]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
               {isSubmitting ? 'Submitting...' : 'Submit'}
             </button>
 

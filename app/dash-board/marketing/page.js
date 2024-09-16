@@ -22,9 +22,9 @@ const Marketing = () => {
 
           <button
             className={`relative py-2 px-4 transition-all duration-300
-        ${activeTab === 'view performance' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
-        after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
-        after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
+        ${activeTab === 'view performance' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
+        after:absolute after:left-0 after:right-0 hover:text-[#D2016E] after:bottom-0 
+        after:h-[2px] after:bg-[#D2016E] after:transition-all after:duration-300
         ${activeTab === 'view performance' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
       `}
             onClick={() => setActiveTab('view performance')}
@@ -34,9 +34,9 @@ const Marketing = () => {
 
           <button
             className={`relative px-4 py-2 transition-all duration-300
-        ${activeTab === 'create promotions' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
+        ${activeTab === 'create promotions' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
         after:absolute after:left-0 after:right-0 after:bottom-0 
-        after:h-[2px] after:bg-[#9F5216] hover:text-[#9F5216] after:transition-all after:duration-300
+        after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300
         ${activeTab === 'create promotions' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
       `}
             onClick={() => setActiveTab('create promotions')}
@@ -46,6 +46,16 @@ const Marketing = () => {
 
         </div>
       </div>
+
+      {activeTab === "view performance" && <div className='pt-6'>
+        <h1 className='font-bold text-xl'>Promotion Performance</h1>
+        <p className='pt-1 text-neutral-400 font-medium'>The data includes all active, ended, or canceled deals. This report represents unaudited data, please refer to your invoice for accurate settlement numbers.</p>
+        <PromotionPerformance />
+
+        <h1 className='font-bold text-xl pt-8'>Recent Promotions</h1>
+        <p className='pt-1 pb-8 text-neutral-400 font-medium'>Please use the following table to view your past and upcoming promotions.</p>
+        <RecentPromotions />
+      </div>}
 
       {activeTab === "create promotions" && <div className='pt-6'>
         <h1 className='font-bold text-xl'>Recommended For You</h1>
@@ -75,7 +85,7 @@ const Marketing = () => {
               </p>
               <Button
                 onClick={() => router.push('/dash-board/marketing/promo/add-promo')}
-                className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium mt-4"
+                className="bg-[#D2016E] hover:bg-[#d2016deb] text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium mt-4"
               >
                 Start Now
               </Button>
@@ -105,7 +115,7 @@ const Marketing = () => {
               </p>
               <button
                 onClick={() => router.push('/dash-board/marketing/offer/add-offer')}
-                className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium mt-4"
+                className="bg-[#D2016E] hover:bg-[#d2016dca] text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium mt-4"
               >
                 Create Offer
               </button>
@@ -115,16 +125,6 @@ const Marketing = () => {
 
       </div>
       }
-
-      {activeTab === "view performance" && <div className='pt-6'>
-        <h1 className='font-bold text-xl'>Promotion Performance</h1>
-        <p className='pt-1 text-neutral-400 font-medium'>The data includes all active, ended, or canceled deals. This report represents unaudited data, please refer to your invoice for accurate settlement numbers.</p>
-        <PromotionPerformance />
-
-        <h1 className='font-bold text-xl pt-8'>Recent Promotions</h1>
-        <p className='pt-1 pb-8 text-neutral-400 font-medium'>Please use the following table to view your past and upcoming promotions.</p>
-        <RecentPromotions />
-      </div>}
     </div>
   );
 };

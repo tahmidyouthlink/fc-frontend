@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, ModalBody, ModalContent, ModalFooter } from '@nextui-org/react';
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
 import FlagRating from './FlagRating';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 
@@ -33,7 +33,8 @@ const RatingModal = ({ isOpen, onClose, onSave, initialRating, selectedCustomer 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xs">
       <ModalContent>
-        <ModalBody>
+        <ModalHeader className="text-lg mt-4 flex justify-center">Customer Reputation</ModalHeader>
+        <ModalBody className='modal-body-scroll'>
           <div className="flex flex-col items-center">
             {!isLoading ? (
               <FlagRating

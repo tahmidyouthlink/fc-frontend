@@ -369,7 +369,7 @@ const RecentPromotions = () => {
             placeholder="Search By Promo/Offer Details..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-12 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-[#f3f3f4] text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
+            className="w-full h-12 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-[#f3f3f4] text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#D2016E]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#D2016E]/30 hover:bg-white hover:shadow-[#D2016E]/30 text-[12px] md:text-base"
           />
         </li>
       </div>
@@ -378,22 +378,22 @@ const RecentPromotions = () => {
       {selectedOption !== 'all' && (
         <div className="flex space-x-4">
           <button
-            className={`relative px-4 py-2 transition-all duration-300 ${activeTab === 'all' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 
-        after:h-[2px] after:bg-[#9F5216] hover:text-[#9F5216] after:transition-all after:duration-300 ${activeTab === 'all' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
+            className={`relative px-4 py-2 transition-all duration-300 ${activeTab === 'all' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 
+        after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300 ${activeTab === 'all' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
             onClick={() => setActiveTab('all')}
           >
             {selectedOption === 'promos' ? `All Promos (${allPromos.length})` : `All Offers (${allOffers.length})`}
           </button>
           <button
-            className={`relative px-4 py-2 transition-all duration-300 ${activeTab === 'active' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 
-        after:h-[2px] after:bg-[#9F5216] hover:text-[#9F5216] after:transition-all after:duration-300 ${activeTab === 'active' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
+            className={`relative px-4 py-2 transition-all duration-300 ${activeTab === 'active' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 
+        after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300 ${activeTab === 'active' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
             onClick={() => setActiveTab('active')}
           >
             {selectedOption === 'promos' ? `Active Promos (${activePromos.length})` : `Active Offers (${activeOffers.length})`}
           </button>
           <button
-            className={`relative px-4 py-2 transition-all duration-300 ${activeTab === 'expired' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 
-        after:h-[2px] after:bg-[#9F5216] hover:text-[#9F5216] after:transition-all after:duration-300 ${activeTab === 'expired' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
+            className={`relative px-4 py-2 transition-all duration-300 ${activeTab === 'expired' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 
+        after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300 ${activeTab === 'expired' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
             onClick={() => setActiveTab('expired')}
           >
             {selectedOption === 'promos' ? `Used Promos (${expiredPromos.length})` : `Used Offers (${expiredOffers.length})`}

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { CgMenuRight } from "react-icons/cg";
+import { CgMenuLeft } from "react-icons/cg";
 import logoWhiteImage from "@/public/logos/fc-logo.png";
 import SideNavbar from "./SideNavbar";
 import Link from "next/link";
@@ -43,7 +43,10 @@ const DashboardNavbar = () => {
     <div>
       {/* Sidebar - hide from medium devices */}
       <div className="flex items-center justify-between px-4">
-        <div className="md:hidden">
+        <button className="md:hidden duration-300 p-2" onClick={() => setIsToggle(!isToggle)}>
+          {isToggle ? null : <CgMenuLeft size={20} />}
+        </button>
+        <div className="w-full flex justify-center md:hidden">
           <Link href="/" legacyBehavior>
             <a className="flex items-center gap-2">
               <Image
@@ -55,9 +58,6 @@ const DashboardNavbar = () => {
             </a>
           </Link>
         </div>
-        <button className="md:hidden duration-300 p-2" onClick={() => setIsToggle(!isToggle)}>
-          {isToggle ? null : <CgMenuRight size={20} />}
-        </button>
         {/* Overlay */}
         {isToggle && (
           <div className="fixed inset-0 z-40 bg-white opacity-100 md:hidden" onClick={handleClose}></div>

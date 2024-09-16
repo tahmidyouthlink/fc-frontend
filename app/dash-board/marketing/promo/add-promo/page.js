@@ -97,8 +97,8 @@ const AddPromo = () => {
       <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-lg mx-auto py-6 flex flex-col gap-6'>
 
         <div>
-          <label htmlFor='promoCode' className='flex justify-start font-medium text-[#9F5216] pb-2'>Promo Code *</label>
-          <input id='promoCode' placeholder='Enter Promo Code'  {...register("promoCode", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="text" />
+          <label htmlFor='promoCode' className='flex justify-start font-medium text-[#D2016E] pb-2'>Promo Code *</label>
+          <input id='promoCode' placeholder='Enter Promo Code'  {...register("promoCode", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="text" />
           {errors.promoCode?.type === "required" && (
             <p className="text-red-600 text-left">Promo Code is required</p>
           )}
@@ -110,14 +110,14 @@ const AddPromo = () => {
             selectedKey={promoDiscountType}
             onSelectionChange={handleTabChange}
           >
-            <Tab className='text-[#9F5216]' key="Percentage" title="Percentage">Percentage (%) *</Tab>
-            <Tab className='text-[#9F5216]' key="Amount" title="Amount">Amount (Taka) *</Tab>
+            <Tab className='text-[#D2016E]' key="Percentage" title="Percentage">Percentage (%) *</Tab>
+            <Tab className='text-[#D2016E]' key="Amount" title="Amount">Amount (Taka) *</Tab>
           </Tabs>
 
           <input
             type="number"
             {...register('promoDiscountValue', { required: true })}
-            className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
+            className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000'
             placeholder={`Enter ${promoDiscountType} Discount`} // Correct placeholder
           />
           {errors.promoDiscountValue?.type === "required" && (
@@ -126,17 +126,17 @@ const AddPromo = () => {
         </div>
 
         <div>
-          <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#9F5216] pb-2'>Maximum Capped Amount</label>
-          <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
+          <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#D2016E] pb-2'>Maximum Capped Amount</label>
+          <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="number" />
         </div>
 
         <div>
-          <label htmlFor='minAmount' className='flex justify-start font-medium text-[#9F5216] pb-2'>Minimum Order Amount</label>
-          <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
+          <label htmlFor='minAmount' className='flex justify-start font-medium text-[#D2016E] pb-2'>Minimum Order Amount</label>
+          <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="number" />
         </div>
 
         <div>
-          <label htmlFor='expiryDate' className='flex justify-start font-medium text-[#9F5216] pb-2'>Promo Expire On *</label>
+          <label htmlFor='expiryDate' className='flex justify-start font-medium text-[#D2016E] pb-2'>Promo Expire On *</label>
           <DatePicker
             id='expiryDate'
             placeholder="Select date"
@@ -149,7 +149,7 @@ const AddPromo = () => {
                 setValue('expiryDate', date); // If DatePicker returns something else, handle it here
               }
             }}
-            className="w-full outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+            className="w-full outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md"
           />
 
           {dateError && (
@@ -159,9 +159,9 @@ const AddPromo = () => {
 
         <div className='flex justify-between items-center mt-4 mb-8'>
 
-          <Link className='flex items-center gap-2 font-medium text-white rounded-lg bg-[#9F5216] hover:bg-[#9f5116c9] py-2 px-4' href={"/dash-board/marketing"}> <FaArrowLeft /> Go Back</Link>
+          <Link className='flex items-center gap-2 font-medium text-white rounded-lg bg-[#D2016E] hover:bg-[#d2016dca] py-2 px-4' href={"/dash-board/marketing"}> <FaArrowLeft /> Go Back</Link>
 
-          <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
+          <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#D2016E] hover:bg-[#d2016dca]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
             {isSubmitting ? 'Submitting...' : 'Submit'}
           </button>
 

@@ -33,7 +33,7 @@ const PromotionPerformanceChart = () => {
       ? new Date(selectedDateRange.end.year, selectedDateRange.end.month - 1, selectedDateRange.end.day)
       : null;
 
-    const adjustedEndDate = end && isValid(end) ? new Date(end.getTime() + 24 * 60 * 60 * 1000 - 1) : null;
+    const adjustedEndDate = end ? new Date(end.getTime() + 24 * 60 * 60 * 1000 - 1) : null;
 
     return { startDate: start, endDate: adjustedEndDate };
   }, [selectedDateRange]);
@@ -81,17 +81,41 @@ const PromotionPerformanceChart = () => {
     let totalPromoAndOfferApplied = 0;
     let totalDiscount = 0;
 
-    orderList?.forEach((order) => {
+    if (!filterStartDate || !filterEndDate) {
+      return { totalPromoAndOfferApplied, totalDiscount }; // No filter applied yet
+    }
+
+    // Convert filter dates to Date objects and normalize them to start and end of day
+    const startDate = new Date(filterStartDate);
+    const endDate = new Date(filterEndDate);
+
+    const adjustedStartDate = new Date(startDate.setHours(0, 0, 0, 0)); // Start of day
+    const adjustedEndDate = new Date(endDate.setHours(23, 59, 59, 999)); // End of day
+
+    // Filter orders based on the normalized date range
+    const filteredOrders = orderList?.filter((order) => {
+      const orderDate = parseDate(order.dateTime);
+      const normalizedOrderDate = new Date(orderDate.setHours(0, 0, 0, 0)); // Normalize order date to start of day
+
+      // Use >= for start date and <= for end date to include the selected range
+      return normalizedOrderDate >= adjustedStartDate && normalizedOrderDate <= adjustedEndDate;
+    });
+
+    filteredOrders?.forEach((order) => {
       let promoDiscount = 0;
       let offerDiscount = 0;
 
       if (order.promoCode?.trim()) {
-        promoDiscount = order.promoDiscountType === 'Percentage' ? (order.promoDiscountValue / 100) * order.totalAmount : order.promoDiscountValue;
+        promoDiscount = order.promoDiscountType === 'Percentage'
+          ? (order.promoDiscountValue / 100) * order.totalAmount
+          : order.promoDiscountValue;
         totalPromoAndOfferApplied += 1;
       }
 
       if (order.offerCode?.trim()) {
-        offerDiscount = order.offerDiscountType === 'Percentage' ? (order.offerDiscountValue / 100) * order.totalAmount : order.offerDiscountValue;
+        offerDiscount = order.offerDiscountType === 'Percentage'
+          ? (order.offerDiscountValue / 100) * order.totalAmount
+          : order.offerDiscountValue;
         totalPromoAndOfferApplied += 1;
       }
 
@@ -100,7 +124,7 @@ const PromotionPerformanceChart = () => {
     });
 
     return { totalPromoAndOfferApplied, totalDiscount };
-  }, [orderList]);
+  }, [orderList, filterStartDate, filterEndDate]);
 
   const dailyData = useMemo(() => {
     const dailyData = {};
@@ -109,16 +133,21 @@ const PromotionPerformanceChart = () => {
       const orderDate = parseDate(order.dateTime);
       const orderDateFormatted = format(orderDate, 'yyyy-MM-dd');
 
+      // Compare order dates with selected date range, inclusive of both start and end dates
       if (orderDateFormatted >= filterStartDate && orderDateFormatted <= filterEndDate) {
         let promoDiscount = 0;
         let offerDiscount = 0;
 
         if (order.promoCode?.trim()) {
-          promoDiscount = order.promoDiscountType === 'Percentage' ? (order.promoDiscountValue / 100) * order.totalAmount : order.promoDiscountValue;
+          promoDiscount = order.promoDiscountType === 'Percentage'
+            ? (order.promoDiscountValue / 100) * order.totalAmount
+            : order.promoDiscountValue;
         }
 
         if (order.offerCode?.trim()) {
-          offerDiscount = order.offerDiscountType === 'Percentage' ? (order.offerDiscountValue / 100) * order.totalAmount : order.offerDiscountValue;
+          offerDiscount = order.offerDiscountType === 'Percentage'
+            ? (order.offerDiscountValue / 100) * order.totalAmount
+            : order.offerDiscountValue;
         }
 
         const totalOrderDiscount = promoDiscount + offerDiscount;
@@ -134,6 +163,7 @@ const PromotionPerformanceChart = () => {
         dailyData[orderDateFormatted].discountedOrders++;
       }
     });
+
 
     return Object.keys(dailyData).map((date) => ({
       date,
@@ -181,8 +211,12 @@ const PromotionPerformanceChart = () => {
         end = endOfToday();
         break;
       case 'lastMonth':
-        start = startOfMonth(subMonths(new Date(), 1));
-        end = endOfMonth(subMonths(new Date(), 1));
+        const previousMonthStart = new Date(startOfMonth(subMonths(new Date(), 1)));
+        previousMonthStart.setHours(0, 0, 0, 0); // Set time to 00:00:00
+        const previousMonthEnd = new Date(endOfMonth(subMonths(new Date(), 1)));
+        previousMonthEnd.setHours(23, 59, 59, 999); // Set time to 23:59:59
+        start = new Date(startOfMonth(subMonths(new Date(), 1)));
+        end = new Date(endOfMonth(subMonths(new Date(), 1)));
         break;
       default:
         break;
@@ -209,29 +243,29 @@ const PromotionPerformanceChart = () => {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-col lg:flex-row mt-6 justify-center lg:justify-end items-center gap-3">
+      <div className="flex flex-wrap mt-6 justify-center lg:justify-end items-center gap-3">
         <div className="flex items-center justify-center gap-2">
           <button
             onClick={() => handleDateFilter('today')}
-            className={`px-2 py-1 text-xs md:text-sm lg:text-base md:py-2 md:px-4 ${activeFilter === 'today' ? 'text-[#9F5216] border rounded-full border-[#9F5216] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
+            className={`px-2 py-1 text-xs md:text-sm lg:text-base md:py-2 md:px-4 ${activeFilter === 'today' ? 'text-[#D2016E] border rounded-full border-[#D2016E] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
           >
             Today
           </button>
           <button
             onClick={() => handleDateFilter('yesterday')}
-            className={`px-2 py-1 text-xs md:text-sm lg:text-base md:py-2 md:px-4 ${activeFilter === 'yesterday' ? 'text-[#9F5216] border rounded-full border-[#9F5216] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
+            className={`px-2 py-1 text-xs md:text-sm lg:text-base md:py-2 md:px-4 ${activeFilter === 'yesterday' ? 'text-[#D2016E] border rounded-full border-[#D2016E] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
           >
             Yesterday
           </button>
           <button
             onClick={() => handleDateFilter('last7days')}
-            className={`px-2 py-1 text-xs md:text-sm lg:text-base md:py-2 md:px-4 ${activeFilter === 'last7days' ? 'text-[#9F5216] border rounded-full border-[#9F5216] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
+            className={`px-2 py-1 text-xs md:text-sm lg:text-base md:py-2 md:px-4 ${activeFilter === 'last7days' ? 'text-[#D2016E] border rounded-full border-[#D2016E] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
           >
             Last 7 Days
           </button>
           <button
             onClick={() => handleDateFilter('lastMonth')}
-            className={`px-2 py-1 text-xs md:text-sm lg:text-base md:py-2 md:px-4 ${activeFilter === 'lastMonth' ? 'text-[#9F5216] border rounded-full border-[#9F5216] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
+            className={`px-2 py-1 text-xs md:text-sm lg:text-base md:py-2 md:px-4 ${activeFilter === 'lastMonth' ? 'text-[#D2016E] border rounded-full border-[#D2016E] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
           >
             Last Month
           </button>
@@ -266,9 +300,9 @@ const PromotionPerformanceChart = () => {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row items-center lg:items-start justify-center gap-6">
+      <div className="flex flex-col lg:flex-row items-center justify-center gap-6">
         {/* Summary Section */}
-        <div className='flex items-center justify-center gap-6 w-1/2 min-h-[150px] max-h-[150px]'>
+        <div className='flex items-center justify-center gap-6 w-1/2 xl:w-3/4 lg:min-h-[150px] lg:max-h-[150px] mt-0 md:mt-6 xl:mt-0'>
           <div className="border rounded-lg p-4 md:p-8 space-y-3">
             <p className="text-[10px] md:text-sm xl:text-base font-semibold">Discounted orders</p>
             <h3 className="font-bold md:text-xl lg:text-2xl xl:text-3xl">{totalPromoAndOfferApplied}</h3>
@@ -281,9 +315,7 @@ const PromotionPerformanceChart = () => {
           </div>
         </div>
 
-
-
-        <div className="w-full h-[250px] flex items-center justify-center">
+        <div className="w-full h-[400px] flex items-center justify-center">
           {dailyData.length === 0 ? (
             <div className="text-center text-gray-500">
               <p className="text-lg font-medium text-gray-500">No data available for the selected day.<br /> Please choose a different date or date range to see results.</p>
@@ -296,8 +328,8 @@ const PromotionPerformanceChart = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="discountedAmount" radius={[8, 8, 0, 0]} fill="#9F5216" name="Total Discounted Amount (৳)" />
-                <Bar dataKey="discountedOrders" radius={[8, 8, 0, 0]} fill="#A3A3A3" name="Total Discounted Orders" />
+                <Bar dataKey="discountedAmount" radius={[8, 8, 0, 0]} fill="#D2016E" name="Total Discounted Amount (৳)" />
+                <Bar dataKey="discountedOrders" radius={[8, 8, 0, 0]} fill="#3480A3" name="Total Discounted Orders" />
               </BarChart>
             </ResponsiveContainer>
           )}

@@ -34,7 +34,6 @@ const EditOffer = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [sizeError, setSizeError] = useState(false);
-  const [sizeError2, setSizeError2] = useState(false);
   const [dateError, setDateError] = useState(false)
   const [offerDetails, setOfferDetails] = useState(null);
 
@@ -134,7 +133,6 @@ const EditOffer = () => {
   const handleCategoryArray = (keys) => {
     const selectedArray = [...keys];
     setSelectedCategories(selectedArray);
-    setSizeError2(selectedArray.length === 0);
   };
 
   const onSubmit = async (data) => {
@@ -142,27 +140,19 @@ const EditOffer = () => {
 
     let hasError = false;
 
-    // Check image
-    let imageUrl = offerDetails.imageUrl || ''; // Use existing image URL if no new image is uploaded
+    // Initialize imageUrl with the existing one
+    let imageUrl = offerDetails.imageUrl || '';
+
+    // If a new image is uploaded, upload it to Imgbb
     if (image && image.file) {
       imageUrl = await uploadToImgbb(image.file);
       if (!imageUrl) {
         toast.error('Image upload failed, cannot proceed.');
         hasError = true;
       }
-    } else if (!image && !offerDetails.imageUrl) {
-      setSizeError(true);
-      hasError = true;
-    } else {
-      setSizeError(false);
-    }
-
-    // Other validation checks (categories, date, etc.)
-    if (selectedCategories.length === 0) {
-      setSizeError2(true);
-      hasError = true;
-    } else {
-      setSizeError2(false);
+    } else if (image === null) {
+      // If the image is removed, explicitly set imageUrl to an empty string
+      imageUrl = '';
     }
 
     if (!expiryDate) {
@@ -182,24 +172,6 @@ const EditOffer = () => {
     }
 
     if (hasError) {
-      return;
-    }
-
-    // Check if any changes were made
-    const noChangesDetected =
-      offerCode === offerDetails.offerCode &&
-      offerTitle === offerDetails.offerTitle &&
-      offerDiscountValue === offerDetails.offerDiscountValue &&
-      offerDiscountType === offerDetails.offerDiscountType &&
-      expiryDate === offerDetails.expiryDate &&
-      maxAmount === offerDetails.maxAmount &&
-      minAmount === offerDetails.minAmount &&
-      offerDescription === offerDetails.offerDescription &&
-      selectedCategories.length === offerDetails.selectedCategories.length &&
-      imageUrl === offerDetails.imageUrl;
-
-    if (noChangesDetected && image) {
-      toast.error('No changes detected.');
       return;
     }
 
@@ -294,7 +266,6 @@ const EditOffer = () => {
                     name="categories"
                     control={control}
                     defaultValue={selectedCategories}
-                    rules={{ required: 'Category is required' }}
                     render={({ field }) => (
                       <div>
                         <Select
@@ -315,8 +286,6 @@ const EditOffer = () => {
                           ))}
                         </Select>
 
-                        {/* Conditional Error Display */}
-                        {sizeError2 && <p className="text-red-600 text-left">Please select a category.</p>}
                       </div>
                     )}
                   />
@@ -392,9 +361,6 @@ const EditOffer = () => {
                       </p>
                     </div>
                   </label>
-                  {sizeError && (
-                    <p className="text-red-600 text-left">Please select an image.</p>
-                  )}
 
                   {image && (
                     <div className='relative'>

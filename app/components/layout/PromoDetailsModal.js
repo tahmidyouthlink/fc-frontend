@@ -34,7 +34,12 @@ const PromoDetailsModal = ({
           <div className="flex flex-col space-y-1 px-4">
             {isPromoSelected && (
               <>
-                <p className="text-base"><strong>Total Promo Applied :</strong> {totalPromoApplied}</p>
+                <p className="text-base">
+                  <strong>Total Promo Applied :</strong>
+                  {totalPromoApplied === 0
+                    ? "No Orders"
+                    : `${totalPromoApplied} ${totalPromoApplied === 1 ? "Order" : "Orders"}`}
+                </p>
                 <p className="text-base"><strong>Total Amount Discounted :</strong> ৳ {totalAmountDiscounted}</p>
                 <p className="text-base"><strong>Minimum Order Amount :</strong> ৳ {promo?.minAmount || '0'}</p>
                 <p className="text-base"><strong>Maximum Capped Amount :</strong> ৳ {promo?.maxAmount || '0'}</p>
@@ -46,7 +51,12 @@ const PromoDetailsModal = ({
                   <Image className='h-[150px] w-[150px] rounded-lg' src={offer?.imageUrl} alt={offer?.imageUrl} height={200} width={1800} />
                 </div>
                 <p className="text-base"><strong>Offer Title :</strong> {offer?.offerTitle}</p>
-                <p className="text-base"><strong>Total Offer Applied :</strong> {totalOfferApplied}</p>
+                <p className="text-base">
+                  <strong>Total Offer Applied :</strong>
+                  {totalOfferApplied === 0
+                    ? "No Orders"
+                    : `${totalOfferApplied} ${totalOfferApplied === 1 ? "Order" : "Orders"}`}
+                </p>
                 <p className="text-base"><strong>Total Amount Discounted :</strong> ৳ {totalOfferAmountDiscounted}</p>
                 <p className="text-base"><strong>Minimum Order Amount :</strong> ৳ {offer?.minAmount || '0'}</p>
                 <p className="text-base"><strong>Maximum Capped Amount :</strong> ৳ {offer?.maxAmount || '0'}</p>
