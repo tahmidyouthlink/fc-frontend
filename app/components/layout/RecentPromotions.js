@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import PromoDetailsModal from './PromoDetailsModal';
 import { FaAngleUp, FaAngleDown } from "react-icons/fa";
 import CustomSwitch from './CustomSwitch';
 import { RiDeleteBinLine } from 'react-icons/ri';
@@ -11,6 +10,7 @@ import usePromoCodes from '@/app/hooks/usePromoCodes';
 import toast from 'react-hot-toast';
 import useOffers from '@/app/hooks/useOffers';
 import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
+import Image from 'next/image';
 
 const RecentPromotions = () => {
 
@@ -19,12 +19,12 @@ const RecentPromotions = () => {
   const [orderList, isOrderPending] = useOrders();
   const [promoList, isPromoPending, refetchPromo] = usePromoCodes();
   const [offerList, isOfferPending, refetchOffer] = useOffers();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPromo, setSelectedPromo] = useState(null);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
   const [selectedOption, setSelectedOption] = useState('all'); // New state for dropdown
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
+  const [isExpanded, setIsExpanded] = useState(null); // To track which row is expanded
 
   // Memoized current date
   const currentDate = useMemo(() => new Date(), []);
@@ -77,17 +77,22 @@ const RecentPromotions = () => {
     );
   };
 
-  const handleViewClickPromo = (promo) => {
-    setSelectedPromo(promo);
-    setSelectedOffer(null);
-    setIsModalOpen(true);
+  const handleViewClick = (item) => {
+    setIsExpanded((prev) => (prev === item._id ? null : item._id)); // Use correct identifier for expansion
   };
 
-  const handleViewClickOffer = (offer) => {
-    setSelectedOffer(offer);
-    setSelectedPromo(null);
-    setIsModalOpen(true);
-  }
+  useMemo(() => {
+    const selectedPromo = promoList?.find(promo => promo?._id === isExpanded);
+    const selectedOffer = offerList?.find(offer => offer?._id === isExpanded);
+
+    if (selectedPromo) {
+      setSelectedPromo(selectedPromo);
+      setSelectedOffer(null); // Clear offer if a promo is selected
+    } else if (selectedOffer) {
+      setSelectedOffer(selectedOffer);
+      setSelectedPromo(null); // Clear promo if an offer is selected
+    }
+  }, [isExpanded, offerList, promoList]);
 
   const totalPromoApplied = useMemo(() => {
     return orderList?.filter(order => order?.promoCode === selectedPromo?.promoCode).length;
@@ -219,94 +224,146 @@ const RecentPromotions = () => {
       <tbody className="bg-white divide-y divide-gray-200">
         {filteredItems.map((item, index) => {
           const isExpired = new Date(item?.expiryDate) < currentDate;
+          const isExpandedItem = isExpanded === item._id;
           return (
-            <tr key={item?._id || index} className="hover:bg-gray-50 transition-colors">
-              <td className="text-xs p-3 text-gray-700 font-mono">{item?.promoCode || item?.offerCode}</td>
-              <td className="text-xs p-3 text-gray-700">
-                {item?.promoDiscountType
-                  ? `${item?.promoDiscountValue} ${item?.promoDiscountType === 'Amount' ? 'Tk' : '%'}`
-                  : item?.offerDiscountType
-                    ? `${item?.offerDiscountValue} ${item?.offerDiscountType === 'Amount' ? 'Tk' : '%'}`
-                    : 'No Discount'}
-              </td>
-              <td className="text-xs p-3 text-gray-700">{item?.expiryDate}</td>
-              <td className="text-xs p-3 text-gray-700">
-                <div className="flex items-center gap-3 cursor-pointer">
-                  <div className="group relative">
-                    <button disabled={isExpired}>
-                      <MdOutlineModeEdit
-                        onClick={() =>
-                          item?.promoCode
-                            ? router.push(`/dash-board/marketing/promo/${item._id}`) // Edit promo
-                            : router.push(`/dash-board/marketing/offer/${item._id}`) // Edit offer
-                        }
-                        size={22}
-                        className={`text-blue-500 ${isExpired ? 'cursor-not-allowed' : 'hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
-                      />
-                    </button>
-                    {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
-                      Edit
-                    </span>}
+            <>
+              <tr key={item?._id || index} className="hover:bg-gray-50 transition-colors">
+                <td className={`p-3 text-gray-700 ${isExpandedItem ? "text-sm" : "text-xs"}`}>{item?.promoCode || item?.offerCode}</td>
+                <td className="text-xs p-3 text-gray-700">
+                  {item?.promoDiscountType
+                    ? `${item?.promoDiscountValue} ${item?.promoDiscountType === 'Amount' ? 'Tk' : '%'}`
+                    : item?.offerDiscountType
+                      ? `${item?.offerDiscountValue} ${item?.offerDiscountType === 'Amount' ? 'Tk' : '%'}`
+                      : 'No Discount'}
+                </td>
+                <td className="text-xs p-3 text-gray-700">{item?.expiryDate}</td>
+                <td className="text-xs p-3 text-gray-700">
+                  <div className="flex items-center gap-3 cursor-pointer">
+                    <div className="group relative">
+                      <button disabled={isExpired}>
+                        <MdOutlineModeEdit
+                          onClick={() =>
+                            item?.promoCode
+                              ? router.push(`/dash-board/marketing/promo/${item._id}`) // Edit promo
+                              : router.push(`/dash-board/marketing/offer/${item._id}`) // Edit offer
+                          }
+                          size={22}
+                          className={`text-blue-500 ${isExpired ? 'cursor-not-allowed' : 'hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
+                        />
+                      </button>
+                      {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
+                        Edit
+                      </span>}
+                    </div>
+                    <div className="group relative">
+                      <button disabled={isExpired}>
+                        <RiDeleteBinLine
+                          onClick={() =>
+                            item?.promoCode
+                              ? handleDeletePromo(item._id) // Delete promo
+                              : handleDeleteOffer(item._id) // Delete offer
+                          }
+                          size={22}
+                          className={`text-red-500 ${isExpired ? 'cursor-not-allowed' : 'hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
+                        />
+                      </button>
+                      {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
+                        Delete
+                      </span>}
+                    </div>
                   </div>
-                  <div className="group relative">
-                    <button disabled={isExpired}>
-                      <RiDeleteBinLine
-                        onClick={() =>
-                          item?.promoCode
-                            ? handleDeletePromo(item._id) // Delete promo
-                            : handleDeleteOffer(item._id) // Delete offer
-                        }
-                        size={22}
-                        className={`text-red-500 ${isExpired ? 'cursor-not-allowed' : 'hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
-                      />
-                    </button>
-                    {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
-                      Delete
-                    </span>}
-                  </div>
-                </div>
-              </td>
-              <td className="text-xs p-3 text-gray-700">
+                </td>
+                <td className="text-xs p-3 text-gray-700">
 
-                {item?.promoCode ? (
-                  <CustomSwitch
-                    checked={item?.promoStatus}
-                    onChange={() => handleStatusChangePromo(item?._id, item?.promoStatus)}
-                    size="md"
-                    color="primary"
-                    disabled={isExpired}
-                  />
-                ) : (
-                  <CustomSwitch
-                    checked={item?.offerStatus}
-                    onChange={() => handleStatusChangeOffer(item?._id, item?.offerStatus)}
-                    size="md"
-                    color="primary"
-                    disabled={isExpired}
-                  />
-                )}
-
-              </td>
-              <td className="text-xs p-3 text-gray-700 cursor-pointer">
-                <div className="group relative">
-                  <button disabled={isExpired}>
-                    <FaAngleDown
-                      onClick={() =>
-                        item?.promoCode
-                          ? handleViewClickPromo(item) // Pass promo details if promoCode exists
-                          : handleViewClickOffer(item) // Pass offer details if promoCode does not exist
-                      }
-                      size={22}
-                      className={`${isExpired ? 'cursor-not-allowed' : 'hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
+                  {item?.promoCode ? (
+                    <CustomSwitch
+                      checked={item?.promoStatus}
+                      onChange={() => handleStatusChangePromo(item?._id, item?.promoStatus)}
+                      size="md"
+                      color="primary"
+                      disabled={isExpired}
                     />
-                  </button>
+                  ) : (
+                    <CustomSwitch
+                      checked={item?.offerStatus}
+                      onChange={() => handleStatusChangeOffer(item?._id, item?.offerStatus)}
+                      size="md"
+                      color="primary"
+                      disabled={isExpired}
+                    />
+                  )}
 
-                  {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
-                    See
-                  </span>}
-                </div>
-              </td>
-            </tr>
+                </td>
+                <td className="text-xs p-3 text-gray-700 cursor-pointer">
+                  <button onClick={() =>
+                    handleViewClick(item)
+                  }>
+                    {isExpandedItem ? <FaAngleUp size={22} /> : <FaAngleDown size={22} />}
+                  </button>
+                </td>
+              </tr>
+              {isExpandedItem && (
+                <tr>
+                  <td colSpan="6" className="p-4 bg-gray-100">
+                    <div className="text-sm">
+                      {item?.promoCode ? (
+                        <>
+                          <p>
+                            Total Promo Applied:
+
+                            {totalPromoApplied === 0
+                              ? " No Orders"
+                              : ` ${totalPromoApplied} ${totalPromoApplied === 1 ? " Order" : " Orders"}`}
+                          </p>
+                          <p>Total Amount Discounted : ৳ {totalAmountDiscounted}</p>
+                          <p>Minimum Order Amount : ৳ {item?.minAmount || '0'}</p>
+                          <p>Maximum Capped Amount : ৳ {item?.maxAmount || '0'}</p>
+                        </>
+                      ) : (
+                        <>
+                          {item?.imageUrl && (
+                            <Image
+                              className='h-[80px] w-[80px] rounded-lg mb-2'
+                              src={item.imageUrl}
+                              alt={item.imageUrl}
+                              height={200}
+                              width={180}
+                            />
+                          )}
+                          <p>Offer Title: {item?.offerTitle}</p>
+                          <p>
+                            Total Promo Applied:
+                            {totalOfferApplied === 0
+                              ? " No Orders"
+                              : ` ${totalOfferApplied} ${totalOfferApplied === 1 ? " Order" : " Orders"}`}
+                          </p>
+                          <p>Total Amount Discounted : ৳ {totalOfferAmountDiscounted}</p>
+                          <p>Minimum Order Amount : ৳ {item?.minAmount || '0'}</p>
+                          <p>Maximum Capped Amount : ৳ {item?.maxAmount || '0'}</p>
+                          <div className="flex items-center gap-2">
+                            Offer Related Categories:
+                            <div className='flex gap-0.5 items-center'>
+                              {item?.selectedCategories?.length > 0 ? (
+                                item.selectedCategories.map((category, index) => (
+                                  <div key={index}>
+                                    {category}
+                                    {index < item.selectedCategories.length - 1 ? ', ' : ''}
+                                  </div>
+                                ))
+                              ) : (
+                                <div>No categories selected</div>
+                              )}
+                            </div>
+                          </div>
+                          {/* <div className="flex flex-col">Offer Description :<p><MarkdownPreview content={item.offerDescription} /></p></div> */}
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </>
+
           )
         })}
       </tbody>
@@ -406,7 +463,7 @@ const RecentPromotions = () => {
         </div>
       )}
 
-      <div className="max-w-screen-2xl mx-auto custom-max-discount overflow-x-auto my-4 modal-body-scroll">
+      <div className="max-w-screen-2xl mx-auto custom-max-discount overflow-x-auto my-4">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-50 sticky top-0 z-[1] rounded-md">
             <tr>
@@ -423,18 +480,6 @@ const RecentPromotions = () => {
           {renderItems(filteredItems)}
         </table>
       </div>
-
-      {/* Promo Details Modal */}
-      <PromoDetailsModal
-        isModalOpen={isModalOpen}
-        setIsModalOpen={setIsModalOpen}
-        totalPromoApplied={selectedPromo ? totalPromoApplied : null}
-        totalAmountDiscounted={selectedPromo ? totalAmountDiscounted : null}
-        totalOfferApplied={selectedOffer ? totalOfferApplied : null}  // New prop for total offers applied
-        totalOfferAmountDiscounted={selectedOffer ? totalOfferAmountDiscounted : null}  // New prop for total offer amount discounted
-        promo={selectedPromo}
-        offer={selectedOffer}  // Passing the selected offer
-      />
     </>
   );
 };

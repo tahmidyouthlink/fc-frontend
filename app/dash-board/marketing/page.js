@@ -16,12 +16,12 @@ const Marketing = () => {
   return (
     <div className='px-6 md:px-10'>
       <div className="bg-white sticky top-0 z-10">
-        <h1 className="font-bold text-4xl py-6 bg-white">Marketing</h1>
+        <h1 className="font-bold text-lg lg:text-xl 2xl:text-2xl py-1 2xl:py-3 bg-white">Marketing</h1>
 
         <div className="flex items-center gap-3 bg-white">
 
           <button
-            className={`relative py-2 px-4 transition-all duration-300
+            className={`relative text-sm py-1 transition-all duration-300
         ${activeTab === 'view performance' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
         after:absolute after:left-0 after:right-0 hover:text-[#D2016E] after:bottom-0 
         after:h-[2px] after:bg-[#D2016E] after:transition-all after:duration-300
@@ -33,7 +33,7 @@ const Marketing = () => {
           </button>
 
           <button
-            className={`relative px-4 py-2 transition-all duration-300
+            className={`relative text-sm py-1 transition-all duration-300
         ${activeTab === 'create promotions' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
         after:absolute after:left-0 after:right-0 after:bottom-0 
         after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300
@@ -47,13 +47,13 @@ const Marketing = () => {
         </div>
       </div>
 
-      {activeTab === "view performance" && <div className='pt-6'>
-        <h1 className='font-bold text-xl'>Promotion Performance</h1>
-        <p className='pt-1 text-neutral-400 font-medium'>The data includes all active, ended, or canceled deals. This report represents unaudited data, please refer to your invoice for accurate settlement numbers.</p>
+      {activeTab === "view performance" && <div className='pt-4'>
+        <h1 className='font-bold'>Promotion Performance</h1>
+        <p className='pt-1 text-neutral-400 text-sm font-medium'>The data includes all active, ended, or canceled deals. This report represents unaudited data, please refer to your invoice for accurate settlement numbers.</p>
         <PromotionPerformance />
 
-        <h1 className='font-bold text-xl pt-8'>Recent Promotions</h1>
-        <p className='pt-1 pb-8 text-neutral-400 font-medium'>Please use the following table to view your past and upcoming promotions.</p>
+        <h1 className='font-bold'>Recent Promotions</h1>
+        <p className='pt-1 pb-8 text-neutral-400 text-sm font-medium'>Please use the following table to view your past and upcoming promotions.</p>
         <RecentPromotions />
       </div>}
 

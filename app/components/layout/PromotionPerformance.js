@@ -254,25 +254,25 @@ const PromotionPerformanceChart = () => {
         <div className="flex items-center justify-center gap-2">
           <button
             onClick={() => handleDateFilter('today')}
-            className={`px-2 py-1 text-xs md:text-sm lg:text-base md:py-2 md:px-4 ${activeFilter === 'today' ? 'text-[#D2016E] border rounded-full border-[#D2016E] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
+            className={`px-2 py-1 text-xs md:text-sm md:py-2 md:px-4 ${activeFilter === 'today' ? 'text-[#D2016E] border rounded-full border-[#D2016E] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
           >
             Today
           </button>
           <button
             onClick={() => handleDateFilter('yesterday')}
-            className={`px-2 py-1 text-xs md:text-sm lg:text-base md:py-2 md:px-4 ${activeFilter === 'yesterday' ? 'text-[#D2016E] border rounded-full border-[#D2016E] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
+            className={`px-2 py-1 text-xs md:text-sm md:py-2 md:px-4 ${activeFilter === 'yesterday' ? 'text-[#D2016E] border rounded-full border-[#D2016E] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
           >
             Yesterday
           </button>
           <button
             onClick={() => handleDateFilter('last7days')}
-            className={`px-2 py-1 text-xs md:text-sm lg:text-base md:py-2 md:px-4 ${activeFilter === 'last7days' ? 'text-[#D2016E] border rounded-full border-[#D2016E] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
+            className={`px-2 py-1 text-xs md:text-sm md:py-2 md:px-4 ${activeFilter === 'last7days' ? 'text-[#D2016E] border rounded-full border-[#D2016E] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
           >
             Last 7 Days
           </button>
           <button
             onClick={() => handleDateFilter('lastMonth')}
-            className={`px-2 py-1 text-xs md:text-sm lg:text-base md:py-2 md:px-4 ${activeFilter === 'lastMonth' ? 'text-[#D2016E] border rounded-full border-[#D2016E] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
+            className={`px-2 py-1 text-xs md:text-sm md:py-2 md:px-4 ${activeFilter === 'lastMonth' ? 'text-[#D2016E] border rounded-full border-[#D2016E] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
           >
             Last Month
           </button>
@@ -309,7 +309,7 @@ const PromotionPerformanceChart = () => {
 
       <div className="flex flex-col lg:flex-row items-center justify-center gap-6">
         {/* Summary Section */}
-        <div className='flex items-center justify-center gap-6 w-1/2 xl:w-3/4 lg:min-h-[150px] lg:max-h-[150px] mt-0 md:mt-6 xl:mt-0'>
+        <div className='flex lg:flex-col xl:flex-row items-center justify-center gap-6 w-1/3 xl:w-3/4 lg:min-h-[150px] lg:max-h-[150px]'>
           <div className="border rounded-lg p-4 md:p-8 space-y-3">
             <p className="text-[10px] md:text-sm xl:text-base font-semibold">Discounted orders</p>
             <h3 className="font-bold md:text-xl lg:text-2xl xl:text-3xl">{totalPromoAndOfferApplied}</h3>
@@ -322,7 +322,7 @@ const PromotionPerformanceChart = () => {
           </div>
         </div>
 
-        <div className="w-full h-[400px] flex items-center justify-center mt-12">
+        <div className="w-full h-[400px] flex items-center justify-center mt-2 lg:mt-6 xl:mt-2 2xl:mt-0">
           {dailyData.length === 0 ? (
             <div className="text-center text-gray-500">
               <p className="text-lg font-medium text-gray-500">No data available for the selected day.<br /> Please choose a different date or date range to see results.</p>
@@ -343,14 +343,14 @@ const PromotionPerformanceChart = () => {
                   )}
                 </BarChart>
               </ResponsiveContainer>
-              <div className="flex gap-4 justify-center">
+              <div className="flex md:gap-4 justify-center">
                 <CheckboxGroup
                   value={selected}
                   onChange={handleChange}
                   orientation="horizontal"
                 >
-                  <Checkbox color="danger" value="totalDiscountedAmount"><span className='text-[#F53B7B]'>Total Discounted Amount (৳)</span></Checkbox>
-                  <Checkbox color="primary" value="totalDiscountedOrders"><span className='text-[#3480A3]'>Total Discounted Orders</span></Checkbox>
+                  <Checkbox color="danger" value="totalDiscountedAmount"><span className='text-sm xl:text-base text-[#F53B7B]'>Total Discounted Amount (৳)</span></Checkbox>
+                  <Checkbox color="primary" value="totalDiscountedOrders"><span className='text-sm xl:text-base text-[#3480A3]'>Total Discounted Orders</span></Checkbox>
                 </CheckboxGroup>
               </div>
             </div>

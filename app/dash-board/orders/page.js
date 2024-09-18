@@ -452,7 +452,7 @@ const OrdersPage = () => {
       <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
         <ModalContent>
           <ModalHeader>Choose Columns</ModalHeader>
-          <ModalBody>
+          <ModalBody className="modal-body-scroll">
             <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
               {columns.map((column) => (
                 <Checkbox key={column} value={column} isDisabled={defaultColumns.includes(column)}>

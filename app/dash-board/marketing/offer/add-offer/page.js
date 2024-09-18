@@ -91,7 +91,6 @@ const AddOffer = () => {
   const onSubmit = async (data) => {
     const { offerCode, offerTitle, offerDiscountValue, expiryDate, maxAmount, minAmount } = data;
 
-
     // Check if expiryDate is selected
     if (!expiryDate) {
       setDateError(true);
