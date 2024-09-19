@@ -177,7 +177,7 @@ export default function EditShippingZone() {
                 type="number"
                 placeholder="Enter Shipping Charge"
                 {...register('shippingCharge', { required: 'Shipping Charge is required' })}
-                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-300 rounded-md shadow-sm"
+                className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-300 rounded-md shadow-sm"
               />
               {/* Display error message for this field */}
               {errors.shippingCharge && (

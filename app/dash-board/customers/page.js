@@ -376,7 +376,7 @@ const Customers = () => {
                   )}
 
                   {selectedColumns.includes('Customer Name') && (
-                    <td className="text-xs p-3 text-gray-700">
+                    <td className="text-xs p-3 text-gray-700 uppercase">
                       {customer?.customerName}
                     </td>
                   )}

@@ -536,7 +536,7 @@ const OrdersPage = () => {
                   <td className="text-xs p-3 text-gray-700">{order?.dateTime}</td>
                 )}
                 {selectedColumns.includes('Customer Name') && (
-                  <td className="text-xs p-3 text-gray-700">{order?.customerName}</td>
+                  <td className="text-xs p-3 text-gray-700 uppercase">{order?.customerName}</td>
                 )}
                 {selectedColumns.includes('Order Amount') && (
                   <td className="text-xs p-3 text-gray-700 pl-1 md:pl-2 lg:pl-4 xl:pl-9">৳ {order?.totalAmount.toFixed(2)}</td>

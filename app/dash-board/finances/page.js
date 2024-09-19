@@ -1,4 +1,5 @@
 "use client";
+import FinancePerformance from '@/app/components/layout/FinancePerformance';
 import PaymentCard from '@/app/components/layout/PaymentCard';
 import React, { useState } from 'react';
 
@@ -43,7 +44,7 @@ const Finances = () => {
       {activeTab === "finance performance" && <div className='pt-4'>
         <h1 className='font-bold'>Finance Performance</h1>
         <p className='pt-1 text-neutral-400 text-sm font-medium'>The data includes all active, ended, or canceled deals. This report represents unaudited data, please refer to your invoice for accurate settlement numbers.</p>
-
+        <FinancePerformance />
       </div>}
 
       {activeTab === "payment method" && <div className='pt-4'>

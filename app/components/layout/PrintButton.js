@@ -8,6 +8,23 @@ function addGaps(text, gap = ' ') {
   return text.split('').join(gap);
 }
 
+// Generate Barcode as PNG Data URL
+const generateBarcodeData = (orderNumber) => {
+  const canvas = document.createElement('canvas');
+  JsBarcode(canvas, orderNumber, {
+    format: 'CODE128',
+    displayValue: false,       // Make sure this is true to display the text
+    fontSize: 20,             // Adjusted font size for better readability
+    width: 2,                 // Thicker lines
+    height: 60,               // Increased height for clarity
+    textAlign: 'center',      // Center-align the text
+    textMargin: 2,           // Margin between barcode and text
+    background: '#ffffff',    // White background for better contrast
+    lineColor: '#000000'      // Black lines for maximum contrast
+  });
+  return canvas.toDataURL('image/png');
+};
+
 const PrintButton = ({ selectedOrder }) => {
 
   const handlePrint = async (selectedOrder) => {
@@ -88,7 +105,7 @@ const PrintButton = ({ selectedOrder }) => {
 
     // Create an array of lines with different formatting
     const customerDetails = [
-      { text: selectedOrder.customerName, fontSize: largeFontSize, fontWeight: boldFontStyle },
+      { text: selectedOrder.customerName.toUpperCase(), fontSize: largeFontSize, fontWeight: boldFontStyle, },
       { text: `${selectedOrder.address1}${selectedOrder.address2 ? ', ' + selectedOrder.address2 : ''}, ${selectedOrder.city}, ${selectedOrder.postalCode}`, fontSize: smallFontSize, fontWeight: '' },
       { text: phoneNumberWithGaps, fontSize: largeFontSize, fontWeight: boldFontStyle },
       { text: phoneNumber2WithGaps, fontSize: largeFontSize, fontWeight: boldFontStyle },
@@ -103,6 +120,10 @@ const PrintButton = ({ selectedOrder }) => {
       pdf.text(text, margin, yPosition);
       yPosition += lineHeight; // Increment Y position for the next line
     });
+
+    // Barcode
+    const barcodeDataUrl = generateBarcodeData(selectedOrder.orderNumber);
+    pdf.addImage(barcodeDataUrl, 'PNG', margin, yPosition, 80, 30);
 
     // Additional Info aligned to the right with smaller font size
     pdf.setFontSize(10);
@@ -142,22 +163,6 @@ const PrintButton = ({ selectedOrder }) => {
     pdf.text(`Payment Status: ${paymentStatus}`, xPosition, yPositionInvoice, { align: 'right' });
     yPositionInvoice += lineHeight;
 
-    pdf.autoTable({
-      startY: margin + 80,
-      head: [['#Title', 'Color', 'Size', 'Price', 'QTY', 'Total']],
-      body: selectedOrder.productInformation.map(product => [
-        product.productTitle,
-        product.color?.label || '',
-        product.size || '',
-        `${product.unitPrice?.toFixed(2)}`,
-        product.sku,
-        `${(product.unitPrice * product.sku).toFixed(2)}`
-      ]),
-      theme: 'grid',
-      headStyles: { fillColor: primaryColor, textColor: 255 },
-      styles: { fontSize: 10, valign: 'middle', halign: 'center' },
-    });
-
     const subtotal = parseFloat(selectedOrder.productInformation.reduce((total, product) => total + (product.unitPrice * product.sku), 0).toFixed(2));
     const shippingCharge = parseFloat(selectedOrder.shippingCharge?.toFixed(2) || "0.00");
 
@@ -192,8 +197,8 @@ const PrintButton = ({ selectedOrder }) => {
     const total = (subtotal - discountAmount + shippingCharge).toFixed(2);
 
     pdf.autoTable({
-      startY: margin + 80,
-      head: [['#Title', 'Color', 'Size', 'Price', 'QTY', 'Total']],
+      startY: margin + 90, // Adjust starting Y position
+      head: [['#Title', 'Color', 'Size', 'Price', 'QTY', 'Total']], // Table headers
       body: [
         ...selectedOrder.productInformation.map(product => [
           product.productTitle,
@@ -202,18 +207,32 @@ const PrintButton = ({ selectedOrder }) => {
           `${product.unitPrice?.toFixed(2)}`,
           product.sku,
           `BDT ${(product.unitPrice * product.sku).toFixed(2)}`
-        ]),
-        [{ content: 'Sub Total:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `BDT ${subtotal.toFixed(2)}`],
-        ...(discountAmount > 0 ? [[{ content: discountLabel, colSpan: 5, styles: { halign: 'right', border: 'none' } }, `BDT -${discountAmount}`]] : []),
-        [{ content: 'Shipping Charge:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `BDT +${shippingCharge.toFixed(2)}`],
-        [{ content: 'Total:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `BDT ${total}`]
+        ]), // Add all product rows
+
+        // Subtotal Row
+        [{ content: 'Subtotal:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `BDT ${subtotal.toFixed(2)}`],
+
+        // Discount Row (only show if applicable)
+        ...(discountAmount > 0
+          ? [[{ content: discountLabel, colSpan: 5, styles: { halign: 'right', border: 'none' } }, `BDT -${discountAmount}`]]
+          : []),
+
+        // Shipping Charge Row
+        [{ content: 'Shipping Charge:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `BDT ${shippingCharge.toFixed(2)}`],
+
+        // Total Row
+        [{ content: 'Total:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `BDT ${total}`]
       ],
-      theme: 'grid',
-      headStyles: { fillColor: primaryColor, textColor: 255 },
-      styles: { fontSize: 10, valign: 'middle', halign: 'center' },
+      theme: 'plain', // No borders for the table
+      styles: {
+        fontSize: 10, // Font size for table content
+        valign: 'middle',
+        halign: 'center',
+        cellPadding: 3, // Adjust cell padding as needed
+      },
       columnStyles: {
-        0: { cellWidth: 'auto' },
-        5: { fontStyle: 'bold', halign: 'center', fillColor: [255, 255, 255], textColor: [0, 0, 0] },
+        0: { halign: 'left' }, // Align product titles to the left
+        5: { halign: 'right', fontStyle: 'bold' }, // Right align price columns, bold total
       }
     });
 
@@ -267,9 +286,11 @@ const PrintButton = ({ selectedOrder }) => {
   };
 
   return (
-    <Button color="primary" onPress={() => handlePrint(selectedOrder)}>
-      Print Invoice
-    </Button>
+    <>
+      <Button color="primary" onPress={() => handlePrint(selectedOrder)}>
+        Print Invoice
+      </Button>
+    </>
   );
 };
 
