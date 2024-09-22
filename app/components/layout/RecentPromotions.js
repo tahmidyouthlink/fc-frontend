@@ -10,7 +10,6 @@ import usePromoCodes from '@/app/hooks/usePromoCodes';
 import toast from 'react-hot-toast';
 import useOffers from '@/app/hooks/useOffers';
 import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
-import Image from 'next/image';
 
 const RecentPromotions = () => {
 
@@ -59,7 +58,20 @@ const RecentPromotions = () => {
     return [...(activeOffers || []), ...(expiredOffers || [])];
   }, [activeOffers, expiredOffers]);
 
-  const allItems = useMemo(() => [...(allPromos || []), ...(allOffers || [])], [allPromos, allOffers]);
+  const allItems = useMemo(() => {
+    const combinedItems = [
+      ...(promoList || []), // Contains all promos
+      ...(offerList || []), // Contains all offers
+    ];
+
+    // Sort combined items by _id (MongoDB ObjectId) or createdAt field
+    return combinedItems.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt) : new Date(parseInt(a._id.substring(0, 8), 16) * 1000);
+      const dateB = b.createdAt ? new Date(b.createdAt) : new Date(parseInt(b._id.substring(0, 8), 16) * 1000);
+
+      return dateB - dateA; // Newest first
+    });
+  }, [promoList, offerList]);
 
   // Function to filter based on the search query and tab/dropdown selection
   const filterItems = (items) => {
@@ -67,7 +79,6 @@ const RecentPromotions = () => {
     const query = searchQuery.toLowerCase();
     return items.filter(item =>
       item?.promoCode?.toLowerCase().includes(query) ||
-      item?.offerCode?.toLowerCase().includes(query) ||
       item?.offerTitle?.toLowerCase().includes(query) ||
       item?.expiryDate?.toLowerCase().includes(query) ||
       (item?.promoDiscountValue && item.promoDiscountValue.toString().includes(query)) ||
@@ -95,37 +106,83 @@ const RecentPromotions = () => {
   }, [isExpanded, offerList, promoList]);
 
   const totalPromoApplied = useMemo(() => {
-    return orderList?.filter(order => order?.promoCode === selectedPromo?.promoCode).length;
+    if (!selectedPromo?.promoCode) return 0;
+
+    return orderList?.filter(order => order.promoCode === selectedPromo.promoCode).length || 0;
   }, [orderList, selectedPromo]);
 
   const totalAmountDiscounted = useMemo(() => {
-    return orderList?.reduce((total, order) => {
-      if (order?.promoCode === selectedPromo?.promoCode) {
-        if (order?.promoDiscountType === 'Percentage') {
-          return total + (order?.totalAmount * (order?.promoDiscountValue / 100));
-        } else if (order?.promoDiscountType === 'Amount') {
-          return total + order?.promoDiscountValue;
+    if (!selectedPromo?.promoCode) return '0.00';
+
+    const totalDiscount = orderList?.reduce((acc, order) => {
+      if (order.promoCode !== selectedPromo.promoCode) return acc;
+
+      let offerDiscountTotal = 0;
+
+      // Calculate total offer discounts for the order (across all products)
+      order.productInformation.forEach(product => {
+        if (product.offerTitle && product.offerDiscountValue > 0) {
+          const productTotal = product.unitPrice * product.sku;
+
+          if (product.offerDiscountType === 'Percentage') {
+            offerDiscountTotal += (product.offerDiscountValue / 100) * productTotal;
+          } else if (product.offerDiscountType === 'Amount') {
+            offerDiscountTotal += product.offerDiscountValue;
+          }
         }
+      });
+
+      // Adjusted order total after offer discounts
+      const adjustedOrderTotal = order.totalAmount - offerDiscountTotal;
+
+      // Calculate promo discount on adjusted order total
+      let promoDiscount = 0;
+      if (order.promoDiscountType === 'Percentage') {
+        promoDiscount = (order.promoDiscountValue / 100) * adjustedOrderTotal;
+      } else if (order.promoDiscountType === 'Amount') {
+        promoDiscount = order.promoDiscountValue;
       }
-      return total;
-    }, 0).toFixed(2);
+
+      return acc + promoDiscount;
+    }, 0) || 0;
+
+    return totalDiscount.toFixed(2);
   }, [orderList, selectedPromo]);
 
   const totalOfferApplied = useMemo(() => {
-    return orderList?.filter(order => order?.offerCode === selectedOffer?.offerCode).length;
+    if (!selectedOffer?.offerTitle) return 0;
+
+    return orderList?.reduce((count, order) => {
+      const offerCount = order.productInformation.filter(
+        product => product.offerTitle === selectedOffer.offerTitle
+      ).length;
+      return count + offerCount;
+    }, 0) || 0;
   }, [orderList, selectedOffer]);
 
   const totalOfferAmountDiscounted = useMemo(() => {
-    return orderList?.reduce((total, order) => {
-      if (order?.offerCode === selectedOffer?.offerCode) {
-        if (order?.offerDiscountType === 'Percentage') {
-          return total + (order?.totalAmount * (order?.offerDiscountValue / 100));
-        } else if (order?.offerDiscountType === 'Amount') {
-          return total + order?.offerDiscountValue;
+    if (!selectedOffer?.offerTitle) return '0.00';
+
+    const totalDiscount = orderList?.reduce((acc, order) => {
+      const offerDiscountTotal = order.productInformation.reduce((prodAcc, product) => {
+        if (product.offerTitle !== selectedOffer.offerTitle) return prodAcc;
+
+        const productSubtotal = product.unitPrice * product.sku;
+        let discount = 0;
+
+        if (product.offerDiscountType === 'Percentage') {
+          discount = (product.offerDiscountValue / 100) * productSubtotal;
+        } else if (product.offerDiscountType === 'Amount') {
+          discount = product.offerDiscountValue;
         }
-      }
-      return total;
-    }, 0).toFixed(2);
+
+        return prodAcc + discount;
+      }, 0);
+
+      return acc + offerDiscountTotal;
+    }, 0) || 0;
+
+    return totalDiscount.toFixed(2);
   }, [orderList, selectedOffer]);
 
   const handleDeletePromo = async (id) => {
@@ -228,7 +285,7 @@ const RecentPromotions = () => {
           return (
             <>
               <tr key={item?._id || index} className="hover:bg-gray-50 transition-colors">
-                <td className={`p-3 text-gray-700 ${isExpandedItem ? "text-sm" : "text-xs"}`}>{item?.promoCode || item?.offerCode}</td>
+                <td className={`p-3 text-gray-700 ${isExpandedItem ? "text-base font-bold" : "text-xs"}`}>{item?.promoCode || item?.offerTitle}</td>
                 <td className="text-xs p-3 text-gray-700">
                   {item?.promoDiscountType
                     ? `${item?.promoDiscountValue} ${item?.promoDiscountType === 'Amount' ? 'Tk' : '%'}`
@@ -298,7 +355,7 @@ const RecentPromotions = () => {
                   <button onClick={() =>
                     handleViewClick(item)
                   }>
-                    {isExpandedItem ? <FaAngleUp size={22} /> : <FaAngleDown size={22} />}
+                    {isExpandedItem ? <FaAngleUp className='hover:text-red-600' size={22} /> : <FaAngleDown className='hover:text-red-600' size={22} />}
                   </button>
                 </td>
               </tr>
@@ -309,7 +366,7 @@ const RecentPromotions = () => {
                       {item?.promoCode ? (
                         <>
                           <p>
-                            Total Promo Applied:
+                            Total Applied:
 
                             {totalPromoApplied === 0
                               ? " No Orders"
@@ -321,18 +378,8 @@ const RecentPromotions = () => {
                         </>
                       ) : (
                         <>
-                          {item?.imageUrl && (
-                            <Image
-                              className='h-[80px] w-[80px] rounded-lg mb-2'
-                              src={item.imageUrl}
-                              alt={item.imageUrl}
-                              height={200}
-                              width={180}
-                            />
-                          )}
-                          <p>Offer Title: {item?.offerTitle}</p>
                           <p>
-                            Total Promo Applied:
+                            Total Applied:
                             {totalOfferApplied === 0
                               ? " No Orders"
                               : ` ${totalOfferApplied} ${totalOfferApplied === 1 ? " Order" : " Orders"}`}
@@ -340,22 +387,6 @@ const RecentPromotions = () => {
                           <p>Total Amount Discounted : ৳ {totalOfferAmountDiscounted}</p>
                           <p>Minimum Order Amount : ৳ {item?.minAmount || '0'}</p>
                           <p>Maximum Capped Amount : ৳ {item?.maxAmount || '0'}</p>
-                          <div className="flex items-center gap-2">
-                            Offer Related Categories:
-                            <div className='flex gap-0.5 items-center'>
-                              {item?.selectedCategories?.length > 0 ? (
-                                item.selectedCategories.map((category, index) => (
-                                  <div key={index}>
-                                    {category}
-                                    {index < item.selectedCategories.length - 1 ? ', ' : ''}
-                                  </div>
-                                ))
-                              ) : (
-                                <div>No categories selected</div>
-                              )}
-                            </div>
-                          </div>
-                          {/* <div className="flex flex-col">Offer Description :<p><MarkdownPreview content={item.offerDescription} /></p></div> */}
                         </>
                       )}
                     </div>
@@ -363,7 +394,6 @@ const RecentPromotions = () => {
                 </tr>
               )}
             </>
-
           )
         })}
       </tbody>
@@ -382,7 +412,8 @@ const RecentPromotions = () => {
     } else if (selectedOption === 'offers') {
       return activeTab === 'all' ? allOffers : activeTab === 'active' ? activeOffers : expiredOffers;
     } else {
-      return allItems;  // "all" includes both promos and offers combined
+      // Combined promos and offers sorted by creation date
+      return allItems;
     }
   };
 
@@ -392,11 +423,11 @@ const RecentPromotions = () => {
   const renderHeading = () => {
     switch (selectedOption) {
       case "offers":
-        return "Offer Code";
+        return "Offer Title";
       case "promos":
         return "Promo Code";
       default:
-        return "Promo Code / Offer Code";
+        return "Promo Code / Offer Title";
     }
   };
 
@@ -451,14 +482,14 @@ const RecentPromotions = () => {
         after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300 ${activeTab === 'active' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
             onClick={() => setActiveTab('active')}
           >
-            {selectedOption === 'promos' ? `Active Promos (${activePromos.length})` : `Active Offers (${activeOffers.length})`}
+            {selectedOption === 'promos' ? `Active (${activePromos.length})` : `Active (${activeOffers.length})`}
           </button>
           <button
             className={`relative px-4 py-2 transition-all duration-300 ${activeTab === 'expired' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 
         after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300 ${activeTab === 'expired' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
             onClick={() => setActiveTab('expired')}
           >
-            {selectedOption === 'promos' ? `Used Promos (${expiredPromos.length})` : `Used Offers (${expiredOffers.length})`}
+            {selectedOption === 'promos' ? `Expired (${expiredPromos.length})` : `Expired (${expiredOffers.length})`}
           </button>
         </div>
       )}

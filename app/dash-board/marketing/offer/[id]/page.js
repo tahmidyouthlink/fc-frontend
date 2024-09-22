@@ -33,7 +33,6 @@ const EditOffer = () => {
   const [image, setImage] = useState(null);
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [sizeError, setSizeError] = useState(false);
   const [dateError, setDateError] = useState(false)
   const [offerDetails, setOfferDetails] = useState(null);
 
@@ -60,7 +59,6 @@ const EditOffer = () => {
         const fetchedExpiryDate = formatDateForInput(offer.expiryDate);
 
         // Set form fields with fetched offer data
-        setValue('offerCode', offer?.offerCode);
         setValue('offerTitle', offer?.offerTitle);
         setValue('offerDiscountValue', offer?.offerDiscountValue);
         setExpiryDate(fetchedExpiryDate); // Ensure no time zone shift
@@ -136,7 +134,7 @@ const EditOffer = () => {
   };
 
   const onSubmit = async (data) => {
-    const { offerCode, offerTitle, offerDiscountValue, maxAmount, minAmount } = data;
+    const { offerTitle, offerDiscountValue, maxAmount, minAmount } = data;
 
     let hasError = false;
 
@@ -179,7 +177,6 @@ const EditOffer = () => {
 
     try {
       const updatedDiscount = {
-        offerCode,
         offerTitle,
         offerDiscountValue,
         offerDiscountType,
@@ -224,14 +221,6 @@ const EditOffer = () => {
           <div className='grid grid-cols-1 lg:grid-cols-12'>
             <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 mt-6 px-6 py-3'>
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-                <div>
-                  <label htmlFor='offerCode' className='flex justify-start font-medium text-[#D2016E]'>Offer Code *</label>
-                  <input id='offerCode' {...register("offerCode", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="text" />
-                  {errors.offerCode?.type === "required" && (
-                    <p className="text-red-600 text-left">Offer Code is required</p>
-                  )}
-                </div>
-
                 <div>
                   <label htmlFor='offerTitle' className='flex justify-start font-medium text-[#D2016E]'>Offer Title *</label>
                   <input id='offerTitle' {...register("offerTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="text" />

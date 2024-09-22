@@ -146,6 +146,8 @@ const OrdersPage = () => {
       const size = (typeof product.size === 'string' ? product.size : '').toLowerCase();
       const color = (product.color?.label || '').toString().toLowerCase();
       const batchCode = (product.batchCode || '').toString().toLowerCase();
+      const offerTitle = (product.offerTitle || '').toString().toLowerCase();
+      const offerDiscountValue = (product.offerDiscountValue || '').toString();
       const sku = (product.sku || '').toString(); // SKU might be numeric, so keep it as a string
 
       return (
@@ -153,6 +155,8 @@ const OrdersPage = () => {
         size.includes(query) ||
         color.includes(query) ||
         batchCode.includes(query) ||
+        offerTitle.includes(query) ||
+        offerDiscountValue.includes(query) ||
         (isNumberQuery && sku === query) // Numeric comparison for SKU
       );
     });
@@ -177,7 +181,6 @@ const OrdersPage = () => {
       (order.promoDiscountValue || '').toString().includes(query) ||
       (order.offerDiscountValue || '').toString().includes(query) ||
       (order.promoCode || '').toLowerCase().includes(query) ||
-      (order.offerCode || '').toLowerCase().includes(query) ||
       (order.offerTitle || '').toLowerCase().includes(query) ||
       (order.transactionId || '').toLowerCase().includes(query) ||
       (order.trackingNumber || '').toLowerCase().includes(query) ||
@@ -357,8 +360,8 @@ const OrdersPage = () => {
   return (
     <div className='max-w-screen-2xl px-0 md:px-6 2xl:px-0 mx-auto'>
 
-      <div className='flex flex-col md:flex-row items-center justify-between my-2 md:my-5'>
-        <h3 className='px-6 w-full text-center md:text-start font-medium md:font-semibold text-[13px] md:text-xl lg:text-2xl'>Order Management</h3>
+      <div className='flex flex-col md:flex-row items-center justify-between my-2 md:my-5 gap-2'>
+        <h3 className='px-6 w-full text-center md:text-start font-medium md:font-semibold text-xl lg:text-2xl'>Order Management</h3>
 
         <div className='flex w-full items-center max-w-screen-2xl px-3 mx-auto justify-center md:justify-end md:gap-6'>
 
@@ -679,36 +682,64 @@ const OrdersPage = () => {
               <div className='flex items-center gap-1 text-xs md:text-sm'>
                 <p className=''>Total Amount:  ৳ {selectedOrder?.totalAmount.toFixed(2)}</p>,
                 <p className=''>
-                  {selectedOrder?.promoCode ? (
-                    <>
-                      Promo applied: {selectedOrder.promoDiscountValue > 0 ? (
-                        selectedOrder.promoDiscountType === 'Percentage' ? (
-                          `${selectedOrder.promoDiscountValue.toFixed(2)}%`
-                        ) : (
-                          `৳ ${selectedOrder.promoDiscountValue.toFixed(2)}`
-                        )
-                      ) : (
-                        '৳ 0.00'
-                      )}
-                    </>
-                  ) : selectedOrder?.offerCode ? (
-                    <>
-                      Offer applied: {selectedOrder.offerDiscountValue > 0 ? (
-                        selectedOrder.offerDiscountType === 'Percentage' ? (
-                          `${selectedOrder.offerDiscountValue.toFixed(2)}%`
-                        ) : (
-                          `৳ ${selectedOrder.offerDiscountValue.toFixed(2)}`
-                        )
-                      ) : (
-                        '৳ 0.00'
-                      )}
-                    </>
+                  {selectedOrder?.promoCode || selectedOrder?.productInformation?.some((product) => product.offerTitle) ? (
+                    (() => {
+                      // Calculate promo discount only if it's greater than 0
+                      const promoDiscount =
+                        selectedOrder.promoDiscountType === 'Percentage'
+                          ? (selectedOrder.totalAmount * selectedOrder.promoDiscountValue) / 100
+                          : selectedOrder.promoDiscountValue;
+
+                      // Extract offer discounts from productInformation and filter out 0-value offers
+                      const offerDetails = selectedOrder.productInformation
+                        .map((product) => {
+                          const offerDiscount =
+                            product.offerDiscountType === 'Percentage'
+                              ? (product.unitPrice * product.offerDiscountValue) / 100
+                              : product.offerDiscountValue;
+
+                          return {
+                            offerTitle: product.offerTitle,
+                            offerDiscountType: product.offerDiscountType,
+                            offerDiscountValue: product.offerDiscountValue,
+                            offerDiscountAmount: offerDiscount,
+                          };
+                        })
+                        .filter((offer) => offer.offerDiscountAmount > 0); // Filter out 0-value offers
+
+                      return (
+                        <>
+                          {/* Show promo discount if applied */}
+                          {selectedOrder.promoCode && promoDiscount > 0 ? (
+                            <>
+                              Promo applied: {selectedOrder.promoDiscountType === 'Percentage'
+                                ? `${selectedOrder.promoDiscountValue.toFixed(2)}%`
+                                : `৳ ${selectedOrder.promoDiscountValue.toFixed(2)}`}
+                              <br />
+                            </>
+                          ) : null}
+
+                          {/* Show multiple offers if they are applied */}
+                          {offerDetails.length > 0 ? (
+                            <>
+                              {offerDetails.map((offer, index) => (
+                                <span key={index}>
+                                  Offer applied ({offer.offerTitle}):{' '}
+                                  {offer.offerDiscountType === 'Percentage'
+                                    ? `${offer.offerDiscountValue.toFixed(2)}%`
+                                    : `৳ ${offer.offerDiscountAmount.toFixed(2)}`}
+                                  <br />
+                                </span>
+                              ))}
+                            </>
+                          ) : null}
+                        </>
+                      );
+                    })()
                   ) : (
                     'Promo / Offer applied : X'
                   )}
                 </p>
-
-
               </div>
               <PrintButton selectedOrder={selectedOrder} />
             </ModalFooter>

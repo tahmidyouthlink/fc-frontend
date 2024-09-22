@@ -16,7 +16,7 @@ const generateBarcodeData = (orderNumber) => {
     displayValue: false,       // Make sure this is true to display the text
     fontSize: 20,             // Adjusted font size for better readability
     width: 2,                 // Thicker lines
-    height: 60,               // Increased height for clarity
+    height: 40,               // Increased height for clarity
     textAlign: 'center',      // Center-align the text
     textMargin: 2,           // Margin between barcode and text
     background: '#ffffff',    // White background for better contrast
@@ -123,7 +123,7 @@ const PrintButton = ({ selectedOrder }) => {
 
     // Barcode
     const barcodeDataUrl = generateBarcodeData(selectedOrder.orderNumber);
-    pdf.addImage(barcodeDataUrl, 'PNG', margin, yPosition, 80, 30);
+    pdf.addImage(barcodeDataUrl, 'PNG', margin, yPosition + 10, 80, 30);
 
     // Additional Info aligned to the right with smaller font size
     pdf.setFontSize(10);
@@ -156,121 +156,156 @@ const PrintButton = ({ selectedOrder }) => {
     pdf.text(`Shipping Method: ${selectedOrder.shippingMethod.trim()}`, xPosition, yPositionInvoice, { align: 'right' });
     yPositionInvoice += lineHeight;
 
-    // Payment status
-    const paymentStatus = selectedOrder.paymentStatus
-      ? selectedOrder.paymentStatus.trim()
-      : `Payable: ${selectedOrder.paymentPayable.trim()}`;
-    pdf.text(`Payment Status: ${paymentStatus}`, xPosition, yPositionInvoice, { align: 'right' });
+    // Shipping zone
+    pdf.text(`Shipping Zone: ${selectedOrder.shippingZone.trim()}`, xPosition, yPositionInvoice, { align: 'right' });
     yPositionInvoice += lineHeight;
 
-    const subtotal = parseFloat(selectedOrder.productInformation.reduce((total, product) => total + (product.unitPrice * product.sku), 0).toFixed(2));
-    const shippingCharge = parseFloat(selectedOrder.shippingCharge?.toFixed(2) || "0.00");
+    // Payment status
+    pdf.text(`Payment Status: ${selectedOrder.paymentStatus.trim()}`, xPosition, yPositionInvoice, { align: 'right' });
+    yPositionInvoice += lineHeight;
 
-    // Check if Promo or Offer is applied
+    // Payment method
+    pdf.text(`Payment Method: ${selectedOrder.paymentMethod.trim()}`, xPosition, yPositionInvoice, { align: 'right' });
+    yPositionInvoice += lineHeight;
+
+    // Vendor
+    pdf.text(`Vendor: ${selectedOrder.vendor.trim()}`, xPosition, yPositionInvoice, { align: 'right' });
+    yPositionInvoice += lineHeight;
+
+    // Tracking Number
+    pdf.text(
+      `Tracking Number: ${selectedOrder.trackingNumber?.trim() || "--"}`,
+      xPosition,
+      yPositionInvoice,
+      { align: 'right' }
+    );
+    yPositionInvoice += lineHeight;
+
+    // Check if any product has an offer
+    const hasOffers = selectedOrder.productInformation.some(product => product.offerTitle);
+
+    // Prepare the product rows
+    const productRows = selectedOrder.productInformation.map(product => {
+      let productTotal = product.unitPrice * product.sku; // Original price
+      let offerDiscount = 0;
+
+      // Apply offer discount per product
+      if (product.offerTitle) {
+        if (product.offerDiscountType === 'Percentage') {
+          offerDiscount = (productTotal * (product.offerDiscountValue / 100)).toFixed(2);
+        } else if (product.offerDiscountType === 'Amount') {
+          offerDiscount = product.offerDiscountValue.toFixed(2);
+        }
+        productTotal = (productTotal - offerDiscount).toFixed(2);
+      }
+
+      return [
+        product.productTitle,   // Title
+        product.color?.label || '',  // Color
+        product.size || '',         // Size
+        `BDT ${product.unitPrice.toFixed(2)}`, // Unit Price
+        product.sku,                // QTY
+        `BDT ${productTotal}`,       // Total
+        product.offerTitle ? `${product.offerTitle} (-BDT ${offerDiscount})` : '' // Offer details
+      ];
+    });
+
+    // Calculate subtotal
+    const subtotal = parseFloat(
+      selectedOrder.productInformation.reduce((total, product) => {
+        const productTotal = product.unitPrice * product.sku;
+        let offerDiscount = 0;
+        if (product.offerTitle) {
+          if (product.offerDiscountType === 'Percentage') {
+            offerDiscount = (productTotal * (product.offerDiscountValue / 100));
+          } else if (product.offerDiscountType === 'Amount') {
+            offerDiscount = product.offerDiscountValue;
+          }
+        }
+        return total + (productTotal - offerDiscount);
+      }, 0).toFixed(2)
+    );
+
+    // Apply promo discount based on subtotal
     const promoCode = selectedOrder.promoCode;
-    const promoDiscountValue = parseFloat(selectedOrder?.promoDiscountValue?.toFixed(2) || "0.00");
-    const offerCode = selectedOrder.offerCode; // Use offerCode instead of offerCode
-    const offerDiscountValue = parseFloat(selectedOrder?.offerDiscountValue?.toFixed(2) || "0.00");
-
-    // Determine if Promo or Offer is applied and calculate the discount accordingly
-    let discountAmount = 0;
-    let discountLabel = '';
+    const promoDiscountValue = parseFloat(selectedOrder.promoDiscountValue || 0);
+    let promoDiscount = 0;
 
     if (promoCode) {
-      // Promo Discount
       if (selectedOrder.promoDiscountType === 'Percentage') {
-        discountAmount = (subtotal * (promoDiscountValue / 100)).toFixed(2);
+        promoDiscount = (subtotal * (promoDiscountValue / 100)).toFixed(2);
       } else if (selectedOrder.promoDiscountType === 'Amount') {
-        discountAmount = promoDiscountValue.toFixed(2);
+        promoDiscount = promoDiscountValue.toFixed(2);
       }
-      discountLabel = `Promo Discount (${promoCode}) :`;
-    } else if (offerCode) {
-      // Offer Discount
-      if (selectedOrder.offerDiscountType === 'Percentage') {
-        discountAmount = (subtotal * (offerDiscountValue / 100)).toFixed(2);
-      } else if (selectedOrder.offerDiscountType === 'Amount') {
-        discountAmount = offerDiscountValue.toFixed(2);
-      }
-      discountLabel = `Offer Discount (${offerCode}) :`;
     }
 
-    const total = (subtotal - discountAmount + shippingCharge).toFixed(2);
+    const shippingCharge = parseFloat(selectedOrder.shippingCharge || 0);
+    const total = (subtotal - (promoDiscount || 0) + shippingCharge).toFixed(2);
 
+    // Generate PDF table with the offer and promo discounts applied
     pdf.autoTable({
-      startY: margin + 90, // Adjust starting Y position
-      head: [['#Title', 'Color', 'Size', 'Price', 'QTY', 'Total']], // Table headers
+      startY: margin + 100,
+      head: [['Title', 'Color', 'Size', 'Unit Price', 'QTY', 'Total', hasOffers ? 'Offers' : '']],
       body: [
-        ...selectedOrder.productInformation.map(product => [
-          product.productTitle,
-          product.color?.label || '',
-          product.size || '',
-          `${product.unitPrice?.toFixed(2)}`,
-          product.sku,
-          `BDT ${(product.unitPrice * product.sku).toFixed(2)}`
-        ]), // Add all product rows
-
-        // Subtotal Row
-        [{ content: 'Subtotal:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `BDT ${subtotal.toFixed(2)}`],
-
-        // Discount Row (only show if applicable)
-        ...(discountAmount > 0
-          ? [[{ content: discountLabel, colSpan: 5, styles: { halign: 'right', border: 'none' } }, `BDT -${discountAmount}`]]
-          : []),
-
-        // Shipping Charge Row
-        [{ content: 'Shipping Charge:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `BDT ${shippingCharge.toFixed(2)}`],
-
-        // Total Row
-        [{ content: 'Total:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `BDT ${total}`]
+        ...productRows.map(product => {
+          return [
+            product[0],   // Title
+            product[1],   // Color
+            product[2],   // Size
+            product[3],   // Unit Price
+            product[4],   // QTY
+            product[5],   // Total
+            hasOffers ? product[6] : '' // Offers (new column for offers)
+          ];
+        }),
+        // Conditional column spans based on offers
+        ...(hasOffers ? [
+          [{ content: 'Subtotal:', colSpan: 5, styles: { halign: 'right' } }, `BDT ${subtotal.toFixed(2)}`],
+          ...(promoDiscount > 0 ? [
+            [{ content: `Promo Discount (${promoCode}):`, colSpan: 5, styles: { halign: 'right' } }, `BDT -${promoDiscount}`]
+          ] : []),
+          [{ content: 'Shipping Charge:', colSpan: 5, styles: { halign: 'right' } }, `BDT ${shippingCharge.toFixed(2)}`],
+          [{ content: 'Total:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `BDT ${total}`]
+        ] : [
+          [{ content: 'Subtotal:', colSpan: 4, styles: { halign: 'right' } }, `BDT ${subtotal.toFixed(2)}`],
+          ...(promoDiscount > 0 ? [
+            [{ content: `Promo Discount (${promoCode}):`, colSpan: 4, styles: { halign: 'right' } }, `BDT -${promoDiscount}`]
+          ] : []),
+          [{ content: 'Shipping Charge:', colSpan: 4, styles: { halign: 'right' } }, `BDT ${shippingCharge.toFixed(2)}`],
+          [{ content: 'Total:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, `BDT ${total}`]
+        ]),
       ],
-      theme: 'plain', // No borders for the table
+      theme: 'plain',
       styles: {
-        fontSize: 10, // Font size for table content
-        valign: 'middle',
-        halign: 'center',
-        cellPadding: 3, // Adjust cell padding as needed
+        fontSize: 10,
+        cellPadding: 3
       },
       columnStyles: {
-        0: { halign: 'left' }, // Align product titles to the left
-        5: { halign: 'right', fontStyle: 'bold' }, // Right align price columns, bold total
+        0: { halign: 'center' },    // Title aligned to center
+        1: { halign: 'center' },    // Color aligned to center
+        2: { halign: 'center' },    // Size aligned to center
+        3: { halign: 'center' },    // Unit Price aligned to center
+        4: { halign: 'center' },    // QTY aligned to center
+        5: { halign: 'center' },    // Total aligned to center
+        6: { halign: 'left' }       // Offers aligned to left
       }
     });
 
-    const additionalDetails = [
-      ['Shipping Zone:', selectedOrder.shippingZone, 'Shipping Method:', selectedOrder.shippingMethod],
-      ['Payment Method:', selectedOrder.paymentMethod, 'Payment Status:', selectedOrder.paymentStatus],
-      ['Vendor:', selectedOrder.vendor, 'Tracking Number:', selectedOrder.trackingNumber],
-    ];
+    // Define footer text
+    const footerText = "www.f-commerce.com | info@f-commerce.com | Hotline: 01700000000";
 
-    pdf.autoTable({
-      startY: pdf.autoTable.previous.finalY + 15,
-      body: additionalDetails,
-      theme: 'grid',
-      styles: { fontSize: 10, valign: 'middle', halign: 'left' },
-      columnStyles: {
-        0: { cellWidth: pageWidth / 4 - 2 * margin },
-        1: { cellWidth: pageWidth / 4 - 2 * margin },
-        2: { cellWidth: pageWidth / 4 - 2 * margin },
-        3: { cellWidth: pageWidth / 4 - 2 * margin },
-      },
-    });
+    // Get the width of the text to center it
+    const textWidth = pdf.getTextWidth(footerText);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const xCenter = (pdfWidth - textWidth) / 2;
 
-    pdf.setFontSize(8);
-    pdf.setTextColor(128, 128, 128);
+    // Set the Y position for the bottom of the page
+    const yBottom = pdf.internal.pageSize.getHeight() - 20; // 20 units from the bottom
 
-    const disclaimerText = 'If this invoice is for ongoing services and you have requested us to take payment using the continuous authority credit or debit card details stored on our system, then we will do so and no further action is required.';
-    const disclaimerWidth = pageWidth - 2 * margin;
-    const disclaimerHeight = pdf.getTextDimensions(disclaimerText, { maxWidth: disclaimerWidth }).h + 4;
-    const disclaimerX = margin;
-    const disclaimerY = pdf.autoTable.previous.finalY + 45;
-
-    pdf.rect(disclaimerX, disclaimerY, disclaimerWidth, disclaimerHeight, 'S');
-
-    pdf.text(disclaimerText, disclaimerX + disclaimerWidth / 2, disclaimerY + disclaimerHeight / 2, {
-      align: 'center',
-      maxWidth: disclaimerWidth,
-      baseline: 'middle',
-    });
+    // Add the footer text to the PDF
+    pdf.setFontSize(10); // Ensure font size is set before adding the text
+    pdf.setTextColor(0, 0, 0); // Optional: set the color for the footer text
+    pdf.text(footerText, xCenter, yBottom); // No need for align: 'center' here
 
     const blob = pdf.output('blob');
     const blobUrl = URL.createObjectURL(blob);

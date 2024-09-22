@@ -1,15 +1,15 @@
 "use client";
-
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
-import { Button, Select, SelectItem } from '@nextui-org/react';
+import { Select, SelectItem } from '@nextui-org/react';
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useForm, useFieldArray, Controller } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { shippingServices } from '@/app/components/layout/shippingServices';
 import { cities } from '@/app/components/layout/cities';
+import Image from 'next/image';
 
 export default function EditShippingZone() {
   const router = useRouter();
@@ -21,33 +21,23 @@ export default function EditShippingZone() {
   const [cityError, setCityError] = useState(false);
 
   const {
-    register,
-    handleSubmit,
-    setValue,
-    control,
-    formState: { errors, isSubmitting }
-  } = useForm({
-    defaultValues: {
-      shippingZone: [{ shippingZone: '' }],
-      selectedCity: [],
-      selectedShipmentHandler: [],
-      shippingCharge: '',
-    }
-  });
-
-  const { fields: shippingZoneFields, append: appendShippingZone, remove: removeShippingZone } = useFieldArray({
-    control,
-    name: 'shippingZone'
-  });
+    register, handleSubmit, setValue, control, formState: { errors, isSubmitting } } = useForm({
+      defaultValues: {
+        shippingZone: '',
+        selectedCity: [],
+        selectedShipmentHandler: [],
+        shippingCharge: '',
+      }
+    });
 
   useEffect(() => {
     const fetchShippingZone = async () => {
       try {
         const { data } = await axiosPublic.get(`/getSingleShippingZone/${params.id}`);
-        setValue('shippingZone', data.shippingZone.map(zone => ({ shippingZone: zone })));
-        setValue('shippingCharge', data.shippingCharge);
-        setSelectedCity(data.selectedCity);
-        setSelectedShipmentHandler(data.selectedShipmentHandler);
+        setValue('shippingZone', data?.shippingZone);
+        setValue('shippingCharge', data?.shippingCharge);
+        setSelectedCity(data?.selectedCity);
+        setSelectedShipmentHandler(data?.selectedShipmentHandler);
       } catch (error) {
         toast.error("Failed to load shipping zone details.");
       }
@@ -56,22 +46,35 @@ export default function EditShippingZone() {
     fetchShippingZone();
   }, [params.id, setValue, axiosPublic]);
 
+  console.log(selectedShipmentHandler);
+
   const handleSelectedCityArray = (keys) => {
     const selectedArray = [...keys];
     setSelectedCity(selectedArray);
     setCityError(selectedArray.length === 0);
   };
 
-  const handleShipmentHandlerArray = (keys) => {
-    const selectedArray = [...keys];
-    setSelectedShipmentHandler(selectedArray);
-    setSizeError(selectedArray.length === 0);
+  const toggleLogoSelection = (key) => {
+    if (selectedShipmentHandler.includes(key)) {
+      setSelectedShipmentHandler(selectedShipmentHandler.filter((selectedKey) => selectedKey !== key));
+    } else {
+      setSelectedShipmentHandler([...selectedShipmentHandler, key]);
+    }
+    // Remove the error message when an image is selected
+    setSizeError(false);
   };
 
   const onSubmit = async (formData) => {
+
+    // Validate shipment handler selection
+    if (selectedShipmentHandler.length === 0) {
+      setSizeError(true);
+      return;
+    }
+
     try {
       const updatedShippingZone = {
-        shippingZone: formData.shippingZone.map(zone => zone.shippingZone),
+        shippingZone: formData.shippingZone,
         selectedCity: selectedCity,
         selectedShipmentHandler: selectedShipmentHandler,
         shippingCharge: formData.shippingCharge,
@@ -102,34 +105,17 @@ export default function EditShippingZone() {
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
             {/* Shipping Zone Field */}
-            <div className="shipping-zone-field w-full">
+            <div className="w-full">
               <label className="flex justify-start font-medium text-[#9F5216] pb-2">Shipping Zone</label>
-              {shippingZoneFields.map((item, index) => (
-                <div key={item.id} className="flex flex-col">
-                  <div className='w-full flex items-center gap-2'>
-                    <input
-                      type="text"
-                      placeholder="Shipping Zone"
-                      {...register(`shippingZone.${index}.shippingZone`, { required: 'Shipping Zone is required' })}
-                      className="w-full my-2 p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-300 rounded-md shadow-sm"
-                    />
-                    <Button type='button' color="danger" onClick={() => removeShippingZone(index)} variant="light">
-                      Remove
-                    </Button>
-                  </div>
-                  {/* Display error message for this field */}
-                  {errors.shippingZone?.[index]?.shippingZone && (
-                    <p className="text-red-600 text-left mt-1 text-sm">{errors.shippingZone[index].shippingZone.message}</p>
-                  )}
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={() => appendShippingZone({ shippingZone: '' })}
-                className="mt-2 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium"
-              >
-                Add Another Shipping Zone
-              </button>
+              <input
+                type="text"
+                placeholder="Add Shipping Zone"
+                {...register('shippingZone', { required: 'Shipping Zone is required' })}
+                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+              />
+              {errors.shippingZone && (
+                <p className="text-red-600 text-left">{errors.shippingZone.message}</p>
+              )}
             </div>
 
             {/* Selected City */}
@@ -187,36 +173,20 @@ export default function EditShippingZone() {
 
             {/* Shipment Handlers */}
             <div className="mt-4">
-              <Controller
-                name="shipmentHandler"
-                control={control}
-                defaultValue={selectedShipmentHandler}
-                render={({ field }) => (
-                  <div>
-                    <Select
-                      label="Select Shipment Handler"
-                      selectionMode="multiple"
-                      value={selectedShipmentHandler}
-                      placeholder="Select Shipment Handler"
-                      selectedKeys={new Set(selectedShipmentHandler)}
-                      onSelectionChange={(keys) => {
-                        handleShipmentHandlerArray(keys);
-                        field.onChange([...keys]);
-                      }}
-                    >
-                      {shippingServices?.map((shipmentHandler) => (
-                        <SelectItem key={shipmentHandler.key}>
-                          {shipmentHandler.label}
-                        </SelectItem>
-                      ))}
-                    </Select>
-                    {/* Display error message if no shipment handler is selected */}
-                    {sizeError && (
-                      <p className="text-red-600 text-left mt-1 text-sm">At least one shipment handler must be selected.</p>
-                    )}
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                {shippingServices.map((shipmentHandler) => (
+                  <div
+                    key={shipmentHandler.name}
+                    onClick={() => toggleLogoSelection(shipmentHandler.name)}
+                    className={`cursor-pointer border-2 rounded-md p-2 ${selectedShipmentHandler.includes(shipmentHandler.name) ? 'border-blue-500' : 'border-gray-300'}`}
+                  >
+                    <Image src={shipmentHandler?.logoURL} alt={shipmentHandler.name} height={300} width={300} className="h-24 w-24 xl:h-32 xl:w-32 object-contain" />
+                    <p className="text-center">{shipmentHandler.name}</p>
                   </div>
-                )}
-              />
+                ))}
+                {/* Display error message if no shipment handler is selected */}
+                {sizeError && <p className='text-red-600 text-left mt-1'>Please select at least one shipment handler.</p>}
+              </div>
             </div>
           </div>
 

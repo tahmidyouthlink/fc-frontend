@@ -89,7 +89,7 @@ const AddOffer = () => {
   };
 
   const onSubmit = async (data) => {
-    const { offerCode, offerTitle, offerDiscountValue, expiryDate, maxAmount, minAmount } = data;
+    const { offerTitle, offerDiscountValue, expiryDate, maxAmount, minAmount } = data;
 
     // Check if expiryDate is selected
     if (!expiryDate) {
@@ -123,7 +123,6 @@ const AddOffer = () => {
 
     try {
       const offerData = {
-        offerCode,
         offerTitle,
         offerDiscountValue,
         offerDiscountType,
@@ -165,14 +164,6 @@ const AddOffer = () => {
           <div className='grid grid-cols-1 lg:grid-cols-12'>
             <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 mt-6 px-6 py-3'>
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-                <div>
-                  <label htmlFor='offerCode' className='flex justify-start font-medium text-[#D2016E] pb-2'>Offer Code *</label>
-                  <input id='offerCode' placeholder='Enter Offer Code'  {...register("offerCode", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="text" />
-                  {errors.offerCode?.type === "required" && (
-                    <p className="text-red-600 text-left">Offer Code is required</p>
-                  )}
-                </div>
-
                 <div>
                   <label htmlFor='offerTitle' className='flex justify-start font-medium text-[#D2016E] pb-2'>Offer Title *</label>
                   <input id='offerTitle' placeholder='Enter Offer Title'  {...register("offerTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="text" />

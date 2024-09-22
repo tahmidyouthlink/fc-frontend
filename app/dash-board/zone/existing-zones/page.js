@@ -3,9 +3,11 @@ import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useShippingZones from '@/app/hooks/useShippingZones';
 import { Button } from '@nextui-org/react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import toast from 'react-hot-toast';
+import { FaArrowLeft } from 'react-icons/fa6';
 
 const ExistingZones = () => {
 
@@ -32,7 +34,10 @@ const ExistingZones = () => {
   return (
     <div>
 
-      <h3 className='md:px-5 2xl:px-16 py-4 w-full text-center md:text-start font-medium md:font-semibold text-[13px] md:text-xl lg:text-2xl'>Existing Shipping Zones</h3>
+      <div className='md:px-5 2xl:px-16 py-4 w-full flex justify-between'>
+        <h3 className='text-center md:text-start font-medium md:font-semibold text-[13px] md:text-xl lg:text-2xl'>Existing Shipping Zones</h3>
+        <Link className='flex items-center gap-2 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium' href={"/dash-board/zone"}> <FaArrowLeft /> Go Back</Link>
+      </div>
 
       <div className="max-w-screen-2xl mx-auto px-0 md:px-4 lg:px-6 custom-max-h overflow-x-auto modal-body-scroll">
         <table className="w-full text-left border-collapse">
@@ -49,7 +54,7 @@ const ExistingZones = () => {
             {shippingList?.map((zone, index) => (
               <tr key={index} className="hover:bg-gray-50 transition-colors">
                 <td className="text-xs p-3 text-gray-700">
-                  {zone?.shippingZone.map(zoneObj => zoneObj).join(', ')}
+                  {zone?.shippingZone}
                 </td>
                 <td className="text-xs p-3 text-gray-700">{zone?.selectedCity.join(', ')}</td>
                 <td className="text-xs p-3 text-gray-700">{zone?.selectedShipmentHandler.join(', ')}</td>

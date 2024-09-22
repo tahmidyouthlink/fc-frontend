@@ -12,10 +12,10 @@
     "city": "Metropolis",
     "postalCode": 12345,
     "orderStatus": "Pending",
-    "totalAmount": 210.0,
+    "totalAmount": 300.0,
     "paymentMethod": "bKash",
     "vendor": "VendorA",
-    "shippingZone": "Zone 1",
+    "shippingZone": "Inside Dhaka",
     "promoDiscountValue": 5.0,
     "promoDiscountType": "Amount",
     "productInformation": [
@@ -29,7 +29,10 @@
         },
         "batchCode": "BATCH123",
         "sku": 2,
-        "unitPrice": 100
+        "unitPrice": 100,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       },
       {
         "productTitle": "Jeans",
@@ -41,7 +44,10 @@
         },
         "batchCode": "BATCH124",
         "sku": 1,
-        "unitPrice": 100
+        "unitPrice": 100,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234567890",
@@ -49,9 +55,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "YOUTHLINK",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -70,9 +73,9 @@
     "totalAmount": 350.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorB",
-    "shippingZone": "Zone 2",
-    "promoDiscountValue": 0.0,
-    "promoDiscountType": "",
+    "shippingZone": "Dhaka Suburbs",
+    "promoDiscountValue": 10,
+    "promoDiscountType": "Percentage",
     "productInformation": [
       {
         "productTitle": "T-Shirt",
@@ -84,7 +87,10 @@
         },
         "batchCode": "BATCH125",
         "sku": 3,
-        "unitPrice": 50
+        "unitPrice": 50,
+        "offerTitle": "Eid Offer 20 Tk",
+        "offerDiscountType": "Amount",
+        "offerDiscountValue": 20
       },
       {
         "productTitle": "Sneakers",
@@ -96,17 +102,17 @@
         },
         "batchCode": "BATCH126",
         "sku": 2,
-        "unitPrice": 100
+        "unitPrice": 100,
+        "offerTitle": "Eid Offer 30 % Off",
+        "offerDiscountType": "Percentage",
+        "offerDiscountValue": 30
       }
     ],
     "transactionId": "TXN2234567890",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
     "shippingCharge": 20,
-    "promoCode": "",
-    "offerCode": "EidSpecial",
-    "offerDiscountType": "Percentage",
-    "offerDiscountValue": 30,
+    "promoCode": "SUMMER5",
     "paymentStatus": "Paid"
   },
   {
@@ -125,7 +131,7 @@
     "totalAmount": 300.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorC",
-    "shippingZone": "Zone 3",
+    "shippingZone": "OutDhkZ",
     "promoDiscountValue": 10.0,
     "promoDiscountType": "Amount",
     "productInformation": [
@@ -139,7 +145,10 @@
         },
         "batchCode": "BATCH127",
         "sku": 1,
-        "unitPrice": 300
+        "unitPrice": 300,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN3234567890",
@@ -147,9 +156,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 15,
     "promoCode": "WINTERSALE",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -168,7 +174,7 @@
     "totalAmount": 500.0,
     "paymentMethod": "bKash",
     "vendor": "VendorD",
-    "shippingZone": "Zone 1",
+    "shippingZone": "Inside Dhaka",
     "promoDiscountValue": 0.0,
     "promoDiscountType": "Amount",
     "productInformation": [
@@ -182,7 +188,10 @@
         },
         "batchCode": "BATCH128",
         "sku": 2,
-        "unitPrice": 250
+        "unitPrice": 250,
+        "offerTitle": "Eid ul Adha 10 % Off",
+        "offerDiscountType": "Percentage",
+        "offerDiscountValue": 10
       }
     ],
     "transactionId": "TXN4234567890",
@@ -190,9 +199,6 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 25,
     "promoCode": "",
-    "offerCode": "Qurbani2024",
-    "offerDiscountType": "Percentage",
-    "offerDiscountValue": 10,
     "paymentStatus": "Refunded"
   },
   {
@@ -211,7 +217,7 @@
     "totalAmount": 400.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorE",
-    "shippingZone": "Zone 2",
+    "shippingZone": "Dhaka Suburbs",
     "promoDiscountValue": 15.0,
     "promoDiscountType": "Amount",
     "productInformation": [
@@ -225,7 +231,10 @@
         },
         "batchCode": "BATCH129",
         "sku": 1,
-        "unitPrice": 400
+        "unitPrice": 400,
+        "offerTitle": "Eid ul Adha 10 % Off",
+        "offerDiscountType": "Percentage",
+        "offerDiscountValue": 10
       }
     ],
     "transactionId": "TXN5234567890",
@@ -233,9 +242,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 30,
     "promoCode": "OFFICEWEAR",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -254,7 +260,7 @@
     "totalAmount": 500.0,
     "paymentMethod": "bKash",
     "vendor": "VendorF",
-    "shippingZone": "Zone 3",
+    "shippingZone": "OutDhkZ",
     "promoDiscountValue": 20.0,
     "promoDiscountType": "Amount",
     "productInformation": [
@@ -268,7 +274,10 @@
         },
         "batchCode": "BATCH130",
         "sku": 1,
-        "unitPrice": 500
+        "unitPrice": 500,
+        "offerTitle": "Eid ul Adha 10 % Off",
+        "offerDiscountType": "Percentage",
+        "offerDiscountValue": 10
       }
     ],
     "transactionId": "TXN6234567890",
@@ -276,9 +285,6 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 35,
     "promoCode": "FORMALWEAR",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -297,7 +303,7 @@
     "totalAmount": 600.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorG",
-    "shippingZone": "Zone 1",
+    "shippingZone": "Inside Dhaka",
     "promoDiscountValue": 25.0,
     "promoDiscountType": "Amount",
     "productInformation": [
@@ -311,7 +317,10 @@
         },
         "batchCode": "BATCH131",
         "sku": 1,
-        "unitPrice": 600
+        "unitPrice": 600,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN7234567890",
@@ -319,9 +328,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 40,
     "promoCode": "WINTERDEAL",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -337,11 +343,11 @@
     "city": "Coast City",
     "postalCode": 98732,
     "orderStatus": "Pending",
-    "totalAmount": 350.0,
+    "totalAmount": 700.0,
     "paymentMethod": "bKash",
     "vendor": "VendorH",
-    "shippingZone": "Zone 2",
-    "promoDiscountValue": 0.0,
+    "shippingZone": "Dhaka Suburbs",
+    "promoDiscountValue": 20,
     "promoDiscountType": "Amount",
     "productInformation": [
       {
@@ -354,7 +360,10 @@
         },
         "batchCode": "BATCH132",
         "sku": 2,
-        "unitPrice": 350
+        "unitPrice": 350,
+        "offerTitle": "Eid ul Adha 10 % Off",
+        "offerDiscountType": "Percentage",
+        "offerDiscountValue": 10
       }
     ],
     "transactionId": "TXN8234567890",
@@ -362,9 +371,6 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 20,
     "promoCode": "FALLDISCOUNT",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -380,12 +386,12 @@
     "city": "Opal City",
     "postalCode": 54323,
     "orderStatus": "Pending",
-    "totalAmount": 200.0,
+    "totalAmount": 650.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorI",
-    "shippingZone": "Zone 3",
+    "shippingZone": "OutDhkZ",
     "promoDiscountValue": 0.0,
-    "promoDiscountType": "Amount",
+    "promoDiscountType": "",
     "productInformation": [
       {
         "productTitle": "Scarf",
@@ -397,7 +403,10 @@
         },
         "batchCode": "BATCH133",
         "sku": 4,
-        "unitPrice": 50
+        "unitPrice": 50,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       },
       {
         "productTitle": "Gloves",
@@ -409,17 +418,17 @@
         },
         "batchCode": "BATCH134",
         "sku": 3,
-        "unitPrice": 150
+        "unitPrice": 150,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN9234567890",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
-    "promoCode": "WINTERWARM",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
+    "promoCode": "",
     "paymentStatus": "Paid"
   },
   {
@@ -435,10 +444,10 @@
     "city": "National City",
     "postalCode": 87654,
     "orderStatus": "Pending",
-    "totalAmount": 450.0,
+    "totalAmount": 900.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorJ",
-    "shippingZone": "Zone 1",
+    "shippingZone": "Inside Dhaka",
     "promoDiscountValue": 10.0,
     "promoDiscountType": "Amount",
     "productInformation": [
@@ -452,7 +461,10 @@
         },
         "batchCode": "BATCH135",
         "sku": 2,
-        "unitPrice": 450
+        "unitPrice": 450,
+        "offerTitle": "New Year 50 Tk",
+        "offerDiscountType": "Amount",
+        "offerDiscountValue": 50
       }
     ],
     "transactionId": "TXN0234567890",
@@ -460,9 +472,6 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 50,
     "promoCode": "FOOTWEARSALE",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -481,7 +490,7 @@
     "totalAmount": 420.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorK",
-    "shippingZone": "Zone 2",
+    "shippingZone": "Dhaka Suburbs",
     "promoDiscountValue": 15.0,
     "promoDiscountType": "Amount",
     "productInformation": [
@@ -495,7 +504,10 @@
         },
         "batchCode": "BATCH136",
         "sku": 2,
-        "unitPrice": 120
+        "unitPrice": 120,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       },
       {
         "productTitle": "Skirt",
@@ -507,7 +519,10 @@
         },
         "batchCode": "BATCH137",
         "sku": 2,
-        "unitPrice": 90
+        "unitPrice": 90,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN0245678901",
@@ -515,9 +530,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 25,
     "promoCode": "SPRINGSALE",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -536,7 +548,7 @@
     "totalAmount": 1500.0,
     "paymentMethod": "bKash",
     "vendor": "VendorL",
-    "shippingZone": "Zone 1",
+    "shippingZone": "Inside Dhaka",
     "promoDiscountValue": 50.0,
     "promoDiscountType": "Amount",
     "productInformation": [
@@ -550,7 +562,10 @@
         },
         "batchCode": "BATCH138",
         "sku": 3,
-        "unitPrice": 500
+        "unitPrice": 500,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1245678901",
@@ -558,9 +573,6 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 75,
     "promoCode": "PREMIUMBUY",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -579,7 +591,7 @@
     "totalAmount": 800.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorM",
-    "shippingZone": "Zone 3",
+    "shippingZone": "OutDhkZ",
     "promoDiscountValue": 25.0,
     "promoDiscountType": "Amount",
     "productInformation": [
@@ -593,7 +605,10 @@
         },
         "batchCode": "BATCH139",
         "sku": 2,
-        "unitPrice": 300
+        "unitPrice": 300,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       },
       {
         "productTitle": "Tie",
@@ -605,7 +620,10 @@
         },
         "batchCode": "BATCH140",
         "sku": 1,
-        "unitPrice": 200
+        "unitPrice": 200,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN2245678901",
@@ -613,9 +631,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 50,
     "promoCode": "BUSINESSSTYLE",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -634,7 +649,7 @@
     "totalAmount": 240.0,
     "paymentMethod": "bKash",
     "vendor": "VendorN",
-    "shippingZone": "Zone 2",
+    "shippingZone": "Dhaka Suburbs",
     "promoDiscountValue": 10.0,
     "promoDiscountType": "Amount",
     "productInformation": [
@@ -648,7 +663,10 @@
         },
         "batchCode": "BATCH141",
         "sku": 4,
-        "unitPrice": 60
+        "unitPrice": 60,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN3245678901",
@@ -656,9 +674,6 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 20,
     "promoCode": "FITNESSDEAL",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -677,7 +692,7 @@
     "totalAmount": 450.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorO",
-    "shippingZone": "Zone 1",
+    "shippingZone": "Inside Dhaka",
     "promoDiscountValue": 15.0,
     "promoDiscountType": "Amount",
     "productInformation": [
@@ -691,7 +706,10 @@
         },
         "batchCode": "BATCH142",
         "sku": 3,
-        "unitPrice": 150
+        "unitPrice": 150,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN4245678901",
@@ -699,9 +717,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 30,
     "promoCode": "ATHLETIC",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -720,7 +735,7 @@
     "totalAmount": 550.0,
     "paymentMethod": "bKash",
     "vendor": "VendorP",
-    "shippingZone": "Zone 3",
+    "shippingZone": "OutDhkZ",
     "promoDiscountValue": 20.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -734,7 +749,10 @@
         },
         "batchCode": "BATCH143",
         "sku": 1,
-        "unitPrice": 300
+        "unitPrice": 300,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       },
       {
         "productTitle": "Evening Gown",
@@ -746,7 +764,10 @@
         },
         "batchCode": "BATCH144",
         "sku": 1,
-        "unitPrice": 250
+        "unitPrice": 250,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN5245678901",
@@ -754,9 +775,6 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 40,
     "promoCode": "GLAMOUR",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -775,7 +793,7 @@
     "totalAmount": 300.0,
     "paymentMethod": "bKash",
     "vendor": "VendorB",
-    "shippingZone": "Zone 2",
+    "shippingZone": "Dhaka Suburbs",
     "promoDiscountValue": 10.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -789,7 +807,10 @@
         },
         "batchCode": "BATCH401",
         "sku": 3,
-        "unitPrice": 100
+        "unitPrice": 100,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN24080118KS001",
@@ -797,9 +818,6 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
     "promoCode": "RUNFAST",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -818,7 +836,7 @@
     "totalAmount": 200.0,
     "paymentMethod": "bKash",
     "vendor": "VendorC",
-    "shippingZone": "Zone 3",
+    "shippingZone": "OutDhkZ",
     "promoDiscountValue": 5.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -832,7 +850,10 @@
         },
         "batchCode": "BATCH987",
         "sku": 2,
-        "unitPrice": 100
+        "unitPrice": 100,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN24080119DG002",
@@ -840,9 +861,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "DENIM10",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -861,8 +879,8 @@
     "totalAmount": 400.0,
     "paymentMethod": "bKash",
     "vendor": "VendorD",
-    "shippingZone": "Zone 1",
-    "promoDiscountValue": 15.0,
+    "shippingZone": "Inside Dhaka",
+    "promoDiscountValue": 20.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
       {
@@ -875,7 +893,10 @@
         },
         "batchCode": "BATCH654",
         "sku": 4,
-        "unitPrice": 100
+        "unitPrice": 100,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN24080120SB003",
@@ -883,9 +904,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 20,
     "promoCode": "JACKET20",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -904,7 +922,7 @@
     "totalAmount": 500.0,
     "paymentMethod": "bKash",
     "vendor": "VendorE",
-    "shippingZone": "Zone 4",
+    "shippingZone": "OutDhkY",
     "promoDiscountValue": 20.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -918,17 +936,17 @@
         },
         "batchCode": "BATCH321",
         "sku": 5,
-        "unitPrice": 100
+        "unitPrice": 100,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN24080121JA004",
     "trackingNumber": "TRA",
     "shippingMethod": "Express Shipping",
     "shippingCharge": 25,
-    "promoCode": "SUIT UP",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
+    "promoCode": "JACKET20",
     "paymentStatus": "Paid"
   },
   {
@@ -947,9 +965,9 @@
     "totalAmount": 50.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorB",
-    "shippingZone": "Zone 2",
+    "shippingZone": "Dhaka Suburbs",
     "promoDiscountValue": 0.0,
-    "promoDiscountType": "Percentage",
+    "promoDiscountType": "",
     "productInformation": [
       {
         "productTitle": "T-Shirt",
@@ -961,17 +979,17 @@
         },
         "batchCode": "BATCH201",
         "sku": 2,
-        "unitPrice": 25
+        "unitPrice": 25,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234567910",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
-    "promoCode": "FREE SHIP",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
+    "promoCode": "",
     "paymentStatus": "Paid"
   },
   {
@@ -990,7 +1008,7 @@
     "totalAmount": 70.0,
     "paymentMethod": "bKash",
     "vendor": "VendorC",
-    "shippingZone": "Zone 3",
+    "shippingZone": "OutDhkZ",
     "promoDiscountValue": 10.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -1004,7 +1022,10 @@
         },
         "batchCode": "BATCH202",
         "sku": 1,
-        "unitPrice": 40
+        "unitPrice": 40,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       },
       {
         "productTitle": "Cap",
@@ -1016,7 +1037,10 @@
         },
         "batchCode": "BATCH203",
         "sku": 1,
-        "unitPrice": 30
+        "unitPrice": 30,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234567920",
@@ -1024,9 +1048,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "SUMMER10",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1042,10 +1063,10 @@
     "city": "Star City",
     "postalCode": 10101,
     "orderStatus": "Pending",
-    "totalAmount": 95.0,
+    "totalAmount": 185.0,
     "paymentMethod": "bKash",
     "vendor": "VendorD",
-    "shippingZone": "Zone 1",
+    "shippingZone": "Inside Dhaka",
     "promoDiscountValue": 5.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -1059,7 +1080,10 @@
         },
         "batchCode": "BATCH204",
         "sku": 1,
-        "unitPrice": 85
+        "unitPrice": 85,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       },
       {
         "productTitle": "Cap",
@@ -1071,7 +1095,10 @@
         },
         "batchCode": "BATCH205",
         "sku": 1,
-        "unitPrice": 10
+        "unitPrice": 100,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234567930",
@@ -1079,9 +1106,6 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
     "promoCode": "WINTER SALE",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1100,8 +1124,8 @@
     "totalAmount": 150.0,
     "paymentMethod": "bKash",
     "vendor": "VendorE",
-    "shippingZone": "Zone 2",
-    "promoDiscountValue": 0.0,
+    "shippingZone": "Dhaka Suburbs",
+    "promoDiscountValue": 10.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
       {
@@ -1114,7 +1138,10 @@
         },
         "batchCode": "BATCH206",
         "sku": 1,
-        "unitPrice": 60
+        "unitPrice": 60,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       },
       {
         "productTitle": "Jacket",
@@ -1126,7 +1153,10 @@
         },
         "batchCode": "BATCH207",
         "sku": 1,
-        "unitPrice": 85
+        "unitPrice": 90,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234567940",
@@ -1134,9 +1164,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 20,
     "promoCode": "BUY1GET1",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1155,7 +1182,7 @@
     "totalAmount": 40.0,
     "paymentMethod": "bKash",
     "vendor": "VendorF",
-    "shippingZone": "Zone 1",
+    "shippingZone": "Inside Dhaka",
     "promoDiscountValue": 5.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -1169,7 +1196,10 @@
         },
         "batchCode": "BATCH208",
         "sku": 2,
-        "unitPrice": 15
+        "unitPrice": 20,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234567950",
@@ -1177,9 +1207,6 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 10,
     "promoCode": "FLASH SALE",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1198,9 +1225,9 @@
     "totalAmount": 60.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorG",
-    "shippingZone": "Zone 2",
+    "shippingZone": "Dhaka Suburbs",
     "promoDiscountValue": 0.0,
-    "promoDiscountType": "Percentage",
+    "promoDiscountType": "",
     "productInformation": [
       {
         "productTitle": "T-Shirt",
@@ -1212,17 +1239,17 @@
         },
         "batchCode": "BATCH209",
         "sku": 3,
-        "unitPrice": 20
+        "unitPrice": 20,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234567960",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 12,
-    "promoCode": "SAVE20",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
+    "promoCode": "",
     "paymentStatus": "Paid"
   },
   {
@@ -1241,7 +1268,7 @@
     "totalAmount": 85.0,
     "paymentMethod": "bKash",
     "vendor": "VendorH",
-    "shippingZone": "Zone 3",
+    "shippingZone": "OutDhkZ",
     "promoDiscountValue": 10.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -1255,7 +1282,10 @@
         },
         "batchCode": "BATCH210",
         "sku": 1,
-        "unitPrice": 85
+        "unitPrice": 85,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234567970",
@@ -1263,9 +1293,6 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
     "promoCode": "WINTER10",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1284,7 +1311,7 @@
     "totalAmount": 120.0,
     "paymentMethod": "bKash",
     "vendor": "VendorI",
-    "shippingZone": "Zone 1",
+    "shippingZone": "Inside Dhaka",
     "promoDiscountValue": 15.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -1298,7 +1325,10 @@
         },
         "batchCode": "BATCH211",
         "sku": 1,
-        "unitPrice": 60
+        "unitPrice": 60,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       },
       {
         "productTitle": "T-Shirt",
@@ -1310,7 +1340,10 @@
         },
         "batchCode": "BATCH212",
         "sku": 1,
-        "unitPrice": 60
+        "unitPrice": 60,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234567980",
@@ -1318,9 +1351,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 18,
     "promoCode": "BUY2GET10",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1339,9 +1369,9 @@
     "totalAmount": 75.0,
     "paymentMethod": "bKash",
     "vendor": "VendorJ",
-    "shippingZone": "Zone 2",
-    "promoDiscountValue": 0.0,
-    "promoDiscountType": "Percentage",
+    "shippingZone": "Dhaka Suburbs",
+    "promoDiscountValue": 15.0,
+    "promoDiscountType": "Amount",
     "productInformation": [
       {
         "productTitle": "Jacket",
@@ -1353,7 +1383,10 @@
         },
         "batchCode": "BATCH213",
         "sku": 1,
-        "unitPrice": 75
+        "unitPrice": 75,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234567990",
@@ -1361,9 +1394,6 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 12,
     "promoCode": "SUMMER15",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1379,10 +1409,10 @@
     "city": "Metropolis",
     "postalCode": 80808,
     "orderStatus": "Pending",
-    "totalAmount": 30.0,
+    "totalAmount": 300.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorK",
-    "shippingZone": "Zone 3",
+    "shippingZone": "OutDhkZ",
     "promoDiscountValue": 5.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -1396,7 +1426,10 @@
         },
         "batchCode": "BATCH214",
         "sku": 2,
-        "unitPrice": 15
+        "unitPrice": 150,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234568000",
@@ -1404,9 +1437,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 8,
     "promoCode": "CLEARANCE",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1425,8 +1455,8 @@
     "totalAmount": 95.0,
     "paymentMethod": "bKash",
     "vendor": "VendorL",
-    "shippingZone": "Zone 2",
-    "promoDiscountValue": 0.0,
+    "shippingZone": "Dhaka Suburbs",
+    "promoDiscountValue": 10.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
       {
@@ -1439,7 +1469,10 @@
         },
         "batchCode": "BATCH215",
         "sku": 1,
-        "unitPrice": 95
+        "unitPrice": 95,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234568010",
@@ -1447,9 +1480,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "FALL2024",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1468,7 +1498,7 @@
     "totalAmount": 150.0,
     "paymentMethod": "bKash",
     "vendor": "VendorM",
-    "shippingZone": "Zone 1",
+    "shippingZone": "Inside Dhaka",
     "promoDiscountValue": 10.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -1482,7 +1512,10 @@
         },
         "batchCode": "BATCH216",
         "sku": 1,
-        "unitPrice": 150
+        "unitPrice": 150,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234568020",
@@ -1490,9 +1523,6 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 20,
     "promoCode": "WINTER20",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1511,7 +1541,7 @@
     "totalAmount": 70.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorN",
-    "shippingZone": "Zone 3",
+    "shippingZone": "OutDhkZ",
     "promoDiscountValue": 5.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -1525,7 +1555,10 @@
         },
         "batchCode": "BATCH217",
         "sku": 2,
-        "unitPrice": 35
+        "unitPrice": 35,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234568030",
@@ -1533,9 +1566,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 8,
     "promoCode": "SUMMER5",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1554,7 +1584,7 @@
     "totalAmount": 80.0,
     "paymentMethod": "bKash",
     "vendor": "VendorO",
-    "shippingZone": "Zone 2",
+    "shippingZone": "Dhaka Suburbs",
     "promoDiscountValue": 10.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -1568,7 +1598,10 @@
         },
         "batchCode": "BATCH218",
         "sku": 1,
-        "unitPrice": 80
+        "unitPrice": 80,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234568040",
@@ -1576,9 +1609,6 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 12,
     "promoCode": "SPRING10",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1597,9 +1627,9 @@
     "totalAmount": 55.0,
     "paymentMethod": "bKash",
     "vendor": "VendorP",
-    "shippingZone": "Zone 3",
-    "promoDiscountValue": 0.0,
-    "promoDiscountType": "Percentage",
+    "shippingZone": "OutDhkZ",
+    "promoDiscountValue": 20.0,
+    "promoDiscountType": "Amount",
     "productInformation": [
       {
         "productTitle": "Belt",
@@ -1611,7 +1641,10 @@
         },
         "batchCode": "BATCH219",
         "sku": 1,
-        "unitPrice": 55
+        "unitPrice": 55,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234568050",
@@ -1619,9 +1652,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "ACCESSORY5",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1640,9 +1670,9 @@
     "totalAmount": 85.0,
     "paymentMethod": "bKash",
     "vendor": "VendorQ",
-    "shippingZone": "Zone 1",
+    "shippingZone": "Inside Dhaka",
     "promoDiscountValue": 0.0,
-    "promoDiscountType": "Percentage",
+    "promoDiscountType": "",
     "productInformation": [
       {
         "productTitle": "Jacket",
@@ -1654,17 +1684,17 @@
         },
         "batchCode": "BATCH220",
         "sku": 1,
-        "unitPrice": 85
+        "unitPrice": 85,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234568060",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 12,
-    "promoCode": "FALL2024",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
+    "promoCode": "",
     "paymentStatus": "Paid"
   },
   {
@@ -1683,7 +1713,7 @@
     "totalAmount": 120.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorR",
-    "shippingZone": "Zone 2",
+    "shippingZone": "Dhaka Suburbs",
     "promoDiscountValue": 10.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -1697,7 +1727,10 @@
         },
         "batchCode": "BATCH221",
         "sku": 1,
-        "unitPrice": 120
+        "unitPrice": 120,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234568070",
@@ -1705,9 +1738,6 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
     "promoCode": "SUIT2024",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1726,7 +1756,7 @@
     "totalAmount": 60.0,
     "paymentMethod": "bKash",
     "vendor": "VendorS",
-    "shippingZone": "Zone 3",
+    "shippingZone": "OutDhkZ",
     "promoDiscountValue": 5.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -1740,7 +1770,10 @@
         },
         "batchCode": "BATCH222",
         "sku": 1,
-        "unitPrice": 60
+        "unitPrice": 60,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234568080",
@@ -1748,9 +1781,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 8,
     "promoCode": "WINTER5",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1769,7 +1799,7 @@
     "totalAmount": 75.0,
     "paymentMethod": "bKash",
     "vendor": "VendorT",
-    "shippingZone": "Zone 2",
+    "shippingZone": "Dhaka Suburbs",
     "promoDiscountValue": 10.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -1783,7 +1813,10 @@
         },
         "batchCode": "BATCH223",
         "sku": 1,
-        "unitPrice": 75
+        "unitPrice": 75,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234568090",
@@ -1791,9 +1824,6 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 10,
     "promoCode": "ACCESSORY10",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1812,7 +1842,7 @@
     "totalAmount": 40.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorU",
-    "shippingZone": "Zone 1",
+    "shippingZone": "Inside Dhaka",
     "promoDiscountValue": 5.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -1826,7 +1856,10 @@
         },
         "batchCode": "BATCH224",
         "sku": 1,
-        "unitPrice": 40
+        "unitPrice": 40,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234568100",
@@ -1834,9 +1867,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 8,
     "promoCode": "SUMMER5",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1855,9 +1885,9 @@
     "totalAmount": 95.0,
     "paymentMethod": "bKash",
     "vendor": "VendorV",
-    "shippingZone": "Zone 3",
+    "shippingZone": "OutDhkZ",
     "promoDiscountValue": 0.0,
-    "promoDiscountType": "Percentage",
+    "promoDiscountType": "",
     "productInformation": [
       {
         "productTitle": "Winter Jacket",
@@ -1869,17 +1899,17 @@
         },
         "batchCode": "BATCH225",
         "sku": 1,
-        "unitPrice": 95
+        "unitPrice": 95,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234568110",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 12,
-    "promoCode": "WINTER2024",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
+    "promoCode": "",
     "paymentStatus": "Paid"
   },
   {
@@ -1898,7 +1928,7 @@
     "totalAmount": 150.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorW",
-    "shippingZone": "Zone 2",
+    "shippingZone": "Dhaka Suburbs",
     "promoDiscountValue": 10.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -1912,7 +1942,10 @@
         },
         "batchCode": "BATCH226",
         "sku": 1,
-        "unitPrice": 150
+        "unitPrice": 150,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234568120",
@@ -1920,9 +1953,6 @@
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
     "promoCode": "BOOTS10",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1941,7 +1971,7 @@
     "totalAmount": 70.0,
     "paymentMethod": "bKash",
     "vendor": "VendorX",
-    "shippingZone": "Zone 1",
+    "shippingZone": "Inside Dhaka",
     "promoDiscountValue": 5.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -1955,7 +1985,10 @@
         },
         "batchCode": "BATCH227",
         "sku": 1,
-        "unitPrice": 70
+        "unitPrice": 70,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234568130",
@@ -1963,9 +1996,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 8,
     "promoCode": "SUMMER2024",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -1984,9 +2014,9 @@
     "totalAmount": 110.0,
     "paymentMethod": "bKash",
     "vendor": "VendorY",
-    "shippingZone": "Zone 2",
+    "shippingZone": "Dhaka Suburbs",
     "promoDiscountValue": 0.0,
-    "promoDiscountType": "Percentage",
+    "promoDiscountType": "",
     "productInformation": [
       {
         "productTitle": "Smartwatch",
@@ -1998,22 +2028,22 @@
         },
         "batchCode": "BATCH228",
         "sku": 1,
-        "unitPrice": 110
+        "unitPrice": 110,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234568140",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
     "shippingCharge": 15,
-    "promoCode": "TECH2024",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
+    "promoCode": "",
     "paymentStatus": "Paid"
   },
   {
     "orderNumber": "24090505FR722",
-    "dateTime": "05-09-24 | 12:00",
+    "dateTime": "05-09-24 | 11:00",
     "customerName": "Frank Richardson",
     "customerId": "FC1712345722",
     "email": "frank.richardson45@example.com",
@@ -2027,7 +2057,7 @@
     "totalAmount": 160.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorZ",
-    "shippingZone": "Zone 3",
+    "shippingZone": "OutDhkZ",
     "promoDiscountValue": 10.0,
     "promoDiscountType": "Percentage",
     "productInformation": [
@@ -2041,7 +2071,10 @@
         },
         "batchCode": "BATCH229",
         "sku": 2,
-        "unitPrice": 80
+        "unitPrice": 80,
+        "offerTitle": "",
+        "offerDiscountType": "",
+        "offerDiscountValue": 0.0
       }
     ],
     "transactionId": "TXN1234568150",
@@ -2049,9 +2082,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "BACKPACK10",
-    "offerCode": "",
-    "offerDiscountType": "",
-    "offerDiscountValue": 0.0,
     "paymentStatus": "Paid"
   },
   {
@@ -2070,7 +2100,7 @@
     "totalAmount": 180.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorZ",
-    "shippingZone": "Zone 3",
+    "shippingZone": "OutDhkZ",
     "promoDiscountValue": 0.0,
     "promoDiscountType": "",
     "productInformation": [
@@ -2084,7 +2114,10 @@
         },
         "batchCode": "BATCH229",
         "sku": 1,
-        "unitPrice": 180
+        "unitPrice": 180,
+        "offerTitle": "NewYear2025",
+        "offerDiscountType": "Amount",
+        "offerDiscountValue": 50
       }
     ],
     "transactionId": "TXN1234568150",
@@ -2092,9 +2125,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "",
-    "offerCode": "NewYear2025",
-    "offerDiscountType": "Amount",
-    "offerDiscountValue": 50.0,
     "paymentStatus": "Paid"
   },
   {
@@ -2113,7 +2143,7 @@
     "totalAmount": 580.0,
     "paymentMethod": "SSLCommerz",
     "vendor": "VendorZ",
-    "shippingZone": "Zone 3",
+    "shippingZone": "OutDhkZ",
     "promoDiscountValue": 0.0,
     "promoDiscountType": "",
     "productInformation": [
@@ -2127,7 +2157,10 @@
         },
         "batchCode": "BATCH229",
         "sku": 1,
-        "unitPrice": 580
+        "unitPrice": 580,
+        "offerTitle": "SHA123",
+        "offerDiscountType": "Amount",
+        "offerDiscountValue": 100.0
       }
     ],
     "transactionId": "TXN1234568150",
@@ -2135,9 +2168,6 @@
     "shippingMethod": "Standard Shipping",
     "shippingCharge": 10,
     "promoCode": "",
-    "offerCode": "SHA123",
-    "offerDiscountType": "Amount",
-    "offerDiscountValue": 100.0,
     "paymentStatus": "Paid"
   }
 ]

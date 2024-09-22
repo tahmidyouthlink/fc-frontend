@@ -61,7 +61,7 @@ const Marketing = () => {
         <h1 className='font-bold text-xl'>Recommended For You</h1>
         <p className='pt-1 pb-8 text-neutral-400 font-medium'>Our recommendations are tailored to suit your fashion commerce and customer preferences.</p>
 
-        <div className="flex flex-col lg:flex-row justify-center gap-6 max-w-screen-lg">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 max-w-screen-2xl">
           {/* Promo Card */}
           <div className="flex-1 overflow-hidden rounded-lg shadow transition hover:shadow-lg flex flex-col">
             {/* Set the container to maintain the aspect ratio */}
@@ -87,7 +87,7 @@ const Marketing = () => {
                 onClick={() => router.push('/dash-board/marketing/promo/add-promo')}
                 className="bg-[#D2016E] hover:bg-[#d2016deb] text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium mt-4"
               >
-                Start Now
+                Create Promo
               </Button>
             </div>
           </div>
@@ -119,6 +119,33 @@ const Marketing = () => {
               >
                 Create Offer
               </button>
+            </div>
+          </div>
+
+          {/* bKash Card */}
+          <div className="flex-1 overflow-hidden rounded-lg shadow transition hover:shadow-lg flex flex-col">
+            {/* Set the container to maintain the aspect ratio */}
+            <div className="relative w-full" style={{ paddingBottom: '38.25%' }}> {/* This maintains a 16:9 aspect ratio */}
+              <Image
+                alt="promo"
+                src="https://i.ibb.co.com/whx7gqH/download-1.png" // Ensure this path is correct
+                layout="fill"
+                className="object-contain" // Ensures the full image is visible
+              />
+            </div>
+            <div className="bg-white p-4 sm:p-6 flex flex-col flex-grow">
+              <h3 className="mb-0.5 text-xl text-gray-900 font-bold">
+                Enjoy bKash Cashback Offer!
+              </h3>
+              <p className="text-neutral-500 text-sm flex-grow">
+                Avail exciting cashback offers with bKash. Use bKash to pay for your purchases and get instant cashback directly to your account. Hurry, limited-time offer!
+                Enjoy seamless transactions and more rewards with bKash.
+              </p>
+              <Button
+                className="bg-[#D2016E] hover:bg-[#d2016deb] text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium mt-4"
+              >
+                Claim Cashback
+              </Button>
             </div>
           </div>
         </div>

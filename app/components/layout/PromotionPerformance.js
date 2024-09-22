@@ -93,41 +93,61 @@ const PromotionPerformanceChart = () => {
     }
 
     // Convert filter dates to Date objects and normalize them to start and end of day
-    const startDate = new Date(filterStartDate);
-    const endDate = new Date(filterEndDate);
+    const startDateObj = new Date(filterStartDate);
+    const endDateObj = new Date(filterEndDate);
 
-    const adjustedStartDate = new Date(startDate.setHours(0, 0, 0, 0)); // Start of day
-    const adjustedEndDate = new Date(endDate.setHours(23, 59, 59, 999)); // End of day
+    const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0)); // Start of day
+    const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999)); // End of day
 
     // Filter orders based on the normalized date range
     const filteredOrders = orderList?.filter((order) => {
       const orderDate = parseDate(order.dateTime);
-      const normalizedOrderDate = new Date(orderDate.setHours(0, 0, 0, 0)); // Normalize order date to start of day
-
-      // Use >= for start date and <= for end date to include the selected range
-      return normalizedOrderDate >= adjustedStartDate && normalizedOrderDate <= adjustedEndDate;
+      return orderDate >= adjustedStartDate && orderDate <= adjustedEndDate;
     });
 
     filteredOrders?.forEach((order) => {
       let promoDiscount = 0;
       let offerDiscount = 0;
+      let isPromoApplied = false;
+      let offerAppliedCount = 0;
 
+      // Calculate total offer discounts for the order
+      order.productInformation.forEach((product) => {
+        if (product.offerTitle?.trim()) {
+          offerAppliedCount += 1;
+          let productTotal = product.unitPrice * product.sku;
+          let productOfferDiscount = 0;
+
+          if (product.offerDiscountType === 'Percentage') {
+            productOfferDiscount = (product.offerDiscountValue / 100) * productTotal;
+          } else {
+            productOfferDiscount = product.offerDiscountValue;
+          }
+
+          offerDiscount += productOfferDiscount;
+        }
+      });
+
+      if (offerDiscount > 0) {
+        totalPromoAndOfferApplied += offerAppliedCount;
+      }
+
+      // Calculate adjusted order total after offer discounts
+      const adjustedOrderTotal = order.totalAmount - offerDiscount;
+
+      // Calculate promo discount based on adjusted order total
       if (order.promoCode?.trim()) {
-        promoDiscount = order.promoDiscountType === 'Percentage'
-          ? (order.promoDiscountValue / 100) * order.totalAmount
-          : order.promoDiscountValue;
+        isPromoApplied = true;
+        if (order.promoDiscountType === 'Percentage') {
+          promoDiscount = (order.promoDiscountValue / 100) * adjustedOrderTotal;
+        } else {
+          promoDiscount = order.promoDiscountValue;
+        }
         totalPromoAndOfferApplied += 1;
       }
 
-      if (order.offerCode?.trim()) {
-        offerDiscount = order.offerDiscountType === 'Percentage'
-          ? (order.offerDiscountValue / 100) * order.totalAmount
-          : order.offerDiscountValue;
-        totalPromoAndOfferApplied += 1;
-      }
-
-      const totalOrderDiscount = promoDiscount + offerDiscount;
-      totalDiscount += totalOrderDiscount;
+      // Sum total discounts
+      totalDiscount += offerDiscount + promoDiscount;
     });
 
     return { totalPromoAndOfferApplied, totalDiscount };
@@ -140,24 +160,45 @@ const PromotionPerformanceChart = () => {
       const orderDate = parseDate(order.dateTime);
       const orderDateFormatted = format(orderDate, 'yyyy-MM-dd');
 
-      // Compare order dates with selected date range, inclusive of both start and end dates
-      if (orderDateFormatted >= filterStartDate && orderDateFormatted <= filterEndDate) {
+      // Check if orderDate is within the selected date range
+      if (
+        orderDateFormatted >= filterStartDate &&
+        orderDateFormatted <= filterEndDate
+      ) {
         let promoDiscount = 0;
         let offerDiscount = 0;
+        let offerAppliedCount = 0;
 
+        // Calculate total offer discounts for the order
+        order.productInformation.forEach((product) => {
+          if (product.offerTitle?.trim()) {
+            offerAppliedCount += 1;
+            let productTotal = product.unitPrice * product.sku;
+            let productOfferDiscount = 0;
+
+            if (product.offerDiscountType === 'Percentage') {
+              productOfferDiscount = (product.offerDiscountValue / 100) * productTotal;
+            } else {
+              productOfferDiscount = product.offerDiscountValue;
+            }
+
+            offerDiscount += productOfferDiscount;
+          }
+        });
+
+        // Calculate adjusted order total after offer discounts
+        const adjustedOrderTotal = order.totalAmount - offerDiscount;
+
+        // Calculate promo discount based on adjusted order total
         if (order.promoCode?.trim()) {
-          promoDiscount = order.promoDiscountType === 'Percentage'
-            ? (order.promoDiscountValue / 100) * order.totalAmount
-            : order.promoDiscountValue;
+          if (order.promoDiscountType === 'Percentage') {
+            promoDiscount = (order.promoDiscountValue / 100) * adjustedOrderTotal;
+          } else {
+            promoDiscount = order.promoDiscountValue;
+          }
         }
 
-        if (order.offerCode?.trim()) {
-          offerDiscount = order.offerDiscountType === 'Percentage'
-            ? (order.offerDiscountValue / 100) * order.totalAmount
-            : order.offerDiscountValue;
-        }
-
-        const totalOrderDiscount = promoDiscount + offerDiscount;
+        const totalOrderDiscount = offerDiscount + promoDiscount;
 
         if (!dailyData[orderDateFormatted]) {
           dailyData[orderDateFormatted] = {
@@ -167,10 +208,10 @@ const PromotionPerformanceChart = () => {
         }
 
         dailyData[orderDateFormatted].discountedAmount += totalOrderDiscount;
-        dailyData[orderDateFormatted].discountedOrders++;
+        dailyData[orderDateFormatted].discountedOrders +=
+          offerDiscount > 0 || promoDiscount > 0 ? 1 : 0;
       }
     });
-
 
     return Object.keys(dailyData).map((date) => ({
       date,

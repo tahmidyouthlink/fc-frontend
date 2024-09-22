@@ -59,11 +59,6 @@ const SideNavbar = ({ onClose }) => {
       path: "/dash-board/marketing"
     },
     {
-      name: "Shipping",
-      icon: <MdOutlineLocalShipping />,
-      path: "/dash-board/shipping"
-    },
-    {
       name: "Settings",
       icon: <MdOutlineSettings />,
       links: [
