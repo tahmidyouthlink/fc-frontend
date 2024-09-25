@@ -4,7 +4,7 @@ import 'react-quill/dist/quill.snow.css'; // Import default styles
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
-const Editor = ({ value, onChange }) => {
+const EditorForEditProduct = ({ value, onChange, isAdmin }) => {
   const modules = {
     toolbar: [
       ['bold', 'italic', 'underline'],
@@ -21,9 +21,10 @@ const Editor = ({ value, onChange }) => {
         value={value}
         onChange={onChange}
         modules={modules}
+        readOnly={!isAdmin} // Set to read-only if isAdmin is false
       />
     </div>
   );
 };
 
-export default Editor;
+export default EditorForEditProduct;

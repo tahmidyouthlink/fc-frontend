@@ -11,7 +11,7 @@ import dynamic from 'next/dynamic';
 import { CustomCheckbox } from '@/app/components/layout/CustomCheckBox';
 import { CustomCheckbox2 } from '@/app/components/layout/CustomCheckBox2';
 import { useRouter } from 'next/navigation';
-import { FaArrowRight } from 'react-icons/fa6';
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6';
 import Image from 'next/image';
 import { RxCross2 } from 'react-icons/rx';
 import { MdOutlineFileUpload } from 'react-icons/md';
@@ -24,6 +24,7 @@ import useSubCategories from '@/app/hooks/useSubCategories';
 import useTags from '@/app/hooks/useTags';
 import useVendors from '@/app/hooks/useVendors';
 import useColors from '@/app/hooks/useColors';
+import Link from 'next/link';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
@@ -426,7 +427,7 @@ const FirstStepOfAddProduct = () => {
           <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 mt-6 px-6 py-3'>
             <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
               <label htmlFor='productTitle' className='flex justify-start font-medium text-[#9F5216]'>Product Title *</label>
-              <input id='productTitle' {...register("productTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="text" />
+              <input id='productTitle' {...register("productTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" placeholder='Enter Product Title' type="text" />
               {errors.productTitle?.type === "required" && (
                 <p className="text-red-600 text-left">Product Title is required</p>
               )}
@@ -650,7 +651,7 @@ const FirstStepOfAddProduct = () => {
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                 <div>
                   <label htmlFor='regularPrice' className='flex justify-start font-medium text-[#9F5216] mt-4'>Regular Price ৳ *</label>
-                  <input id='regularPrice' {...register("regularPrice", { required: true })} className="custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000" type="number" />
+                  <input id='regularPrice' {...register("regularPrice", { required: true })} className="custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000" placeholder='Enter Product Price' type="number" />
                   {errors.regularPrice?.type === "required" && (
                     <p className="text-red-600 text-left">Product Price is required</p>
                   )}
@@ -811,8 +812,13 @@ const FirstStepOfAddProduct = () => {
           </div>
 
         </div>
-        <div className='px-6 flex justify-end items-center'>
-          <button type='submit' className='mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2'>Next Step<FaArrowRight /></button>
+        <div className='flex justify-between px-6 pt-4 pb-8'>
+          <Link href='/dash-board/products' className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
+            <FaArrowLeft /> Previous Step
+          </Link>
+          <button type='submit' className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
+            Next Step <FaArrowRight />
+          </button>
         </div>
       </form>
     </div>

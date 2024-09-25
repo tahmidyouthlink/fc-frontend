@@ -98,6 +98,23 @@ const ThirdStepOfAddProduct = () => {
 
       if (response?.data?.insertedId) {
         toast.success('Product Details added successfully!');
+        localStorage.removeItem('productTitle');
+        localStorage.removeItem('regularPrice');
+        JSON.parse(localStorage.removeItem('uploadedImageUrls') || '[]');
+        localStorage.removeItem('discountType');
+        localStorage.removeItem('discountValue');
+        localStorage.removeItem('productDetails');
+        localStorage.removeItem('materialCare');
+        localStorage.removeItem('sizeFit');
+        localStorage.removeItem('category');
+        JSON.parse(localStorage.removeItem('subCategories') || '[]');
+        JSON.parse(localStorage.removeItem('groupOfSizes') || '[]');
+        JSON.parse(localStorage.removeItem('allSizes') || '[]');
+        JSON.parse(localStorage.removeItem('availableColors') || '[]');
+        localStorage.removeItem('newArrival');
+        JSON.parse(localStorage.removeItem('vendors') || '[]');
+        JSON.parse(localStorage.removeItem('tags') || '[]');
+        JSON.parse(localStorage.removeItem('productVariants') || '[]');
         router.push("/dash-board/products/existing-products");
       }
     } catch (error) {

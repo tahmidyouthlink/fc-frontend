@@ -46,8 +46,6 @@ export default function EditShippingZone() {
     fetchShippingZone();
   }, [params.id, setValue, axiosPublic]);
 
-  console.log(selectedShipmentHandler);
-
   const handleSelectedCityArray = (keys) => {
     const selectedArray = [...keys];
     setSelectedCity(selectedArray);
