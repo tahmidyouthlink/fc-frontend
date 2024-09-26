@@ -23,7 +23,7 @@ const EditProduct = () => {
   }
 
   return (
-    <div className='bg-[#FBEDE2] relative w-full min-h-screen'>
+    <div className='relative w-full min-h-screen'>
       <div
         style={{
           backgroundImage: `url(${arrivals1.src})`,
@@ -44,7 +44,7 @@ const EditProduct = () => {
       />
       <div className='max-w-[1300px] mx-auto px-5 2xl:px-0 py-8 md:py-10 lg:py-12 relative z-10'>
         <div className='flex justify-between items-center'>
-          <h1 className='font-bold text-xl md:text-2xl lg:text-3xl'>Look at Our Products</h1>
+          <h1 className='font-bold text-xl md:text-2xl lg:text-3xl'>Look at Our Categories</h1>
           <Link className='flex items-center gap-2 text-[10px] md:text-base' href="/dash-board/products"> <span className='border border-black rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
         <div className="pt-6 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">

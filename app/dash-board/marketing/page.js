@@ -144,7 +144,7 @@ const Marketing = () => {
               <Button
                 className="bg-[#D2016E] hover:bg-[#d2016deb] text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium mt-4"
               >
-                Claim Cashback
+                Start Cashback
               </Button>
             </div>
           </div>

@@ -13,6 +13,7 @@ import { RxCross2 } from 'react-icons/rx';
 import dynamic from 'next/dynamic';
 import useCategories from '@/app/hooks/useCategories';
 import { MdOutlineFileUpload } from 'react-icons/md';
+import useProductsInformation from '@/app/hooks/useProductsInformation';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
@@ -35,6 +36,9 @@ const EditOffer = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [dateError, setDateError] = useState(false)
   const [offerDetails, setOfferDetails] = useState(null);
+  const [productTitle, setProductTitle] = useState([]);
+  const [productList, isProductPending] = useProductsInformation();
+  const [titleError, setTitleError] = useState(false);
 
   const handleTabChange = (key) => {
     setOfferDiscountType(key);
@@ -69,6 +73,8 @@ const EditOffer = () => {
         setOfferDescription(offer?.offerDescription || "");
         setImage(offer?.imageUrl || null);
         setCategories(categoryList);
+
+        setProductTitle(offer?.productTitle || []);
 
         // Set selected categories
         setSelectedCategories(offer?.selectedCategories || []);
@@ -133,6 +139,17 @@ const EditOffer = () => {
     setSelectedCategories(selectedArray);
   };
 
+  const handleProductTitle = (keys) => {
+    const selectedArray = [...keys];
+    setProductTitle(selectedArray);
+    if (selectedArray.length === 0) {
+      setTitleError(true);
+    }
+    else {
+      setTitleError(false);
+    }
+  };
+
   const onSubmit = async (data) => {
     const { offerTitle, offerDiscountValue, maxAmount, minAmount } = data;
 
@@ -169,6 +186,12 @@ const EditOffer = () => {
       }
     }
 
+    if (productTitle.length === 0) {
+      setTitleError(true);
+      return;
+    }
+    setTitleError(false);
+
     if (hasError) {
       return;
     }
@@ -185,7 +208,8 @@ const EditOffer = () => {
         minAmount: minAmount || 0,
         offerDescription,
         selectedCategories,
-        imageUrl
+        imageUrl,
+        productTitle
       };
 
       const res = await axiosPublic.put(`/updateOffer/${id}`, updatedDiscount);
@@ -203,7 +227,7 @@ const EditOffer = () => {
     }
   };
 
-  if (isLoading || isCategoryPending) {
+  if (isLoading || isCategoryPending || isProductPending) {
     return <Loading />;
   }
 
@@ -250,35 +274,6 @@ const EditOffer = () => {
                   )}
                 </div>
 
-                <div className="mt-4">
-                  <Controller
-                    name="categories"
-                    control={control}
-                    defaultValue={selectedCategories}
-                    render={({ field }) => (
-                      <div>
-                        <Select
-                          label="Select offer related categories"
-                          selectionMode="multiple"
-                          value={selectedCategories}
-                          placeholder="Select Categories"
-                          selectedKeys={new Set(selectedCategories)}
-                          onSelectionChange={(keys) => {
-                            handleCategoryArray(keys);
-                            field.onChange([...keys]);
-                          }}
-                        >
-                          {categories?.map((category) => (
-                            <SelectItem key={category.key}>
-                              {category.label}
-                            </SelectItem>
-                          ))}
-                        </Select>
-
-                      </div>
-                    )}
-                  />
-                </div>
               </div>
 
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
@@ -310,9 +305,58 @@ const EditOffer = () => {
                 </div>
               </div>
             </div>
+
             <div className='grid grid-cols-1 lg:col-span-5 xl:col-span-5 gap-8 mt-6 px-6 py-3'>
 
               <div className='flex flex-col gap-6 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+
+                <div>
+                  <Select
+                    label="Select offer related product title"
+                    selectionMode="multiple"
+                    value={productTitle}
+                    placeholder="Select Product Title"
+                    selectedKeys={new Set(productTitle)}
+                    onSelectionChange={(keys) => {
+                      handleProductTitle(keys);
+                    }}
+                  >
+                    {productList?.map((product) => (
+                      <SelectItem key={product._id}>
+                        {product.productTitle}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                  {titleError && <p className='text-red-600 text-left pl-2 pt-1'>Please select at least one product Title.</p>}
+                </div>
+
+                <Controller
+                  name="categories"
+                  control={control}
+                  defaultValue={selectedCategories}
+                  render={({ field }) => (
+                    <div>
+                      <Select
+                        label="Select offer related categories"
+                        selectionMode="multiple"
+                        value={selectedCategories}
+                        placeholder="Select Categories"
+                        selectedKeys={new Set(selectedCategories)}
+                        onSelectionChange={(keys) => {
+                          handleCategoryArray(keys);
+                          field.onChange([...keys]);
+                        }}
+                      >
+                        {categories?.map((category) => (
+                          <SelectItem key={category.key}>
+                            {category.label}
+                          </SelectItem>
+                        ))}
+                      </Select>
+
+                    </div>
+                  )}
+                />
 
                 <div className='flex w-full flex-col gap-2'>
                   <label htmlFor='offerDescription' className='flex justify-start font-medium text-[#D2016E] pb-2'>Offer Description</label>

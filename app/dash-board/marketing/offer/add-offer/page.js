@@ -13,6 +13,7 @@ import Image from 'next/image';
 import { RxCross2 } from 'react-icons/rx';
 import useCategories from '@/app/hooks/useCategories';
 import Loading from '@/app/components/shared/Loading/Loading';
+import useProductsInformation from '@/app/hooks/useProductsInformation';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
@@ -30,6 +31,9 @@ const AddOffer = () => {
   const [offerDescription, setOfferDescription] = useState("");
   const [image, setImage] = useState(null);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [productTitle, setProductTitle] = useState([]);
+  const [productList, isProductPending] = useProductsInformation();
+  const [titleError, setTitleError] = useState(false);
 
   const handleTabChange = (key) => {
     setOfferDiscountType(key);
@@ -88,6 +92,17 @@ const AddOffer = () => {
     setSelectedCategories(selectedArray);
   };
 
+  const handleProductTitle = (keys) => {
+    const selectedArray = [...keys];
+    setProductTitle(selectedArray);
+    if (selectedArray.length === 0) {
+      setTitleError(true);
+    }
+    else {
+      setTitleError(false);
+    }
+  };
+
   const onSubmit = async (data) => {
     const { offerTitle, offerDiscountValue, expiryDate, maxAmount, minAmount } = data;
 
@@ -119,6 +134,13 @@ const AddOffer = () => {
         return;
       }
     }
+
+    if (productTitle.length === 0) {
+      setTitleError(true);
+      return;
+    }
+    setTitleError(false);
+
     setIsSubmitting(true);
 
     try {
@@ -132,7 +154,8 @@ const AddOffer = () => {
         maxAmount: maxAmount ? maxAmount : 0,
         minAmount: minAmount ? minAmount : 0,
         offerStatus: true,
-        imageUrl
+        imageUrl,
+        productTitle
       };
 
       const response = await axiosPublic.post('/addOffer', offerData);
@@ -147,7 +170,7 @@ const AddOffer = () => {
     }
   };
 
-  if (isCategoryPending) {
+  if (isCategoryPending || isProductPending) {
     return <Loading />
   }
 
@@ -193,35 +216,6 @@ const AddOffer = () => {
                   )}
                 </div>
 
-                <div className="mt-4">
-                  <Controller
-                    name="categories"
-                    control={control}
-                    defaultValue={selectedCategories}
-                    render={({ field }) => (
-                      <div>
-                        <Select
-                          label="Select offer related categories"
-                          selectionMode="multiple"
-                          value={selectedCategories}
-                          placeholder="Select Categories"
-                          selectedKeys={new Set(selectedCategories)}
-                          onSelectionChange={(keys) => {
-                            handleCategoryArray(keys);
-                            field.onChange([...keys]);
-                          }}
-                        >
-                          {categoryList?.map((category) => (
-                            <SelectItem key={category.key}>
-                              {category.label}
-                            </SelectItem>
-                          ))}
-                        </Select>
-                      </div>
-                    )}
-                  />
-                </div>
-
               </div>
 
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
@@ -260,6 +254,53 @@ const AddOffer = () => {
             </div>
             <div className='grid grid-cols-1 lg:col-span-5 xl:col-span-5 gap-8 mt-6 px-6 py-3'>
               <div className='flex flex-col gap-6 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+
+                <div>
+                  <Select
+                    label="Select offer related product title"
+                    selectionMode="multiple"
+                    value={productTitle}
+                    placeholder="Select Product Title"
+                    selectedKeys={new Set(productTitle)}
+                    onSelectionChange={(keys) => {
+                      handleProductTitle(keys);
+                    }}
+                  >
+                    {productList?.map((product) => (
+                      <SelectItem key={product._id}>
+                        {product.productTitle}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                  {titleError && <p className='text-red-600 text-left pl-2 pt-1'>Please select at least one product Title.</p>}
+                </div>
+
+                <Controller
+                  name="categories"
+                  control={control}
+                  defaultValue={selectedCategories}
+                  render={({ field }) => (
+                    <div>
+                      <Select
+                        label="Select offer related categories"
+                        selectionMode="multiple"
+                        value={selectedCategories}
+                        placeholder="Select Categories"
+                        selectedKeys={new Set(selectedCategories)}
+                        onSelectionChange={(keys) => {
+                          handleCategoryArray(keys);
+                          field.onChange([...keys]);
+                        }}
+                      >
+                        {categoryList?.map((category) => (
+                          <SelectItem key={category.key}>
+                            {category.label}
+                          </SelectItem>
+                        ))}
+                      </Select>
+                    </div>
+                  )}
+                />
 
                 <div className='flex w-full flex-col gap-2'>
                   <label htmlFor='offerDescription' className='flex justify-start font-medium text-[#D2016E]'>Offer Description</label>
@@ -316,6 +357,7 @@ const AddOffer = () => {
                     </div>
                   )}
                 </div>
+
               </div>
             </div>
 

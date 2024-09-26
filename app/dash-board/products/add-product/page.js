@@ -663,8 +663,8 @@ const FirstStepOfAddProduct = () => {
                     selectedKey={discountType}
                     onSelectionChange={handleTabChange}
                   >
-                    <Tab key="Percentage" title="Percentage">Percentage (%)</Tab>
-                    <Tab key="Flat" title="Flat">Flat (Taka)</Tab>
+                    <Tab key="Percentage" title="Percentage">Discount (%)</Tab>
+                    <Tab key="Flat" title="Flat">Flat Discount (taka)</Tab>
                   </Tabs>
 
                   <input
@@ -677,34 +677,6 @@ const FirstStepOfAddProduct = () => {
               </div>
 
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-                <label htmlFor='vendors' className='flex justify-start font-medium text-[#9F5216]'>Select Vendor *</label>
-                <Controller
-                  name="vendors"
-                  control={control}
-                  defaultValue={selectedVendors}
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <div className="parent-container">
-                      <ReactSelect
-                        {...field}
-                        options={vendorList}
-                        isMulti
-                        className="w-full border rounded-md creatable-select-container"
-                        value={selectedVendors}
-                        menuPortalTarget={menuPortalTarget}
-                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                        menuPlacement="auto"
-                        onChange={(newValue) => {
-                          setSelectedVendors(newValue);
-                          field.onChange(newValue);
-                        }}
-                      />
-                    </div>
-                  )}
-                />
-                {errors.vendors && (
-                  <p className="text-red-600 text-left">Vendors are required</p>
-                )}
 
                 <label htmlFor='tags' className='flex justify-start font-medium text-[#9F5216]'>Select Tag *</label>
                 <Controller
@@ -734,6 +706,32 @@ const FirstStepOfAddProduct = () => {
                 {errors.tags && (
                   <p className="text-red-600 text-left">Tags are required</p>
                 )}
+
+                <label htmlFor='vendors' className='flex justify-start font-medium text-[#9F5216]'>Select Vendor *</label>
+                <Controller
+                  name="vendors"
+                  control={control}
+                  defaultValue={selectedVendors}
+                  render={({ field }) => (
+                    <div className="parent-container">
+                      <ReactSelect
+                        {...field}
+                        options={vendorList}
+                        isMulti
+                        className="w-full border rounded-md creatable-select-container"
+                        value={selectedVendors}
+                        menuPortalTarget={menuPortalTarget}
+                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                        menuPlacement="auto"
+                        onChange={(newValue) => {
+                          setSelectedVendors(newValue);
+                          field.onChange(newValue);
+                        }}
+                      />
+                    </div>
+                  )}
+                />
+
               </div>
 
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>

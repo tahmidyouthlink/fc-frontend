@@ -28,7 +28,7 @@ import toast from 'react-hot-toast';
 import useShippingZones from '@/app/hooks/useShippingZones';
 import { shippingServices } from '@/app/components/layout/shippingServices';
 
-const EditorForEditProduct = dynamic(() => import('@/app/utils/EditorForEditProduct/EditorForEditProduct'), { ssr: false });
+const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 
@@ -36,7 +36,7 @@ const EditProductPage = () => {
 
   const { register, handleSubmit, setValue, control, formState: { errors } } = useForm();
 
-  const isAdmin = true;
+  const isAdmin = false;
   const { id } = useParams();
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
@@ -54,7 +54,6 @@ const EditProductPage = () => {
   const [sizeError4, setSizeError4] = useState(false);
   const [sizeError5, setSizeError5] = useState(false);
   const [colorError, setColorError] = useState(false);
-  const [vendorError, setVendorError] = useState(false);
   const [tagError, setTagError] = useState(false);
   const [newArrivalError, setNewArrivalError] = useState(false);
   const [menuPortalTarget, setMenuPortalTarget] = useState(null);
@@ -371,11 +370,6 @@ const EditProductPage = () => {
 
   const handleVendorChange = (newValue) => {
     setSelectedVendors(newValue);
-    if (newValue.length === 0) {
-      setVendorError(true);  // Show error if no color is selected
-    } else {
-      setVendorError(false); // Hide error if at least one color is selected
-    }
   };
 
   const handleTagChange = (newValue) => {
@@ -430,12 +424,6 @@ const EditProductPage = () => {
         return;
       }
       setColorError(false);
-
-      if (selectedVendors.length === 0) {
-        setVendorError(true);
-        return;
-      }
-      setVendorError(false);
 
       if (selectedTags.length === 0) {
         setTagError(true);
@@ -512,8 +500,7 @@ const EditProductPage = () => {
           <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 md:mt-6 px-6 py-3'>
             <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
               <label htmlFor='productTitle' className='flex justify-start font-medium text-[#9F5216]'>Product Title *</label>
-              <input id='productTitle' {...register("productTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" placeholder='Enter Product Title'
-                disabled={!isAdmin} type="text" />
+              <input id='productTitle' {...register("productTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" placeholder='Enter Product Title' type="text" />
               {errors.productTitle?.type === "required" && (
                 <p className="text-red-600 text-left">Product Title is required</p>
               )}
@@ -524,12 +511,11 @@ const EditProductPage = () => {
                 name="productDetails"
                 defaultValue=""
                 control={control}
-                render={() => <EditorForEditProduct
+                render={() => <Editor
                   value={productDetails}
                   onChange={(value) => {
                     setProductDetails(value);
                   }}
-                  isAdmin={isAdmin}
                 />}
               />
             </div>
@@ -540,7 +526,6 @@ const EditProductPage = () => {
                 <label htmlFor="category" className='text-xs px-2'>Category</label>
                 <select
                   id="category"
-                  disabled={!isAdmin}
                   className={`bg-gray-100 p-2 rounded-md ${errors.category ? 'border-red-600' : ''}`}
                   value={selectedCategory}
                   {...register('category', { required: 'Category is required' })}
@@ -626,7 +611,6 @@ const EditProductPage = () => {
                             handleSubCategoryArray(keys);
                             field.onChange([...keys]);
                           }}
-                          isDisabled={!isAdmin}
                         >
                           {subCategoryList[selectedCategory]?.map((subCategory) => (
                             <SelectItem key={subCategory.key}>
@@ -688,12 +672,11 @@ const EditProductPage = () => {
                 name="materialCare"
                 defaultValue=""
                 control={control}
-                render={() => <EditorForEditProduct
+                render={() => <Editor
                   value={materialCare}
                   onChange={(value) => {
                     setMaterialCare(value);
                   }}
-                  isAdmin={isAdmin}
                 />}
               />
 
@@ -702,12 +685,11 @@ const EditProductPage = () => {
                 name="sizeFit"
                 defaultValue=""
                 control={control}
-                render={() => <EditorForEditProduct
+                render={() => <Editor
                   value={sizeFit}
                   onChange={(value) => {
                     setSizeFit(value);
                   }}
-                  isAdmin={isAdmin}
                 />}
               />
             </div>
@@ -718,7 +700,7 @@ const EditProductPage = () => {
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                 <div>
                   <label htmlFor='regularPrice' className='flex justify-start font-medium text-[#9F5216] mt-4'>Regular Price ৳ *</label>
-                  <input id='regularPrice' {...register("regularPrice", { required: true })} className="custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000" disabled={!isAdmin} placeholder='Enter Product Price' type="number" />
+                  <input id='regularPrice' {...register("regularPrice", { required: true })} className="custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000" placeholder='Enter Product Price' type="number" />
                   {errors.regularPrice?.type === "required" && (
                     <p className="text-red-600 text-left">Product Price is required</p>
                   )}
@@ -730,8 +712,8 @@ const EditProductPage = () => {
                     selectedKey={discountType}
                     onSelectionChange={handleTabChange}
                   >
-                    <Tab key="Percentage" title="Percentage">Percentage (%)</Tab>
-                    <Tab key="Flat" title="Flat">Flat (Taka)</Tab>
+                    <Tab key="Percentage" title="Percentage">Discount (%)</Tab>
+                    <Tab key="Flat" title="Flat">Flat Discount (taka)</Tab>
                   </Tabs>
 
                   <input
@@ -745,23 +727,6 @@ const EditProductPage = () => {
               </div>
 
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-                <label htmlFor='vendors' className='flex justify-start font-medium text-[#9F5216]'>Select Vendor *</label>
-                <div className="parent-container">
-                  <ReactSelect
-                    options={vendorList}
-                    isMulti
-                    className="w-full border rounded-md creatable-select-container"
-                    value={selectedVendors}
-                    menuPortalTarget={menuPortalTarget}
-                    styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                    menuPlacement="auto"
-                    onChange={handleVendorChange}
-                    isDisabled={!isAdmin}
-                  />
-                </div>
-                {vendorError && (
-                  <p className="text-red-600 text-left">Vendors are required</p>
-                )}
 
                 <label htmlFor='tags' className='flex justify-start font-medium text-[#9F5216]'>Select Tag *</label>
                 <div className="parent-container">
@@ -774,15 +739,29 @@ const EditProductPage = () => {
                     styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                     menuPlacement="auto"
                     onChange={handleTagChange}
-                    isDisabled={!isAdmin}
                   />
                 </div>
                 {tagError && (
                   <p className="text-red-600 text-left">Tags are required</p>
                 )}
+
+                <label htmlFor='vendors' className='flex justify-start font-medium text-[#9F5216]'>Select Vendor *</label>
+                <div className="parent-container">
+                  <ReactSelect
+                    options={vendorList}
+                    isMulti
+                    className="w-full border rounded-md creatable-select-container"
+                    value={selectedVendors}
+                    menuPortalTarget={menuPortalTarget}
+                    styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                    menuPlacement="auto"
+                    onChange={handleVendorChange}
+                  />
+                </div>
+
               </div>
 
-              <div className={`flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg ${!isAdmin ? "opacity-50 pointer-events-none" : ""}`}>
+              <div className={`flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg`}>
                 <div className='flex flex-col gap-4'>
                   <input
                     id='imageUpload'
@@ -891,7 +870,6 @@ const EditProductPage = () => {
                     onChange={(e) => handleVariantChange(index, 'weight', e.target.value)}
                     className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                     type="number"
-                    disabled={!isAdmin}
                   />
                   {errors[`weight-${index}`] && (
                     <p className="text-red-600 text-left">Weight is required</p>
@@ -931,7 +909,7 @@ const EditProductPage = () => {
               </div>
               <div className='flex flex-col gap-4'>
                 <label className='font-medium text-[#9F5216]'>Select Media</label>
-                <div className={`grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 2xl:grid-cols-4 gap-2 ${!isAdmin ? "opacity-50 pointer-events-none" : ""}`}>
+                <div className={`grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 2xl:grid-cols-4 gap-2`}>
                   {uploadedImageUrls.map((url, imgIndex) => (
                     <div
                       key={imgIndex}
@@ -959,7 +937,7 @@ const EditProductPage = () => {
               return (
                 <div
                   key={index}
-                  onClick={() => (isAdmin ? toggleCardSelection(shipping) : null)}
+                  onClick={() => toggleCardSelection(shipping)}
                   className={`cursor-pointer flex flex-col gap-4 p-5 md:p-7 rounded-lg transition-all duration-200 ${isSelected ? 'border-2 border-blue-500 bg-gray-50 duration-300' : 'border border-gray-200 bg-white'
                     }`}
                 >
