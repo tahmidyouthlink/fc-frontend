@@ -236,7 +236,7 @@ export default function EditCategory() {
                   Upload Thumbnail
                 </h5>
                 <p className='text-sm text-gray-500'>
-                  Photo Should be in PNG, JPEG or JPG format
+                  Photo Should be in PNG, JPEG, JPG, WEBP or Avif format
                 </p>
               </div>
             </label>
@@ -246,9 +246,9 @@ export default function EditCategory() {
                 <Image
                   src={typeof image === 'string' ? image : image.src}
                   alt='Uploaded image'
-                  height={100}
-                  width={200}
-                  className='w-1/2 mx-auto h-[350px] mt-8 rounded-md'
+                  height={2000}
+                  width={2000}
+                  className='w-1/2 mx-auto h-[350px] mt-8 rounded-lg object-contain'
                 />
                 <button
                   onClick={handleImageRemove}
