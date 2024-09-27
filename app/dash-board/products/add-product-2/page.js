@@ -167,6 +167,7 @@ const SecondStepOfAddProduct = () => {
                   <label htmlFor={`sku-${index}`} className='font-medium text-[#9F5216]'>SKU</label>
                   <input
                     id={`sku-${index}`}
+                    autocomplete="off"
                     {...register(`sku-${index}`, { required: true })}
                     value={variant.sku}
                     onChange={(e) => handleVariantChange(index, 'sku', e.target.value)}
@@ -181,6 +182,7 @@ const SecondStepOfAddProduct = () => {
                   <label htmlFor={`batchCode-${index}`} className='font-medium text-[#9F5216]'>Batch Code</label>
                   <input
                     id={`batchCode-${index}`}
+                    autocomplete="off"
                     {...register(`batchCode-${index}`, {
                       required: 'Batch Code is required',
                       pattern: {
