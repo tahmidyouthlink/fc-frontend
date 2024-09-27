@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import useCategories from '@/app/hooks/useCategories';
 import Loading from '@/app/components/shared/Loading/Loading';
+import Image from 'next/image';
 
 const CategoriesOverview = () => {
   const axiosPublic = useAxiosPublic();
@@ -40,6 +41,7 @@ const CategoriesOverview = () => {
       <div className='max-w-screen-2xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 px-6'>
         {categoryList?.map(category => (
           <div key={category?._id} className='category-item border p-4 rounded-md shadow-md'>
+            {/* {category?.imageUrl && <Image src={category?.imageUrl} alt='image' height={600} width={600} />} */}
             <h4 className='font-bold text-lg'>{category?.label}</h4>
             <div className='sizes mt-2'>
               <strong>Sizes:</strong> {category.sizes.join(', ')}

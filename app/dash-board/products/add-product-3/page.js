@@ -3,6 +3,7 @@ import { shippingServices } from '@/app/components/layout/shippingServices';
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useShippingZones from '@/app/hooks/useShippingZones';
+import { Checkbox } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -19,6 +20,7 @@ const ThirdStepOfAddProduct = () => {
   const { handleSubmit } = useForm();
   const [shippingList, isShippingPending] = useShippingZones();
   const [selectedShipmentHandler, setSelectedShipmentHandler] = useState([]);
+  const [selectAll, setSelectAll] = useState(false); // State for "select all"
   const [sizeError, setSizeError] = useState(false);
 
   // Toggle card selection
@@ -28,13 +30,11 @@ const ThirdStepOfAddProduct = () => {
     );
 
     if (isSelected) {
-      // If already selected, remove from selectedShipmentHandler
       const updatedSelection = selectedShipmentHandler.filter(
         (handler) => handler.shippingZone !== shipping.shippingZone
       );
       setSelectedShipmentHandler(updatedSelection);
     } else {
-      // Add the full shipping object to the selectedShipmentHandler
       const updatedSelection = [...selectedShipmentHandler, shipping];
       setSelectedShipmentHandler(updatedSelection);
 
@@ -42,6 +42,15 @@ const ThirdStepOfAddProduct = () => {
         setSizeError(false);
       }
     }
+  };
+
+  const toggleSelectAll = () => {
+    if (selectAll) {
+      setSelectedShipmentHandler([]); // Deselect all
+    } else {
+      setSelectedShipmentHandler(shippingList); // Select all
+    }
+    setSelectAll(!selectAll); // Toggle selectAll state
   };
 
   const onSubmit = async () => {
@@ -129,48 +138,82 @@ const ThirdStepOfAddProduct = () => {
   }
 
   return (
-    <div className='bg-gray-50 min-h-screen'>
-      <h3 className='text-center font-semibold text-xl md:text-2xl px-6 pt-6'>Add Shipping Details</h3>
+    <div className='min-h-screen'>
+      <h3 className='font-semibold text-xl md:text-2xl px-6 2xl:px-0 pt-6 max-w-screen-xl mx-auto'>Add Shipping Details</h3>
 
-      <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-2xl mx-auto mt-6'>
-        <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 px-6'>
-          {shippingList?.map((shipping, index) => {
-            const isSelected = selectedShipmentHandler.some(
-              (handler) => handler.shippingZone === shipping?.shippingZone
-            );
-            return (
-              <div
-                key={index}
-                onClick={() => toggleCardSelection(shipping)} // Pass full shipping details
-                className={`cursor-pointer flex flex-col gap-4 p-5 md:p-7 rounded-lg transition-all duration-200 ${isSelected ? 'border-2 border-blue-500 bg-gray-50 duration-300' : 'border border-gray-200 bg-white'
-                  }`}
-              >
-                {/* Shipping Zone Title - Large and Bold */}
-                <h1 className="text-2xl font-bold text-gray-900 text-center">{shipping?.shippingZone}</h1>
+      <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto mt-6'>
 
-                {/* Mapping over selectedShipmentHandler to display names and logos */}
-                <div className='flex items-center justify-center gap-4'>
-                  {shipping?.selectedShipmentHandler?.map((handlerName, handlerIndex) => {
-                    const handler = shippingServices.find(service => service.name === handlerName);
+        <div className="overflow-x-auto">
+          <table className="min-w-full table-auto">
+            <thead>
+              <tr>
+                <th className="px-2 py-1 md:px-4 md:py-2 border-b border-gray-300">
+                  <Checkbox
+                    isSelected={selectAll}
+                    onChange={toggleSelectAll}
+                    color="success"
+                    size='lg'
+                  />
+                </th>
+                <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipping Zone</th>
+                <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipment Handlers</th>
+                <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipping Charge</th>
+              </tr>
+            </thead>
+            <tbody>
+              {shippingList?.map((shipping, index) => {
+                const isSelected = selectedShipmentHandler.some(
+                  (handler) => handler.shippingZone === shipping?.shippingZone
+                );
 
-                    return (
-                      <div key={handlerIndex} className="p-4 rounded-lg flex flex-col items-center justify-center h-40 w-40">
-                        {handler?.logoURL && (
-                          <Image
-                            src={handler.logoURL}
-                            alt={handler.name}
-                            width={100}
-                            height={100}
-                            className="mb-2 object-contain h-32 w-32"
-                          />
-                        )}
+                return (
+                  <tr
+                    key={index}
+                    className={`cursor-pointer transition-all duration-200 ${isSelected ? 'bg-gray-50' : 'bg-white'}`}
+                  >
+                    {/* Checkbox for selecting a row */}
+                    <td className="text-center">
+                      <Checkbox
+                        isSelected={isSelected}
+                        onChange={() => toggleCardSelection(shipping)}
+                        color="success"
+                        size='lg'
+                      />
+                    </td>
+
+                    {/* Shipping Zone Title */}
+                    <td className="text-xs md:text-base text-center font-bold text-gray-900">
+                      {shipping?.shippingZone}
+                    </td>
+
+                    {/* Shipment Handlers */}
+                    <td className="px-2 py-1 md:px-4 md:py-2">
+                      <div className="flex items-center justify-center md:gap-4">
+                        {shipping?.selectedShipmentHandler?.map((handlerName, handlerIndex) => {
+                          const handler = shippingServices.find(service => service.name === handlerName);
+
+                          return (
+                            <div key={handlerIndex} className="p-2 rounded-lg flex items-center justify-center">
+                              {handler?.logoURL && (
+                                <Image
+                                  src={handler.logoURL}
+                                  alt={handler.name}
+                                  width={200} // Increased size for better visibility
+                                  height={200} // Increased size for better visibility
+                                  className="object-contain rounded-md w-full h-auto max-w-[50px] max-h-[50px] min-h-[50px] transition-transform duration-300 hover:scale-105" // Responsive styling
+                                />
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
+                    </td>
+                    <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{shipping?.shippingCharge}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
 
         {/* Error message */}
@@ -178,11 +221,11 @@ const ThirdStepOfAddProduct = () => {
           <p className='text-red-600 text-left mt-4 max-w-screen-xl px-6'>Please select at least one shipping handler.</p>
         )}
 
-        <div className='flex justify-between mt-6 px-6'>
-          <Link href='/dash-board/products/add-product-2' className='flex items-center gap-2 mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium'>
+        <div className='flex justify-between mt-6 px-6 2xl:px-0'>
+          <Link href='/dash-board/products/add-product-2' className='flex items-center gap-2 mt-4 mb-8 bg-[#9F5216] hover:bg-[#804010] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium'>
             <FaArrowLeft /> Previous Step
           </Link>
-          <button disabled={isSubmitting} type='submit' className={`mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium ${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium`}>
+          <button disabled={isSubmitting} type='submit' className={`mt-4 mb-8 bg-[#9F5216] hover:bg-[#804010] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium ${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium`}>
             {isSubmitting ? 'Submitting...' : 'Submit'}
           </button>
         </div>
