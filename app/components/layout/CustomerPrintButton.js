@@ -2,6 +2,28 @@ import React from 'react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
+// Function to add gaps between every letter
+function addGaps(text, gap = ' ') {
+  return text.split('').join(gap);
+}
+
+// Generate Barcode as PNG Data URL
+const generateBarcodeData = (orderNumber) => {
+  const canvas = document.createElement('canvas');
+  JsBarcode(canvas, orderNumber, {
+    format: 'CODE128',
+    displayValue: false,       // Make sure this is true to display the text
+    fontSize: 20,             // Adjusted font size for better readability
+    width: 2,                 // Thicker lines
+    height: 40,               // Increased height for clarity
+    textAlign: 'center',      // Center-align the text
+    textMargin: 2,           // Margin between barcode and text
+    background: '#ffffff',    // White background for better contrast
+    lineColor: '#000000'      // Black lines for maximum contrast
+  });
+  return canvas.toDataURL('image/png');
+};
+
 const CustomerPrintButton = ({ selectedOrder }) => {
 
   const handlePrint = async (selectedOrder) => {
@@ -13,171 +35,296 @@ const CustomerPrintButton = ({ selectedOrder }) => {
       return;
     }
 
+    const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB8AAAAgCAYAAADqgqNBAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAHBSURBVHgB7Ze/TsJQFMa/cynqYlISSBjZdOQNxMlRou5AeAB8A19BZ2PwBSSQuDApg6ORQRKc7OCA0aEmDtXgPR4IyJ+2iUWQAX7LvXyc06/ntqe3BZbMAfL7o7gfK0BTViJMTArD1sQn+dLLOX5rXkybCaiVR0wLrbdz5dfrcVl5BlO4iGlCdOQpjwtSdVKqvsO08ajeXbkKFzADmCjtsnKHUQozgIgysqqmr3kxHcvKkMBsMLVazcLPXO6ADGaIYr07atdj6u3lh/6M5Mq23T2ZvtaGkXAFEhyPdBteeMV65hvJ/uzH3EC7LoM1HMYaVZcZUR3EzRGNUecv1MZc7F7+MJY4Wf0fof6k0nSc9MZ6hcERUh1jqrHCPZgfqHN1FL8z6JaBGxkbkvJBxG1m1RCtJmVYchJvRFiTsamBC0l76mqKOxaX0KFcrtyyBgvjwdle9FDcJn+muyA7X3o+HlcV5sjSfPHMDQSEmE1ppx2ZxXuSIz3TYs012bnsIMcKbq5oS3p3c0RkxGXXcqSbq0GOFXzZ2fedLo6ALO/2xTPvbiynB9GUodUV/ovem2y31Yy29Ceh/qevk0AM9vTF5Buk7I7utuWMlAAAAABJRU5ErkJggg==";
+
     const pdf = new jsPDF('p', 'mm', 'a4');
     const margin = 10;
     const pageWidth = pdf.internal.pageSize.width;
 
     // Set up fonts and colors
-    pdf.setFont('Oxygen', 'normal');
-    const primaryColor = [0, 102, 204];
-    const secondaryColor = [0, 0, 0];
+    pdf.setFont('helvetica', 'normal');
+    const primaryColor = [0, 0, 0];
+    const secondaryColor = [128, 128, 128];
+    const textColor = [0, 0, 0]; // Black color for text
 
     // Top Section - Order Details and Company Information
     pdf.setFontSize(10);
     pdf.setTextColor(...secondaryColor);
 
-    // Order Details on the left
-    const orderDetails = [
-      `Customer ID: ${selectedOrder.customerId}`,
-      `Order Id: #${selectedOrder.orderNumber}`,
-      `Order Date & Time: ${selectedOrder.dateTime}`,
-    ].join('\n');
-    pdf.text(orderDetails, margin, margin + 10);
+    const logoX = margin; // X position of the logo
+    const logoY = margin; // Y position of the logo
+    const textX = logoX + 12; // X position of the text, adjust to position relative to the logo
+    const textY = logoY + 8; // Y position of the text, adjust as needed
+
+    // Define sizes for the logo and text
+    const textSizeLogo = 20; // Font size for the logo text
+    const textSize = 10; // Font size for the company information text
+    const logoWidth = 10; // Width of the logo
+    const logoHeight = 10; // Height of the logo
+
+    // Add the logo image to the PDF
+    pdf.addImage(logoBase64, 'PNG', logoX, logoY, logoWidth, logoHeight);
+
+    // Add the logo text below or alongside the logo
+    pdf.setFontSize(textSizeLogo);
+    pdf.setTextColor(...textColor);
+    pdf.text('F-Commerce', textX, textY);
 
     // Company Information on the right
-    pdf.text('Fashion Commerce', pageWidth - margin, margin + 10, { align: 'right' });
-    pdf.text('Mirpur, Dhaka, 1100', pageWidth - margin, margin + 15, { align: 'right' });
-    pdf.text('Email: fashion@commerce.com', pageWidth - margin, margin + 20, { align: 'right' });
-    pdf.text('Phone: +88 019 999 99999', pageWidth - margin, margin + 25, { align: 'right' });
+    pdf.setFontSize(textSize); // Set font size for company information
+    pdf.setTextColor(...textColor);
+
+    // Right-align company information
+    pdf.text('Fashion Commerce', pageWidth - margin, margin, { align: 'right' });
+    pdf.text('Mirpur, Dhaka, 1100', pageWidth - margin, margin + 5, { align: 'right' });
+    pdf.text('Email: fashion@commerce.com', pageWidth - margin, margin + 10, { align: 'right' });
+    pdf.text('Phone: +88 019 999 99999', pageWidth - margin, margin + 15, { align: 'right' });
 
     // Customer Info
-    pdf.setFontSize(12);
-    pdf.setTextColor(...primaryColor);
-    pdf.text('Customer Details', margin, margin + 45);
-
     pdf.setFontSize(10);
-    pdf.setTextColor(...secondaryColor);
+    pdf.setTextColor(...primaryColor);
+    pdf.text('Delivery Address', margin, margin + 31);
+
+    const lineHeight = 7;
+    const charGap = ' '; // Gap between characters
+    // Define font sizes and styles
+    const largeFontSize = 14; // Font size for customer name and phone number
+    const smallFontSize = 10; // Font size for address
+    const boldFontStyle = 'normal'; // Bold style
+
+    // Define text color (replace ...secondaryColor with actual color values)
+
+    pdf.setTextColor(...textColor);
+
+    // Format the phone numbers with gaps between characters
+    const phoneNumberWithGaps = addGaps(selectedOrder.phoneNumber, charGap);
+    const phoneNumber2WithGaps = selectedOrder.phoneNumber2 && selectedOrder.phoneNumber2 !== '0'
+      ? addGaps(selectedOrder.phoneNumber2, charGap)
+      : null;
+
+    // Create an array of lines with different formatting
     const customerDetails = [
-      `Name: ${selectedOrder.customerName}`,
-      `Email: ${selectedOrder.email}`,
-      `Phone: ${selectedOrder.phoneNumber}`,
-      selectedOrder.phoneNumber2 && selectedOrder.phoneNumber2 !== '0' ? `Phone 2: ${selectedOrder.phoneNumber2}` : null,
-      `Address: ${selectedOrder.address1}${selectedOrder.address2 ? ', ' + selectedOrder.address2 : ''}, ${selectedOrder.city}, ${selectedOrder.postalCode}`,
-    ].filter(Boolean).join('\n'); // Filter out any null values
-    pdf.text(customerDetails, margin, margin + 50);
+      { text: selectedOrder.customerName.toUpperCase(), fontSize: largeFontSize, fontWeight: boldFontStyle, },
+      { text: `${selectedOrder.address1}${selectedOrder.address2 ? ', ' + selectedOrder.address2 : ''}, ${selectedOrder.city}, ${selectedOrder.postalCode}`, fontSize: smallFontSize, fontWeight: '' },
+      { text: phoneNumberWithGaps, fontSize: largeFontSize, fontWeight: boldFontStyle },
+      { text: phoneNumber2WithGaps, fontSize: largeFontSize, fontWeight: boldFontStyle },
+    ].filter(item => item.text); // Filter out any null values
 
-    pdf.setFontSize(16);
-    pdf.setTextColor(...primaryColor);
-    pdf.text('INVOICE', pageWidth / 2, margin + 85, { align: 'center' });
+    // Calculate the starting Y position
+    let yPosition = margin + 37;
 
-    pdf.setFontSize(12);
-    pdf.setTextColor(...primaryColor);
-    pdf.text('Product Details', margin, margin + 95);
-
-    pdf.autoTable({
-      startY: margin + 100,
-      head: [['Product Title', 'Color', 'Size', 'Unit Price', 'SKU', 'Gross Amount (Tk)']],
-      body: selectedOrder.productInformation.map(product => [
-        product.productTitle,
-        product.color?.label || '',
-        product.size || '',
-        `${product.unitPrice?.toFixed(2)}`,
-        product.sku,
-        `${(product.unitPrice * product.sku).toFixed(2)}`
-      ]),
-      theme: 'grid',
-      headStyles: { fillColor: primaryColor, textColor: 255 },
-      styles: { fontSize: 10, valign: 'middle', halign: 'center' },
+    // Add each line of text to the PDF with specific formatting
+    customerDetails.forEach(({ text, fontSize, fontWeight }) => {
+      pdf.setFontSize(fontSize);
+      pdf.text(text, margin, yPosition);
+      yPosition += lineHeight; // Increment Y position for the next line
     });
 
-    const subtotal = parseFloat(selectedOrder.productInformation.reduce((total, product) => total + (product.unitPrice * product.sku), 0).toFixed(2));
-    const shippingCharge = parseFloat(selectedOrder.shippingCharge?.toFixed(2) || "0.00");
+    // Barcode
+    const barcodeDataUrl = generateBarcodeData(selectedOrder.orderNumber);
+    pdf.addImage(barcodeDataUrl, 'PNG', margin, yPosition + 10, 80, 30);
 
-    // Check if Promo or Offer is applied
+    // Additional Info aligned to the right with smaller font size
+    pdf.setFontSize(10);
+    let yPositionInvoice = 41;
+
+    // Set constant xPosition for right alignment
+    const xPosition = pageWidth - margin;
+
+    // Bold "Invoice" text, aligned right
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Invoice', xPosition, yPositionInvoice, { align: 'right' });
+    yPositionInvoice += lineHeight;
+
+    // Normal font for the rest
+    pdf.setFont('helvetica', 'normal');
+
+    pdf.text(`Invoice ID: ${selectedOrder.orderNumber}`, xPosition, yPositionInvoice, { align: 'right' });
+    yPositionInvoice += lineHeight;
+
+    // Order date
+    pdf.text(`Order Date: ${selectedOrder.dateTime.trim()}`, xPosition, yPositionInvoice, { align: 'right' });
+    yPositionInvoice += lineHeight;
+
+    // Item count
+    const itemCount = selectedOrder.productInformation.length;
+    pdf.text(`Items Count: ${itemCount}`, xPosition, yPositionInvoice, { align: 'right' });
+    yPositionInvoice += lineHeight;
+
+    // Shipping method
+    pdf.text(`Shipping Method: ${selectedOrder.shippingMethod.trim()}`, xPosition, yPositionInvoice, { align: 'right' });
+    yPositionInvoice += lineHeight;
+
+    // Shipping zone
+    pdf.text(`Shipping Zone: ${selectedOrder.shippingZone.trim()}`, xPosition, yPositionInvoice, { align: 'right' });
+    yPositionInvoice += lineHeight;
+
+    // Payment status
+    pdf.text(`Payment Status: ${selectedOrder.paymentStatus.trim()}`, xPosition, yPositionInvoice, { align: 'right' });
+    yPositionInvoice += lineHeight;
+
+    // Payment method
+    pdf.text(`Payment Method: ${selectedOrder.paymentMethod.trim()}`, xPosition, yPositionInvoice, { align: 'right' });
+    yPositionInvoice += lineHeight;
+
+    // Vendor
+    pdf.text(`Vendor: ${selectedOrder.vendor.trim()}`, xPosition, yPositionInvoice, { align: 'right' });
+    yPositionInvoice += lineHeight;
+
+    // Tracking Number
+    pdf.text(
+      `Tracking Number: ${selectedOrder.trackingNumber?.trim() || "--"}`,
+      xPosition,
+      yPositionInvoice,
+      { align: 'right' }
+    );
+    yPositionInvoice += lineHeight;
+
+    // Check if any product has an offer
+    const hasOffers = selectedOrder.productInformation.some(product => product.offerTitle);
+
+    // Prepare the product rows without applying discount at this point
+    const productRows = selectedOrder.productInformation.map(product => {
+      const productTotal = (product.unitPrice * product.sku).toFixed(2); // Original price without discount
+
+      return [
+        product.productTitle,   // Title
+        product.color?.label || '',  // Color
+        product.size || '',         // Size
+        `${product.unitPrice.toFixed(2)}`, // Unit Price
+        product.sku,                // QTY
+        `BDT ${productTotal}`,       // Total (without discount)
+        product.offerTitle ? { offerTitle: product.offerTitle, offerDiscount: 0, productTitle: product.productTitle } : null // Store offer details without applying discount yet
+      ];
+    });
+
+    // Calculate subtotal without offer discounts initially
+    const subtotal = parseFloat(
+      selectedOrder.productInformation.reduce((total, product) => {
+        const productTotal = product.unitPrice * product.sku;
+        return total + productTotal;
+      }, 0).toFixed(2)
+    );
+
+    // Apply promo discount based on subtotal
     const promoCode = selectedOrder.promoCode;
-    const promoDiscountValue = parseFloat(selectedOrder?.promoDiscountValue?.toFixed(2) || "0.00");
-    const offerCode = selectedOrder.offerCode;
-    const offerDiscountValue = parseFloat(selectedOrder?.offerDiscountValue?.toFixed(2) || "0.00");
-
-    // Determine if Promo or Offer is applied and calculate the discount accordingly
-    let discountAmount = 0;
-    let discountLabel = '';
+    const promoDiscountValue = parseFloat(selectedOrder.promoDiscountValue || 0);
+    let promoDiscount = 0;
 
     if (promoCode) {
-      // Promo Discount
       if (selectedOrder.promoDiscountType === 'Percentage') {
-        discountAmount = (subtotal * (promoDiscountValue / 100)).toFixed(2);
+        promoDiscount = (subtotal * (promoDiscountValue / 100)).toFixed(2);
       } else if (selectedOrder.promoDiscountType === 'Amount') {
-        discountAmount = promoDiscountValue.toFixed(2);
+        promoDiscount = promoDiscountValue.toFixed(2);
       }
-      discountLabel = `Promo Discount (${promoCode}) :`;
-    } else if (offerCode) {
-      // Offer Discount
-      if (selectedOrder.offerDiscountType === 'Percentage') {
-        discountAmount = (subtotal * (offerDiscountValue / 100)).toFixed(2);
-      } else if (selectedOrder.offerDiscountType === 'Amount') {
-        discountAmount = offerDiscountValue.toFixed(2);
-      }
-      discountLabel = `Offer Discount (${offerCode}) :`;
     }
 
-    const total = (subtotal - discountAmount + shippingCharge).toFixed(2);
+    const shippingCharge = parseFloat(selectedOrder.shippingCharge || 0);
+    let total = subtotal - promoDiscount + shippingCharge;
 
-    pdf.autoTable({
-      startY: margin + 100,
-      head: [['Product Title', 'Color', 'Size', 'Unit Price', 'SKU', 'Gross Amount (Tk)']],
-      body: [
-        ...selectedOrder.productInformation.map(product => [
-          product.productTitle,
-          product.color?.label || '',
-          product.size || '',
-          `${product.unitPrice?.toFixed(2)}`,
-          product.sku,
-          `${(product.unitPrice * product.sku).toFixed(2)}`
-        ]),
-        [{ content: 'Subtotal:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `${subtotal.toFixed(2)}`],
-        ...(discountAmount > 0 ? [[{ content: discountLabel, colSpan: 5, styles: { halign: 'right', border: 'none' } }, `-${discountAmount}`]] : []),
-        [{ content: 'Shipping Charge:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `+${shippingCharge.toFixed(2)}`],
-        [{ content: 'Total:', colSpan: 5, styles: { halign: 'right', border: 'none' } }, `${total}`],
-      ],
-      theme: 'grid',
-      headStyles: { fillColor: primaryColor, textColor: 255 },
-      styles: { fontSize: 10, valign: 'middle', halign: 'center' },
-      columnStyles: {
-        0: { cellWidth: 'auto' },
-        5: { fontStyle: 'bold', halign: 'right', fillColor: [255, 255, 255], textColor: [0, 0, 0] },
+    // Add the offer discount after calculating the promo
+    productRows.forEach((productRow, index) => {
+      const offerDetails = productRow[6];
+      if (offerDetails) {
+        let offerDiscount = 0;
+        const productInfo = selectedOrder.productInformation[index]; // Get the current product's info
+        const productTotal = parseFloat((productInfo.unitPrice * productInfo.sku).toFixed(2)); // Recalculate product total
+
+        // Apply offer discount for this product
+        if (offerDetails.offerTitle) {
+          if (productInfo.offerDiscountType === 'Percentage') {
+            offerDiscount = (productTotal * (productInfo.offerDiscountValue / 100)).toFixed(2);
+          } else if (productInfo.offerDiscountType === 'Amount') {
+            offerDiscount = productInfo.offerDiscountValue.toFixed(2);
+          }
+          total -= offerDiscount; // Reduce total by the offer discount for this product
+        }
+
+        // Update the offer details with the actual discount applied
+        offerDetails.offerDiscount = offerDiscount;
       }
     });
 
-    pdf.setFontSize(12);
-    pdf.setTextColor(...primaryColor);
-    pdf.text('Additional Details', margin, pdf.autoTable.previous.finalY + 10);
+    total = total.toFixed(2);
 
-    const additionalDetails = [
-      ['Shipping Zone:', selectedOrder.shippingZone, 'Shipping Method:', selectedOrder.shippingMethod],
-      ['Payment Method:', selectedOrder.paymentMethod, 'Payment Status:', selectedOrder.paymentStatus],
-      ['Vendor:', selectedOrder.vendor, 'Tracking Number:', selectedOrder.trackingNumber],
-    ];
+    // Generate PDF table with the product rows (without discount in the body)
+    pdf.autoTable({
+      startY: margin + 100,
+      head: [['Title', 'Color', 'Size', 'Unit Price', 'QTY', 'Total']],
+      body: productRows.map(product => [
+        product[0],   // Title
+        product[1],   // Color
+        product[2],   // Size
+        product[3],   // Unit Price
+        product[4],   // QTY
+        product[5],   // Total (without discount)
+      ]),
+      theme: 'plain',
+      styles: {
+        fontSize: 10,
+        cellPadding: 3
+      },
+      columnStyles: {
+        0: { halign: 'center' },    // Title aligned to center
+        1: { halign: 'center' },    // Color aligned to center
+        2: { halign: 'center' },    // Size aligned to center
+        3: { halign: 'center' },    // Unit Price aligned to center
+        4: { halign: 'center' },    // QTY aligned to center
+        5: { halign: 'center' }     // Total aligned to center
+      }
+    });
+
+    // Now add subtotal, promo discount, and total aligned to the right with extra padding
 
     pdf.autoTable({
-      startY: pdf.autoTable.previous.finalY + 15,
-      body: additionalDetails,
-      theme: 'grid',
-      styles: { fontSize: 10, valign: 'middle', halign: 'left' },
+      startY: pdf.lastAutoTable.finalY + 3, // Start just below the previous table
+      body: [
+        [{ content: 'Subtotal:', styles: { halign: 'right', fillColor: [255, 255, 255], cellPadding: { left: 25 } } }, `BDT ${subtotal.toFixed(2)}`], // Increased padding
+        ...(promoDiscount > 0 ? [[{ content: `Promo (${promoCode}):`, styles: { halign: 'right', cellPadding: { left: 25 } } }, `BDT -${promoDiscount}`]] : []), // Increased padding
+        ...(hasOffers ? productRows.map((product, index) => {
+          const offerDetails = product[6];
+          if (offerDetails) {
+            return [
+              { content: `Offer (${offerDetails.offerTitle}) on ${offerDetails.productTitle}:`, styles: { halign: 'right', cellPadding: { left: 25 } } }, // Increased padding
+              `BDT -${offerDetails.offerDiscount}`
+            ];
+          }
+        }).filter(Boolean) : []),
+        [{ content: 'Shipping Charge:', styles: { halign: 'right', cellPadding: { left: 25 } } }, `BDT +${shippingCharge.toFixed(2)}`], // Increased padding
+        [{ content: 'Total:', styles: { halign: 'right', fontStyle: 'bold', cellPadding: { left: 25 } } }, `BDT ${total}`] // Increased padding
+      ],
+      theme: 'plain',
+      styles: {
+        fontSize: 10,
+        cellPadding: { top: 0.5, bottom: 0.5, left: 6, right: 3 },
+      },
       columnStyles: {
-        0: { cellWidth: pageWidth / 4 - 2 * margin },
-        1: { cellWidth: pageWidth / 4 - 2 * margin },
-        2: { cellWidth: pageWidth / 4 - 2 * margin },
-        3: { cellWidth: pageWidth / 4 - 2 * margin },
+        0: { halign: 'right' },  // Align labels to the right
+        1: { halign: 'center' },  // Align amounts to center
       },
     });
 
-    pdf.setFontSize(8);
-    pdf.setTextColor(128, 128, 128);
+    // Define footer text
+    const footerText = "www.fashion-commerce.com | info@fashion-commerce.com | Hotline: 01700000000";
 
-    const disclaimerText = 'If this invoice is for ongoing services and you have requested us to take payment using the continuous authority credit or debit card details stored on our system, then we will do so and no further action is required.';
-    const disclaimerWidth = pageWidth - 2 * margin;
-    const disclaimerHeight = pdf.getTextDimensions(disclaimerText, { maxWidth: disclaimerWidth }).h + 4;
-    const disclaimerX = margin;
-    const disclaimerY = pdf.autoTable.previous.finalY + 45;
+    // Get the width of the text to center it
+    const textWidth = pdf.getTextWidth(footerText);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const xCenter = (pdfWidth - textWidth) / 2;
 
-    pdf.rect(disclaimerX, disclaimerY, disclaimerWidth, disclaimerHeight, 'S');
+    // Set the Y position for the bottom of the page
+    const yBottom = pdf.internal.pageSize.getHeight() - 20; // 20 units from the bottom
 
-    pdf.text(disclaimerText, disclaimerX + disclaimerWidth / 2, disclaimerY + disclaimerHeight / 2, {
-      align: 'center',
-      maxWidth: disclaimerWidth,
-      baseline: 'middle',
-    });
+    // Add custom slim/thin font (make sure you've included the font in your jsPDF instance)
+    // pdf.addFont('path_to_thin_font.ttf', 'SlimFont', 'normal'); // Load the font if required
+    pdf.setFont('SlimFont', 'normal'); // Use the custom thin font
+
+    // Set the font size and color
+    pdf.setFontSize(10); // Ensure font size is set before adding the text
+    pdf.setTextColor(0, 0, 0); // Optional: set the color for the footer text
+
+    // Add the footer text to the PDF
+    pdf.text(footerText, xCenter, yBottom); // No need for align: 'center' here
 
     const blob = pdf.output('blob');
     const blobUrl = URL.createObjectURL(blob);

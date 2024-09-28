@@ -57,7 +57,9 @@ const ExistingZones = () => {
                   {zone?.shippingZone}
                 </td>
                 <td className="text-xs p-3 text-gray-700">{zone?.selectedCity.join(', ')}</td>
-                <td className="text-xs p-3 text-gray-700">{zone?.selectedShipmentHandler.join(', ')}</td>
+                <td className="text-xs p-3 text-gray-700">
+                  {zone?.selectedShipmentHandler.map(handler => handler.shipmentHandlerName).join(', ')}
+                </td>
                 <td className="text-xs p-3 text-gray-700">৳ {zone?.shippingCharge}</td>
                 <td className="p-3">
                   <div className="flex gap-2 items-center">

@@ -44,12 +44,12 @@ const EditProduct = () => {
         }}
         className='absolute inset-0 z-0 top-2 md:top-5 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
-      <div className='max-w-[1300px] mx-auto px-6 py-8 md:py-10 lg:py-12 relative z-10'>
+
+      <div className='max-w-screen-2xl mx-auto px-6 py-8 md:py-10 lg:py-12 relative z-10'>
         <div className='flex justify-between items-center'>
           <h1 className='font-bold text-xl md:text-2xl lg:text-3xl'>Look at Our Categories</h1>
           <Link className='flex items-center gap-2 text-[10px] md:text-base' href="/dash-board/products"> <span className='border border-black rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
-
       </div>
 
       <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 max-w-screen-2xl mx-auto px-6">

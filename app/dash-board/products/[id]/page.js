@@ -26,7 +26,7 @@ import { RxCross2 } from 'react-icons/rx';
 import ReactSelect from 'react-select';
 import toast from 'react-hot-toast';
 import useShippingZones from '@/app/hooks/useShippingZones';
-import { shippingServices } from '@/app/components/layout/shippingServices';
+import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
@@ -72,6 +72,7 @@ const EditProductPage = () => {
   const [productVariants, setProductVariants] = useState([]);
   const [selectedShipmentHandler, setSelectedShipmentHandler] = useState([]);
   const [shippingList, isShippingPending] = useShippingZones();
+  const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
   const [previousBatchCode, setPreviousBatchCode] = useState("");
 
   const toggleCardSelection = (shipping) => {
@@ -499,7 +500,7 @@ const EditProductPage = () => {
     }
   };
 
-  if (isCategoryPending || isSizeRangePending || isSubCategoryPending || isTagPending || isVendorPending || isColorPending || isShippingPending) {
+  if (isCategoryPending || isSizeRangePending || isSubCategoryPending || isTagPending || isVendorPending || isColorPending || isShippingPending || isShipmentHandlerPending) {
     return <Loading />
   }
 
@@ -964,14 +965,14 @@ const EditProductPage = () => {
                   >
                     <h1 className="text-2xl font-bold text-gray-900 text-center">{shipping?.shippingZone}</h1>
                     <div className='flex items-center justify-center gap-4'>
-                      {shipping?.selectedShipmentHandler?.map((handlerName, handlerIndex) => {
-                        const handler = shippingServices?.find(service => service.name === handlerName);
+                      {shipping?.selectedShipmentHandler?.map((shipping, handlerIndex) => {
+                        const handler = shipmentHandlerList?.find(service => service.shipmentHandlerName === shipping?.shipmentHandlerName);
                         return (
                           <div key={handlerIndex} className="p-4 rounded-lg flex flex-col items-center justify-center h-40 w-40">
-                            {handler?.logoURL && (
+                            {handler?.imageUrl && (
                               <Image
-                                src={handler.logoURL}
-                                alt={handler.name}
+                                src={handler.imageUrl}
+                                alt="shipping"
                                 width={100}
                                 height={100}
                                 className="mb-2 object-contain h-32 w-32"
@@ -991,7 +992,7 @@ const EditProductPage = () => {
           </div>
         </div>
 
-        <div className='2xl:max-w-screen-2xl 2xl:mx-auto flex justify-between px-6 pt-4 pb-8'>
+        <div className='2xl:max-w-screen-2xl 2xl:mx-auto flex justify-between px-6 pt-8 pb-16'>
           <Link href='/dash-board/products/existing-products' className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
             <FaArrowLeft /> Go Back
           </Link>

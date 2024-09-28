@@ -7,15 +7,17 @@ import { useForm, Controller } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { FaArrowLeft } from 'react-icons/fa6';
-import { shippingServices } from '@/app/components/layout/shippingServices';
 import { cities } from '@/app/components/layout/cities';
 import Image from 'next/image';
+import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
+import Loading from '@/app/components/shared/Loading/Loading';
 
 export default function EditShippingZone() {
   const router = useRouter();
   const params = useParams();
   const axiosPublic = useAxiosPublic();
   const [selectedShipmentHandler, setSelectedShipmentHandler] = useState([]);
+  const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
   const [sizeError, setSizeError] = useState(false);
   const [selectedCity, setSelectedCity] = useState([]);
   const [cityError, setCityError] = useState(false);
@@ -52,14 +54,20 @@ export default function EditShippingZone() {
     setCityError(selectedArray.length === 0);
   };
 
-  const toggleLogoSelection = (key) => {
-    if (selectedShipmentHandler.includes(key)) {
-      setSelectedShipmentHandler(selectedShipmentHandler.filter((selectedKey) => selectedKey !== key));
+  const toggleLogoSelection = (shipmentHandler) => {
+    // Check if the handler is already selected using _id
+    if (selectedShipmentHandler.some(handler => handler._id === shipmentHandler._id)) {
+      // Remove the handler if it's already selected
+      setSelectedShipmentHandler(selectedShipmentHandler.filter((selectedHandler) => selectedHandler._id !== shipmentHandler._id));
     } else {
-      setSelectedShipmentHandler([...selectedShipmentHandler, key]);
+      // Add the new handler if it's not selected
+      setSelectedShipmentHandler([...selectedShipmentHandler, shipmentHandler]);
+
+      // Clear the error if a handler is selected
+      if (sizeError) {
+        setSizeError(false);
+      }
     }
-    // Remove the error message when an image is selected
-    setSizeError(false);
   };
 
   const onSubmit = async (formData) => {
@@ -89,6 +97,10 @@ export default function EditShippingZone() {
       toast.error('There was an error updating the shipping zone.');
     }
   };
+
+  if (isShipmentHandlerPending) {
+    return <Loading />
+  }
 
   return (
     <div className='bg-gray-50 min-h-screen'>
@@ -170,21 +182,20 @@ export default function EditShippingZone() {
             </div>
 
             {/* Shipment Handlers */}
-            <div className="mt-4">
-              <div className="flex flex-wrap items-center justify-center gap-4">
-                {shippingServices.map((shipmentHandler) => (
-                  <div
-                    key={shipmentHandler.name}
-                    onClick={() => toggleLogoSelection(shipmentHandler.name)}
-                    className={`cursor-pointer border-2 rounded-md p-2 ${selectedShipmentHandler.includes(shipmentHandler.name) ? 'border-blue-500' : 'border-gray-300'}`}
-                  >
-                    <Image src={shipmentHandler?.logoURL} alt={shipmentHandler.name} height={300} width={300} className="h-24 w-24 xl:h-32 xl:w-32 object-contain" />
-                    <p className="text-center">{shipmentHandler.name}</p>
-                  </div>
-                ))}
-                {/* Display error message if no shipment handler is selected */}
-                {sizeError && <p className='text-red-600 text-left mt-1'>Please select at least one shipment handler.</p>}
-              </div>
+            <h1 className='text-[#9F5216] mt-4'>Select Shipment Handler</h1>
+            <div className="flex flex-wrap items-center justify-start gap-4">
+              {shipmentHandlerList?.map((shipmentHandler) => (
+                <div
+                  key={shipmentHandler._id}  // Always use unique keys
+                  onClick={() => toggleLogoSelection(shipmentHandler)}
+                  className={`cursor-pointer border-2 rounded-md p-2 ${selectedShipmentHandler.some((handler) => handler._id === shipmentHandler._id) ? 'border-blue-500' : 'border-gray-300'}`}
+                >
+                  {shipmentHandler?.imageUrl && <Image src={shipmentHandler?.imageUrl} alt="shipment" height={300} width={300} className="h-24 w-24 xl:h-32 xl:w-32 object-contain" />}
+                  <p className="text-center">{shipmentHandler.shipmentHandlerName}</p>
+                </div>
+              ))}
+              {/* Display error message if no shipment handler is selected */}
+              {sizeError && <p className='text-red-600 text-left mt-1'>Please select at least one shipment handler.</p>}
             </div>
           </div>
 

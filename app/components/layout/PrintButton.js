@@ -184,45 +184,26 @@ const PrintButton = ({ selectedOrder }) => {
     // Check if any product has an offer
     const hasOffers = selectedOrder.productInformation.some(product => product.offerTitle);
 
-    // Prepare the product rows
+    // Prepare the product rows without applying discount at this point
     const productRows = selectedOrder.productInformation.map(product => {
-      let productTotal = product.unitPrice * product.sku; // Original price
-      let offerDiscount = 0;
-
-      // Apply offer discount per product
-      if (product.offerTitle) {
-        if (product.offerDiscountType === 'Percentage') {
-          offerDiscount = (productTotal * (product.offerDiscountValue / 100)).toFixed(2);
-        } else if (product.offerDiscountType === 'Amount') {
-          offerDiscount = product.offerDiscountValue.toFixed(2);
-        }
-        productTotal = (productTotal - offerDiscount).toFixed(2);
-      }
+      const productTotal = (product.unitPrice * product.sku).toFixed(2); // Original price without discount
 
       return [
         product.productTitle,   // Title
         product.color?.label || '',  // Color
         product.size || '',         // Size
-        `BDT ${product.unitPrice.toFixed(2)}`, // Unit Price
+        `${product.unitPrice.toFixed(2)}`, // Unit Price
         product.sku,                // QTY
-        `BDT ${productTotal}`,       // Total
-        product.offerTitle ? `${product.offerTitle} (-BDT ${offerDiscount})` : '' // Offer details
+        `BDT ${productTotal}`,       // Total (without discount)
+        product.offerTitle ? { offerTitle: product.offerTitle, offerDiscount: 0, productTitle: product.productTitle } : null // Store offer details without applying discount yet
       ];
     });
 
-    // Calculate subtotal
+    // Calculate subtotal without offer discounts initially
     const subtotal = parseFloat(
       selectedOrder.productInformation.reduce((total, product) => {
         const productTotal = product.unitPrice * product.sku;
-        let offerDiscount = 0;
-        if (product.offerTitle) {
-          if (product.offerDiscountType === 'Percentage') {
-            offerDiscount = (productTotal * (product.offerDiscountValue / 100));
-          } else if (product.offerDiscountType === 'Amount') {
-            offerDiscount = product.offerDiscountValue;
-          }
-        }
-        return total + (productTotal - offerDiscount);
+        return total + productTotal;
       }, 0).toFixed(2)
     );
 
@@ -240,41 +221,45 @@ const PrintButton = ({ selectedOrder }) => {
     }
 
     const shippingCharge = parseFloat(selectedOrder.shippingCharge || 0);
-    const total = (subtotal - (promoDiscount || 0) + shippingCharge).toFixed(2);
+    let total = subtotal - promoDiscount + shippingCharge;
 
-    // Generate PDF table with the offer and promo discounts applied
+    // Add the offer discount after calculating the promo
+    productRows.forEach((productRow, index) => {
+      const offerDetails = productRow[6];
+      if (offerDetails) {
+        let offerDiscount = 0;
+        const productInfo = selectedOrder.productInformation[index]; // Get the current product's info
+        const productTotal = parseFloat((productInfo.unitPrice * productInfo.sku).toFixed(2)); // Recalculate product total
+
+        // Apply offer discount for this product
+        if (offerDetails.offerTitle) {
+          if (productInfo.offerDiscountType === 'Percentage') {
+            offerDiscount = (productTotal * (productInfo.offerDiscountValue / 100)).toFixed(2);
+          } else if (productInfo.offerDiscountType === 'Amount') {
+            offerDiscount = productInfo.offerDiscountValue.toFixed(2);
+          }
+          total -= offerDiscount; // Reduce total by the offer discount for this product
+        }
+
+        // Update the offer details with the actual discount applied
+        offerDetails.offerDiscount = offerDiscount;
+      }
+    });
+
+    total = total.toFixed(2);
+
+    // Generate PDF table with the product rows (without discount in the body)
     pdf.autoTable({
       startY: margin + 100,
-      head: [['Title', 'Color', 'Size', 'Unit Price', 'QTY', 'Total', hasOffers ? 'Offers' : '']],
-      body: [
-        ...productRows.map(product => {
-          return [
-            product[0],   // Title
-            product[1],   // Color
-            product[2],   // Size
-            product[3],   // Unit Price
-            product[4],   // QTY
-            product[5],   // Total
-            hasOffers ? product[6] : '' // Offers (new column for offers)
-          ];
-        }),
-        // Conditional column spans based on offers
-        ...(hasOffers ? [
-          [{ content: 'Subtotal:', colSpan: 5, styles: { halign: 'right' } }, `BDT ${subtotal.toFixed(2)}`],
-          ...(promoDiscount > 0 ? [
-            [{ content: `Promo Discount (${promoCode}):`, colSpan: 5, styles: { halign: 'right' } }, `BDT -${promoDiscount}`]
-          ] : []),
-          [{ content: 'Shipping Charge:', colSpan: 5, styles: { halign: 'right' } }, `BDT ${shippingCharge.toFixed(2)}`],
-          [{ content: 'Total:', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }, `BDT ${total}`]
-        ] : [
-          [{ content: 'Subtotal:', colSpan: 4, styles: { halign: 'right' } }, `BDT ${subtotal.toFixed(2)}`],
-          ...(promoDiscount > 0 ? [
-            [{ content: `Promo Discount (${promoCode}):`, colSpan: 4, styles: { halign: 'right' } }, `BDT -${promoDiscount}`]
-          ] : []),
-          [{ content: 'Shipping Charge:', colSpan: 4, styles: { halign: 'right' } }, `BDT ${shippingCharge.toFixed(2)}`],
-          [{ content: 'Total:', colSpan: 4, styles: { halign: 'right', fontStyle: 'bold' } }, `BDT ${total}`]
-        ]),
-      ],
+      head: [['Title', 'Color', 'Size', 'Unit Price', 'QTY', 'Total']],
+      body: productRows.map(product => [
+        product[0],   // Title
+        product[1],   // Color
+        product[2],   // Size
+        product[3],   // Unit Price
+        product[4],   // QTY
+        product[5],   // Total (without discount)
+      ]),
       theme: 'plain',
       styles: {
         fontSize: 10,
@@ -286,13 +271,42 @@ const PrintButton = ({ selectedOrder }) => {
         2: { halign: 'center' },    // Size aligned to center
         3: { halign: 'center' },    // Unit Price aligned to center
         4: { halign: 'center' },    // QTY aligned to center
-        5: { halign: 'center' },    // Total aligned to center
-        6: { halign: 'left' }       // Offers aligned to left
+        5: { halign: 'center' }     // Total aligned to center
       }
     });
 
+    // Now add subtotal, promo discount, and total aligned to the right with extra padding
+
+    pdf.autoTable({
+      startY: pdf.lastAutoTable.finalY + 3, // Start just below the previous table
+      body: [
+        [{ content: 'Subtotal:', styles: { halign: 'right', fillColor: [255, 255, 255], cellPadding: { left: 25 } } }, `BDT ${subtotal.toFixed(2)}`], // Increased padding
+        ...(promoDiscount > 0 ? [[{ content: `Promo (${promoCode}):`, styles: { halign: 'right', cellPadding: { left: 25 } } }, `BDT -${promoDiscount}`]] : []), // Increased padding
+        ...(hasOffers ? productRows.map((product, index) => {
+          const offerDetails = product[6];
+          if (offerDetails) {
+            return [
+              { content: `Offer (${offerDetails.offerTitle}) on ${offerDetails.productTitle}:`, styles: { halign: 'right', cellPadding: { left: 25 } } }, // Increased padding
+              `BDT -${offerDetails.offerDiscount}`
+            ];
+          }
+        }).filter(Boolean) : []),
+        [{ content: 'Shipping Charge:', styles: { halign: 'right', cellPadding: { left: 25 } } }, `BDT +${shippingCharge.toFixed(2)}`], // Increased padding
+        [{ content: 'Total:', styles: { halign: 'right', fontStyle: 'bold', cellPadding: { left: 25 } } }, `BDT ${total}`] // Increased padding
+      ],
+      theme: 'plain',
+      styles: {
+        fontSize: 10,
+        cellPadding: { top: 0.5, bottom: 0.5, left: 6, right: 3 },
+      },
+      columnStyles: {
+        0: { halign: 'right' },  // Align labels to the right
+        1: { halign: 'center' },  // Align amounts to center
+      },
+    });
+
     // Define footer text
-    const footerText = "www.f-commerce.com | info@f-commerce.com | Hotline: 01700000000";
+    const footerText = "www.fashion-commerce.com | info@fashion-commerce.com | Hotline: 01700000000";
 
     // Get the width of the text to center it
     const textWidth = pdf.getTextWidth(footerText);
@@ -302,9 +316,15 @@ const PrintButton = ({ selectedOrder }) => {
     // Set the Y position for the bottom of the page
     const yBottom = pdf.internal.pageSize.getHeight() - 20; // 20 units from the bottom
 
-    // Add the footer text to the PDF
+    // Add custom slim/thin font (make sure you've included the font in your jsPDF instance)
+    // pdf.addFont('path_to_thin_font.ttf', 'SlimFont', 'normal'); // Load the font if required
+    pdf.setFont('SlimFont', 'normal'); // Use the custom thin font
+
+    // Set the font size and color
     pdf.setFontSize(10); // Ensure font size is set before adding the text
     pdf.setTextColor(0, 0, 0); // Optional: set the color for the footer text
+
+    // Add the footer text to the PDF
     pdf.text(footerText, xCenter, yBottom); // No need for align: 'center' here
 
     const blob = pdf.output('blob');

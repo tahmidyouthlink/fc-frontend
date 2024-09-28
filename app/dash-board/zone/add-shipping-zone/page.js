@@ -1,7 +1,8 @@
 "use client";
 import { cities } from '@/app/components/layout/cities';
-import { shippingServices } from '@/app/components/layout/shippingServices';
+import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
+import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
 import { Select, SelectItem } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,7 +10,10 @@ import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import { FaPlusCircle } from 'react-icons/fa';
 import { FaArrowLeft } from 'react-icons/fa6';
+import { MdOutlineModeEdit } from 'react-icons/md';
+import { RiDeleteBinLine } from 'react-icons/ri';
 
 const AddShippingZone = () => {
   const axiosPublic = useAxiosPublic();
@@ -19,6 +23,7 @@ const AddShippingZone = () => {
   const [sizeError, setSizeError] = useState(false);
   const [selectedCity, setSelectedCity] = useState([]);
   const [cityError, setCityError] = useState(false);
+  const [shipmentHandlerList, isShipmentHandlerPending, refetch] = useShipmentHandlers();
 
   const { register, handleSubmit, control, formState: { errors } } = useForm();
 
@@ -28,14 +33,37 @@ const AddShippingZone = () => {
     setCityError(selectedArray.length === 0);
   };
 
-  const toggleLogoSelection = (key) => {
-    if (selectedShipmentHandler.includes(key)) {
-      setSelectedShipmentHandler(selectedShipmentHandler.filter((selectedKey) => selectedKey !== key));
+  const toggleLogoSelection = (shipmentHandler) => {
+    // Check if the handler is already selected
+    if (selectedShipmentHandler.some(handler => handler._id === shipmentHandler._id)) {
+      // Remove the handler if it's already selected
+      setSelectedShipmentHandler(selectedShipmentHandler.filter((selectedHandler) => selectedHandler._id !== shipmentHandler._id));
     } else {
-      setSelectedShipmentHandler([...selectedShipmentHandler, key]);
+      // Add the new handler if it's not selected
+      setSelectedShipmentHandler([...selectedShipmentHandler, shipmentHandler]);
+
+      // Clear the error if a handler is selected
       if (sizeError) {
-        setSizeError(false);  // Clear the error when a logo is selected
+        setSizeError(false);
       }
+    }
+  };
+
+  const handleEditShipmentHandler = (e, id) => {
+    e.preventDefault();
+    router.push(`/dash-board/zone/add-shipping-zone/${id}`)
+  }
+
+  const handleDeleteShipmentHandler = async (e, id) => {
+    e.preventDefault(); // Prevent form submission
+    try {
+      const res = await axiosPublic.delete(`/deleteShipmentHandler/${id}`);
+      if (res?.data?.deletedCount) {
+        refetch();
+        toast.success('Shipment Handler Deleted successfully!');
+      }
+    } catch (error) {
+      toast.error('Failed to delete this shipment handler. Please try again!');
     }
   };
 
@@ -83,6 +111,10 @@ const AddShippingZone = () => {
       setIsSubmitting(false);
     }
   };
+
+  if (isShipmentHandlerPending) {
+    return <Loading />
+  }
 
   return (
     <div className='bg-gray-50 min-h-screen'>
@@ -159,20 +191,64 @@ const AddShippingZone = () => {
             </div>
 
             {/* Shipping Handler Selection */}
-            <div className="flex flex-wrap items-center justify-center mt-4 gap-4">
-              {shippingServices.map((shipmentHandler) => (
+            <h1 className='text-[#9F5216] mt-4'>Add, Edit or Select Shipment Handler</h1>
+            <div className="flex flex-wrap items-center justify-start gap-4">
+              {shipmentHandlerList?.map((shipmentHandler) => (
                 <div
-                  key={shipmentHandler.name}
-                  onClick={() => toggleLogoSelection(shipmentHandler.name)}
-                  className={`cursor-pointer border-2 rounded-md p-2 ${selectedShipmentHandler.includes(shipmentHandler.name) ? 'border-blue-500' : 'border-gray-300'
+                  key={shipmentHandler._id}
+                  onClick={() => toggleLogoSelection(shipmentHandler)}  // Click on card to select/deselect
+                  className={`relative cursor-pointer border-2 rounded-md ${shipmentHandler?.imageUrl ? "p-2" : "p-8"} ${selectedShipmentHandler.some((handler) => handler._id === shipmentHandler._id) ? 'border-blue-500' : 'border-gray-300'
                     }`}
                 >
-                  <Image src={shipmentHandler?.logoURL} alt={shipmentHandler.name} height={300} width={300} className="h-32 w-32 object-contain" />
-                  <p className="text-center">{shipmentHandler.name}</p>
+                  {/* Icons Section */}
+                  <div className="absolute top-2 right-2 flex items-center justify-between space-x-2">
+
+                    <div className="group relative">
+                      <button>
+                        <RiDeleteBinLine
+                          onClick={(e) => handleDeleteShipmentHandler(e, shipmentHandler._id)}
+                          size={22}
+                          className={`text-red-500 hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200`}
+                        />
+                      </button>
+                      {<span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
+                        Delete
+                      </span>}
+                    </div>
+
+                    <div className="group relative">
+                      <button>
+                        <MdOutlineModeEdit
+                          onClick={(e) => handleEditShipmentHandler(e, shipmentHandler._id)}
+                          size={22}
+                          className={`text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200`}
+                        />
+                      </button>
+                      {<span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
+                        Edit
+                      </span>}
+                    </div>
+
+                  </div>
+
+                  {/* Shipment Handler Image */}
+                  {shipmentHandler?.imageUrl && <Image src={shipmentHandler?.imageUrl} alt="shipment" height={300} width={300} className="h-32 w-32 object-contain" />}
+
+                  {/* Shipment Handler Name */}
+                  <p className="text-center">{shipmentHandler.shipmentHandlerName}</p>
                 </div>
               ))}
-              {sizeError && <p className='text-red-600 text-left'>Please select at least one image.</p>}
+
+              <div>
+                <Link
+                  href="/dash-board/zone/add-shipment-handler"
+                  className="relative w-full h-40 px-14 xl:px-8 border-2 border-dashed border-gray-600 bg-white text-gray-600 font-extrabold rounded-lg shadow-lg flex items-center justify-center gap-4 sm:gap-5 md:gap-6 transition-all duration-300 group hover:bg-[#ffddc2] hover:text-gray-800 hover:border-transparent hover:shadow-xl"
+                >
+                  <FaPlusCircle className="transition-transform transform group-hover:scale-110 group-hover:text-gray-800 animate-pulse text-3xl" />
+                </Link>
+              </div>
             </div>
+            {sizeError && <p className='text-red-600 text-left'>Please select at least one shipment handler.</p>}
 
           </div>
 

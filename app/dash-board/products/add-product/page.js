@@ -663,8 +663,8 @@ const FirstStepOfAddProduct = () => {
                     selectedKey={discountType}
                     onSelectionChange={handleTabChange}
                   >
-                    <Tab key="Percentage" title="Percentage">Discount (%)</Tab>
-                    <Tab key="Flat" title="Flat">Flat Discount (taka)</Tab>
+                    <Tab key="Percentage" title="Percentage" className='text-[#9F5216]'>Discount (%)</Tab>
+                    <Tab key="Flat" title="Flat" className='text-[#9F5216]'>Flat Discount (taka)</Tab>
                   </Tabs>
 
                   <input

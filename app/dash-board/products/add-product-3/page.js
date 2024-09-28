@@ -1,7 +1,7 @@
 "use client";
-import { shippingServices } from '@/app/components/layout/shippingServices';
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
+import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
 import useShippingZones from '@/app/hooks/useShippingZones';
 import { Checkbox } from '@nextui-org/react';
 import Image from 'next/image';
@@ -22,6 +22,7 @@ const ThirdStepOfAddProduct = () => {
   const [selectedShipmentHandler, setSelectedShipmentHandler] = useState([]);
   const [selectAll, setSelectAll] = useState(false); // State for "select all"
   const [sizeError, setSizeError] = useState(false);
+  const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
 
   // Toggle card selection
   const toggleCardSelection = (shipping) => {
@@ -133,7 +134,7 @@ const ThirdStepOfAddProduct = () => {
     }
   };
 
-  if (isShippingPending) {
+  if (isShippingPending || isShipmentHandlerPending) {
     return <Loading />
   }
 
@@ -189,18 +190,17 @@ const ThirdStepOfAddProduct = () => {
                     {/* Shipment Handlers */}
                     <td className="px-2 py-1 md:px-4 md:py-2">
                       <div className="flex items-center justify-center md:gap-4">
-                        {shipping?.selectedShipmentHandler?.map((handlerName, handlerIndex) => {
-                          const handler = shippingServices.find(service => service.name === handlerName);
-
+                        {shipping?.selectedShipmentHandler?.map((shipping, handlerIndex) => {
+                          const handler = shipmentHandlerList?.find(service => service.shipmentHandlerName === shipping?.shipmentHandlerName);
                           return (
-                            <div key={handlerIndex} className="p-2 rounded-lg flex items-center justify-center">
-                              {handler?.logoURL && (
+                            <div key={handlerIndex} className="p-4 rounded-lg flex flex-col items-center justify-center h-40 w-40">
+                              {handler?.imageUrl && (
                                 <Image
-                                  src={handler.logoURL}
-                                  alt={handler.name}
-                                  width={200} // Increased size for better visibility
-                                  height={200} // Increased size for better visibility
-                                  className="object-contain rounded-md w-full h-auto max-w-[50px] max-h-[50px] min-h-[50px] transition-transform duration-300 hover:scale-105" // Responsive styling
+                                  src={handler.imageUrl}
+                                  alt="shipping"
+                                  width={100}
+                                  height={100}
+                                  className="mb-2 object-contain h-32 w-32"
                                 />
                               )}
                             </div>
