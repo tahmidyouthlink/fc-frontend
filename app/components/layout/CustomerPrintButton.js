@@ -122,7 +122,7 @@ const CustomerPrintButton = ({ selectedOrder }) => {
 
     // Barcode
     const barcodeDataUrl = generateBarcodeData(selectedOrder.orderNumber);
-    pdf.addImage(barcodeDataUrl, 'PNG', margin, yPosition + 10, 80, 30);
+    pdf.addImage(barcodeDataUrl, 'PNG', margin, yPosition + 5, 80, 30);
 
     // Additional Info aligned to the right with smaller font size
     pdf.setFontSize(10);
@@ -247,61 +247,77 @@ const CustomerPrintButton = ({ selectedOrder }) => {
 
     total = total.toFixed(2);
 
-    // Generate PDF table with the product rows (without discount in the body)
     pdf.autoTable({
       startY: margin + 100,
       head: [['Title', 'Color', 'Size', 'Unit Price', 'QTY', 'Total']],
       body: productRows.map(product => [
-        product[0],   // Title
-        product[1],   // Color
-        product[2],   // Size
-        product[3],   // Unit Price
-        product[4],   // QTY
-        product[5],   // Total (without discount)
+        { content: product[0], styles: { halign: 'center' } },   // Title aligned to left
+        { content: product[1], styles: { halign: 'center' } },   // Color aligned to left
+        { content: product[2], styles: { halign: 'center' } }, // Size aligned to center
+        { content: product[3], styles: { halign: 'center' } },  // Unit Price aligned to center
+        { content: product[4], styles: { halign: 'center' } },  // QTY aligned to right
+        { content: product[5], styles: { halign: 'center' } }    // Total aligned to right
       ]),
       theme: 'plain',
       styles: {
         fontSize: 10,
-        cellPadding: 3
+        cellPadding: { top: 2, bottom: 2, left: 2, right: 2 }, // Uniform padding
+      },
+      headStyles: {
+        fontStyle: 'bold',          // Bold text for headers
+        halign: 'center',             // Default header alignment to the left (can be overridden by 
       },
       columnStyles: {
-        0: { halign: 'center' },    // Title aligned to center
-        1: { halign: 'center' },    // Color aligned to center
-        2: { halign: 'center' },    // Size aligned to center
-        3: { halign: 'center' },    // Unit Price aligned to center
-        4: { halign: 'center' },    // QTY aligned to center
-        5: { halign: 'center' }     // Total aligned to center
+        0: { halign: 'left', cellWidth: 'auto' },    // Title aligned to left
+        1: { halign: 'left', cellWidth: 'auto' },    // Color aligned to left
+        2: { halign: 'center', cellWidth: 'auto' },  // Size aligned to center
+        3: { halign: 'center', cellWidth: 'auto' },  // Unit Price aligned to center
+        4: { halign: 'left', cellWidth: 'auto' },   // QTY aligned to right
+        5: { halign: 'left', cellWidth: 'auto' }    // Total aligned to right
       }
     });
 
     // Now add subtotal, promo discount, and total aligned to the right with extra padding
-
     pdf.autoTable({
       startY: pdf.lastAutoTable.finalY + 3, // Start just below the previous table
       body: [
-        [{ content: 'Subtotal:', styles: { halign: 'right', fillColor: [255, 255, 255], cellPadding: { left: 25 } } }, `BDT ${subtotal.toFixed(2)}`], // Increased padding
-        ...(promoDiscount > 0 ? [[{ content: `Promo (${promoCode}):`, styles: { halign: 'right', cellPadding: { left: 25 } } }, `BDT -${promoDiscount}`]] : []), // Increased padding
+        [
+          { content: 'Subtotal:', styles: { fillColor: [255, 255, 255] } },
+          `BDT ${subtotal.toFixed(2)}`
+        ], // Increased padding
+        ...(promoDiscount > 0 ? [
+          [
+            { content: `Promo (${promoCode}):` },
+            `BDT -${promoDiscount}`
+          ]
+        ] : []), // Increased padding
         ...(hasOffers ? productRows.map((product, index) => {
           const offerDetails = product[6];
           if (offerDetails) {
             return [
-              { content: `Offer (${offerDetails.offerTitle}) on ${offerDetails.productTitle}:`, styles: { halign: 'right', cellPadding: { left: 25 } } }, // Increased padding
+              { content: `Offer (${offerDetails.offerTitle}) on ${offerDetails.productTitle}:` },
               `BDT -${offerDetails.offerDiscount}`
             ];
           }
         }).filter(Boolean) : []),
-        [{ content: 'Shipping Charge:', styles: { halign: 'right', cellPadding: { left: 25 } } }, `BDT +${shippingCharge.toFixed(2)}`], // Increased padding
-        [{ content: 'Total:', styles: { halign: 'right', fontStyle: 'bold', cellPadding: { left: 25 } } }, `BDT ${total}`] // Increased padding
+        [
+          { content: 'Shipping Charge:' },
+          `BDT +${shippingCharge.toFixed(2)}`
+        ], // Increased padding
+        [
+          { content: 'Total:', styles: { fontStyle: 'bold' } },
+          `BDT ${total}`
+        ] // Increased padding
       ],
       theme: 'plain',
       styles: {
         fontSize: 10,
-        cellPadding: { top: 0.5, bottom: 0.5, left: 6, right: 3 },
+        minCellHeight: 6, // Optional: Adjust row height
       },
       columnStyles: {
-        0: { halign: 'right' },  // Align labels to the right
-        1: { halign: 'center' },  // Align amounts to center
-      },
+        0: { halign: 'right', cellWidth: 'auto', cellPadding: { left: 4 } },  // Align labels to the right, extra padding
+        1: { halign: 'right', cellWidth: 40, cellPadding: { left: 8, right: 12 } }
+      }
     });
 
     // Define footer text
