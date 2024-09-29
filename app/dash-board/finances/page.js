@@ -23,7 +23,7 @@ const Finances = () => {
       `}
             onClick={() => setActiveTab('finance performance')}
           >
-            Finance Performance
+            Performance
           </button>
 
           <button
@@ -35,14 +35,14 @@ const Finances = () => {
       `}
             onClick={() => setActiveTab('payment method')}
           >
-            Payment Method
+            Payment Methods
           </button>
 
         </div>
       </div>
 
       {activeTab === "finance performance" && <div className='pt-4'>
-        <h1 className='font-bold'>Finance Performance</h1>
+        <h1 className='font-bold'>Performance</h1>
         <p className='pt-1 text-neutral-400 text-sm font-medium'>The data includes all active, ended, or canceled deals. This report represents unaudited data, please refer to your invoice for accurate settlement numbers.</p>
         <FinancePerformance />
       </div>}
