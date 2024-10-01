@@ -2,9 +2,8 @@
 import { FaBullhorn } from "react-icons/fa";
 import { PiUsersThreeLight } from "react-icons/pi";
 import { BiCategory } from "react-icons/bi";
-import { PiResizeBold } from "react-icons/pi";
 import { IoMdHome } from "react-icons/io";
-import { MdOutlineLocalShipping, MdOutlineSettings } from "react-icons/md";
+import { MdOutlineSettings, MdPayment } from "react-icons/md";
 import { TbClipboardList } from "react-icons/tb";
 import { LiaBoxOpenSolid } from "react-icons/lia";
 import { TbBuildingBank } from "react-icons/tb";
@@ -18,6 +17,9 @@ import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 import { useState } from "react";
 import { ImCross } from "react-icons/im";
 import { LiaUserLockSolid } from "react-icons/lia";
+import { IoColorPaletteOutline } from "react-icons/io5";
+import { LuWarehouse } from "react-icons/lu";
+import { BsTags } from "react-icons/bs";
 
 const SideNavbar = ({ onClose }) => {
   const pathname = usePathname();
@@ -49,6 +51,11 @@ const SideNavbar = ({ onClose }) => {
       path: "/dash-board/customers"
     },
     {
+      name: "Finances",
+      icon: <TbBuildingBank />,
+      path: "/dash-board/finances"
+    },
+    {
       name: "Analytics",
       icon: <TbBrandGoogleAnalytics />,
       path: "/dash-board/analytics"
@@ -63,10 +70,12 @@ const SideNavbar = ({ onClose }) => {
       icon: <MdOutlineSettings />,
       links: [
         { label: 'Permissions', link: '/dash-board/permissions', icon: <LiaUserLockSolid /> },
-        { label: 'Shipping Zone', link: '/dash-board/zone', icon: <PiMapPinAreaBold /> },
-        { label: 'Finances', link: '/dash-board/finances', icon: <TbBuildingBank /> },
+        { label: 'Shipment', link: '/dash-board/zone', icon: <PiMapPinAreaBold /> },
+        { label: 'Payment Methods', link: '/dash-board/payment-methods', icon: <MdPayment /> },
         { label: 'Categories', link: '/dash-board/categories', icon: <BiCategory /> },
-        { label: 'Variants', link: '/dash-board/variants', icon: <PiResizeBold /> },
+        { label: 'Colors', link: '/dash-board/colors', icon: <IoColorPaletteOutline /> },
+        { label: 'Vendors', link: '/dash-board/vendors', icon: <LuWarehouse /> },
+        { label: 'Tags', link: '/dash-board/tags', icon: <BsTags /> },
       ]
     },
   ];
@@ -128,7 +137,7 @@ const SideNavbar = ({ onClose }) => {
                   {item?.links?.map((linkItem, linkIndex) => (
                     <Link href={linkItem?.link} key={linkIndex} legacyBehavior>
                       <a
-                        className={`flex items-center gap-2 w-full hover:bg-[#F9FBFA] hover:text-black px-4 ml-12 py-2 rounded-md ${pathname === linkItem.link || (linkItem.link === '/dash-board/zone' && pathname.startsWith('/dash-board/zone/add-shipping-zone')) || (linkItem.link === "/dash-board/variants" && pathname.startsWith("/dash-board/variants/add-color")) || (linkItem.link === "/dash-board/variants" && pathname.startsWith("/dash-board/variants/add-tag")) || (linkItem.link === "/dash-board/variants" && pathname.startsWith("/dash-board/variants/add-vendor")) || (linkItem.link === "/dash-board/categories" && pathname.startsWith("/dash-board/categories/add-category")) || (linkItem.link === "/dash-board/zone" && pathname.startsWith("/dash-board/zone/existing-zones")) ? "text-black bg-[#F9FBFA]" : ""}`}
+                        className={`flex items-center gap-2 w-full hover:bg-[#F9FBFA] hover:text-black px-4 ml-12 py-2 rounded-md ${pathname === linkItem.link || (linkItem.link === '/dash-board/zone' && pathname.startsWith('/dash-board/zone/add-shipping-zone')) || (linkItem.link === "/dash-board/variants" && pathname.startsWith("/dash-board/variants/add-color")) || (linkItem.link === "/dash-board/variants" && pathname.startsWith("/dash-board/variants/add-tag")) || (linkItem.link === "/dash-board/variants" && pathname.startsWith("/dash-board/variants/add-vendor")) || (linkItem.link === "/dash-board/categories" && pathname.startsWith("/dash-board/categories/add-category")) || (linkItem.link === "/dash-board/vendors" && pathname.startsWith("/dash-board/vendors/add-vendor")) || (linkItem.link === "/dash-board/tags" && pathname.startsWith("/dash-board/tags/add-tag")) || (linkItem.link === "/dash-board/colors" && pathname.startsWith("/dash-board/colors/add-color")) || (linkItem.link === "/dash-board/zone" && pathname.startsWith("/dash-board/zone/existing-zones")) ? "text-black bg-[#F9FBFA]" : ""}`}
                         onClick={onClose}
                       >
                         <h2 className="p-1 text-2xl rounded-xl">{linkItem?.icon}</h2>

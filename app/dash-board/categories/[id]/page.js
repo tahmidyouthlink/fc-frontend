@@ -1,10 +1,12 @@
 "use client";
+import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
+import useCategories from '@/app/hooks/useCategories';
 import { Button } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -20,29 +22,42 @@ export default function EditCategory() {
   const axiosPublic = useAxiosPublic();
   const [image, setImage] = useState(null);
   const [categoryDetails, setCategoryDetails] = useState([]);
+  const inputRef = useRef(null);
+  const suggestionsRef = useRef(null);
+  const inputRefCategory = useRef(null);
+  const suggestionsRefCategory = useRef(null);
+  const [categoryList, isCategoryPending] = useCategories();
+  const [sizeInput, setSizeInput] = useState('');
+  const [filteredSizes, setFilteredSizes] = useState([]);
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [fetchedSizes, setFetchedSizes] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [subCategoryInput, setSubCategoryInput] = useState('');
+  const [filteredSubCategories, setFilteredSubCategories] = useState([]);
+  const [selectedSubCategories, setSelectedSubCategories] = useState([]);
+  const [fetchedSubCategories, setFetchedSubCategories] = useState([]);
+  const [showSubCategorySuggestions, setShowSubCategorySuggestions] = useState(false);
 
   const { register, handleSubmit, control, setValue, formState: { errors, isSubmitting } } = useForm({
     defaultValues: { category: '', sizes: [{ size: '' }], subCategories: [{ subCategory: '' }] }
   });
 
-  const { fields: sizeFields, append: appendSize, remove: removeSize } = useFieldArray({
-    control,
-    name: 'sizes'
-  });
-
-  const { fields: subCategoryFields, append: appendSubCategory, remove: removeSubCategory } = useFieldArray({
-    control,
-    name: 'subCategories'
-  });
+  // Fetch all unique sizes from categoryList
+  useEffect(() => {
+    const allSizes = Array.from(new Set(categoryList?.flatMap(category => category.sizes)));
+    setFetchedSizes(allSizes);
+    const allSubCategories = Array.from(new Set(categoryList?.flatMap(category => category.subCategories.map(sub => sub.label))));
+    setFetchedSubCategories(allSubCategories);
+  }, [categoryList]);
 
   useEffect(() => {
     const fetchCategory = async () => {
       try {
         const res = await axiosPublic.get(`/allCategories/${params.id}`);
         const category = res.data;
-        setValue('category', category.label);
-        setValue('sizes', category.sizes.map(size => ({ size })));
-        setValue('subCategories', category.subCategories.map(subCat => ({ subCategory: subCat.label })));
+        setValue('category', category?.label);
+        setSelectedSizes(category?.sizes);
+        setSelectedSubCategories(category?.subCategories.map(sub => sub.label));
         setImage(category?.imageUrl || null);
         setCategoryDetails(category);
       } catch (error) {
@@ -52,6 +67,132 @@ export default function EditCategory() {
     };
     fetchCategory();
   }, [params.id, axiosPublic, setValue]);
+
+  // Close suggestions if clicking outside the input or suggestions
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        inputRefCategory.current &&
+        !inputRefCategory.current.contains(event.target) &&
+        suggestionsRefCategory.current &&
+        !suggestionsRefCategory.current.contains(event.target)
+      ) {
+        setShowSubCategorySuggestions(false); // Close sub-category suggestions
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Close suggestions if clicking outside the input or suggestions
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        inputRef.current &&
+        !inputRef.current.contains(event.target) &&
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(event.target)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Handle input change for sub-categories
+  const handleSubCategoryInputChange = (value) => {
+    setSubCategoryInput(value);
+    const filtered = fetchedSubCategories
+      .filter(subCategory => subCategory.toLowerCase().includes(value.toLowerCase()))
+      .filter(subCategory => !selectedSubCategories.includes(subCategory)); // Exclude already selected
+
+    setFilteredSubCategories(filtered);
+  };
+
+  // Focus handler for sub-category input
+  const handleSubCategoryInputFocus = () => {
+    const filtered = fetchedSubCategories
+      .filter(subCategory => !selectedSubCategories.includes(subCategory)); // Exclude already selected
+    setFilteredSubCategories(filtered);
+    setShowSubCategorySuggestions(true); // Show suggestions when input is focused
+  };
+
+  // Add sub-category
+  const addSubCategory = (subCategory) => {
+    if (!subCategory || !subCategory.trim()) return;
+    if (selectedSubCategories.includes(subCategory)) return;
+
+    setSelectedSubCategories(prev => [...prev, subCategory]);
+    setSubCategoryInput('');
+    setFilteredSubCategories([]);
+  };
+
+  // Add sub-category manually
+  const handleAddSubCategory = () => {
+    addSubCategory(subCategoryInput);
+  };
+
+  // Select from suggestions
+  const handleSubCategorySelect = (subCategory) => {
+    addSubCategory(subCategory);
+    setShowSubCategorySuggestions(false);
+  };
+
+  // Remove sub-category
+  const handleSubCategoryRemove = (indexToRemove) => {
+    setSelectedSubCategories(prev => prev.filter((_, i) => i !== indexToRemove));
+  };
+
+  // Function to handle input change and filter suggestions
+  const handleSizeInputChange = (value) => {
+    setSizeInput(value);
+    const filtered = fetchedSizes
+      .filter(size => size.toLowerCase().includes(value.toLowerCase()))
+      .filter(size => !selectedSizes.includes(size)); // Exclude already selected sizes
+
+    setFilteredSizes(filtered);
+  };
+
+  // Function to show suggestions when the input is focused
+  const handleInputFocus = () => {
+    const filtered = fetchedSizes
+      .filter(size => !selectedSizes.includes(size)); // Exclude already selected sizes
+    setFilteredSizes(filtered);
+    setShowSuggestions(true); // Show suggestions when input is focused
+  };
+
+  // Function to validate and add a size (both typed or selected)
+  const addSize = (size) => {
+    if (!size || !size.trim()) return; // Prevent empty inputs
+    if (selectedSizes.includes(size)) return; // Prevent duplicate sizes
+
+    setSelectedSizes(prev => [...prev, size]);
+    setSizeInput(''); // Clear input after adding
+    setFilteredSizes([]); // Clear suggestions
+  };
+
+  // Add manually typed size
+  const handleAddSize = () => {
+    addSize(sizeInput); // Use the common function for validation and addition
+  };
+
+  // Select from suggestion list
+  const handleSizeSelect = (size) => {
+    addSize(size); // Use the common function for validation and addition
+    setShowSuggestions(false); // Hide suggestions after selecting
+  };
+
+  // Remove size from the list
+  const handleSizeRemove = (indexToRemove) => {
+    setSelectedSizes(prev => prev.filter((_, i) => i !== indexToRemove));
+  };
 
   const uploadToImgbb = async (imageFile) => {
     const formData = new FormData();
@@ -116,11 +257,28 @@ export default function EditCategory() {
         imageUrl = '';
       }
 
+      // Validate sizes
+      if (selectedSizes.length === 0) {
+        toast.error('You must select at least one size.');
+        return;
+      }
+
+      // Validate subCategories (if required)
+      if (selectedSubCategories.length === 0) {
+        toast.error('You must select at least one sub-category.');
+        return;
+      }
+
+      const formattedSubCategories = selectedSubCategories.map((subCategory) => ({
+        key: subCategory, // Assuming subCategory is a string
+        label: subCategory,
+      }));
+
       const updatedCategory = {
         key: data?.category,
         label: data?.category,
-        sizes: data.sizes.map(size => size.size),
-        subCategories: data.subCategories.map(subCat => ({ key: subCat.subCategory, label: subCat.subCategory })),
+        sizes: selectedSizes,
+        subCategories: formattedSubCategories,
         imageUrl
       };
 
@@ -137,8 +295,19 @@ export default function EditCategory() {
     }
   };
 
+  if (isCategoryPending) {
+    return <Loading />
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
+
+      <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
+        <div className='flex items-center justify-between'>
+          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Edit Category Details</h3>
+          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/categories"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        </div>
+      </div>
 
       <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
 
@@ -157,66 +326,114 @@ export default function EditCategory() {
             )}
           </div>
 
-          {/* Size Ranges Field */}
-          <div className="w-full">
-            <label className="flex justify-start font-medium text-[#9F5216] pb-2">Size Ranges</label>
-            {sizeFields.map((item, index) => (
-              <div key={item.id} className="flex flex-col mb-2">
-                <div className='w-full flex items-center gap-2'>
-                  <input
-                    type="text"
-                    placeholder="Add Size Range (e.g., XXS-6XL)"
-                    {...register(`sizes.${index}.size`, { required: 'Size Range is required' })}
-                    className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-300 rounded-md shadow-sm"
-                  />
-                  <Button type='button' color="danger" onClick={() => removeSize(index)} variant="light">
-                    Remove
-                  </Button>
-                </div>
-                {errors.sizes?.[index]?.size && (
-                  <p className="text-red-600 text-left mt-1 text-sm">{errors.sizes[index].size.message}</p>
-                )}
+          {/* Size input field with improved styling */}
+          <div className="w-full" ref={inputRef}>
+            <label className="flex justify-start font-medium text-[#9F5216] pb-2">Size Range</label>
+            <div className="flex gap-2 items-center">
+              <input
+                type="text"
+                placeholder="Add or Search Size Range (e.g., XXS-6XL)"
+                value={sizeInput}
+                onFocus={handleInputFocus}
+                onChange={(e) => handleSizeInputChange(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9F5216] focus:border-transparent transition duration-300 ease-in-out"
+              />
+              <Button
+                type="button"
+                onClick={handleAddSize}
+                disabled={!sizeInput}
+                className={`px-4 py-2 rounded-md ${sizeInput ? 'bg-[#9F5216] text-white hover:bg-[#804010]' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+              >
+                Add Size
+              </Button>
+            </div>
+
+            {/* Display filtered size suggestions with a dropdown-like design */}
+            {showSuggestions && filteredSizes?.length > 0 && (
+              <ul ref={suggestionsRef} className="w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto z-[9999]">
+                {filteredSizes.map((size, i) => (
+                  <li
+                    key={i}
+                    className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors duration-150"
+                    onClick={() => handleSizeSelect(size)}
+                  >
+                    {size}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Display selected sizes with a more polished look */}
+          <div className="selected-sizes flex flex-wrap gap-3">
+            {selectedSizes?.map((size, index) => (
+              <div key={index} className="flex items-center bg-gray-100 border border-gray-300 rounded-full py-1 px-3 text-sm text-gray-700">
+                <span>{size}</span>
+                <button
+                  type="button"
+                  onClick={() => handleSizeRemove(index)}
+                  className="ml-2 text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-150"
+                >
+                  Remove
+                </button>
               </div>
             ))}
-            <button
-              type="button"
-              onClick={() => appendSize({ size: '' })}
-              className="mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium flex items-center gap-2"
-            >
-              Add Size
-            </button>
           </div>
         </div>
 
         <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
-          {/* Sub-Categories Field */}
-          <div className="w-full">
+
+          <div className="w-full" ref={inputRefCategory}>
             <label className="flex justify-start font-medium text-[#9F5216] pb-2">Sub-Category</label>
-            {subCategoryFields.map((item, index) => (
-              <div key={item.id} className="flex flex-col mb-2">
-                <div className='w-full flex items-center gap-2'>
-                  <input
-                    type="text"
-                    placeholder="Add Sub-Category"
-                    {...register(`subCategories.${index}.subCategory`, { required: 'Sub-Category is required' })}
-                    className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-300 rounded-md shadow-sm"
-                  />
-                  <Button type='button' color="danger" onClick={() => removeSubCategory(index)} variant="light">
-                    Remove
-                  </Button>
-                </div>
-                {errors.subCategories?.[index]?.subCategory && (
-                  <p className="text-red-600 text-left mt-1 text-sm">{errors.subCategories[index].subCategory.message}</p>
-                )}
+            <div className="flex gap-2 items-center">
+              <input
+                type="text"
+                placeholder="Add or Search Sub-Category"
+                value={subCategoryInput}
+                onFocus={handleSubCategoryInputFocus}
+                onChange={(e) => handleSubCategoryInputChange(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9F5216] focus:border-transparent transition duration-300 ease-in-out"
+              />
+              <Button
+                type="button"
+                onClick={handleAddSubCategory}
+                disabled={!subCategoryInput}
+                className={`px-4 py-2 rounded-md ${subCategoryInput ? 'bg-[#9F5216] text-white hover:bg-[#804010]' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+              >
+                Add Sub-Category
+              </Button>
+            </div>
+
+            {/* Sub-category suggestions */}
+            {showSubCategorySuggestions && filteredSubCategories?.length > 0 && (
+              <ul ref={suggestionsRefCategory} className="w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto z-[9999]">
+                {filteredSubCategories.map((subCategory, i) => (
+                  <li
+                    key={i}
+                    className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors duration-150"
+                    onClick={() => handleSubCategorySelect(subCategory)}
+                  >
+                    {subCategory}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Selected sub-categories */}
+          <div className="selected-subCategories flex flex-wrap gap-3 mb-8">
+            {selectedSubCategories?.map((subCategory, index) => (
+              <div key={index} className="flex items-center bg-gray-100 border border-gray-300 rounded-full py-1 px-3 text-sm text-gray-700">
+                <span>{subCategory}</span>
+                <button
+                  type="button"
+                  onClick={() => handleSubCategoryRemove(index)}
+                  className="ml-2 text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-150"
+                >
+                  Remove
+                </button>
               </div>
             ))}
-            <button
-              type="button"
-              onClick={() => appendSubCategory({ subCategory: '' })}
-              className="mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium flex items-center gap-2"
-            >
-              Add Sub-Category
-            </button>
           </div>
 
           <div>
@@ -263,12 +480,7 @@ export default function EditCategory() {
         </div>
 
         {/* Submit Button */}
-        <div className='flex justify-between pt-4 pb-8'>
-
-          <Link href='/dash-board/categories' className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
-            <FaArrowLeft /> Previous Step
-          </Link>
-
+        <div className='flex justify-end pt-4 pb-8'>
           <button
             type='submit'
             disabled={isSubmitting}
@@ -277,6 +489,7 @@ export default function EditCategory() {
             {isSubmitting ? 'Save Changes...' : 'Saved'}
           </button>
         </div>
+
       </div>
     </form>
   );

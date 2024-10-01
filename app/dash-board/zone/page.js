@@ -12,7 +12,7 @@ const Zone = () => {
           >
             <FaPlusCircle className="text-4xl sm:text-5xl md:text-6xl transition-transform transform group-hover:scale-110 group-hover:text-gray-800 animate-pulse" />
             <span className="relative transition-transform duration-300 group-hover:text-gray-800 group-hover:translate-x-2">
-              Add Shipping Zone
+              Add Shipment
             </span>
           </Link>
           <Link
@@ -21,7 +21,7 @@ const Zone = () => {
           >
             <FaListAlt className="text-4xl sm:text-5xl md:text-6xl transition-transform transform group-hover:scale-110 group-hover:text-gray-800 animate-pulse" />
             <span className="relative transition-transform duration-300 group-hover:text-gray-800 group-hover:translate-x-2">
-              Existing Zones
+              Existing Shipments
             </span>
           </Link>
         </div>

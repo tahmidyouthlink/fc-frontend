@@ -1,17 +1,18 @@
+"use client";
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
-import usePaymentMethods from '@/app/hooks/usePaymentMethods';
 import React from 'react';
-import Loading from '../shared/Loading/Loading';
 import toast from 'react-hot-toast';
-import CustomSwitchPaymentMethod from './CustomSwitchPaymentMethod';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaPlusCircle } from 'react-icons/fa';
 import MarkdownRenderer from '@/app/utils/Markdown/MarkdownRenderer';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { RiDeleteBinLine } from 'react-icons/ri';
+import Loading from '@/app/components/shared/Loading/Loading';
+import CustomSwitchPaymentMethod from '@/app/components/layout/CustomSwitchPaymentMethod';
+import usePaymentMethods from '@/app/hooks/usePaymentMethods';
 
-const PaymentCard = () => {
+const PaymentMethods = () => {
 
   const [paymentMethodList, isPaymentMethodPending, refetch] = usePaymentMethods();
   const axiosPublic = useAxiosPublic();
@@ -61,11 +62,14 @@ const PaymentCard = () => {
   }
 
   return (
-    <div>
+    <div className='bg-gray-50 min-h-screen'>
+      <div className='max-w-screen-2xl mx-auto flex items-center pt-3 md:pt-6'>
+        <h3 className='w-full font-semibold text-xl lg:text-2xl'>Payment Management</h3>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-center gap-6 max-w-screen-2xl mx-auto my-6">
         {
           paymentMethodList?.map((payment, index) => (
-            <div key={index} className="flex-1 overflow-hidden rounded-lg shadow transition hover:shadow-lg flex flex-col">
+            <div key={index} className="flex-1 overflow-hidden rounded-lg shadow transition hover:shadow-lg flex flex-col bg-white">
               {/* Set the container to maintain the aspect ratio */}
               {payment?.imageUrl && <div className="relative w-full" style={{ paddingBottom: '38.25%' }}> {/* This maintains a 16:9 aspect ratio */}
                 <Image
@@ -83,7 +87,7 @@ const PaymentCard = () => {
                   <MarkdownRenderer content={payment?.paymentDetails} />
                 </p>
               </div>
-              <div className="flex flex-wrap justify-between items-center gap-3 pb-6 px-6">
+              <div className="flex flex-wrap justify-between items-center pb-6 px-6">
                 <div className='flex items-center gap-3'>
                   <span className="text-sm font-medium text-gray-500">
                     Active
@@ -98,7 +102,7 @@ const PaymentCard = () => {
                     {payment?.status ? "Yes" : "NO"}
                   </span>
                 </div>
-                <div className="flex items-center justify-center space-x-2">
+                <div className="flex items-center justify-center gap-3">
 
                   <div className="group relative">
                     <button>
@@ -114,7 +118,7 @@ const PaymentCard = () => {
                   </div>
 
                   <div className="group relative">
-                    <Link href={`/dash-board/finances/${payment?._id}`}>
+                    <Link href={`/dash-board/payment-methods/${payment?._id}`}>
                       <MdOutlineModeEdit
                         size={22}
                         className={`text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200`}
@@ -132,7 +136,7 @@ const PaymentCard = () => {
         }
         <div className="flex-1 overflow-hidden rounded-lg shadow transition hover:shadow-lg flex flex-col">
           <Link
-            href="/dash-board/finances/add-payment-method"
+            href="/dash-board/payment-methods/add-payment-method"
             className="relative w-full h-60 xl:h-[450px] px-6 2xl:px-14 xl:px-8 border-2 border-dashed border-gray-600 bg-white text-gray-600 font-extrabold rounded-lg shadow-lg flex items-center justify-center gap-4 sm:gap-5 md:gap-6 transition-all duration-300 group hover:bg-[#ffddc2] hover:text-gray-800 hover:border-transparent hover:shadow-xl"
           >
             <FaPlusCircle className="transition-transform transform group-hover:scale-110 group-hover:text-gray-800 animate-pulse text-3xl" />
@@ -146,4 +150,4 @@ const PaymentCard = () => {
   );
 };
 
-export default PaymentCard;
+export default PaymentMethods;

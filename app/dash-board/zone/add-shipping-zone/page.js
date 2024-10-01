@@ -7,7 +7,7 @@ import { Select, SelectItem } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaPlusCircle } from 'react-icons/fa';
@@ -19,13 +19,13 @@ const AddShippingZone = () => {
   const axiosPublic = useAxiosPublic();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
-  const [selectedShipmentHandler, setSelectedShipmentHandler] = useState([]);
+  const [selectedShipmentHandler, setSelectedShipmentHandler] = useState(null);
   const [sizeError, setSizeError] = useState(false);
   const [selectedCity, setSelectedCity] = useState([]);
   const [cityError, setCityError] = useState(false);
   const [shipmentHandlerList, isShipmentHandlerPending, refetch] = useShipmentHandlers();
 
-  const { register, handleSubmit, control, formState: { errors } } = useForm();
+  const { register, handleSubmit, control, resetField, formState: { errors } } = useForm();
 
   const handleSelectedCityArray = (keys) => {
     const selectedArray = [...keys];
@@ -33,25 +33,21 @@ const AddShippingZone = () => {
     setCityError(selectedArray.length === 0);
   };
 
+  // Function to handle selection (only one allowed)
   const toggleLogoSelection = (shipmentHandler) => {
-    // Check if the handler is already selected
-    if (selectedShipmentHandler.some(handler => handler._id === shipmentHandler._id)) {
-      // Remove the handler if it's already selected
-      setSelectedShipmentHandler(selectedShipmentHandler.filter((selectedHandler) => selectedHandler._id !== shipmentHandler._id));
+    // If the same handler is clicked again, deselect it
+    if (selectedShipmentHandler?._id === shipmentHandler._id) {
+      setSelectedShipmentHandler(null);
     } else {
-      // Add the new handler if it's not selected
-      setSelectedShipmentHandler([...selectedShipmentHandler, shipmentHandler]);
-
-      // Clear the error if a handler is selected
-      if (sizeError) {
-        setSizeError(false);
-      }
+      // Replace the selection with the newly clicked handler
+      setSelectedShipmentHandler(shipmentHandler);
+      setSizeError(false); // Clear error when a handler is selected
     }
   };
 
   const handleEditShipmentHandler = (e, id) => {
     e.preventDefault();
-    router.push(`/dash-board/zone/add-shipping-zone/${id}`)
+    router.push(`/dash-board/zone/add-shipment-handler/${id}`)
   }
 
   const handleDeleteShipmentHandler = async (e, id) => {
@@ -67,14 +63,26 @@ const AddShippingZone = () => {
     }
   };
 
+  // Reset shipping charge fields when the selected shipment handler changes
+  useEffect(() => {
+    if (selectedShipmentHandler) {
+      if (selectedShipmentHandler.deliveryType.includes('STANDARD')) {
+        resetField('shippingChargeSTANDARD');
+      }
+      if (selectedShipmentHandler.deliveryType.includes('EXPRESS')) {
+        resetField('shippingChargeEXPRESS');
+      }
+    }
+  }, [selectedShipmentHandler, resetField]);
+
   const onSubmit = async (data) => {
     setIsSubmitting(true);
-    const { shippingZone, shippingCharge } = data;
+    const { shippingZone } = data;
 
     // Check if cities and shipping handlers are selected
     let hasError = false;
 
-    if (selectedShipmentHandler.length === 0) {
+    if (!selectedShipmentHandler) {
       setSizeError(true);
       hasError = true;
     }
@@ -90,10 +98,26 @@ const AddShippingZone = () => {
       return;
     }
 
+    let shippingCharges = {};
+
+    // Build the shipping charges object based on the delivery types
+    if (selectedShipmentHandler.deliveryType.length === 1) {
+      // Use the single input for the charge
+      shippingCharges[selectedShipmentHandler.deliveryType[0]] = data.shippingCharge;
+    } else {
+      // Handle multiple delivery types
+      if (selectedShipmentHandler.deliveryType.includes('STANDARD')) {
+        shippingCharges['STANDARD'] = data.shippingChargeStandard;
+      }
+      if (selectedShipmentHandler.deliveryType.includes('EXPRESS')) {
+        shippingCharges['EXPRESS'] = data.shippingChargeExpress;
+      }
+    }
+
     const shippingData = {
       shippingZone,
-      shippingCharge,
       selectedShipmentHandler,
+      shippingCharges,
       selectedCity
     };
 
@@ -119,8 +143,11 @@ const AddShippingZone = () => {
   return (
     <div className='bg-gray-50 min-h-screen'>
 
-      <div className='max-w-screen-lg mx-auto flex items-center pt-3 md:pt-6'>
-        <h3 className='w-full text-center font-semibold text-xl lg:text-2xl'>Add Shipping Zone</h3>
+      <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
+        <div className='flex items-center justify-between'>
+          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Shipping Configuration</h3>
+          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/zone"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -176,33 +203,18 @@ const AddShippingZone = () => {
 
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
-            {/* Shipping Charge Input */}
-            <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Shipping Charge</label>
-              <input
-                type="number"
-                placeholder="Add Shipping Charge"
-                {...register('shippingCharge', { required: 'Shipping Charge is required' })}
-                className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-              />
-              {errors.shippingCharge && (
-                <p className="text-red-600 text-left">{errors.shippingCharge.message}</p>
-              )}
-            </div>
-
             {/* Shipping Handler Selection */}
-            <h1 className='text-[#9F5216] mt-4'>Add, Edit or Select Shipment Handler</h1>
+            <h1 className='text-[#9F5216]'>Add, Edit or Select Shipment Handler</h1>
             <div className="flex flex-wrap items-center justify-start gap-4">
               {shipmentHandlerList?.map((shipmentHandler) => (
                 <div
                   key={shipmentHandler._id}
-                  onClick={() => toggleLogoSelection(shipmentHandler)}  // Click on card to select/deselect
-                  className={`relative cursor-pointer border-2 rounded-md ${shipmentHandler?.imageUrl ? "p-2" : "p-8"} ${selectedShipmentHandler.some((handler) => handler._id === shipmentHandler._id) ? 'border-blue-500' : 'border-gray-300'
-                    }`}
+                  onClick={() => toggleLogoSelection(shipmentHandler)} // Click to select handler
+                  className={`relative cursor-pointer border-2 rounded-md ${shipmentHandler?.imageUrl ? "p-2" : "p-8"} 
+              ${selectedShipmentHandler?._id === shipmentHandler._id ? 'border-blue-500' : 'border-gray-300'}`}
                 >
                   {/* Icons Section */}
                   <div className="absolute top-2 right-2 flex items-center justify-between space-x-2">
-
                     <div className="group relative">
                       <button>
                         <RiDeleteBinLine
@@ -211,9 +223,9 @@ const AddShippingZone = () => {
                           className={`text-red-500 hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200`}
                         />
                       </button>
-                      {<span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
+                      <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
                         Delete
-                      </span>}
+                      </span>
                     </div>
 
                     <div className="group relative">
@@ -224,11 +236,10 @@ const AddShippingZone = () => {
                           className={`text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200`}
                         />
                       </button>
-                      {<span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
+                      <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
                         Edit
-                      </span>}
+                      </span>
                     </div>
-
                   </div>
 
                   {/* Shipment Handler Image */}
@@ -250,13 +261,67 @@ const AddShippingZone = () => {
             </div>
             {sizeError && <p className='text-red-600 text-left'>Please select at least one shipment handler.</p>}
 
+            {/* Shipping Charge Input */}
+            <div className="w-full mt-4">
+              {/* Conditionally render shipping charge input fields based on deliveryType */}
+              {selectedShipmentHandler?.deliveryType.length === 1 && (
+                <div>
+                  <label className="flex justify-start font-medium text-[#9F5216] pb-2">
+                    {selectedShipmentHandler?.deliveryType[0]} Shipping Charge
+                  </label>
+                  <input
+                    type="number"
+                    placeholder={`Enter Shipping Charge for ${selectedShipmentHandler?.deliveryType[0]}`}
+                    {...register('shippingCharge', { required: 'Shipping Charge is required' })}
+                    className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                  />
+                  {errors.shippingCharge && (
+                    <p className="text-red-600 text-left">{errors?.shippingCharge?.message}</p>
+                  )}
+                </div>
+              )}
+
+              {selectedShipmentHandler?.deliveryType?.length === 2 && (
+                <div className='flex flex-col lg:flex-row items-center justify-center gap-4 w-full'>
+                  <div className='w-full'>
+                    {/* Input for STANDARD shipping charge */}
+                    <label className="flex justify-start font-medium text-[#9F5216] pb-2">
+                      STANDARD Shipping Charge
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Enter Shipping Charge for STANDARD"
+                      {...register('shippingChargeStandard', { required: 'STANDARD Shipping Charge is required' })}
+                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                    />
+                    {errors.shippingChargeStandard && (
+                      <p className="text-red-600 text-left">{errors?.shippingChargeStandard?.message}</p>
+                    )}
+                  </div>
+
+                  <div className='w-full'>
+                    {/* Input for EXPRESS shipping charge */}
+                    <label className="flex justify-start font-medium text-[#9F5216] pb-2">
+                      EXPRESS  Shipping Charge
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Add Shipping Charge for EXPRESS"
+                      {...register('shippingChargeExpress', { required: 'EXPRESS Shipping Charge is required' })}
+                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                    />
+                    {errors.shippingChargeExpress && (
+                      <p className="text-red-600 text-left">{errors?.shippingChargeExpress?.message}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
           </div>
 
           {/* Submit Button */}
-          <div className='flex justify-between items-center'>
-
-            <Link className='flex items-center gap-2 mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium' href={"/dash-board/zone"}> <FaArrowLeft /> Go Back</Link>
-
+          <div className='flex justify-end items-center'>
             <button
               type='submit'
               disabled={isSubmitting}

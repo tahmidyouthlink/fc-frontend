@@ -9,6 +9,9 @@ import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCross2 } from 'react-icons/rx';
+import standardImage from "../../../../../public/logos/standard.png";
+import expressImage from "../../../../../public/logos/express.png";
+import defaultImage from "../../../../../public/logos/default-image.png";
 
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
@@ -19,16 +22,19 @@ const EditShipmentHandler = () => {
   const axiosPublic = useAxiosPublic();
   const [image, setImage] = useState(null);
   const [shipmentDetails, setShipmentDetails] = useState([]);
+  const [deliveryType, setDeliveryType] = useState([]);
   const router = useRouter();
+  const DEFAULT_IMAGE_URL = defaultImage;
 
   const {
-    register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
+    register, handleSubmit, setValue, trigger, formState: { errors, isSubmitting } } = useForm({
       defaultValues: {
         shipmentHandlerName: '',
         contactPersonName: '',
         contactPersonNumber: '',
         officeAddress: '',
-        imageUrl: ''
+        imageUrl: '',
+        deliveryType: []
       }
     });
 
@@ -40,6 +46,8 @@ const EditShipmentHandler = () => {
         setValue('contactPersonName', data?.contactPersonName);
         setValue('contactPersonNumber', data?.contactPersonNumber);
         setValue('officeAddress', data?.officeAddress);
+        setDeliveryType(data?.deliveryType || []);
+        setValue('deliveryType', data?.deliveryType || []);
         setImage(data?.imageUrl);
         setShipmentDetails(data);
       } catch (error) {
@@ -49,6 +57,19 @@ const EditShipmentHandler = () => {
 
     fetchShipmentHandler();
   }, [id, setValue, axiosPublic]);
+
+  const handleDeliveryType = (option) => {
+    let deliveryTypes;
+    if (deliveryType?.includes(option)) {
+      deliveryTypes = deliveryType?.filter(item => item !== option);
+    } else {
+      deliveryTypes = [...deliveryType, option];
+    }
+    setDeliveryType(deliveryTypes);
+    setValue('deliveryType', deliveryTypes); // Update the form value
+    trigger('deliveryType'); // Manually trigger validation
+    console.log('Updated selected options:', deliveryTypes);
+  };
 
   const uploadToImgbb = async (imageFile) => {
     const formData = new FormData();
@@ -106,11 +127,12 @@ const EditShipmentHandler = () => {
         imageUrl = await uploadToImgbb(image.file);
         if (!imageUrl) {
           toast.error('Image upload failed, cannot proceed.');
+          imageUrl = DEFAULT_IMAGE_URL;
           hasError = true;
         }
       } else if (image === null) {
         // If the image is removed, explicitly set imageUrl to an empty string
-        imageUrl = '';
+        imageUrl = DEFAULT_IMAGE_URL;
       }
 
       const updatedShipmentHandler = {
@@ -118,7 +140,8 @@ const EditShipmentHandler = () => {
         contactPersonName: data?.contactPersonName,
         contactPersonNumber: data?.contactPersonNumber,
         officeAddress: data?.officeAddress,
-        imageUrl
+        imageUrl,
+        deliveryType
       };
 
       const res = await axiosPublic.put(`/editShipmentHandler/${id}`, updatedShipmentHandler);
@@ -137,8 +160,11 @@ const EditShipmentHandler = () => {
   return (
     <div className='bg-gray-50 min-h-screen'>
 
-      <div className='max-w-screen-lg mx-auto flex items-center pt-3 md:pt-6'>
-        <h3 className='w-full text-center font-semibold text-xl lg:text-2xl'>Edit Shipment Handler</h3>
+      <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
+        <div className='flex items-center justify-between'>
+          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Edit Shipment Handler</h3>
+          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/zone/add-shipping-zone"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -199,6 +225,55 @@ const EditShipmentHandler = () => {
               />
             </div>
 
+            {/* Delivery type of the Shipment handler Input */}
+            <div className="flex flex-col w-full gap-4">
+              <label className="font-medium text-[#9F5216]">Select Delivery Type *</label>
+              {/* Standard Option */}
+              <div className='flex items-center gap-4'>
+                <div
+                  onClick={() => handleDeliveryType('STANDARD')}
+                  className={`flex items-center gap-2 border rounded-lg px-6 cursor-pointer ${deliveryType?.includes('STANDARD') ? 'border-2 bg-gray-50' : 'bg-white'
+                    }`}
+                >
+                  <Image
+                    className="object-contain h-12 w-12 rounded-lg"
+                    src={standardImage}
+                    alt="standard image"
+                    height={400}
+                    width={400}
+                  />
+                  <h1 className="font-bold">STANDARD</h1>
+                </div>
+
+                {/* Express Option */}
+                <div
+                  onClick={() => handleDeliveryType('EXPRESS')}
+                  className={`flex items-center gap-2 border rounded-lg px-6 cursor-pointer ${deliveryType?.includes('EXPRESS') ? 'border-2 bg-gray-50' : 'bg-white'
+                    }`}
+                >
+                  <Image
+                    className="object-contain h-12 w-12 rounded-lg"
+                    src={expressImage}
+                    alt="express image"
+                    height={400}
+                    width={400}
+                  />
+                  <h1 className="font-bold">EXPRESS</h1>
+                </div>
+              </div>
+            </div>
+
+            {/* Error Message of delivery type */}
+            {errors.deliveryType && (
+              <p className="text-red-500">Please Select at least One Delivery Type.</p>
+            )}
+
+            {/* Hidden Input for Validation */}
+            <input
+              type="hidden"
+              {...register('deliveryType', { validate: (value) => value.length > 0 })}
+            />
+
           </div>
 
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
@@ -243,8 +318,7 @@ const EditShipmentHandler = () => {
 
           </div>
 
-          <div className='flex justify-between items-center'>
-            <Link className='flex items-center gap-2 mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium' href={"/dash-board/zone/add-shipping-zone"}> <FaArrowLeft /> Go Back</Link>
+          <div className='flex justify-end items-center'>
             <button
               type='submit'
               disabled={isSubmitting}

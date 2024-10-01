@@ -9,6 +9,9 @@ import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCross2 } from 'react-icons/rx';
+import standardImage from "../../../../public/logos/standard.png";
+import expressImage from "../../../../public/logos/express.png";
+import defaultImage from "../../../../public/logos/default-image.png";
 
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
@@ -18,9 +21,11 @@ const AddShipmentHandler = () => {
   const axiosPublic = useAxiosPublic();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [image, setImage] = useState(null);
+  const [deliveryType, setDeliveryType] = useState([]);
   const router = useRouter();
+  const DEFAULT_IMAGE_URL = defaultImage;
 
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors }, trigger, setValue } = useForm();
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -58,6 +63,18 @@ const AddShipmentHandler = () => {
     return null;
   };
 
+  const handleDeliveryType = (option) => {
+    let deliveryTypes;
+    if (deliveryType.includes(option)) {
+      deliveryTypes = deliveryType.filter(item => item !== option);
+    } else {
+      deliveryTypes = [...deliveryType, option];
+    }
+    setDeliveryType(deliveryTypes);
+    setValue('deliveryType', deliveryTypes); // Update the form value
+    trigger('deliveryType'); // Manually trigger validation
+  };
+
   const onSubmit = async (data) => {
 
     setIsSubmitting(true);
@@ -67,10 +84,14 @@ const AddShipmentHandler = () => {
     let imageUrl = '';
     if (image) {
       imageUrl = await uploadImageToImgbb(image);
+      // If image upload fails, use default image URL
       if (!imageUrl) {
-        toast.error('Image upload failed, cannot proceed.');
-        return;
+        toast.error('Image upload failed, using default image.');
+        imageUrl = DEFAULT_IMAGE_URL; // Set to default image URL
       }
+    } else {
+      // If no image is uploaded, set to default image URL
+      imageUrl = DEFAULT_IMAGE_URL; // Set to default image URL
     }
 
     const shipmentData = {
@@ -78,7 +99,8 @@ const AddShipmentHandler = () => {
       contactPersonName,
       contactPersonNumber,
       officeAddress,
-      imageUrl
+      imageUrl,
+      deliveryType
     };
 
     try {
@@ -99,8 +121,11 @@ const AddShipmentHandler = () => {
   return (
     <div className='bg-gray-50 min-h-screen'>
 
-      <div className='max-w-screen-lg mx-auto flex items-center pt-3 md:pt-6'>
-        <h3 className='w-full text-center font-semibold text-xl lg:text-2xl'>Add Shipment Handler</h3>
+      <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
+        <div className='flex items-center justify-between'>
+          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Add Shipment Handler</h3>
+          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/zone/add-shipping-zone"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -160,6 +185,55 @@ const AddShipmentHandler = () => {
               />
             </div>
 
+            {/* Delivery type of the Shipment handler Input */}
+            <div className="flex flex-col w-full gap-4">
+              <label className="font-medium text-[#9F5216]">Select Delivery Type *</label>
+              {/* Standard Option */}
+              <div className='flex items-center gap-4'>
+                <div
+                  onClick={() => handleDeliveryType('STANDARD')}
+                  className={`flex items-center gap-2 border rounded-lg px-6 cursor-pointer ${deliveryType.includes('STANDARD') ? 'border-2 bg-gray-50' : 'bg-white'
+                    }`}
+                >
+                  <Image
+                    className="object-contain h-12 w-12 rounded-lg"
+                    src={standardImage}
+                    alt="standard image"
+                    height={400}
+                    width={400}
+                  />
+                  <h1 className="font-bold">STANDARD</h1>
+                </div>
+
+                {/* Express Option */}
+                <div
+                  onClick={() => handleDeliveryType('EXPRESS')}
+                  className={`flex items-center gap-2 border rounded-lg px-6 cursor-pointer ${deliveryType.includes('EXPRESS') ? 'border-2 bg-gray-50' : 'bg-white'
+                    }`}
+                >
+                  <Image
+                    className="object-contain h-12 w-12 rounded-lg"
+                    src={expressImage}
+                    alt="express image"
+                    height={400}
+                    width={400}
+                  />
+                  <h1 className="font-bold">EXPRESS</h1>
+                </div>
+              </div>
+            </div>
+
+            {/* Error Message of delivery type */}
+            {errors.deliveryType && (
+              <p className="text-red-500">Please Select at least One Delivery Type.</p>
+            )}
+
+            {/* Hidden Input for Validation */}
+            <input
+              type="hidden"
+              {...register('deliveryType', { validate: (value) => value.length > 0 })}
+            />
+
           </div>
 
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
@@ -204,9 +278,7 @@ const AddShipmentHandler = () => {
           </div>
 
           {/* Submit Button */}
-          <div className='flex justify-between items-center'>
-
-            <Link className='flex items-center gap-2 mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium' href={"/dash-board/zone/add-shipping-zone"}> <FaArrowLeft /> Go Back</Link>
+          <div className='flex justify-end items-center'>
 
             <button
               type='submit'

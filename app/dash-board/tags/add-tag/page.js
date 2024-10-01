@@ -5,7 +5,6 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { Button } from '@nextui-org/react';
 import Link from 'next/link';
-import { RxCross2 } from 'react-icons/rx';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa6';
 
@@ -37,7 +36,7 @@ const AddTag = () => {
       if (response.status === 201) {
         toast.success('Tags added successfully!');
         reset();
-        router.push("/dash-board/variants")
+        router.push("/dash-board/tags")
       }
     } catch (error) {
       setIsSubmitting(false);
@@ -46,13 +45,18 @@ const AddTag = () => {
   };
 
   return (
-    <div className='max-w-screen-lg mx-auto px-6'>
+    <div className='min-h-screen px-6 bg-gray-50'>
 
-      <h3 className='text-center font-semibold text-xl md:text-2xl px-6 pt-6'>Create New Tags</h3>
+      <div className='max-w-screen-lg mx-auto pt-3 md:pt-6'>
+        <div className='flex items-center justify-between'>
+          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Create New Tags</h3>
+          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/tags"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        </div>
+      </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="tag-field w-full">
-          <label className="flex justify-start font-medium text-[#9F5216]">Tag</label>
+      <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-lg mx-auto'>
+        <div className="mt-8 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg">
+          <label className="flex justify-start font-medium text-[#9F5216]">Enter Tag</label>
           {tagFields?.map((item, index) => (
             <div key={item.id} className="flex flex-col">
               <div className='w-full flex items-center gap-2'>
@@ -75,11 +79,8 @@ const AddTag = () => {
             Add Tag
           </button>
         </div>
-        <div className='flex justify-between items-center mt-16 mb-8'>
-
-          <Link className='flex items-center gap-2 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium' href={"/dash-board/variants"}> <FaArrowLeft /> Go Back</Link>
-
-          <button type='submit' className=' bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium flex items-center gap-2'>{isSubmitting ? 'Submitting...' : 'Submit Colors'}</button>
+        <div className='flex justify-end items-center my-8'>
+          <button type='submit' className=' bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium flex items-center gap-2'>{isSubmitting ? 'Submitting...' : 'Submit Tags'}</button>
         </div>
       </form>
 

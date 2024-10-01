@@ -965,9 +965,8 @@ const EditProductPage = () => {
                   >
                     <h1 className="text-2xl font-bold text-gray-900 text-center">{shipping?.shippingZone}</h1>
                     <div className='flex items-center justify-center gap-4'>
-                      {shipping?.selectedShipmentHandler?.map((shipping, handlerIndex) => {
-                        const handler = shipmentHandlerList?.find(service => service.shipmentHandlerName === shipping?.shipmentHandlerName);
-                        return (
+                      {shipmentHandlerList?.map((handler, handlerIndex) => (
+                        shipping?.selectedShipmentHandler?.shipmentHandlerName === handler?.shipmentHandlerName && (
                           <div key={handlerIndex} className="p-4 rounded-lg flex flex-col items-center justify-center h-40 w-40">
                             {handler?.imageUrl && (
                               <Image
@@ -979,8 +978,8 @@ const EditProductPage = () => {
                               />
                             )}
                           </div>
-                        );
-                      })}
+                        )
+                      ))}
                     </div>
                   </div>
                 );

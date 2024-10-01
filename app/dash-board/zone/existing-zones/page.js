@@ -34,9 +34,9 @@ const ExistingZones = () => {
   return (
     <div>
 
-      <div className='md:px-5 2xl:px-16 py-4 w-full flex justify-between'>
-        <h3 className='text-center md:text-start font-medium md:font-semibold text-[13px] md:text-xl lg:text-2xl'>Existing Shipping Zones</h3>
-        <Link className='flex items-center gap-2 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium' href={"/dash-board/zone"}> <FaArrowLeft /> Go Back</Link>
+      <div className='px-5 2xl:px-16 py-4 w-full flex justify-between'>
+        <h3 className='text-start font-medium md:font-semibold text-[14px] md:text-xl lg:text-2xl w-full'>Shipping Management</h3>
+        <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/zone"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
       </div>
 
       <div className="max-w-screen-2xl mx-auto px-0 md:px-4 lg:px-6 custom-max-h overflow-x-auto modal-body-scroll">
@@ -58,9 +58,16 @@ const ExistingZones = () => {
                 </td>
                 <td className="text-xs p-3 text-gray-700">{zone?.selectedCity.join(', ')}</td>
                 <td className="text-xs p-3 text-gray-700">
-                  {zone?.selectedShipmentHandler.map(handler => handler.shipmentHandlerName).join(', ')}
+                  {zone?.selectedShipmentHandler?.shipmentHandlerName}
                 </td>
-                <td className="text-xs p-3 text-gray-700">৳ {zone?.shippingCharge}</td>
+                <td className="text-xs p-3 text-gray-700">
+                  {zone?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
+                    <div key={idx}>
+                      {type}: ৳ {zone.shippingCharges[type]}
+                    </div>
+                  ))}
+                </td>
+
                 <td className="p-3">
                   <div className="flex gap-2 items-center">
                     <Button onClick={() => router.push(`/dash-board/zone/${zone?._id}`)} size="sm" className="text-xs" color="primary" variant="flat">

@@ -16,30 +16,54 @@ export default function EditShippingZone() {
   const router = useRouter();
   const params = useParams();
   const axiosPublic = useAxiosPublic();
-  const [selectedShipmentHandler, setSelectedShipmentHandler] = useState([]);
+  const [selectedShipmentHandler, setSelectedShipmentHandler] = useState(null);
   const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
   const [sizeError, setSizeError] = useState(false);
   const [selectedCity, setSelectedCity] = useState([]);
   const [cityError, setCityError] = useState(false);
 
   const {
-    register, handleSubmit, setValue, control, formState: { errors, isSubmitting } } = useForm({
-      defaultValues: {
-        shippingZone: '',
-        selectedCity: [],
-        selectedShipmentHandler: [],
-        shippingCharge: '',
-      }
-    });
+    register, handleSubmit, setValue, control, resetField, formState: { errors, isSubmitting }
+  } = useForm({
+    defaultValues: {
+      shippingZone: '',
+      selectedCity: [],
+      shippingCharge: '',
+      shippingChargeStandard: '',
+      shippingChargeExpress: '',
+    }
+  });
 
   useEffect(() => {
     const fetchShippingZone = async () => {
       try {
         const { data } = await axiosPublic.get(`/getSingleShippingZone/${params.id}`);
+        console.log(data);
+
         setValue('shippingZone', data?.shippingZone);
-        setValue('shippingCharge', data?.shippingCharge);
         setSelectedCity(data?.selectedCity);
         setSelectedShipmentHandler(data?.selectedShipmentHandler);
+
+        // Set shipping charges based on delivery types
+        if (data?.shippingCharges) {
+          const deliveryTypes = data?.selectedShipmentHandler?.deliveryType;
+
+          if (deliveryTypes) {
+            if (deliveryTypes.length === 1) {
+              // Only one delivery type, set the single shipping charge
+              const deliveryType = deliveryTypes[0];
+              setValue('shippingCharge', data.shippingCharges[deliveryType]);
+            } else if (deliveryTypes.length > 1) {
+              // Set values for both STANDARD and EXPRESS charges
+              if (data.shippingCharges.STANDARD) {
+                setValue('shippingChargeStandard', data.shippingCharges.STANDARD);
+              }
+              if (data.shippingCharges.EXPRESS) {
+                setValue('shippingChargeExpress', data.shippingCharges.EXPRESS);
+              }
+            }
+          }
+        }
       } catch (error) {
         toast.error("Failed to load shipping zone details.");
       }
@@ -55,35 +79,44 @@ export default function EditShippingZone() {
   };
 
   const toggleLogoSelection = (shipmentHandler) => {
-    // Check if the handler is already selected using _id
-    if (selectedShipmentHandler.some(handler => handler._id === shipmentHandler._id)) {
-      // Remove the handler if it's already selected
-      setSelectedShipmentHandler(selectedShipmentHandler.filter((selectedHandler) => selectedHandler._id !== shipmentHandler._id));
+    if (selectedShipmentHandler?._id === shipmentHandler._id) {
+      setSelectedShipmentHandler(null);
     } else {
-      // Add the new handler if it's not selected
-      setSelectedShipmentHandler([...selectedShipmentHandler, shipmentHandler]);
-
-      // Clear the error if a handler is selected
-      if (sizeError) {
-        setSizeError(false);
-      }
+      setSelectedShipmentHandler(shipmentHandler);
+      setSizeError(false); // Clear error when a handler is selected
     }
   };
 
   const onSubmit = async (formData) => {
+    let hasError = false;
 
     // Validate shipment handler selection
-    if (selectedShipmentHandler.length === 0) {
+    if (!selectedShipmentHandler) {
       setSizeError(true);
-      return;
+      hasError = true;
     }
+
+    let shippingCharges = {};
+
+    if (selectedShipmentHandler?.deliveryType.length === 1) {
+      shippingCharges[selectedShipmentHandler.deliveryType[0]] = formData.shippingCharge;
+    } else {
+      if (selectedShipmentHandler?.deliveryType.includes('STANDARD')) {
+        shippingCharges['STANDARD'] = formData.shippingChargeStandard;
+      }
+      if (selectedShipmentHandler?.deliveryType.includes('EXPRESS')) {
+        shippingCharges['EXPRESS'] = formData.shippingChargeExpress;
+      }
+    }
+
+    if (hasError) return; // Early return if there are validation errors
 
     try {
       const updatedShippingZone = {
         shippingZone: formData.shippingZone,
         selectedCity: selectedCity,
         selectedShipmentHandler: selectedShipmentHandler,
-        shippingCharge: formData.shippingCharge,
+        shippingCharges,
       };
 
       const res = await axiosPublic.put(`/editShippingZone/${params.id}`, updatedShippingZone);
@@ -99,13 +132,16 @@ export default function EditShippingZone() {
   };
 
   if (isShipmentHandlerPending) {
-    return <Loading />
+    return <Loading />;
   }
 
   return (
     <div className='bg-gray-50 min-h-screen'>
-      <div className='max-w-screen-lg mx-auto flex items-center pt-3 md:pt-6'>
-        <h3 className='w-full text-center font-semibold text-xl lg:text-2xl'>Edit Shipping Zone</h3>
+      <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
+        <div className='flex items-center justify-between'>
+          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Shipping Settings</h3>
+          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/zone/existing-zones"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -166,29 +202,15 @@ export default function EditShippingZone() {
           </div>
 
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-            {/* Shipping Charge Field */}
-            <div className="shipping-charge-field w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Shipping Charge</label>
-              <input
-                type="number"
-                placeholder="Enter Shipping Charge"
-                {...register('shippingCharge', { required: 'Shipping Charge is required' })}
-                className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-300 rounded-md shadow-sm"
-              />
-              {/* Display error message for this field */}
-              {errors.shippingCharge && (
-                <p className="text-red-600 text-left mt-1 text-sm">{errors.shippingCharge.message}</p>
-              )}
-            </div>
 
             {/* Shipment Handlers */}
-            <h1 className='text-[#9F5216] mt-4'>Select Shipment Handler</h1>
+            <h1 className='text-[#9F5216]'>Select Shipment Handler</h1>
             <div className="flex flex-wrap items-center justify-start gap-4">
               {shipmentHandlerList?.map((shipmentHandler) => (
                 <div
                   key={shipmentHandler._id}  // Always use unique keys
                   onClick={() => toggleLogoSelection(shipmentHandler)}
-                  className={`cursor-pointer border-2 rounded-md p-2 ${selectedShipmentHandler.some((handler) => handler._id === shipmentHandler._id) ? 'border-blue-500' : 'border-gray-300'}`}
+                  className={`cursor-pointer border-2 rounded-md p-2 ${selectedShipmentHandler?._id === shipmentHandler._id ? 'border-blue-500' : 'border-gray-300'}`}
                 >
                   {shipmentHandler?.imageUrl && <Image src={shipmentHandler?.imageUrl} alt="shipment" height={300} width={300} className="h-24 w-24 xl:h-32 xl:w-32 object-contain" />}
                   <p className="text-center">{shipmentHandler.shipmentHandlerName}</p>
@@ -197,17 +219,68 @@ export default function EditShippingZone() {
               {/* Display error message if no shipment handler is selected */}
               {sizeError && <p className='text-red-600 text-left mt-1'>Please select at least one shipment handler.</p>}
             </div>
-          </div>
 
-          {/* Submit Button */}
-          <div className='flex justify-between items-center'>
-            <Link className='flex items-center gap-2 mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium' href={"/dash-board/zone/existing-zones"}> <FaArrowLeft /> Go Back</Link>
+            {/* Shipping Charge Fields */}
+            {selectedShipmentHandler && (
+              <>
+                {selectedShipmentHandler.deliveryType?.length === 1 && (
+                  <div className="shipping-charge-field w-full">
+                    <label className="flex justify-start font-medium text-[#9F5216] pb-2">
+                      {selectedShipmentHandler.deliveryType[0]} Shipping Charge
+                    </label>
+                    <input
+                      type="number"
+                      placeholder={`Enter ${selectedShipmentHandler.deliveryType[0]} Shipping Charge`}
+                      {...register('shippingCharge', { required: 'Shipping charge is required' })}
+                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                    />
+                    {errors.shippingCharge && (
+                      <p className="text-red-600 text-left">{errors.shippingCharge.message}</p>
+                    )}
+                  </div>
+                )}
+
+                {selectedShipmentHandler.deliveryType.length > 1 && (
+                  <>
+                    <div className="shipping-charge-field w-full">
+                      <label className="flex justify-start font-medium text-[#9F5216] pb-2">STANDARD Shipping Charge</label>
+                      <input
+                        type="number"
+                        placeholder="Enter STANDARD Shipping Charge"
+                        {...register('shippingChargeStandard', { required: 'Shipping Charge Standard is required' })}
+                        className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-300 rounded-md shadow-sm"
+                      />
+                      {errors.shippingChargeStandard && (
+                        <p className="text-red-600 text-left mt-1 text-sm">{errors.shippingChargeStandard.message}</p>
+                      )}
+                    </div>
+
+                    <div className="shipping-charge-field w-full">
+                      <label className="flex justify-start font-medium text-[#9F5216] pb-2">EXPRESS Shipping Charge</label>
+                      <input
+                        type="number"
+                        placeholder="Enter EXPRESS Shipping Charge"
+                        {...register('shippingChargeExpress', { required: 'Shipping Charge Express is required' })}
+                        className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-300 rounded-md shadow-sm"
+                      />
+                      {errors.shippingChargeExpress && (
+                        <p className="text-red-600 text-left mt-1 text-sm">{errors.shippingChargeExpress.message}</p>
+                      )}
+                    </div>
+                  </>
+                )}
+
+              </>
+            )}
+          </div>
+          <div className='flex justify-end items-center'>
+
             <button
               type='submit'
               disabled={isSubmitting}
               className={`mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium ${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium`}
             >
-              {isSubmitting ? 'Saving Changes...' : 'Save Changes'}
+              {isSubmitting ? 'Submitting...' : 'Submit'}
             </button>
           </div>
         </div>

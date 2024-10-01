@@ -39,7 +39,7 @@ const AddColor = () => {
       if (response.status === 201) {
         toast.success('Colors added successfully!');
         reset();
-        router.push("/dash-board/variants")
+        router.push("/dash-board/colors")
       }
     } catch (error) {
       toast.error('Failed to add colors. Please try again!');
@@ -50,28 +50,35 @@ const AddColor = () => {
   return (
     <div className='relative max-w-screen-lg mx-auto px-6'>
 
-      <h3 className='text-center font-semibold text-xl md:text-2xl px-6 pt-6'>Create New Colors</h3>
+      <div className='max-w-screen-lg mx-auto pt-3 md:pt-6'>
+        <div className='flex items-center justify-between'>
+          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Create New Colors</h3>
+          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/colors"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="color-field w-full">
-          <label className="flex justify-start font-medium text-[#9F5216]">Colors</label>
+        <div className="mt-8 w-full bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg">
+          <label className="flex justify-start font-medium text-[#9F5216] pb-2">Select Color</label>
           {colorFields.map((item, index) => (
             <div key={item.id} className="flex flex-col mb-4">
-              <div className="flex items-center gap-4">
-                <input
-                  type="color"
-                  {...register(`colors.${index}.colorCode`, {
-                    required: 'Color code is required',
-                    validate: value => value !== '#FFFFFF' || 'Please select a color other than the default white'
-                  })}
-                  className="w-16 h-16 p-0 border border-gray-300 rounded-md"
-                />
-                <input
-                  type="text"
-                  placeholder="Enter color name"
-                  {...register(`colors.${index}.colorName`, { required: 'Color name is required' })}
-                  className="p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md w-full"
-                />
+              <div className="flex flex-col md:flex-row items-center gap-4 w-full">
+                <div className='flex flex-1 items-center gap-4'>
+                  <input
+                    type="color"
+                    {...register(`colors.${index}.colorCode`, {
+                      required: 'Color code is required',
+                      validate: value => value !== '#FFFFFF' || 'Please select a color other than the default white'
+                    })}
+                    className="w-16 h-16 p-0 border border-gray-300 rounded-md"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Enter color name"
+                    {...register(`colors.${index}.colorName`, { required: 'Color name is required' })}
+                    className="p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md w-full"
+                  />
+                </div>
                 <Button type="button" color="danger" onClick={() => removeColor(index)} variant="light">
                   Remove
                 </Button>
@@ -92,10 +99,7 @@ const AddColor = () => {
             Add Color
           </button>
         </div>
-        <div className='flex justify-between items-center mt-16 mb-8'>
-
-          <Link className='flex items-center gap-2 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium' href={"/dash-board/variants"}> <FaArrowLeft /> Go Back</Link>
-
+        <div className='flex justify-end items-center my-8'>
           <button type='submit' className=' bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium flex items-center gap-2'>{isSubmitting ? 'Submitting...' : 'Submit Colors'}</button>
         </div>
       </form>

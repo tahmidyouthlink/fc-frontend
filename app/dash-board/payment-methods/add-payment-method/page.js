@@ -10,6 +10,7 @@ import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCross2 } from 'react-icons/rx';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
+import defaultImage from "@/public/card-images/default-payment-image.jpg";
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
@@ -22,6 +23,7 @@ const AddPaymentMethod = () => {
   const [image, setImage] = useState(null);
   const router = useRouter();
   const [paymentDetails, setPaymentDetails] = useState("");
+  const DEFAULT_IMAGE_URL = defaultImage;
 
   const { register, handleSubmit, control, formState: { errors } } = useForm();
 
@@ -72,8 +74,11 @@ const AddPaymentMethod = () => {
       imageUrl = await uploadImageToImgbb(image);
       if (!imageUrl) {
         toast.error('Image upload failed, cannot proceed.');
+        imageUrl = DEFAULT_IMAGE_URL;
         return;
       }
+    } else {
+      imageUrl = DEFAULT_IMAGE_URL;
     }
 
     const paymentData = {
@@ -87,7 +92,7 @@ const AddPaymentMethod = () => {
       const response = await axiosPublic.post('/addPaymentMethod', paymentData);
       if (response?.data?.insertedId) {
         toast.success('Payment Method added successfully!');
-        router.push("/dash-board/finances");
+        router.push("/dash-board/payment-methods");
       } else {
         throw new Error('Failed to add Payment Method');
       }
@@ -101,8 +106,11 @@ const AddPaymentMethod = () => {
   return (
     <div className='bg-gray-50 min-h-screen'>
 
-      <div className='max-w-screen-lg mx-auto flex items-center pt-3 md:pt-6'>
-        <h3 className='w-full text-center font-semibold text-xl lg:text-2xl'>Add Payment Method</h3>
+      <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
+        <div className='flex items-center justify-between'>
+          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Payment Configuration</h3>
+          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/payment-methods"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -183,10 +191,7 @@ const AddPaymentMethod = () => {
           </div>
 
           {/* Submit Button */}
-          <div className='flex justify-between items-center'>
-
-            <Link className='flex items-center gap-2 mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium' href={"/dash-board/finances"}> <FaArrowLeft /> Go Back</Link>
-
+          <div className='flex justify-end items-center'>
             <button
               type='submit'
               disabled={isSubmitting}

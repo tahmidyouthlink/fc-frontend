@@ -10,12 +10,13 @@ import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCross2 } from 'react-icons/rx';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
+import defaultImage from "@/public/card-images/default-payment-image.jpg";
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 
-const EditFinancesPage = () => {
+const EditPaymentMethod = () => {
 
   const { id } = useParams();
   const axiosPublic = useAxiosPublic();
@@ -23,6 +24,7 @@ const EditFinancesPage = () => {
   const [fullPaymentDetails, setFullPaymentDetails] = useState([]);
   const [paymentDetails, setPaymentDetails] = useState([]);
   const router = useRouter();
+  const DEFAULT_IMAGE_URL = defaultImage;
 
   const {
     register, handleSubmit, setValue, control, formState: { errors, isSubmitting } } = useForm({
@@ -105,11 +107,12 @@ const EditFinancesPage = () => {
         imageUrl = await uploadToImgbb(image.file);
         if (!imageUrl) {
           toast.error('Image upload failed, cannot proceed.');
+          imageUrl = DEFAULT_IMAGE_URL;
           hasError = true;
         }
       } else if (image === null) {
         // If the image is removed, explicitly set imageUrl to an empty string
-        imageUrl = '';
+        imageUrl = DEFAULT_IMAGE_URL;;
       }
 
       const updatedPaymentMethod = {
@@ -121,7 +124,7 @@ const EditFinancesPage = () => {
       const res = await axiosPublic.put(`/editPaymentMethod/${id}`, updatedPaymentMethod);
       if (res.data.modifiedCount > 0) {
         toast.success('Payment Method updated successfully');
-        router.push('/dash-board/finances');
+        router.push('/dash-board/payment-methods');
       } else {
         toast.error('No changes detected.');
       }
@@ -134,8 +137,11 @@ const EditFinancesPage = () => {
   return (
     <div className='bg-gray-50 min-h-screen'>
 
-      <div className='max-w-screen-lg mx-auto flex items-center pt-3 md:pt-6'>
-        <h3 className='w-full text-center font-semibold text-xl lg:text-2xl'>Edit Shipment Handler</h3>
+      <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
+        <div className='flex items-center justify-between'>
+          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Payment Settings</h3>
+          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/payment-methods"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -213,8 +219,7 @@ const EditFinancesPage = () => {
 
           </div>
 
-          <div className='flex justify-between items-center'>
-            <Link className='flex items-center gap-2 mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium' href={"/dash-board/finances"}> <FaArrowLeft /> Go Back</Link>
+          <div className='flex justify-end items-center'>
             <button
               type='submit'
               disabled={isSubmitting}
@@ -230,4 +235,4 @@ const EditFinancesPage = () => {
   );
 };
 
-export default EditFinancesPage;
+export default EditPaymentMethod;

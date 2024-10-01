@@ -101,37 +101,38 @@ const ThirdStepOfAddProduct = () => {
       productVariants: storedVariants,
       shippingDetails: selectedShipmentHandler
     }
+    console.log(selectedShipmentHandler);
 
-    try {
-      // Post the entire selectedShipmentHandler array, which contains full shipping details
-      const response = await axiosPublic.post('/addProduct', wholeProductData);
+    // try {
+    //   // Post the entire selectedShipmentHandler array, which contains full shipping details
+    //   const response = await axiosPublic.post('/addProduct', wholeProductData);
 
-      if (response?.data?.insertedId) {
-        toast.success('Product Details added successfully!');
-        localStorage.removeItem('productTitle');
-        localStorage.removeItem('regularPrice');
-        JSON.parse(localStorage.removeItem('uploadedImageUrls') || '[]');
-        localStorage.removeItem('discountType');
-        localStorage.removeItem('discountValue');
-        localStorage.removeItem('productDetails');
-        localStorage.removeItem('materialCare');
-        localStorage.removeItem('sizeFit');
-        localStorage.removeItem('category');
-        JSON.parse(localStorage.removeItem('subCategories') || '[]');
-        JSON.parse(localStorage.removeItem('groupOfSizes') || '[]');
-        JSON.parse(localStorage.removeItem('allSizes') || '[]');
-        JSON.parse(localStorage.removeItem('availableColors') || '[]');
-        localStorage.removeItem('newArrival');
-        JSON.parse(localStorage.removeItem('vendors') || '[]');
-        JSON.parse(localStorage.removeItem('tags') || '[]');
-        JSON.parse(localStorage.removeItem('productVariants') || '[]');
-        router.push("/dash-board/products/existing-products");
-      }
-    } catch (error) {
-      console.error("Error response:", error.response || error.message);
-      setIsSubmitting(false);
-      toast.error('Failed to add Product Details. Please try again!');
-    }
+    //   if (response?.data?.insertedId) {
+    //     toast.success('Product Details added successfully!');
+    //     localStorage.removeItem('productTitle');
+    //     localStorage.removeItem('regularPrice');
+    //     JSON.parse(localStorage.removeItem('uploadedImageUrls') || '[]');
+    //     localStorage.removeItem('discountType');
+    //     localStorage.removeItem('discountValue');
+    //     localStorage.removeItem('productDetails');
+    //     localStorage.removeItem('materialCare');
+    //     localStorage.removeItem('sizeFit');
+    //     localStorage.removeItem('category');
+    //     JSON.parse(localStorage.removeItem('subCategories') || '[]');
+    //     JSON.parse(localStorage.removeItem('groupOfSizes') || '[]');
+    //     JSON.parse(localStorage.removeItem('allSizes') || '[]');
+    //     JSON.parse(localStorage.removeItem('availableColors') || '[]');
+    //     localStorage.removeItem('newArrival');
+    //     JSON.parse(localStorage.removeItem('vendors') || '[]');
+    //     JSON.parse(localStorage.removeItem('tags') || '[]');
+    //     JSON.parse(localStorage.removeItem('productVariants') || '[]');
+    //     router.push("/dash-board/products/existing-products");
+    //   }
+    // } catch (error) {
+    //   console.error("Error response:", error.response || error.message);
+    //   setIsSubmitting(false);
+    //   toast.error('Failed to add Product Details. Please try again!');
+    // }
   };
 
   if (isShippingPending || isShipmentHandlerPending) {
@@ -158,7 +159,7 @@ const ThirdStepOfAddProduct = () => {
                 </th>
                 <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipping Zone</th>
                 <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipment Handlers</th>
-                <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipping Charge</th>
+                <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipping Charges</th>
               </tr>
             </thead>
             <tbody>
@@ -190,9 +191,8 @@ const ThirdStepOfAddProduct = () => {
                     {/* Shipment Handlers */}
                     <td className="px-2 py-1 md:px-4 md:py-2">
                       <div className="flex items-center justify-center md:gap-4">
-                        {shipping?.selectedShipmentHandler?.map((shipping, handlerIndex) => {
-                          const handler = shipmentHandlerList?.find(service => service.shipmentHandlerName === shipping?.shipmentHandlerName);
-                          return (
+                        {shipmentHandlerList?.map((handler, handlerIndex) => (
+                          shipping?.selectedShipmentHandler?.shipmentHandlerName === handler?.shipmentHandlerName && (
                             <div key={handlerIndex} className="p-4 rounded-lg flex flex-col items-center justify-center h-40 w-40">
                               {handler?.imageUrl && (
                                 <Image
@@ -204,11 +204,15 @@ const ThirdStepOfAddProduct = () => {
                                 />
                               )}
                             </div>
-                          );
-                        })}
+                          )
+                        ))}
                       </div>
                     </td>
-                    <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{shipping?.shippingCharge}</td>
+                    <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{shipping?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
+                      <div key={idx}>
+                        {type}: ৳ {shipping?.shippingCharges[type]}
+                      </div>
+                    ))}</td>
                   </tr>
                 );
               })}
