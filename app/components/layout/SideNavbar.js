@@ -7,7 +7,6 @@ import { MdOutlineSettings, MdPayment } from "react-icons/md";
 import { TbClipboardList } from "react-icons/tb";
 import { LiaBoxOpenSolid } from "react-icons/lia";
 import { TbBuildingBank } from "react-icons/tb";
-import { PiMapPinAreaBold } from "react-icons/pi";
 import { TbBrandGoogleAnalytics } from "react-icons/tb";
 import Image from "next/image";
 import logoWhiteImage from "../../../public/logos/fc-logo.png";
@@ -21,6 +20,7 @@ import { IoColorPaletteOutline } from "react-icons/io5";
 import { LuWarehouse } from "react-icons/lu";
 import { BsTags } from "react-icons/bs";
 import { FaRegIdCard } from "react-icons/fa";
+import { BsBoxSeam } from "react-icons/bs";
 
 const SideNavbar = ({ onClose }) => {
   const pathname = usePathname();
@@ -71,8 +71,8 @@ const SideNavbar = ({ onClose }) => {
       icon: <MdOutlineSettings />,
       links: [
         { label: 'Permissions', link: '/dash-board/permissions', icon: <LiaUserLockSolid /> },
-        { label: 'Membership', link: '/dash-board/membership', icon: <FaRegIdCard /> },
-        { label: 'Shipment', link: '/dash-board/zone', icon: <PiMapPinAreaBold /> },
+        { label: 'Reward Level', link: '/dash-board/reward-level', icon: <FaRegIdCard /> },
+        { label: 'Shipment', link: '/dash-board/zone', icon: <BsBoxSeam /> },
         { label: 'Payment Methods', link: '/dash-board/payment-methods', icon: <MdPayment /> },
         { label: 'Categories', link: '/dash-board/categories', icon: <BiCategory /> },
         { label: 'Colors', link: '/dash-board/colors', icon: <IoColorPaletteOutline /> },

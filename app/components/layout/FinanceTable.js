@@ -1,11 +1,12 @@
 "use client";
 import useOrders from '@/app/hooks/useOrders';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
 import CustomPagination from './CustomPagination';
-import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
+import { Button, Checkbox, CheckboxGroup, DateRangePicker, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
+import { IoMdClose } from 'react-icons/io';
 
-const columns = ['Order ID', 'Customer Name', 'Payment Method', 'Transaction ID', 'Payment Status'];
+const columns = ["Date & Time", 'Order ID', 'Customer Name', 'Payment Method', 'Transaction ID', 'Payment Status'];
 
 const FinanceTable = () => {
 
@@ -15,6 +16,10 @@ const FinanceTable = () => {
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   const [selectedColumns, setSelectedColumns] = useState(columns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
+  const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState("All");
+  const [openDropdown, setOpenDropdown] = useState(false);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedColumnsFinancesPage'));
@@ -53,9 +58,51 @@ const FinanceTable = () => {
     setPage(0); // Reset to first page when changing items per page
   };
 
+  const toggleDropdown = (dropdown) => {
+    setOpenDropdown((prev) => (prev === dropdown ? null : dropdown)); // Toggle the clicked dropdown
+  };
+
+  // Close dropdown when clicking outside
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setOpenDropdown(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Convert dateTime string to Date object
+  const parseDate = (dateString) => {
+    const [date, time] = dateString.split(' | ');
+    const [day, month, year] = date.split('-').map(num => parseInt(num, 10));
+    const [hours, minutes] = time.split(':').map(num => parseInt(num, 10));
+    return new Date(year + 2000, month - 1, day, hours, minutes);
+  };
+
+  // Extract start and end dates from selectedDateRange
+  const startDate = selectedDateRange?.start ? new Date(selectedDateRange.start.year, selectedDateRange.start.month - 1, selectedDateRange.start.day) : null;
+  const endDate = selectedDateRange?.end ? new Date(selectedDateRange.end.year, selectedDateRange.end.month - 1, selectedDateRange.end.day) : null; // Adjust end date to include the entire end day
+  const adjustedEndDate = endDate ? new Date(endDate.getTime() + 24 * 60 * 60 * 1000 - 1) : null; // Add 1 day and subtract 1 ms
+
+  const handleReset = () => {
+    setSelectedDateRange(null); // Reset the selected date range
+  };
+
   // Filter orders based on search query and date range
   const searchedOrders = orderList?.filter(order => {
     const query = searchQuery.toLowerCase();
+
+    // Date range filtering
+    const orderDate = parseDate(order.dateTime);
+    const isDateInRange = startDate && adjustedEndDate
+      ? (orderDate >= startDate && orderDate <= adjustedEndDate)
+      : true;
+
+    // Payment status filtering
+    const isStatusMatch = selectedPaymentStatus === 'All' || order.paymentStatus === selectedPaymentStatus;
 
     // Check if order details match the search query
     const orderMatch = (
@@ -66,7 +113,10 @@ const FinanceTable = () => {
       (order.paymentStatus || '').toLowerCase().includes(query)
     );
 
-    return orderMatch;
+    // Check if query matches date in specific format
+    const dateMatch = (order.dateTime || '').toLowerCase().includes(query);
+
+    return isDateInRange && isStatusMatch && (orderMatch || dateMatch);
   });
 
   const paginatedOrders = useMemo(() => {
@@ -77,6 +127,12 @@ const FinanceTable = () => {
 
   const totalPages = Math.ceil(searchedOrders?.length / itemsPerPage);
 
+  useEffect(() => {
+    if (paginatedOrders?.length === 0) {
+      setPage(0); // Reset to the first page if no data
+    }
+  }, [paginatedOrders]);
+
   if (isOrderPending) {
     return <SmallHeightLoading />
   }
@@ -84,28 +140,87 @@ const FinanceTable = () => {
   return (
     <div>
 
-      <div className='mt-8 md:mt-16 flex items-center justify-between gap-6'>
-        <div className="py-1 flex-1">
-          <Button variant="light" color="primary" onClick={() => { setColumnModalOpen(true) }} className="w-full">
-            Choose Columns
-          </Button>
+      <div className='mt-8 md:mt-16 flex flex-col lg:flex-row items-center justify-evenly gap-6 max-w-screen-2xl mx-auto'>
+
+        <div className='w-full'>
+          <li className="flex items-center relative group flex-1">
+            <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
+              <g>
+                <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
+              </g>
+            </svg>
+            <input
+              type="search"
+              placeholder="Search By Order Details..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-[#f3f3f4] text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
+            />
+          </li>
         </div>
-        <li className="flex items-center relative group flex-1">
-          <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
-            <g>
-              <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
-            </g>
-          </svg>
-          <input
-            type="search"
-            placeholder="Search By Order Details..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-[#f3f3f4] text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
-          />
-        </li>
+
+        <div className="flex items-center gap-6 flex-wrap w-full">
+          <select
+            id="paymentStatusFilter"
+            value={selectedPaymentStatus}
+            onChange={(e) => setSelectedPaymentStatus(e.target.value)}
+            className="border border-gray-300 py-2 px-4 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#9f511681] focus:border-transparent bg-white transition-all duration-200 ease-in-out w-full lg:w-1/2"
+          >
+            <option value="All">All</option>
+            <option value="Pending">Pending</option>
+            <option value="Paid">Paid</option>
+            <option value="Cancelled">Cancelled</option>
+            <option value="Refunded">Refunded</option>
+          </select>
+        </div>
+
+        <div ref={dropdownRef} className="relative inline-block text-left z-50">
+          <Button onClick={() => toggleDropdown('other')} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
+            Customize
+            <svg
+              className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown === "other" ? 'rotate-180' : ''}`}
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </Button>
+
+          {openDropdown === 'other' && (
+            <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <div className='p-1'>
+
+                <div className='flex items-center gap-2'>
+                  <DateRangePicker
+                    label="Order Duration"
+                    visibleMonths={1}
+                    onChange={(range) => setSelectedDateRange(range)} // Ensure range is an array
+                    value={selectedDateRange} // Ensure this matches the expected format
+                  />
+
+                  {selectedDateRange && selectedDateRange.start && selectedDateRange.end && (
+                    <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={handleReset}>
+                      <IoMdClose size={20} />
+                    </button>
+                  )}
+                </div>
+
+                <div className="py-1 flex-1">
+                  <Button variant="light" color="primary" onClick={() => { setColumnModalOpen(true) }} className="w-full">
+                    Choose Columns
+                  </Button>
+                </div>
+
+              </div>
+
+            </div>
+          )}
+        </div>
 
       </div>
+
       {/* Column Selection Modal */}
       <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
         <ModalContent>
@@ -120,11 +235,11 @@ const FinanceTable = () => {
             </CheckboxGroup>
           </ModalBody>
           <ModalFooter>
-            <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
-              Select All
-            </Button>
             <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
               Deselect All
+            </Button>
+            <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
+              Select All
             </Button>
             <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
               Save
@@ -137,6 +252,9 @@ const FinanceTable = () => {
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-50 sticky top-0 z-[1] rounded-md">
             <tr>
+              {selectedColumns.includes('Date & Time') && (
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Date & Time</th>
+              )}
               {selectedColumns.includes('Order ID') && (
                 <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Order ID</th>
               )}
@@ -156,30 +274,41 @@ const FinanceTable = () => {
           </thead>
 
           <tbody className="bg-white divide-y divide-gray-200">
-            {paginatedOrders?.map((order, index) => {
+            {paginatedOrders?.length === 0 ?
+              <tr>
+                <td colSpan={selectedColumns.length} className="text-center p-4 text-gray-500 md:pt-40 pt-32 lg:pt-52 xl:pt-60 2xl:pt-72">
+                  No orders found matching your criteria. Please adjust your filters or check back later.
+                </td>
+              </tr>
+              :
+              (paginatedOrders?.map((order, index) => {
 
-              return (
-                <>
-                  <tr key={order?._id || index} className="hover:bg-gray-50 transition-colors">
-                    {selectedColumns.includes('Order ID') && (
-                      <td className="text-xs p-3 text-gray-700">{order?.orderNumber}</td>
-                    )}
-                    {selectedColumns.includes('Customer Name') && (
-                      <td className="text-xs p-3 text-gray-700">{order?.customerName}</td>
-                    )}
-                    {selectedColumns.includes('Payment Method') && (
-                      <td className="text-xs p-3 text-gray-700">{order?.paymentMethod}</td>
-                    )}
-                    {selectedColumns.includes('Transaction ID') && (
-                      <td className="text-xs p-3 text-gray-700">{order?.transactionId ? order.transactionId : '--'}</td>
-                    )}
-                    {selectedColumns.includes('Payment Status') && (
-                      <td className="text-xs p-3 text-gray-700">{order?.paymentStatus}</td>
-                    )}
-                  </tr>
-                </>
-              )
-            })}
+                return (
+                  <>
+                    <tr key={order?._id || index} className="hover:bg-gray-50 transition-colors">
+                      {selectedColumns.includes('Date & Time') && (
+                        <th className="text-xs p-3 text-gray-700">{order?.dateTime}</th>
+                      )}
+                      {selectedColumns.includes('Order ID') && (
+                        <td className="text-xs p-3 text-gray-700">{order?.orderNumber}</td>
+                      )}
+                      {selectedColumns.includes('Customer Name') && (
+                        <td className="text-xs p-3 text-gray-700">{order?.customerName}</td>
+                      )}
+                      {selectedColumns.includes('Payment Method') && (
+                        <td className="text-xs p-3 text-gray-700">{order?.paymentMethod}</td>
+                      )}
+                      {selectedColumns.includes('Transaction ID') && (
+                        <td className="text-xs p-3 text-gray-700">{order?.transactionId ? order.transactionId : '--'}</td>
+                      )}
+                      {selectedColumns.includes('Payment Status') && (
+                        <td className="text-xs p-3 text-gray-700">{order?.paymentStatus}</td>
+                      )}
+                    </tr>
+                  </>
+                )
+              }))
+            }
           </tbody>
 
         </table>

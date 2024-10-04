@@ -10,6 +10,7 @@ import usePromoCodes from '@/app/hooks/usePromoCodes';
 import toast from 'react-hot-toast';
 import useOffers from '@/app/hooks/useOffers';
 import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
+import { RxCheck, RxCross2 } from 'react-icons/rx';
 
 const RecentPromotions = () => {
 
@@ -190,7 +191,39 @@ const RecentPromotions = () => {
       const res = await axiosPublic.delete(`/deletePromo/${id}`);
       if (res?.data?.deletedCount) {
         refetchPromo();
-        toast.success('Promo deleted successfully!');
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="pl-6">
+              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    Promo Removed!
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    The promo has been successfully deleted!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        })
       }
     } catch (error) {
       toast.error('Failed to delete promo. Please try again!');
@@ -202,7 +235,39 @@ const RecentPromotions = () => {
       const res = await axiosPublic.delete(`/deleteOffer/${id}`);
       if (res?.data?.deletedCount) {
         refetchOffer();
-        toast.success('Offer deleted successfully!');
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="pl-6">
+              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    Offer Removed!
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    The offer has been successfully deleted!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        })
       }
     } catch (error) {
       toast.error('Failed to delete offer. Please try again!');
@@ -226,7 +291,39 @@ const RecentPromotions = () => {
       const res = await axiosPublic.put(`/updatePromo/${id}`, discountData);
       if (res.data.modifiedCount > 0) {
         await refetchPromo(); // Refetch the promo list to get the updated data
-        toast.success('Status changed successfully!');
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="pl-6">
+              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    Status Updated!
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Status updated successfully!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        })
       } else {
         toast.error('No changes detected.');
       }
@@ -253,7 +350,39 @@ const RecentPromotions = () => {
       const res = await axiosPublic.put(`/updateOffer/${id}`, discountData);
       if (res.data.modifiedCount > 0) {
         refetchOffer(); // Refetch the promo list to get the updated data
-        toast.success('Status changed successfully!');
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="pl-6">
+              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    Status Updated!
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Status updated successfully!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        })
       } else {
         toast.error('No changes detected.');
       }

@@ -1,17 +1,10 @@
 import useOrders from '@/app/hooks/useOrders';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
 import { Checkbox, CheckboxGroup, DateRangePicker } from '@nextui-org/react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
 import { IoMdClose } from 'react-icons/io';
 import { format, startOfToday, endOfToday, startOfYesterday, endOfYesterday, subDays, subMonths, startOfMonth, endOfMonth, isValid } from 'date-fns';
-
-const parseDate = (dateString) => {
-  const [datePart] = dateString.split('|').map(part => part.trim());
-  const [day, month, year] = datePart.split('-').map(Number);
-  const fullYear = year < 100 ? 2000 + year : year;
-  return new Date(fullYear, month - 1, day);
-};
 
 const FinancePerformance = () => {
   const [orderList, isOrderPending] = useOrders();
@@ -19,6 +12,25 @@ const FinancePerformance = () => {
   const [activeFilter, setActiveFilter] = useState('today');
   const [showDateRangePicker, setShowDateRangePicker] = useState(true); // New state
   const [selected, setSelected] = useState(['bKash', 'SSLCommerz']);
+
+  useEffect(() => {
+    // Set default date range to Today when the component mounts
+    handleDateFilter('today');
+  }, []);
+
+  const parseDate = (dateString) => {
+    const [datePart, timePart] = dateString.split('|').map(part => part.trim());
+    const [day, month, year] = datePart.split('-').map(Number);
+    const fullYear = year < 100 ? 2000 + year : year;
+    const date = new Date(fullYear, month - 1, day);
+
+    if (timePart) {
+      const [hours, minutes] = timePart.split(':').map(Number);
+      date.setHours(hours, minutes);
+    }
+
+    return date;
+  };
 
   const { startDate, endDate } = useMemo(() => {
     const start = selectedDateRange.start
@@ -45,8 +57,8 @@ const FinancePerformance = () => {
   }, [getDateRange]);
 
   const normalizeDateRange = (startRange, endRange) => {
-    const startDate = startRange && typeof startRange === 'object' ? new Date(startRange) : null;
-    const endDate = endRange && typeof endRange === 'object' ? new Date(endRange) : null;
+    const startDate = startRange ? new Date(startRange) : null;
+    const endDate = endRange ? new Date(endRange) : null;
 
     const normalizedStart = startDate ? {
       year: startDate.getFullYear(),
@@ -72,12 +84,14 @@ const FinancePerformance = () => {
     }
   };
 
-  const { bKashTransactions, sslCommerzTransactions } = useMemo(() => {
+  const { bKashTransactions, sslCommerzTransactions, totalBKashRevenue, totalSSLCommerzRevenue } = useMemo(() => {
     let bKashTransactions = 0;
     let sslCommerzTransactions = 0;
+    let totalBKashRevenue = 0; // Initialize total revenue for bKash
+    let totalSSLCommerzRevenue = 0; // Initialize total revenue for SSLCommerz
 
     if (!filterStartDate || !filterEndDate) {
-      return { bKashTransactions, sslCommerzTransactions }; // No filter applied yet
+      return { bKashTransactions, sslCommerzTransactions, totalBKashRevenue, totalSSLCommerzRevenue }; // No filter applied yet
     }
 
     // Convert filter dates to Date objects and normalize them to start and end of day
@@ -89,20 +103,63 @@ const FinancePerformance = () => {
 
     // Filter orders based on the normalized date range
     const filteredOrders = orderList?.filter((order) => {
-      const orderDate = parseDate(order.dateTime);
+      const orderDate = parseDate(order.dateTime); // Assuming parseDate is a function to parse order date
       return orderDate >= adjustedStartDate && orderDate <= adjustedEndDate;
     });
 
-    // Count the number of transactions for each payment method
+    // Count the number of transactions and calculate total revenue for each payment method
     filteredOrders?.forEach((order) => {
+      // Calculate subtotal without offer discounts initially
+      let subtotal = parseFloat(
+        order.productInformation.reduce((total, product) => {
+          const productTotal = product.unitPrice * product.sku; // Assuming sku represents quantity
+          return total + productTotal;
+        }, 0).toFixed(2)
+      );
+
+      // Apply promo discount based on subtotal
+      const promoDiscountValue = parseFloat(order.promoDiscountValue || 0);
+      let promoDiscount = 0;
+
+      if (order.promoCode) {
+        if (order.promoDiscountType === 'Percentage') {
+          promoDiscount = (subtotal * (promoDiscountValue / 100)).toFixed(2);
+        } else if (order.promoDiscountType === 'Amount') {
+          promoDiscount = promoDiscountValue.toFixed(2);
+        }
+      }
+
+      // Calculate total after applying promo discount
+      let total = subtotal - promoDiscount;
+
+      // Add the offer discount after calculating the promo
+      order.productInformation.forEach((product) => {
+        let offerDiscount = 0;
+        const productTotal = parseFloat((product.unitPrice * product.sku).toFixed(2)); // Recalculate product total
+
+        // Apply offer discount for this product
+        if (product.offerDiscountType === 'Percentage') {
+          offerDiscount = (productTotal * (product.offerDiscountValue / 100)).toFixed(2);
+        } else if (product.offerDiscountType === 'Amount') {
+          offerDiscount = product.offerDiscountValue.toFixed(2);
+        }
+        total -= offerDiscount; // Reduce total by the offer discount for this product
+      });
+
+      // Ensure total is not negative after all discounts
+      const orderTotal = Math.max(parseFloat(total), 0);
+
+      // Count the transactions based on the payment method
       if (order.paymentMethod === 'bKash') {
         bKashTransactions += 1;
+        totalBKashRevenue += orderTotal; // Add to total revenue for bKash
       } else if (order.paymentMethod === 'SSLCommerz') {
         sslCommerzTransactions += 1;
+        totalSSLCommerzRevenue += orderTotal; // Add to total revenue for SSLCommerz
       }
     });
 
-    return { bKashTransactions, sslCommerzTransactions };
+    return { bKashTransactions, sslCommerzTransactions, totalBKashRevenue, totalSSLCommerzRevenue };
   }, [orderList, filterStartDate, filterEndDate]);
 
   const paymentMethodData = useMemo(() => {
@@ -139,8 +196,47 @@ const FinancePerformance = () => {
     }));
   }, [orderList, filterStartDate, filterEndDate]);
 
+  // Memoize filtered data to group by hour for today or yesterday
+  const hourlyPaymentData = useMemo(() => {
+    if (!filterStartDate || !filterEndDate) return [];
+
+    const isTodayOrYesterday = activeFilter === 'today' || activeFilter === 'yesterday';
+    if (!isTodayOrYesterday) return [];
+
+    const startDateObj = new Date(filterStartDate);
+    const endDateObj = new Date(filterEndDate);
+
+    const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0));
+    const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999));
+
+    const filteredOrders = orderList?.filter((order) => {
+      const orderDate = parseDate(order.dateTime);
+      return orderDate >= adjustedStartDate && orderDate <= adjustedEndDate;
+    });
+
+    // Initialize an object with keys for each hour (0-23)
+    const hourlyData = Array(24).fill().map((_, hour) => ({
+      hour: `${hour}:00`,
+      bKashTransactions: 0,
+      sslCommerzTransactions: 0,
+    }));
+
+    // Group orders by the hour
+    filteredOrders?.forEach((order) => {
+      const orderDate = parseDate(order.dateTime);
+      const hour = orderDate.getHours();
+
+      if (order.paymentMethod === 'bKash') {
+        hourlyData[hour].bKashTransactions += 1;
+      } else if (order.paymentMethod === 'SSLCommerz') {
+        hourlyData[hour].sslCommerzTransactions += 1;
+      }
+    });
+
+    return hourlyData;
+  }, [orderList, filterStartDate, filterEndDate, activeFilter]);
+
   const handleReset = () => {
-    // Set date range to today
     const today = new Date();
     setSelectedDateRange({
       start: {
@@ -155,7 +251,6 @@ const FinancePerformance = () => {
       },
     });
 
-    // Set active filter to 'today'
     setActiveFilter('today');
     setShowDateRangePicker(true);
   };
@@ -178,12 +273,8 @@ const FinancePerformance = () => {
         end = endOfToday();
         break;
       case 'lastMonth':
-        const previousMonthStart = new Date(startOfMonth(subMonths(new Date(), 1)));
-        previousMonthStart.setHours(0, 0, 0, 0); // Set time to 00:00:00
-        const previousMonthEnd = new Date(endOfMonth(subMonths(new Date(), 1)));
-        previousMonthEnd.setHours(23, 59, 59, 999); // Set time to 23:59:59
-        start = new Date(startOfMonth(subMonths(new Date(), 1)));
-        end = new Date(endOfMonth(subMonths(new Date(), 1)));
+        start = startOfMonth(subMonths(new Date(), 1));
+        end = endOfMonth(subMonths(new Date(), 1));
         break;
       default:
         break;
@@ -193,8 +284,14 @@ const FinancePerformance = () => {
       start: start && { year: start.getFullYear(), month: start.getMonth() + 1, day: start.getDate() },
       end: end && { year: end.getFullYear(), month: end.getMonth() + 1, day: end.getDate() },
     });
-    setActiveFilter(filter); // Set active filter
+    setActiveFilter(filter);
     setShowDateRangePicker(true);
+  };
+
+  const handleChange = (values) => {
+    // Ensure at least one checkbox is always selected
+    if (values.length === 0) return;
+    setSelected(values);
   };
 
   const formatXAxis = (tickItem) => {
@@ -204,11 +301,14 @@ const FinancePerformance = () => {
     return format(date, 'MM/dd');
   };
 
-  const handleChange = (values) => {
-    // Ensure at least one checkbox is always selected
-    if (values.length === 0) return;
-    setSelected(values);
-  };
+  // Calculate the maximum value for the Y-axis
+  const maxBKash = Math.max(...paymentMethodData.map(data => data.bKashTransactions), 0);
+  const maxSSLCommerz = Math.max(...paymentMethodData.map(data => data.sslCommerzTransactions), 0);
+  const maxHourlyBKash = Math.max(...hourlyPaymentData.map(data => data.bKashTransactions), 0);
+  const maxHourlySSLCommerz = Math.max(...hourlyPaymentData.map(data => data.sslCommerzTransactions), 0);
+
+  // Set the maximum value for the Y-axis (slightly above the highest transaction count, minimum of 20)
+  const maxYValue = Math.max(Math.ceil(Math.max(maxBKash, maxSSLCommerz, maxHourlyBKash, maxHourlySSLCommerz) * 1.1), 15); // Ensure minimum of 20
 
   if (isOrderPending) {
     return <SmallHeightLoading />;
@@ -277,13 +377,13 @@ const FinancePerformance = () => {
         {/* Summary Section */}
         <div className='flex lg:flex-col xl:flex-row items-center justify-center gap-6 w-1/3 xl:w-3/4 lg:min-h-[150px] lg:max-h-[150px]'>
           <div className="border rounded-lg p-4 md:p-8 space-y-3">
-            <p className="text-[10px] md:text-sm xl:text-base font-semibold">Number of bKash Transactions</p>
-            <h3 className="font-bold md:text-xl lg:text-2xl xl:text-3xl">{bKashTransactions}</h3>
+            <p className="text-[10px] md:text-sm xl:text-base font-semibold">Number of bKash Payments</p>
+            <h3 className="font-bold md:text-xl lg:text-2xl xl:text-3xl">{bKashTransactions} |  ৳ {totalBKashRevenue.toFixed(2)}</h3>
           </div>
           <div className="border rounded-lg p-4 md:p-8 space-y-3">
-            <p className="text-[10px] md:text-sm xl:text-base font-semibold">Number of SSLCommerz Transactions</p>
+            <p className="text-[10px] md:text-sm xl:text-base font-semibold">Number of SSLCommerz Payments</p>
             <h3 className="font-bold md:text-xl lg:text-2xl xl:text-3xl flex items-center gap-0 md:gap-1">
-              {sslCommerzTransactions}
+              {sslCommerzTransactions} | ৳ {totalSSLCommerzRevenue.toFixed(2)}
             </h3>
           </div>
         </div>
@@ -296,10 +396,10 @@ const FinancePerformance = () => {
           ) : (
             <div className='w-full'>
               <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={paymentMethodData}>
+                <BarChart data={activeFilter === 'today' || activeFilter === 'yesterday' ? hourlyPaymentData : paymentMethodData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" tickFormatter={formatXAxis} /> {/* X-axis labels based on date */}
-                  <YAxis />
+                  <XAxis dataKey={activeFilter === 'today' || activeFilter === 'yesterday' ? "hour" : "date"} tickFormatter={activeFilter === 'today' || activeFilter === 'yesterday' ? "" : formatXAxis} /> {/* X-axis labels based on date */}
+                  <YAxis domain={[0, maxYValue]} />
                   <Tooltip />
 
                   {/* Bar for bKash transactions */}

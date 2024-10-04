@@ -12,7 +12,9 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
+import { FiSave } from 'react-icons/fi';
 import { MdOutlineFileUpload } from 'react-icons/md';
+import { RxCheck, RxCross2 } from 'react-icons/rx';
 
 const ThirdStepOfAddProduct = () => {
 
@@ -25,7 +27,6 @@ const ThirdStepOfAddProduct = () => {
   const [selectAll, setSelectAll] = useState(false); // State for "select all"
   const [sizeError, setSizeError] = useState(false);
   const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
-  const [productList, isProductPending] = useProductsInformation();
 
   // Toggle card selection
   const toggleCardSelection = (shipping) => {
@@ -58,34 +59,6 @@ const ThirdStepOfAddProduct = () => {
     setSelectAll(!selectAll); // Toggle selectAll state
   };
 
-  const generateProductID = (category) => {
-    const prefix = "FC"; // Automatically generated "FC"
-    const currentYear = new Date().getFullYear();
-    const yearCode = String(currentYear).slice(-3); // Last 3 digits of the year (e.g., "024" for 2024)
-
-    // Filter the productList to get products only in the specified category
-    const productsInCategory = productList?.filter(product => product?.category === category);
-
-    // Extract the numeric parts of existing product IDs
-    const productNumbers = productsInCategory
-      ?.map(product => {
-        const match = product?.productId?.match(/(\d+)$/);
-        return match ? parseInt(match[0], 10) : 0;
-      })
-      ?.filter(number => number > 0);
-
-    // Get the highest number found in the product IDs
-    const highestNumber = productNumbers?.length ? Math.max(...productNumbers) : 0;
-
-    // Calculate the next product number, skipping deleted product numbers
-    const nextProductNumber = String(highestNumber + 1).padStart(3, '0'); // 3-digit number with leading zeros
-
-    const categoryCode = category.slice(0, 2).toUpperCase(); // First 2 letters of the category
-
-    const productID = `${prefix}${yearCode}${categoryCode}${nextProductNumber}`;
-    return productID;
-  };
-
   const onSubmit = async () => {
     setIsSubmitting(true);
 
@@ -95,6 +68,7 @@ const ThirdStepOfAddProduct = () => {
       return;
     }
 
+    const storedFormattedDate = localStorage.getItem("formattedDate")
     const storedProductTitle = localStorage.getItem('productTitle');
     const storedProductWeight = localStorage.getItem('weight');
     const storedProductBatchCode = localStorage.getItem('batchCode');
@@ -114,9 +88,10 @@ const ThirdStepOfAddProduct = () => {
     const storedVendors = JSON.parse(localStorage.getItem('vendors') || '[]');
     const storedTags = JSON.parse(localStorage.getItem('tags') || '[]');
     const storedVariants = JSON.parse(localStorage.getItem('productVariants') || '[]');
-    const productId = generateProductID(storedCategory);
+    const storedProductId = localStorage.getItem('productId');
 
     const wholeProductData = {
+      publishDate: storedFormattedDate,
       productTitle: storedProductTitle,
       weight: storedProductWeight,
       batchCode: storedProductBatchCode,
@@ -137,7 +112,7 @@ const ThirdStepOfAddProduct = () => {
       tags: storedTags,
       productVariants: storedVariants,
       shippingDetails: selectedShipmentHandler,
-      productId,
+      productId: storedProductId,
       status: "active"
     }
 
@@ -146,7 +121,39 @@ const ThirdStepOfAddProduct = () => {
       const response = await axiosPublic.post('/addProduct', wholeProductData);
 
       if (response?.data?.insertedId) {
-        toast.success('Product Details added successfully!');
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="pl-6">
+              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    Product Published!
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    This Product is successfully added!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        })
         localStorage.removeItem('productTitle');
         localStorage.removeItem('batchCode');
         localStorage.removeItem('weight');
@@ -166,6 +173,8 @@ const ThirdStepOfAddProduct = () => {
         JSON.parse(localStorage.removeItem('vendors') || '[]');
         JSON.parse(localStorage.removeItem('tags') || '[]');
         JSON.parse(localStorage.removeItem('productVariants') || '[]');
+        localStorage.removeItem('formattedDate');
+        localStorage.removeItem('productId');
         router.push("/dash-board/products/existing-products");
       }
     } catch (error) {
@@ -175,7 +184,127 @@ const ThirdStepOfAddProduct = () => {
     }
   };
 
-  if (isShippingPending || isShipmentHandlerPending || isProductPending) {
+  // New function for "Save for Now" button
+  const onSaveForNow = async () => {
+
+    if (selectedShipmentHandler.length === 0) {
+      setSizeError(true);
+      return;
+    }
+
+    const storedFormattedDate = localStorage.getItem("formattedDate");
+    const storedProductTitle = localStorage.getItem('productTitle');
+    const storedProductWeight = localStorage.getItem('weight');
+    const storedProductBatchCode = localStorage.getItem('batchCode');
+    const storedRegularPrice = localStorage.getItem('regularPrice');
+    const storedUploadedImageUrls = JSON.parse(localStorage.getItem('uploadedImageUrls') || '[]');
+    const storedDiscountType = localStorage.getItem('discountType');
+    const storedDiscountValue = localStorage.getItem('discountValue');
+    const storedProductDetails = localStorage.getItem('productDetails');
+    const storedMaterialCare = localStorage.getItem('materialCare');
+    const storedSizeFit = localStorage.getItem('sizeFit');
+    const storedCategory = localStorage.getItem('category');
+    const storedSubCategories = JSON.parse(localStorage.getItem('subCategories') || '[]');
+    const storedGroupOfSizes = JSON.parse(localStorage.getItem('groupOfSizes') || '[]');
+    const storedAllSizes = JSON.parse(localStorage.getItem('allSizes') || '[]');
+    const storedAvailableColors = JSON.parse(localStorage.getItem('availableColors') || '[]');
+    const storedNewArrival = localStorage.getItem('newArrival');
+    const storedVendors = JSON.parse(localStorage.getItem('vendors') || '[]');
+    const storedTags = JSON.parse(localStorage.getItem('tags') || '[]');
+    const storedProductId = localStorage.getItem('productId');
+    const storedVariants = JSON.parse(localStorage.getItem('productVariants') || '[]');
+
+    const productData = {
+      publishDate: storedFormattedDate,
+      productTitle: storedProductTitle,
+      weight: storedProductWeight,
+      batchCode: storedProductBatchCode,
+      regularPrice: storedRegularPrice,
+      imageUrls: storedUploadedImageUrls,
+      discountType: storedDiscountType,
+      discountValue: storedDiscountValue,
+      productDetails: storedProductDetails,
+      materialCare: storedMaterialCare,
+      sizeFit: storedSizeFit,
+      category: storedCategory,
+      subCategories: storedSubCategories,
+      groupOfSizes: storedGroupOfSizes,
+      allSizes: storedAllSizes,
+      availableColors: storedAvailableColors,
+      newArrival: storedNewArrival,
+      vendors: storedVendors,
+      tags: storedTags,
+      productId: storedProductId,
+      productVariants: storedVariants,
+      shippingDetails: selectedShipmentHandler,
+      status: "draft",
+    };
+
+    try {
+      const response = await axiosPublic.post('/addProduct', productData);
+      if (response?.data?.insertedId) {
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="pl-6">
+              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    Product Drafted!
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    This Product is successfully drafted!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        })
+        localStorage.removeItem('formattedDate');
+        localStorage.removeItem('productTitle');
+        localStorage.removeItem('batchCode');
+        localStorage.removeItem('weight');
+        localStorage.removeItem('regularPrice');
+        JSON.parse(localStorage.removeItem('uploadedImageUrls') || '[]');
+        localStorage.removeItem('discountType');
+        localStorage.removeItem('discountValue');
+        localStorage.removeItem('productDetails');
+        localStorage.removeItem('materialCare');
+        localStorage.removeItem('sizeFit');
+        localStorage.removeItem('category');
+        localStorage.removeItem('productId');
+        JSON.parse(localStorage.removeItem('subCategories') || '[]');
+        JSON.parse(localStorage.removeItem('groupOfSizes') || '[]');
+        JSON.parse(localStorage.removeItem('allSizes') || '[]');
+        JSON.parse(localStorage.removeItem('availableColors') || '[]');
+        localStorage.removeItem('newArrival');
+        JSON.parse(localStorage.removeItem('vendors') || '[]');
+        JSON.parse(localStorage.removeItem('tags') || '[]');
+        JSON.parse(localStorage.removeItem('productVariants') || '[]');
+        router.push("/dash-board/products/existing-products");
+      }
+    } catch (err) {
+      toast.error("Failed to save product information");
+    }
+  };
+
+  if (isShippingPending || isShipmentHandlerPending) {
     return <Loading />
   }
 
@@ -185,7 +314,7 @@ const ThirdStepOfAddProduct = () => {
 
       <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto mt-6'>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto min-h-[700px]">
           <table className="min-w-full table-auto">
             <thead>
               <tr>
@@ -272,12 +401,19 @@ const ThirdStepOfAddProduct = () => {
         )}
 
         <div className='flex justify-between mt-6 px-6 2xl:px-0'>
-          <Link href='/dash-board/products/add-product-2' className='flex items-center gap-2 mt-4 mb-8 bg-[#9F5216] hover:bg-[#804010] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium'>
+          <Link href='/dash-board/products/add-product-2' className='flex items-center gap-2 mt-4 mb-8 bg-[#9F5216] hover:bg-[#804010] text-white py-2 px-4 rounded-md cursor-pointer font-medium'>
             <FaArrowLeft /> Previous Step
           </Link>
-          <button disabled={isSubmitting} type='submit' className={`mt-4 mb-8 bg-[#9F5216] hover:bg-[#804010] text-white py-2 px-4 flex items-center justify-center gap-2 text-sm rounded-md cursor-pointer font-medium ${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium`}>
-            {isSubmitting ? 'Publishing...' : 'Publish'} <MdOutlineFileUpload size={20} />
-          </button>
+
+          <div className='flex items-center gap-6'>
+            <button type="button" onClick={handleSubmit(onSaveForNow)} className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
+              Save For Now <FiSave size={19} />
+            </button>
+            <button disabled={isSubmitting} type='submit' className={`bg-[#9F5216] hover:bg-[#804010] text-white py-2 px-4 flex items-center justify-center gap-2 rounded-md cursor-pointer font-medium ${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 rounded-md cursor-pointer font-medium`}>
+              {isSubmitting ? 'Publishing...' : 'Publish'} <MdOutlineFileUpload size={20} />
+            </button>
+          </div>
+
         </div>
       </form>
 

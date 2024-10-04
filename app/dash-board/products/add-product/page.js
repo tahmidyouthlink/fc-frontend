@@ -1,11 +1,11 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useForm, Controller } from "react-hook-form";
 import toast from 'react-hot-toast';
 import ReactSelect from "react-select";
 import ColorOption from '@/app/components/layout/ColorOption';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { CheckboxGroup, Select, SelectItem, Tabs, Tab, RadioGroup, Radio } from "@nextui-org/react";
+import { CheckboxGroup, Select, SelectItem, Tabs, Tab, RadioGroup, Radio, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
 import 'react-quill/dist/quill.snow.css';
 import dynamic from 'next/dynamic';
 import { CustomCheckbox } from '@/app/components/layout/CustomCheckBox';
@@ -13,7 +13,7 @@ import { CustomCheckbox2 } from '@/app/components/layout/CustomCheckBox2';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6';
 import Image from 'next/image';
-import { RxCross2 } from 'react-icons/rx';
+import { RxCheck, RxCross2 } from 'react-icons/rx';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useCategories from '@/app/hooks/useCategories';
@@ -25,6 +25,8 @@ import useTags from '@/app/hooks/useTags';
 import useVendors from '@/app/hooks/useVendors';
 import useColors from '@/app/hooks/useColors';
 import Link from 'next/link';
+import useProductsInformation from '@/app/hooks/useProductsInformation';
+import { FiSave } from "react-icons/fi";
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
@@ -61,6 +63,7 @@ const FirstStepOfAddProduct = () => {
   const [categoryList, isCategoryPending] = useCategories();
   const [sizeRangeList, isSizeRangePending] = useSizeRanges();
   const [subCategoryList, isSubCategoryPending] = useSubCategories();
+  const [productList, isProductPending] = useProductsInformation();
 
   const handleCategoryChange = (value) => {
     localStorage.setItem('category', value); // Save the selected category to local storage
@@ -369,6 +372,34 @@ const FirstStepOfAddProduct = () => {
     }
   }, [setValue]);
 
+  const generateProductID = (category) => {
+    const prefix = "FC"; // Automatically generated "FC"
+    const currentYear = new Date().getFullYear();
+    const yearCode = String(currentYear).slice(-3); // Last 3 digits of the year (e.g., "024" for 2024)
+
+    // Filter the productList to get products only in the specified category
+    const productsInCategory = productList?.filter(product => product?.category === category);
+
+    // Extract the numeric parts of existing product IDs
+    const productNumbers = productsInCategory
+      ?.map(product => {
+        const match = product?.productId?.match(/(\d+)$/);
+        return match ? parseInt(match[0], 10) : 0;
+      })
+      ?.filter(number => number > 0);
+
+    // Get the highest number found in the product IDs
+    const highestNumber = productNumbers?.length ? Math.max(...productNumbers) : 0;
+
+    // Calculate the next product number, skipping deleted product numbers
+    const nextProductNumber = String(highestNumber + 1).padStart(3, '0'); // 3-digit number with leading zeros
+
+    const categoryCode = category.slice(0, 2).toUpperCase(); // First 2 letters of the category
+
+    const productID = `${prefix}${yearCode}${categoryCode}${nextProductNumber}`;
+    return productID;
+  };
+
   const onSubmit = async (data) => {
     try {
       if (uploadedImageUrls.length === 0) {
@@ -395,6 +426,7 @@ const FirstStepOfAddProduct = () => {
       const currentDate = new Date();
       const options = { year: 'numeric', month: 'long', day: 'numeric' };
       const formattedDate = currentDate.toLocaleDateString('en-US', options);
+      const productId = generateProductID(selectedCategory);
 
       localStorage.setItem('formattedDate', formattedDate);
       localStorage.setItem('productTitle', data.productTitle);
@@ -409,9 +441,110 @@ const FirstStepOfAddProduct = () => {
       localStorage.setItem('vendors', JSON.stringify(data.vendors));
       localStorage.setItem('tags', JSON.stringify(data.tags));
       localStorage.setItem('newArrival', data.newArrival);
+      localStorage.setItem('productId', productId);
       setNavigate(true);
     } catch (err) {
       toast.error("Failed to publish your work");
+    }
+  };
+
+  // New function for "Save for Now" button
+  const onSaveForNow = async (formData) => {
+
+    if (uploadedImageUrls.length === 0) {
+      setSizeError(true);
+      return;
+    }
+    setSizeError(false);
+    if (groupSelected.length === 0) {
+      setSizeError2(true);
+      return;
+    }
+    setSizeError2(false);
+    if (groupSelected2.length === 0) {
+      setSizeError3(true);
+      return;
+    }
+    setSizeError3(false);
+    if (selectedSubCategories.length === 0) {
+      setSizeError4(true);
+      return;
+    }
+    setSizeError4(false);
+
+    const currentDate = new Date();
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const publishDate = currentDate.toLocaleDateString('en-US', options);
+    const productId = generateProductID(selectedCategory);
+    const productData = {
+      ...formData,
+      imageUrls: uploadedImageUrls,
+      discountType,
+      publishDate,
+      groupOfSizes: groupSelected,
+      allSizes: groupSelected2,
+      productId,
+      status: "draft",
+    };
+
+    try {
+      const response = await axiosPublic.post('/addProduct', productData);
+      if (response?.data?.insertedId) {
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="pl-6">
+              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    Product Drafted!
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    This Product is successfully drafted!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        })
+        localStorage.removeItem('productTitle');
+        localStorage.removeItem('batchCode');
+        localStorage.removeItem('weight');
+        localStorage.removeItem('regularPrice');
+        JSON.parse(localStorage.removeItem('uploadedImageUrls') || '[]');
+        localStorage.removeItem('discountType');
+        localStorage.removeItem('discountValue');
+        localStorage.removeItem('productDetails');
+        localStorage.removeItem('materialCare');
+        localStorage.removeItem('sizeFit');
+        localStorage.removeItem('category');
+        JSON.parse(localStorage.removeItem('subCategories') || '[]');
+        JSON.parse(localStorage.removeItem('groupOfSizes') || '[]');
+        JSON.parse(localStorage.removeItem('allSizes') || '[]');
+        JSON.parse(localStorage.removeItem('availableColors') || '[]');
+        localStorage.removeItem('newArrival');
+        JSON.parse(localStorage.removeItem('vendors') || '[]');
+        JSON.parse(localStorage.removeItem('tags') || '[]');
+        router.push("/dash-board/products/existing-products");
+      }
+    } catch (err) {
+      toast.error("Failed to save product information");
     }
   };
 
@@ -422,13 +555,20 @@ const FirstStepOfAddProduct = () => {
     }
   }, [navigate, router]);
 
-  if (isCategoryPending || isSizeRangePending || isSubCategoryPending || isTagPending || isVendorPending || isColorPending) {
+  if (isCategoryPending || isSizeRangePending || isSubCategoryPending || isTagPending || isVendorPending || isColorPending || isProductPending) {
     return <Loading />
   }
 
   return (
     <div className='bg-gray-50 min-h-screen'>
-      <h3 className='text-center font-semibold text-xl md:text-2xl px-6 pt-6'>Add Product Details</h3>
+
+      <div className='max-w-screen-2xl mx-auto pt-3 md:pt-6 px-6'>
+        <div className='flex items-center justify-between'>
+          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Product Configuration</h3>
+          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/products"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        </div>
+      </div>
+
       <form className='2xl:max-w-screen-2xl 2xl:mx-auto' onSubmit={handleSubmit(onSubmit)}>
         <div className='grid grid-cols-1 lg:grid-cols-12'>
 
@@ -710,11 +850,11 @@ const FirstStepOfAddProduct = () => {
                   )}
                 </div>
                 <div>
-                  <label htmlFor={`weight`} className='font-medium text-[#9F5216]'>Weight</label>
+                  <label htmlFor={`weight`} className='font-medium text-[#9F5216]'>Weight (gram)</label>
                   <input
                     id={`weight`}
                     {...register(`weight`)}
-                    placeholder={`Enter Weight`}
+                    placeholder={`Enter Weight (gram)`}
                     className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mt-2"
                     type="number"
                   />
@@ -855,13 +995,16 @@ const FirstStepOfAddProduct = () => {
           </div>
 
         </div>
-        <div className='flex justify-between px-6 pt-4 pb-8'>
-          <Link href='/dash-board/products' className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
-            <FaArrowLeft /> Previous Step
-          </Link>
+        <div className='flex justify-end gap-6 px-6 pt-4 pb-8'>
+
+          <button type="button" onClick={handleSubmit(onSaveForNow)} className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
+            Save For Now <FiSave size={19} />
+          </button>
+
           <button type='submit' className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
             Next Step <FaArrowRight />
           </button>
+
         </div>
       </form>
     </div>

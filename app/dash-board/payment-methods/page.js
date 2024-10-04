@@ -11,6 +11,7 @@ import { RiDeleteBinLine } from 'react-icons/ri';
 import Loading from '@/app/components/shared/Loading/Loading';
 import CustomSwitchPaymentMethod from '@/app/components/layout/CustomSwitchPaymentMethod';
 import usePaymentMethods from '@/app/hooks/usePaymentMethods';
+import { RxCheck, RxCross2 } from 'react-icons/rx';
 
 const PaymentMethods = () => {
 
@@ -35,7 +36,39 @@ const PaymentMethods = () => {
       const res = await axiosPublic.put(`/editPaymentMethod/${id}`, paymentMethodData);
       if (res.data.modifiedCount > 0) {
         refetch(); // Refetch the promo list to get the updated data
-        toast.success('Status changed successfully!');
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="pl-6">
+              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    Status Changed!
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Status changed successfully!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        })
       } else {
         toast.error('No changes detected.');
       }

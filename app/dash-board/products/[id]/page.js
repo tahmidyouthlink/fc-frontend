@@ -22,12 +22,13 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { Controller, useForm } from 'react-hook-form';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { MdOutlineFileUpload } from 'react-icons/md';
-import { RxCross2 } from 'react-icons/rx';
+import { RxCheck, RxCross2 } from 'react-icons/rx';
 import ReactSelect from 'react-select';
 import toast from 'react-hot-toast';
 import useShippingZones from '@/app/hooks/useShippingZones';
 import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
 import { HiOutlineArchive } from "react-icons/hi";
+import { RxUpdate } from "react-icons/rx";
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
@@ -37,7 +38,7 @@ const EditProductPage = () => {
 
   const { register, handleSubmit, setValue, control, formState: { errors } } = useForm();
 
-  const isAdmin = false;
+  const isAdmin = true;
   const { id } = useParams();
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
@@ -482,12 +483,44 @@ const EditProductPage = () => {
         tags: selectedTags,
         productVariants: formattedData,
         shippingDetails: selectedShipmentHandler,
-        status: data?.status
+        status: data?.status,
       }
 
       const res = await axiosPublic.put(`/editProductDetails/${id}`, updatedProductData);
       if (res.data.modifiedCount > 0) {
-        toast.success('Product Details updated successfully!');
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="pl-6">
+              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    Product Updated!
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Product Details updated successfully!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        })
         router.push(`/dash-board/products/existing-products/${selectedCategory}`);
       } else {
         toast.error('No changes detected!');
@@ -1000,29 +1033,38 @@ const EditProductPage = () => {
         </div>
 
         <div className='2xl:max-w-screen-2xl 2xl:mx-auto flex justify-between px-6 pt-8 pb-16'>
-          {productStatus === "active" ?
-            <Button color="danger" size='sm' className='flex items-center gap-1' onClick={handleSubmit((formData) => {
+          {productStatus === "active" &&
+            <Button color="danger" className='flex items-center gap-1' onClick={handleSubmit((formData) => {
               setProductStatus("archive"); // Set status to archive
               onSubmit({ ...formData, status: "archive" }); // Pass the updated status directly
             })}
             >
-              Archive <HiOutlineArchive size={18} /></Button>
-            :
+              Archive <HiOutlineArchive size={20} />
+            </Button>}
+
+          <div className='flex items-center justify-end gap-6 w-full'>
             <Button
-              className="flex items-center gap-1" size='sm'
+              type='button'
+              className='bg-[#9F5216] hover:bg-[#804010] text-white '
+              onClick={handleSubmit((formData) => {
+                const newStatus = productStatus === "draft" ? "active" : productStatus; // Change draft to active
+                onSubmit({ ...formData, status: newStatus }); // Pass the updated status directly
+              })}
+            >
+              Update <RxUpdate size={18} />
+            </Button>
+
+            {productStatus === "archive" && <Button
+              className="flex items-center gap-1"
               color="secondary"
               onClick={handleSubmit((formData) => {
                 setProductStatus("active"); // Set status to active
                 onSubmit({ ...formData, status: "active" }); // Pass the updated status directly
               })}
             >
-              Publish <MdOutlineFileUpload size={18} />
-            </Button>
-          }
-
-          <button type='submit' className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-1.5 rounded-md flex items-center gap-2 text-sm'>
-            Save Changes
-          </button>
+              Publish Again <MdOutlineFileUpload size={18} />
+            </Button>}
+          </div>
         </div>
       </form>
     </div>

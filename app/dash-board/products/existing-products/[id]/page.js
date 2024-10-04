@@ -9,14 +9,15 @@ import arrowSvgImage from "../../../../../public/card-images/arrow.svg";
 import arrivals1 from "../../../../../public/card-images/arrivals1.svg";
 import arrivals2 from "../../../../../public/card-images/arrivals2.svg";
 import SmallHeightLoading from '@/app/components/shared/Loading/SmallHeightLoading';
-import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
+import { Button, Checkbox, CheckboxGroup, DateRangePicker, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
 import TabsOrder from '@/app/components/layout/TabsOrder';
 import CustomPagination from '@/app/components/layout/CustomPagination';
 import Link from 'next/link';
+import { IoMdClose } from 'react-icons/io';
 
 const columns = ['Product', 'Status', 'SKU', 'Category', 'Price', 'Sizes', 'Colors', 'Vendor', 'Shipping Zones', 'Shipment Handlers'];
 
-const productStatusTab = ['All', 'Active', 'Archive', 'Draft'];
+const productStatusTab = ['All', 'Active', 'Draft', 'Archived'];
 
 const ProductPage = () => {
 
@@ -37,6 +38,7 @@ const ProductPage = () => {
   const [openDropdown, setOpenDropdown] = useState(false);
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(25);
+  const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedColumnsProductCategory'));
@@ -62,33 +64,67 @@ const ProductPage = () => {
     fetchProductDetails();
   }, [decodedCategoryName, axiosPublic]);
 
+  // Convert dateTime string to Date object
+  const parseDate = (dateString) => {
+    if (!dateString) {
+      console.error("Invalid dateString:", dateString); // Log the error for debugging
+      return null; // Return null or some default date
+    }
+
+    // Parse the date string using Date.parse or create a new Date object directly
+    const date = new Date(dateString);
+
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      console.error("Invalid date format:", dateString); // Log if the date is invalid
+      return null; // Return null or some default date
+    }
+
+    return date; // Return the valid date object
+  };
+
+
+  // Extract start and end dates from selectedDateRange
+  const startDate = selectedDateRange?.start ? new Date(selectedDateRange.start.year, selectedDateRange.start.month - 1, selectedDateRange.start.day) : null;
+  const endDate = selectedDateRange?.end ? new Date(selectedDateRange.end.year, selectedDateRange.end.month - 1, selectedDateRange.end.day) : null; // Adjust end date to include the entire end day
+  const adjustedEndDate = endDate ? new Date(endDate.getTime() + 24 * 60 * 60 * 1000 - 1) : null; // Add 1 day and subtract 1 ms
+
   // Filter products based on search and selected tab
   const searchedProductDetails = productDetails?.filter((product) => {
+    const query = searchQuery.trim().toLowerCase();
+    const isNumberQuery = !isNaN(query) && query !== '';
+
+    const publishDate = parseDate(product.publishDate);
+    const isDateInRange = startDate && adjustedEndDate
+      ? (publishDate >= startDate && publishDate <= adjustedEndDate)
+      : true;
+
     // Calculate total SKU for all product variants
-    const totalSku = product?.productVariants?.reduce((acc, variant) => acc + variant?.sku, 0);
+    const totalSku = product?.productVariants?.reduce((acc, variant) => acc + variant?.sku, 0) || 0;
 
     const matchesSearch =
-      product?.productTitle?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
-      product?.productId?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
-      product?.status?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
-      product?.productVariants?.some(variant => variant?.sku?.toString()?.includes(searchQuery)) ||
-      product?.category?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
-      product?.regularPrice?.includes(searchQuery) ||
-      product?.allSizes?.some(size => size.toLowerCase()?.includes(searchQuery.toLowerCase())) ||
-      product?.availableColors?.some(color => color?.value?.toLowerCase()?.includes(searchQuery?.toLowerCase())) ||
-      product?.vendors?.some(vendor => vendor?.value?.toLowerCase()?.includes(searchQuery?.toLowerCase())) ||
-      product?.shippingDetails?.some(shipping => shipping?.shippingZone?.toLowerCase()?.includes(searchQuery.toLowerCase())) ||
-      product?.shippingDetails?.some(shipping => shipping?.selectedShipmentHandler?.shipmentHandlerName?.toLowerCase()?.includes(searchQuery?.toLowerCase())) ||
-      totalSku?.toString()?.includes(searchQuery); // Search by total SKU
+      product?.productTitle?.toLowerCase().includes(query) ||
+      product?.productId?.toLowerCase().includes(query) ||
+      product?.status?.toLowerCase().includes(query) ||
+      product?.productVariants?.some(variant => variant?.sku?.toString().includes(query)) ||
+      product?.category?.toLowerCase().includes(query) ||
+      product?.regularPrice?.toString().includes(query) || // Convert regularPrice to string for searching
+      product?.allSizes?.some(size => size.toString().toLowerCase().includes(query)) || // Convert sizes to string
+      product?.availableColors?.some(color => color?.value?.toLowerCase().includes(query)) ||
+      product?.vendors?.some(vendor => vendor?.value?.toLowerCase().includes(query)) ||
+      product?.shippingDetails?.some(shipping => shipping?.shippingZone?.toLowerCase().includes(query)) ||
+      product?.shippingDetails?.some(shipping => shipping?.selectedShipmentHandler?.shipmentHandlerName?.toLowerCase().includes(query)) ||
+      totalSku.toString().includes(query); // Convert total SKU to string for searching
 
-    return matchesSearch;
+    return isDateInRange && matchesSearch;
   });
+
 
   const getFilteredProducts = () => {
     switch (selectedTab) {
       case 'Active':
         return productDetails?.filter(product => product?.status === 'active');
-      case 'Archive':
+      case 'Archived':
         return productDetails?.filter(product => product?.status === "archive");
       case 'Draft':
         return productDetails?.filter(product => product?.status === 'draft');
@@ -97,11 +133,15 @@ const ProductPage = () => {
     }
   };
 
-  const isFilterActive = searchQuery;
+  const handleReset = () => {
+    setSelectedDateRange(null); // Reset the selected date range
+  };
+
+  const isFilterActive = searchQuery || (selectedDateRange?.start && selectedDateRange?.end);
 
   const filteredProducts = isFilterActive ? searchedProductDetails : getFilteredProducts();
 
-  const paginatedOrders = useMemo(() => {
+  const paginatedProducts = useMemo(() => {
     const startIndex = page * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return filteredProducts?.slice(startIndex, endIndex);
@@ -149,6 +189,12 @@ const ProductPage = () => {
   const handleGoToEditPage = (id) => {
     router.push(`/dash-board/products/${id}`);
   }
+
+  useEffect(() => {
+    if (paginatedProducts?.length === 0) {
+      setPage(0); // Reset to the first page if no data
+    }
+  }, [paginatedProducts]);
 
   return (
     <div className='relative w-full min-h-screen bg-gray-100'>
@@ -232,6 +278,21 @@ const ProductPage = () => {
                   Choose Columns
                 </Button>
 
+                <div className='flex items-center gap-2'>
+                  <DateRangePicker
+                    label="Order Duration"
+                    visibleMonths={1}
+                    onChange={(range) => setSelectedDateRange(range)} // Ensure range is an array
+                    value={selectedDateRange} // Ensure this matches the expected format
+                  />
+
+                  {selectedDateRange && selectedDateRange.start && selectedDateRange.end && (
+                    <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={handleReset}>
+                      <IoMdClose size={20} />
+                    </button>
+                  )}
+                </div>
+
               </div>
             </div>
           )}
@@ -243,7 +304,7 @@ const ProductPage = () => {
           <SmallHeightLoading />
         </div>
       ) : (
-        paginatedOrders?.length > 0 ? (
+        paginatedProducts?.length > 0 ? (
           <div className='mx-6 2xl:mx-0 custom-max-h-orders'>
             <div className='bg-white max-w-screen-2xl mx-auto relative'>
               <div className="max-w-screen-2xl mx-auto overflow-x-auto modal-body-scroll">
@@ -286,14 +347,14 @@ const ProductPage = () => {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
 
-                    {paginatedOrders?.map((product, index) => (
+                    {paginatedProducts?.map((product, index) => (
                       <tr key={product?._id || index} className="hover:bg-gray-50 transition-colors">
                         {selectedColumns.includes('Product') && (
-                          <td onClick={() => handleGoToEditPage(product?._id)} className="text-xs p-3 font-mono cursor-pointer text-blue-600 hover:text-blue-800 flex flex-col lg:flex-row items-center gap-3">
+                          <td onClick={() => handleGoToEditPage(product?._id)} className="text-xs p-3 cursor-pointer text-blue-600 hover:text-blue-800 flex flex-col lg:flex-row items-center gap-3">
                             <div>
                               <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrls[0]} alt='productIMG' height={600} width={600} />
                             </div>
-                            <div className='flex flex-col items-center'>
+                            <div className='flex flex-col'>
                               <p>{product?.productTitle}</p>
                               <p>{product?.productId}</p>
                             </div>
@@ -305,7 +366,7 @@ const ProductPage = () => {
                               : product?.status === "archive" ? "bg-blue-200 text-blue-800 rounded-full"
                                 : "bg-yellow-200 text-yellow-800 rounded-full"}`}>
                               {product?.status === "active" ? "Active"
-                                : product?.status === "archive" ? "Archive"
+                                : product?.status === "archive" ? "Archived"
                                   : "Draft"}
                             </span>
                           </td>

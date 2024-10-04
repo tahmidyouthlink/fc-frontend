@@ -9,7 +9,7 @@ import { Controller, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
 import dynamic from 'next/dynamic';
-import { RxCross2 } from 'react-icons/rx';
+import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Image from 'next/image';
 import { MdOutlineFileUpload } from 'react-icons/md';
 
@@ -176,7 +176,39 @@ const EditPromo = () => {
 
       const res = await axiosPublic.put(`/updatePromo/${id}`, updatedDiscount);
       if (res.data.modifiedCount > 0) {
-        toast.success('Promo updated successfully!');
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="pl-6">
+              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    Promo Updated!
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    The promo has been successfully updated!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        })
         router.push('/dash-board/marketing');
       } else {
         toast.error('No changes detected.');

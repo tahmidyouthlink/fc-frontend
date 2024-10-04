@@ -6,6 +6,9 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import useCategories from '@/app/hooks/useCategories';
 import Loading from '@/app/components/shared/Loading/Loading';
+import { RiDeleteBinLine } from 'react-icons/ri';
+import { MdOutlineModeEdit } from 'react-icons/md';
+import { RxCheck, RxCross2 } from 'react-icons/rx';
 
 const CategoriesOverview = () => {
   const axiosPublic = useAxiosPublic();
@@ -20,7 +23,39 @@ const CategoriesOverview = () => {
       const res = await axiosPublic.delete(`/deleteCategory/${categoryId}`);
       if (res?.data?.deletedCount) {
         refetch(); // Call your refetch function to refresh data
-        toast.success('Category deleted successfully!');
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="pl-6">
+              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    Category Removed!
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Category has been deleted successfully!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        })
       }
     } catch (error) {
       toast.error('Failed to delete category. Please try again.');
@@ -84,13 +119,15 @@ const CategoriesOverview = () => {
             </div>
             <div className='flex gap-2 mt-4'>
               {/* Edit Button */}
-              <Button size='sm'
-                onClick={() => router.push(`/dash-board/categories/${category._id}`)}
-                className='bg-[#9F5216] text-white'>
-                Edit Category
-              </Button>
+              <button size="sm" color='danger' variant="ghost" onClick={() => router.push(`/dash-board/categories/${category._id}`)}>
+                <span className='flex items-center py-1 px-3 rounded-lg border-1.5 border-blue-500 gap-2 text-blue-500 hover:text-white hover:bg-blue-600 hover:border-none text-sm font-semibold'>Edit <MdOutlineModeEdit size={16} /></span>
+              </button>
+
               {/* Delete Button */}
-              <Button size="sm" className="text-xs" color="danger" variant="light" onPress={() => openModal(category?._id)}>Delete Category</Button>
+              <button size="sm" color='danger' variant="ghost" onPress={() => openModal(category?._id)}>
+                <span className='flex items-center py-1 px-3 border-1.5 rounded-lg border-red-500 gap-2 text-red-500 hover:text-white hover:bg-red-600 hover:border-none text-sm font-semibold'>Delete <RiDeleteBinLine size={16} /></span>
+              </button>
+
             </div>
           </div>
         ))}

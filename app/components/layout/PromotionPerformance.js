@@ -6,13 +6,6 @@ import { format, startOfToday, endOfToday, startOfYesterday, endOfYesterday, sub
 import { Checkbox, CheckboxGroup, DateRangePicker } from '@nextui-org/react';
 import { IoMdClose } from 'react-icons/io';
 
-const parseDate = (dateString) => {
-  const [datePart] = dateString.split('|').map(part => part.trim());
-  const [day, month, year] = datePart.split('-').map(Number);
-  const fullYear = year < 100 ? 2000 + year : year;
-  return new Date(fullYear, month - 1, day);
-};
-
 const PromotionPerformanceChart = () => {
   const [orderList, isOrderPending] = useOrders();
   const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
@@ -29,8 +22,21 @@ const PromotionPerformanceChart = () => {
   useEffect(() => {
     // Set default date range to Today when the component mounts
     handleDateFilter('today');
-    setShowDateRangePicker(true);
   }, []);
+
+  const parseDate = (dateString) => {
+    const [datePart, timePart] = dateString.split('|').map(part => part.trim());
+    const [day, month, year] = datePart.split('-').map(Number);
+    const fullYear = year < 100 ? 2000 + year : year;
+    const date = new Date(fullYear, month - 1, day);
+
+    if (timePart) {
+      const [hours, minutes] = timePart.split(':').map(Number);
+      date.setHours(hours, minutes);
+    }
+
+    return date;
+  };
 
   const { startDate, endDate } = useMemo(() => {
     const start = selectedDateRange.start
@@ -57,8 +63,8 @@ const PromotionPerformanceChart = () => {
   }, [getDateRange]);
 
   const normalizeDateRange = (startRange, endRange) => {
-    const startDate = startRange && typeof startRange === 'object' ? new Date(startRange) : null;
-    const endDate = endRange && typeof endRange === 'object' ? new Date(endRange) : null;
+    const startDate = startRange ? new Date(startRange) : null;
+    const endDate = endRange ? new Date(endRange) : null;
 
     const normalizedStart = startDate ? {
       year: startDate.getFullYear(),
@@ -108,13 +114,12 @@ const PromotionPerformanceChart = () => {
     filteredOrders?.forEach((order) => {
       let promoDiscount = 0;
       let offerDiscount = 0;
-      let isPromoApplied = false;
       let offerAppliedCount = 0;
 
       // Calculate total offer discounts for the order
       order.productInformation.forEach((product) => {
         if (product.offerTitle?.trim()) {
-          offerAppliedCount += 1;
+          offerAppliedCount += 1; // Count how many offers were applied
           let productTotal = product.unitPrice * product.sku;
           let productOfferDiscount = 0;
 
@@ -124,12 +129,13 @@ const PromotionPerformanceChart = () => {
             productOfferDiscount = product.offerDiscountValue;
           }
 
-          offerDiscount += productOfferDiscount;
+          offerDiscount += productOfferDiscount; // Sum up offer discounts
         }
       });
 
+      // Add to total counts if any offers were applied
       if (offerDiscount > 0) {
-        totalPromoAndOfferApplied += offerAppliedCount;
+        totalPromoAndOfferApplied += offerAppliedCount; // Add number of offers applied
       }
 
       // Calculate adjusted order total after offer discounts
@@ -137,21 +143,90 @@ const PromotionPerformanceChart = () => {
 
       // Calculate promo discount based on adjusted order total
       if (order.promoCode?.trim()) {
-        isPromoApplied = true;
         if (order.promoDiscountType === 'Percentage') {
           promoDiscount = (order.promoDiscountValue / 100) * adjustedOrderTotal;
         } else {
           promoDiscount = order.promoDiscountValue;
         }
-        totalPromoAndOfferApplied += 1;
+        totalPromoAndOfferApplied += 1; // Count the promo applied
       }
 
-      // Sum total discounts
+      // Sum total discounts from offers and promo codes
       totalDiscount += offerDiscount + promoDiscount;
     });
 
     return { totalPromoAndOfferApplied, totalDiscount };
   }, [orderList, filterStartDate, filterEndDate]);
+
+  const hourlyPromotionData = useMemo(() => {
+    if (!filterStartDate || !filterEndDate) return [];
+
+    const isTodayOrYesterday = activeFilter === 'today' || activeFilter === 'yesterday';
+    if (!isTodayOrYesterday) return [];
+
+    const startDateObj = new Date(filterStartDate);
+    const endDateObj = new Date(filterEndDate);
+
+    const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0));
+    const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999));
+
+    const hourlyData = Array(24).fill().map((_, hour) => ({
+      hour: `${hour}:00`,
+      discountedAmount: 0,
+      discountedOrders: 0,
+    }));
+
+    // Filter orders within the date range
+    orderList?.forEach((order) => {
+      const orderDate = parseDate(order.dateTime);
+      // Check if the order is within the specified date range
+      if (orderDate >= adjustedStartDate && orderDate <= adjustedEndDate) {
+        const hour = orderDate.getHours();
+
+        let promoDiscount = 0;
+        let offerDiscount = 0;
+        let offerAppliedCount = 0;
+
+        // Calculate total offer discounts for the order
+        order.productInformation.forEach((product) => {
+          if (product.offerTitle?.trim()) {
+            offerAppliedCount += 1;
+            let productTotal = product.unitPrice * product.sku;
+            let productOfferDiscount = 0;
+
+            if (product.offerDiscountType === 'Percentage') {
+              productOfferDiscount = (product.offerDiscountValue / 100) * productTotal;
+            } else {
+              productOfferDiscount = product.offerDiscountValue;
+            }
+
+            offerDiscount += productOfferDiscount;
+          }
+        });
+
+        // Calculate adjusted order total after offer discounts
+        const adjustedOrderTotal = order.totalAmount - offerDiscount;
+
+        // Calculate promo discount based on adjusted order total
+        if (order.promoCode?.trim()) {
+          if (order.promoDiscountType === 'Percentage') {
+            promoDiscount = (order.promoDiscountValue / 100) * adjustedOrderTotal;
+          } else {
+            promoDiscount = order.promoDiscountValue;
+          }
+        }
+
+        const totalOrderDiscount = offerDiscount + promoDiscount;
+
+        // Update the hourly data
+        hourlyData[hour].discountedAmount += totalOrderDiscount;
+        hourlyData[hour].discountedOrders +=
+          offerDiscount > 0 || promoDiscount > 0 ? 1 : 0;
+      }
+    });
+
+    return hourlyData;
+  }, [orderList, filterStartDate, filterEndDate, activeFilter]);
 
   const dailyData = useMemo(() => {
     const dailyData = {};
@@ -285,6 +360,17 @@ const PromotionPerformanceChart = () => {
     return format(date, 'MM/dd');
   };
 
+  const maxDiscountedAmount = useMemo(() => {
+    return Math.floor(Math.max(...hourlyPromotionData.map(data => data.discountedAmount), 0));
+  }, [hourlyPromotionData]);
+
+  const maxDiscountedAmountDay = useMemo(() => {
+    return Math.floor(Math.max(...dailyData.map(data => data.discountedAmount), 0));
+  }, [dailyData]);
+
+  const yAxisDomain = [0, maxDiscountedAmount * 1.2];
+  const yAxisDomainDay = [0, maxDiscountedAmountDay * 1.2];
+
   if (isOrderPending) {
     return <SmallHeightLoading />;
   }
@@ -371,10 +457,10 @@ const PromotionPerformanceChart = () => {
           ) : (
             <div className='w-full'>
               <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={dailyData}>
+                <BarChart data={activeFilter === 'today' || activeFilter === 'yesterday' ? hourlyPromotionData : dailyData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" tickFormatter={formatXAxis} />
-                  <YAxis />
+                  <XAxis dataKey={activeFilter === 'today' || activeFilter === 'yesterday' ? "hour" : "date"} tickFormatter={activeFilter === 'today' || activeFilter === 'yesterday' ? "" : formatXAxis} />
+                  <YAxis domain={activeFilter === 'today' || activeFilter === 'yesterday' ? yAxisDomain : yAxisDomainDay} />
                   <Tooltip />
                   {selected.includes('totalDiscountedAmount') && (
                     <Bar dataKey="discountedAmount" radius={[8, 8, 0, 0]} fill="#D2016E" name="Total Discounted Amount (৳)" />

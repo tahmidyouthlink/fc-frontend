@@ -6,6 +6,9 @@ import Link from 'next/link';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import useAxiosPublic from '@/app/hooks/useAxiosPublic';
+import { RxCheck, RxCross2 } from 'react-icons/rx';
+import { FiSave } from 'react-icons/fi';
 
 const SecondStepOfAddProduct = () => {
 
@@ -14,6 +17,7 @@ const SecondStepOfAddProduct = () => {
   const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
   const [navigate, setNavigate] = useState(false);
   const router = useRouter();
+  const axiosPublic = useAxiosPublic();
 
   useEffect(() => {
     try {
@@ -84,7 +88,7 @@ const SecondStepOfAddProduct = () => {
 
   const onSubmit = (data) => {
     try {
-      const formattedData = productVariants.map((variant, index) => ({
+      const formattedData = productVariants?.map((variant, index) => ({
         color: variant.color,
         size: variant.size,
         sku: parseFloat(data[`sku-${index}`]),
@@ -92,7 +96,7 @@ const SecondStepOfAddProduct = () => {
       }));
 
       // Check if any variant is missing an image URL
-      const missingImage = formattedData.some(variant => variant.imageUrl === "");
+      const missingImage = formattedData?.some(variant => variant.imageUrl === "");
       if (missingImage) {
         toast.error("Please select an image for each variant.");
         return;
@@ -102,6 +106,133 @@ const SecondStepOfAddProduct = () => {
       setNavigate(true);
     } catch (error) {
       toast.error("Failed to save product variants.");
+    }
+  };
+
+  // New function for "Save for Now" button
+  const onSaveForNow = async (formData) => {
+
+    const storedFormattedDate = localStorage.getItem("formattedDate");
+    const storedProductTitle = localStorage.getItem('productTitle');
+    const storedProductWeight = localStorage.getItem('weight');
+    const storedProductBatchCode = localStorage.getItem('batchCode');
+    const storedRegularPrice = localStorage.getItem('regularPrice');
+    const storedUploadedImageUrls = JSON.parse(localStorage.getItem('uploadedImageUrls') || '[]');
+    const storedDiscountType = localStorage.getItem('discountType');
+    const storedDiscountValue = localStorage.getItem('discountValue');
+    const storedProductDetails = localStorage.getItem('productDetails');
+    const storedMaterialCare = localStorage.getItem('materialCare');
+    const storedSizeFit = localStorage.getItem('sizeFit');
+    const storedCategory = localStorage.getItem('category');
+    const storedSubCategories = JSON.parse(localStorage.getItem('subCategories') || '[]');
+    const storedGroupOfSizes = JSON.parse(localStorage.getItem('groupOfSizes') || '[]');
+    const storedAllSizes = JSON.parse(localStorage.getItem('allSizes') || '[]');
+    const storedAvailableColors = JSON.parse(localStorage.getItem('availableColors') || '[]');
+    const storedNewArrival = localStorage.getItem('newArrival');
+    const storedVendors = JSON.parse(localStorage.getItem('vendors') || '[]');
+    const storedTags = JSON.parse(localStorage.getItem('tags') || '[]');
+    const storedProductId = localStorage.getItem('productId');
+
+    const formattedData = productVariants?.map((variant, index) => ({
+      color: variant.color,
+      size: variant.size,
+      sku: parseFloat(formData[`sku-${index}`]),
+      imageUrl: formData[`imageUrl-${index}`] || ""
+    }));
+
+    // Check if any variant is missing an image URL
+    const missingImage = formattedData?.some(variant => variant.imageUrl === "");
+    if (missingImage) {
+      toast.error("Please select an image for each variant.");
+      return;
+    }
+
+    const productData = {
+      publishDate: storedFormattedDate,
+      productTitle: storedProductTitle,
+      weight: storedProductWeight,
+      batchCode: storedProductBatchCode,
+      regularPrice: storedRegularPrice,
+      imageUrls: storedUploadedImageUrls,
+      discountType: storedDiscountType,
+      discountValue: storedDiscountValue,
+      productDetails: storedProductDetails,
+      materialCare: storedMaterialCare,
+      sizeFit: storedSizeFit,
+      category: storedCategory,
+      subCategories: storedSubCategories,
+      groupOfSizes: storedGroupOfSizes,
+      allSizes: storedAllSizes,
+      availableColors: storedAvailableColors,
+      newArrival: storedNewArrival,
+      vendors: storedVendors,
+      tags: storedTags,
+      productId: storedProductId,
+      productVariants: formattedData,
+      status: "draft",
+    };
+
+    try {
+      const response = await axiosPublic.post('/addProduct', productData);
+      if (response?.data?.insertedId) {
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="pl-6">
+              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    Product Drafted!
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    This Product is successfully drafted!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        })
+        localStorage.removeItem('formattedDate');
+        localStorage.removeItem('productTitle');
+        localStorage.removeItem('batchCode');
+        localStorage.removeItem('weight');
+        localStorage.removeItem('regularPrice');
+        JSON.parse(localStorage.removeItem('uploadedImageUrls') || '[]');
+        localStorage.removeItem('discountType');
+        localStorage.removeItem('discountValue');
+        localStorage.removeItem('productDetails');
+        localStorage.removeItem('materialCare');
+        localStorage.removeItem('sizeFit');
+        localStorage.removeItem('category');
+        localStorage.removeItem('productId');
+        JSON.parse(localStorage.removeItem('subCategories') || '[]');
+        JSON.parse(localStorage.removeItem('groupOfSizes') || '[]');
+        JSON.parse(localStorage.removeItem('allSizes') || '[]');
+        JSON.parse(localStorage.removeItem('availableColors') || '[]');
+        localStorage.removeItem('newArrival');
+        JSON.parse(localStorage.removeItem('vendors') || '[]');
+        JSON.parse(localStorage.removeItem('tags') || '[]');
+        JSON.parse(localStorage.removeItem('productVariants') || '[]');
+        router.push("/dash-board/products/existing-products");
+      }
+    } catch (err) {
+      toast.error("Failed to save product information");
     }
   };
 
@@ -179,9 +310,14 @@ const SecondStepOfAddProduct = () => {
           <Link href='/dash-board/products/add-product' className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
             <FaArrowLeft /> Previous Step
           </Link>
-          <button type='submit' className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
-            Next Step <FaArrowRight />
-          </button>
+          <div className='flex items-center gap-6'>
+            <button type="button" onClick={handleSubmit(onSaveForNow)} className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
+              Save For Now <FiSave size={19} />
+            </button>
+            <button type='submit' className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
+              Next Step <FaArrowRight />
+            </button>
+          </div>
         </div>
       </form>
     </div>
