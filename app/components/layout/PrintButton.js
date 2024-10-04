@@ -2,6 +2,7 @@ import React from 'react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { Button } from '@nextui-org/react';
+import { PiDownloadBold } from "react-icons/pi";
 
 // Function to add gaps between every letter
 function addGaps(text, gap = ' ') {
@@ -194,7 +195,7 @@ const PrintButton = ({ selectedOrder }) => {
         product.size || '',         // Size
         `${product.unitPrice.toFixed(2)}`, // Unit Price
         product.sku,                // QTY
-        `BDT ${productTotal}`,       // Total (without discount)
+        `${productTotal}`,       // Total (without discount)
         product.offerTitle ? { offerTitle: product.offerTitle, offerDiscount: 0, productTitle: product.productTitle } : null // Store offer details without applying discount yet
       ];
     });
@@ -250,7 +251,7 @@ const PrintButton = ({ selectedOrder }) => {
 
     pdf.autoTable({
       startY: margin + 100,
-      head: [['Title', 'Color', 'Size', 'Unit Price', 'QTY', 'Total']],
+      head: [['Title', 'Color', 'Size', 'Unit Price', 'QTY', 'Total (BDT)']],
       body: productRows.map(product => [
         { content: product[0], styles: { halign: 'center' } },   // Title aligned to left
         { content: product[1], styles: { halign: 'center' } },   // Color aligned to left
@@ -274,7 +275,7 @@ const PrintButton = ({ selectedOrder }) => {
         2: { halign: 'center', cellWidth: 'auto' },  // Size aligned to center
         3: { halign: 'center', cellWidth: 'auto' },  // Unit Price aligned to center
         4: { halign: 'left', cellWidth: 'auto' },   // QTY aligned to right
-        5: { halign: 'left', cellWidth: 'auto' }    // Total aligned to right
+        5: { halign: 'center', cellWidth: 'auto' }    // Total aligned to right
       }
     });
 
@@ -284,12 +285,12 @@ const PrintButton = ({ selectedOrder }) => {
       body: [
         [
           { content: 'Subtotal:', styles: { fillColor: [255, 255, 255] } },
-          `BDT ${subtotal.toFixed(2)}`
+          `${subtotal.toFixed(2)}`
         ], // Increased padding
         ...(promoDiscount > 0 ? [
           [
             { content: `Promo (${promoCode}):` },
-            `BDT -${promoDiscount}`
+            `-${promoDiscount}`
           ]
         ] : []), // Increased padding
         ...(hasOffers ? productRows.map((product, index) => {
@@ -297,17 +298,17 @@ const PrintButton = ({ selectedOrder }) => {
           if (offerDetails) {
             return [
               { content: `Offer (${offerDetails.offerTitle}) on ${offerDetails.productTitle}:` },
-              `BDT -${offerDetails.offerDiscount}`
+              `-${offerDetails.offerDiscount}`
             ];
           }
         }).filter(Boolean) : []),
         [
           { content: 'Shipping Charge:' },
-          `BDT +${shippingCharge.toFixed(2)}`
+          `+${shippingCharge.toFixed(2)}`
         ], // Increased padding
         [
           { content: 'Total:', styles: { fontStyle: 'bold' } },
-          `BDT ${total}`
+          `${total}`
         ] // Increased padding
       ],
       theme: 'plain',
@@ -358,8 +359,8 @@ const PrintButton = ({ selectedOrder }) => {
 
   return (
     <>
-      <Button color="primary" onPress={() => handlePrint(selectedOrder)}>
-        Print Invoice
+      <Button color="primary" size='sm' onPress={() => handlePrint(selectedOrder)}>
+        Download Invoice <PiDownloadBold size={18} />
       </Button>
     </>
   );

@@ -83,6 +83,11 @@ const AddPromo = () => {
     return null;
   };
 
+  const handleGoBack = async () => {
+    localStorage.setItem('activeTabMarketingPage', "create promotions");
+    router.push("/dash-board/marketing");
+  }
+
   const onSubmit = async (data) => {
     const { promoCode, promoDiscountValue, expiryDate, maxAmount, minAmount } = data;
 
@@ -134,6 +139,7 @@ const AddPromo = () => {
       const response = await axiosPublic.post('/addPromoCode', discountData);
       if (response.data.insertedId) {
         toast.success('Promo published successfully!');
+        localStorage.setItem('activeTabMarketingPage', "view performance");
         router.push("/dash-board/marketing");
       }
     } catch (err) {
@@ -291,7 +297,7 @@ const AddPromo = () => {
 
         <div className='flex justify-between items-center px-6'>
 
-          <Link className='flex items-center gap-2 font-medium text-white rounded-lg bg-[#D2016E] hover:bg-[#d2016dca] py-2 px-4' href={"/dash-board/marketing"}> <FaArrowLeft /> Go Back</Link>
+          <button className='flex items-center gap-2 font-medium text-white rounded-lg bg-[#D2016E] hover:bg-[#d2016dca] py-2 px-4' onClick={() => handleGoBack()}><FaArrowLeft /> Go Back</button>
 
           <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#D2016E] hover:bg-[#d2016dca]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
             {isSubmitting ? 'Submitting...' : 'Submit'}

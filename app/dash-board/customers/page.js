@@ -7,15 +7,16 @@ import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalF
 import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import CustomerPrintButton from '@/app/components/layout/CustomerPrintButton';
-import RatingModal from '@/app/components/layout/RatingModal';
-import toast from 'react-hot-toast';
-import { PiFlagPennantFill } from "react-icons/pi";
+// import RatingModal from '@/app/components/layout/RatingModal';
+// import toast from 'react-hot-toast';
+// import { PiFlagPennantFill } from "react-icons/pi";
 import { getColorClass } from '@/app/components/layout/getColorClass';
 import useCustomers from '@/app/hooks/useCustomers';
+import { FaCrown, FaMedal, FaRegUser, FaStar } from 'react-icons/fa6';
 
 const Customers = () => {
 
-  const isAdmin = true;
+  // const isAdmin = true;
   const dropdownRef = useRef(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [orderList, isOrderListPending] = useOrders();
@@ -24,28 +25,26 @@ const Customers = () => {
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const columns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alternative Phone Number', 'Verification', 'Rate'];
-  const defaultColumns = useMemo(() => ['Customer ID', 'Customer Name', 'Email', 'Phone Number'], []);
+  const columns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alternative Phone Number', 'Verification', 'Status'];
   const [selectedColumns, setSelectedColumns] = useState(columns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
-  const [isRatingModalOpen, setRatingModalOpen] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [ratings, setRatings] = useState({});
+  // const [isRatingModalOpen, setRatingModalOpen] = useState(false);
+  // const [selectedCustomer, setSelectedCustomer] = useState(null);
+  // const [ratings, setRatings] = useState({});
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedCustomerColumns'));
     if (savedColumns) {
       setSelectedColumns(savedColumns);
     } else {
-      setSelectedColumns(defaultColumns);
+      setSelectedColumns([]);
     }
-  }, [defaultColumns]);
+  }, []);
 
   const handleColumnChange = (selected) => {
-    const combinedSelection = [...defaultColumns, ...selected.filter(col => !defaultColumns.includes(col))];
-    setSelectedColumns(combinedSelection);
+    setSelectedColumns(selected);
   };
 
   const handleSelectAll = () => {
@@ -53,7 +52,7 @@ const Customers = () => {
   };
 
   const handleDeselectAll = () => {
-    setSelectedColumns(defaultColumns);
+    setSelectedColumns([]);
   };
 
   const handleSave = () => {
@@ -176,45 +175,69 @@ const Customers = () => {
     return filteredData?.slice(start, start + itemsPerPage);
   }, [filteredData, page, itemsPerPage]);
 
-  const handleRateClick = (customer) => {
-    setSelectedCustomer(customer);
-    setRatingModalOpen(true);
+  const statusColors = {
+    basic: 'bg-gray-400',      // Light gray for basic
+    bronze: 'bg-orange-700',    // Softer orange for bronze
+    silver: 'bg-gray-600',      // Softer gray for silver
+    gold: 'bg-yellow-800',      // Softer yellow for gold
   };
 
-  const handleSaveRating = async (ratingColor) => {
-    if (selectedCustomer) {
-      try {
-        const response = await axiosPublic.patch(`/addRatingToCustomer/${selectedCustomer.customerId}`, { rating: ratingColor });
 
-        if (response.status === 200) {
-          setRatings({
-            ...ratings,
-            [selectedCustomer.customerId]: ratingColor // Update with the selected color
-          });
-          toast.success(`Rating updated successfully for customer ${selectedCustomer.customerId}`);
-        } else {
-          toast.error('Failed to save rating: ' + response.data.message);
-        }
-      } catch (error) {
-        console.error('Error saving rating:', error);
-        toast.error('Error saving rating. Please try again.');
-      }
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'basic':
+        return <FaRegUser className="mr-3" />; // User icon for basic
+      case 'bronze':
+        return <FaMedal className="mr-1" />; // Medal icon for bronze
+      case 'silver':
+        return <FaStar className="mr-2" />; // Star icon for silver
+      case 'gold':
+        return <FaCrown className="mr-3" />; // Crown icon for gold
+      default:
+        return null; // Default icon if status is unknown
     }
-
-    setRatingModalOpen(false);
   };
 
-  const handleCloseModal = () => {
-    // Reset rating for the selected customer
-    if (selectedCustomer) {
-      setRatings({
-        ...ratings,
-        [selectedCustomer.customerId]: 0 // Or any default value
-      });
-    }
-    setSelectedCustomer(null);
-    setRatingModalOpen(false);
-  };
+
+  // const handleRateClick = (customer) => {
+  //   setSelectedCustomer(customer);
+  //   setRatingModalOpen(true);
+  // };
+
+  // const handleSaveRating = async (ratingColor) => {
+  //   if (selectedCustomer) {
+  //     try {
+  //       const response = await axiosPublic.patch(`/addRatingToCustomer/${selectedCustomer.customerId}`, { rating: ratingColor });
+
+  //       if (response.status === 200) {
+  //         setRatings({
+  //           ...ratings,
+  //           [selectedCustomer.customerId]: ratingColor // Update with the selected color
+  //         });
+  //         toast.success(`Rating updated successfully for customer ${selectedCustomer.customerId}`);
+  //       } else {
+  //         toast.error('Failed to save rating: ' + response.data.message);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error saving rating:', error);
+  //       toast.error('Error saving rating. Please try again.');
+  //     }
+  //   }
+
+  //   setRatingModalOpen(false);
+  // };
+
+  // const handleCloseModal = () => {
+  //   // Reset rating for the selected customer
+  //   if (selectedCustomer) {
+  //     setRatings({
+  //       ...ratings,
+  //       [selectedCustomer.customerId]: 0 // Or any default value
+  //     });
+  //   }
+  //   setSelectedCustomer(null);
+  //   setRatingModalOpen(false);
+  // };
 
   if (isCustomerListPending || isOrderListPending || isCustomerPending) {
     return <Loading />
@@ -283,20 +306,20 @@ const Customers = () => {
           <ModalBody className="modal-body-scroll">
             <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
               {columns.map((column) => (
-                <Checkbox key={column} value={column} isDisabled={defaultColumns.includes(column)}>
+                <Checkbox key={column} value={column}>
                   {column}
                 </Checkbox>
               ))}
             </CheckboxGroup>
+          </ModalBody>
+          <ModalFooter>
             <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
               Select All
             </Button>
             <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
               Deselect All
             </Button>
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="solid" color="primary" onClick={handleSave}>
+            <Button variant="solid" size='sm' color="primary" onClick={handleSave}>
               Save
             </Button>
           </ModalFooter>
@@ -356,8 +379,8 @@ const Customers = () => {
                 <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Verification</th>
               )}
 
-              {selectedColumns.includes('Rate') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Rate</th>
+              {selectedColumns.includes('Status') && (
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Status</th>
               )}
 
             </tr>
@@ -365,8 +388,8 @@ const Customers = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedData?.map((customer, index) => {
               // Determine the color class based on customer.rating or ratings[customer.customerId]
-              const ratingColorClass = getColorClass(ratings[customer.customerId] || customer.rating);
-
+              // const ratingColorClass = getColorClass(ratings[customer.customerId] || customer.rating);
+              const formattedStatus = customer?.status.charAt(0).toUpperCase() + customer?.status.slice(1);
               return (
                 <tr key={customer?._id || index} className="hover:bg-gray-50 transition-colors">
                   {selectedColumns.includes('Customer ID') && (
@@ -441,15 +464,22 @@ const Customers = () => {
                     </td>
                   )}
 
-                  {selectedColumns.includes('Rate') && (
-                    <td>
-                      <button
+                  {selectedColumns.includes('Status') && (
+                    <td className='text-xs p-3 text-gray-700 whitespace-nowrap'>
+                      <span
+                        className={`inline-flex items-center rounded-md py-1 px-2 text-white font-medium ${statusColors[customer?.status]} transition duration-300 ease-in-out transform hover:scale-105`}
+                        title={formattedStatus}
+                      >
+                        {getStatusIcon(customer?.status)}
+                        <span className='ml-1'>{formattedStatus}</span>
+                      </span>
+                      {/* <button
                         onClick={() => handleRateClick(customer)}
                         disabled={!isAdmin}
                         className={ratingColorClass} // Apply the color class
                       >
                         <PiFlagPennantFill size={24} />
-                      </button>
+                      </button> */}
                     </td>
                   )}
 
@@ -461,7 +491,7 @@ const Customers = () => {
       </div>
 
       {/* Add Rating Modal */}
-      {selectedCustomer && (
+      {/* {selectedCustomer && (
         <RatingModal
           isOpen={isRatingModalOpen}
           onClose={handleCloseModal}
@@ -469,7 +499,7 @@ const Customers = () => {
           initialRating={ratings[selectedCustomer.customerId] || 'default'}
           selectedCustomer={selectedCustomer}
         />
-      )}
+      )} */}
 
       {selectedOrder && (
         <Modal className='mx-4 lg:mx-0 px-4' isOpen={isOpen} onOpenChange={onClose} size='2xl'>

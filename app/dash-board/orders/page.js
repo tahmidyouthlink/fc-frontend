@@ -1,4 +1,5 @@
 "use client";
+import * as XLSX from 'xlsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Checkbox, CheckboxGroup, DateRangePicker } from "@nextui-org/react";
 import emailjs from '@emailjs/browser';
@@ -7,7 +8,6 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextu
 import { useDisclosure } from '@nextui-org/react';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import toast from 'react-hot-toast';
-import { useQuery } from '@tanstack/react-query';
 import { FaUndo } from 'react-icons/fa';
 import Barcode from '@/app/components/layout/Barcode';
 import { IoMdClose } from 'react-icons/io';
@@ -15,6 +15,17 @@ import Papa from 'papaparse';
 import useOrders from '@/app/hooks/useOrders';
 import PrintButton from '@/app/components/layout/PrintButton';
 import CustomPagination from '@/app/components/layout/CustomPagination';
+import TabsOrder from '@/app/components/layout/TabsOrder';
+import { RxCheck, RxCross2 } from 'react-icons/rx';
+
+const columns = ['Order Number', 'Date & Time', 'Customer Name', 'Order Amount', 'Order Status', 'Action', 'Email', 'Phone Number', 'Alternative Phone Number', 'Shipping Zone', 'Shipping Method', 'Payment Status', 'Payment Method', 'Vendor'];
+
+const orderStatusTabs = [
+  'New Orders',
+  'Active Orders',
+  'Completed Orders',
+  'Canceled Orders',
+];
 
 const OrdersPage = () => {
   const isAdmin = true;
@@ -25,22 +36,22 @@ const OrdersPage = () => {
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
-  const [isOpenDropdown, setIsOpenDropdown] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(false);
   const dropdownRef = useRef(null);
+  const dropdownRefDownload = useRef(null);
   const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
-  const columns = ['Order Number', 'Date & Time', 'Customer Name', 'Order Amount', 'Order Status', 'Action', 'Email', 'Phone Number', 'Alternative Phone Number', 'Shipping Zone', 'Shipping Method', 'Payment Status', 'Payment Method', 'Vendor'];
-  const defaultColumns = useMemo(() => ['Order Number', 'Date & Time', 'Order Amount', 'Order Status'], []);
   const [selectedColumns, setSelectedColumns] = useState(columns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(orderStatusTabs[0]);
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedColumns'));
     if (savedColumns) {
       setSelectedColumns(savedColumns);
     } else {
-      setSelectedColumns(defaultColumns);
+      setSelectedColumns([]);
     }
-  }, [defaultColumns]);
+  }, []);
 
   useEffect(() => {
     if (searchQuery) {
@@ -49,8 +60,7 @@ const OrdersPage = () => {
   }, [searchQuery, refetchOrder]);
 
   const handleColumnChange = (selected) => {
-    const combinedSelection = [...defaultColumns, ...selected.filter(col => !defaultColumns.includes(col))];
-    setSelectedColumns(combinedSelection);
+    setSelectedColumns(selected);
   };
 
   const handleSelectAll = () => {
@@ -58,7 +68,7 @@ const OrdersPage = () => {
   };
 
   const handleDeselectAll = () => {
-    setSelectedColumns(defaultColumns);
+    setSelectedColumns([]);
   };
 
   const handleSave = () => {
@@ -74,6 +84,14 @@ const OrdersPage = () => {
     return new Date(year + 2000, month - 1, day, hours, minutes);
   };
 
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   // Extract start and end dates from selectedDateRange
   const startDate = selectedDateRange?.start ? new Date(selectedDateRange.start.year, selectedDateRange.start.month - 1, selectedDateRange.start.day) : null;
   const endDate = selectedDateRange?.end ? new Date(selectedDateRange.end.year, selectedDateRange.end.month - 1, selectedDateRange.end.day) : null; // Adjust end date to include the entire end day
@@ -83,49 +101,16 @@ const OrdersPage = () => {
     setSelectedDateRange(null); // Reset the selected date range
   };
 
-  const toggleDropdown = () => setIsOpenDropdown(!isOpenDropdown);
-
-  const { data: { result, totalOrderList } = [], isOrderPending, refetch } = useQuery({
-    queryKey: ["orderList", page, itemsPerPage],
-    queryFn: async () => {
-      const res = await axiosPublic.get(`/orderList?page=${page}&itemsPerPage=${itemsPerPage}`);
-      return res?.data;
-    },
-    refetchInterval: 1000 * 30, // Refetch every 30 seconds
-    onError: (err) => {
-      console.error('Error fetching order list:', err);
-    }
-  });
-
-  const totalPage = Math.ceil(totalOrderList / itemsPerPage);
-  const pages = Array.from({ length: totalPage }, (_, i) => i);
+  const toggleDropdown = (dropdown) => {
+    setOpenDropdown((prev) => (prev === dropdown ? null : dropdown)); // Toggle the clicked dropdown
+  };
 
   // Check if filters are applied
   const isFilterActive = searchQuery || (selectedDateRange?.start && selectedDateRange?.end);
 
   const handleItemsPerPageChange = (e) => {
-    // Extracting only the value from the event
-    const value = Number(e.target.value);
-    setItemsPerPage(value); // Set the number of items per page
-    setPage(0); // Reset to the first page
-    refetch(); // Refetch the data with updated items per page
-  };
-
-  // Close dropdown when clicking outside
-  const handleClickOutside = (event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setIsOpenDropdown(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleOrderClick = (order) => {
-    setSelectedOrder(order);
-    onOpen();
+    setItemsPerPage(parseInt(e.target.value));
+    setPage(0); // Reset to first page when changing items per page
   };
 
   // Filter orders based on search query and date range
@@ -202,8 +187,35 @@ const OrdersPage = () => {
     return isDateInRange && (productMatch || orderMatch || nameMatch || dateMatch);
   });
 
+  // Function to get filtered orders based on the selected tab
+  const getFilteredOrders = () => {
+    switch (selectedTab) {
+      case 'New Orders':
+        return orderList?.filter(order => order?.orderStatus === 'Pending');
+      case 'Active Orders':
+        return orderList?.filter(order => ['Processing', 'Shipped', 'On Hold'].includes(order?.orderStatus));
+      case 'Completed Orders':
+        return orderList?.filter(order => order?.orderStatus === 'Delivered');
+      case 'Canceled Orders':
+        return orderList?.filter(order => ['Requested Return', 'Refunded'].includes(order?.orderStatus));
+      default:
+        return orderList;
+    }
+  };
+
+  // Filtered orders based on the selected tab
+  const filteredOrders = isFilterActive ? searchedOrders : getFilteredOrders();
+
+  const paginatedOrders = useMemo(() => {
+    const startIndex = page * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredOrders?.slice(startIndex, endIndex);
+  }, [filteredOrders, page, itemsPerPage]);
+
+  const totalPages = Math.ceil(filteredOrders?.length / itemsPerPage);
+
   const handleActions = async (id, actionType, isUndo = false) => {
-    const order = result.find(order => order._id === id);
+    const order = paginatedOrders?.find(order => order._id === id);
 
     if (!order) {
       toast.error("Order not found");
@@ -242,11 +254,12 @@ const OrdersPage = () => {
       const res = await axiosPublic.patch(`/changeOrderStatus/${id}`, { orderStatus: updateStatus });
       if (res?.data?.modifiedCount) {
         if (isUndo) {
+          refetchOrder();
           toast.success("Order status reverted successfully.");
         } else {
           sendOrderEmail(order, actionType); // Send the email with the appropriate message
         }
-        refetch(); // Refetch the orders to update the UI
+        refetchOrder(); // Refetch the orders to update the UI
       } else {
         toast.error("Failed to update order status");
       }
@@ -274,23 +287,27 @@ const OrdersPage = () => {
     switch (actionType) {
       case 'shipped':
         message = "Your order has been shipped and is on its way to you. You will receive tracking information shortly so you can follow its journey.";
-        successToastMessage = "Shipping information sent successfully.";
+        successToastMessage = "Order has been shipped";
         break;
       case 'delivered':
         message = "Your order has been successfully delivered. We hope you are happy with your purchase. If you have any issues, please contact us.";
-        successToastMessage = "Thank you sent successfully.";
+        successToastMessage = "Delivered successfully.";
+        break;
+      case 'onHold':
+        message = "We have received your return request and will process it shortly. You will be contacted with further instructions on how to return your items.";
+        successToastMessage = "Shipment is on hold.";
         break;
       case 'requestedReturn':
         message = "We have received your return request and will process it shortly. You will be contacted with further instructions on how to return your items.";
-        successToastMessage = "Order cancellation sent successfully.";
+        successToastMessage = "Return request has been initiated!";
         break;
       case 'refunded':
         message = "Your refund has been processed successfully. The amount will be credited to your original payment method. Thank you for your patience.";
-        successToastMessage = "Refund information sent successfully.";
+        successToastMessage = "Customer has been refunded";
         break;
       default:
         message = "Thank you for your order! We have received it and are processing it. You will receive an update once your order is on its way.";
-        successToastMessage = "Order confirmation sent successfully.";
+        successToastMessage = "Order confirmation sent successfully";
         break;
     }
 
@@ -301,25 +318,70 @@ const OrdersPage = () => {
       message: message,
     };
 
+
     emailjs.send('service_26qm3vn', 'template_u931mzo', templateParams, 'kM2ZZ-I4QiQPp3W81')
       .then(() => {
-        toast.success(successToastMessage);
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="pl-6">
+              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    Order Updated!
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    {successToastMessage}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        })
       })
       .catch(() => {
         toast.error("Failed to send email");
       });
   };
 
+  const handleOrderClick = (order) => {
+    setSelectedOrder(order);
+    onOpen();
+  };
+
   const exportToCSV = async () => {
     let dataToExport = [];
 
-    // Check if filtering is applied (i.e., if `searchedOrders` is not empty)
-    if (searchedOrders.length > 0) {
-      // If filtering is applied, use the searched orders
+    // Check if a search query is applied (i.e., if `searchedOrders` is not empty)
+    if (searchQuery) {
       dataToExport = searchedOrders;
-    } else {
-      // If no filtering, fetch all order data (across all pages)
-      dataToExport = orderList;
+    }
+    // If date range is applied, filter orders based on date range
+    else if (startDate && adjustedEndDate) {
+      dataToExport = filteredOrders.filter(order => {
+        const orderDate = parseDate(order.dateTime);
+        return orderDate >= startDate && orderDate <= adjustedEndDate;
+      });
+    }
+    // Otherwise, apply tab-based filtering
+    else {
+      dataToExport = filteredOrders;
     }
 
     // Extract only the order-level details for the export
@@ -344,16 +406,130 @@ const OrdersPage = () => {
       return data;
     });
 
+    // Create the filename dynamically based on applied filters
+    let fileName = 'order_data';
+    if (searchQuery) fileName += `_searched`;
+    else if (startDate && adjustedEndDate) fileName += `_from_${formatDate(startDate)}_to_${formatDate(adjustedEndDate)}`;
+    else fileName += `_${selectedTab.replace(/\s/g, '_').toLowerCase()}`;
+
     // Convert to CSV and trigger download
     const csv = Papa.unparse(filteredData);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'order_data.csv';
+    link.download = `${fileName}.csv`;
     link.click();
   };
 
-  if (isOrderPending || isOrderListPending) {
+  const exportToPDF = async () => {
+    const { jsPDF } = await import("jspdf");  // Dynamically import jsPDF
+    const autoTable = (await import("jspdf-autotable")).default;  // Import jsPDF-AutoTable
+
+    // Create a new document
+    const doc = new jsPDF();
+
+    // Define the columns based on selectedColumns
+    const columns = selectedColumns.map((col) => ({
+      header: col,
+      dataKey: col,
+    }));
+
+    // Map filtered orders to the correct data format based on selectedColumns
+    const rows = filteredOrders?.map((order) => {
+      const rowData = {};
+      if (selectedColumns.includes("Order Number")) rowData["Order Number"] = order.orderNumber;
+      if (selectedColumns.includes("Date & Time")) rowData["Date & Time"] = order.dateTime;
+      if (selectedColumns.includes("Customer Name")) rowData["Customer Name"] = order.customerName;
+      if (selectedColumns.includes("Order Amount")) rowData["Order Amount"] = `${order.totalAmount.toFixed(2)}`;
+      if (selectedColumns.includes("Order Status")) rowData["Order Status"] = order.orderStatus;
+      if (selectedColumns.includes("Email")) rowData["Email"] = order.email;
+      if (selectedColumns.includes("Phone Number")) rowData["Phone Number"] = order.phoneNumber;
+      if (selectedColumns.includes("Alternative Phone Number")) rowData["Alternative Phone Number"] = order.phoneNumber2 || "--";
+      if (selectedColumns.includes("Shipping Zone")) rowData["Shipping Zone"] = order.shippingZone;
+      if (selectedColumns.includes("Shipping Method")) rowData["Shipping Method"] = order.shippingMethod;
+      if (selectedColumns.includes("Payment Status")) rowData["Payment Status"] = order.paymentStatus;
+      if (selectedColumns.includes("Payment Method")) rowData["Payment Method"] = order.paymentMethod;
+      if (selectedColumns.includes("Vendor")) rowData["Vendor"] = order.vendor;
+
+      return rowData;
+    });
+
+    // Use jsPDF-AutoTable to create the table
+    autoTable(doc, {
+      columns: columns,  // Column headers
+      body: rows,        // Order data
+      startY: 10,        // Start position for the table
+      styles: { fontSize: 8 },
+      theme: "striped",  // Optional: customize the look of the table
+    });
+
+    // Save the PDF document
+    doc.save("Filtered_Orders.pdf");
+  };
+
+  const exportToXLS = async () => {
+    let dataToExport = [];
+
+    // Check if a search query is applied (i.e., if `searchedOrders` is not empty)
+    if (searchQuery) {
+      dataToExport = searchedOrders;
+    }
+    // If date range is applied, filter orders based on date range
+    else if (startDate && adjustedEndDate) {
+      dataToExport = filteredOrders.filter(order => {
+        const orderDate = parseDate(order.dateTime);
+        return orderDate >= startDate && orderDate <= adjustedEndDate;
+      });
+    }
+    // Otherwise, apply tab-based filtering
+    else {
+      dataToExport = filteredOrders;
+    }
+
+    // Extract only the order-level details for the export
+    const filteredData = dataToExport.map(row => {
+      const data = {};
+
+      // Include only the selected columns
+      if (selectedColumns.includes('Order Number')) data.orderNumber = row.orderNumber;
+      if (selectedColumns.includes('Date & Time')) data.dateTime = row.dateTime;
+      if (selectedColumns.includes('Customer Name')) data.customerName = row.customerName;
+      if (selectedColumns.includes('Order Amount')) data.totalAmount = row.totalAmount;
+      if (selectedColumns.includes('Order Status')) data.orderStatus = row.orderStatus;
+      if (selectedColumns.includes('Email')) data.email = row.email;
+      if (selectedColumns.includes('Phone Number')) data.phoneNumber = row.phoneNumber;
+      if (selectedColumns.includes('Alternative Phone Number')) data.phoneNumber2 = row.phoneNumber2;
+      if (selectedColumns.includes('Shipping Zone')) data.shippingZone = row.shippingZone;
+      if (selectedColumns.includes('Shipping Method')) data.shippingMethod = row.shippingMethod;
+      if (selectedColumns.includes('Payment Status')) data.paymentStatus = row.paymentStatus;
+      if (selectedColumns.includes('Payment Method')) data.paymentMethod = row.paymentMethod;
+      if (selectedColumns.includes('Vendor')) data.vendor = row.vendor;
+
+      return data;
+    });
+
+    // Create the filename dynamically based on applied filters
+    let fileName = 'order_data';
+    if (searchQuery) fileName += `_searched`;
+    else if (startDate && adjustedEndDate) fileName += `_from_${formatDate(startDate)}_to_${formatDate(adjustedEndDate)}`;
+    else fileName += `_${selectedTab.replace(/\s/g, '_').toLowerCase()}`;
+
+    // Prepare the worksheet and workbook for XLSX
+    const worksheet = XLSX.utils.json_to_sheet(filteredData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Orders');
+
+    // Export the file as XLSX
+    XLSX.writeFile(workbook, `${fileName}.xlsx`);
+  };
+
+  useEffect(() => {
+    if (paginatedOrders?.length === 0) {
+      setPage(0); // Reset to the first page if no data
+    }
+  }, [paginatedOrders]);
+
+  if (isOrderListPending) {
     return <Loading />;
   }
 
@@ -365,34 +541,11 @@ const OrdersPage = () => {
 
         <div className='flex w-full items-center max-w-screen-2xl px-3 mx-auto justify-center md:justify-end md:gap-6'>
 
-          {/* Button to export to CSV */}
-          <button
-            onClick={exportToCSV}
-            className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
-       md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
-            <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
-             md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
-              Export CSV
-            </span>
-            <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
-             md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+          <div ref={dropdownRefDownload} className="relative inline-block text-left z-50">
+            <Button onClick={() => toggleDropdown('download')} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
+              Download Data
               <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 35 35"
-                className="w-[20px] fill-white"
-              >
-                <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
-                <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
-                <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
-              </svg>
-            </span>
-          </button>
-
-          <div ref={dropdownRef} className="relative inline-block text-left">
-            <Button onClick={toggleDropdown} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
-              Customize
-              <svg
-                className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${isOpenDropdown ? 'rotate-180' : ''}`}
+                className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown === "download" ? 'rotate-180' : ''}`}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -402,7 +555,98 @@ const OrdersPage = () => {
               </svg>
             </Button>
 
-            {isOpenDropdown && (
+            {openDropdown === 'download' && (
+              <div className="absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div className="p-2 flex flex-col gap-2">
+
+                  {/* Button to export to CSV */}
+                  <button
+                    onClick={exportToCSV}
+                    className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
+       md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+                    <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
+             md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+                      Export CSV
+                    </span>
+                    <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
+             md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 35 35"
+                        className="w-[20px] fill-white"
+                      >
+                        <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
+                        <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
+                        <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
+                      </svg>
+                    </span>
+                  </button>
+
+                  {/* Button to export to XLSX */}
+                  <button
+                    onClick={exportToXLS}
+                    className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
+       md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+                    <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
+             md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+                      Export XLSX
+                    </span>
+                    <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
+             md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 35 35"
+                        className="w-[20px] fill-white"
+                      >
+                        <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
+                        <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
+                        <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
+                      </svg>
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={exportToPDF}
+                    className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
+       md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+                    <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
+             md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+                      Export PDF
+                    </span>
+                    <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
+             md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 35 35"
+                        className="w-[20px] fill-white"
+                      >
+                        <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
+                        <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
+                        <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
+                      </svg>
+                    </span>
+                  </button>
+
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div ref={dropdownRef} className="relative inline-block text-left z-50">
+            <Button onClick={() => toggleDropdown('other')} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
+              Customize
+              <svg
+                className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown === "other" ? 'rotate-180' : ''}`}
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </Button>
+
+            {openDropdown === 'other' && (
               <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="p-1">
                   {/* Search Product Item */}
@@ -423,7 +667,7 @@ const OrdersPage = () => {
 
                   {/* Choose Columns Button */}
                   <div className="py-1">
-                    <Button variant="light" color="primary" onClick={() => { setColumnModalOpen(true); setIsOpenDropdown(false) }} className="w-full">
+                    <Button variant="light" color="primary" onClick={() => { setColumnModalOpen(true); setOpenDropdown(false) }} className="w-full">
                       Choose Columns
                     </Button>
                   </div>
@@ -451,6 +695,14 @@ const OrdersPage = () => {
         </div>
       </div>
 
+      <div className='pb-6 px-6'>
+        <TabsOrder
+          tabs={orderStatusTabs}
+          selectedTab={selectedTab}
+          onTabChange={setSelectedTab} // This passes the function to change the tab
+        />
+      </div>
+
       {/* Column Selection Modal */}
       <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
         <ModalContent>
@@ -458,20 +710,20 @@ const OrdersPage = () => {
           <ModalBody className="modal-body-scroll">
             <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
               {columns.map((column) => (
-                <Checkbox key={column} value={column} isDisabled={defaultColumns.includes(column)}>
+                <Checkbox key={column} value={column}>
                   {column}
                 </Checkbox>
               ))}
             </CheckboxGroup>
+          </ModalBody>
+          <ModalFooter>
             <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
               Select All
             </Button>
             <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
               Deselect All
             </Button>
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="solid" color="primary" onClick={handleSave}>
+            <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
               Save
             </Button>
           </ModalFooter>
@@ -479,7 +731,7 @@ const OrdersPage = () => {
       </Modal>
 
       {/* table content */}
-      <div className="max-w-screen-2xl mx-auto px-0 md:px-4 lg:px-6 custom-max-h overflow-x-auto modal-body-scroll">
+      <div className="max-w-screen-2xl mx-auto px-0 md:px-4 lg:px-6 custom-max-h-orders overflow-x-auto modal-body-scroll">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-100 sticky top-0 z-[1] shadow-md">
             <tr>
@@ -528,7 +780,12 @@ const OrdersPage = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {(isFilterActive ? searchedOrders : result)?.map((order, index) => (
+
+            {paginatedOrders?.length === 0 ? <tr>
+              <td colSpan={selectedColumns.length} className="text-center p-4 text-gray-500 md:pt-40 pt-32 lg:pt-52 xl:pt-60 2xl:pt-72">
+                No orders found matching your criteria. Please adjust your filters or check back later.
+              </td>
+            </tr> : (paginatedOrders?.map((order, index) => (
               <tr key={order?._id || index} className="hover:bg-gray-50 transition-colors">
                 {selectedColumns.includes('Order Number') && (
                   <td className="text-xs p-3 font-mono cursor-pointer text-blue-600 hover:text-blue-800" onClick={() => handleOrderClick(order)}>
@@ -586,7 +843,7 @@ const OrdersPage = () => {
                         </Button>
                       )}
                       {order.orderStatus === 'Refunded' && (
-                        <Button className="text-xs w-20" size="sm" color="default" isDisabled>
+                        <Button className="text-xs w-20 cursor-not-allowed" size="sm" color="default" isDisabled>
                           Refunded
                         </Button>
                       )}
@@ -628,7 +885,8 @@ const OrdersPage = () => {
                   <td className="text-xs p-3 text-gray-700">{order?.vendor}</td>
                 )}
               </tr>
-            ))}
+            )))}
+
           </tbody>
         </table>
       </div>
@@ -637,110 +895,116 @@ const OrdersPage = () => {
       {selectedOrder && (
         <Modal className='mx-4 lg:mx-0' isOpen={isOpen} onOpenChange={onClose} size='xl'>
           <ModalContent>
-            <div className='flex items-center'>
-              <ModalHeader className="text-sm md:text-base">Order Id - #{selectedOrder?.orderNumber}</ModalHeader>
-              <ModalHeader className='text-sm md:text-base'>Customer Id - {selectedOrder?.customerId}</ModalHeader>
+            <div className='flex items-center justify-center'>
+              <ModalHeader className="text-sm md:text-base"><Barcode selectedOrder={selectedOrder} /></ModalHeader>
             </div>
             <ModalBody className="modal-body-scroll">
-              <div className='flex justify-center'>
-                <Barcode selectedOrder={selectedOrder} />
+              <div className='flex items-center justify-between w-full pr-10'>
+                <p>Order Id - <strong>#{selectedOrder?.orderNumber}</strong></p>
+                <p>Customer Id - <strong>{selectedOrder?.customerId}</strong></p>
               </div>
               <p className='text-xs md:text-base'>Address: {selectedOrder?.address1} {selectedOrder?.address2}, {selectedOrder?.city}, {selectedOrder?.postalCode}</p>
               <p className='text-xs md:text-base'>Transaction Id: {selectedOrder?.transactionId}</p>
               <p className='text-xs md:text-base'>Tracking Number: {selectedOrder?.trackingNumber === "" ? '--' : selectedOrder?.trackingNumber}</p>
 
-              {/* Display product information */}
-              {selectedOrder.productInformation && selectedOrder.productInformation.length > 0 && (
-                <>
-                  <h4 className="mt-4 mb-2 text-lg font-semibold">Product Information</h4>
-                  {selectedOrder.productInformation.map((product, index) => (
-                    <div key={index} className="mb-4">
-                      <p><strong>Product : </strong> {product?.productTitle}</p>
-                      <p><strong>Size:</strong>  {product?.size}</p>
-                      <p className='flex items-center gap-2'><strong>Color:</strong>
-                        {product?.color?.label}
-                        <span
-                          style={{
-                            display: 'inline-block',
-                            width: '20px',
-                            height: '20px',
-                            backgroundColor: product.color?.color || '#fff',
-                            marginRight: '8px',
-                            borderRadius: '4px'
-                          }}
-                        />
-                      </p>
-                      <p><strong>Batch Code:</strong> {product?.batchCode}</p>
-                      <p><strong>Unit Price:</strong> {product?.unitPrice}</p>
-                      <p><strong>SKU:</strong> {product?.sku}</p>
-                    </div>
-                  ))}
-                </>
-              )}
-            </ModalBody>
-            <ModalFooter className='flex justify-between items-center'>
-              <div className='flex items-center gap-1 text-xs md:text-sm'>
-                <p className=''>Total Amount:  ৳ {selectedOrder?.totalAmount.toFixed(2)}</p>,
-                <p className=''>
-                  {selectedOrder?.promoCode || selectedOrder?.productInformation?.some((product) => product.offerTitle) ? (
-                    (() => {
-                      // Calculate promo discount only if it's greater than 0
-                      const promoDiscount =
-                        selectedOrder.promoDiscountType === 'Percentage'
-                          ? (selectedOrder.totalAmount * selectedOrder.promoDiscountValue) / 100
-                          : selectedOrder.promoDiscountValue;
-
-                      // Extract offer discounts from productInformation and filter out 0-value offers
-                      const offerDetails = selectedOrder.productInformation
-                        .map((product) => {
-                          const offerDiscount =
-                            product.offerDiscountType === 'Percentage'
-                              ? (product.unitPrice * product.offerDiscountValue) / 100
-                              : product.offerDiscountValue;
-
-                          return {
-                            offerTitle: product.offerTitle,
-                            offerDiscountType: product.offerDiscountType,
-                            offerDiscountValue: product.offerDiscountValue,
-                            offerDiscountAmount: offerDiscount,
-                          };
-                        })
-                        .filter((offer) => offer.offerDiscountAmount > 0); // Filter out 0-value offers
-
-                      return (
-                        <>
-                          {/* Show promo discount if applied */}
-                          {selectedOrder.promoCode && promoDiscount > 0 ? (
-                            <>
-                              Promo applied: {selectedOrder.promoDiscountType === 'Percentage'
-                                ? `${selectedOrder.promoDiscountValue.toFixed(2)}%`
-                                : `৳ ${selectedOrder.promoDiscountValue.toFixed(2)}`}
-                              <br />
-                            </>
-                          ) : null}
-
-                          {/* Show multiple offers if they are applied */}
-                          {offerDetails.length > 0 ? (
-                            <>
-                              {offerDetails.map((offer, index) => (
-                                <span key={index}>
-                                  Offer applied ({offer.offerTitle}):{' '}
-                                  {offer.offerDiscountType === 'Percentage'
-                                    ? `${offer.offerDiscountValue.toFixed(2)}%`
-                                    : `৳ ${offer.offerDiscountAmount.toFixed(2)}`}
-                                  <br />
-                                </span>
-                              ))}
-                            </>
-                          ) : null}
-                        </>
-                      );
-                    })()
-                  ) : (
-                    'Promo / Offer applied : X'
+              <h4 className="mt-4 text-lg font-semibold">Product Information</h4>
+              {/* Display product and promo/offer information */}
+              <div className='flex justify-between gap-6 pr-6'>
+                <div>
+                  {selectedOrder.productInformation && selectedOrder.productInformation.length > 0 && (
+                    <>
+                      {selectedOrder.productInformation.map((product, index) => (
+                        <div key={index} className="mb-4">
+                          <p><strong>Product : </strong> {product?.productTitle}</p>
+                          <p><strong>Size:</strong>  {product?.size}</p>
+                          <p className='flex items-center gap-2'><strong>Color:</strong>
+                            {product?.color?.label}
+                            <span
+                              style={{
+                                display: 'inline-block',
+                                width: '20px',
+                                height: '20px',
+                                backgroundColor: product.color?.color || '#fff',
+                                marginRight: '8px',
+                                borderRadius: '4px'
+                              }}
+                            />
+                          </p>
+                          <p><strong>Batch Code:</strong> {product?.batchCode}</p>
+                          <p><strong>Unit Price:</strong> {product?.unitPrice}</p>
+                          <p><strong>SKU:</strong> {product?.sku}</p>
+                        </div>
+                      ))}
+                    </>
                   )}
-                </p>
+                </div>
+                <div className='flex flex-col items-center text-sm md:text-base w-60'>
+                  <p className='w-full'><strong>Total Amount:</strong>  ৳ {selectedOrder?.totalAmount.toFixed(2)}</p>
+                  <p className='w-full'>
+                    {selectedOrder?.promoCode || selectedOrder?.productInformation?.some((product) => product.offerTitle) ? (
+                      (() => {
+                        // Calculate promo discount only if it's greater than 0
+                        const promoDiscount =
+                          selectedOrder.promoDiscountType === 'Percentage'
+                            ? (selectedOrder.totalAmount * selectedOrder.promoDiscountValue) / 100
+                            : selectedOrder.promoDiscountValue;
+
+                        // Extract offer discounts from productInformation and filter out 0-value offers
+                        const offerDetails = selectedOrder.productInformation
+                          .map((product) => {
+                            const offerDiscount =
+                              product.offerDiscountType === 'Percentage'
+                                ? (product.unitPrice * product.offerDiscountValue) / 100
+                                : product.offerDiscountValue;
+
+                            return {
+                              offerTitle: product.offerTitle,
+                              offerDiscountType: product.offerDiscountType,
+                              offerDiscountValue: product.offerDiscountValue,
+                              offerDiscountAmount: offerDiscount,
+                            };
+                          })
+                          .filter((offer) => offer.offerDiscountAmount > 0); // Filter out 0-value offers
+
+                        return (
+                          <div className='flex flex-col gap-2'>
+                            {/* Show promo discount if applied */}
+                            {selectedOrder.promoCode && promoDiscount > 0 ? (
+                              <div>
+                                <strong>Promo applied:</strong> {selectedOrder.promoDiscountType === 'Percentage'
+                                  ? `${selectedOrder.promoDiscountValue.toFixed(2)}%`
+                                  : `৳ ${selectedOrder.promoDiscountValue.toFixed(2)}`}
+                                <br />
+                              </div>
+                            ) : null}
+
+                            {/* Show multiple offers if they are applied */}
+                            {offerDetails.length > 0 ? (
+                              <div>
+                                {offerDetails.map((offer, index) => (
+                                  <span key={index}>
+                                    <strong>Offer applied</strong> ({offer.offerTitle}):{' '}
+                                    {offer.offerDiscountType === 'Percentage'
+                                      ? `${offer.offerDiscountValue.toFixed(2)}%`
+                                      : `৳ ${offer.offerDiscountAmount.toFixed(2)}`}
+                                    <br />
+                                  </span>
+                                ))}
+                              </div>
+                            ) : null}
+                          </div>
+                        );
+                      })()
+                    ) : (
+                      <div>
+                        <strong>Promo/Offer applied:</strong> X
+                      </div>
+                    )}
+                  </p>
+                </div>
               </div>
+            </ModalBody>
+            <ModalFooter className='flex items-center justify-end'>
               <PrintButton selectedOrder={selectedOrder} />
             </ModalFooter>
           </ModalContent>
@@ -748,30 +1012,28 @@ const OrdersPage = () => {
       )}
 
       {/* Pagination Button */}
-      {!isFilterActive && (
-        <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
-          <CustomPagination
-            totalPages={pages.length}
-            currentPage={page}
-            onPageChange={setPage}
-          />
-          <div className="relative inline-block">
-            <select
-              id="itemsPerPage"
-              value={itemsPerPage}
-              onChange={handleItemsPerPageChange}
-              className="cursor-pointer px-3 py-2 rounded-lg text-sm md:text-base text-gray-800 bg-white shadow-lg border border-gray-300 focus:outline-none hover:bg-gradient-to-tr hover:from-pink-400 hover:to-yellow-400 hover:text-white transition-colors duration-300 appearance-none w-16 md:w-20 lg:w-24"
-            >
-              <option className='bg-white text-black' value={25}>25</option>
-              <option className='bg-white text-black' value={50}>50</option>
-              <option className='bg-white text-black' value={100}>100</option>
-            </select>
-            <svg className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
+      <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
+        <CustomPagination
+          totalPages={totalPages}
+          currentPage={page}
+          onPageChange={setPage}
+        />
+        <div className="relative inline-block">
+          <select
+            id="itemsPerPage"
+            value={itemsPerPage}
+            onChange={handleItemsPerPageChange}
+            className="cursor-pointer px-3 py-2 rounded-lg text-sm md:text-base text-gray-800 bg-white shadow-lg border border-gray-300 focus:outline-none hover:bg-gradient-to-tr hover:from-pink-400 hover:to-yellow-400 hover:text-white transition-colors duration-300 appearance-none w-16 md:w-20 lg:w-24"
+          >
+            <option className='bg-white text-black' value={25}>25</option>
+            <option className='bg-white text-black' value={50}>50</option>
+            <option className='bg-white text-black' value={100}>100</option>
+          </select>
+          <svg className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
         </div>
-      )}
+      </div>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React from 'react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import JsBarcode from 'jsbarcode';
 
 // Function to add gaps between every letter
 function addGaps(text, gap = ' ') {
@@ -193,7 +194,7 @@ const CustomerPrintButton = ({ selectedOrder }) => {
         product.size || '',         // Size
         `${product.unitPrice.toFixed(2)}`, // Unit Price
         product.sku,                // QTY
-        `BDT ${productTotal}`,       // Total (without discount)
+        `${productTotal}`,       // Total (without discount)
         product.offerTitle ? { offerTitle: product.offerTitle, offerDiscount: 0, productTitle: product.productTitle } : null // Store offer details without applying discount yet
       ];
     });
@@ -249,7 +250,7 @@ const CustomerPrintButton = ({ selectedOrder }) => {
 
     pdf.autoTable({
       startY: margin + 100,
-      head: [['Title', 'Color', 'Size', 'Unit Price', 'QTY', 'Total']],
+      head: [['Title', 'Color', 'Size', 'Unit Price', 'QTY', 'Total (BDT)']],
       body: productRows.map(product => [
         { content: product[0], styles: { halign: 'center' } },   // Title aligned to left
         { content: product[1], styles: { halign: 'center' } },   // Color aligned to left
@@ -283,12 +284,12 @@ const CustomerPrintButton = ({ selectedOrder }) => {
       body: [
         [
           { content: 'Subtotal:', styles: { fillColor: [255, 255, 255] } },
-          `BDT ${subtotal.toFixed(2)}`
+          `${subtotal.toFixed(2)}`
         ], // Increased padding
         ...(promoDiscount > 0 ? [
           [
             { content: `Promo (${promoCode}):` },
-            `BDT -${promoDiscount}`
+            `-${promoDiscount}`
           ]
         ] : []), // Increased padding
         ...(hasOffers ? productRows.map((product, index) => {
@@ -296,17 +297,17 @@ const CustomerPrintButton = ({ selectedOrder }) => {
           if (offerDetails) {
             return [
               { content: `Offer (${offerDetails.offerTitle}) on ${offerDetails.productTitle}:` },
-              `BDT -${offerDetails.offerDiscount}`
+              `-${offerDetails.offerDiscount}`
             ];
           }
         }).filter(Boolean) : []),
         [
           { content: 'Shipping Charge:' },
-          `BDT +${shippingCharge.toFixed(2)}`
+          `+${shippingCharge.toFixed(2)}`
         ], // Increased padding
         [
           { content: 'Total:', styles: { fontStyle: 'bold' } },
-          `BDT ${total}`
+          `${total}`
         ] // Increased padding
       ],
       theme: 'plain',

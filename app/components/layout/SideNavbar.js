@@ -20,6 +20,7 @@ import { LiaUserLockSolid } from "react-icons/lia";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { LuWarehouse } from "react-icons/lu";
 import { BsTags } from "react-icons/bs";
+import { FaRegIdCard } from "react-icons/fa";
 
 const SideNavbar = ({ onClose }) => {
   const pathname = usePathname();
@@ -70,6 +71,7 @@ const SideNavbar = ({ onClose }) => {
       icon: <MdOutlineSettings />,
       links: [
         { label: 'Permissions', link: '/dash-board/permissions', icon: <LiaUserLockSolid /> },
+        { label: 'Membership', link: '/dash-board/membership', icon: <FaRegIdCard /> },
         { label: 'Shipment', link: '/dash-board/zone', icon: <PiMapPinAreaBold /> },
         { label: 'Payment Methods', link: '/dash-board/payment-methods', icon: <MdPayment /> },
         { label: 'Categories', link: '/dash-board/categories', icon: <BiCategory /> },

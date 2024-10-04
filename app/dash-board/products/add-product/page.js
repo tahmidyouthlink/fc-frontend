@@ -273,6 +273,12 @@ const FirstStepOfAddProduct = () => {
       const storedProductTitle = localStorage.getItem('productTitle');
       if (storedProductTitle) setValue('productTitle', storedProductTitle);
 
+      const storedProductBatchCode = localStorage.getItem('batchCode');
+      if (storedProductBatchCode) setValue('batchCode', storedProductBatchCode);
+
+      const storedProductWeight = localStorage.getItem('weight');
+      if (storedProductWeight) setValue('weight', storedProductWeight);
+
       const storedRegularPrice = localStorage.getItem('regularPrice');
       if (storedRegularPrice) setValue('regularPrice', storedRegularPrice);
 
@@ -392,6 +398,8 @@ const FirstStepOfAddProduct = () => {
 
       localStorage.setItem('formattedDate', formattedDate);
       localStorage.setItem('productTitle', data.productTitle);
+      localStorage.setItem('weight', data.weight);
+      localStorage.setItem('batchCode', data.batchCode);
       localStorage.setItem('regularPrice', parseFloat(data.regularPrice) || 0);
       localStorage.setItem('discountType', discountType);
       localStorage.setItem('discountValue', parseFloat(data.discountValue || 0));
@@ -664,7 +672,7 @@ const FirstStepOfAddProduct = () => {
                     onSelectionChange={handleTabChange}
                   >
                     <Tab key="Percentage" title="Percentage" className='text-[#9F5216]'>Discount (%)</Tab>
-                    <Tab key="Flat" title="Flat" className='text-[#9F5216]'>Flat Discount (taka)</Tab>
+                    <Tab key="Flat" title="Flat" className='text-[#9F5216]'>Flat Discount (৳)</Tab>
                   </Tabs>
 
                   <input
@@ -672,6 +680,43 @@ const FirstStepOfAddProduct = () => {
                     {...register('discountValue')}
                     className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
                     placeholder={`Enter ${discountType} Discount`} // Correct placeholder
+                  />
+                </div>
+              </div>
+
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+                <div>
+                  <label htmlFor={`batchCode`} className='font-medium text-[#9F5216]'>Batch Code *</label>
+                  <input
+                    id={`batchCode`}
+                    autoComplete="off"
+                    {...register(`batchCode`, {
+                      required: 'Batch Code is required',
+                      pattern: {
+                        value: /^[A-Z0-9]*$/,
+                        message: 'Batch Code must be alphanumeric and uppercase',
+                      },
+                    })}
+                    placeholder={`Enter Batch Code`}
+                    className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mt-2"
+                    type="text"
+                    onChange={(e) => {
+                      // Convert input to uppercase and remove non-alphanumeric characters
+                      e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                    }}
+                  />
+                  {errors.batchCode && (
+                    <p className="text-red-600 text-left">{errors.batchCode.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor={`weight`} className='font-medium text-[#9F5216]'>Weight</label>
+                  <input
+                    id={`weight`}
+                    {...register(`weight`)}
+                    placeholder={`Enter Weight`}
+                    className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mt-2"
+                    type="number"
                   />
                 </div>
               </div>
@@ -707,7 +752,7 @@ const FirstStepOfAddProduct = () => {
                   <p className="text-red-600 text-left">Tags are required</p>
                 )}
 
-                <label htmlFor='vendors' className='flex justify-start font-medium text-[#9F5216]'>Select Vendor *</label>
+                <label htmlFor='vendors' className='flex justify-start font-medium text-[#9F5216]'>Select Vendor</label>
                 <Controller
                   name="vendors"
                   control={control}
@@ -760,7 +805,7 @@ const FirstStepOfAddProduct = () => {
                     </div>
                   </label>
                   {sizeError && (
-                    <p className="text-red-600 text-left">Please select at least one image</p>
+                    <p className="text-red-600 text-center">Please select at least one image</p>
                   )}
 
                   <DragDropContext onDragEnd={handleOnDragEnd}>

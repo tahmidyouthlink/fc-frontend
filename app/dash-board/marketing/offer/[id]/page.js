@@ -14,6 +14,8 @@ import dynamic from 'next/dynamic';
 import useCategories from '@/app/hooks/useCategories';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
+import ProductSearchSelectId from '@/app/components/layout/ProductSearchSelectId';
+import CategorySearchSelectId from '@/app/components/layout/CategorySearchSelectId';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
@@ -24,7 +26,6 @@ const EditOffer = () => {
   const { id } = useParams();
   const axiosPublic = useAxiosPublic();
   const router = useRouter();
-  const [categoryList, isCategoryPending] = useCategories();
   const { register, handleSubmit, control, setValue, formState: { errors } } = useForm();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,13 +33,25 @@ const EditOffer = () => {
   const [expiryDate, setExpiryDate] = useState(''); // Initial state set to an empty string
   const [offerDescription, setOfferDescription] = useState("");
   const [image, setImage] = useState(null);
-  const [categories, setCategories] = useState([]);
+  const [categoryList, isCategoryPending] = useCategories();
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [categoryError, setCategoryError] = useState(false);
   const [dateError, setDateError] = useState(false)
   const [offerDetails, setOfferDetails] = useState(null);
-  const [productTitle, setProductTitle] = useState([]);
+  const [selectedProductIds, setSelectedProductIds] = useState([]);
   const [productList, isProductPending] = useProductsInformation();
-  const [titleError, setTitleError] = useState(false);
+  const [productIdError, setProductIdError] = useState(false);
+  const [selectedTab, setSelectedTab] = useState('Products');
+
+  const handleTabChangeForCategoryOrProduct = (key) => {
+    setSelectedTab(key);
+    // Reset the other tab's value when switching tabs
+    if (key === "Products") {
+      setSelectedCategories([]); // Clear selected categories when switching to Products
+    } else if (key === "Categories") {
+      setSelectedProductIds([]); // Clear selected products when switching to Categories
+    }
+  };
 
   const handleTabChange = (key) => {
     setOfferDiscountType(key);
@@ -72,12 +85,19 @@ const EditOffer = () => {
 
         setOfferDescription(offer?.offerDescription || "");
         setImage(offer?.imageUrl || null);
-        setCategories(categoryList);
 
-        setProductTitle(offer?.productTitle || []);
-
-        // Set selected categories
         setSelectedCategories(offer?.selectedCategories || []);
+        setSelectedProductIds(offer?.selectedProductIds || []);
+
+        // Determine which tab to show based on the fetched data
+        if (offer?.selectedCategories?.length > 0) {
+          setSelectedTab('Categories');
+        } else if (offer?.selectedProductIds?.length > 0) {
+          setSelectedTab('Products');
+        } else {
+          setSelectedTab('Products'); // Default tab if both are empty
+        }
+
         setOfferDetails(offer);
         setIsLoading(false);
       } catch (err) {
@@ -134,20 +154,14 @@ const EditOffer = () => {
     document.getElementById('imageUpload').value = ''; // Clear the file input
   };
 
-  const handleCategoryArray = (keys) => {
-    const selectedArray = [...keys];
-    setSelectedCategories(selectedArray);
+  const handleCategorySelectionChange = (selectedCats) => {
+    setSelectedCategories(selectedCats);
+    setCategoryError(selectedCats.length === 0);
   };
 
-  const handleProductTitle = (keys) => {
-    const selectedArray = [...keys];
-    setProductTitle(selectedArray);
-    if (selectedArray.length === 0) {
-      setTitleError(true);
-    }
-    else {
-      setTitleError(false);
-    }
+  const handleProductSelectionChange = (selectedIds) => {
+    setSelectedProductIds(selectedIds);
+    setProductIdError(selectedIds.length === 0);
   };
 
   const onSubmit = async (data) => {
@@ -186,11 +200,15 @@ const EditOffer = () => {
       }
     }
 
-    if (productTitle.length === 0) {
-      setTitleError(true);
+    if (selectedTab === "Products" && selectedProductIds.length === 0) {
+      setProductIdError(true);
       return;
     }
-    setTitleError(false);
+
+    if (selectedTab === "Categories" && selectedCategories.length === 0) {
+      setCategoryError(true);
+      return;
+    }
 
     if (hasError) {
       return;
@@ -209,7 +227,7 @@ const EditOffer = () => {
         offerDescription,
         selectedCategories,
         imageUrl,
-        productTitle
+        selectedProductIds
       };
 
       const res = await axiosPublic.put(`/updateOffer/${id}`, updatedDiscount);
@@ -308,56 +326,44 @@ const EditOffer = () => {
 
             <div className='grid grid-cols-1 lg:col-span-5 xl:col-span-5 gap-8 mt-6 px-6 py-3'>
 
-              <div className='flex flex-col gap-6 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+              <div className='flex flex-col bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
-                <div>
-                  <Select
-                    label="Select offer related product title"
-                    selectionMode="multiple"
-                    value={productTitle}
-                    placeholder="Select Product Title"
-                    selectedKeys={new Set(productTitle)}
-                    onSelectionChange={(keys) => {
-                      handleProductTitle(keys);
-                    }}
-                  >
-                    {productList?.map((product) => (
-                      <SelectItem key={product._id}>
-                        {product.productTitle}
-                      </SelectItem>
-                    ))}
-                  </Select>
-                  {titleError && <p className='text-red-600 text-left pl-2 pt-1'>Please select at least one product Title.</p>}
-                </div>
-
-                <Controller
-                  name="categories"
-                  control={control}
-                  defaultValue={selectedCategories}
-                  render={({ field }) => (
+                <Tabs
+                  aria-label="Product and Category Selection"
+                  selectedKey={selectedTab}
+                  onSelectionChange={handleTabChangeForCategoryOrProduct}
+                >
+                  <Tab key="Products" title="Products">
                     <div>
-                      <Select
-                        label="Select offer related categories"
-                        selectionMode="multiple"
-                        value={selectedCategories}
-                        placeholder="Select Categories"
-                        selectedKeys={new Set(selectedCategories)}
-                        onSelectionChange={(keys) => {
-                          handleCategoryArray(keys);
-                          field.onChange([...keys]);
-                        }}
-                      >
-                        {categories?.map((category) => (
-                          <SelectItem key={category.key}>
-                            {category.label}
-                          </SelectItem>
-                        ))}
-                      </Select>
-
+                      <label htmlFor='Product Title' className='flex justify-start font-medium text-[#D2016E] pb-2'>Product Title *</label>
+                      {productList && (
+                        <ProductSearchSelectId
+                          productList={productList}
+                          value={selectedProductIds}
+                          onSelectionChange={handleProductSelectionChange}
+                        />
+                      )}
+                      {productIdError && <p className="text-red-600 text-left">Select at least one product ID</p>}
                     </div>
-                  )}
-                />
+                  </Tab>
+                  <Tab key="Categories" title="Categories">
+                    <div>
+                      <label htmlFor='Category' className='flex justify-start font-medium text-[#D2016E] pb-2'>Category Selection *</label>
+                      {categoryList && (
+                        <CategorySearchSelectId
+                          categoryList={categoryList}
+                          value={selectedCategories} // Persist selected categories
+                          onSelectionChange={handleCategorySelectionChange}
+                        />
+                      )}
+                      {categoryError && <p className="text-red-600 text-left">Select at least one category</p>}
+                    </div>
+                  </Tab>
+                </Tabs>
 
+              </div>
+
+              <div className='flex flex-col gap-6 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                 <div className='flex w-full flex-col gap-2'>
                   <label htmlFor='offerDescription' className='flex justify-start font-medium text-[#D2016E] pb-2'>Offer Description</label>
                   <Controller
@@ -414,7 +420,6 @@ const EditOffer = () => {
                   )}
 
                 </div>
-
               </div>
 
             </div>

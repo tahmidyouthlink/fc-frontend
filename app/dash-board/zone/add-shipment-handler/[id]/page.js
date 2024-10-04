@@ -232,7 +232,7 @@ const EditShipmentHandler = () => {
               <div className='flex items-center gap-4'>
                 <div
                   onClick={() => handleDeliveryType('STANDARD')}
-                  className={`flex items-center gap-2 border rounded-lg px-6 cursor-pointer ${deliveryType?.includes('STANDARD') ? 'border-2 bg-gray-50' : 'bg-white'
+                  className={`flex items-center gap-2 border rounded-lg px-6 cursor-pointer ${deliveryType?.includes('STANDARD') ? 'border-[#ffddc2] bg-[#ffddc2]' : 'bg-white'
                     }`}
                 >
                   <Image
@@ -248,7 +248,7 @@ const EditShipmentHandler = () => {
                 {/* Express Option */}
                 <div
                   onClick={() => handleDeliveryType('EXPRESS')}
-                  className={`flex items-center gap-2 border rounded-lg px-6 cursor-pointer ${deliveryType?.includes('EXPRESS') ? 'border-2 bg-gray-50' : 'bg-white'
+                  className={`flex items-center gap-2 border rounded-lg px-6 cursor-pointer ${deliveryType?.includes('EXPRESS') ? 'border-[#ffddc2] bg-[#ffddc2]' : 'bg-white'
                     }`}
                 >
                   <Image

@@ -1,7 +1,7 @@
 "use client";
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import React, { useEffect, useRef, useState } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Button } from '@nextui-org/react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
@@ -15,10 +15,12 @@ import Loading from '@/app/components/shared/Loading/Loading';
 
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
-const defaultImages = ["https://i.ibb.co.com/pdFg53w/Formal-shirt-1-600x600.jpg",
-  "https://i.ibb.co.com/4222Bd7/0638072-fine-tex-premium-quality-white-color-drop-shoulder-t-shirt-for-men.webp",
-  "https://i.ibb.co.com/RjGjk9M/41aa718b01389b003bc79e7c5a0ff8bd.jpg",
-  "https://i.ibb.co.com/BPSDBck/406870-3175-XXL.jpg",];
+const defaultImages = ["https://i.ibb.co.com/ZJ2Qy29/2892174.png",
+  "https://i.ibb.co.com/dcRM6Fz/88768.png",
+  "https://i.ibb.co.com/sm3xZHL/pngtree-shoes-icon-design-template-illustration-png-image-3177407-removebg-preview.png",
+  "https://i.ibb.co.com/yFVrMHF/664466.png",
+  "https://i.ibb.co.com/khrPqNc/3345358.png",
+  "https://i.ibb.co.com/F7qy9Gh/5258035.png",];
 
 const AddCategory = () => {
 
@@ -364,7 +366,7 @@ const AddCategory = () => {
                     onClick={() => handleSizeRemove(index)}
                     className="ml-2 text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-150"
                   >
-                    Remove
+                    <RxCross2 size={19} />
                   </button>
                 </div>
               ))}
@@ -421,7 +423,7 @@ const AddCategory = () => {
                     onClick={() => handleSubCategoryRemove(index)}
                     className="ml-2 text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-150"
                   >
-                    Remove
+                    <RxCross2 size={19} />
                   </button>
                 </div>
               ))}
@@ -470,7 +472,7 @@ const AddCategory = () => {
 
               {/* Show default images for selection if no image is uploaded */}
               {!image && !selectedDefaultImage && (
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-4'>
+                <div className='grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 lg:gap-8 xl:gap-4 mt-8'>
                   {defaultImages.map((defaultImage, index) => (
                     <div key={index} onClick={() => handleDefaultImageSelect(defaultImage)} className='cursor-pointer'>
                       <Image
@@ -478,7 +480,7 @@ const AddCategory = () => {
                         alt={`Default image ${index + 1}`}
                         height={2000}
                         width={2000}
-                        className='w-full h-52 xl:h-96 rounded-md mt-8 object-contain'
+                        className='w-full h-52 xl:h-96 rounded-md object-contain'
                       />
                     </div>
                   ))}

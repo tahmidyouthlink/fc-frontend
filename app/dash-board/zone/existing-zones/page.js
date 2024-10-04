@@ -2,10 +2,10 @@
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useShippingZones from '@/app/hooks/useShippingZones';
-import { Button } from '@nextui-org/react';
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
 
@@ -14,17 +14,32 @@ const ExistingZones = () => {
   const axiosPublic = useAxiosPublic();
   const [shippingList, isShippingPending, refetch] = useShippingZones();
   const router = useRouter();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [zoneId, setZoneId] = useState(null);
 
   const handleDelete = async (zoneId) => {
     try {
       const res = await axiosPublic.delete(`/deleteShippingZone/${zoneId}`);
       if (res?.data?.deletedCount) {
-        refetch();
-        toast.success('Shipping Zone deleted successfully!');
+        refetch(); // Call your refetch function to refresh data
+        toast.success('Shipment deleted successfully!');
       }
     } catch (error) {
       toast.error('Failed to delete shipping zone. Please try again.');
     }
+  };
+
+  const confirmDelete = () => {
+    if (zoneId) {
+      handleDelete(zoneId);
+    }
+    onOpenChange(false); // Close the modal
+    setZoneId(null); // Reset the zoneId
+  };
+
+  const openModal = (id) => {
+    setZoneId(id); // Set the zoneId for the deletion
+    onOpen(); // Open the modal
   };
 
   if (isShippingPending) {
@@ -47,6 +62,7 @@ const ExistingZones = () => {
               <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Cities</th>
               <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Shipping Handlers</th>
               <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Shipping Charge</th>
+              <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Shipping Hour</th>
               <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Actions</th>
             </tr>
           </thead>
@@ -63,7 +79,14 @@ const ExistingZones = () => {
                 <td className="text-xs p-3 text-gray-700">
                   {zone?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
                     <div key={idx}>
-                      {type}: ৳ {zone.shippingCharges[type]}
+                      {type}: ৳ {zone?.shippingCharges[type]}
+                    </div>
+                  ))}
+                </td>
+                <td className="text-xs p-3 text-gray-700">
+                  {zone?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
+                    <div key={idx}>
+                      {type}: {zone?.shippingHours[type]} Hours
                     </div>
                   ))}
                 </td>
@@ -73,9 +96,8 @@ const ExistingZones = () => {
                     <Button onClick={() => router.push(`/dash-board/zone/${zone?._id}`)} size="sm" className="text-xs" color="primary" variant="flat">
                       Edit
                     </Button>
-                    <Button onClick={() => handleDelete(zone?._id)} size="sm" className="text-xs" color="danger" variant="flat">
-                      Delete
-                    </Button>
+
+                    <Button size="sm" className="text-xs" color="danger" variant="flat" onPress={() => openModal(zone?._id)}>Delete</Button>
                   </div>
                 </td>
               </tr>
@@ -83,6 +105,26 @@ const ExistingZones = () => {
           </tbody>
         </table>
       </div>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>Confirm Deletion</ModalHeader>
+              <ModalBody className='modal-body-scroll'>
+                <p>Are you sure you want to delete this Shipment?</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" size="sm" variant="flat" onPress={confirmDelete}>
+                  Yes
+                </Button>
+                <Button variant="flat" size="sm" onPress={onClose}>
+                  No
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

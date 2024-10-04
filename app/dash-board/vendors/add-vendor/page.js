@@ -97,16 +97,13 @@ const AddVendor = () => {
 
             {/* Vendor Address of the Vendor Input */}
             <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Vendor Address *</label>
+              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Vendor Address</label>
               <input
                 type="text"
                 placeholder="Add Vendor Address"
-                {...register('vendorAddress', { required: 'Vendor Address is required' })}
+                {...register('vendorAddress')}
                 className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
               />
-              {errors.vendorAddress && (
-                <p className="text-red-600 text-left">{errors.vendorAddress.message}</p>
-              )}
             </div>
 
           </div>

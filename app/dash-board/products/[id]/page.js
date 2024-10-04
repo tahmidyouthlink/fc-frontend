@@ -13,7 +13,7 @@ import useSubCategories from '@/app/hooks/useSubCategories';
 import useTags from '@/app/hooks/useTags';
 import useVendors from '@/app/hooks/useVendors';
 import { generateSizes } from '@/app/utils/GenerateSizes/GenerateSizes';
-import { CheckboxGroup, Radio, RadioGroup, Select, SelectItem, Tab, Tabs } from '@nextui-org/react';
+import { Button, CheckboxGroup, Radio, RadioGroup, Select, SelectItem, Tab, Tabs } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -27,6 +27,7 @@ import ReactSelect from 'react-select';
 import toast from 'react-hot-toast';
 import useShippingZones from '@/app/hooks/useShippingZones';
 import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
+import { HiOutlineArchive } from "react-icons/hi";
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
@@ -73,7 +74,7 @@ const EditProductPage = () => {
   const [selectedShipmentHandler, setSelectedShipmentHandler] = useState([]);
   const [shippingList, isShippingPending] = useShippingZones();
   const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
-  const [previousBatchCode, setPreviousBatchCode] = useState("");
+  const [productStatus, setProductStatus] = useState("");
 
   const toggleCardSelection = (shipping) => {
     const isSelected = selectedShipmentHandler.some(
@@ -264,9 +265,20 @@ const EditProductPage = () => {
     setDiscountType(key);
   };
 
+  useEffect(() => {
+    if (uploadedImageUrls.length > 0) {
+      setProductVariants(prevVariants =>
+        prevVariants.map(variant => ({
+          ...variant,
+          imageUrl: "", // Reset image URL for each variant
+        }))
+      );
+    }
+  }, [uploadedImageUrls]);
+
   const initializeVariants = useCallback((colors, sizes, savedVariants) => {
     // Filter saved variants based on available colors and sizes
-    const variants = savedVariants.filter(variant =>
+    const variants = savedVariants?.filter(variant =>
       sizes.includes(variant.size) && colors.some(color => color.value === variant.color.value)
     );
 
@@ -274,14 +286,13 @@ const EditProductPage = () => {
     for (const color of colors) {
       for (const size of sizes) {
         if (!variants.some(variant => variant.color.value === color.value && variant.size === size)) {
-          variants.push({ color, size, sku: "", batchCode: isAdmin ? "" : previousBatchCode, weight: "", imageUrl: "" });
+          variants.push({ color, size, sku: "", imageUrl: "" });
         }
       }
     }
 
     // Avoid re-setting the productVariants if nothing has changed to prevent loops
     setProductVariants((prevVariants) => {
-      // Only update if variants are different from previous ones to avoid re-triggering
       if (JSON.stringify(prevVariants) !== JSON.stringify(variants)) {
         return variants;
       }
@@ -291,25 +302,18 @@ const EditProductPage = () => {
     // Set form values for each variant
     variants.forEach((variant, index) => {
       setValue(`sku-${index}`, variant.sku);
-      setValue(`batchCode-${index}`, variant.batchCode);
-      setValue(`weight-${index}`, variant.weight);
       setValue(`imageUrl-${index}`, variant.imageUrl);
     });
 
-    // Update the previous batch code for non-admin users
-    if (!isAdmin && variants.length > 0) {
-      const lastVariant = variants[variants.length - 1]; // Get the last variant
-      if (lastVariant.batchCode) {
-        setPreviousBatchCode(lastVariant.batchCode); // Set the previous batch code to the last variant's batch code
-      }
-    }
-  }, [setValue, isAdmin, previousBatchCode]);
+  }, [setValue]);
 
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
         const { data } = await axiosPublic.get(`/singleProduct/${id}`);
         setValue('productTitle', data?.productTitle);
+        setValue('batchCode', data?.batchCode);
+        setValue('weight', data?.weight);
         setValue('regularPrice', data?.regularPrice);
         setValue('discountValue', data?.discountValue)
         setUploadedImageUrls(data?.imageUrls);
@@ -326,7 +330,8 @@ const EditProductPage = () => {
         setSelectedNewArrival(data?.newArrival);
         setSelectedVendors(data?.vendors);
         setSelectedTags(data?.tags);
-        initializeVariants(data?.availableColors || [], data?.allSizes || [], data?.productVariants || [], previousBatchCode);
+        initializeVariants(data?.availableColors || [], data?.allSizes || [], data?.productVariants || []);
+        setProductStatus(data?.status);
         setSelectedShipmentHandler(data?.shippingDetails || []);
 
         if (typeof document !== 'undefined') {
@@ -338,7 +343,7 @@ const EditProductPage = () => {
     };
 
     fetchProductDetails();
-  }, [id, setValue, axiosPublic, initializeVariants, previousBatchCode]);
+  }, [id, setValue, axiosPublic, initializeVariants]);
 
   // Only reinitialize variants when colors or sizes change, not productVariants itself
   useEffect(() => {
@@ -351,14 +356,6 @@ const EditProductPage = () => {
     const updatedVariants = [...productVariants];
     updatedVariants[index][field] = value;
     setProductVariants(updatedVariants);
-  };
-
-  const handleBatchCodeChange = (index, e) => {
-    const uppercaseValue = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    if (isAdmin) {
-      handleVariantChange(index, 'batchCode', uppercaseValue);
-    }
-    setPreviousBatchCode(uppercaseValue);
   };
 
   const onImageClick = (variantIndex, imgUrl) => {
@@ -454,8 +451,6 @@ const EditProductPage = () => {
         color: variant.color,
         size: variant.size,
         sku: parseFloat(data[`sku-${index}`]),
-        batchCode: data[`batchCode-${index}`],
-        weight: parseFloat(data[`weight-${index}`]),
         imageUrl: data[`imageUrl-${index}`] || ""
       }));
 
@@ -469,6 +464,8 @@ const EditProductPage = () => {
       const updatedProductData = {
         productTitle: data?.productTitle,
         regularPrice: data?.regularPrice,
+        weight: data?.weight,
+        batchCode: data?.batchCode,
         imageUrls: uploadedImageUrls,
         discountType: discountType,
         discountValue: data?.discountValue,
@@ -484,13 +481,14 @@ const EditProductPage = () => {
         vendors: selectedVendors,
         tags: selectedTags,
         productVariants: formattedData,
-        shippingDetails: selectedShipmentHandler
+        shippingDetails: selectedShipmentHandler,
+        status: data?.status
       }
 
       const res = await axiosPublic.put(`/editProductDetails/${id}`, updatedProductData);
       if (res.data.modifiedCount > 0) {
         toast.success('Product Details updated successfully!');
-        router.push('/dash-board/products/existing-products');
+        router.push(`/dash-board/products/existing-products/${selectedCategory}`);
       } else {
         toast.error('No changes detected!');
       }
@@ -508,8 +506,12 @@ const EditProductPage = () => {
     <div className='bg-gray-50 min-h-screen'>
       <form onSubmit={handleSubmit(onSubmit)}>
 
-        <div className='2xl:max-w-screen-2xl 2xl:mx-auto'>
-          <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl px-6 pt-2 md:pt-6'>Update Product Details</h3>
+        <div className='max-w-screen-2xl mx-auto flex justify-between px-6 items-center pt-2 xl:pt-4'>
+          <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl'>Update Product Details</h3>
+          <Link className='flex items-center gap-2 text-[10px] md:text-base' href={`/dash-board/products/existing-products/${selectedCategory}`}> <span className='border border-black rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        </div>
+
+        <div className='max-w-screen-2xl mx-auto'>
           <div className='grid grid-cols-1 lg:grid-cols-12'>
             <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 md:mt-2 px-6 py-3'>
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
@@ -741,6 +743,43 @@ const EditProductPage = () => {
                 </div>
 
                 <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+                  <div>
+                    <label htmlFor={`batchCode`} className='font-medium text-[#9F5216]'>Batch Code *</label>
+                    <input
+                      id={`batchCode`}
+                      autoComplete="off"
+                      {...register(`batchCode`, {
+                        required: 'Batch Code is required',
+                        pattern: {
+                          value: /^[A-Z0-9]*$/,
+                          message: 'Batch Code must be alphanumeric and uppercase',
+                        },
+                      })}
+                      placeholder={`Enter Batch Code`}
+                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mt-2"
+                      type="text"
+                      onChange={(e) => {
+                        // Convert input to uppercase and remove non-alphanumeric characters
+                        e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                      }}
+                    />
+                    {errors.batchCode && (
+                      <p className="text-red-600 text-left">{errors.batchCode.message}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label htmlFor={`weight`} className='font-medium text-[#9F5216]'>Weight</label>
+                    <input
+                      id={`weight`}
+                      {...register(`weight`)}
+                      placeholder={`Enter Weight`}
+                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mt-2"
+                      type="number"
+                    />
+                  </div>
+                </div>
+
+                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
                   <label htmlFor='tags' className='flex justify-start font-medium text-[#9F5216]'>Select Tag *</label>
                   <div className="parent-container">
@@ -879,22 +918,6 @@ const EditProductPage = () => {
                         disabled
                       />
                     </div>
-                    <div className='w-1/3'>
-                      <label htmlFor={`weight-${index}`} className='font-medium text-[#9F5216]'>Weight</label>
-                      <input
-                        id={`weight-${index}`}
-                        {...register(`weight-${index}`, { required: true })}
-                        value={variant.weight}
-                        onChange={(e) => handleVariantChange(index, 'weight', e.target.value)}
-                        className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                        type="number"
-                      />
-                      {errors[`weight-${index}`] && (
-                        <p className="text-red-600 text-left">Weight is required</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className='flex items-center gap-2 md:gap-4'>
                     <div className='md:w-1/3'>
                       <label htmlFor={`sku-${index}`} className='font-medium text-[#9F5216]'>SKU</label>
                       <input
@@ -907,21 +930,6 @@ const EditProductPage = () => {
                       />
                       {errors[`sku-${index}`] && (
                         <p className="text-red-600 text-left">SKU is required</p>
-                      )}
-                    </div>
-                    <div className='md:w-1/3'>
-                      <label htmlFor={`batchCode-${index}`} className='font-medium text-[#9F5216]'>Batch Code</label>
-                      <input
-                        id={`batchCode-${index}`}
-                        {...register(`batchCode-${index}`, { required: true })}
-                        value={variant.batchCode || (!isAdmin && previousBatchCode ? previousBatchCode : "")}
-                        onChange={(e) => handleBatchCodeChange(index, e)}
-                        className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                        type="text"
-                        disabled={!isAdmin}
-                      />
-                      {errors[`batchCode-${index}`] && (
-                        <p className="text-red-600 text-left">Batch Code is required</p>
                       )}
                     </div>
                   </div>
@@ -992,11 +1000,28 @@ const EditProductPage = () => {
         </div>
 
         <div className='2xl:max-w-screen-2xl 2xl:mx-auto flex justify-between px-6 pt-8 pb-16'>
-          <Link href='/dash-board/products/existing-products' className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
-            <FaArrowLeft /> Go Back
-          </Link>
-          <button type='submit' className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
-            Submit
+          {productStatus === "active" ?
+            <Button color="danger" size='sm' className='flex items-center gap-1' onClick={handleSubmit((formData) => {
+              setProductStatus("archive"); // Set status to archive
+              onSubmit({ ...formData, status: "archive" }); // Pass the updated status directly
+            })}
+            >
+              Archive <HiOutlineArchive size={18} /></Button>
+            :
+            <Button
+              className="flex items-center gap-1" size='sm'
+              color="secondary"
+              onClick={handleSubmit((formData) => {
+                setProductStatus("active"); // Set status to active
+                onSubmit({ ...formData, status: "active" }); // Pass the updated status directly
+              })}
+            >
+              Publish <MdOutlineFileUpload size={18} />
+            </Button>
+          }
+
+          <button type='submit' className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-1.5 rounded-md flex items-center gap-2 text-sm'>
+            Save Changes
           </button>
         </div>
       </form>

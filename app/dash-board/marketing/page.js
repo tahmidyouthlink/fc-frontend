@@ -2,7 +2,7 @@
 import { Button } from '@nextui-org/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import promo from "../../../public/card-images/promo.jpg";
 import specialOffer from "../../../public/card-images/special-offer.jpg";
 import RecentPromotions from '@/app/components/layout/RecentPromotions';
@@ -12,6 +12,23 @@ const Marketing = () => {
 
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('view performance');
+
+  // Ensure the code runs only on the client
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedTab = localStorage.getItem('activeTabMarketingPage');
+      if (savedTab) {
+        setActiveTab(savedTab);
+      }
+    }
+  }, []);
+
+  // Save the activeTab to localStorage when it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('activeTabMarketingPage', activeTab);
+    }
+  }, [activeTab]);
 
   return (
     <div className='px-6 md:px-10'>
@@ -42,6 +59,18 @@ const Marketing = () => {
             onClick={() => setActiveTab('create promotions')}
           >
             Create Promotions
+          </button>
+
+          <button
+            className={`relative text-sm py-1 transition-all duration-300
+        ${activeTab === 'marketing content' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
+        after:absolute after:left-0 after:right-0 after:bottom-0 
+        after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300
+        ${activeTab === 'marketing content' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
+      `}
+            onClick={() => setActiveTab('marketing content')}
+          >
+            Marketing Content
           </button>
 
         </div>
@@ -149,6 +178,12 @@ const Marketing = () => {
             </div>
           </div>
         </div>
+
+      </div>
+      }
+      {activeTab === "marketing content" && <div className='pt-6'>
+        <h1 className='font-bold text-xl'>Recommended For You</h1>
+        <p className='pt-1 pb-8 text-neutral-400 font-medium'>Our recommendations are tailored to suit your fashion commerce and customer preferences.</p>
 
       </div>
       }

@@ -2,10 +2,9 @@
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useColors from '@/app/hooks/useColors';
-import { Button } from '@nextui-org/react';
-import Link from 'next/link';
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { MdDeleteOutline } from 'react-icons/md';
 
@@ -14,55 +13,43 @@ const ColorsPage = () => {
   const [colorList, isColorPending, refetchColors] = useColors();
   const axiosPublic = useAxiosPublic();
   const router = useRouter();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [colorId, setColorId] = useState(null);
 
-  const handleDeleteColor = (id) => {
-    toast((t) => (
-      <div className="flex flex-col items-center p-4 bg-white rounded-lg w-80">
-        <span className="mb-3 text-lg text-center">Are you sure you want to delete this color?</span>
-        <div className="flex justify-between w-full">
-          <button
-            onClick={async () => {
-              const res = await axiosPublic.delete(`/deleteColor/${id}`);
-              if (res?.data?.deletedCount) {
-                refetchColors();
-                toast.success((t) => (
-                  <span>
-                    Color has been deleted.
-                    <button onClick={() => toast.dismiss(t.id)} className="ml-2 text-blue-500 underline">
-                      Dismiss
-                    </button>
-                  </span>
-                ));
-              } else {
-                toast.error("Failed to delete the color.");
-              }
-              toast.dismiss(t.id); // Dismiss the confirmation toast
-            }}
-            className="px-4 py-2 text-white bg-green-600 rounded-md hover:bg-green-700 transition"
-          >
-            Yes
-          </button>
-          <button
-            onClick={() => toast.dismiss(t.id)} // Dismiss the confirmation toast
-            className="px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-700 transition"
-          >
-            No
-          </button>
-        </div>
-      </div>
-    ));
+  const handleDeleteColor = async (colorId) => {
+    try {
+      const res = await axiosPublic.delete(`/deleteColor/${colorId}`);
+      if (res?.data?.deletedCount) {
+        refetchColors(); // Call your refetch function to refresh data
+        toast.success('Color deleted successfully!');
+      }
+    } catch (error) {
+      toast.error('Failed to delete color. Please try again.');
+    }
+  };
+
+  const confirmDelete = () => {
+    if (colorId) {
+      handleDeleteColor(colorId);
+    }
+    onOpenChange(false); // Close the modal
+    setColorId(null); // Reset the colorId
+  };
+
+  const openModal = (id) => {
+    setColorId(id); // Set the colorId for the deletion
+    onOpen(); // Open the modal
   };
 
   if (isColorPending) {
     return <Loading />
   }
 
-
   return (
     <div className='relative'>
-      <div className='sticky top-0 z-10 bg-white flex items-center justify-between px-6'>
+      <div className='sticky top-0 z-10 bg-white flex items-center justify-between p-6'>
         <h1 className='font-semibold text-center md:text-xl lg:text-2xl'>Color Management</h1>
-        <Button onClick={() => router.push('/dash-board/colors/add-color')} className='mt-6 bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium'>
+        <Button onClick={() => router.push('/dash-board/colors/add-color')} className='bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium'>
           New Color
         </Button>
       </div>
@@ -85,11 +72,31 @@ const ColorsPage = () => {
                 />
                 {color?.value}
               </p>
-              <MdDeleteOutline onClick={() => handleDeleteColor(color?._id)} className='text-red-800 hover:text-red-950 text-2xl cursor-pointer' />
+              <Button size="sm" className="text-xs" color="danger" variant="light" onPress={() => openModal(color?._id)}><MdDeleteOutline className='text-red-800 hover:text-red-950 text-xl cursor-pointer' /></Button>
             </div>
           ))}
         </div>
       </div>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>Confirm Deletion</ModalHeader>
+              <ModalBody className='modal-body-scroll'>
+                <p>Are you sure you want to delete this Color?</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" size="sm" variant="flat" onPress={confirmDelete}>
+                  Yes
+                </Button>
+                <Button variant="flat" size="sm" onPress={onClose}>
+                  No
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

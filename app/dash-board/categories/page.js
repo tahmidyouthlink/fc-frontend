@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
-import { Button } from '@nextui-org/react';
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import useCategories from '@/app/hooks/useCategories';
@@ -12,47 +12,32 @@ const CategoriesOverview = () => {
   const router = useRouter();
   const [categoryList, isCategoryPending, refetch] = useCategories();
   const [expandedCategory, setExpandedCategory] = useState(null);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [categoryId, setCategoryId] = useState(null);
 
-  const handleDelete = (categoryId) => {
-    toast((t) => (
-      <div className="flex flex-col items-center p-4 bg-white rounded-lg w-80">
-        <span className="mb-3 text-lg text-center">Are you sure you want to delete this category?</span>
-        <div className="flex justify-between w-full">
-          <button
-            onClick={async () => {
-              try {
-                const res = await axiosPublic.delete(`/deleteCategory/${categoryId}`);
-                if (res?.data?.deletedCount) {
-                  refetch();
-                  toast.success((t) => (
-                    <span>
-                      Category has been deleted.
-                      <button onClick={() => toast.dismiss(t.id)} className="ml-2 text-blue-500 underline">
-                        Dismiss
-                      </button>
-                    </span>
-                  ));
-                } else {
-                  toast.error("Failed to delete the category.");
-                }
-              } catch (error) {
-                toast.error('Failed to delete the category. Please try again.');
-              }
-              toast.dismiss(t.id); // Dismiss the confirmation toast
-            }}
-            className="px-4 py-2 text-white bg-green-600 rounded-md hover:bg-green-700 transition"
-          >
-            Yes
-          </button>
-          <button
-            onClick={() => toast.dismiss(t.id)} // Dismiss the confirmation toast
-            className="px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-700 transition"
-          >
-            No
-          </button>
-        </div>
-      </div>
-    ));
+  const handleDelete = async (categoryId) => {
+    try {
+      const res = await axiosPublic.delete(`/deleteCategory/${categoryId}`);
+      if (res?.data?.deletedCount) {
+        refetch(); // Call your refetch function to refresh data
+        toast.success('Category deleted successfully!');
+      }
+    } catch (error) {
+      toast.error('Failed to delete category. Please try again.');
+    }
+  };
+
+  const confirmDelete = () => {
+    if (categoryId) {
+      handleDelete(categoryId);
+    }
+    onOpenChange(false); // Close the modal
+    setCategoryId(null); // Reset the categoryId
+  };
+
+  const openModal = (id) => {
+    setCategoryId(id); // Set the categoryId for the deletion
+    onOpen(); // Open the modal
   };
 
   const toggleSubCategoriesVisibility = (categoryId) => {
@@ -66,9 +51,9 @@ const CategoriesOverview = () => {
   return (
     <div className='bg-gray-50 min-h-screen'>
 
-      <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between max-w-screen-2xl mx-auto px-6'>
+      <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between max-w-screen-2xl mx-auto px-6 pt-6'>
         <h1 className='font-semibold text-center md:text-xl lg:text-2xl'>Category Management</h1>
-        <Button onClick={() => router.push('/dash-board/categories/add-category')} className='mt-6 bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium'>
+        <Button onClick={() => router.push('/dash-board/categories/add-category')} className='bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium'>
           New Category
         </Button>
       </div>
@@ -99,22 +84,38 @@ const CategoriesOverview = () => {
             </div>
             <div className='flex gap-2 mt-4'>
               {/* Edit Button */}
-              <Button
+              <Button size='sm'
                 onClick={() => router.push(`/dash-board/categories/${category._id}`)}
                 className='bg-[#9F5216] text-white'>
                 Edit Category
               </Button>
               {/* Delete Button */}
-              <Button
-                onClick={() => handleDelete(category._id)}
-                color="danger"
-                variant="light">
-                Delete Category
-              </Button>
+              <Button size="sm" className="text-xs" color="danger" variant="light" onPress={() => openModal(category?._id)}>Delete Category</Button>
             </div>
           </div>
         ))}
       </div>
+
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>Confirm Deletion</ModalHeader>
+              <ModalBody className='modal-body-scroll'>
+                <p>Are you sure you want to delete this Category?</p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" size="sm" variant="flat" onPress={confirmDelete}>
+                  Yes
+                </Button>
+                <Button variant="flat" size="sm" onPress={onClose}>
+                  No
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
 
     </div>
   );

@@ -37,7 +37,7 @@ const SecondStepOfAddProduct = () => {
       for (const color of storedColors) {
         for (const size of storedSizes) {
           if (!variants.some(variant => variant.color.value === color.value && variant.size === size)) {
-            variants.push({ color, size, sku: "", batchCode: "", weight: "", imageUrl: "" });
+            variants.push({ color, size, sku: "", imageUrl: "" });
           }
         }
       }
@@ -48,8 +48,6 @@ const SecondStepOfAddProduct = () => {
       // Set form values for stored variants
       variants.forEach((variant, index) => {
         setValue(`sku-${index}`, variant.sku);
-        setValue(`batchCode-${index}`, variant.batchCode);
-        setValue(`weight-${index}`, variant.weight);
         setValue(`imageUrl-${index}`, variant.imageUrl); // Set the image URL
       });
     } catch (e) {
@@ -61,11 +59,6 @@ const SecondStepOfAddProduct = () => {
     const updatedVariants = [...productVariants];
     updatedVariants[index][field] = value;
     setProductVariants(updatedVariants);
-  };
-
-  const handleBatchCodeChange = (index, e) => {
-    const uppercaseValue = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    handleVariantChange(index, 'batchCode', uppercaseValue);
   };
 
   const onImageClick = (variantIndex, imgUrl) => {
@@ -95,8 +88,6 @@ const SecondStepOfAddProduct = () => {
         color: variant.color,
         size: variant.size,
         sku: parseFloat(data[`sku-${index}`]),
-        batchCode: data[`batchCode-${index}`],
-        weight: parseFloat(data[`weight-${index}`]),
         imageUrl: data[`imageUrl-${index}`] || ""
       }));
 
@@ -147,22 +138,6 @@ const SecondStepOfAddProduct = () => {
                     readOnly
                   />
                 </div>
-                <div className='w-1/3'>
-                  <label htmlFor={`weight-${index}`} className='font-medium text-[#9F5216]'>Weight</label>
-                  <input
-                    id={`weight-${index}`}
-                    {...register(`weight-${index}`, { required: true })}
-                    value={variant.weight}
-                    onChange={(e) => handleVariantChange(index, 'weight', e.target.value)}
-                    className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                    type="number"
-                  />
-                  {errors[`weight-${index}`] && (
-                    <p className="text-red-600 text-left">Weight is required</p>
-                  )}
-                </div>
-              </div>
-              <div className='flex items-center gap-2 md:gap-4'>
                 <div className='md:w-1/3'>
                   <label htmlFor={`sku-${index}`} className='font-medium text-[#9F5216]'>SKU</label>
                   <input
@@ -176,27 +151,6 @@ const SecondStepOfAddProduct = () => {
                   />
                   {errors[`sku-${index}`] && (
                     <p className="text-red-600 text-left">SKU is required</p>
-                  )}
-                </div>
-                <div className='md:w-1/3'>
-                  <label htmlFor={`batchCode-${index}`} className='font-medium text-[#9F5216]'>Batch Code</label>
-                  <input
-                    id={`batchCode-${index}`}
-                    autocomplete="off"
-                    {...register(`batchCode-${index}`, {
-                      required: 'Batch Code is required',
-                      pattern: {
-                        value: /^[A-Z0-9]*$/,
-                        message: 'Batch Code must be alphanumeric and uppercase',
-                      },
-                    })}
-                    value={variant.batchCode}
-                    onChange={(e) => handleBatchCodeChange(index, e)}
-                    className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                    type="text"
-                  />
-                  {errors[`batchCode-${index}`] && (
-                    <p className="text-red-600 text-left">{errors[`batchCode-${index}`].message}</p>
                   )}
                 </div>
               </div>
