@@ -310,11 +310,14 @@ const ThirdStepOfAddProduct = () => {
 
   return (
     <div className='min-h-screen'>
-      <h3 className='font-semibold text-xl md:text-2xl px-6 2xl:px-0 py-6 max-w-screen-xl mx-auto'>Select Shipping Details</h3>
 
-      <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto mt-6'>
+      <div className='max-w-screen-xl mx-auto sticky top-0 z-10'>
+        <h3 className='text-left bg-white font-semibold text-xl md:text-2xl px-6 py-6'>Add Select Shipping Details</h3>
+      </div>
 
-        <div className="overflow-x-auto min-h-[700px]">
+      <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto mt-6 min-h-[85vh] flex flex-col justify-between'>
+
+        <div className="overflow-x-auto">
           <table className="min-w-full table-auto">
             <thead>
               <tr>

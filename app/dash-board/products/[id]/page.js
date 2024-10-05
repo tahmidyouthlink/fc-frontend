@@ -76,6 +76,7 @@ const EditProductPage = () => {
   const [shippingList, isShippingPending] = useShippingZones();
   const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
   const [productStatus, setProductStatus] = useState("");
+  const [productId, setProductId] = useState("");
 
   const toggleCardSelection = (shipping) => {
     const isSelected = selectedShipmentHandler.some(
@@ -312,6 +313,8 @@ const EditProductPage = () => {
     const fetchProductDetails = async () => {
       try {
         const { data } = await axiosPublic.get(`/singleProduct/${id}`);
+        console.log(data);
+
         setValue('productTitle', data?.productTitle);
         setValue('batchCode', data?.batchCode);
         setValue('weight', data?.weight);
@@ -332,6 +335,7 @@ const EditProductPage = () => {
         setSelectedVendors(data?.vendors);
         setSelectedTags(data?.tags);
         initializeVariants(data?.availableColors || [], data?.allSizes || [], data?.productVariants || []);
+        setProductId(data?.productId);
         setProductStatus(data?.status);
         setSelectedShipmentHandler(data?.shippingDetails || []);
 
@@ -400,6 +404,8 @@ const EditProductPage = () => {
       setNewArrivalError(true); // Hide error if at least one color is selected
     }
   };
+
+  const totalSku = productVariants?.reduce((sum, variant) => sum + variant.sku, 0);
 
   const onSubmit = async (data) => {
     try {
@@ -548,6 +554,7 @@ const EditProductPage = () => {
           <div className='grid grid-cols-1 lg:grid-cols-12'>
             <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 md:mt-2 px-6 py-3'>
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+                <p className='w-full'>Product ID: <strong>{productId}</strong></p>
                 <label htmlFor='productTitle' className='flex justify-start font-medium text-[#9F5216]'>Product Title *</label>
                 <input id='productTitle' {...register("productTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" placeholder='Enter Product Title' type="text" />
                 {errors.productTitle?.type === "required" && (
@@ -928,7 +935,16 @@ const EditProductPage = () => {
 
         <div className='bg-white pb-4 xl:pb-8'>
           <div className='2xl:max-w-screen-2xl 2xl:mx-auto mt-4 xl:mt-8'>
-            <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl px-6 pt-2 md:pt-6'>Update Inventory Variants</h3>
+            <div className='flex items-center justify-between  px-6 pt-2 md:pt-6'>
+              <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl'>Update Inventory Variants</h3>
+              <p className="font-semibold text-xl md:text-2xl xl:text-3xl">
+                {productVariants?.length > 0 ? (
+                  `${productVariants.reduce((acc, variant) => acc + Number(variant.sku), 0)} ${productVariants.reduce((acc, variant) => acc + Number(variant.sku), 0) === 1 ? 'Item' : 'Items'}`
+                ) : (
+                  'No Items'
+                )}
+              </p>
+            </div>
             <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 px-6 py-6'>
               {productVariants?.map((variant, index) => (
                 <div key={index} className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>

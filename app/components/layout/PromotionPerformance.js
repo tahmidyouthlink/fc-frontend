@@ -164,33 +164,35 @@ const PromotionPerformanceChart = () => {
     const isTodayOrYesterday = activeFilter === 'today' || activeFilter === 'yesterday';
     if (!isTodayOrYesterday) return [];
 
+    // Normalize the start and end date to include the full day range
     const startDateObj = new Date(filterStartDate);
     const endDateObj = new Date(filterEndDate);
-
     const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0));
     const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999));
 
-    const hourlyData = Array(24).fill().map((_, hour) => ({
+    // Initialize an array to hold hourly data
+    const hourlyData = Array.from({ length: 24 }, (_, hour) => ({
       hour: `${hour}:00`,
       discountedAmount: 0,
       discountedOrders: 0,
     }));
 
-    // Filter orders within the date range
+    // Filter and process each order
     orderList?.forEach((order) => {
       const orderDate = parseDate(order.dateTime);
+
       // Check if the order is within the specified date range
       if (orderDate >= adjustedStartDate && orderDate <= adjustedEndDate) {
         const hour = orderDate.getHours();
-
-        let promoDiscount = 0;
         let offerDiscount = 0;
-        let offerAppliedCount = 0;
+        let promoDiscount = 0;
+        let hasOfferApplied = false;
+        let hasPromoApplied = false;
 
         // Calculate total offer discounts for the order
         order.productInformation.forEach((product) => {
           if (product.offerTitle?.trim()) {
-            offerAppliedCount += 1;
+            hasOfferApplied = true; // Track if any offer is applied
             let productTotal = product.unitPrice * product.sku;
             let productOfferDiscount = 0;
 
@@ -209,6 +211,7 @@ const PromotionPerformanceChart = () => {
 
         // Calculate promo discount based on adjusted order total
         if (order.promoCode?.trim()) {
+          hasPromoApplied = true; // Track if promo code is applied
           if (order.promoDiscountType === 'Percentage') {
             promoDiscount = (order.promoDiscountValue / 100) * adjustedOrderTotal;
           } else {
@@ -216,12 +219,19 @@ const PromotionPerformanceChart = () => {
           }
         }
 
+        // Calculate total discount from offers and promo codes
         const totalOrderDiscount = offerDiscount + promoDiscount;
 
         // Update the hourly data
         hourlyData[hour].discountedAmount += totalOrderDiscount;
-        hourlyData[hour].discountedOrders +=
-          offerDiscount > 0 || promoDiscount > 0 ? 1 : 0;
+
+        // Increment discountedOrders for each type of discount applied
+        if (hasOfferApplied) {
+          hourlyData[hour].discountedOrders += 1;
+        }
+        if (hasPromoApplied) {
+          hourlyData[hour].discountedOrders += 1;
+        }
       }
     });
 
@@ -229,25 +239,31 @@ const PromotionPerformanceChart = () => {
   }, [orderList, filterStartDate, filterEndDate, activeFilter]);
 
   const dailyData = useMemo(() => {
+    if (!filterStartDate || !filterEndDate) return []; // Return empty if filters are not set
+
+    const startDateObj = new Date(filterStartDate);
+    const endDateObj = new Date(filterEndDate);
+    endDateObj.setHours(23, 59, 59, 999); // Set to end of the day
+
+    // Initialize an object to hold daily data
     const dailyData = {};
 
+    // Filter and process each order
     orderList?.forEach((order) => {
       const orderDate = parseDate(order.dateTime);
       const orderDateFormatted = format(orderDate, 'yyyy-MM-dd');
 
-      // Check if orderDate is within the selected date range
-      if (
-        orderDateFormatted >= filterStartDate &&
-        orderDateFormatted <= filterEndDate
-      ) {
-        let promoDiscount = 0;
+      // Check if the order is within the specified date range
+      if (orderDate >= startDateObj && orderDate <= endDateObj) {
         let offerDiscount = 0;
-        let offerAppliedCount = 0;
+        let promoDiscount = 0;
+        let hasOfferApplied = false;
+        let hasPromoApplied = false;
 
         // Calculate total offer discounts for the order
         order.productInformation.forEach((product) => {
           if (product.offerTitle?.trim()) {
-            offerAppliedCount += 1;
+            hasOfferApplied = true; // Track if any offer is applied
             let productTotal = product.unitPrice * product.sku;
             let productOfferDiscount = 0;
 
@@ -266,6 +282,7 @@ const PromotionPerformanceChart = () => {
 
         // Calculate promo discount based on adjusted order total
         if (order.promoCode?.trim()) {
+          hasPromoApplied = true; // Track if promo code is applied
           if (order.promoDiscountType === 'Percentage') {
             promoDiscount = (order.promoDiscountValue / 100) * adjustedOrderTotal;
           } else {
@@ -273,25 +290,37 @@ const PromotionPerformanceChart = () => {
           }
         }
 
-        const totalOrderDiscount = offerDiscount + promoDiscount;
-
+        // Initialize dailyData for the specific date if it doesn't exist
         if (!dailyData[orderDateFormatted]) {
           dailyData[orderDateFormatted] = {
             discountedAmount: 0,
             discountedOrders: 0,
+            offerCount: 0,
+            promoCount: 0,
           };
         }
 
-        dailyData[orderDateFormatted].discountedAmount += totalOrderDiscount;
-        dailyData[orderDateFormatted].discountedOrders +=
-          offerDiscount > 0 || promoDiscount > 0 ? 1 : 0;
+        // Update the daily data with the calculated discounts
+        dailyData[orderDateFormatted].discountedAmount += offerDiscount + promoDiscount;
+
+        // Increment discountedOrders for each type of discount applied
+        if (hasOfferApplied) {
+          dailyData[orderDateFormatted].discountedOrders += 1; // Count this order as discounted
+          dailyData[orderDateFormatted].offerCount += 1; // Count individual offer application
+        }
+        if (hasPromoApplied) {
+          dailyData[orderDateFormatted].discountedOrders += 1; // Count this order as discounted
+          dailyData[orderDateFormatted].promoCount += 1; // Count individual promo application
+        }
       }
     });
 
+    // Create a final array for bar chart
     return Object.keys(dailyData).map((date) => ({
       date,
       discountedAmount: dailyData[date].discountedAmount.toFixed(2),
       discountedOrders: dailyData[date].discountedOrders,
+      totalPromoAndOfferApplied: dailyData[date].offerCount + dailyData[date].promoCount, // Total applied count
     }));
   }, [orderList, filterStartDate, filterEndDate]);
 

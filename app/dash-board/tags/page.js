@@ -2,63 +2,74 @@
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useTags from '@/app/hooks/useTags';
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
+import { Button } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React from 'react';
 import toast from 'react-hot-toast';
 import { MdDeleteOutline } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
+import Swal from 'sweetalert2';
 
 const TagsPage = () => {
 
   const [tagList, isTagPending, refetchTags] = useTags();
   const axiosPublic = useAxiosPublic();
   const router = useRouter();
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [tagId, setTagId] = useState(null);
 
   const handleDeleteTag = async (tagId) => {
-    try {
-      const res = await axiosPublic.delete(`/deleteTag/${tagId}`);
-      if (res?.data?.deletedCount) {
-        refetchTags(); // Call your refetch function to refresh data
-        toast.custom((t) => (
-          <div
-            className={`${t.visible ? 'animate-enter' : 'animate-leave'
-              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
-          >
-            <div className="pl-6">
-              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
-            </div>
-            <div className="flex-1 w-0 p-4">
-              <div className="flex items-start">
-                <div className="ml-3 flex-1">
-                  <p className="text-base font-bold text-gray-900">
-                    Tag Removed!
-                  </p>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Tag has been removed successfully!
-                  </p>
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await axiosPublic.delete(`/deleteTag/${tagId}`);
+          if (res?.data?.deletedCount) {
+            refetchTags(); // Call your refetch function to refresh data
+            toast.custom((t) => (
+              <div
+                className={`${t.visible ? 'animate-enter' : 'animate-leave'
+                  } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+              >
+                <div className="pl-6">
+                  <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+                </div>
+                <div className="flex-1 w-0 p-4">
+                  <div className="flex items-start">
+                    <div className="ml-3 flex-1">
+                      <p className="text-base font-bold text-gray-900">
+                        Tag Removed!
+                      </p>
+                      <p className="mt-1 text-sm text-gray-500">
+                        Tag has been removed successfully!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex border-l border-gray-200">
+                  <button
+                    onClick={() => toast.dismiss(t.id)}
+                    className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+                  >
+                    <RxCross2 />
+                  </button>
                 </div>
               </div>
-            </div>
-            <div className="flex border-l border-gray-200">
-              <button
-                onClick={() => toast.dismiss(t.id)}
-                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
-              >
-                <RxCross2 />
-              </button>
-            </div>
-          </div>
-        ), {
-          position: "bottom-right",
-          duration: 5000
-        })
+            ), {
+              position: "bottom-right",
+              duration: 5000
+            })
+          }
+        } catch (error) {
+          toast.error('Failed to delete Tag. Please try again.');
+        }
       }
-    } catch (error) {
-      toast.error('Failed to delete Tag. Please try again.');
-    }
+    });
   };
 
   const confirmDelete = () => {
@@ -94,31 +105,11 @@ const TagsPage = () => {
               <p className='flex text-[15px] items-center gap-0.5 md:gap-1 p-2 w-full'>
                 {tag?.value}
               </p>
-              <Button size="sm" className="text-xs" color="danger" variant="light" onPress={() => openModal(tag?._id)}><MdDeleteOutline className='text-red-800 hover:text-red-950 text-xl cursor-pointer' /></Button>
+              <Button size="sm" className="text-xs" color="danger" variant="light" onClick={() => handleDeleteTag(tag?._id)}><MdDeleteOutline className='text-red-800 hover:text-red-950 text-xl cursor-pointer' /></Button>
             </div>
           ))}
         </div>
       </div>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader>Confirm Deletion</ModalHeader>
-              <ModalBody className='modal-body-scroll'>
-                <p>Are you sure you want to delete this Color?</p>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" size="sm" variant="flat" onPress={confirmDelete}>
-                  Yes
-                </Button>
-                <Button variant="flat" size="sm" onPress={onClose}>
-                  No
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
     </div>
   );
 };

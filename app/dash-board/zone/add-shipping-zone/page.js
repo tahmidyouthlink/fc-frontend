@@ -15,6 +15,7 @@ import { FaArrowLeft } from 'react-icons/fa6';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
+import Swal from 'sweetalert2';
 
 const AddShippingZone = () => {
   const axiosPublic = useAxiosPublic();
@@ -53,47 +54,59 @@ const AddShippingZone = () => {
 
   const handleDeleteShipmentHandler = async (e, id) => {
     e.preventDefault(); // Prevent form submission
-    try {
-      const res = await axiosPublic.delete(`/deleteShipmentHandler/${id}`);
-      if (res?.data?.deletedCount) {
-        refetch();
-        toast.custom((t) => (
-          <div
-            className={`${t.visible ? 'animate-enter' : 'animate-leave'
-              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
-          >
-            <div className="pl-6">
-              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
-            </div>
-            <div className="flex-1 w-0 p-4">
-              <div className="flex items-start">
-                <div className="ml-3 flex-1">
-                  <p className="text-base font-bold text-gray-900">
-                    Shipment Removed!
-                  </p>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Shipment Handler deleted successfully!
-                  </p>
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await axiosPublic.delete(`/deleteShipmentHandler/${id}`);
+          if (res?.data?.deletedCount) {
+            refetch();
+            toast.custom((t) => (
+              <div
+                className={`${t.visible ? 'animate-enter' : 'animate-leave'
+                  } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+              >
+                <div className="pl-6">
+                  <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+                </div>
+                <div className="flex-1 w-0 p-4">
+                  <div className="flex items-start">
+                    <div className="ml-3 flex-1">
+                      <p className="text-base font-bold text-gray-900">
+                        Shipment Removed!
+                      </p>
+                      <p className="mt-1 text-sm text-gray-500">
+                        Shipment Handler deleted successfully!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex border-l border-gray-200">
+                  <button
+                    onClick={() => toast.dismiss(t.id)}
+                    className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+                  >
+                    <RxCross2 />
+                  </button>
                 </div>
               </div>
-            </div>
-            <div className="flex border-l border-gray-200">
-              <button
-                onClick={() => toast.dismiss(t.id)}
-                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
-              >
-                <RxCross2 />
-              </button>
-            </div>
-          </div>
-        ), {
-          position: "bottom-right",
-          duration: 5000
-        })
+            ), {
+              position: "bottom-right",
+              duration: 5000
+            })
+          }
+        } catch (error) {
+          toast.error('Failed to delete this shipment handler. Please try again!');
+        }
       }
-    } catch (error) {
-      toast.error('Failed to delete this shipment handler. Please try again!');
-    }
+    });
   };
 
   // Reset shipping charge fields when the selected shipment handler changes

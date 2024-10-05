@@ -245,9 +245,11 @@ const SecondStepOfAddProduct = () => {
 
   return (
     <div className='bg-gray-50 min-h-screen'>
-      <h3 className='text-center font-semibold text-xl md:text-2xl px-6 pt-6'>Add Inventory Variants</h3>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 mt-6 px-6 lg:px-8 xl:px-10 2xl:px-12 py-3'>
+      <div className='max-w-screen-2xl mx-auto sticky top-0 z-10'>
+        <h3 className='text-left bg-gray-50 font-semibold text-xl md:text-2xl px-6 py-6'>Add Inventory Variants</h3>
+      </div>
+      <form onSubmit={handleSubmit(onSubmit)} className='min-h-[90vh] flex flex-col justify-between'>
+        <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 px-6 lg:px-8 xl:px-10 2xl:px-12 py-3'>
           {productVariants?.map((variant, index) => (
             <div key={index} className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
               <div className='flex items-center gap-2 md:gap-4'>
@@ -294,7 +296,7 @@ const SecondStepOfAddProduct = () => {
                       className={`image-container ${variant.imageUrl === url ? 'selected' : ''}`}
                       onClick={() => onImageClick(index, url)}
                     >
-                      <Image src={url} alt={`image-${imgIndex}`} width={800} height={800} className="rounded-md" />
+                      <Image src={url} alt={`image-${imgIndex}`} width={800} height={800} className="w-full min-h-60 object-cover rounded-md" />
                     </div>
                   ))}
                 </div>

@@ -243,16 +243,17 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 /* Styles for expired state */
 .custom-switch-slider.expired {
   cursor: not-allowed; /* Cursor for expired state */
-  background-color: #e0e0e0; /* Disabled color */
+  background-color: #e0e0e0a8; /* Disabled color */
 }
 
 /* Custom scrollbar styling */
 .custom-scrollbar::-webkit-scrollbar {
   height: 6px; /* Thin scrollbar */
+  width: 6px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #888; /* Scrollbar color */
+  background-color: #f9fafb; /* Scrollbar color */
   border-radius: 10px; /* Rounded edges */
 }
 

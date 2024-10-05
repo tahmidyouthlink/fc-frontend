@@ -562,7 +562,7 @@ const FirstStepOfAddProduct = () => {
   return (
     <div className='bg-gray-50 min-h-screen'>
 
-      <div className='max-w-screen-2xl mx-auto pt-3 md:pt-6 px-6'>
+      <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
         <div className='flex items-center justify-between'>
           <h3 className='w-full font-semibold text-xl lg:text-2xl'>Product Configuration</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/products"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
@@ -572,7 +572,7 @@ const FirstStepOfAddProduct = () => {
       <form className='2xl:max-w-screen-2xl 2xl:mx-auto' onSubmit={handleSubmit(onSubmit)}>
         <div className='grid grid-cols-1 lg:grid-cols-12'>
 
-          <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 mt-6 px-6 py-3'>
+          <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 px-6 py-3'>
             <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
               <label htmlFor='productTitle' className='flex justify-start font-medium text-[#9F5216]'>Product Title *</label>
               <input id='productTitle' {...register("productTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" placeholder='Enter Product Title' type="text" />
@@ -969,9 +969,9 @@ const FirstStepOfAddProduct = () => {
                                     <Image
                                       src={url}
                                       alt={`Uploaded image ${index + 1}`}
-                                      height={100}
-                                      width={200}
-                                      className='w-full h-auto rounded-md'
+                                      height={1000}
+                                      width={1000}
+                                      className='w-full h-auto rounded-md object-cover'
                                     />
                                     <button
                                       onClick={() => handleImageRemove(index)}

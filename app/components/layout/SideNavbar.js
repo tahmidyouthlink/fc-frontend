@@ -19,7 +19,7 @@ import { LiaUserLockSolid } from "react-icons/lia";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { LuWarehouse } from "react-icons/lu";
 import { BsTags } from "react-icons/bs";
-import { FaRegIdCard } from "react-icons/fa";
+import { CiMedal } from "react-icons/ci";
 import { BsBoxSeam } from "react-icons/bs";
 
 const SideNavbar = ({ onClose }) => {
@@ -71,7 +71,7 @@ const SideNavbar = ({ onClose }) => {
       icon: <MdOutlineSettings />,
       links: [
         { label: 'Permissions', link: '/dash-board/permissions', icon: <LiaUserLockSolid /> },
-        { label: 'Reward Level', link: '/dash-board/reward-level', icon: <FaRegIdCard /> },
+        { label: 'Reward Level', link: '/dash-board/reward-level', icon: <CiMedal /> },
         { label: 'Shipment', link: '/dash-board/zone', icon: <BsBoxSeam /> },
         { label: 'Payment Methods', link: '/dash-board/payment-methods', icon: <MdPayment /> },
         { label: 'Categories', link: '/dash-board/categories', icon: <BiCategory /> },
@@ -83,7 +83,7 @@ const SideNavbar = ({ onClose }) => {
   ];
 
   return (
-    <div className="h-screen w-full md:w-[220px] lg:w-[250px] xl:w-[280px] 2xl:w-[300px] fixed z-50 overflow-y-auto scroll-smooth bg-gradient-to-t from-[#9f511655] to-[#9f511616]">
+    <div className="h-screen w-full md:w-[220px] lg:w-[250px] xl:w-[280px] 2xl:w-[300px] fixed z-50 overflow-y-auto custom-scrollbar bg-gradient-to-t from-[#9f511655] to-[#9f511616]">
       <button onClick={onClose} className="md:hidden p-2 absolute right-2 top-2">
         <ImCross size={20} />
       </button>

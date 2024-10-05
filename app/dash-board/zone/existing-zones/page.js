@@ -2,77 +2,75 @@
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useShippingZones from '@/app/hooks/useShippingZones';
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
+import { Button } from '@nextui-org/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React from 'react';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
+import Swal from 'sweetalert2';
 
 const ExistingZones = () => {
 
   const axiosPublic = useAxiosPublic();
   const [shippingList, isShippingPending, refetch] = useShippingZones();
   const router = useRouter();
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [zoneId, setZoneId] = useState(null);
 
   const handleDelete = async (zoneId) => {
-    try {
-      const res = await axiosPublic.delete(`/deleteShippingZone/${zoneId}`);
-      if (res?.data?.deletedCount) {
-        refetch(); // Call your refetch function to refresh data
-        toast.custom((t) => (
-          <div
-            className={`${t.visible ? 'animate-enter' : 'animate-leave'
-              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
-          >
-            <div className="pl-6">
-              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
-            </div>
-            <div className="flex-1 w-0 p-4">
-              <div className="flex items-start">
-                <div className="ml-3 flex-1">
-                  <p className="text-base font-bold text-gray-900">
-                    Shipment Removed!
-                  </p>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Shipment Handler deleted successfully!
-                  </p>
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await axiosPublic.delete(`/deleteShippingZone/${zoneId}`);
+          if (res?.data?.deletedCount) {
+            refetch(); // Call your refetch function to refresh data
+            toast.custom((t) => (
+              <div
+                className={`${t.visible ? 'animate-enter' : 'animate-leave'
+                  } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+              >
+                <div className="pl-6">
+                  <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+                </div>
+                <div className="flex-1 w-0 p-4">
+                  <div className="flex items-start">
+                    <div className="ml-3 flex-1">
+                      <p className="text-base font-bold text-gray-900">
+                        Shipment Removed!
+                      </p>
+                      <p className="mt-1 text-sm text-gray-500">
+                        Shipment Handler deleted successfully!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex border-l border-gray-200">
+                  <button
+                    onClick={() => toast.dismiss(t.id)}
+                    className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+                  >
+                    <RxCross2 />
+                  </button>
                 </div>
               </div>
-            </div>
-            <div className="flex border-l border-gray-200">
-              <button
-                onClick={() => toast.dismiss(t.id)}
-                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
-              >
-                <RxCross2 />
-              </button>
-            </div>
-          </div>
-        ), {
-          position: "bottom-right",
-          duration: 5000
-        })
+            ), {
+              position: "bottom-right",
+              duration: 5000
+            })
+          }
+        } catch (error) {
+          toast.error('Failed to delete shipping zone. Please try again.');
+        }
       }
-    } catch (error) {
-      toast.error('Failed to delete shipping zone. Please try again.');
-    }
-  };
-
-  const confirmDelete = () => {
-    if (zoneId) {
-      handleDelete(zoneId);
-    }
-    onOpenChange(false); // Close the modal
-    setZoneId(null); // Reset the zoneId
-  };
-
-  const openModal = (id) => {
-    setZoneId(id); // Set the zoneId for the deletion
-    onOpen(); // Open the modal
+    });
   };
 
   if (isShippingPending) {
@@ -130,7 +128,7 @@ const ExistingZones = () => {
                       Edit
                     </Button>
 
-                    <Button size="sm" className="text-xs" color="danger" variant="flat" onPress={() => openModal(zone?._id)}>Delete</Button>
+                    <Button size="sm" className="text-xs" color="danger" variant="flat" onPress={() => handleDelete(zone?._id)}>Delete</Button>
                   </div>
                 </td>
               </tr>
@@ -138,26 +136,6 @@ const ExistingZones = () => {
           </tbody>
         </table>
       </div>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader>Confirm Deletion</ModalHeader>
-              <ModalBody className='modal-body-scroll'>
-                <p>Are you sure you want to delete this Shipment?</p>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" size="sm" variant="flat" onPress={confirmDelete}>
-                  Yes
-                </Button>
-                <Button variant="flat" size="sm" onPress={onClose}>
-                  No
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
     </div>
   );
 };

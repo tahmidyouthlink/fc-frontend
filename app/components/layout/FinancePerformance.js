@@ -308,7 +308,7 @@ const FinancePerformance = () => {
   const maxHourlySSLCommerz = Math.max(...hourlyPaymentData.map(data => data.sslCommerzTransactions), 0);
 
   // Set the maximum value for the Y-axis (slightly above the highest transaction count, minimum of 20)
-  const maxYValue = Math.max(Math.ceil(Math.max(maxBKash, maxSSLCommerz, maxHourlyBKash, maxHourlySSLCommerz) * 1.1), 15); // Ensure minimum of 20
+  const maxYValue = Math.max(Math.ceil(Math.max(maxBKash, maxSSLCommerz, maxHourlyBKash, maxHourlySSLCommerz) * 1.1)); // Ensure minimum of 20
 
   if (isOrderPending) {
     return <SmallHeightLoading />;
