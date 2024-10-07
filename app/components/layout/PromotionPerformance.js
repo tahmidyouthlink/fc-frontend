@@ -9,7 +9,7 @@ import { IoMdClose } from 'react-icons/io';
 const PromotionPerformanceChart = () => {
   const [orderList, isOrderPending] = useOrders();
   const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
-  const [activeFilter, setActiveFilter] = useState('today');
+  const [activeFilter, setActiveFilter] = useState('all');
   const [showDateRangePicker, setShowDateRangePicker] = useState(true); // New state
   const [selected, setSelected] = useState(['totalDiscountedAmount', 'totalDiscountedOrders']);
 
@@ -21,7 +21,7 @@ const PromotionPerformanceChart = () => {
 
   useEffect(() => {
     // Set default date range to Today when the component mounts
-    handleDateFilter('today');
+    handleDateFilter('all');
   }, []);
 
   const parseDate = (dateString) => {
@@ -94,22 +94,23 @@ const PromotionPerformanceChart = () => {
     let totalPromoAndOfferApplied = 0;
     let totalDiscount = 0;
 
-    if (!filterStartDate || !filterEndDate) {
-      return { totalPromoAndOfferApplied, totalDiscount }; // No filter applied yet
-    }
+    // If activeFilter is "all", we ignore the date filters and calculate for all orders
+    const filteredOrders = activeFilter === "all" ? orderList?.filter((order) => order.paymentStatus === "Paid")
+      : orderList?.filter((order) => {
+        // Date filter only applies if activeFilter is not "all"
+        if (!filterStartDate || !filterEndDate) {
+          return false; // No filter applied yet, return empty
+        }
 
-    // Convert filter dates to Date objects and normalize them to start and end of day
-    const startDateObj = new Date(filterStartDate);
-    const endDateObj = new Date(filterEndDate);
+        const startDateObj = new Date(filterStartDate);
+        const endDateObj = new Date(filterEndDate);
+        const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0)); // Start of day
+        const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999)); // End of day
+        const orderDate = parseDate(order.dateTime);
 
-    const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0)); // Start of day
-    const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999)); // End of day
-
-    // Filter orders based on the normalized date range
-    const filteredOrders = orderList?.filter((order) => {
-      const orderDate = parseDate(order.dateTime);
-      return orderDate >= adjustedStartDate && orderDate <= adjustedEndDate;
-    });
+        // Return only orders that fall within the date range and are "Paid"
+        return orderDate >= adjustedStartDate && orderDate <= adjustedEndDate && order.paymentStatus === "Paid";
+      });
 
     filteredOrders?.forEach((order) => {
       let promoDiscount = 0;
@@ -156,7 +157,7 @@ const PromotionPerformanceChart = () => {
     });
 
     return { totalPromoAndOfferApplied, totalDiscount };
-  }, [orderList, filterStartDate, filterEndDate]);
+  }, [orderList, filterStartDate, filterEndDate, activeFilter]);
 
   const hourlyPromotionData = useMemo(() => {
     if (!filterStartDate || !filterEndDate) return [];
@@ -179,6 +180,7 @@ const PromotionPerformanceChart = () => {
 
     // Filter and process each order
     orderList?.forEach((order) => {
+      if (order.paymentStatus !== 'Paid') return;
       const orderDate = parseDate(order.dateTime);
 
       // Check if the order is within the specified date range
@@ -239,79 +241,88 @@ const PromotionPerformanceChart = () => {
   }, [orderList, filterStartDate, filterEndDate, activeFilter]);
 
   const dailyData = useMemo(() => {
-    if (!filterStartDate || !filterEndDate) return []; // Return empty if filters are not set
-
-    const startDateObj = new Date(filterStartDate);
-    const endDateObj = new Date(filterEndDate);
-    endDateObj.setHours(23, 59, 59, 999); // Set to end of the day
-
     // Initialize an object to hold daily data
     const dailyData = {};
 
-    // Filter and process each order
-    orderList?.forEach((order) => {
+    // Determine whether to filter by date based on activeFilter
+    let filteredOrders;
+    if (activeFilter === "all") {
+      // If activeFilter is "all", consider all "Paid" orders without date filtering
+      filteredOrders = orderList?.filter((order) => order.paymentStatus === "Paid");
+    } else {
+      // Apply date filtering if activeFilter is not "all"
+      if (!filterStartDate || !filterEndDate) return []; // Return empty if filters are not set
+
+      const startDateObj = new Date(filterStartDate);
+      const endDateObj = new Date(filterEndDate);
+      endDateObj.setHours(23, 59, 59, 999); // Set to end of the day
+
+      filteredOrders = orderList?.filter((order) => {
+        const orderDate = parseDate(order.dateTime);
+        return orderDate >= startDateObj && orderDate <= endDateObj && order.paymentStatus === "Paid";
+      });
+    }
+
+    // Process each filtered order
+    filteredOrders?.forEach((order) => {
       const orderDate = parseDate(order.dateTime);
       const orderDateFormatted = format(orderDate, 'yyyy-MM-dd');
+      let offerDiscount = 0;
+      let promoDiscount = 0;
+      let hasOfferApplied = false;
+      let hasPromoApplied = false;
 
-      // Check if the order is within the specified date range
-      if (orderDate >= startDateObj && orderDate <= endDateObj) {
-        let offerDiscount = 0;
-        let promoDiscount = 0;
-        let hasOfferApplied = false;
-        let hasPromoApplied = false;
+      // Calculate total offer discounts for the order
+      order.productInformation.forEach((product) => {
+        if (product.offerTitle?.trim()) {
+          hasOfferApplied = true; // Track if any offer is applied
+          let productTotal = product.unitPrice * product.sku;
+          let productOfferDiscount = 0;
 
-        // Calculate total offer discounts for the order
-        order.productInformation.forEach((product) => {
-          if (product.offerTitle?.trim()) {
-            hasOfferApplied = true; // Track if any offer is applied
-            let productTotal = product.unitPrice * product.sku;
-            let productOfferDiscount = 0;
-
-            if (product.offerDiscountType === 'Percentage') {
-              productOfferDiscount = (product.offerDiscountValue / 100) * productTotal;
-            } else {
-              productOfferDiscount = product.offerDiscountValue;
-            }
-
-            offerDiscount += productOfferDiscount;
-          }
-        });
-
-        // Calculate adjusted order total after offer discounts
-        const adjustedOrderTotal = order.totalAmount - offerDiscount;
-
-        // Calculate promo discount based on adjusted order total
-        if (order.promoCode?.trim()) {
-          hasPromoApplied = true; // Track if promo code is applied
-          if (order.promoDiscountType === 'Percentage') {
-            promoDiscount = (order.promoDiscountValue / 100) * adjustedOrderTotal;
+          if (product.offerDiscountType === 'Percentage') {
+            productOfferDiscount = (product.offerDiscountValue / 100) * productTotal;
           } else {
-            promoDiscount = order.promoDiscountValue;
+            productOfferDiscount = product.offerDiscountValue;
           }
-        }
 
-        // Initialize dailyData for the specific date if it doesn't exist
-        if (!dailyData[orderDateFormatted]) {
-          dailyData[orderDateFormatted] = {
-            discountedAmount: 0,
-            discountedOrders: 0,
-            offerCount: 0,
-            promoCount: 0,
-          };
+          offerDiscount += productOfferDiscount;
         }
+      });
 
-        // Update the daily data with the calculated discounts
-        dailyData[orderDateFormatted].discountedAmount += offerDiscount + promoDiscount;
+      // Calculate adjusted order total after offer discounts
+      const adjustedOrderTotal = order.totalAmount - offerDiscount;
 
-        // Increment discountedOrders for each type of discount applied
-        if (hasOfferApplied) {
-          dailyData[orderDateFormatted].discountedOrders += 1; // Count this order as discounted
-          dailyData[orderDateFormatted].offerCount += 1; // Count individual offer application
+      // Calculate promo discount based on adjusted order total
+      if (order.promoCode?.trim()) {
+        hasPromoApplied = true; // Track if promo code is applied
+        if (order.promoDiscountType === 'Percentage') {
+          promoDiscount = (order.promoDiscountValue / 100) * adjustedOrderTotal;
+        } else {
+          promoDiscount = order.promoDiscountValue;
         }
-        if (hasPromoApplied) {
-          dailyData[orderDateFormatted].discountedOrders += 1; // Count this order as discounted
-          dailyData[orderDateFormatted].promoCount += 1; // Count individual promo application
-        }
+      }
+
+      // Initialize dailyData for the specific date if it doesn't exist
+      if (!dailyData[orderDateFormatted]) {
+        dailyData[orderDateFormatted] = {
+          discountedAmount: 0,
+          discountedOrders: 0,
+          offerCount: 0,
+          promoCount: 0,
+        };
+      }
+
+      // Update the daily data with the calculated discounts
+      dailyData[orderDateFormatted].discountedAmount += offerDiscount + promoDiscount;
+
+      // Increment discountedOrders for each type of discount applied
+      if (hasOfferApplied) {
+        dailyData[orderDateFormatted].discountedOrders += 1; // Count this order as discounted
+        dailyData[orderDateFormatted].offerCount += 1; // Count individual offer application
+      }
+      if (hasPromoApplied) {
+        dailyData[orderDateFormatted].discountedOrders += 1; // Count this order as discounted
+        dailyData[orderDateFormatted].promoCount += 1; // Count individual promo application
       }
     });
 
@@ -322,7 +333,7 @@ const PromotionPerformanceChart = () => {
       discountedOrders: dailyData[date].discountedOrders,
       totalPromoAndOfferApplied: dailyData[date].offerCount + dailyData[date].promoCount, // Total applied count
     }));
-  }, [orderList, filterStartDate, filterEndDate]);
+  }, [orderList, filterStartDate, filterEndDate, activeFilter]);
 
   const handleReset = () => {
     // Set date range to today
@@ -341,7 +352,7 @@ const PromotionPerformanceChart = () => {
     });
 
     // Set active filter to 'today'
-    setActiveFilter('today');
+    setActiveFilter('all');
     setShowDateRangePicker(true);
   };
 
@@ -408,6 +419,12 @@ const PromotionPerformanceChart = () => {
     <div className="space-y-5">
       <div className="flex flex-wrap mt-6 justify-center lg:justify-end items-center gap-3">
         <div className="flex items-center justify-center gap-2">
+          <button
+            onClick={() => handleDateFilter('all')}
+            className={`px-2 py-1 text-xs md:text-sm md:py-2 md:px-4 ${activeFilter === 'all' ? 'text-[#D2016E] border rounded-full border-[#D2016E] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
+          >
+            All
+          </button>
           <button
             onClick={() => handleDateFilter('today')}
             className={`px-2 py-1 text-xs md:text-sm md:py-2 md:px-4 ${activeFilter === 'today' ? 'text-[#D2016E] border rounded-full border-[#D2016E] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}

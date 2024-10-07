@@ -6,7 +6,7 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Toolti
 import { IoMdClose } from 'react-icons/io';
 import { format, startOfToday, endOfToday, startOfYesterday, endOfYesterday, subDays, subMonths, startOfMonth, endOfMonth, isValid } from 'date-fns';
 
-const FinancePerformance = () => {
+const RefundedPayments = () => {
   const [orderList, isOrderPending] = useOrders();
   const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
   const [activeFilter, setActiveFilter] = useState('all');
@@ -94,7 +94,7 @@ const FinancePerformance = () => {
     if (activeFilter === "all" && activeFilter === "all") {
       // Count the transactions and calculate total revenue for each payment method without any date filtering
       orderList?.forEach((order) => {
-        if (order.paymentStatus === "Paid") { // Only consider paid orders
+        if (order.paymentStatus === "Refunded") { // Only consider paid orders
           // Calculate subtotal
           let subtotal = parseFloat(
             order.productInformation.reduce((total, product) => {
@@ -159,7 +159,7 @@ const FinancePerformance = () => {
     // Filter orders based on the normalized date range and paymentStatus = "Paid"
     const filteredOrders = orderList?.filter((order) => {
       const orderDate = parseDate(order.dateTime); // Assuming parseDate is a function to parse order date
-      return orderDate >= adjustedStartDate && orderDate <= adjustedEndDate && order.paymentStatus === "Paid";
+      return orderDate >= adjustedStartDate && orderDate <= adjustedEndDate && order.paymentStatus === "Refunded";
     });
 
     // Count the number of transactions and calculate total revenue for each payment method
@@ -224,7 +224,7 @@ const FinancePerformance = () => {
     if (activeFilter === "all" && activeFilter === "all") {
       // Count transactions for all orders
       orderList?.forEach((order) => {
-        if (order.paymentStatus === "Paid") { // Only consider paid orders
+        if (order.paymentStatus === "Refunded") { // Only consider paid orders
           const orderDate = parseDate(order.dateTime);
           const orderDateFormatted = format(orderDate, 'yyyy-MM-dd');
 
@@ -258,7 +258,7 @@ const FinancePerformance = () => {
         const orderDateFormatted = format(orderDate, 'yyyy-MM-dd');
 
         // Check if orderDate is within the selected date range and paymentStatus is "Paid"
-        if (orderDate >= adjustedStartDate && orderDate <= adjustedEndDate && order.paymentStatus === "Paid") {
+        if (orderDate >= adjustedStartDate && orderDate <= adjustedEndDate && order.paymentStatus === "Refunded") {
           // Initialize the date key if not already present
           if (!dailyData[orderDateFormatted]) {
             dailyData[orderDateFormatted] = {
@@ -300,7 +300,7 @@ const FinancePerformance = () => {
 
     const filteredOrders = orderList?.filter((order) => {
       const orderDate = parseDate(order.dateTime);
-      return orderDate >= adjustedStartDate && orderDate <= adjustedEndDate && order.paymentStatus === "Paid";
+      return orderDate >= adjustedStartDate && orderDate <= adjustedEndDate && order.paymentStatus === "Refunded";
     });
 
     // Initialize an object with keys for each hour (0-23)
@@ -472,11 +472,11 @@ const FinancePerformance = () => {
         {/* Summary Section */}
         <div className='flex lg:flex-col xl:flex-row items-center justify-center gap-6 w-1/3 xl:w-3/4 lg:min-h-[150px] lg:max-h-[150px]'>
           <div className="border rounded-lg p-4 md:p-8 space-y-3">
-            <p className="text-[10px] md:text-sm xl:text-base font-semibold">Number of bKash Payments</p>
+            <p className="text-[10px] md:text-sm xl:text-base font-semibold">Number of bKash Refunds</p>
             <h3 className="font-bold md:text-xl lg:text-2xl xl:text-3xl">{bKashTransactions} |  ৳ {totalBKashRevenue.toFixed(2)}</h3>
           </div>
           <div className="border rounded-lg p-4 md:p-8 space-y-3">
-            <p className="text-[10px] md:text-sm xl:text-base font-semibold">Number of SSLCommerz Payments</p>
+            <p className="text-[10px] md:text-sm xl:text-base font-semibold">Number of SSLCommerz Refunds</p>
             <h3 className="font-bold md:text-xl lg:text-2xl xl:text-3xl flex items-center gap-0 md:gap-1">
               {sslCommerzTransactions} | ৳ {totalSSLCommerzRevenue.toFixed(2)}
             </h3>
@@ -530,4 +530,4 @@ const FinancePerformance = () => {
   );
 };
 
-export default FinancePerformance;
+export default RefundedPayments;

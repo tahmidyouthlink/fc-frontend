@@ -29,6 +29,7 @@ const AddPromo = () => {
 
   const handleTabChange = (key) => {
     setPromoDiscountType(key);
+    setValue('maxAmount', '');
   };
 
   const handleShowDateError = (date) => {
@@ -188,7 +189,6 @@ const AddPromo = () => {
         <h3 className='w-full text-center font-semibold text-xl lg:text-2xl'>Create New Promo</h3>
       </div>
 
-
       <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto pt-1 pb-6 flex flex-col gap-6'>
 
         <div className='grid grid-cols-1 lg:grid-cols-12'>
@@ -225,13 +225,6 @@ const AddPromo = () => {
             </div>
 
             <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-              <div>
-                <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#D2016E] pb-2'>Maximum Capped Amount</label>
-                <input id='maxAmount' {...register("maxAmount", { required: true })} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="number" />
-                {errors.maxAmount?.type === "required" && (
-                  <p className="text-red-600 text-left">Max Amount is required</p>
-                )}
-              </div>
 
               <div>
                 <label htmlFor='minAmount' className='flex justify-start font-medium text-[#D2016E] pb-2'>Minimum Order Amount</label>
@@ -240,6 +233,14 @@ const AddPromo = () => {
                   <p className="text-red-600 text-left">Min Amount is required</p>
                 )}
               </div>
+
+              {promoDiscountType === "Percentage" && <div>
+                <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#D2016E] pb-2'>Maximum Capped Amount</label>
+                <input id='maxAmount' {...register("maxAmount", { required: true })} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="number" />
+                {errors.maxAmount?.type === "required" && (
+                  <p className="text-red-600 text-left">Max Amount is required</p>
+                )}
+              </div>}
 
               <div>
                 <label htmlFor='expiryDate' className='flex justify-start font-medium text-[#D2016E] pb-2'>Promo Expire On *</label>

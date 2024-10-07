@@ -2,7 +2,7 @@ import React from 'react';
 
 const TabsOrder = ({ tabs, selectedTab, onTabChange }) => {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-wrap items-center gap-3">
       {tabs?.map((tab) => (
         <button
           key={tab}

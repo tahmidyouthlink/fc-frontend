@@ -140,7 +140,7 @@ const FinanceTable = () => {
   return (
     <div>
 
-      <div className='mt-8 md:mt-16 flex flex-col lg:flex-row items-center justify-evenly gap-6 max-w-screen-2xl mx-auto'>
+      <div className='flex flex-col lg:flex-row items-center justify-evenly gap-6 max-w-screen-2xl mx-auto'>
 
         <div className='w-full'>
           <li className="flex items-center relative group flex-1">

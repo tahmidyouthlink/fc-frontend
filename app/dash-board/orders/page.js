@@ -17,6 +17,7 @@ import PrintButton from '@/app/components/layout/PrintButton';
 import CustomPagination from '@/app/components/layout/CustomPagination';
 import TabsOrder from '@/app/components/layout/TabsOrder';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
+import Swal from 'sweetalert2';
 
 const columns = ['Order Number', 'Date & Time', 'Customer Name', 'Order Amount', 'Order Status', 'Action', 'Email', 'Phone Number', 'Alternative Phone Number', 'Shipping Zone', 'Shipping Method', 'Payment Status', 'Payment Method', 'Vendor'];
 
@@ -222,82 +223,104 @@ const OrdersPage = () => {
       return;
     }
 
-    let updateStatus;
-    if (isUndo) {
-      updateStatus = order.previousStatus; // Set status to previous status on undo
-      localStorage.removeItem(`undoVisible_${id}`);
-    } else {
-      switch (actionType) {
-        case 'shipped':
-          updateStatus = 'Shipped';
-          break;
-        case 'onHold':
-          updateStatus = 'On Hold';
-          break;
-        case 'delivered':
-          updateStatus = 'Delivered';
-          break;
-        case 'requestedReturn':
-          updateStatus = 'Requested Return';
-          break;
-        case 'refunded':
-          updateStatus = 'Refunded';
-          break;
-        default:
-          updateStatus = 'Processing';
-          break;
-      }
-      localStorage.setItem(`undoVisible_${id}`, true);
-    }
+    const actionMessages = {
+      undefined: "You want to confirm this order?",
+      shipped: "You want to ship this order?",
+      onHold: "You want to put this order on hold?",
+      delivered: "You want to mark this order as delivered?",
+      requestedReturn: "You want to approve a return request for this order?",
+      refunded: "You want to refund this order?",
+      "": "You want to revert this order?", // handling empty string
+    };
 
-    try {
-      const res = await axiosPublic.patch(`/changeOrderStatus/${id}`, { orderStatus: updateStatus });
-      if (res?.data?.modifiedCount) {
+    Swal.fire({
+      title: "Are you sure?",
+      text: actionMessages[actionType] || "Action not recognized",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, update it!"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        let updateStatus;
         if (isUndo) {
-          refetchOrder();
-          toast.custom((t) => (
-            <div
-              className={`${t.visible ? 'animate-enter' : 'animate-leave'
-                } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
-            >
-              <div className="pl-6">
-                <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
-              </div>
-              <div className="flex-1 w-0 p-4">
-                <div className="flex items-start">
-                  <div className="ml-3 flex-1">
-                    <p className="text-base font-bold text-gray-900">
-                      Order Updated!
-                    </p>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Order status reverted successfully.
-                    </p>
+          updateStatus = order?.previousStatus; // Set status to previous status on undo
+          localStorage.removeItem(`undoVisible_${id}`);
+        } else {
+          switch (actionType) {
+            case 'shipped':
+              updateStatus = 'Shipped';
+              break;
+            case 'onHold':
+              updateStatus = 'On Hold';
+              break;
+            case 'delivered':
+              updateStatus = 'Delivered';
+              break;
+            case 'requestedReturn':
+              updateStatus = 'Requested Return';
+              break;
+            case 'refunded':
+              updateStatus = 'Refunded';
+              break;
+            default:
+              updateStatus = 'Processing';
+              break;
+          }
+          localStorage.setItem(`undoVisible_${id}`, true);
+        }
+
+        try {
+          const res = await axiosPublic.patch(`/changeOrderStatus/${id}`, { orderStatus: updateStatus });
+          if (res?.data?.modifiedCount) {
+            if (isUndo) {
+              refetchOrder();
+              toast.custom((t) => (
+                <div
+                  className={`${t.visible ? 'animate-enter' : 'animate-leave'
+                    } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+                >
+                  <div className="pl-6">
+                    <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+                  </div>
+                  <div className="flex-1 w-0 p-4">
+                    <div className="flex items-start">
+                      <div className="ml-3 flex-1">
+                        <p className="text-base font-bold text-gray-900">
+                          Order Updated!
+                        </p>
+                        <p className="mt-1 text-sm text-gray-500">
+                          Order status reverted successfully.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex border-l border-gray-200">
+                    <button
+                      onClick={() => toast.dismiss(t.id)}
+                      className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+                    >
+                      <RxCross2 />
+                    </button>
                   </div>
                 </div>
-              </div>
-              <div className="flex border-l border-gray-200">
-                <button
-                  onClick={() => toast.dismiss(t.id)}
-                  className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
-                >
-                  <RxCross2 />
-                </button>
-              </div>
-            </div>
-          ), {
-            position: "bottom-right",
-            duration: 5000
-          })
-        } else {
-          sendOrderEmail(order, actionType); // Send the email with the appropriate message
+              ), {
+                position: "bottom-right",
+                duration: 5000
+              })
+            } else {
+              sendOrderEmail(order, actionType); // Send the email with the appropriate message
+            }
+            refetchOrder(); // Refetch the orders to update the UI
+          } else {
+            toast.error("Failed to update order status");
+          }
+        } catch (error) {
+          toast.error("Error updating order status");
         }
-        refetchOrder(); // Refetch the orders to update the UI
-      } else {
-        toast.error("Failed to update order status");
       }
-    } catch (error) {
-      toast.error("Error updating order status");
-    }
+    });
   };
 
   // Adjust this logic to correctly determine the visibility of the Undo button
@@ -601,12 +624,44 @@ const OrdersPage = () => {
   return (
     <div className='max-w-screen-2xl px-0 md:px-6 2xl:px-0 mx-auto'>
 
-      <div className='flex flex-col md:flex-row items-center justify-between my-2 md:my-5 gap-2'>
-        <h3 className='px-6 w-full text-center md:text-start font-medium md:font-semibold text-xl lg:text-2xl'>Order Management</h3>
+      <div className='flex items-center justify-between my-2 md:my-5 gap-2'>
 
-        <div className='flex w-full items-center max-w-screen-2xl px-3 mx-auto justify-center md:justify-end md:gap-6'>
+        <div className='w-full'>
+          <h3 className='text-center md:text-start font-medium md:font-semibold text-xl lg:text-2xl'>Order Management</h3>
+        </div>
 
-          <div ref={dropdownRefDownload} className="relative inline-block text-left z-50">
+        {/* Search Product Item */}
+        <div className='w-full'>
+          <li className="flex items-center relative group">
+            <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
+              <g>
+                <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
+              </g>
+            </svg>
+            <input
+              type="search"
+              placeholder="Search By Order Details..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-[#f3f3f4] text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
+            />
+          </li>
+        </div>
+
+      </div>
+
+      <div className='pb-6 px-6 md:px-0 pt-3 md:pt-0 flex justify-center md:justify-between'>
+        <div className='flex justify-center md:justify-start w-full'>
+          <TabsOrder
+            tabs={orderStatusTabs}
+            selectedTab={selectedTab}
+            onTabChange={setSelectedTab} // This passes the function to change the tab
+          />
+        </div>
+
+        <div className='flex w-full flex-wrap items-center max-w-screen-2xl px-3 mx-auto justify-center md:justify-end gap-3 md:gap-6'>
+
+          <div ref={dropdownRefDownload} className="relative inline-block text-left z-10">
             <Button onClick={() => toggleDropdown('download')} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
               Download Data
               <svg
@@ -628,13 +683,13 @@ const OrdersPage = () => {
                   <button
                     onClick={exportToCSV}
                     className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
-       md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
                     <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
-             md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+   md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
                       Export CSV
                     </span>
                     <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
-             md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+   md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 35 35"
@@ -651,13 +706,13 @@ const OrdersPage = () => {
                   <button
                     onClick={exportToXLS}
                     className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
-       md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
                     <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
-             md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+   md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
                       Export XLSX
                     </span>
                     <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
-             md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+   md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 35 35"
@@ -673,13 +728,13 @@ const OrdersPage = () => {
                   <button
                     onClick={exportToPDF}
                     className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
-       md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
                     <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
-             md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+   md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
                       Export PDF
                     </span>
                     <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
-             md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+   md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 35 35"
@@ -697,7 +752,7 @@ const OrdersPage = () => {
             )}
           </div>
 
-          <div ref={dropdownRef} className="relative inline-block text-left z-50">
+          <div ref={dropdownRef} className="relative inline-block text-left z-10">
             <Button onClick={() => toggleDropdown('other')} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
               Customize
               <svg
@@ -713,29 +768,12 @@ const OrdersPage = () => {
 
             {openDropdown === 'other' && (
               <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                <div className="p-1">
-                  {/* Search Product Item */}
-                  <li className="flex items-center relative group">
-                    <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
-                      <g>
-                        <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
-                      </g>
-                    </svg>
-                    <input
-                      type="search"
-                      placeholder="Search By Order Details..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-[#f3f3f4] text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
-                    />
-                  </li>
 
-                  {/* Choose Columns Button */}
-                  <div className="py-1">
-                    <Button variant="light" color="primary" onClick={() => { setColumnModalOpen(true); setOpenDropdown(false) }} className="w-full">
-                      Choose Columns
-                    </Button>
-                  </div>
+                {/* Choose Columns Button */}
+                <div className="py-1">
+                  <Button variant="light" color="primary" onClick={() => { setColumnModalOpen(true); setOpenDropdown(false) }} className="w-full">
+                    Choose Columns
+                  </Button>
 
                   <div className='flex items-center gap-2'>
                     <DateRangePicker
@@ -758,14 +796,6 @@ const OrdersPage = () => {
           </div>
 
         </div>
-      </div>
-
-      <div className='pb-6 px-6'>
-        <TabsOrder
-          tabs={orderStatusTabs}
-          selectedTab={selectedTab}
-          onTabChange={setSelectedTab} // This passes the function to change the tab
-        />
       </div>
 
       {/* Column Selection Modal */}
@@ -796,7 +826,7 @@ const OrdersPage = () => {
       </Modal>
 
       {/* table content */}
-      <div className="max-w-screen-2xl mx-auto px-0 md:px-4 lg:px-6 custom-max-h-orders overflow-x-auto modal-body-scroll">
+      <div className="max-w-screen-2xl mx-auto custom-max-h-orders overflow-x-auto modal-body-scroll">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-100 sticky top-0 z-[1] shadow-md">
             <tr>

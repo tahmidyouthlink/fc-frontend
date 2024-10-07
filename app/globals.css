@@ -77,6 +77,7 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 
 .image-container.selected {
   transform: scale(1.05);
+  border: 1px solid #9f5216; /* Add a border when selected */
 }
 
 .image-container::after {
@@ -163,8 +164,22 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 /* Medium screens (tablets) */
 @media (min-width: 768px) {
   .custom-max-h-orders {
-    min-height: calc(100vh - 180px);
-    max-height: calc(100vh - 180px);
+    min-height: calc(100vh - 250px);
+    max-height: calc(100vh - 250px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .custom-max-h-orders {
+    min-height: calc(100vh - 220px);
+    max-height: calc(100vh - 220px);
+  }
+}
+
+@media (min-width: 1440px) {
+  .custom-max-h-orders {
+    min-height: calc(100vh - 190px);
+    max-height: calc(100vh - 190px);
   }
 }
 

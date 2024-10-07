@@ -259,7 +259,7 @@ const SecondStepOfAddProduct = () => {
                     type="text"
                     value={variant.color.label}
                     className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                    readOnly
+                    disabled
                   />
                 </div>
                 <div className='w-1/3'>
@@ -268,11 +268,11 @@ const SecondStepOfAddProduct = () => {
                     type="text"
                     value={variant.size}
                     className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                    readOnly
+                    disabled
                   />
                 </div>
                 <div className='md:w-1/3'>
-                  <label htmlFor={`sku-${index}`} className='font-medium text-[#9F5216]'>SKU</label>
+                  <label htmlFor={`sku-${index}`} className='font-medium text-[#9F5216]'>SKU *</label>
                   <input
                     id={`sku-${index}`}
                     autocomplete="off"
@@ -288,7 +288,7 @@ const SecondStepOfAddProduct = () => {
                 </div>
               </div>
               <div className='flex flex-col gap-4'>
-                <label className='font-medium text-[#9F5216]'>Select Media</label>
+                <label className='font-medium text-[#9F5216]'>Select Media *</label>
                 <div className='grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 2xl:grid-cols-4 gap-2'>
                   {uploadedImageUrls.map((url, imgIndex) => (
                     <div
@@ -296,7 +296,7 @@ const SecondStepOfAddProduct = () => {
                       className={`image-container ${variant.imageUrl === url ? 'selected' : ''}`}
                       onClick={() => onImageClick(index, url)}
                     >
-                      <Image src={url} alt={`image-${imgIndex}`} width={800} height={800} className="w-full min-h-60 object-cover rounded-md" />
+                      <Image src={url} alt={`image-${imgIndex}`} width={800} height={800} className="w-full min-h-60 object-contain rounded-md" />
                     </div>
                   ))}
                 </div>
