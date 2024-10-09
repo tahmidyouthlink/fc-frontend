@@ -35,7 +35,7 @@ const Marketing = () => {
       <div className="bg-white sticky top-0 z-10">
         <h1 className="font-bold text-lg lg:text-xl 2xl:text-2xl py-1 2xl:py-3 bg-white">Marketing</h1>
 
-        <div className="flex items-center gap-3 bg-white">
+        <div className="flex flex-wrap items-center gap-3 bg-white">
 
           <button
             className={`relative text-sm py-1 transition-all duration-300
@@ -81,7 +81,7 @@ const Marketing = () => {
         <p className='pt-1 text-neutral-400 text-sm font-medium'>The data includes all active, ended, or canceled deals. This report represents unaudited data, please refer to your invoice for accurate settlement numbers.</p>
         <PromotionPerformance />
 
-        <h1 className='font-bold'>Recent Promotions</h1>
+        <h1 className='font-bold pt-12 lg:pt-6'>Recent Promotions</h1>
         <p className='pt-1 pb-8 text-neutral-400 text-sm font-medium'>Please use the following table to view your past and upcoming promotions.</p>
         <RecentPromotions />
       </div>}

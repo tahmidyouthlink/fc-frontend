@@ -135,7 +135,7 @@ const SideNavbar = ({ onClose }) => {
                 )}
               </div>
               {item?.links && activeItem === item?.name && (
-                <div className="px-4 py-2 flex flex-col items-center gap-2">
+                <div className="px-6 py-2 flex flex-col items-center gap-2">
                   {item?.links?.map((linkItem, linkIndex) => (
                     <Link href={linkItem?.link} key={linkIndex} legacyBehavior>
                       <a

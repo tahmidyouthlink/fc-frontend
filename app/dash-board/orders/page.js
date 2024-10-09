@@ -18,6 +18,9 @@ import CustomPagination from '@/app/components/layout/CustomPagination';
 import TabsOrder from '@/app/components/layout/TabsOrder';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
+import arrowSvgImage from "../../../public/card-images/arrow.svg";
+import arrivals1 from "../../../public/card-images/arrivals1.svg";
+import arrivals2 from "../../../public/card-images/arrivals2.svg";
 
 const columns = ['Order Number', 'Date & Time', 'Customer Name', 'Order Amount', 'Order Status', 'Action', 'Email', 'Phone Number', 'Alternative Phone Number', 'Shipping Zone', 'Shipping Method', 'Payment Status', 'Payment Method', 'Vendor'];
 
@@ -129,6 +132,7 @@ const OrdersPage = () => {
     // Check if any product detail contains the search query
     const productMatch = order.productInformation?.some(product => {
       const productTitle = (product.productTitle || '').toString().toLowerCase();
+      const productId = (product.productId || '').toString().toLowerCase();
       const size = (typeof product.size === 'string' ? product.size : '').toLowerCase();
       const color = (product.color?.label || '').toString().toLowerCase();
       const batchCode = (product.batchCode || '').toString().toLowerCase();
@@ -138,6 +142,7 @@ const OrdersPage = () => {
 
       return (
         productTitle.includes(query) ||
+        productId.includes(query) ||
         size.includes(query) ||
         color.includes(query) ||
         batchCode.includes(query) ||
@@ -513,8 +518,8 @@ const OrdersPage = () => {
     const { jsPDF } = await import("jspdf");  // Dynamically import jsPDF
     const autoTable = (await import("jspdf-autotable")).default;  // Import jsPDF-AutoTable
 
-    // Create a new document
-    const doc = new jsPDF();
+    // Create a new document in landscape mode
+    const doc = new jsPDF('landscape'); // 'landscape' mode
 
     // Define the columns based on selectedColumns
     const columns = selectedColumns.map((col) => ({
@@ -622,514 +627,538 @@ const OrdersPage = () => {
   }
 
   return (
-    <div className='max-w-screen-2xl px-0 md:px-6 2xl:px-0 mx-auto'>
+    <div className='relative w-full min-h-screen bg-gray-100'>
 
-      <div className='flex items-center justify-between my-2 md:my-5 gap-2'>
+      <div
+        style={{
+          backgroundImage: `url(${arrivals1.src})`,
+        }}
+        className='absolute inset-0 z-0 hidden md:block bg-no-repeat left-[45%] lg:left-[60%] -top-[138px]'
+      />
+      <div
+        style={{
+          backgroundImage: `url(${arrivals2.src})`,
+        }}
+        className='absolute inset-0 z-0 bg-contain bg-center xl:-top-28 w-full bg-no-repeat'
+      />
+      <div
+        style={{
+          backgroundImage: `url(${arrowSvgImage.src})`,
+        }}
+        className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
+      />
 
-        <div className='w-full'>
-          <h3 className='text-center md:text-start font-medium md:font-semibold text-xl lg:text-2xl'>Order Management</h3>
+      <div className='max-w-screen-2xl px-0 md:px-6 2xl:px-0 mx-auto'>
+
+        <div className='flex items-center justify-between py-2 md:py-5 gap-2'>
+
+          <div className='w-full'>
+            <h3 className='text-center md:text-start font-semibold text-xl lg:text-2xl'>Order Management</h3>
+          </div>
+
+          {/* Search Product Item */}
+          <div className='w-full'>
+            <li className="flex items-center relative group">
+              <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
+                <g>
+                  <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
+                </g>
+              </svg>
+              <input
+                type="search"
+                placeholder="Search By Order Details..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-white text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
+              />
+            </li>
+          </div>
+
         </div>
 
-        {/* Search Product Item */}
-        <div className='w-full'>
-          <li className="flex items-center relative group">
-            <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
-              <g>
-                <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
-              </g>
-            </svg>
-            <input
-              type="search"
-              placeholder="Search By Order Details..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-[#f3f3f4] text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
+        <div className='pb-3 px-6 md:px-0 pt-3 md:pt-0 flex flex-wrap lg:flex-nowrap gap-3 lg:gap-0 justify-center md:justify-between'>
+          <div className='flex justify-center md:justify-start w-full'>
+            <TabsOrder
+              tabs={orderStatusTabs}
+              selectedTab={selectedTab}
+              onTabChange={setSelectedTab} // This passes the function to change the tab
             />
-          </li>
-        </div>
-
-      </div>
-
-      <div className='pb-6 px-6 md:px-0 pt-3 md:pt-0 flex justify-center md:justify-between'>
-        <div className='flex justify-center md:justify-start w-full'>
-          <TabsOrder
-            tabs={orderStatusTabs}
-            selectedTab={selectedTab}
-            onTabChange={setSelectedTab} // This passes the function to change the tab
-          />
-        </div>
-
-        <div className='flex w-full flex-wrap items-center max-w-screen-2xl px-3 mx-auto justify-center md:justify-end gap-3 md:gap-6'>
-
-          <div ref={dropdownRefDownload} className="relative inline-block text-left z-10">
-            <Button onClick={() => toggleDropdown('download')} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
-              Download Data
-              <svg
-                className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown === "download" ? 'rotate-180' : ''}`}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </Button>
-
-            {openDropdown === 'download' && (
-              <div className="absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                <div className="p-2 flex flex-col gap-2">
-
-                  {/* Button to export to CSV */}
-                  <button
-                    onClick={exportToCSV}
-                    className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
-md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
-                    <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
-   md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
-                      Export CSV
-                    </span>
-                    <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
-   md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 35 35"
-                        className="w-[20px] fill-white"
-                      >
-                        <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
-                        <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
-                        <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
-                      </svg>
-                    </span>
-                  </button>
-
-                  {/* Button to export to XLSX */}
-                  <button
-                    onClick={exportToXLS}
-                    className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
-md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
-                    <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
-   md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
-                      Export XLSX
-                    </span>
-                    <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
-   md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 35 35"
-                        className="w-[20px] fill-white"
-                      >
-                        <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
-                        <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
-                        <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
-                      </svg>
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={exportToPDF}
-                    className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
-md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
-                    <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
-   md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
-                      Export PDF
-                    </span>
-                    <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
-   md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 35 35"
-                        className="w-[20px] fill-white"
-                      >
-                        <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
-                        <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
-                        <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
-                      </svg>
-                    </span>
-                  </button>
-
-                </div>
-              </div>
-            )}
           </div>
 
-          <div ref={dropdownRef} className="relative inline-block text-left z-10">
-            <Button onClick={() => toggleDropdown('other')} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
-              Customize
-              <svg
-                className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown === "other" ? 'rotate-180' : ''}`}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </Button>
+          <div className='flex w-full items-center max-w-screen-2xl px-3 mx-auto justify-center md:justify-end gap-3 md:gap-6'>
 
-            {openDropdown === 'other' && (
-              <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <div ref={dropdownRefDownload} className="relative inline-block text-left z-10">
+              <Button onClick={() => toggleDropdown('download')} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
+                Download Data
+                <svg
+                  className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown === "download" ? 'rotate-180' : ''}`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </Button>
 
-                {/* Choose Columns Button */}
-                <div className="py-1">
-                  <Button variant="light" color="primary" onClick={() => { setColumnModalOpen(true); setOpenDropdown(false) }} className="w-full">
-                    Choose Columns
-                  </Button>
+              {openDropdown === 'download' && (
+                <div className="absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <div className="p-2 flex flex-col gap-2">
 
-                  <div className='flex items-center gap-2'>
-                    <DateRangePicker
-                      label="Order Duration"
-                      visibleMonths={1}
-                      onChange={(range) => setSelectedDateRange(range)} // Ensure range is an array
-                      value={selectedDateRange} // Ensure this matches the expected format
-                    />
-
-                    {selectedDateRange && selectedDateRange.start && selectedDateRange.end && (
-                      <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={handleReset}>
-                        <IoMdClose size={20} />
-                      </button>
-                    )}
-                  </div>
-
-                </div>
-              </div>
-            )}
-          </div>
-
-        </div>
-      </div>
-
-      {/* Column Selection Modal */}
-      <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
-        <ModalContent>
-          <ModalHeader>Choose Columns</ModalHeader>
-          <ModalBody className="modal-body-scroll">
-            <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
-              {columns.map((column) => (
-                <Checkbox key={column} value={column}>
-                  {column}
-                </Checkbox>
-              ))}
-            </CheckboxGroup>
-          </ModalBody>
-          <ModalFooter>
-            <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
-              Select All
-            </Button>
-            <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
-              Deselect All
-            </Button>
-            <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
-              Save
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-      {/* table content */}
-      <div className="max-w-screen-2xl mx-auto custom-max-h-orders overflow-x-auto modal-body-scroll">
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-100 sticky top-0 z-[1] shadow-md">
-            <tr>
-              {selectedColumns.includes('Order Number') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Order Number</th>
-              )}
-              {selectedColumns.includes('Date & Time') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Date & Time</th>
-              )}
-              {selectedColumns.includes('Customer Name') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Customer Name</th>
-              )}
-              {selectedColumns.includes('Order Amount') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Order Amount</th>
-              )}
-              {selectedColumns.includes('Order Status') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Order Status</th>
-              )}
-              {selectedColumns.includes('Action') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Action</th>
-              )}
-              {selectedColumns.includes('Email') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Email</th>
-              )}
-              {selectedColumns.includes('Phone Number') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Phone Number</th>
-              )}
-              {selectedColumns.includes('Alternative Phone Number') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Alternative Phone Number</th>
-              )}
-              {selectedColumns.includes('Shipping Zone') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Shipping Zone</th>
-              )}
-              {selectedColumns.includes('Shipping Method') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Shipping Method</th>
-              )}
-              {selectedColumns.includes('Payment Status') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Payment Status</th>
-              )}
-              {selectedColumns.includes('Payment Method') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Payment Method</th>
-              )}
-              {selectedColumns.includes('Vendor') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Vendor</th>
-              )}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-
-            {paginatedOrders?.length === 0 ? <tr>
-              <td colSpan={selectedColumns.length} className="text-center p-4 text-gray-500 md:pt-40 pt-32 lg:pt-52 xl:pt-60 2xl:pt-72">
-                No orders found matching your criteria. Please adjust your filters or check back later.
-              </td>
-            </tr> : (paginatedOrders?.map((order, index) => (
-              <tr key={order?._id || index} className="hover:bg-gray-50 transition-colors">
-                {selectedColumns.includes('Order Number') && (
-                  <td className="text-xs p-3 font-mono cursor-pointer text-blue-600 hover:text-blue-800" onClick={() => handleOrderClick(order)}>
-                    {order?.orderNumber}
-                  </td>
-                )}
-                {selectedColumns.includes('Date & Time') && (
-                  <td className="text-xs p-3 text-gray-700">{order?.dateTime}</td>
-                )}
-                {selectedColumns.includes('Customer Name') && (
-                  <td className="text-xs p-3 text-gray-700 uppercase">{order?.customerName}</td>
-                )}
-                {selectedColumns.includes('Order Amount') && (
-                  <td className="text-xs p-3 text-gray-700 pl-1 md:pl-2 lg:pl-4 xl:pl-9">৳ {order?.totalAmount.toFixed(2)}</td>
-                )}
-                {selectedColumns.includes('Order Status') && (
-                  <td className="text-xs p-3 text-yellow-600">{order?.orderStatus}</td>
-                )}
-                {selectedColumns.includes('Action') && (
-                  <td className="p-3">
-                    <div className="flex gap-2 items-center">
-                      {order.orderStatus === 'Pending' && (
-                        <Button onClick={() => handleActions(order._id)} size="sm" className="text-xs w-20" color="primary" variant="flat">
-                          Confirm
-                        </Button>
-                      )}
-                      {order.orderStatus === 'Processing' && (
-                        <Button onClick={() => handleActions(order._id, 'shipped')} size="sm" className="text-xs w-20" color="secondary" variant="flat">
-                          Shipped
-                        </Button>
-                      )}
-                      {order.orderStatus === 'Shipped' && (
-                        <div className="flex items-center gap-2">
-                          <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'onHold')} size="sm" color="warning" variant="flat">
-                            On Hold
-                          </Button>
-                          <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'delivered')} size="sm" color="success" variant="flat">
-                            Delivered
-                          </Button>
-                        </div>
-                      )}
-                      {order.orderStatus === 'On Hold' && (
-                        <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'delivered')} size="sm" color="success" variant="flat">
-                          Delivered
-                        </Button>
-                      )}
-                      {order.orderStatus === 'Delivered' && (
-                        <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'requestedReturn')} size="sm" color="danger" variant="flat">
-                          Return
-                        </Button>
-                      )}
-                      {order.orderStatus === 'Requested Return' && (
-                        <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'refunded')} size="sm" color="danger" variant="flat">
-                          Refund
-                        </Button>
-                      )}
-                      {order.orderStatus === 'Refunded' && (
-                        <Button className="text-xs w-20 cursor-not-allowed" size="sm" color="default" isDisabled>
-                          Refunded
-                        </Button>
-                      )}
-
-                      {/* Undo button logic */}
-                      {isAdmin && isUndoAvailable(order) && (
-                        <button
-                          onClick={() => handleActions(order._id, '', true)}
-                          className="text-red-600 hover:text-red-800 focus:ring-2 focus:ring-red-500 rounded p-1"
+                    {/* Button to export to CSV */}
+                    <button
+                      onClick={exportToCSV}
+                      className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
+md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+                      <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
+md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+                        Export CSV
+                      </span>
+                      <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
+md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 35 35"
+                          className="w-[20px] fill-white"
                         >
-                          <FaUndo />
+                          <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
+                          <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
+                          <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
+                        </svg>
+                      </span>
+                    </button>
+
+                    {/* Button to export to XLSX */}
+                    <button
+                      onClick={exportToXLS}
+                      className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
+md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+                      <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
+md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+                        Export XLSX
+                      </span>
+                      <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
+md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 35 35"
+                          className="w-[20px] fill-white"
+                        >
+                          <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
+                          <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
+                          <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
+                        </svg>
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={exportToPDF}
+                      className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
+md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+                      <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
+md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+                        Export PDF
+                      </span>
+                      <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
+md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 35 35"
+                          className="w-[20px] fill-white"
+                        >
+                          <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
+                          <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
+                          <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
+                        </svg>
+                      </span>
+                    </button>
+
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div ref={dropdownRef} className="relative inline-block text-left z-10">
+              <Button onClick={() => toggleDropdown('other')} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
+                Customize
+                <svg
+                  className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown === "other" ? 'rotate-180' : ''}`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </Button>
+
+              {openDropdown === 'other' && (
+                <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+
+                  {/* Choose Columns Button */}
+                  <div className="py-1">
+                    <Button variant="light" color="primary" onClick={() => { setColumnModalOpen(true); setOpenDropdown(false) }} className="w-full">
+                      Choose Columns
+                    </Button>
+
+                    <div className='flex items-center gap-2'>
+                      <DateRangePicker
+                        label="Order Duration"
+                        visibleMonths={1}
+                        onChange={(range) => setSelectedDateRange(range)} // Ensure range is an array
+                        value={selectedDateRange} // Ensure this matches the expected format
+                      />
+
+                      {selectedDateRange && selectedDateRange.start && selectedDateRange.end && (
+                        <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={handleReset}>
+                          <IoMdClose size={20} />
                         </button>
                       )}
                     </div>
-                  </td>
-                )}
-                {selectedColumns.includes('Email') && (
-                  <td className="text-xs p-3 text-gray-700">{order?.email}</td>
-                )}
-                {selectedColumns.includes('Phone Number') && (
-                  <td className="text-xs p-3 text-gray-700">{order?.phoneNumber}</td>
-                )}
-                {selectedColumns.includes('Alternative Phone Number') && (
-                  <td className="text-xs p-3 text-gray-700">{order?.phoneNumber2 === 0 ? '--' : order?.phoneNumber2}</td>
-                )}
-                {selectedColumns.includes('Shipping Zone') && (
-                  <td className="text-xs p-3 text-gray-700">{order?.shippingZone}</td>
-                )}
-                {selectedColumns.includes('Shipping Method') && (
-                  <td className="text-xs p-3 text-gray-700">{order?.shippingMethod}</td>
-                )}
-                {selectedColumns.includes('Payment Status') && (
-                  <td className="text-xs p-3 text-gray-700">{order?.paymentStatus}</td>
-                )}
-                {selectedColumns.includes('Payment Method') && (
-                  <td className="text-xs p-3 text-gray-700">{order?.paymentMethod}</td>
-                )}
-                {selectedColumns.includes('Vendor') && (
-                  <td className="text-xs p-3 text-gray-700">{order?.vendor}</td>
-                )}
-              </tr>
-            )))}
 
-          </tbody>
-        </table>
-      </div>
-
-      {/* Modal of order number */}
-      {selectedOrder && (
-        <Modal className='mx-4 lg:mx-0' isOpen={isOpen} onOpenChange={onClose} size='xl'>
-          <ModalContent>
-            <div className='flex items-center justify-center'>
-              <ModalHeader className="text-sm md:text-base"><Barcode selectedOrder={selectedOrder} /></ModalHeader>
+                  </div>
+                </div>
+              )}
             </div>
+
+          </div>
+        </div>
+
+        {/* Column Selection Modal */}
+        <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
+          <ModalContent>
+            <ModalHeader>Choose Columns</ModalHeader>
             <ModalBody className="modal-body-scroll">
-              <div className='flex items-center justify-between w-full pr-10'>
-                <p>Order Id - <strong>#{selectedOrder?.orderNumber}</strong></p>
-                <p>Customer Id - <strong>{selectedOrder?.customerId}</strong></p>
-              </div>
-              <p className='text-xs md:text-base'>Address: {selectedOrder?.address1} {selectedOrder?.address2}, {selectedOrder?.city}, {selectedOrder?.postalCode}</p>
-              <p className='text-xs md:text-base'>Transaction Id: {selectedOrder?.transactionId}</p>
-              <p className='text-xs md:text-base'>Tracking Number: {selectedOrder?.trackingNumber === "" ? '--' : selectedOrder?.trackingNumber}</p>
-
-              <h4 className="mt-4 text-lg font-semibold">Product Information</h4>
-              {/* Display product and promo/offer information */}
-              <div className='flex justify-between gap-6 pr-6'>
-                <div>
-                  {selectedOrder.productInformation && selectedOrder.productInformation.length > 0 && (
-                    <>
-                      {selectedOrder.productInformation.map((product, index) => (
-                        <div key={index} className="mb-4">
-                          <p><strong>Product : </strong> {product?.productTitle}</p>
-                          <p><strong>Size:</strong>  {product?.size}</p>
-                          <p className='flex items-center gap-2'><strong>Color:</strong>
-                            {product?.color?.label}
-                            <span
-                              style={{
-                                display: 'inline-block',
-                                width: '20px',
-                                height: '20px',
-                                backgroundColor: product.color?.color || '#fff',
-                                marginRight: '8px',
-                                borderRadius: '4px'
-                              }}
-                            />
-                          </p>
-                          <p><strong>Batch Code:</strong> {product?.batchCode}</p>
-                          <p><strong>Unit Price:</strong> {product?.unitPrice}</p>
-                          <p><strong>SKU:</strong> {product?.sku}</p>
-                        </div>
-                      ))}
-                    </>
-                  )}
-                </div>
-                <div className='flex flex-col items-center text-sm md:text-base w-60'>
-                  <p className='w-full'><strong>Total Amount:</strong>  ৳ {selectedOrder?.totalAmount.toFixed(2)}</p>
-                  <p className='w-full'>
-                    {selectedOrder?.promoCode || selectedOrder?.productInformation?.some((product) => product.offerTitle) ? (
-                      (() => {
-                        // Calculate promo discount only if it's greater than 0
-                        const promoDiscount =
-                          selectedOrder.promoDiscountType === 'Percentage'
-                            ? (selectedOrder.totalAmount * selectedOrder.promoDiscountValue) / 100
-                            : selectedOrder.promoDiscountValue;
-
-                        // Extract offer discounts from productInformation and filter out 0-value offers
-                        const offerDetails = selectedOrder.productInformation
-                          .map((product) => {
-                            const offerDiscount =
-                              product.offerDiscountType === 'Percentage'
-                                ? (product.unitPrice * product.offerDiscountValue) / 100
-                                : product.offerDiscountValue;
-
-                            return {
-                              offerTitle: product.offerTitle,
-                              offerDiscountType: product.offerDiscountType,
-                              offerDiscountValue: product.offerDiscountValue,
-                              offerDiscountAmount: offerDiscount,
-                            };
-                          })
-                          .filter((offer) => offer.offerDiscountAmount > 0); // Filter out 0-value offers
-
-                        return (
-                          <div className='flex flex-col gap-2'>
-                            {/* Show promo discount if applied */}
-                            {selectedOrder.promoCode && promoDiscount > 0 ? (
-                              <div>
-                                <strong>Promo applied:</strong> {selectedOrder.promoDiscountType === 'Percentage'
-                                  ? `${selectedOrder.promoDiscountValue.toFixed(2)}%`
-                                  : `৳ ${selectedOrder.promoDiscountValue.toFixed(2)}`}
-                                <br />
-                              </div>
-                            ) : null}
-
-                            {/* Show multiple offers if they are applied */}
-                            {offerDetails.length > 0 ? (
-                              <div>
-                                {offerDetails.map((offer, index) => (
-                                  <span key={index}>
-                                    <strong>Offer applied</strong> ({offer.offerTitle}):{' '}
-                                    {offer.offerDiscountType === 'Percentage'
-                                      ? `${offer.offerDiscountValue.toFixed(2)}%`
-                                      : `৳ ${offer.offerDiscountAmount.toFixed(2)}`}
-                                    <br />
-                                  </span>
-                                ))}
-                              </div>
-                            ) : null}
-                          </div>
-                        );
-                      })()
-                    ) : (
-                      <div>
-                        <strong>Promo/Offer applied:</strong> X
-                      </div>
-                    )}
-                  </p>
-                </div>
-              </div>
+              <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
+                {columns.map((column) => (
+                  <Checkbox key={column} value={column}>
+                    {column}
+                  </Checkbox>
+                ))}
+              </CheckboxGroup>
             </ModalBody>
-            <ModalFooter className='flex items-center justify-end'>
-              <PrintButton selectedOrder={selectedOrder} />
+            <ModalFooter>
+              <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
+                Select All
+              </Button>
+              <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
+                Deselect All
+              </Button>
+              <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
+                Save
+              </Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
-      )}
 
-      {/* Pagination Button */}
-      <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
-        <CustomPagination
-          totalPages={totalPages}
-          currentPage={page}
-          onPageChange={setPage}
-        />
-        <div className="relative inline-block">
-          <select
-            id="itemsPerPage"
-            value={itemsPerPage}
-            onChange={handleItemsPerPageChange}
-            className="cursor-pointer px-3 py-2 rounded-lg text-sm md:text-base text-gray-800 bg-white shadow-lg border border-gray-300 focus:outline-none hover:bg-gradient-to-tr hover:from-pink-400 hover:to-yellow-400 hover:text-white transition-colors duration-300 appearance-none w-16 md:w-20 lg:w-24"
-          >
-            <option className='bg-white text-black' value={25}>25</option>
-            <option className='bg-white text-black' value={50}>50</option>
-            <option className='bg-white text-black' value={100}>100</option>
-          </select>
-          <svg className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-          </svg>
+        {/* table content */}
+        <div className="max-w-screen-2xl mx-auto custom-max-h-orders overflow-x-auto custom-scrollbar relative">
+          <table className="w-full text-left border-collapse">
+            <thead className="sticky top-0 z-[1] bg-white">
+              <tr>
+                {selectedColumns.includes('Order Number') && (
+                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Order Number</th>
+                )}
+                {selectedColumns.includes('Date & Time') && (
+                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Date & Time</th>
+                )}
+                {selectedColumns.includes('Customer Name') && (
+                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Customer Name</th>
+                )}
+                {selectedColumns.includes('Order Amount') && (
+                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Order Amount</th>
+                )}
+                {selectedColumns.includes('Order Status') && (
+                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Order Status</th>
+                )}
+                {selectedColumns.includes('Action') && (
+                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Action</th>
+                )}
+                {selectedColumns.includes('Email') && (
+                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Email</th>
+                )}
+                {selectedColumns.includes('Phone Number') && (
+                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Phone Number</th>
+                )}
+                {selectedColumns.includes('Alternative Phone Number') && (
+                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Alternative Phone Number</th>
+                )}
+                {selectedColumns.includes('Shipping Zone') && (
+                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Shipping Zone</th>
+                )}
+                {selectedColumns.includes('Shipping Method') && (
+                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Shipping Method</th>
+                )}
+                {selectedColumns.includes('Payment Status') && (
+                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Payment Status</th>
+                )}
+                {selectedColumns.includes('Payment Method') && (
+                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Payment Method</th>
+                )}
+                {selectedColumns.includes('Vendor') && (
+                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Vendor</th>
+                )}
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+
+              {paginatedOrders?.length === 0 ? <tr>
+                <td colSpan={selectedColumns.length} className="text-center p-4 text-gray-500 md:pt-40 pt-32 lg:pt-52 xl:pt-60 2xl:pt-72">
+                  No orders found matching your criteria. Please adjust your filters or check back later.
+                </td>
+              </tr> : (paginatedOrders?.map((order, index) => (
+                <tr key={order?._id || index} className="hover:bg-gray-50 transition-colors">
+                  {selectedColumns.includes('Order Number') && (
+                    <td className="text-xs p-3 font-mono cursor-pointer text-blue-600 hover:text-blue-800" onClick={() => handleOrderClick(order)}>
+                      {order?.orderNumber}
+                    </td>
+                  )}
+                  {selectedColumns.includes('Date & Time') && (
+                    <td className="text-xs p-3 text-gray-700">{order?.dateTime}</td>
+                  )}
+                  {selectedColumns.includes('Customer Name') && (
+                    <td className="text-xs p-3 text-gray-700 uppercase">{order?.customerName}</td>
+                  )}
+                  {selectedColumns.includes('Order Amount') && (
+                    <td className="text-xs p-3 text-gray-700 pl-1 md:pl-2 lg:pl-4 xl:pl-9">৳ {order?.totalAmount.toFixed(2)}</td>
+                  )}
+                  {selectedColumns.includes('Order Status') && (
+                    <td className="text-xs p-3 text-yellow-600">{order?.orderStatus}</td>
+                  )}
+                  {selectedColumns.includes('Action') && (
+                    <td className="p-3">
+                      <div className="flex gap-2 items-center">
+                        {order.orderStatus === 'Pending' && (
+                          <Button onClick={() => handleActions(order._id)} size="sm" className="text-xs w-20" color="primary" variant="flat">
+                            Confirm
+                          </Button>
+                        )}
+                        {order.orderStatus === 'Processing' && (
+                          <Button onClick={() => handleActions(order._id, 'shipped')} size="sm" className="text-xs w-20" color="secondary" variant="flat">
+                            Shipped
+                          </Button>
+                        )}
+                        {order.orderStatus === 'Shipped' && (
+                          <div className="flex items-center gap-2">
+                            <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'onHold')} size="sm" color="warning" variant="flat">
+                              On Hold
+                            </Button>
+                            <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'delivered')} size="sm" color="success" variant="flat">
+                              Delivered
+                            </Button>
+                          </div>
+                        )}
+                        {order.orderStatus === 'On Hold' && (
+                          <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'delivered')} size="sm" color="success" variant="flat">
+                            Delivered
+                          </Button>
+                        )}
+                        {order.orderStatus === 'Delivered' && (
+                          <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'requestedReturn')} size="sm" color="danger" variant="flat">
+                            Return
+                          </Button>
+                        )}
+                        {order.orderStatus === 'Requested Return' && (
+                          <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'refunded')} size="sm" color="danger" variant="flat">
+                            Refund
+                          </Button>
+                        )}
+                        {order.orderStatus === 'Refunded' && (
+                          <Button className="text-xs w-20 cursor-not-allowed" size="sm" color="default" isDisabled>
+                            Refunded
+                          </Button>
+                        )}
+
+                        {/* Undo button logic */}
+                        {isAdmin && isUndoAvailable(order) && (
+                          <button
+                            onClick={() => handleActions(order._id, '', true)}
+                            className="text-red-600 hover:text-red-800 focus:ring-2 focus:ring-red-500 rounded p-1"
+                          >
+                            <FaUndo />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  )}
+                  {selectedColumns.includes('Email') && (
+                    <td className="text-xs p-3 text-gray-700">{order?.email}</td>
+                  )}
+                  {selectedColumns.includes('Phone Number') && (
+                    <td className="text-xs p-3 text-gray-700">{order?.phoneNumber}</td>
+                  )}
+                  {selectedColumns.includes('Alternative Phone Number') && (
+                    <td className="text-xs p-3 text-gray-700">{order?.phoneNumber2 === 0 ? '--' : order?.phoneNumber2}</td>
+                  )}
+                  {selectedColumns.includes('Shipping Zone') && (
+                    <td className="text-xs p-3 text-gray-700">{order?.shippingZone}</td>
+                  )}
+                  {selectedColumns.includes('Shipping Method') && (
+                    <td className="text-xs p-3 text-gray-700">{order?.shippingMethod}</td>
+                  )}
+                  {selectedColumns.includes('Payment Status') && (
+                    <td className="text-xs p-3 text-gray-700">{order?.paymentStatus}</td>
+                  )}
+                  {selectedColumns.includes('Payment Method') && (
+                    <td className="text-xs p-3 text-gray-700">{order?.paymentMethod}</td>
+                  )}
+                  {selectedColumns.includes('Vendor') && (
+                    <td className="text-xs p-3 text-gray-700">{order?.vendor}</td>
+                  )}
+                </tr>
+              )))}
+
+            </tbody>
+          </table>
+        </div>
+
+        {/* Modal of order number */}
+        {selectedOrder && (
+          <Modal className='mx-4 lg:mx-0' isOpen={isOpen} onOpenChange={onClose} size='xl'>
+            <ModalContent>
+              <div className='flex items-center justify-center'>
+                <ModalHeader className="text-sm md:text-base"><Barcode selectedOrder={selectedOrder} /></ModalHeader>
+              </div>
+              <ModalBody className="modal-body-scroll">
+                <div className='flex items-center justify-between w-full pr-10'>
+                  <p>Order Id - <strong>#{selectedOrder?.orderNumber}</strong></p>
+                  <p>Customer Id - <strong>{selectedOrder?.customerId}</strong></p>
+                </div>
+                <p className='text-xs md:text-base'>Address: {selectedOrder?.address1} {selectedOrder?.address2}, {selectedOrder?.city}, {selectedOrder?.postalCode}</p>
+                <p className='text-xs md:text-base'>Transaction Id: {selectedOrder?.transactionId}</p>
+                <p className='text-xs md:text-base'>Tracking Number: {selectedOrder?.trackingNumber === "" ? '--' : selectedOrder?.trackingNumber}</p>
+
+                <h4 className="mt-4 text-lg font-semibold">Product Information</h4>
+                {/* Display product and promo/offer information */}
+                <div className='flex justify-between gap-6 pr-6'>
+                  <div>
+                    {selectedOrder.productInformation && selectedOrder.productInformation.length > 0 && (
+                      <>
+                        {selectedOrder.productInformation.map((product, index) => (
+                          <div key={index} className="mb-4">
+                            <p><strong>Product : </strong> {product?.productTitle}</p>
+                            <p><strong>Product ID : </strong> {product?.productId}</p>
+                            <p><strong>Size:</strong>  {product?.size}</p>
+                            <p className='flex items-center gap-2'><strong>Color:</strong>
+                              {product?.color?.label}
+                              <span
+                                style={{
+                                  display: 'inline-block',
+                                  width: '20px',
+                                  height: '20px',
+                                  backgroundColor: product.color?.color || '#fff',
+                                  marginRight: '8px',
+                                  borderRadius: '4px'
+                                }}
+                              />
+                            </p>
+                            <p><strong>Batch Code:</strong> {product?.batchCode}</p>
+                            <p><strong>Unit Price:</strong> {product?.unitPrice}</p>
+                            <p><strong>SKU:</strong> {product?.sku}</p>
+                          </div>
+                        ))}
+                      </>
+                    )}
+                  </div>
+                  <div className='flex flex-col items-center text-sm md:text-base w-60'>
+                    <p className='w-full'><strong>Total Amount:</strong>  ৳ {selectedOrder?.totalAmount.toFixed(2)}</p>
+                    <p className='w-full'>
+                      {selectedOrder?.promoCode || selectedOrder?.productInformation?.some((product) => product.offerTitle) ? (
+                        (() => {
+                          // Calculate promo discount only if it's greater than 0
+                          const promoDiscount =
+                            selectedOrder.promoDiscountType === 'Percentage'
+                              ? (selectedOrder.totalAmount * selectedOrder.promoDiscountValue) / 100
+                              : selectedOrder.promoDiscountValue;
+
+                          // Extract offer discounts from productInformation and filter out 0-value offers
+                          const offerDetails = selectedOrder.productInformation
+                            .map((product) => {
+                              const offerDiscount =
+                                product.offerDiscountType === 'Percentage'
+                                  ? (product.unitPrice * product.offerDiscountValue) / 100
+                                  : product.offerDiscountValue;
+
+                              return {
+                                offerTitle: product.offerTitle,
+                                offerDiscountType: product.offerDiscountType,
+                                offerDiscountValue: product.offerDiscountValue,
+                                offerDiscountAmount: offerDiscount,
+                              };
+                            })
+                            .filter((offer) => offer.offerDiscountAmount > 0); // Filter out 0-value offers
+
+                          return (
+                            <div className='flex flex-col gap-2'>
+                              {/* Show promo discount if applied */}
+                              {selectedOrder.promoCode && promoDiscount > 0 ? (
+                                <div>
+                                  <strong>Promo applied:</strong> {selectedOrder.promoDiscountType === 'Percentage'
+                                    ? `${selectedOrder.promoDiscountValue.toFixed(2)}%`
+                                    : `৳ ${selectedOrder.promoDiscountValue.toFixed(2)}`}
+                                  <br />
+                                </div>
+                              ) : null}
+
+                              {/* Show multiple offers if they are applied */}
+                              {offerDetails.length > 0 ? (
+                                <div>
+                                  {offerDetails.map((offer, index) => (
+                                    <span key={index}>
+                                      <strong>Offer applied</strong> ({offer.offerTitle}):{' '}
+                                      {offer.offerDiscountType === 'Percentage'
+                                        ? `${offer.offerDiscountValue.toFixed(2)}%`
+                                        : `৳ ${offer.offerDiscountAmount.toFixed(2)}`}
+                                      <br />
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : null}
+                            </div>
+                          );
+                        })()
+                      ) : (
+                        <div>
+                          <strong>Promo/Offer applied:</strong> X
+                        </div>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </ModalBody>
+              <ModalFooter className='flex items-center justify-end'>
+                <PrintButton selectedOrder={selectedOrder} />
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+        )}
+
+        {/* Pagination Button */}
+        <div className="flex flex-col mt-2 md:flex-row gap-4 justify-center items-center relative">
+          <CustomPagination
+            totalPages={totalPages}
+            currentPage={page}
+            onPageChange={setPage}
+          />
+          <div className="relative inline-block">
+            <select
+              id="itemsPerPage"
+              value={itemsPerPage}
+              onChange={handleItemsPerPageChange}
+              className="cursor-pointer px-3 py-2 rounded-lg text-sm md:text-base text-gray-800 bg-white shadow-lg border border-gray-300 focus:outline-none hover:bg-gradient-to-tr hover:from-pink-400 hover:to-yellow-400 hover:text-white transition-colors duration-300 appearance-none w-16 md:w-20 lg:w-24"
+            >
+              <option className='bg-white text-black' value={25}>25</option>
+              <option className='bg-white text-black' value={50}>50</option>
+              <option className='bg-white text-black' value={100}>100</option>
+            </select>
+            <svg className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
         </div>
       </div>
     </div>
+
   );
 };
 

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FaAngleUp, FaAngleDown } from "react-icons/fa";
 import CustomSwitch from './CustomSwitch';
 import { RiDeleteBinLine } from 'react-icons/ri';
@@ -12,20 +12,50 @@ import useOffers from '@/app/hooks/useOffers';
 import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
+import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
 
 const RecentPromotions = () => {
 
+  const dropdownRef = useRef(null);
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
   const [orderList, isOrderPending] = useOrders();
   const [promoList, isPromoPending, refetchPromo] = usePromoCodes();
   const [offerList, isOfferPending, refetchOffer] = useOffers();
-  const [selectedPromo, setSelectedPromo] = useState(null);
-  const [selectedOffer, setSelectedOffer] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
   const [selectedOption, setSelectedOption] = useState('all'); // New state for dropdown
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
-  const [isExpanded, setIsExpanded] = useState(null); // To track which row is expanded
+  // const [isExpanded, setIsExpanded] = useState(null); // To track which row is expanded
+  const [isOpenDropdown, setIsOpenDropdown] = useState(false);
+  const columns = ["Promo Code / Offer Title", "Type", "Discount Value", "Expiry Date", "Total Times Applied", "Total Discount Given", "Products Affected", "Min Order Amount", "Max Capped Amount", "Actions", "Status"];
+  const [selectedColumns, setSelectedColumns] = useState(columns);
+  const [isColumnModalOpen, setColumnModalOpen] = useState(false);
+
+  useEffect(() => {
+    const savedColumns = JSON.parse(localStorage.getItem('selectedMarketingColumns'));
+    if (savedColumns) {
+      setSelectedColumns(savedColumns);
+    } else {
+      setSelectedColumns([]);
+    }
+  }, []);
+
+  const handleColumnChange = (selected) => {
+    setSelectedColumns(selected);
+  };
+
+  const handleSelectAll = () => {
+    setSelectedColumns(columns);
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedColumns([]);
+  };
+
+  const handleSave = () => {
+    localStorage.setItem('selectedMarketingColumns', JSON.stringify(selectedColumns));
+    setColumnModalOpen(false);
+  };
 
   // Memoized current date
   const currentDate = useMemo(() => new Date(), []);
@@ -75,57 +105,18 @@ const RecentPromotions = () => {
     });
   }, [promoList, offerList]);
 
-  // Function to filter based on the search query and tab/dropdown selection
-  const filterItems = (items) => {
-    if (!searchQuery) return items;
-    const query = searchQuery.toLowerCase();
-    return items.filter(item =>
-      item?.promoCode?.toLowerCase().includes(query) ||
-      item?.offerTitle?.toLowerCase().includes(query) ||
-      item?.expiryDate?.toLowerCase().includes(query) ||
-      (item?.promoDiscountValue && item.promoDiscountValue.toString().includes(query)) ||
-      (item?.promoDiscountType && item.promoDiscountType.toLowerCase().includes(query)) ||
-      (item?.offerDiscountValue && item.offerDiscountValue.toString().includes(query)) ||
-      (item?.offerDiscountType && item.offerDiscountType.toLowerCase().includes(query))
-    );
+  const calculateTotalPromoApplied = (promoCode) => {
+    return orderList?.filter(order => order.promoCode === promoCode && order.paymentStatus === "Paid").length || 0;
   };
 
-  const handleViewClick = (item) => {
-    setIsExpanded((prev) => (prev === item._id ? null : item._id)); // Use correct identifier for expansion
-  };
-
-  useMemo(() => {
-    const selectedPromo = promoList?.find(promo => promo?._id === isExpanded);
-    const selectedOffer = offerList?.find(offer => offer?._id === isExpanded);
-
-    if (selectedPromo) {
-      setSelectedPromo(selectedPromo);
-      setSelectedOffer(null); // Clear offer if a promo is selected
-    } else if (selectedOffer) {
-      setSelectedOffer(selectedOffer);
-      setSelectedPromo(null); // Clear promo if an offer is selected
-    }
-  }, [isExpanded, offerList, promoList]);
-
-  const totalPromoApplied = useMemo(() => {
-    if (!selectedPromo?.promoCode) return 0;
-
-    return orderList?.filter(order => order.promoCode === selectedPromo.promoCode).length || 0;
-  }, [orderList, selectedPromo]);
-
-  const totalAmountDiscounted = useMemo(() => {
-    if (!selectedPromo?.promoCode) return '0.00';
-
+  const calculateTotalAmountDiscounted = (promoCode) => {
     const totalDiscount = orderList?.reduce((acc, order) => {
-      if (order.promoCode !== selectedPromo.promoCode) return acc;
+      if (order.promoCode !== promoCode || order.paymentStatus !== "Paid") return acc; // Check for payment status
 
       let offerDiscountTotal = 0;
-
-      // Calculate total offer discounts for the order (across all products)
       order.productInformation.forEach(product => {
         if (product.offerTitle && product.offerDiscountValue > 0) {
           const productTotal = product.unitPrice * product.sku;
-
           if (product.offerDiscountType === 'Percentage') {
             offerDiscountTotal += (product.offerDiscountValue / 100) * productTotal;
           } else if (product.offerDiscountType === 'Amount') {
@@ -134,10 +125,7 @@ const RecentPromotions = () => {
         }
       });
 
-      // Adjusted order total after offer discounts
       const adjustedOrderTotal = order.totalAmount - offerDiscountTotal;
-
-      // Calculate promo discount on adjusted order total
       let promoDiscount = 0;
       if (order.promoDiscountType === 'Percentage') {
         promoDiscount = (order.promoDiscountValue / 100) * adjustedOrderTotal;
@@ -149,25 +137,23 @@ const RecentPromotions = () => {
     }, 0) || 0;
 
     return totalDiscount.toFixed(2);
-  }, [orderList, selectedPromo]);
+  };
 
-  const totalOfferApplied = useMemo(() => {
-    if (!selectedOffer?.offerTitle) return 0;
-
+  const calculateTotalOfferApplied = (offerTitle) => {
     return orderList?.reduce((count, order) => {
-      const offerCount = order.productInformation.filter(
-        product => product.offerTitle === selectedOffer.offerTitle
-      ).length;
+      const offerCount = (order.paymentStatus === "Paid" && order.productInformation.filter(
+        product => product.offerTitle === offerTitle
+      ).length) || 0; // Check for payment status
       return count + offerCount;
     }, 0) || 0;
-  }, [orderList, selectedOffer]);
+  };
 
-  const totalOfferAmountDiscounted = useMemo(() => {
-    if (!selectedOffer?.offerTitle) return '0.00';
-
+  const calculateTotalOfferAmountDiscounted = (offerTitle) => {
     const totalDiscount = orderList?.reduce((acc, order) => {
+      if (order.paymentStatus !== "Paid") return acc; // Check for payment status
+
       const offerDiscountTotal = order.productInformation.reduce((prodAcc, product) => {
-        if (product.offerTitle !== selectedOffer.offerTitle) return prodAcc;
+        if (product.offerTitle !== offerTitle) return prodAcc;
 
         const productSubtotal = product.unitPrice * product.sku;
         let discount = 0;
@@ -185,7 +171,82 @@ const RecentPromotions = () => {
     }, 0) || 0;
 
     return totalDiscount.toFixed(2);
-  }, [orderList, selectedOffer]);
+  };
+
+  const getProductTitlesForPromo = (promoCode) => {
+    const productTitles = [];
+
+    orderList.forEach(order => {
+      if (order.promoCode === promoCode && order.paymentStatus === "Paid") { // Check for payment status
+        order.productInformation.forEach(product => {
+          productTitles.push(product.productTitle); // Adjust this to your actual product title field
+        });
+      }
+    });
+
+    return productTitles;
+  };
+
+  const getProductTitlesForOffer = (offerTitle) => {
+    const productTitles = [];
+
+    orderList.forEach(order => {
+      if (order.paymentStatus === "Paid") { // Check for payment status
+        order.productInformation.forEach(product => {
+          if (product.offerTitle === offerTitle) {
+            productTitles.push(product.productTitle); // Adjust this to your actual product title field
+          }
+        });
+      }
+    });
+
+    return productTitles;
+  };
+
+  // Function to filter based on the search query and tab/dropdown selection
+  const filterItems = (items) => {
+    if (!searchQuery) return items;
+    const query = searchQuery.toLowerCase();
+
+    return items.filter(item => {
+
+      // Get calculated totals for promo/offer
+      const totalPromoApplied = item?.promoCode ? calculateTotalPromoApplied(item.promoCode) : 0;
+      const totalAmountDiscounted = item?.promoCode ? calculateTotalAmountDiscounted(item.promoCode) : '0.00';
+      const totalOfferApplied = item?.offerTitle ? calculateTotalOfferApplied(item.offerTitle) : 0;
+      const totalOfferAmountDiscounted = item?.offerTitle ? calculateTotalOfferAmountDiscounted(item.offerTitle) : '0.00';
+
+      // Get product titles for promo and offer
+      const promoProductTitles = getProductTitlesForPromo(item.promoCode);
+      const offerProductTitles = getProductTitlesForOffer(item.offerTitle);
+
+      // Check for product titles in the search query
+      const productTitleMatch = promoProductTitles.some(title => title.toLowerCase().includes(query)) ||
+        offerProductTitles.some(title => title.toLowerCase().includes(query));
+
+      // Return true if any of the item's details or calculated values match the query
+      return (
+        item?.promoCode?.toLowerCase().includes(query) ||
+        item?.offerTitle?.toLowerCase().includes(query) ||
+        item?.expiryDate?.toLowerCase().includes(query) ||
+        item?.minAmount?.toString().includes(query) ||
+        item?.maxAmount?.toString().includes(query) ||
+        (item?.promoDiscountValue && item.promoDiscountValue.toString().includes(query)) ||
+        (item?.promoDiscountType && item.promoDiscountType.toLowerCase().includes(query)) ||
+        (item?.offerDiscountValue && item.offerDiscountValue.toString().includes(query)) ||
+        (item?.offerDiscountType && item.offerDiscountType.toLowerCase().includes(query)) ||
+        totalPromoApplied.toString().includes(query) ||
+        totalAmountDiscounted.toString().includes(query) ||
+        totalOfferApplied.toString().includes(query) ||
+        totalOfferAmountDiscounted.toString().includes(query) ||
+        productTitleMatch // Check for product titles
+      );
+    });
+  };
+
+  // const handleViewClick = (item) => {
+  //   setIsExpanded((prev) => (prev === item._id ? null : item._id)); // Use correct identifier for expansion
+  // };
 
   const handleDeletePromo = async (id) => {
     Swal.fire({
@@ -425,7 +486,7 @@ const RecentPromotions = () => {
       return (
         <tbody>
           <tr>
-            <td colSpan="6" className="text-center py-4">No items found</td>
+            <td colSpan="12" className="text-center py-4">No items found</td>
           </tr>
         </tbody>
       );
@@ -435,92 +496,187 @@ const RecentPromotions = () => {
       <tbody className="bg-white divide-y divide-gray-200">
         {filteredItems.map((item, index) => {
           const isExpired = new Date(item?.expiryDate) < currentDate;
-          const isExpandedItem = isExpanded === item._id;
+          // const isExpandedItem = isExpanded === item._id;
+
+          const totalPromoApplied = item?.promoCode
+            ? calculateTotalPromoApplied(item?.promoCode)
+            : 0;
+
+          const totalAmountDiscounted = item?.promoCode
+            ? calculateTotalAmountDiscounted(item?.promoCode)
+            : '0.00';
+
+          const totalOfferApplied = item?.offerTitle
+            ? calculateTotalOfferApplied(item?.offerTitle)
+            : 0;
+
+          const totalOfferAmountDiscounted = item?.offerTitle
+            ? calculateTotalOfferAmountDiscounted(item?.offerTitle)
+            : '0.00';
+
           return (
             <>
               <tr key={item?._id || index} className="hover:bg-gray-50 transition-colors">
-                <td className={`p-3 text-gray-700 ${isExpandedItem ? "text-base font-bold" : "text-xs"}`}>{item?.promoCode || item?.offerTitle}</td>
-                <td className="text-xs p-3 text-gray-700">
-                  {item?.promoDiscountType
-                    ? `${item?.promoDiscountValue} ${item?.promoDiscountType === 'Amount' ? 'Tk' : '%'}`
-                    : item?.offerDiscountType
-                      ? `${item?.offerDiscountValue} ${item?.offerDiscountType === 'Amount' ? 'Tk' : '%'}`
-                      : 'No Discount'}
-                </td>
-                <td className="text-xs p-3 text-gray-700">{item?.expiryDate}</td>
-                <td className="text-xs p-3 text-gray-700">
-                  <div className="flex items-center gap-3 cursor-pointer">
-                    <div className="group relative">
-                      <button disabled={isExpired}>
-                        <MdOutlineModeEdit
-                          onClick={() =>
-                            item?.promoCode
-                              ? router.push(`/dash-board/marketing/promo/${item._id}`) // Edit promo
-                              : router.push(`/dash-board/marketing/offer/${item._id}`) // Edit offer
-                          }
-                          size={22}
-                          className={`text-blue-500 ${isExpired ? 'cursor-not-allowed' : 'hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
-                        />
-                      </button>
-                      {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
-                        Edit
-                      </span>}
-                    </div>
-                    <div className="group relative">
-                      <button disabled={isExpired}>
-                        <RiDeleteBinLine
-                          onClick={() =>
-                            item?.promoCode
-                              ? handleDeletePromo(item._id) // Delete promo
-                              : handleDeleteOffer(item._id) // Delete offer
-                          }
-                          size={22}
-                          className={`text-red-500 ${isExpired ? 'cursor-not-allowed' : 'hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
-                        />
-                      </button>
-                      {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
-                        Delete
-                      </span>}
-                    </div>
-                  </div>
-                </td>
-                <td className="text-xs p-3 text-gray-700">
+                {selectedColumns.includes('Promo Code / Offer Title') && (
+                  // <td className={`p-3 text-gray-700 ${isExpandedItem ? "text-base font-bold" : "text-xs"}`}>{item?.promoCode || item?.offerTitle}</td>
+                  <td className={`p-3 text-gray-700 text-xs`}>{item?.promoCode || item?.offerTitle}</td>
+                )}
+                {selectedColumns.includes('Type') && (
+                  <td className="text-xs p-3 text-gray-700">
+                    {item?.promoCode ? "Promo" : "Offer"}
+                  </td>
+                )}
+                {selectedColumns.includes('Discount Value') && (
+                  <td className="text-xs p-3 text-gray-700">
+                    {item?.promoDiscountType
+                      ? `${item?.promoDiscountValue} ${item?.promoDiscountType === 'Amount' ? 'Tk' : '%'}`
+                      : item?.offerDiscountType
+                        ? `${item?.offerDiscountValue} ${item?.offerDiscountType === 'Amount' ? 'Tk' : '%'}`
+                        : 'No Discount'}
+                  </td>
+                )}
+                {selectedColumns.includes('Expiry Date') && (
+                  <td className="text-xs p-3 text-gray-700">{item?.expiryDate}</td>
+                )}
+                {selectedColumns.includes('Total Times Applied') && (
+                  <td className="text-xs p-3 text-gray-700">
+                    {item?.promoCode
+                      ? `${totalPromoApplied} ${totalPromoApplied === 1 ? "Order" : "Orders"}`
+                      : `${totalOfferApplied} ${totalOfferApplied === 1 ? "Order" : "Orders"}`}
+                  </td>
+                )}
+                {selectedColumns.includes('Total Discount Given') && (
+                  <td className="text-xs p-3 text-gray-700">
+                    {item?.promoCode
+                      ? `৳ ${totalAmountDiscounted}`
+                      : `৳ ${totalOfferAmountDiscounted}`}
+                  </td>
+                )}
+                {selectedColumns.includes('Products Affected') && (
+                  <td className="text-xs p-3 text-gray-700">
+                    {item?.promoCode && (
+                      <div>
+                        <ul>
+                          {getProductTitlesForPromo(item?.promoCode).join(", ") || "No products applied"}
+                        </ul>
+                      </div>
+                    )}
 
-                  {item?.promoCode ? (
-                    <CustomSwitch
-                      checked={item?.promoStatus}
-                      onChange={() => handleStatusChangePromo(item?._id, item?.promoStatus)}
-                      size="md"
-                      color="primary"
-                      disabled={isExpired}
-                    />
-                  ) : (
-                    <CustomSwitch
-                      checked={item?.offerStatus}
-                      onChange={() => handleStatusChangeOffer(item?._id, item?.offerStatus)}
-                      size="md"
-                      color="primary"
-                      disabled={isExpired}
-                    />
-                  )}
+                    {item?.offerTitle && (
+                      <div>
+                        <ul>
+                          {getProductTitlesForOffer(item?.offerTitle).join(", ") || "No products applied"}
+                        </ul>
+                      </div>
+                    )}
+                  </td>
+                )}
+                {selectedColumns.includes('Min Order Amount') && (
+                  <td className="text-xs p-3 text-gray-700">
+                    {item?.promoCode ? (
+                      <>
+                        <p> ৳ {item?.minAmount || '0'}</p>
+                      </>
+                    ) : (
+                      <>
+                        <p> ৳ {item?.minAmount || '0'}</p>
+                      </>
+                    )}
+                  </td>
+                )}
+                {selectedColumns.includes('Max Capped Amount') && (
+                  <td className="text-xs p-3 text-gray-700">
+                    {item?.promoCode ? (
+                      <>
+                        <p> ৳ {item?.maxAmount || '0'}</p>
+                      </>
+                    ) : (
+                      <>
 
-                </td>
-                <td className="text-xs p-3 text-gray-700 cursor-pointer">
-                  <button onClick={() =>
-                    handleViewClick(item)
-                  }>
-                    {isExpandedItem ? <FaAngleUp className='hover:text-red-600' size={22} /> : <FaAngleDown className='hover:text-red-600' size={22} />}
-                  </button>
-                </td>
+                        <p> ৳ {item?.maxAmount || '0'}</p>
+                      </>
+                    )}
+                  </td>
+                )}
+                {selectedColumns.includes('Actions') && (
+                  <td className="text-xs p-3 text-gray-700">
+                    <div className="flex items-center gap-3 cursor-pointer">
+                      <div className="group relative">
+                        <button disabled={isExpired}>
+                          <MdOutlineModeEdit
+                            onClick={() =>
+                              item?.promoCode
+                                ? router.push(`/dash-board/marketing/promo/${item._id}`) // Edit promo
+                                : router.push(`/dash-board/marketing/offer/${item._id}`) // Edit offer
+                            }
+                            size={22}
+                            className={`text-blue-500 ${isExpired ? 'cursor-not-allowed' : 'hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
+                          />
+                        </button>
+                        {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
+                          Edit
+                        </span>}
+                      </div>
+                      <div className="group relative">
+                        <button disabled={isExpired}>
+                          <RiDeleteBinLine
+                            onClick={() =>
+                              item?.promoCode
+                                ? handleDeletePromo(item._id) // Delete promo
+                                : handleDeleteOffer(item._id) // Delete offer
+                            }
+                            size={22}
+                            className={`text-red-500 ${isExpired ? 'cursor-not-allowed' : 'hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
+                          />
+                        </button>
+                        {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
+                          Delete
+                        </span>}
+                      </div>
+                    </div>
+                  </td>
+                )}
+                {selectedColumns.includes('Status') && (
+                  <td className="text-xs p-3 text-gray-700">
+
+                    {item?.promoCode ? (
+                      <CustomSwitch
+                        checked={item?.promoStatus}
+                        onChange={() => handleStatusChangePromo(item?._id, item?.promoStatus)}
+                        size="md"
+                        color="primary"
+                        disabled={isExpired}
+                      />
+                    ) : (
+                      <CustomSwitch
+                        checked={item?.offerStatus}
+                        onChange={() => handleStatusChangeOffer(item?._id, item?.offerStatus)}
+                        size="md"
+                        color="primary"
+                        disabled={isExpired}
+                      />
+                    )}
+
+                  </td>
+                )}
+                {/* {selectedColumns.includes('Preview') && (
+                  <td className="text-xs p-3 text-gray-700 cursor-pointer">
+                    <button onClick={() =>
+                      handleViewClick(item)
+                    }>
+                      {isExpandedItem ? <FaAngleUp className='hover:text-red-600' size={22} /> : <FaAngleDown className='hover:text-red-600' size={22} />}
+                    </button>
+                  </td>
+                )} */}
               </tr>
-              {isExpandedItem && (
+              {/* {isExpandedItem && (
                 <tr>
-                  <td colSpan="6" className="p-4 bg-gray-100">
+                  <td colSpan="12" className="p-4 bg-gray-100">
                     <div className="text-sm">
                       {item?.promoCode ? (
                         <>
                           <p>
-                            Total Applied:
+                            Total Times Applied:
 
                             {totalPromoApplied === 0
                               ? " No Orders"
@@ -533,7 +689,7 @@ const RecentPromotions = () => {
                       ) : (
                         <>
                           <p>
-                            Total Applied:
+                            Total Times Applied:
                             {totalOfferApplied === 0
                               ? " No Orders"
                               : ` ${totalOfferApplied} ${totalOfferApplied === 1 ? " Order" : " Orders"}`}
@@ -546,7 +702,7 @@ const RecentPromotions = () => {
                     </div>
                   </td>
                 </tr>
-              )}
+              )} */}
             </>
           )
         })}
@@ -585,6 +741,20 @@ const RecentPromotions = () => {
     }
   };
 
+  const toggleDropdown = () => setIsOpenDropdown(!isOpenDropdown);
+
+  // Close dropdown when clicking outside
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsOpenDropdown(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   if (isPromoPending || isOrderPending || isOfferPending) {
     return <SmallHeightLoading />;
   }
@@ -602,6 +772,36 @@ const RecentPromotions = () => {
             <option value="promos">Promos</option>
             <option value="offers">Offers</option>
           </select>
+        </div>
+
+        <div ref={dropdownRef} className="relative inline-block text-left">
+          <Button onClick={toggleDropdown} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
+            Customize
+            <svg
+              className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${isOpenDropdown ? 'rotate-180' : ''}`}
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </Button>
+
+          {isOpenDropdown && (
+            <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <div className="p-1">
+
+
+                <div className="py-1">
+                  <Button variant="solid" color="danger" onClick={() => { setColumnModalOpen(true) }} className="w-full">
+                    Choose Columns
+                  </Button>
+                </div>
+
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Search Product Item */}
@@ -648,16 +848,46 @@ const RecentPromotions = () => {
         </div>
       )}
 
-      <div className="max-w-screen-2xl mx-auto custom-max-discount overflow-x-auto my-4">
+      <div className="max-w-screen-2xl mx-auto custom-max-discount custom-scrollbar overflow-x-auto my-4">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-50 sticky top-0 z-[1] rounded-md">
             <tr>
-              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">{renderHeading()}</th>
-              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Discount</th>
-              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Expiry Date</th>
-              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Actions</th>
-              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Status</th>
-              <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Preview</th>
+              {selectedColumns.includes('Promo Code / Offer Title') && (
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">{renderHeading()}</th>
+              )}
+              {selectedColumns.includes('Type') && (
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Type</th>
+              )}
+              {selectedColumns.includes('Discount Value') && (
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Discount Value</th>
+              )}
+              {selectedColumns.includes('Expiry Date') && (
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Expiry Date</th>
+              )}
+              {selectedColumns.includes('Total Times Applied') && (
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Total Times Applied</th>
+              )}
+              {selectedColumns.includes('Total Discount Given') && (
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Total Discount Given</th>
+              )}
+              {selectedColumns.includes('Products Affected') && (
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Products Affected</th>
+              )}
+              {selectedColumns.includes('Min Order Amount') && (
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Min Order Amount</th>
+              )}
+              {selectedColumns.includes('Max Capped Amount') && (
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Max Capped Amount</th>
+              )}
+              {selectedColumns.includes('Actions') && (
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Actions</th>
+              )}
+              {selectedColumns.includes('Status') && (
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Status</th>
+              )}
+              {/* {selectedColumns.includes('Preview') && (
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Preview</th>
+              )} */}
             </tr>
           </thead>
 
@@ -665,6 +895,33 @@ const RecentPromotions = () => {
           {renderItems(filteredItems)}
         </table>
       </div>
+
+      {/* Column Selection Modal */}
+      <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
+        <ModalContent>
+          <ModalHeader>Choose Columns</ModalHeader>
+          <ModalBody className="modal-body-scroll">
+            <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
+              {columns.map((column) => (
+                <Checkbox key={column} value={column}>
+                  {column}
+                </Checkbox>
+              ))}
+            </CheckboxGroup>
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
+              Select All
+            </Button>
+            <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
+              Deselect All
+            </Button>
+            <Button variant="solid" size='sm' color="primary" onClick={handleSave}>
+              Save
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };

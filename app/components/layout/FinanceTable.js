@@ -248,7 +248,7 @@ const FinanceTable = () => {
         </ModalContent>
       </Modal>
 
-      <div className="max-w-screen-2xl mx-auto custom-max-discount overflow-x-auto mt-6">
+      <div className="max-w-screen-2xl mx-auto custom-scrollbar custom-max-discount overflow-x-auto mt-6">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-50 sticky top-0 z-[1] rounded-md">
             <tr>

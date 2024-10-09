@@ -534,6 +534,7 @@ const FirstStepOfAddProduct = () => {
         localStorage.removeItem('materialCare');
         localStorage.removeItem('sizeFit');
         localStorage.removeItem('category');
+        localStorage.removeItem('productId');
         JSON.parse(localStorage.removeItem('subCategories') || '[]');
         JSON.parse(localStorage.removeItem('groupOfSizes') || '[]');
         JSON.parse(localStorage.removeItem('allSizes') || '[]');
@@ -570,10 +571,10 @@ const FirstStepOfAddProduct = () => {
       </div>
 
       <form className='2xl:max-w-screen-2xl 2xl:mx-auto' onSubmit={handleSubmit(onSubmit)}>
-        <div className='grid grid-cols-1 lg:grid-cols-12'>
+        <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
 
-          <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 px-6 py-3'>
-            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+          <div className='grid grid-cols-1 lg:col-span-7 gap-8 px-6 py-3 max-h-[1550px]'>
+            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[420px]'>
               <label htmlFor='productTitle' className='flex justify-start font-medium text-[#9F5216]'>Product Title *</label>
               <input id='productTitle' {...register("productTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" placeholder='Enter Product Title' type="text" />
               {errors.productTitle?.type === "required" && (
@@ -596,7 +597,7 @@ const FirstStepOfAddProduct = () => {
               />
             </div>
 
-            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[560px]'>
 
               <div className='flex flex-col rounded-md relative'>
                 <label htmlFor="category" className='text-xs px-2'>Category</label>
@@ -763,7 +764,7 @@ const FirstStepOfAddProduct = () => {
               />
             </div>
 
-            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[570px]'>
               <label htmlFor='materialCare' className='flex justify-start font-medium text-[#9F5216]'>Material Care</label>
               <Controller
                 name="materialCare"
@@ -794,7 +795,7 @@ const FirstStepOfAddProduct = () => {
             </div>
           </div>
 
-          <div className='grid grid-cols-1 lg:col-span-5 xl:col-span-5 gap-8 mt-6 px-6 py-3'>
+          <div className='grid grid-cols-1 lg:col-span-5 gap-8 px-6 py-3'>
             <div className='flex flex-col gap-4 h-fit'>
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                 <div>
@@ -969,9 +970,9 @@ const FirstStepOfAddProduct = () => {
                                     <Image
                                       src={url}
                                       alt={`Uploaded image ${index + 1}`}
-                                      height={1000}
-                                      width={1000}
-                                      className='w-full h-auto rounded-md object-cover'
+                                      height={3000}
+                                      width={3000}
+                                      className='w-full h-auto max-h-[350px] rounded-md object-cover'
                                     />
                                     <button
                                       onClick={() => handleImageRemove(index)}
@@ -995,7 +996,7 @@ const FirstStepOfAddProduct = () => {
           </div>
 
         </div>
-        <div className='flex justify-end gap-6 px-6 pt-4 pb-8'>
+        <div className='flex justify-end gap-6 px-6 pt-16 pb-8'>
 
           <button type="button" onClick={handleSubmit(onSaveForNow)} className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
             Save For Now <FiSave size={19} />

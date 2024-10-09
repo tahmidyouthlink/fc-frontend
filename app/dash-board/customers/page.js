@@ -7,12 +7,12 @@ import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalF
 import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import CustomerPrintButton from '@/app/components/layout/CustomerPrintButton';
+import useCustomers from '@/app/hooks/useCustomers';
+import { FaCrown, FaMedal, FaRegUser, FaStar } from 'react-icons/fa6';
 // import RatingModal from '@/app/components/layout/RatingModal';
 // import toast from 'react-hot-toast';
 // import { PiFlagPennantFill } from "react-icons/pi";
-import { getColorClass } from '@/app/components/layout/getColorClass';
-import useCustomers from '@/app/hooks/useCustomers';
-import { FaCrown, FaMedal, FaRegUser, FaStar } from 'react-icons/fa6';
+// import { getColorClass } from '@/app/components/layout/getColorClass';
 
 const Customers = () => {
 
@@ -246,12 +246,36 @@ const Customers = () => {
   return (
     <div className='max-w-screen-2xl px-6 2xl:px-0 mx-auto'>
 
-      <div className='flex items-center justify-between my-2 md:my-5'>
-        <h3 className='px-6 w-full text-center md:text-start font-medium md:font-semibold text-[13px] md:text-xl lg:text-2xl'>Customer Management</h3>
+      <div className='flex flex-wrap md:flex-nowrap items-center gap-2 md:gap-0 justify-center md:justify-between my-2 md:my-5'>
+        <h3 className='w-full text-center md:text-start font-medium md:font-semibold text-[13px] lg:text-lg xl:text-2xl'>Customer Management</h3>
 
-        <div className='flex w-full items-center max-w-screen-2xl px-3 mx-auto justify-center md:justify-end md:gap-6'>
+        <div className='min-w-[40%]'>
+          {/* Search Product Item */}
+          <li className="flex items-center relative group">
+            <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
+              <g>
+                <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
+              </g>
+            </svg>
+            <input
+              type="search"
+              placeholder="Search By Customer Details..."
+              value={searchQuery}
+              onChange={handleSearch}
+              className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-[#f3f3f4] text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
+            />
+          </li>
+        </div>
 
-          <div ref={dropdownRef} className="relative inline-block text-left">
+        <div className='flex w-full items-center max-w-screen-2xl mx-auto justify-center md:justify-end md:gap-6'>
+
+          <div>
+            <Button variant="solid" color="danger" onClick={() => { setColumnModalOpen(true) }} className="w-full">
+              Choose Columns
+            </Button>
+          </div>
+
+          {/* <div ref={dropdownRef} className="relative inline-block text-left">
             <Button onClick={toggleDropdown} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
               Customize
               <svg
@@ -268,25 +292,10 @@ const Customers = () => {
             {isOpenDropdown && (
               <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="p-1">
-                  {/* Search Product Item */}
-                  <li className="flex items-center relative group">
-                    <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
-                      <g>
-                        <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
-                      </g>
-                    </svg>
-                    <input
-                      type="search"
-                      placeholder="Search By Customer Details..."
-                      value={searchQuery}
-                      onChange={handleSearch}
-                      className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-[#f3f3f4] text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
-                    />
-                  </li>
 
-                  {/* Choose Columns Button */}
+                  
                   <div className="py-1">
-                    <Button variant="light" color="primary" onClick={() => { setColumnModalOpen(true) }} className="w-full">
+                    <Button variant="solid" color="danger" onClick={() => { setColumnModalOpen(true) }} className="w-full">
                       Choose Columns
                     </Button>
                   </div>
@@ -294,7 +303,7 @@ const Customers = () => {
                 </div>
               </div>
             )}
-          </div>
+          </div> */}
 
         </div>
       </div>
@@ -327,7 +336,7 @@ const Customers = () => {
       </Modal>
 
       {/* table content */}
-      <div className="max-w-screen-2xl mx-auto px-0 md:px-4 lg:px-6 custom-max-h overflow-x-auto modal-body-scroll">
+      <div className="max-w-screen-2xl mx-auto custom-max-h overflow-x-auto modal-body-scroll">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-100 sticky top-0 z-[1] shadow-md">
             <tr>

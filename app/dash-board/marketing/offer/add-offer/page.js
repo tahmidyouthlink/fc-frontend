@@ -1,7 +1,6 @@
 "use client";
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
-import { DatePicker, Select, SelectItem, Tab, Tabs } from '@nextui-org/react';
-import Link from 'next/link';
+import { DatePicker, Tab, Tabs } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -244,18 +243,21 @@ const AddOffer = () => {
   };
 
   return (
-    <div className='bg-gray-50  min-h-screen'>
+    <div className='bg-gray-50 min-h-screen'>
       <div className='max-w-screen-2xl px-6 2xl:px-0 mx-auto'>
 
-        <div className='max-w-screen-xl mx-auto flex items-center pt-3 md:pt-6'>
-          <h3 className='w-full text-center font-semibold text-xl lg:text-2xl'>Create New Offer</h3>
+        <div className='max-w-screen-xl mx-auto pt-3 sticky top-0 z-10 bg-gray-50'>
+          <div className='flex items-center justify-between'>
+            <h3 className='w-full font-semibold text-lg md:text-xl lg:text-2xl'>Offer Configuration</h3>
+            <button className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' onClick={() => handleGoBack()}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</button>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto pt-1 pb-6 flex flex-col gap-6'>
+        <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto pt-1 pb-6 flex flex-col'>
 
-          <div className='grid grid-cols-1 lg:grid-cols-12'>
-            <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 mt-6 px-6 py-3'>
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+          <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
+            <div className='grid grid-cols-1 lg:col-span-7 gap-8 mt-3 py-3 max-h-[650px]'>
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[300px]'>
                 <div>
                   <label htmlFor='offerTitle' className='flex justify-start font-medium text-[#D2016E] pb-2'>Offer Title *</label>
                   <input id='offerTitle' placeholder='Enter Offer Title'  {...register("offerTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="text" />
@@ -287,7 +289,7 @@ const AddOffer = () => {
 
               </div>
 
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[350px]'>
 
                 <div>
                   <label htmlFor='minAmount' className='flex justify-start font-medium text-[#D2016E] pb-2'>Minimum Order Amount</label>
@@ -322,7 +324,7 @@ const AddOffer = () => {
                 </div>
               </div>
             </div>
-            <div className='grid grid-cols-1 lg:col-span-5 xl:col-span-5 gap-8 mt-6 px-6 py-3'>
+            <div className='grid grid-cols-1 lg:col-span-5 gap-8 mt-3 py-3'>
               <div className='flex flex-col bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                 <Tabs
                   aria-label="Product and Category Selection"
@@ -398,7 +400,7 @@ const AddOffer = () => {
                         alt='Uploaded image'
                         height={100}
                         width={200}
-                        className='w-3/4 mx-auto h-[350px] mt-4 rounded-md'
+                        className='w-3/4 mx-auto max-h-[350px] mt-4 rounded-md'
                       />
                       <button
                         onClick={handleImageRemove}
@@ -415,9 +417,7 @@ const AddOffer = () => {
 
           </div>
 
-          <div className='flex justify-between items-center px-6'>
-
-            <button className='flex items-center gap-2 font-medium text-white rounded-lg bg-[#D2016E] hover:bg-[#d2016dca] py-2 px-4' onClick={() => handleGoBack()}><FaArrowLeft /> Go Back</button>
+          <div className='flex justify-end items-center mt-3'>
 
             <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#D2016E] hover:bg-[#d2016dca]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
               {isSubmitting ? 'Submitting...' : 'Submit'}

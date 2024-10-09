@@ -156,8 +156,8 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 
 /* Base styles for small screens (mobile) */
 .custom-max-h-orders {
-  min-height: calc(100vh - 180px);
-  max-height: calc(100vh - 180px);
+  min-height: calc(100vh - 300px);
+  max-height: calc(100vh - 300px);
   overflow-y: auto;
 }
 
@@ -166,6 +166,7 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
   .custom-max-h-orders {
     min-height: calc(100vh - 250px);
     max-height: calc(100vh - 250px);
+    overflow-y: auto;
   }
 }
 
@@ -173,28 +174,38 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
   .custom-max-h-orders {
     min-height: calc(100vh - 220px);
     max-height: calc(100vh - 220px);
+    overflow-y: auto;
   }
 }
 
 @media (min-width: 1440px) {
   .custom-max-h-orders {
-    min-height: calc(100vh - 190px);
-    max-height: calc(100vh - 190px);
+    min-height: calc(100vh - 195px);
+    max-height: calc(100vh - 195px);
+    overflow-y: auto;
   }
 }
 
 /* Base styles for small screens (mobile) */
 .custom-max-discount {
-  min-height: calc(100vh - 380px);
-  max-height: calc(100vh - 380px);
+  min-height: calc(100vh - 100px);
+  max-height: calc(100vh - 100px);
   overflow-y: auto;
 }
 
 /* Medium screens (tablets) */
 @media (min-width: 768px) {
   .custom-max-discount {
-    min-height: calc(100vh - 430px);
-    max-height: calc(100vh - 430px);
+    min-height: calc(100vh - 150px);
+    max-height: calc(100vh - 150px);
+  }
+}
+
+/* Medium screens (tablets) */
+@media (min-width: 1024px) {
+  .custom-max-discount {
+    min-height: calc(100vh - 200px);
+    max-height: calc(100vh - 200px);
   }
 }
 
@@ -268,7 +279,7 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #f9fafb; /* Scrollbar color */
+  background-color: #a8a8a8; /* Scrollbar color */
   border-radius: 10px; /* Rounded edges */
 }
 

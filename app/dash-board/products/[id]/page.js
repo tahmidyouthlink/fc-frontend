@@ -545,15 +545,17 @@ const EditProductPage = () => {
     <div className='bg-gray-50 min-h-screen'>
       <form onSubmit={handleSubmit(onSubmit)}>
 
-        <div className='max-w-screen-2xl mx-auto flex justify-between px-6 items-center pt-2 xl:pt-4'>
-          <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl'>Update Product Details</h3>
-          <Link className='flex items-center gap-2 text-[10px] md:text-base' href={`/dash-board/products/existing-products/${selectedCategory}`}> <span className='border border-black rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        <div className='py-3 md:py-6 px-6 2xl:px-12 sticky top-0 z-10 bg-gray-50'>
+          <div className='flex items-center justify-between'>
+            <h3 className='w-full font-semibold text-xl lg:text-2xl xl:text-3xl'>Update Product Details</h3>
+            <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={`/dash-board/products/existing-products/${selectedCategory}`}> <span className='border border-black rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+          </div>
         </div>
 
         <div className='max-w-screen-2xl mx-auto'>
-          <div className='grid grid-cols-1 lg:grid-cols-12'>
-            <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 md:mt-2 px-6 py-3'>
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+          <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
+            <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 md:mt-2 px-6 py-3 max-h-[1550px]'>
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[420px]'>
                 <p className='w-full'>Product ID: <strong>{productId}</strong></p>
                 <label htmlFor='productTitle' className='flex justify-start font-medium text-[#9F5216]'>Product Title *</label>
                 <input id='productTitle' {...register("productTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" placeholder='Enter Product Title' type="text" />
@@ -576,7 +578,7 @@ const EditProductPage = () => {
                 />
               </div>
 
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[560px]'>
 
                 <div className='flex flex-col rounded-md relative'>
                   <label htmlFor="category" className='text-xs px-2'>Category</label>
@@ -722,7 +724,7 @@ const EditProductPage = () => {
                 </div>
               </div>
 
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[570px]'>
                 <label htmlFor='materialCare' className='flex justify-start font-medium text-[#9F5216]'>Material Care</label>
                 <Controller
                   name="materialCare"
