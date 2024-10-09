@@ -9,12 +9,30 @@ import arrivals2 from "../../../../public/card-images/arrivals2.svg";
 import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa6";
 import useCategories from "@/app/hooks/useCategories";
+import { useEffect, useState } from "react";
 
 const EditProduct = () => {
 
   const [categoryList, isCategoryPending] = useCategories();
   const [productList, isProductPending] = useProductsInformation();
+  const [isScrolled, setIsScrolled] = useState(false);
   const router = useRouter();
+
+  // Scroll event listener to track when to add background color
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const handleGoToCategoryPage = (categoryName) => {
     router.push(`/dash-board/products/existing-products/${categoryName}`);
@@ -25,7 +43,7 @@ const EditProduct = () => {
   }
 
   return (
-    <div className='relative w-full min-h-screen'>
+    <div className='relative w-full min-h-screen bg-gray-50'>
       <div
         style={{
           backgroundImage: `url(${arrivals1.src})`,
@@ -42,13 +60,16 @@ const EditProduct = () => {
         style={{
           backgroundImage: `url(${arrowSvgImage.src})`,
         }}
-        className='absolute inset-0 z-0 top-2 md:top-5 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
+        className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl mx-auto px-6 py-8 md:py-10 lg:py-12 relative z-10'>
-        <div className='flex justify-between items-center'>
-          <h1 className='font-bold text-xl md:text-2xl lg:text-3xl'>Look at Our Categories</h1>
-          <Link className='flex items-center gap-2 text-[10px] md:text-base' href="/dash-board/products"> <span className='border border-black rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+      <div
+        className={`max-w-screen-2xl mx-auto px-6 sticky top-0 z-10 transition-colors duration-300 ${isScrolled ? "bg-gray-50 py-3" : "bg-transparent py-3 md:py-6"
+          }`}
+      >
+        <div className='flex items-center justify-between'>
+          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Look at Our Categories</h3>
+          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href="/dash-board/products"> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
 

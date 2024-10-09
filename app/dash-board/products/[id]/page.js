@@ -554,8 +554,8 @@ const EditProductPage = () => {
 
         <div className='max-w-screen-2xl mx-auto'>
           <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
-            <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 md:mt-2 px-6 py-3 max-h-[1550px]'>
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[420px]'>
+            <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 px-6 py-3'>
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                 <p className='w-full'>Product ID: <strong>{productId}</strong></p>
                 <label htmlFor='productTitle' className='flex justify-start font-medium text-[#9F5216]'>Product Title *</label>
                 <input id='productTitle' {...register("productTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" placeholder='Enter Product Title' type="text" />
@@ -724,7 +724,7 @@ const EditProductPage = () => {
                 </div>
               </div>
 
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[570px]'>
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                 <label htmlFor='materialCare' className='flex justify-start font-medium text-[#9F5216]'>Material Care</label>
                 <Controller
                   name="materialCare"
@@ -753,7 +753,7 @@ const EditProductPage = () => {
               </div>
             </div>
 
-            <div className='grid grid-cols-1 lg:col-span-5 xl:col-span-5 gap-8 mt-6 px-6 py-3'>
+            <div className='grid grid-cols-1 lg:col-span-5 xl:col-span-5 gap-8 px-6 py-3'>
               <div className='flex flex-col gap-4 h-fit'>
                 <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                   <div>

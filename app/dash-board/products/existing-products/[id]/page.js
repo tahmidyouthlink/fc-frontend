@@ -14,8 +14,9 @@ import TabsOrder from '@/app/components/layout/TabsOrder';
 import CustomPagination from '@/app/components/layout/CustomPagination';
 import Link from 'next/link';
 import { IoMdClose } from 'react-icons/io';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
-const columns = ['Product', 'Status', 'SKU', 'Category', 'Price', 'Sizes', 'Colors', 'Vendor', 'Shipping Zones', 'Shipment Handlers'];
+const initialColumns = ['Product', 'Status', 'SKU', 'Category', 'Price', 'Sizes', 'Colors', 'Vendor', 'Shipping Zones', 'Shipment Handlers'];
 
 const productStatusTab = ['All', 'Active', 'Draft', 'Archived'];
 
@@ -30,7 +31,8 @@ const ProductPage = () => {
 
   const [productDetails, setProductDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // Loading state
-  const [selectedColumns, setSelectedColumns] = useState(columns);
+  const [selectedColumns, setSelectedColumns] = useState([]);
+  const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTab, setSelectedTab] = useState(productStatusTab[0]);
@@ -42,12 +44,44 @@ const ProductPage = () => {
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedColumnsProductCategory'));
+    const savedExistingProduct = JSON.parse(localStorage.getItem('selectedExistingProduct'));
     if (savedColumns) {
       setSelectedColumns(savedColumns);
-    } else {
-      setSelectedColumns([]);
+    }
+    if (savedExistingProduct) {
+      setColumnOrder(savedExistingProduct);
     }
   }, []);
+
+  const handleColumnChange = (selected) => {
+    setSelectedColumns(selected);
+  };
+
+  const handleSelectAll = () => {
+    setSelectedColumns(initialColumns);
+    setColumnOrder(initialColumns);
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedColumns([]);
+    setColumnOrder([]);
+  };
+
+  const handleSave = () => {
+    localStorage.setItem('selectedColumnsProductCategory', JSON.stringify(selectedColumns));
+    localStorage.setItem('selectedExistingProduct', JSON.stringify(columnOrder));
+    setColumnModalOpen(false);
+  };
+
+  const handleOnDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const reorderedColumns = Array.from(columnOrder);
+    const [draggedColumn] = reorderedColumns.splice(result.source.index, 1);
+    reorderedColumns.splice(result.destination.index, 0, draggedColumn);
+
+    setColumnOrder(reorderedColumns); // Update the column order both in modal and table
+  };
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -82,7 +116,6 @@ const ProductPage = () => {
 
     return date; // Return the valid date object
   };
-
 
   // Extract start and end dates from selectedDateRange
   const startDate = selectedDateRange?.start ? new Date(selectedDateRange.start.year, selectedDateRange.start.month - 1, selectedDateRange.start.day) : null;
@@ -119,7 +152,6 @@ const ProductPage = () => {
     return isDateInRange && matchesSearch;
   });
 
-
   const getFilteredProducts = () => {
     switch (selectedTab) {
       case 'Active':
@@ -149,10 +181,6 @@ const ProductPage = () => {
 
   const totalPages = Math.ceil(filteredProducts?.length / itemsPerPage);
 
-  const handleColumnChange = (selected) => {
-    setSelectedColumns(selected);
-  };
-
   const toggleDropdown = (dropdown) => {
     setOpenDropdown((prev) => (prev === dropdown ? null : dropdown)); // Toggle the clicked dropdown
   };
@@ -167,19 +195,6 @@ const ProductPage = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const handleSelectAll = () => {
-    setSelectedColumns(columns);
-  };
-
-  const handleDeselectAll = () => {
-    setSelectedColumns([]);
-  };
-
-  const handleSave = () => {
-    localStorage.setItem('selectedColumnsProductCategory', JSON.stringify(selectedColumns));
-    setColumnModalOpen(false);
-  };
 
   const handleItemsPerPageChange = (e) => {
     setItemsPerPage(parseInt(e.target.value));
@@ -314,36 +329,9 @@ const ProductPage = () => {
                   <thead className="sticky top-0 z-[1] w-full bg-white">
                     <tr className='w-full'>
 
-                      {selectedColumns.includes('Product') && (
-                        <th className="text-[10px] md:text-xs p-2 pl-6 lg:pl-20 text-gray-700 border-b ">Product</th>
-                      )}
-                      {selectedColumns.includes('Status') && (
-                        <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b ">Status</th>
-                      )}
-                      {selectedColumns.includes('SKU') && (
-                        <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b ">SKU</th>
-                      )}
-                      {selectedColumns.includes('Category') && (
-                        <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b ">Category</th>
-                      )}
-                      {selectedColumns.includes('Price') && (
-                        <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b ">Price</th>
-                      )}
-                      {selectedColumns.includes('Sizes') && (
-                        <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b ">Sizes</th>
-                      )}
-                      {selectedColumns.includes('Colors') && (
-                        <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b ">Colors</th>
-                      )}
-                      {selectedColumns.includes('Vendor') && (
-                        <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b ">Vendor</th>
-                      )}
-                      {selectedColumns.includes('Shipping Zones') && (
-                        <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b ">Shipping Zones</th>
-                      )}
-                      {selectedColumns.includes('Shipment Handlers') && (
-                        <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b ">Shipment Handlers</th>
-                      )}
+                      {columnOrder.map((column) => selectedColumns.includes(column) && (
+                        <th key={column} className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">{column}</th>
+                      ))}
 
                     </tr>
                   </thead>
@@ -351,58 +339,63 @@ const ProductPage = () => {
 
                     {paginatedProducts?.map((product, index) => (
                       <tr key={product?._id || index} className="hover:bg-gray-50 transition-colors">
-                        {selectedColumns.includes('Product') && (
-                          <td onClick={() => handleGoToEditPage(product?._id)} className="text-xs p-3 cursor-pointer text-blue-600 hover:text-blue-800 flex flex-col lg:flex-row items-center gap-3">
-                            <div>
-                              <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrls[0]} alt='productIMG' height={600} width={600} />
-                            </div>
-                            <div className='flex flex-col'>
-                              <p>{product?.productTitle}</p>
-                              <p>{product?.productId}</p>
-                            </div>
-                          </td>
+                        {columnOrder.map(
+                          (column) =>
+                            selectedColumns.includes(column) && (
+                              <>
+                                {column === 'Product' && (
+                                  <td onClick={() => handleGoToEditPage(product?._id)} className="text-xs p-3 cursor-pointer text-blue-600 hover:text-blue-800 flex flex-col lg:flex-row items-center gap-3">
+                                    <div>
+                                      <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrls[0]} alt='productIMG' height={600} width={600} />
+                                    </div>
+                                    <div className='flex flex-col'>
+                                      <p>{product?.productTitle}</p>
+                                      <p>{product?.productId}</p>
+                                    </div>
+                                  </td>
+                                )}
+                                {column === 'Status' && (
+                                  <td className="text-xs p-3 text-gray-700">
+                                    <span className={`px-2 py-0.5 ${product?.status === "active" ? "bg-green-200 text-green-800 rounded-full"
+                                      : product?.status === "archive" ? "bg-blue-200 text-blue-800 rounded-full"
+                                        : "bg-yellow-200 text-yellow-800 rounded-full"}`}>
+                                      {product?.status === "active" ? "Active"
+                                        : product?.status === "archive" ? "Archived"
+                                          : "Draft"}
+                                    </span>
+                                  </td>
+                                )}
+                                {column === 'SKU' && (
+                                  <td className="text-xs p-3 text-gray-700">{product?.productVariants?.length > 0
+                                    ? `${product.productVariants.reduce((acc, variant) => acc + variant.sku, 0)} ${product.productVariants.reduce((acc, variant) => acc + variant.sku, 0) === 1 ? 'Item' : 'Items'}`
+                                    : 'No Items'}</td>
+                                )}
+                                {column === 'Category' && (
+                                  <td className="text-xs p-3 text-gray-700">{product?.category}</td>
+                                )}
+                                {column === 'Price' && (
+                                  <td className="text-xs p-3 text-gray-700">৳ {product?.regularPrice}</td>
+                                )}
+                                {column === 'Sizes' && (
+                                  <td className="text-xs p-3 text-gray-700">{product?.allSizes?.join(', ') || 'No sizes available'}</td>
+                                )}
+                                {column === 'Colors' && (
+                                  <td className="text-xs p-3 text-gray-700">{product?.availableColors?.map(colorObj => (
+                                    <span key={colorObj._id} style={{ backgroundColor: colorObj.color }} className="inline-block w-5 h-5 mr-1 rounded-full"></span>
+                                  ))}</td>
+                                )}
+                                {column === 'Vendor' && (
+                                  <td className="text-xs p-3 text-gray-700">{product?.vendors?.length > 0 ? <div>{product?.vendors?.map((vendor, index) => (<div key={index}>{vendor?.value}</div>))}</div> : <div>N/A</div>} </td>
+                                )}
+                                {column === 'Shipping Zones' && (
+                                  <td className="text-xs p-3 text-gray-700">{product?.shippingDetails?.map(detail => detail.shippingZone).join(', ') || 'No shipping zones available'}</td>
+                                )}
+                                {column === 'Shipment Handlers' && (
+                                  <td className="text-xs p-3 text-gray-700">{product?.shippingDetails?.map(detail => detail.selectedShipmentHandler.shipmentHandlerName).join(', ') || 'No shipment handlers available'}</td>
+                                )}
+                              </>
+                            )
                         )}
-                        {selectedColumns.includes('Status') && (
-                          <td className="text-xs p-3 text-gray-700">
-                            <span className={`px-2 py-0.5 ${product?.status === "active" ? "bg-green-200 text-green-800 rounded-full"
-                              : product?.status === "archive" ? "bg-blue-200 text-blue-800 rounded-full"
-                                : "bg-yellow-200 text-yellow-800 rounded-full"}`}>
-                              {product?.status === "active" ? "Active"
-                                : product?.status === "archive" ? "Archived"
-                                  : "Draft"}
-                            </span>
-                          </td>
-                        )}
-                        {selectedColumns.includes('SKU') && (
-                          <td className="text-xs p-3 text-gray-700">{product?.productVariants?.length > 0
-                            ? `${product.productVariants.reduce((acc, variant) => acc + variant.sku, 0)} ${product.productVariants.reduce((acc, variant) => acc + variant.sku, 0) === 1 ? 'Item' : 'Items'}`
-                            : 'No Items'}</td>
-                        )}
-                        {selectedColumns.includes('Category') && (
-                          <td className="text-xs p-3 text-gray-700">{product?.category}</td>
-                        )}
-                        {selectedColumns.includes('Price') && (
-                          <td className="text-xs p-3 text-gray-700">৳ {product?.regularPrice}</td>
-                        )}
-                        {selectedColumns.includes('Sizes') && (
-                          <td className="text-xs p-3 text-gray-700"> {product?.allSizes?.join(', ') || 'No sizes available'} </td>
-                        )}
-                        {selectedColumns.includes('Colors') && (
-                          <td className="text-xs p-3 text-gray-700">{product?.availableColors?.map(colorObj => (
-                            <span key={colorObj._id} style={{ backgroundColor: colorObj.color }} className="inline-block w-5 h-5 mr-1 rounded-full"></span>
-                          ))}</td>
-                        )}
-                        {selectedColumns.includes('Vendor') && (
-                          <td className="text-xs p-3 text-gray-700">{product?.vendors?.length > 0 ? <div>{product?.vendors?.map((vendor, index) => (<div key={index}>{vendor?.value}</div>))}</div> : <div>N/A</div>} </td>
-                        )}
-                        {selectedColumns.includes('Shipping Zones') && (
-                          <td className="text-xs p-3 text-gray-700">{product?.shippingDetails?.map(detail => detail.shippingZone).join(', ') || 'No shipping zones available'} </td>
-                        )}
-                        {selectedColumns.includes('Shipment Handlers') && (
-                          <td className="text-xs p-3 text-gray-700">{product?.shippingDetails?.map(detail => detail.selectedShipmentHandler.shipmentHandlerName).join(', ') || 'No shipment handlers available'}
-                          </td>
-                        )}
-
                       </tr>
                     ))}
 
@@ -418,17 +411,50 @@ const ProductPage = () => {
           </div>
         )
       )}
+
+      {/* Column Selection Modal */}
       <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
         <ModalContent>
           <ModalHeader>Choose Columns</ModalHeader>
           <ModalBody className="modal-body-scroll">
-            <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
-              {columns.map((column) => (
-                <Checkbox key={column} value={column}>
-                  {column}
-                </Checkbox>
-              ))}
-            </CheckboxGroup>
+            <DragDropContext onDragEnd={handleOnDragEnd}>
+              <Droppable droppableId="droppable">
+                {(provided) => (
+                  <div ref={provided.innerRef} {...provided.droppableProps}>
+                    <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
+                      {columnOrder.map((column, index) => (
+                        <Draggable key={column} draggableId={column} index={index}>
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className="flex items-center justify-between p-2 border-b"
+                            >
+                              <Checkbox
+                                value={column}
+                                isChecked={selectedColumns.includes(column)}
+                                onChange={() => {
+                                  // Toggle column selection
+                                  if (selectedColumns.includes(column)) {
+                                    setSelectedColumns(selectedColumns.filter(col => col !== column));
+                                  } else {
+                                    setSelectedColumns([...selectedColumns, column]);
+                                  }
+                                }}
+                              >
+                                {column}
+                              </Checkbox>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </CheckboxGroup>
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           </ModalBody>
           <ModalFooter>
             <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
@@ -467,6 +493,7 @@ const ProductPage = () => {
           </svg>
         </div>
       </div>
+
     </div>
   );
 };

@@ -5,8 +5,9 @@ import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
 import CustomPagination from './CustomPagination';
 import { Button, Checkbox, CheckboxGroup, DateRangePicker, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
 import { IoMdClose } from 'react-icons/io';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
-const columns = ["Date & Time", 'Order ID', 'Customer Name', 'Payment Method', 'Transaction ID', 'Payment Status'];
+const initialColumns = ["Date & Time", 'Order ID', 'Customer Name', 'Payment Method', 'Transaction ID', 'Payment Status'];
 
 const FinanceTable = () => {
 
@@ -14,7 +15,8 @@ const FinanceTable = () => {
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
-  const [selectedColumns, setSelectedColumns] = useState(columns);
+  const [selectedColumns, setSelectedColumns] = useState([]);
+  const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
   const [selectedPaymentStatus, setSelectedPaymentStatus] = useState("All");
@@ -22,11 +24,13 @@ const FinanceTable = () => {
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    const savedColumns = JSON.parse(localStorage.getItem('selectedColumnsFinancesPage'));
+    const savedColumns = JSON.parse(localStorage.getItem('selectedColumnsFinance'));
+    const savedColumnsFinancesPage = JSON.parse(localStorage.getItem('selectedColumnsFinancesPage'));
     if (savedColumns) {
       setSelectedColumns(savedColumns);
-    } else {
-      setSelectedColumns([]);
+    }
+    if (savedColumnsFinancesPage) {
+      setColumnOrder(savedColumnsFinancesPage);
     }
   }, []);
 
@@ -41,16 +45,29 @@ const FinanceTable = () => {
   };
 
   const handleSelectAll = () => {
-    setSelectedColumns(columns);
+    setSelectedColumns(initialColumns);
+    setColumnOrder(initialColumns);
   };
 
   const handleDeselectAll = () => {
     setSelectedColumns([]);
+    setColumnOrder([]);
   };
 
   const handleSave = () => {
-    localStorage.setItem('selectedColumnsFinancesPage', JSON.stringify(selectedColumns));
+    localStorage.setItem('selectedColumnsFinance', JSON.stringify(selectedColumns));
+    localStorage.setItem('selectedColumnsFinancesPage', JSON.stringify(columnOrder));
     setColumnModalOpen(false);
+  };
+
+  const handleOnDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const reorderedColumns = Array.from(columnOrder);
+    const [draggedColumn] = reorderedColumns.splice(result.source.index, 1);
+    reorderedColumns.splice(result.destination.index, 0, draggedColumn);
+
+    setColumnOrder(reorderedColumns); // Update the column order both in modal and table
   };
 
   const handleItemsPerPageChange = (e) => {
@@ -226,13 +243,44 @@ const FinanceTable = () => {
         <ModalContent>
           <ModalHeader>Choose Columns</ModalHeader>
           <ModalBody className="modal-body-scroll">
-            <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
-              {columns.map((column) => (
-                <Checkbox key={column} value={column}>
-                  {column}
-                </Checkbox>
-              ))}
-            </CheckboxGroup>
+            <DragDropContext onDragEnd={handleOnDragEnd}>
+              <Droppable droppableId="droppable">
+                {(provided) => (
+                  <div ref={provided.innerRef} {...provided.droppableProps}>
+                    <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
+                      {columnOrder.map((column, index) => (
+                        <Draggable key={column} draggableId={column} index={index}>
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className="flex items-center justify-between p-2 border-b"
+                            >
+                              <Checkbox
+                                value={column}
+                                isChecked={selectedColumns.includes(column)}
+                                onChange={() => {
+                                  // Toggle column selection
+                                  if (selectedColumns.includes(column)) {
+                                    setSelectedColumns(selectedColumns.filter(col => col !== column));
+                                  } else {
+                                    setSelectedColumns([...selectedColumns, column]);
+                                  }
+                                }}
+                              >
+                                {column}
+                              </Checkbox>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </CheckboxGroup>
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           </ModalBody>
           <ModalFooter>
             <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
@@ -252,24 +300,9 @@ const FinanceTable = () => {
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-50 sticky top-0 z-[1] rounded-md">
             <tr>
-              {selectedColumns.includes('Date & Time') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Date & Time</th>
-              )}
-              {selectedColumns.includes('Order ID') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Order ID</th>
-              )}
-              {selectedColumns.includes('Customer Name') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Customer Name</th>
-              )}
-              {selectedColumns.includes('Payment Method') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Payment Method</th>
-              )}
-              {selectedColumns.includes('Transaction ID') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Transaction ID</th>
-              )}
-              {selectedColumns.includes('Payment Status') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Status</th>
-              )}
+              {columnOrder.map((column) => selectedColumns.includes(column) && (
+                <th key={column} className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">{column}</th>
+              ))}
             </tr>
           </thead>
 
@@ -286,23 +319,42 @@ const FinanceTable = () => {
                 return (
                   <>
                     <tr key={order?._id || index} className="hover:bg-gray-50 transition-colors">
-                      {selectedColumns.includes('Date & Time') && (
-                        <th className="text-xs p-3 text-gray-700">{order?.dateTime}</th>
-                      )}
-                      {selectedColumns.includes('Order ID') && (
-                        <td className="text-xs p-3 text-gray-700">{order?.orderNumber}</td>
-                      )}
-                      {selectedColumns.includes('Customer Name') && (
-                        <td className="text-xs p-3 text-gray-700">{order?.customerName}</td>
-                      )}
-                      {selectedColumns.includes('Payment Method') && (
-                        <td className="text-xs p-3 text-gray-700">{order?.paymentMethod}</td>
-                      )}
-                      {selectedColumns.includes('Transaction ID') && (
-                        <td className="text-xs p-3 text-gray-700">{order?.transactionId ? order.transactionId : '--'}</td>
-                      )}
-                      {selectedColumns.includes('Payment Status') && (
-                        <td className="text-xs p-3 text-gray-700">{order?.paymentStatus}</td>
+                      {columnOrder.map(
+                        (column) =>
+                          selectedColumns.includes(column) && (
+                            <>
+                              {column === 'Date & Time' && (
+                                <td key="dateTime" className="text-xs p-3 text-gray-700">
+                                  {order?.dateTime}
+                                </td>
+                              )}
+                              {column === 'Order ID' && (
+                                <td key="orderNumber" className="text-xs p-3 text-gray-700">
+                                  {order?.orderNumber}
+                                </td>
+                              )}
+                              {column === 'Customer Name' && (
+                                <td key="customerName" className="text-xs p-3 text-gray-700">
+                                  {order?.customerName}
+                                </td>
+                              )}
+                              {column === 'Payment Method' && (
+                                <td key="paymentMethod" className="text-xs p-3 text-gray-700">
+                                  {order?.paymentMethod}
+                                </td>
+                              )}
+                              {column === 'Transaction ID' && (
+                                <td key="transactionId" className="text-xs p-3 text-gray-700">
+                                  {order?.transactionId ? order.transactionId : '--'}
+                                </td>
+                              )}
+                              {column === 'Payment Status' && (
+                                <td key="paymentStatus" className="text-xs p-3 text-gray-700">
+                                  {order?.paymentStatus}
+                                </td>
+                              )}
+                            </>
+                          )
                       )}
                     </tr>
                   </>

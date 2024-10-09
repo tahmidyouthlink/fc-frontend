@@ -13,6 +13,7 @@ import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 const RecentPromotions = () => {
 
@@ -27,16 +28,19 @@ const RecentPromotions = () => {
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   // const [isExpanded, setIsExpanded] = useState(null); // To track which row is expanded
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
-  const columns = ["Promo Code / Offer Title", "Type", "Discount Value", "Expiry Date", "Total Times Applied", "Total Discount Given", "Products Affected", "Min Order Amount", "Max Capped Amount", "Actions", "Status"];
-  const [selectedColumns, setSelectedColumns] = useState(columns);
+  const initialColumns = ["Promo Code / Offer Title", "Type", "Discount Value", "Expiry Date", "Total Times Applied", "Total Discount Given", "Products Affected", "Min Order Amount", "Max Capped Amount", "Actions", "Status"];
+  const [selectedColumns, setSelectedColumns] = useState([]);
+  const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
 
   useEffect(() => {
-    const savedColumns = JSON.parse(localStorage.getItem('selectedMarketingColumns'));
+    const savedColumns = JSON.parse(localStorage.getItem('selectedMarketing'));
+    const savedMarketingColumns = JSON.parse(localStorage.getItem('selectedMarketingColumns'));
     if (savedColumns) {
       setSelectedColumns(savedColumns);
-    } else {
-      setSelectedColumns([]);
+    }
+    if (savedMarketingColumns) {
+      setColumnOrder(savedMarketingColumns);
     }
   }, []);
 
@@ -45,16 +49,29 @@ const RecentPromotions = () => {
   };
 
   const handleSelectAll = () => {
-    setSelectedColumns(columns);
+    setSelectedColumns(initialColumns);
+    setColumnOrder(initialColumns);
   };
 
   const handleDeselectAll = () => {
     setSelectedColumns([]);
+    setColumnOrder([]);
   };
 
   const handleSave = () => {
-    localStorage.setItem('selectedMarketingColumns', JSON.stringify(selectedColumns));
+    localStorage.setItem('selectedMarketing', JSON.stringify(selectedColumns));
+    localStorage.setItem('selectedMarketingColumns', JSON.stringify(columnOrder));
     setColumnModalOpen(false);
+  };
+
+  const handleOnDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const reorderedColumns = Array.from(columnOrder);
+    const [draggedColumn] = reorderedColumns.splice(result.source.index, 1);
+    reorderedColumns.splice(result.destination.index, 0, draggedColumn);
+
+    setColumnOrder(reorderedColumns); // Update the column order both in modal and table
   };
 
   // Memoized current date
@@ -517,147 +534,118 @@ const RecentPromotions = () => {
           return (
             <>
               <tr key={item?._id || index} className="hover:bg-gray-50 transition-colors">
-                {selectedColumns.includes('Promo Code / Offer Title') && (
-                  // <td className={`p-3 text-gray-700 ${isExpandedItem ? "text-base font-bold" : "text-xs"}`}>{item?.promoCode || item?.offerTitle}</td>
-                  <td className={`p-3 text-gray-700 text-xs`}>{item?.promoCode || item?.offerTitle}</td>
-                )}
-                {selectedColumns.includes('Type') && (
-                  <td className="text-xs p-3 text-gray-700">
-                    {item?.promoCode ? "Promo" : "Offer"}
-                  </td>
-                )}
-                {selectedColumns.includes('Discount Value') && (
-                  <td className="text-xs p-3 text-gray-700">
-                    {item?.promoDiscountType
-                      ? `${item?.promoDiscountValue} ${item?.promoDiscountType === 'Amount' ? 'Tk' : '%'}`
-                      : item?.offerDiscountType
-                        ? `${item?.offerDiscountValue} ${item?.offerDiscountType === 'Amount' ? 'Tk' : '%'}`
-                        : 'No Discount'}
-                  </td>
-                )}
-                {selectedColumns.includes('Expiry Date') && (
-                  <td className="text-xs p-3 text-gray-700">{item?.expiryDate}</td>
-                )}
-                {selectedColumns.includes('Total Times Applied') && (
-                  <td className="text-xs p-3 text-gray-700">
-                    {item?.promoCode
-                      ? `${totalPromoApplied} ${totalPromoApplied === 1 ? "Order" : "Orders"}`
-                      : `${totalOfferApplied} ${totalOfferApplied === 1 ? "Order" : "Orders"}`}
-                  </td>
-                )}
-                {selectedColumns.includes('Total Discount Given') && (
-                  <td className="text-xs p-3 text-gray-700">
-                    {item?.promoCode
-                      ? `৳ ${totalAmountDiscounted}`
-                      : `৳ ${totalOfferAmountDiscounted}`}
-                  </td>
-                )}
-                {selectedColumns.includes('Products Affected') && (
-                  <td className="text-xs p-3 text-gray-700">
-                    {item?.promoCode && (
-                      <div>
-                        <ul>
-                          {getProductTitlesForPromo(item?.promoCode).join(", ") || "No products applied"}
-                        </ul>
-                      </div>
-                    )}
-
-                    {item?.offerTitle && (
-                      <div>
-                        <ul>
-                          {getProductTitlesForOffer(item?.offerTitle).join(", ") || "No products applied"}
-                        </ul>
-                      </div>
-                    )}
-                  </td>
-                )}
-                {selectedColumns.includes('Min Order Amount') && (
-                  <td className="text-xs p-3 text-gray-700">
-                    {item?.promoCode ? (
-                      <>
-                        <p> ৳ {item?.minAmount || '0'}</p>
-                      </>
-                    ) : (
-                      <>
-                        <p> ৳ {item?.minAmount || '0'}</p>
-                      </>
-                    )}
-                  </td>
-                )}
-                {selectedColumns.includes('Max Capped Amount') && (
-                  <td className="text-xs p-3 text-gray-700">
-                    {item?.promoCode ? (
-                      <>
-                        <p> ৳ {item?.maxAmount || '0'}</p>
-                      </>
-                    ) : (
-                      <>
-
-                        <p> ৳ {item?.maxAmount || '0'}</p>
-                      </>
-                    )}
-                  </td>
-                )}
-                {selectedColumns.includes('Actions') && (
-                  <td className="text-xs p-3 text-gray-700">
-                    <div className="flex items-center gap-3 cursor-pointer">
-                      <div className="group relative">
-                        <button disabled={isExpired}>
-                          <MdOutlineModeEdit
-                            onClick={() =>
-                              item?.promoCode
-                                ? router.push(`/dash-board/marketing/promo/${item._id}`) // Edit promo
-                                : router.push(`/dash-board/marketing/offer/${item._id}`) // Edit offer
-                            }
-                            size={22}
-                            className={`text-blue-500 ${isExpired ? 'cursor-not-allowed' : 'hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
+                {columnOrder.map((column) =>
+                  selectedColumns.includes(column) && (
+                    <>
+                      {column === 'Promo Code / Offer Title' && (
+                        <td key="promoCodeOfferTitle" className="text-xs p-3 text-gray-700">
+                          {item?.promoCode || item?.offerTitle}
+                        </td>
+                      )}
+                      {column === 'Type' && (
+                        <td key="type" className="text-xs p-3 text-gray-700">
+                          {item?.promoCode ? 'Promo' : 'Offer'}
+                        </td>
+                      )}
+                      {column === 'Discount Value' && (
+                        <td key="discountValue" className="text-xs p-3 text-gray-700">
+                          {item?.promoDiscountType
+                            ? `${item?.promoDiscountValue} ${item?.promoDiscountType === 'Amount' ? 'Tk' : '%'}`
+                            : item?.offerDiscountType
+                              ? `${item?.offerDiscountValue} ${item?.offerDiscountType === 'Amount' ? 'Tk' : '%'}`
+                              : 'No Discount'}
+                        </td>
+                      )}
+                      {column === 'Expiry Date' && (
+                        <td key="expiryDate" className="text-xs p-3 text-gray-700">
+                          {item?.expiryDate}
+                        </td>
+                      )}
+                      {column === 'Total Times Applied' && (
+                        <td key="totalTimesApplied" className="text-xs p-3 text-gray-700">
+                          {item?.promoCode
+                            ? `${totalPromoApplied} ${totalPromoApplied === 1 ? "Order" : "Orders"}`
+                            : `${totalOfferApplied} ${totalOfferApplied === 1 ? "Order" : "Orders"}`}
+                        </td>
+                      )}
+                      {column === 'Total Discount Given' && (
+                        <td key="totalDiscountGiven" className="text-xs p-3 text-gray-700">
+                          {item?.promoCode
+                            ? `৳ ${totalAmountDiscounted}`
+                            : `৳ ${totalOfferAmountDiscounted}`}
+                        </td>
+                      )}
+                      {column === 'Products Affected' && (
+                        <td key="productsAffected" className="text-xs p-3 text-gray-700">
+                          {item?.promoCode && (
+                            <div>
+                              {getProductTitlesForPromo(item?.promoCode).join(", ") || "No products applied"}
+                            </div>
+                          )}
+                          {item?.offerTitle && (
+                            <div>
+                              {getProductTitlesForOffer(item?.offerTitle).join(", ") || "No products applied"}
+                            </div>
+                          )}
+                        </td>
+                      )}
+                      {column === 'Min Order Amount' && (
+                        <td key="minOrderAmount" className="text-xs p-3 text-gray-700">
+                          ৳ {item?.minAmount || '0'}
+                        </td>
+                      )}
+                      {column === 'Max Capped Amount' && (
+                        <td key="maxCappedAmount" className="text-xs p-3 text-gray-700">
+                          ৳ {item?.maxAmount || '0'}
+                        </td>
+                      )}
+                      {column === 'Actions' && (
+                        <td key="actions" className="text-xs p-3 text-gray-700">
+                          <div className="flex items-center gap-3 cursor-pointer">
+                            <div className="group relative">
+                              <button disabled={isExpired}>
+                                <MdOutlineModeEdit
+                                  onClick={() =>
+                                    item?.promoCode
+                                      ? router.push(`/dash-board/marketing/promo/${item._id}`)
+                                      : router.push(`/dash-board/marketing/offer/${item._id}`)
+                                  }
+                                  size={22}
+                                  className={`text-blue-500 ${isExpired ? 'cursor-not-allowed' : 'hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
+                                />
+                              </button>
+                              {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">Edit</span>}
+                            </div>
+                            <div className="group relative">
+                              <button disabled={isExpired}>
+                                <RiDeleteBinLine
+                                  onClick={() =>
+                                    item?.promoCode
+                                      ? handleDeletePromo(item._id)
+                                      : handleDeleteOffer(item._id)
+                                  }
+                                  size={22}
+                                  className={`text-red-500 ${isExpired ? 'cursor-not-allowed' : 'hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
+                                />
+                              </button>
+                              {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">Delete</span>}
+                            </div>
+                          </div>
+                        </td>
+                      )}
+                      {column === 'Status' && (
+                        <td key="status" className="text-xs p-3 text-gray-700">
+                          <CustomSwitch
+                            checked={item?.promoCode ? item?.promoStatus : item?.offerStatus}
+                            onChange={() => item?.promoCode ? handleStatusChangePromo(item?._id, item?.promoStatus) : handleStatusChangeOffer(item?._id, item?.offerStatus)}
+                            size="md"
+                            color="primary"
+                            disabled={isExpired}
                           />
-                        </button>
-                        {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
-                          Edit
-                        </span>}
-                      </div>
-                      <div className="group relative">
-                        <button disabled={isExpired}>
-                          <RiDeleteBinLine
-                            onClick={() =>
-                              item?.promoCode
-                                ? handleDeletePromo(item._id) // Delete promo
-                                : handleDeleteOffer(item._id) // Delete offer
-                            }
-                            size={22}
-                            className={`text-red-500 ${isExpired ? 'cursor-not-allowed' : 'hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
-                          />
-                        </button>
-                        {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
-                          Delete
-                        </span>}
-                      </div>
-                    </div>
-                  </td>
-                )}
-                {selectedColumns.includes('Status') && (
-                  <td className="text-xs p-3 text-gray-700">
-
-                    {item?.promoCode ? (
-                      <CustomSwitch
-                        checked={item?.promoStatus}
-                        onChange={() => handleStatusChangePromo(item?._id, item?.promoStatus)}
-                        size="md"
-                        color="primary"
-                        disabled={isExpired}
-                      />
-                    ) : (
-                      <CustomSwitch
-                        checked={item?.offerStatus}
-                        onChange={() => handleStatusChangeOffer(item?._id, item?.offerStatus)}
-                        size="md"
-                        color="primary"
-                        disabled={isExpired}
-                      />
-                    )}
-
-                  </td>
+                        </td>
+                      )}
+                    </>
+                  )
                 )}
                 {/* {selectedColumns.includes('Preview') && (
                   <td className="text-xs p-3 text-gray-700 cursor-pointer">
@@ -852,42 +840,65 @@ const RecentPromotions = () => {
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-50 sticky top-0 z-[1] rounded-md">
             <tr>
-              {selectedColumns.includes('Promo Code / Offer Title') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">{renderHeading()}</th>
-              )}
-              {selectedColumns.includes('Type') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Type</th>
-              )}
-              {selectedColumns.includes('Discount Value') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Discount Value</th>
-              )}
-              {selectedColumns.includes('Expiry Date') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Expiry Date</th>
-              )}
-              {selectedColumns.includes('Total Times Applied') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Total Times Applied</th>
-              )}
-              {selectedColumns.includes('Total Discount Given') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Total Discount Given</th>
-              )}
-              {selectedColumns.includes('Products Affected') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Products Affected</th>
-              )}
-              {selectedColumns.includes('Min Order Amount') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Min Order Amount</th>
-              )}
-              {selectedColumns.includes('Max Capped Amount') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Max Capped Amount</th>
-              )}
-              {selectedColumns.includes('Actions') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Actions</th>
-              )}
-              {selectedColumns.includes('Status') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Status</th>
-              )}
-              {/* {selectedColumns.includes('Preview') && (
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Preview</th>
-              )} */}
+              {columnOrder.map((column) => (
+                <>
+                  {column === 'Promo Code / Offer Title' && selectedColumns.includes(column) && (
+                    <th key="promoCode" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                      {renderHeading()}
+                    </th>
+                  )}
+                  {column === 'Type' && selectedColumns.includes(column) && (
+                    <th key="type" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                      Type
+                    </th>
+                  )}
+                  {column === 'Discount Value' && selectedColumns.includes(column) && (
+                    <th key="discountValue" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                      Discount Value
+                    </th>
+                  )}
+                  {column === 'Expiry Date' && selectedColumns.includes(column) && (
+                    <th key="expiryDate" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                      Expiry Date
+                    </th>
+                  )}
+                  {column === 'Total Times Applied' && selectedColumns.includes(column) && (
+                    <th key="totalTimesApplied" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                      Total Times Applied
+                    </th>
+                  )}
+                  {column === 'Total Discount Given' && selectedColumns.includes(column) && (
+                    <th key="totalDiscountGiven" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                      Total Discount Given
+                    </th>
+                  )}
+                  {column === 'Products Affected' && selectedColumns.includes(column) && (
+                    <th key="productsAffected" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                      Products Affected
+                    </th>
+                  )}
+                  {column === 'Min Order Amount' && selectedColumns.includes(column) && (
+                    <th key="minOrderAmount" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                      Min Order Amount
+                    </th>
+                  )}
+                  {column === 'Max Capped Amount' && selectedColumns.includes(column) && (
+                    <th key="maxCappedAmount" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                      Max Capped Amount
+                    </th>
+                  )}
+                  {column === 'Actions' && selectedColumns.includes(column) && (
+                    <th key="actions" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                      Actions
+                    </th>
+                  )}
+                  {column === 'Status' && selectedColumns.includes(column) && (
+                    <th key="status" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                      Status
+                    </th>
+                  )}
+                </>
+              ))}
             </tr>
           </thead>
 
@@ -901,13 +912,44 @@ const RecentPromotions = () => {
         <ModalContent>
           <ModalHeader>Choose Columns</ModalHeader>
           <ModalBody className="modal-body-scroll">
-            <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
-              {columns.map((column) => (
-                <Checkbox key={column} value={column}>
-                  {column}
-                </Checkbox>
-              ))}
-            </CheckboxGroup>
+            <DragDropContext onDragEnd={handleOnDragEnd}>
+              <Droppable droppableId="droppable">
+                {(provided) => (
+                  <div ref={provided.innerRef} {...provided.droppableProps}>
+                    <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
+                      {columnOrder.map((column, index) => (
+                        <Draggable key={column} draggableId={column} index={index}>
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className="flex items-center justify-between p-2 border-b"
+                            >
+                              <Checkbox
+                                value={column}
+                                isChecked={selectedColumns.includes(column)}
+                                onChange={() => {
+                                  // Toggle column selection
+                                  if (selectedColumns.includes(column)) {
+                                    setSelectedColumns(selectedColumns.filter(col => col !== column));
+                                  } else {
+                                    setSelectedColumns([...selectedColumns, column]);
+                                  }
+                                }}
+                              >
+                                {column}
+                              </Checkbox>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </CheckboxGroup>
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           </ModalBody>
           <ModalFooter>
             <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">

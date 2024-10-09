@@ -21,8 +21,9 @@ import Swal from 'sweetalert2';
 import arrowSvgImage from "../../../public/card-images/arrow.svg";
 import arrivals1 from "../../../public/card-images/arrivals1.svg";
 import arrivals2 from "../../../public/card-images/arrivals2.svg";
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
-const columns = ['Order Number', 'Date & Time', 'Customer Name', 'Order Amount', 'Order Status', 'Action', 'Email', 'Phone Number', 'Alternative Phone Number', 'Shipping Zone', 'Shipping Method', 'Payment Status', 'Payment Method', 'Vendor'];
+const initialColumns = ['Order Number', 'Date & Time', 'Customer Name', 'Order Amount', 'Order Status', 'Action', 'Email', 'Phone Number', 'Alternative Phone Number', 'Shipping Zone', 'Shipping Method', 'Payment Status', 'Payment Method', 'Vendor'];
 
 const orderStatusTabs = [
   'New Orders',
@@ -44,16 +45,19 @@ const OrdersPage = () => {
   const dropdownRef = useRef(null);
   const dropdownRefDownload = useRef(null);
   const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
-  const [selectedColumns, setSelectedColumns] = useState(columns);
+  const [selectedColumns, setSelectedColumns] = useState([]);
+  const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState(orderStatusTabs[0]);
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedColumns'));
+    const savedOrder = JSON.parse(localStorage.getItem('columnOrder'));
     if (savedColumns) {
       setSelectedColumns(savedColumns);
-    } else {
-      setSelectedColumns([]);
+    }
+    if (savedOrder) {
+      setColumnOrder(savedOrder);
     }
   }, []);
 
@@ -68,16 +72,29 @@ const OrdersPage = () => {
   };
 
   const handleSelectAll = () => {
-    setSelectedColumns(columns);
+    setSelectedColumns(initialColumns);
+    setColumnOrder(initialColumns);
   };
 
   const handleDeselectAll = () => {
     setSelectedColumns([]);
+    setColumnOrder([]);
   };
 
   const handleSave = () => {
     localStorage.setItem('selectedColumns', JSON.stringify(selectedColumns));
+    localStorage.setItem('columnOrder', JSON.stringify(columnOrder));
     setColumnModalOpen(false);
+  };
+
+  const handleOnDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const reorderedColumns = Array.from(columnOrder);
+    const [draggedColumn] = reorderedColumns.splice(result.source.index, 1);
+    reorderedColumns.splice(result.destination.index, 0, draggedColumn);
+
+    setColumnOrder(reorderedColumns); // Update the column order both in modal and table
   };
 
   // Convert dateTime string to Date object
@@ -193,20 +210,29 @@ const OrdersPage = () => {
     return isDateInRange && (productMatch || orderMatch || nameMatch || dateMatch);
   });
 
-  // Function to get filtered orders based on the selected tab
+  // Function to get filtered orders based on the selected tab and sort by last status change
   const getFilteredOrders = () => {
+    let filtered = [];
+
     switch (selectedTab) {
       case 'New Orders':
-        return orderList?.filter(order => order?.orderStatus === 'Pending');
+        filtered = orderList?.filter(order => order?.orderStatus === 'Pending');
+        break;
       case 'Active Orders':
-        return orderList?.filter(order => ['Processing', 'Shipped', 'On Hold'].includes(order?.orderStatus));
+        filtered = orderList?.filter(order => ['Processing', 'Shipped', 'On Hold'].includes(order?.orderStatus));
+        break;
       case 'Completed Orders':
-        return orderList?.filter(order => order?.orderStatus === 'Delivered');
+        filtered = orderList?.filter(order => order?.orderStatus === 'Delivered');
+        break;
       case 'Canceled Orders':
-        return orderList?.filter(order => ['Requested Return', 'Refunded'].includes(order?.orderStatus));
+        filtered = orderList?.filter(order => ['Requested Return', 'Refunded'].includes(order?.orderStatus));
+        break;
       default:
-        return orderList;
+        filtered = orderList;
     }
+
+    // Sort the filtered orders based on last status change, most recent first
+    return filtered?.sort((a, b) => new Date(b.lastStatusChange) - new Date(a.lastStatusChange));
   };
 
   // Filtered orders based on the selected tab
@@ -245,7 +271,7 @@ const OrdersPage = () => {
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, update it!"
+      confirmButtonText: "Yes"
     }).then(async (result) => {
       if (result.isConfirmed) {
         let updateStatus;
@@ -829,13 +855,44 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
           <ModalContent>
             <ModalHeader>Choose Columns</ModalHeader>
             <ModalBody className="modal-body-scroll">
-              <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
-                {columns.map((column) => (
-                  <Checkbox key={column} value={column}>
-                    {column}
-                  </Checkbox>
-                ))}
-              </CheckboxGroup>
+              <DragDropContext onDragEnd={handleOnDragEnd}>
+                <Droppable droppableId="droppable">
+                  {(provided) => (
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                      <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
+                        {columnOrder.map((column, index) => (
+                          <Draggable key={column} draggableId={column} index={index}>
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className="flex items-center justify-between p-2 border-b"
+                              >
+                                <Checkbox
+                                  value={column}
+                                  isChecked={selectedColumns.includes(column)}
+                                  onChange={() => {
+                                    // Toggle column selection
+                                    if (selectedColumns.includes(column)) {
+                                      setSelectedColumns(selectedColumns.filter(col => col !== column));
+                                    } else {
+                                      setSelectedColumns([...selectedColumns, column]);
+                                    }
+                                  }}
+                                >
+                                  {column}
+                                </Checkbox>
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </CheckboxGroup>
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
             </ModalBody>
             <ModalFooter>
               <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
@@ -844,7 +901,7 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
               <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
                 Deselect All
               </Button>
-              <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
+              <Button variant="solid" color="primary" size="sm" onClick={handleSave}>
                 Save
               </Button>
             </ModalFooter>
@@ -856,158 +913,129 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 z-[1] bg-white">
               <tr>
-                {selectedColumns.includes('Order Number') && (
-                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Order Number</th>
-                )}
-                {selectedColumns.includes('Date & Time') && (
-                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Date & Time</th>
-                )}
-                {selectedColumns.includes('Customer Name') && (
-                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Customer Name</th>
-                )}
-                {selectedColumns.includes('Order Amount') && (
-                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Order Amount</th>
-                )}
-                {selectedColumns.includes('Order Status') && (
-                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Order Status</th>
-                )}
-                {selectedColumns.includes('Action') && (
-                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Action</th>
-                )}
-                {selectedColumns.includes('Email') && (
-                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Email</th>
-                )}
-                {selectedColumns.includes('Phone Number') && (
-                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Phone Number</th>
-                )}
-                {selectedColumns.includes('Alternative Phone Number') && (
-                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Alternative Phone Number</th>
-                )}
-                {selectedColumns.includes('Shipping Zone') && (
-                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Shipping Zone</th>
-                )}
-                {selectedColumns.includes('Shipping Method') && (
-                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Shipping Method</th>
-                )}
-                {selectedColumns.includes('Payment Status') && (
-                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Payment Status</th>
-                )}
-                {selectedColumns.includes('Payment Method') && (
-                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Payment Method</th>
-                )}
-                {selectedColumns.includes('Vendor') && (
-                  <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Vendor</th>
-                )}
+                {columnOrder.map((column) => selectedColumns.includes(column) && (
+                  <th key={column} className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">{column}</th>
+                ))}
               </tr>
             </thead>
+
             <tbody className="bg-white divide-y divide-gray-200">
-
-              {paginatedOrders?.length === 0 ? <tr>
-                <td colSpan={selectedColumns.length} className="text-center p-4 text-gray-500 md:pt-40 pt-32 lg:pt-52 xl:pt-60 2xl:pt-72">
-                  No orders found matching your criteria. Please adjust your filters or check back later.
-                </td>
-              </tr> : (paginatedOrders?.map((order, index) => (
-                <tr key={order?._id || index} className="hover:bg-gray-50 transition-colors">
-                  {selectedColumns.includes('Order Number') && (
-                    <td className="text-xs p-3 font-mono cursor-pointer text-blue-600 hover:text-blue-800" onClick={() => handleOrderClick(order)}>
-                      {order?.orderNumber}
-                    </td>
-                  )}
-                  {selectedColumns.includes('Date & Time') && (
-                    <td className="text-xs p-3 text-gray-700">{order?.dateTime}</td>
-                  )}
-                  {selectedColumns.includes('Customer Name') && (
-                    <td className="text-xs p-3 text-gray-700 uppercase">{order?.customerName}</td>
-                  )}
-                  {selectedColumns.includes('Order Amount') && (
-                    <td className="text-xs p-3 text-gray-700 pl-1 md:pl-2 lg:pl-4 xl:pl-9">৳ {order?.totalAmount.toFixed(2)}</td>
-                  )}
-                  {selectedColumns.includes('Order Status') && (
-                    <td className="text-xs p-3 text-yellow-600">{order?.orderStatus}</td>
-                  )}
-                  {selectedColumns.includes('Action') && (
-                    <td className="p-3">
-                      <div className="flex gap-2 items-center">
-                        {order.orderStatus === 'Pending' && (
-                          <Button onClick={() => handleActions(order._id)} size="sm" className="text-xs w-20" color="primary" variant="flat">
-                            Confirm
-                          </Button>
-                        )}
-                        {order.orderStatus === 'Processing' && (
-                          <Button onClick={() => handleActions(order._id, 'shipped')} size="sm" className="text-xs w-20" color="secondary" variant="flat">
-                            Shipped
-                          </Button>
-                        )}
-                        {order.orderStatus === 'Shipped' && (
-                          <div className="flex items-center gap-2">
-                            <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'onHold')} size="sm" color="warning" variant="flat">
-                              On Hold
-                            </Button>
-                            <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'delivered')} size="sm" color="success" variant="flat">
-                              Delivered
-                            </Button>
-                          </div>
-                        )}
-                        {order.orderStatus === 'On Hold' && (
-                          <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'delivered')} size="sm" color="success" variant="flat">
-                            Delivered
-                          </Button>
-                        )}
-                        {order.orderStatus === 'Delivered' && (
-                          <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'requestedReturn')} size="sm" color="danger" variant="flat">
-                            Return
-                          </Button>
-                        )}
-                        {order.orderStatus === 'Requested Return' && (
-                          <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'refunded')} size="sm" color="danger" variant="flat">
-                            Refund
-                          </Button>
-                        )}
-                        {order.orderStatus === 'Refunded' && (
-                          <Button className="text-xs w-20 cursor-not-allowed" size="sm" color="default" isDisabled>
-                            Refunded
-                          </Button>
-                        )}
-
-                        {/* Undo button logic */}
-                        {isAdmin && isUndoAvailable(order) && (
-                          <button
-                            onClick={() => handleActions(order._id, '', true)}
-                            className="text-red-600 hover:text-red-800 focus:ring-2 focus:ring-red-500 rounded p-1"
-                          >
-                            <FaUndo />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  )}
-                  {selectedColumns.includes('Email') && (
-                    <td className="text-xs p-3 text-gray-700">{order?.email}</td>
-                  )}
-                  {selectedColumns.includes('Phone Number') && (
-                    <td className="text-xs p-3 text-gray-700">{order?.phoneNumber}</td>
-                  )}
-                  {selectedColumns.includes('Alternative Phone Number') && (
-                    <td className="text-xs p-3 text-gray-700">{order?.phoneNumber2 === 0 ? '--' : order?.phoneNumber2}</td>
-                  )}
-                  {selectedColumns.includes('Shipping Zone') && (
-                    <td className="text-xs p-3 text-gray-700">{order?.shippingZone}</td>
-                  )}
-                  {selectedColumns.includes('Shipping Method') && (
-                    <td className="text-xs p-3 text-gray-700">{order?.shippingMethod}</td>
-                  )}
-                  {selectedColumns.includes('Payment Status') && (
-                    <td className="text-xs p-3 text-gray-700">{order?.paymentStatus}</td>
-                  )}
-                  {selectedColumns.includes('Payment Method') && (
-                    <td className="text-xs p-3 text-gray-700">{order?.paymentMethod}</td>
-                  )}
-                  {selectedColumns.includes('Vendor') && (
-                    <td className="text-xs p-3 text-gray-700">{order?.vendor}</td>
-                  )}
+              {paginatedOrders?.length === 0 ? (
+                <tr>
+                  <td colSpan={selectedColumns.length} className="text-center p-4 text-gray-500">
+                    No orders found matching your criteria. Please adjust your filters or check back later.
+                  </td>
                 </tr>
-              )))}
+              ) : (
+                paginatedOrders.map((order, index) => (
+                  <tr key={order?._id || index} className="hover:bg-gray-50 transition-colors">
+                    {columnOrder.map(
+                      (column) =>
+                        selectedColumns.includes(column) && (
+                          <>
+                            {column === 'Order Number' && (
+                              <td key="orderNumber" className="text-xs p-3 font-mono cursor-pointer text-blue-600 hover:text-blue-800" onClick={() => handleOrderClick(order)}>
+                                {order?.orderNumber}
+                              </td>
+                            )}
+                            {column === 'Date & Time' && (
+                              <td key="dateTime" className="text-xs p-3 text-gray-700">{order?.dateTime}</td>
+                            )}
+                            {column === 'Customer Name' && (
+                              <td key="customerName" className="text-xs p-3 text-gray-700 uppercase">{order?.customerName}</td>
+                            )}
+                            {column === 'Order Amount' && (
+                              <td key="orderAmount" className="text-xs p-3 text-gray-700 pl-1 md:pl-2 lg:pl-4 xl:pl-9">৳ {order?.totalAmount.toFixed(2)}</td>
+                            )}
+                            {column === 'Order Status' && (
+                              <td key="orderStatus" className="text-xs p-3 text-yellow-600">{order?.orderStatus}</td>
+                            )}
+                            {column === 'Action' && (
+                              <td className="p-3">
+                                <div className="flex gap-2 items-center">
+                                  {order.orderStatus === 'Pending' && (
+                                    <Button onClick={() => handleActions(order._id)} size="sm" className="text-xs w-20" color="primary" variant="flat">
+                                      Confirm
+                                    </Button>
+                                  )}
+                                  {order.orderStatus === 'Processing' && (
+                                    <Button onClick={() => handleActions(order._id, 'shipped')} size="sm" className="text-xs w-20" color="secondary" variant="flat">
+                                      Shipped
+                                    </Button>
+                                  )}
+                                  {order.orderStatus === 'Shipped' && (
+                                    <div className="flex items-center gap-2">
+                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'onHold')} size="sm" color="warning" variant="flat">
+                                        On Hold
+                                      </Button>
+                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'delivered')} size="sm" color="success" variant="flat">
+                                        Delivered
+                                      </Button>
+                                    </div>
+                                  )}
+                                  {order.orderStatus === 'On Hold' && (
+                                    <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'delivered')} size="sm" color="success" variant="flat">
+                                      Delivered
+                                    </Button>
+                                  )}
+                                  {order.orderStatus === 'Delivered' && (
+                                    <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'requestedReturn')} size="sm" color="danger" variant="flat">
+                                      Return
+                                    </Button>
+                                  )}
+                                  {order.orderStatus === 'Requested Return' && (
+                                    <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'refunded')} size="sm" color="danger" variant="flat">
+                                      Refund
+                                    </Button>
+                                  )}
+                                  {order.orderStatus === 'Refunded' && (
+                                    <Button className="text-xs w-20 cursor-not-allowed" size="sm" color="default" isDisabled>
+                                      Refunded
+                                    </Button>
+                                  )}
 
+                                  {/* Undo button logic */}
+                                  {isAdmin && isUndoAvailable(order) && (
+                                    <button
+                                      onClick={() => handleActions(order._id, '', true)}
+                                      className="text-red-600 hover:text-red-800 focus:ring-2 focus:ring-red-500 rounded p-1"
+                                    >
+                                      <FaUndo />
+                                    </button>
+                                  )}
+                                </div>
+                              </td>
+                            )}
+                            {column === 'Email' && (
+                              <td key="email" className="text-xs p-3 text-gray-700">{order?.email}</td>
+                            )}
+                            {column === 'Phone Number' && (
+                              <td key="phoneNumber" className="text-xs p-3 text-gray-700">{order?.phoneNumber}</td>
+                            )}
+                            {column === 'Alternative Phone Number' && (
+                              <td key="altPhoneNumber" className="text-xs p-3 text-gray-700">{order?.phoneNumber2 === 0 ? '--' : order?.phoneNumber2}</td>
+                            )}
+                            {column === 'Shipping Zone' && (
+                              <td key="shippingZone" className="text-xs p-3 text-gray-700">{order?.shippingZone}</td>
+                            )}
+                            {column === 'Shipping Method' && (
+                              <td key="shippingMethod" className="text-xs p-3 text-gray-700">{order?.shippingMethod}</td>
+                            )}
+                            {column === 'Payment Status' && (
+                              <td key="paymentStatus" className="text-xs p-3 text-gray-700">{order?.paymentStatus}</td>
+                            )}
+                            {column === 'Payment Method' && (
+                              <td key="paymentMethod" className="text-xs p-3 text-gray-700">{order?.paymentMethod}</td>
+                            )}
+                            {column === 'Vendor' && (
+                              <td key="vendor" className="text-xs p-3 text-gray-700">{order?.vendor}</td>
+                            )}
+                          </>
+                        )
+                    )}
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
