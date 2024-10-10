@@ -507,20 +507,54 @@ const OrdersPage = () => {
     const filteredData = dataToExport.map(row => {
       const data = {};
 
-      // Include only the selected columns
-      if (selectedColumns.includes('Order Number')) data.orderNumber = row.orderNumber;
-      if (selectedColumns.includes('Date & Time')) data.dateTime = row.dateTime;
-      if (selectedColumns.includes('Customer Name')) data.customerName = row.customerName;
-      if (selectedColumns.includes('Order Amount')) data.totalAmount = row.totalAmount;
-      if (selectedColumns.includes('Order Status')) data.orderStatus = row.orderStatus;
-      if (selectedColumns.includes('Email')) data.email = row.email;
-      if (selectedColumns.includes('Phone Number')) data.phoneNumber = row.phoneNumber;
-      if (selectedColumns.includes('Alternative Phone Number')) data.phoneNumber2 = row.phoneNumber2;
-      if (selectedColumns.includes('Shipping Zone')) data.shippingZone = row.shippingZone;
-      if (selectedColumns.includes('Shipping Method')) data.shippingMethod = row.shippingMethod;
-      if (selectedColumns.includes('Payment Status')) data.paymentStatus = row.paymentStatus;
-      if (selectedColumns.includes('Payment Method')) data.paymentMethod = row.paymentMethod;
-      if (selectedColumns.includes('Vendor')) data.vendor = row.vendor;
+      // Loop through columnOrder and include only the selected columns in the correct order
+      columnOrder.forEach((col) => {
+        if (selectedColumns.includes(col)) {
+          switch (col) {
+            case 'Order Number':
+              data.orderNumber = row.orderNumber;
+              break;
+            case 'Date & Time':
+              data.dateTime = row.dateTime;
+              break;
+            case 'Customer Name':
+              data.customerName = row.customerName;
+              break;
+            case 'Order Amount':
+              data.totalAmount = row.totalAmount;
+              break;
+            case 'Order Status':
+              data.orderStatus = row.orderStatus;
+              break;
+            case 'Email':
+              data.email = row.email;
+              break;
+            case 'Phone Number':
+              data.phoneNumber = row.phoneNumber;
+              break;
+            case 'Alternative Phone Number':
+              data.phoneNumber2 = row.phoneNumber2 || "--";
+              break;
+            case 'Shipping Zone':
+              data.shippingZone = row.shippingZone;
+              break;
+            case 'Shipping Method':
+              data.shippingMethod = row.shippingMethod;
+              break;
+            case 'Payment Status':
+              data.paymentStatus = row.paymentStatus;
+              break;
+            case 'Payment Method':
+              data.paymentMethod = row.paymentMethod;
+              break;
+            case 'Vendor':
+              data.vendor = row.vendor;
+              break;
+            default:
+              break;
+          }
+        }
+      });
 
       return data;
     });
@@ -547,28 +581,65 @@ const OrdersPage = () => {
     // Create a new document in landscape mode
     const doc = new jsPDF('landscape'); // 'landscape' mode
 
-    // Define the columns based on selectedColumns
-    const columns = selectedColumns.map((col) => ({
-      header: col,
-      dataKey: col,
-    }));
+    // Define the columns based on columnOrder
+    const columns = columnOrder
+      .filter((col) => selectedColumns.includes(col))  // Ensure only selected columns are included
+      .map((col) => ({
+        header: col,
+        dataKey: col,
+      }));
 
-    // Map filtered orders to the correct data format based on selectedColumns
+    // Map filtered orders to the correct data format based on columnOrder
     const rows = filteredOrders?.map((order) => {
       const rowData = {};
-      if (selectedColumns.includes("Order Number")) rowData["Order Number"] = order.orderNumber;
-      if (selectedColumns.includes("Date & Time")) rowData["Date & Time"] = order.dateTime;
-      if (selectedColumns.includes("Customer Name")) rowData["Customer Name"] = order.customerName;
-      if (selectedColumns.includes("Order Amount")) rowData["Order Amount"] = `${order.totalAmount.toFixed(2)}`;
-      if (selectedColumns.includes("Order Status")) rowData["Order Status"] = order.orderStatus;
-      if (selectedColumns.includes("Email")) rowData["Email"] = order.email;
-      if (selectedColumns.includes("Phone Number")) rowData["Phone Number"] = order.phoneNumber;
-      if (selectedColumns.includes("Alternative Phone Number")) rowData["Alternative Phone Number"] = order.phoneNumber2 || "--";
-      if (selectedColumns.includes("Shipping Zone")) rowData["Shipping Zone"] = order.shippingZone;
-      if (selectedColumns.includes("Shipping Method")) rowData["Shipping Method"] = order.shippingMethod;
-      if (selectedColumns.includes("Payment Status")) rowData["Payment Status"] = order.paymentStatus;
-      if (selectedColumns.includes("Payment Method")) rowData["Payment Method"] = order.paymentMethod;
-      if (selectedColumns.includes("Vendor")) rowData["Vendor"] = order.vendor;
+
+      columnOrder.forEach((col) => {
+        if (selectedColumns.includes(col)) {
+          switch (col) {
+            case "Order Number":
+              rowData["Order Number"] = order.orderNumber;
+              break;
+            case "Date & Time":
+              rowData["Date & Time"] = order.dateTime;
+              break;
+            case "Customer Name":
+              rowData["Customer Name"] = order.customerName;
+              break;
+            case "Order Amount":
+              rowData["Order Amount"] = `${order.totalAmount.toFixed(2)}`;
+              break;
+            case "Order Status":
+              rowData["Order Status"] = order.orderStatus;
+              break;
+            case "Email":
+              rowData["Email"] = order.email;
+              break;
+            case "Phone Number":
+              rowData["Phone Number"] = order.phoneNumber;
+              break;
+            case "Alternative Phone Number":
+              rowData["Alternative Phone Number"] = order.phoneNumber2 || "--";
+              break;
+            case "Shipping Zone":
+              rowData["Shipping Zone"] = order.shippingZone;
+              break;
+            case "Shipping Method":
+              rowData["Shipping Method"] = order.shippingMethod;
+              break;
+            case "Payment Status":
+              rowData["Payment Status"] = order.paymentStatus;
+              break;
+            case "Payment Method":
+              rowData["Payment Method"] = order.paymentMethod;
+              break;
+            case "Vendor":
+              rowData["Vendor"] = order.vendor;
+              break;
+            default:
+              break;
+          }
+        }
+      });
 
       return rowData;
     });
@@ -609,20 +680,54 @@ const OrdersPage = () => {
     const filteredData = dataToExport.map(row => {
       const data = {};
 
-      // Include only the selected columns
-      if (selectedColumns.includes('Order Number')) data.orderNumber = row.orderNumber;
-      if (selectedColumns.includes('Date & Time')) data.dateTime = row.dateTime;
-      if (selectedColumns.includes('Customer Name')) data.customerName = row.customerName;
-      if (selectedColumns.includes('Order Amount')) data.totalAmount = row.totalAmount;
-      if (selectedColumns.includes('Order Status')) data.orderStatus = row.orderStatus;
-      if (selectedColumns.includes('Email')) data.email = row.email;
-      if (selectedColumns.includes('Phone Number')) data.phoneNumber = row.phoneNumber;
-      if (selectedColumns.includes('Alternative Phone Number')) data.phoneNumber2 = row.phoneNumber2;
-      if (selectedColumns.includes('Shipping Zone')) data.shippingZone = row.shippingZone;
-      if (selectedColumns.includes('Shipping Method')) data.shippingMethod = row.shippingMethod;
-      if (selectedColumns.includes('Payment Status')) data.paymentStatus = row.paymentStatus;
-      if (selectedColumns.includes('Payment Method')) data.paymentMethod = row.paymentMethod;
-      if (selectedColumns.includes('Vendor')) data.vendor = row.vendor;
+      // Include all selected columns, even if empty
+      columnOrder.forEach((col) => {
+        if (selectedColumns.includes(col)) {
+          switch (col) {
+            case 'Order Number':
+              data["Order Number"] = row.orderNumber || "";  // Include empty cells
+              break;
+            case 'Date & Time':
+              data["Date & Time"] = row.dateTime || "";  // Include empty cells
+              break;
+            case 'Customer Name':
+              data["Customer Name"] = row.customerName || "";  // Include empty cells
+              break;
+            case 'Order Amount':
+              data["Order Amount"] = row.totalAmount || "";  // Include empty cells
+              break;
+            case 'Order Status':
+              data["Order Status"] = row.orderStatus || "";  // Include empty cells
+              break;
+            case 'Email':
+              data["Email"] = row.email || "";  // Include empty cells
+              break;
+            case 'Phone Number':
+              data["Phone Number"] = row.phoneNumber || "";  // Include empty cells
+              break;
+            case 'Alternative Phone Number':
+              data["Alternative Phone Number"] = row.phoneNumber2 || "";  // Include empty cells
+              break;
+            case 'Shipping Zone':
+              data["Shipping Zone"] = row.shippingZone || "";  // Include empty cells
+              break;
+            case 'Shipping Method':
+              data["Shipping Method"] = row.shippingMethod || "";  // Include empty cells
+              break;
+            case 'Payment Status':
+              data["Payment Status"] = row.paymentStatus || "";  // Include empty cells
+              break;
+            case 'Payment Method':
+              data["Payment Method"] = row.paymentMethod || "";  // Include empty cells
+              break;
+            case 'Vendor':
+              data["Vendor"] = row.vendor || "";  // Include empty cells
+              break;
+            default:
+              break;
+          }
+        }
+      });
 
       return data;
     });
@@ -633,8 +738,8 @@ const OrdersPage = () => {
     else if (startDate && adjustedEndDate) fileName += `_from_${formatDate(startDate)}_to_${formatDate(adjustedEndDate)}`;
     else fileName += `_${selectedTab.replace(/\s/g, '_').toLowerCase()}`;
 
-    // Prepare the worksheet and workbook for XLSX
-    const worksheet = XLSX.utils.json_to_sheet(filteredData);
+    // Prepare the worksheet and workbook for XLSX export
+    const worksheet = XLSX.utils.json_to_sheet(filteredData);  // Convert JSON data to sheet format
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Orders');
 
@@ -909,7 +1014,7 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
         </Modal>
 
         {/* table content */}
-        <div className="max-w-screen-2xl mx-auto custom-max-h-orders overflow-x-auto custom-scrollbar relative">
+        <div className="max-w-screen-2xl mx-auto custom-max-h-orders overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 z-[1] bg-white">
               <tr>

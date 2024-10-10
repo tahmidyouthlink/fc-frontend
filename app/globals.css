@@ -290,3 +290,15 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 .custom-scrollbar::-webkit-scrollbar-track {
   background-color: #f1f1f1; /* Track color */
 }
+
+/* Add this style to restrict the image section height */
+.image-upload-container {
+  max-height: 700px; /* Adjust based on your layout */
+  overflow-y: auto; /* Allow scrolling */
+}
+
+/* Ensure the images are not too large */
+.uploaded-image {
+  max-height: 150px; /* Restrict image height */
+  object-fit: cover; /* Maintain aspect ratio */
+}

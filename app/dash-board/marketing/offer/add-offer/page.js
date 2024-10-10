@@ -398,9 +398,9 @@ const AddOffer = () => {
                       <Image
                         src={image.src}
                         alt='Uploaded image'
-                        height={100}
-                        width={200}
-                        className='w-3/4 mx-auto max-h-[350px] mt-4 rounded-md'
+                        height={3000}
+                        width={3000}
+                        className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
                       />
                       <button
                         onClick={handleImageRemove}

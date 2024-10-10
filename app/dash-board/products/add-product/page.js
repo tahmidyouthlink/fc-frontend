@@ -573,8 +573,8 @@ const FirstStepOfAddProduct = () => {
       <form className='2xl:max-w-screen-2xl 2xl:mx-auto' onSubmit={handleSubmit(onSubmit)}>
         <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
 
-          <div className='grid grid-cols-1 lg:col-span-7 gap-8 px-6 py-3 max-h-[1550px]'>
-            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[420px]'>
+          <div className='grid grid-cols-1 lg:col-span-7 gap-8 px-6 py-3'>
+            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
               <label htmlFor='productTitle' className='flex justify-start font-medium text-[#9F5216]'>Product Title *</label>
               <input id='productTitle' {...register("productTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" placeholder='Enter Product Title' type="text" />
               {errors.productTitle?.type === "required" && (
@@ -764,7 +764,7 @@ const FirstStepOfAddProduct = () => {
               />
             </div>
 
-            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[570px]'>
+            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
               <label htmlFor='materialCare' className='flex justify-start font-medium text-[#9F5216]'>Material Care</label>
               <Controller
                 name="materialCare"
@@ -957,33 +957,35 @@ const FirstStepOfAddProduct = () => {
                           {...provided.droppableProps}
                           ref={provided.innerRef}
                         >
-                          <div className='grid grid-cols-2 gap-4 mt-4'>
-                            {uploadedImageUrls.map((url, index) => (
-                              <Draggable key={url} draggableId={url} index={index}>
-                                {(provided) => (
-                                  <li
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    className="flex items-center mb-2 p-2 bg-white border border-gray-300 rounded-md relative"
-                                  >
-                                    <Image
-                                      src={url}
-                                      alt={`Uploaded image ${index + 1}`}
-                                      height={3000}
-                                      width={3000}
-                                      className='w-full h-auto max-h-[350px] rounded-md object-cover'
-                                    />
-                                    <button
-                                      onClick={() => handleImageRemove(index)}
-                                      className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                          <div className='image-upload-container custom-scrollbar'>
+                            <div className='grid grid-cols-2 gap-4 mt-4'>
+                              {uploadedImageUrls.map((url, index) => (
+                                <Draggable key={url} draggableId={url} index={index}>
+                                  {(provided) => (
+                                    <li
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      {...provided.dragHandleProps}
+                                      className="flex items-center mb-2 p-2 bg-white border border-gray-300 rounded-md relative"
                                     >
-                                      <RxCross2 size={24} />
-                                    </button>
-                                  </li>
-                                )}
-                              </Draggable>
-                            ))}
+                                      <Image
+                                        src={url}
+                                        alt={`Uploaded image ${index + 1}`}
+                                        height={3000}
+                                        width={3000}
+                                        className='w-full h-auto max-h-[250px] rounded-md object-contain'
+                                      />
+                                      <button
+                                        onClick={() => handleImageRemove(index)}
+                                        className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                                      >
+                                        <RxCross2 size={24} />
+                                      </button>
+                                    </li>
+                                  )}
+                                </Draggable>
+                              ))}
+                            </div>
                           </div>
                           {provided.placeholder}
                         </ul>

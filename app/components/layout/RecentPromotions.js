@@ -836,7 +836,7 @@ const RecentPromotions = () => {
         </div>
       )}
 
-      <div className="max-w-screen-2xl mx-auto custom-max-discount custom-scrollbar overflow-x-auto my-4">
+      <div className="max-w-screen-2xl mx-auto custom-max-discount custom-scrollbar overflow-x-auto my-4 drop-shadow rounded-lg">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-50 sticky top-0 z-[1] rounded-md">
             <tr>

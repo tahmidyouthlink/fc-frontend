@@ -296,7 +296,7 @@ const SecondStepOfAddProduct = () => {
                       className={`image-container ${variant.imageUrl === url ? 'selected' : ''}`}
                       onClick={() => onImageClick(index, url)}
                     >
-                      <Image src={url} alt={`image-${imgIndex}`} width={800} height={800} className="w-full min-h-60 object-contain rounded-md" />
+                      <Image src={url} alt={`image-${imgIndex}`} width={3000} height={3000} className="w-full min-h-[200px] max-h-[200px] rounded-md object-contain" />
                     </div>
                   ))}
                 </div>

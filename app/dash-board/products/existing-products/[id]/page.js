@@ -323,85 +323,83 @@ const ProductPage = () => {
       ) : (
         paginatedProducts?.length > 0 ? (
           <div className='mx-6 2xl:mx-0 custom-max-h-orders'>
-            <div className='bg-white max-w-screen-2xl mx-auto relative'>
-              <div className="max-w-screen-2xl mx-auto overflow-x-auto custom-scrollbar">
-                <table className="w-full text-left border-collapse rounded-lg">
-                  <thead className="sticky top-0 z-[1] w-full bg-white">
-                    <tr className='w-full'>
+            <div className="max-w-screen-2xl mx-auto overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
+              <table className="w-full text-left border-collapse">
+                <thead className="sticky top-0 z-[1] w-full bg-white">
+                  <tr className='w-full'>
 
-                      {columnOrder.map((column) => selectedColumns.includes(column) && (
-                        <th key={column} className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">{column}</th>
-                      ))}
-
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-
-                    {paginatedProducts?.map((product, index) => (
-                      <tr key={product?._id || index} className="hover:bg-gray-50 transition-colors">
-                        {columnOrder.map(
-                          (column) =>
-                            selectedColumns.includes(column) && (
-                              <>
-                                {column === 'Product' && (
-                                  <td onClick={() => handleGoToEditPage(product?._id)} className="text-xs p-3 cursor-pointer text-blue-600 hover:text-blue-800 flex flex-col lg:flex-row items-center gap-3">
-                                    <div>
-                                      <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrls[0]} alt='productIMG' height={600} width={600} />
-                                    </div>
-                                    <div className='flex flex-col'>
-                                      <p>{product?.productTitle}</p>
-                                      <p>{product?.productId}</p>
-                                    </div>
-                                  </td>
-                                )}
-                                {column === 'Status' && (
-                                  <td className="text-xs p-3 text-gray-700">
-                                    <span className={`px-2 py-0.5 ${product?.status === "active" ? "bg-green-200 text-green-800 rounded-full"
-                                      : product?.status === "archive" ? "bg-blue-200 text-blue-800 rounded-full"
-                                        : "bg-yellow-200 text-yellow-800 rounded-full"}`}>
-                                      {product?.status === "active" ? "Active"
-                                        : product?.status === "archive" ? "Archived"
-                                          : "Draft"}
-                                    </span>
-                                  </td>
-                                )}
-                                {column === 'SKU' && (
-                                  <td className="text-xs p-3 text-gray-700">{product?.productVariants?.length > 0
-                                    ? `${product.productVariants.reduce((acc, variant) => acc + variant.sku, 0)} ${product.productVariants.reduce((acc, variant) => acc + variant.sku, 0) === 1 ? 'Item' : 'Items'}`
-                                    : 'No Items'}</td>
-                                )}
-                                {column === 'Category' && (
-                                  <td className="text-xs p-3 text-gray-700">{product?.category}</td>
-                                )}
-                                {column === 'Price' && (
-                                  <td className="text-xs p-3 text-gray-700">৳ {product?.regularPrice}</td>
-                                )}
-                                {column === 'Sizes' && (
-                                  <td className="text-xs p-3 text-gray-700">{product?.allSizes?.join(', ') || 'No sizes available'}</td>
-                                )}
-                                {column === 'Colors' && (
-                                  <td className="text-xs p-3 text-gray-700">{product?.availableColors?.map(colorObj => (
-                                    <span key={colorObj._id} style={{ backgroundColor: colorObj.color }} className="inline-block w-5 h-5 mr-1 rounded-full"></span>
-                                  ))}</td>
-                                )}
-                                {column === 'Vendor' && (
-                                  <td className="text-xs p-3 text-gray-700">{product?.vendors?.length > 0 ? <div>{product?.vendors?.map((vendor, index) => (<div key={index}>{vendor?.value}</div>))}</div> : <div>N/A</div>} </td>
-                                )}
-                                {column === 'Shipping Zones' && (
-                                  <td className="text-xs p-3 text-gray-700">{product?.shippingDetails?.map(detail => detail.shippingZone).join(', ') || 'No shipping zones available'}</td>
-                                )}
-                                {column === 'Shipment Handlers' && (
-                                  <td className="text-xs p-3 text-gray-700">{product?.shippingDetails?.map(detail => detail.selectedShipmentHandler.shipmentHandlerName).join(', ') || 'No shipment handlers available'}</td>
-                                )}
-                              </>
-                            )
-                        )}
-                      </tr>
+                    {columnOrder.map((column) => selectedColumns.includes(column) && (
+                      <th key={column} className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">{column}</th>
                     ))}
 
-                  </tbody>
-                </table>
-              </div>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+
+                  {paginatedProducts?.map((product, index) => (
+                    <tr key={product?._id || index} className="hover:bg-gray-50 transition-colors">
+                      {columnOrder.map(
+                        (column) =>
+                          selectedColumns.includes(column) && (
+                            <>
+                              {column === 'Product' && (
+                                <td onClick={() => handleGoToEditPage(product?._id)} className="text-xs p-3 cursor-pointer text-blue-600 hover:text-blue-800 flex flex-col lg:flex-row items-center gap-3">
+                                  <div>
+                                    <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrls[0]} alt='productIMG' height={600} width={600} />
+                                  </div>
+                                  <div className='flex flex-col'>
+                                    <p>{product?.productTitle}</p>
+                                    <p>{product?.productId}</p>
+                                  </div>
+                                </td>
+                              )}
+                              {column === 'Status' && (
+                                <td className="text-xs p-3 text-gray-700">
+                                  <span className={`px-2 py-0.5 ${product?.status === "active" ? "bg-green-200 text-green-800 rounded-full"
+                                    : product?.status === "archive" ? "bg-blue-200 text-blue-800 rounded-full"
+                                      : "bg-yellow-200 text-yellow-800 rounded-full"}`}>
+                                    {product?.status === "active" ? "Active"
+                                      : product?.status === "archive" ? "Archived"
+                                        : "Draft"}
+                                  </span>
+                                </td>
+                              )}
+                              {column === 'SKU' && (
+                                <td className="text-xs p-3 text-gray-700">{product?.productVariants?.length > 0
+                                  ? `${product.productVariants.reduce((acc, variant) => acc + variant.sku, 0)} ${product.productVariants.reduce((acc, variant) => acc + variant.sku, 0) === 1 ? 'Item' : 'Items'}`
+                                  : 'No Items'}</td>
+                              )}
+                              {column === 'Category' && (
+                                <td className="text-xs p-3 text-gray-700">{product?.category}</td>
+                              )}
+                              {column === 'Price' && (
+                                <td className="text-xs p-3 text-gray-700">৳ {product?.regularPrice}</td>
+                              )}
+                              {column === 'Sizes' && (
+                                <td className="text-xs p-3 text-gray-700">{product?.allSizes?.join(', ') || 'No sizes available'}</td>
+                              )}
+                              {column === 'Colors' && (
+                                <td className="text-xs p-3 text-gray-700">{product?.availableColors?.map(colorObj => (
+                                  <span key={colorObj._id} style={{ backgroundColor: colorObj.color }} className="inline-block w-5 h-5 mr-1 rounded-full"></span>
+                                ))}</td>
+                              )}
+                              {column === 'Vendor' && (
+                                <td className="text-xs p-3 text-gray-700">{product?.vendors?.length > 0 ? <div>{product?.vendors?.map((vendor, index) => (<div key={index}>{vendor?.value}</div>))}</div> : <div>N/A</div>} </td>
+                              )}
+                              {column === 'Shipping Zones' && (
+                                <td className="text-xs p-3 text-gray-700">{product?.shippingDetails?.map(detail => detail.shippingZone).join(', ') || 'No shipping zones available'}</td>
+                              )}
+                              {column === 'Shipment Handlers' && (
+                                <td className="text-xs p-3 text-gray-700">{product?.shippingDetails?.map(detail => detail.selectedShipmentHandler.shipmentHandlerName).join(', ') || 'No shipment handlers available'}</td>
+                              )}
+                            </>
+                          )
+                      )}
+                    </tr>
+                  ))}
+
+                </tbody>
+              </table>
             </div>
           </div>
 

@@ -280,7 +280,7 @@ const Customers = () => {
         style={{
           backgroundImage: `url(${arrowSvgImage.src})`,
         }}
-        className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[20%] xl:left[10%] 2xl:left-[23%] bg-no-repeat'
+        className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[25%] xl:left-[26%] 2xl:left-[24%] bg-no-repeat'
       />
 
       <div className='max-w-screen-2xl px-6 2xl:px-0 mx-auto'>
@@ -408,7 +408,7 @@ const Customers = () => {
         </Modal>
 
         {/* table content */}
-        <div className="max-w-screen-2xl mx-auto custom-max-h overflow-x-auto custom-scrollbar relative">
+        <div className="max-w-screen-2xl mx-auto custom-max-h overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 z-[1] bg-white">
               <tr>

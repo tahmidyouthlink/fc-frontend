@@ -296,9 +296,9 @@ const FinanceTable = () => {
         </ModalContent>
       </Modal>
 
-      <div className="max-w-screen-2xl mx-auto custom-scrollbar custom-max-discount overflow-x-auto mt-6">
+      <div className="max-w-screen-2xl mx-auto custom-scrollbar custom-max-discount overflow-x-auto mt-6 drop-shadow rounded-lg">
         <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-50 sticky top-0 z-[1] rounded-md">
+          <thead className="bg-white sticky top-0 z-[1] rounded-md">
             <tr>
               {columnOrder.map((column) => selectedColumns.includes(column) && (
                 <th key={column} className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">{column}</th>
@@ -366,7 +366,7 @@ const FinanceTable = () => {
         </table>
 
       </div>
-      <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
+      <div className="flex flex-col md:flex-row gap-4 justify-center items-center py-3">
         <CustomPagination
           totalPages={totalPages}
           currentPage={page}

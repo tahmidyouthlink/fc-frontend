@@ -313,7 +313,6 @@ const EditProductPage = () => {
     const fetchProductDetails = async () => {
       try {
         const { data } = await axiosPublic.get(`/singleProduct/${id}`);
-        console.log(data);
 
         setValue('productTitle', data?.productTitle);
         setValue('batchCode', data?.batchCode);
@@ -404,8 +403,6 @@ const EditProductPage = () => {
       setNewArrivalError(true); // Hide error if at least one color is selected
     }
   };
-
-  const totalSku = productVariants?.reduce((sum, variant) => sum + variant.sku, 0);
 
   const onSubmit = async (data) => {
     try {
@@ -893,33 +890,35 @@ const EditProductPage = () => {
                             {...provided.droppableProps}
                             ref={provided.innerRef}
                           >
-                            <div className='grid grid-cols-2 gap-4 mt-4'>
-                              {uploadedImageUrls.map((url, index) => (
-                                <Draggable key={url} draggableId={url} index={index}>
-                                  {(provided) => (
-                                    <li
-                                      ref={provided.innerRef}
-                                      {...provided.draggableProps}
-                                      {...provided.dragHandleProps}
-                                      className="flex items-center mb-2 p-2 bg-white border border-gray-300 rounded-md relative"
-                                    >
-                                      <Image
-                                        src={url}
-                                        alt={`Uploaded image ${index + 1}`}
-                                        height={100}
-                                        width={200}
-                                        className='w-full h-auto rounded-md'
-                                      />
-                                      <button
-                                        onClick={() => handleImageRemove(index)}
-                                        className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                            <div className='image-upload-container custom-scrollbar'>
+                              <div className='grid grid-cols-2 gap-4 mt-4'>
+                                {uploadedImageUrls.map((url, index) => (
+                                  <Draggable key={url} draggableId={url} index={index}>
+                                    {(provided) => (
+                                      <li
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        className="flex items-center mb-2 p-2 bg-white border border-gray-300 rounded-md relative"
                                       >
-                                        <RxCross2 size={24} />
-                                      </button>
-                                    </li>
-                                  )}
-                                </Draggable>
-                              ))}
+                                        <Image
+                                          src={url}
+                                          alt={`Uploaded image ${index + 1}`}
+                                          height={100}
+                                          width={200}
+                                          className='w-full h-auto max-h-[250px] rounded-md object-contain'
+                                        />
+                                        <button
+                                          onClick={() => handleImageRemove(index)}
+                                          className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                                        >
+                                          <RxCross2 size={24} />
+                                        </button>
+                                      </li>
+                                    )}
+                                  </Draggable>
+                                ))}
+                              </div>
                             </div>
                             {provided.placeholder}
                           </ul>
@@ -993,7 +992,7 @@ const EditProductPage = () => {
                           className={`image-container ${variant.imageUrl === url ? 'selected' : ''}`}
                           onClick={() => onImageClick(index, url)}
                         >
-                          <Image src={url} alt={`image-${imgIndex}`} width={800} height={800} className="rounded-md" />
+                          <Image src={url} alt={`image-${imgIndex}`} width={3000} height={3000} className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain' />
                         </div>
                       ))}
                     </div>
