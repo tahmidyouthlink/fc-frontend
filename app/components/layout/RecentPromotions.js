@@ -28,7 +28,7 @@ const RecentPromotions = () => {
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   // const [isExpanded, setIsExpanded] = useState(null); // To track which row is expanded
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
-  const initialColumns = ["Promo Code / Offer Title", "Type", "Discount Value", "Expiry Date", "Total Times Applied", "Total Discount Given", "Products Affected", "Min Order Amount", "Max Capped Amount", "Actions", "Status"];
+  const initialColumns = ["Promo Code / Offer Title", "Type", "Discount Value", "Expiry Date", "Total Times Applied", "Total Discount Given", "Min Order Amount", "Max Capped Amount", "Actions", "Status"];
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
@@ -562,7 +562,14 @@ const RecentPromotions = () => {
                         </td>
                       )}
                       {column === 'Total Times Applied' && (
-                        <td key="totalTimesApplied" className="text-xs p-3 text-gray-700">
+                        <td
+                          key="totalTimesApplied"
+                          className="text-xs p-3 font-mono cursor-pointer text-blue-600 hover:text-blue-800"
+                          onClick={() => {
+                            const searchParam = item?.promoCode ? `promo=${item.promoCode}` : `offer=${item.offerTitle}`;
+                            router.push(`/dash-board/orders?${searchParam}`);
+                          }}
+                        >
                           {item?.promoCode
                             ? `${totalPromoApplied} ${totalPromoApplied === 1 ? "Order" : "Orders"}`
                             : `${totalOfferApplied} ${totalOfferApplied === 1 ? "Order" : "Orders"}`}
@@ -573,20 +580,6 @@ const RecentPromotions = () => {
                           {item?.promoCode
                             ? `৳ ${totalAmountDiscounted}`
                             : `৳ ${totalOfferAmountDiscounted}`}
-                        </td>
-                      )}
-                      {column === 'Products Affected' && (
-                        <td key="productsAffected" className="text-xs p-3 text-gray-700">
-                          {item?.promoCode && (
-                            <div>
-                              {getProductTitlesForPromo(item?.promoCode).join(", ") || "No products applied"}
-                            </div>
-                          )}
-                          {item?.offerTitle && (
-                            <div>
-                              {getProductTitlesForOffer(item?.offerTitle).join(", ") || "No products applied"}
-                            </div>
-                          )}
                         </td>
                       )}
                       {column === 'Min Order Amount' && (

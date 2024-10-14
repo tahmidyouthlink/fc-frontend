@@ -5,7 +5,8 @@
     "email": "john.doe1@example.com",
     "phoneNumber": "01712345678",
     "emailVerified": "Unverified",
-    "status": "basic"
+    "status": "standard",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Jane Smith",
@@ -13,7 +14,8 @@
     "email": "jane.smith2@example.com",
     "phoneNumber": "01712345679",
     "emailVerified": "Verified",
-    "status": "bronze"
+    "status": "bronze",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Robert Brown",
@@ -21,7 +23,8 @@
     "email": "robert.brown3@example.com",
     "phoneNumber": "01712345680",
     "emailVerified": "Verified",
-    "status": "bronze"
+    "status": "premium",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Emily Davis",
@@ -29,7 +32,8 @@
     "email": "emily.davis4@example.com",
     "phoneNumber": "01712345681",
     "emailVerified": "Unverified",
-    "status": "bronze"
+    "status": "gold",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Michael Johnson",
@@ -37,7 +41,8 @@
     "email": "michael.johnson5@example.com",
     "phoneNumber": "01712345682",
     "emailVerified": "Unverified",
-    "status": "bronze"
+    "status": "silver",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Mary Lee",
@@ -45,7 +50,8 @@
     "email": "mary.lee6@example.com",
     "phoneNumber": "01712345683",
     "emailVerified": "Unverified",
-    "status": "bronze"
+    "status": "premium",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "David Wilson",
@@ -53,7 +59,8 @@
     "email": "david.wilson7@example.com",
     "phoneNumber": "01712345684",
     "emailVerified": "Unverified",
-    "status": "bronze"
+    "status": "bronze",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Linda Martinez",
@@ -61,7 +68,8 @@
     "email": "linda.martinez8@example.com",
     "phoneNumber": "01712345685",
     "emailVerified": "Unverified",
-    "status": "bronze"
+    "status": "gold",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "James Anderson",
@@ -69,7 +77,8 @@
     "email": "james.anderson9@example.com",
     "phoneNumber": "01712345686",
     "emailVerified": "Unverified",
-    "status": "bronze"
+    "status": "silver",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Barbara Clark",
@@ -77,7 +86,8 @@
     "email": "barbara.clark10@example.com",
     "phoneNumber": "01712345687",
     "emailVerified": "Unverified",
-    "status": "bronze"
+    "status": "standard",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "William Rodriguez",
@@ -85,7 +95,8 @@
     "email": "william.rodriguez11@example.com",
     "phoneNumber": "01712345688",
     "emailVerified": "Unverified",
-    "status": "bronze"
+    "status": "premium",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Elizabeth Lewis",
@@ -93,7 +104,8 @@
     "email": "elizabeth.lewis12@example.com",
     "phoneNumber": "01712345689",
     "emailVerified": "Unverified",
-    "status": "bronze"
+    "status": "bronze",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Christopher Walker",
@@ -101,7 +113,8 @@
     "email": "christopher.walker13@example.com",
     "phoneNumber": "01712345690",
     "emailVerified": "Unverified",
-    "status": "bronze"
+    "status": "gold",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Patricia Hall",
@@ -109,7 +122,8 @@
     "email": "patricia.hall14@example.com",
     "phoneNumber": "01712345691",
     "emailVerified": "Unverified",
-    "status": "silver"
+    "status": "silver",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Daniel Young",
@@ -117,7 +131,8 @@
     "email": "daniel.young15@example.com",
     "phoneNumber": "01712345692",
     "emailVerified": "Unverified",
-    "status": "silver"
+    "status": "standard",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Nancy King",
@@ -125,7 +140,8 @@
     "email": "nancy.king16@example.com",
     "phoneNumber": "01712345693",
     "emailVerified": "Unverified",
-    "status": "silver"
+    "status": "premium",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Matthew Wright",
@@ -133,7 +149,8 @@
     "email": "matthew.wright17@example.com",
     "phoneNumber": "01712345694",
     "emailVerified": "Unverified",
-    "status": "silver"
+    "status": "silver",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Karen Scott",
@@ -141,7 +158,8 @@
     "email": "karen.scott18@example.com",
     "phoneNumber": "01712345695",
     "emailVerified": "Unverified",
-    "status": "silver"
+    "status": "gold",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Donald Green",
@@ -149,7 +167,8 @@
     "email": "donald.green19@example.com",
     "phoneNumber": "01712345696",
     "emailVerified": "Unverified",
-    "status": "silver"
+    "status": "bronze",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Sarah Baker",
@@ -157,7 +176,8 @@
     "email": "sarah.baker20@example.com",
     "phoneNumber": "01712345697",
     "emailVerified": "Unverified",
-    "status": "silver"
+    "status": "standard",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Joshua Adams",
@@ -165,7 +185,8 @@
     "email": "joshua.adams21@example.com",
     "phoneNumber": "01712345698",
     "emailVerified": "Verified",
-    "status": "silver"
+    "status": "silver",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Michelle Nelson",
@@ -173,7 +194,8 @@
     "email": "michelle.nelson22@example.com",
     "phoneNumber": "01712345699",
     "emailVerified": "Verified",
-    "status": "silver"
+    "status": "premium",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Mark Carter",
@@ -181,7 +203,8 @@
     "email": "mark.carter23@example.com",
     "phoneNumber": "01712345700",
     "emailVerified": "Verified",
-    "status": "silver"
+    "status": "silver",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Lisa Mitchell",
@@ -189,7 +212,8 @@
     "email": "lisa.mitchell24@example.com",
     "phoneNumber": "01712345701",
     "emailVerified": "Verified",
-    "status": "silver"
+    "status": "silver",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Steven Perez",
@@ -197,7 +221,8 @@
     "email": "steven.perez25@example.com",
     "phoneNumber": "01712345702",
     "emailVerified": "Verified",
-    "status": "silver"
+    "status": "silver",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Betty Roberts",
@@ -205,7 +230,8 @@
     "email": "betty.roberts26@example.com",
     "phoneNumber": "01712345703",
     "emailVerified": "Verified",
-    "status": "silver"
+    "status": "silver",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Joseph Turner",
@@ -213,7 +239,8 @@
     "email": "joseph.turner27@example.com",
     "phoneNumber": "01712345704",
     "emailVerified": "Verified",
-    "status": "gold"
+    "status": "gold",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Sandra Phillips",
@@ -221,7 +248,8 @@
     "email": "sandra.phillips28@example.com",
     "phoneNumber": "01712345705",
     "emailVerified": "Verified",
-    "status": "gold"
+    "status": "premium",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Paul Campbell",
@@ -229,7 +257,8 @@
     "email": "paul.campbell29@example.com",
     "phoneNumber": "01712345706",
     "emailVerified": "Verified",
-    "status": "gold"
+    "status": "gold",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Jessica Parker",
@@ -237,7 +266,8 @@
     "email": "jessica.parker30@example.com",
     "phoneNumber": "01712345707",
     "emailVerified": "Verified",
-    "status": "gold"
+    "status": "gold",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Thomas Evans",
@@ -245,7 +275,8 @@
     "email": "thomas.evans31@example.com",
     "phoneNumber": "01712345708",
     "emailVerified": "Verified",
-    "status": "gold"
+    "status": "gold",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Carol Edwards",
@@ -253,7 +284,8 @@
     "email": "carol.edwards32@example.com",
     "phoneNumber": "01712345709",
     "emailVerified": "Verified",
-    "status": "gold"
+    "status": "premium",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Larry Collins",
@@ -261,7 +293,8 @@
     "email": "larry.collins33@example.com",
     "phoneNumber": "01712345710",
     "emailVerified": "Verified",
-    "status": "gold"
+    "status": "gold",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Dorothy Stewart",
@@ -269,7 +302,8 @@
     "email": "dorothy.stewart34@example.com",
     "phoneNumber": "01712345711",
     "emailVerified": "Verified",
-    "status": "gold"
+    "status": "gold",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Kevin Morris",
@@ -277,7 +311,8 @@
     "email": "kevin.morris35@example.com",
     "phoneNumber": "01712345712",
     "emailVerified": "Verified",
-    "status": "gold"
+    "status": "gold",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Shirley Rogers",
@@ -285,7 +320,8 @@
     "email": "shirley.rogers36@example.com",
     "phoneNumber": "01712345713",
     "emailVerified": "Verified",
-    "status": "gold"
+    "status": "gold",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Brian Reed",
@@ -293,7 +329,8 @@
     "email": "brian.reed37@example.com",
     "phoneNumber": "01712345714",
     "emailVerified": "Verified",
-    "status": "gold"
+    "status": "gold",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Cynthia Cook",
@@ -301,7 +338,8 @@
     "email": "cynthia.cook38@example.com",
     "phoneNumber": "01712345715",
     "emailVerified": "Verified",
-    "status": "gold"
+    "status": "gold",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Edward Morgan",
@@ -309,7 +347,8 @@
     "email": "edward.morgan39@example.com",
     "phoneNumber": "01712345716",
     "emailVerified": "Verified",
-    "status": "basic"
+    "status": "standard",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Margaret Bell",
@@ -317,7 +356,8 @@
     "email": "margaret.bell40@example.com",
     "phoneNumber": "01712345717",
     "emailVerified": "Verified",
-    "status": "basic"
+    "status": "standard",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Jason Murphy",
@@ -325,7 +365,8 @@
     "email": "jason.murphy41@example.com",
     "phoneNumber": "01712345718",
     "emailVerified": "Verified",
-    "status": "basic"
+    "status": "standard",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Amy Bailey",
@@ -333,7 +374,8 @@
     "email": "amy.bailey42@example.com",
     "phoneNumber": "01712345719",
     "emailVerified": "Verified",
-    "status": "basic"
+    "status": "standard",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Jeffrey Rivera",
@@ -341,7 +383,8 @@
     "email": "jeffrey.rivera43@example.com",
     "phoneNumber": "01712345720",
     "emailVerified": "Verified",
-    "status": "basic"
+    "status": "standard",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Anna Cooper",
@@ -349,7 +392,8 @@
     "email": "anna.cooper44@example.com",
     "phoneNumber": "01712345721",
     "emailVerified": "Verified",
-    "status": "basic"
+    "status": "standard",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Frank Richardson",
@@ -357,7 +401,8 @@
     "email": "frank.richardson45@example.com",
     "phoneNumber": "01712345722",
     "emailVerified": "Verified",
-    "status": "basic"
+    "status": "standard",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Rebecca Cox",
@@ -365,7 +410,8 @@
     "email": "rebecca.cox46@example.com",
     "phoneNumber": "01712345723",
     "emailVerified": "Verified",
-    "status": "basic"
+    "status": "premium",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Gary Howard",
@@ -373,7 +419,8 @@
     "email": "gary.howard47@example.com",
     "phoneNumber": "01712345724",
     "emailVerified": "Verified",
-    "status": "basic"
+    "status": "standard",
+    "isNewsletterSubscribe": true
   },
   {
     "customerName": "Laura Ward",
@@ -381,7 +428,8 @@
     "email": "laura.ward48@example.com",
     "phoneNumber": "01712345725",
     "emailVerified": "Verified",
-    "status": "basic"
+    "status": "premium",
+    "isNewsletterSubscribe": false
   },
   {
     "customerName": "Frank Richardson",
@@ -389,6 +437,7 @@
     "email": "frank.richardson45@example.com",
     "phoneNumber": "01712345722",
     "emailVerified": "Verified",
-    "status": "basic"
+    "status": "standard",
+    "isNewsletterSubscribe": true
   }
 ]

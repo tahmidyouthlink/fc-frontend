@@ -1,6 +1,6 @@
 "use client";
 import { FaBullhorn } from "react-icons/fa";
-import { PiUsersThreeLight } from "react-icons/pi";
+import { PiUsersThreeLight, PiWarehouseBold } from "react-icons/pi";
 import { BiCategory } from "react-icons/bi";
 import { IoMdHome } from "react-icons/io";
 import { MdOutlineSettings, MdPayment } from "react-icons/md";
@@ -72,6 +72,7 @@ const SideNavbar = ({ onClose }) => {
       links: [
         { label: 'Permissions', link: '/dash-board/permissions', icon: <LiaUserLockSolid /> },
         { label: 'Reward Level', link: '/dash-board/reward-level', icon: <CiMedal /> },
+        { label: 'Warehouse', link: '/dash-board/ware-house', icon: <PiWarehouseBold /> },
         { label: 'Shipment', link: '/dash-board/zone', icon: <BsBoxSeam /> },
         { label: 'Payment Methods', link: '/dash-board/payment-methods', icon: <MdPayment /> },
         { label: 'Categories', link: '/dash-board/categories', icon: <BiCategory /> },

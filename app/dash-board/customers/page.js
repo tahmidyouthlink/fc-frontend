@@ -8,7 +8,9 @@ import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import CustomerPrintButton from '@/app/components/layout/CustomerPrintButton';
 import useCustomers from '@/app/hooks/useCustomers';
-import { FaCrown, FaMedal, FaRegUser, FaStar } from 'react-icons/fa6';
+import { FaCrown, FaMedal, FaRegUser, FaStar, FaCheck } from 'react-icons/fa6';
+import { RxCross2 } from "react-icons/rx";
+import { MdWorkspacePremium } from "react-icons/md";
 import arrowSvgImage from "../../../public/card-images/arrow.svg";
 import arrivals1 from "../../../public/card-images/arrivals1.svg";
 import arrivals2 from "../../../public/card-images/arrivals2.svg";
@@ -29,7 +31,7 @@ const Customers = () => {
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const initialColumns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alternative Phone Number', 'Verification', 'Status'];
+  const initialColumns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alternative Phone Number', 'NewsLetter', 'Verification', 'Status'];
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
@@ -196,22 +198,25 @@ const Customers = () => {
   }, [filteredData, page, itemsPerPage]);
 
   const statusColors = {
-    basic: 'bg-gray-400',      // Light gray for basic
+    standard: 'bg-gray-400',      // Light gray for basic
     bronze: 'bg-orange-700',    // Softer orange for bronze
     silver: 'bg-gray-600',      // Softer gray for silver
     gold: 'bg-yellow-800',      // Softer yellow for gold
+    premium: 'bg-orange-900'
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'basic':
-        return <FaRegUser className="mr-3" />; // User icon for basic
+      case 'standard':
+        return <FaRegUser />; // User icon for basic
       case 'bronze':
         return <FaMedal className="mr-1" />; // Medal icon for bronze
       case 'silver':
         return <FaStar className="mr-2" />; // Star icon for silver
       case 'gold':
         return <FaCrown className="mr-3" />; // Crown icon for gold
+      case 'premium':
+        return <MdWorkspacePremium size={15} />; // Crown icon for gold
       default:
         return null; // Default icon if status is unknown
     }
@@ -261,6 +266,8 @@ const Customers = () => {
     return <Loading />
   }
 
+  console.log(paginatedData);
+
   return (
     <div className='relative w-full min-h-screen bg-gray-100'>
 
@@ -285,8 +292,8 @@ const Customers = () => {
 
       <div className='max-w-screen-2xl px-6 2xl:px-0 mx-auto'>
 
-        <div className='flex flex-wrap md:flex-nowrap items-center gap-2 md:gap-0 justify-center md:justify-between py-2 md:py-5'>
-          <h3 className='w-1/2 text-center md:text-start font-medium md:font-semibold text-[13px] lg:text-lg xl:text-2xl'>Customer Management</h3>
+        <div className='flex flex-wrap lg:flex-nowrap items-center gap-2 lg:gap-0 justify-center md:justify-between py-2 md:py-5'>
+          <h3 className='w-full lg:w-1/2 font-semibold text-lg xl:text-2xl'>Customer Management</h3>
 
           <div className='flex items-center justify-center gap-2 w-full'>
             <div className='w-full'>
@@ -302,7 +309,7 @@ const Customers = () => {
                   placeholder="Search By Customer Details..."
                   value={searchQuery}
                   onChange={handleSearch}
-                  className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-white text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
+                  className="w-full h-[40px] md:h-11 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-white text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
                 />
               </li>
             </div>
@@ -310,7 +317,7 @@ const Customers = () => {
             <div className='flex items-center max-w-screen-2xl mx-auto justify-center md:justify-end md:gap-6'>
 
               <div>
-                <Button variant="solid" size='sm' color="danger" onClick={() => { setColumnModalOpen(true) }} className="w-full">
+                <Button variant="solid" color="danger" onClick={() => { setColumnModalOpen(true) }} className="w-full">
                   Choose Columns
                 </Button>
               </div>
@@ -413,7 +420,7 @@ const Customers = () => {
             <thead className="sticky top-0 z-[1] bg-white">
               <tr>
                 {columnOrder.map((column) => selectedColumns.includes(column) && (
-                  <th key={column} className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">{column}</th>
+                  <th key={column} className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">{column}</th>
                 ))}
               </tr>
             </thead>
@@ -438,7 +445,7 @@ const Customers = () => {
                           selectedColumns.includes(column) && (
                             <>
                               {column === 'Customer ID' && (
-                                <td key="customerId" className="text-xs p-3 font-mono">
+                                <td key="customerId" className="text-xs p-3 font-mono text-center">
                                   {customer?.customerId}
                                 </td>
                               )}
@@ -453,52 +460,59 @@ const Customers = () => {
                                 </td>
                               )}
                               {column === 'Phone Number' && (
-                                <td key="phoneNumber" className="text-xs p-3 text-gray-700">
+                                <td key="phoneNumber" className="text-xs text-center p-3 text-gray-700">
                                   {customer?.phoneNumber}
                                 </td>
                               )}
                               {column === 'Order History' && (
-                                <td key="orderHistory" onClick={() => handleViewClick(customer?.customerId)} className="text-xs p-3 cursor-pointer text-blue-600 hover:text-blue-800">
-                                  View
+                                <td>
+                                  {customer?.paymentMethods === "--" ? <p className='text-center'>--</p> : <p key="orderHistory" onClick={() => handleViewClick(customer?.customerId)} className="text-xs p-3 cursor-pointer text-blue-600 hover:text-blue-800 text-center">
+                                    View
+                                  </p>}
                                 </td>
                               )}
                               {column === 'City' && (
-                                <td key="city" className="text-xs p-3 text-gray-700">
+                                <td key="city" className="text-xs p-3 text-gray-700 text-center">
                                   {customer?.city}
                                 </td>
                               )}
                               {column === 'Postal Code' && (
-                                <td key="postalCode" className="text-xs p-3 text-gray-700">
+                                <td key="postalCode" className="text-xs p-3 text-gray-700 text-center">
                                   {customer?.postalCode}
                                 </td>
                               )}
                               {column === 'Street Address' && (
-                                <td key="streetAddress" className="text-xs p-3 text-gray-700">
+                                <td key="streetAddress" className="text-xs p-3 text-gray-700 text-center">
                                   {customer?.streetAddress}
                                 </td>
                               )}
                               {column === 'Preferred Payment Method' && (
-                                <td key="paymentMethod" className="text-xs p-3 text-gray-700">
+                                <td key="paymentMethod" className="text-xs p-3 text-gray-700 text-center">
                                   {customer?.paymentMethods}
                                 </td>
                               )}
                               {column === 'Shipping Method' && (
-                                <td key="shippingMethod" className="text-xs p-3 text-gray-700">
+                                <td key="shippingMethod" className="text-xs p-3 text-gray-700 text-center">
                                   {customer?.shippingMethods}
                                 </td>
                               )}
                               {column === 'Alternative Phone Number' && (
-                                <td key="altPhoneNumber" className="text-xs p-3 text-gray-700">
+                                <td key="altPhoneNumber" className="text-xs p-3 text-gray-700 text-center">
                                   {customer?.alternativePhoneNumber}
                                 </td>
                               )}
+                              {column === 'NewsLetter' && (
+                                <td key="newsLetter" className="text-xs p-3 text-gray-700 text-center">
+                                  {customer?.isNewsletterSubscribe ? <FaCheck className='text-blue-600' size={20} /> : <RxCross2 className='text-red-600' size={26} />}
+                                </td>
+                              )}
                               {column === 'Verification' && (
-                                <td key="verification" className="text-xs p-3 text-gray-700">
+                                <td key="verification" className="text-xs p-3 text-gray-700 text-center">
                                   {customer?.emailVerified}
                                 </td>
                               )}
                               {column === 'Status' && (
-                                <td key="status" className="text-xs p-3 text-gray-700 whitespace-nowrap">
+                                <td key="status" className="text-xs p-3 text-gray-700 whitespace-nowrap text-center">
                                   <span
                                     className={`inline-flex items-center rounded-md py-1 px-2 text-white font-medium ${statusColors[customer?.status]} transition duration-300 ease-in-out transform hover:scale-105`}
                                     title={formattedStatus}

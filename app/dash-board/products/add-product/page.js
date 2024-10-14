@@ -998,7 +998,7 @@ const FirstStepOfAddProduct = () => {
           </div>
 
         </div>
-        <div className='flex justify-end gap-6 px-6 pt-16 pb-8'>
+        <div className='flex justify-end gap-6 px-6 py-8'>
 
           <button type="button" onClick={handleSubmit(onSaveForNow)} className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
             Save For Now <FiSave size={19} />

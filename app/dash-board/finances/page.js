@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 
 const Finances = () => {
 
-  const [activeTab, setActiveTab] = useState('paid payments');
+  const [activeTab, setActiveTab] = useState('completed');
 
   return (
     <div className='px-6 md:px-10'>
@@ -17,46 +17,46 @@ const Finances = () => {
 
           <button
             className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'paid payments' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
+        ${activeTab === 'completed' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
         after:absolute after:left-0 after:right-0 hover:text-[#D2016E] after:bottom-0 
         after:h-[2px] after:bg-[#D2016E] after:transition-all after:duration-300
-        ${activeTab === 'paid payments' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
+        ${activeTab === 'completed' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
       `}
-            onClick={() => setActiveTab('paid payments')}
+            onClick={() => setActiveTab('completed')}
           >
-            Paid Payments
+            Completed
           </button>
 
           <button
             className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'refunded payments' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
+        ${activeTab === 'refunded' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
         after:absolute after:left-0 after:right-0 after:bottom-0 
         after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300
-        ${activeTab === 'refunded payments' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
+        ${activeTab === 'refunded' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
       `}
-            onClick={() => setActiveTab('refunded payments')}
+            onClick={() => setActiveTab('refunded')}
           >
-            Refunded Payments
+            Refunded
           </button>
 
         </div>
       </div>
 
-      {activeTab === "paid payments" && <div className='pt-4'>
-        <h1 className='font-bold'>Promotion Performance</h1>
-        <p className='pt-1 text-neutral-400 text-sm font-medium'>The data includes all active, ended, or canceled deals. This report represents unaudited data, please refer to your invoice for accurate settlement numbers.</p>
+      {activeTab === "completed" && <div className='pt-4'>
+        <h1 className='font-bold'>Performance</h1>
+        <p className='pt-1 text-neutral-400 text-sm font-medium'>The data includes all Pending, Paid, Canceled, or Refunded transactions.</p>
         <FinancePerformance />
       </div>}
 
-      {activeTab === "refunded payments" && <div className='pt-4'>
-        <h1 className='font-bold'>Promotion Performance</h1>
-        <p className='pt-1 text-neutral-400 text-sm font-medium'>The data includes all active, ended, or canceled deals. This report represents unaudited data, please refer to your invoice for accurate settlement numbers.</p>
+      {activeTab === "refunded" && <div className='pt-4'>
+        <h1 className='font-bold'>Performance</h1>
+        <p className='pt-1 text-neutral-400 text-sm font-medium'>The data includes all Pending, Paid, Canceled, or Refunded transactions.</p>
         <RefundedPayments />
       </div>}
 
       <div className='mt-12 md:mt-16'>
-        <h1 className='font-bold'>Recent Promotions</h1>
-        <p className='pt-1 pb-6 text-neutral-400 text-sm font-medium'>Please use the following table to view your past and upcoming promotions.</p>
+        <h1 className='font-bold'>Recent Transactions</h1>
+        <p className='pt-1 pb-6 text-neutral-400 text-sm font-medium'>Please use the following table to view your transactions.</p>
         <FinanceTable />
       </div>
     </div >

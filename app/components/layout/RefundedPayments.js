@@ -217,6 +217,14 @@ const RefundedPayments = () => {
     return { bKashTransactions, sslCommerzTransactions, totalBKashRevenue, totalSSLCommerzRevenue };
   }, [orderList, filterStartDate, filterEndDate, activeFilter]);
 
+  const getTotalTransactions = (bKashTransactions, sslCommerzTransactions) => {
+    return bKashTransactions + sslCommerzTransactions;
+  };
+
+  const getTotalRevenue = (totalBKashRevenue, totalSSLCommerzRevenue) => {
+    return totalBKashRevenue + totalSSLCommerzRevenue;
+  };
+
   const paymentMethodData = useMemo(() => {
     const dailyData = {};
 
@@ -390,6 +398,9 @@ const RefundedPayments = () => {
     return format(date, 'MM/dd');
   };
 
+  const totalTransactions = getTotalTransactions(bKashTransactions, sslCommerzTransactions);
+  const totalRevenue = getTotalRevenue(totalBKashRevenue, totalSSLCommerzRevenue);
+
   // Calculate the maximum value for the Y-axis
   const maxBKash = Math.max(...paymentMethodData.map(data => data.bKashTransactions), 0);
   const maxSSLCommerz = Math.max(...paymentMethodData.map(data => data.sslCommerzTransactions), 0);
@@ -469,17 +480,43 @@ const RefundedPayments = () => {
         </div>
       </div>
       <div className='flex flex-col lg:flex-row items-center justify-center gap-6'>
+
         {/* Summary Section */}
-        <div className='flex lg:flex-col xl:flex-row items-center justify-center gap-6 w-1/3 xl:w-3/4 lg:min-h-[150px] lg:max-h-[150px]'>
-          <div className="border rounded-lg p-4 md:p-8 space-y-3">
-            <p className="text-[10px] md:text-sm xl:text-base font-semibold">Number of bKash Refunds</p>
-            <h3 className="font-bold md:text-xl lg:text-2xl xl:text-3xl">{bKashTransactions} |  ৳ {totalBKashRevenue.toFixed(2)}</h3>
+        <div className='flex flex-col gap-6 items-center justify-center w-full lg:w-2/3 xl:w-3/4'>
+          {/* Total Order Count and Total Amount Received */}
+          <div className='flex flex-row lg:flex-col xl:flex-row items-center justify-center gap-6 w-full'>
+            {/* Total Order Count */}
+            <div className="w-full border rounded-lg p-4 md:p-6 lg:p-8 space-y-3">
+              <p className="text-xs md:text-sm xl:text-base font-semibold">Total Refunded Order Count</p>
+              <h3 className="font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl">{totalTransactions}</h3>
+            </div>
+
+            {/* Total Amount Received */}
+            <div className="w-full border rounded-lg p-4 md:p-6 lg:p-8 space-y-3">
+              <p className="text-xs md:text-sm xl:text-base font-semibold">Total Amount refunded</p>
+              <h3 className="font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl">
+                ৳ {totalRevenue.toFixed(2)}
+              </h3>
+            </div>
           </div>
-          <div className="border rounded-lg p-4 md:p-8 space-y-3">
-            <p className="text-[10px] md:text-sm xl:text-base font-semibold">Number of SSLCommerz Refunds</p>
-            <h3 className="font-bold md:text-xl lg:text-2xl xl:text-3xl flex items-center gap-0 md:gap-1">
-              {sslCommerzTransactions} | ৳ {totalSSLCommerzRevenue.toFixed(2)}
-            </h3>
+
+          {/* Number of bKash and SSLCommerz Payments */}
+          <div className='flex flex-row lg:flex-col xl:flex-row items-center justify-center gap-6 w-full'>
+            {/* bKash Payments */}
+            <div className="w-full border rounded-lg p-4 md:p-6 lg:p-8 space-y-3">
+              <p className="text-xs md:text-sm xl:text-base font-semibold">Total bKash Refunded Payments</p>
+              <h3 className="font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl">
+                {bKashTransactions} <span>|</span> ৳ {totalBKashRevenue.toFixed(2)}
+              </h3>
+            </div>
+
+            {/* SSLCommerz Payments */}
+            <div className="w-full border rounded-lg p-4 md:p-6 lg:p-8 space-y-3">
+              <p className="text-xs md:text-sm xl:text-base font-semibold">Total SSLCommerz Refunded Payments</p>
+              <h3 className="font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl">
+                {sslCommerzTransactions} <span>|</span> ৳ {totalSSLCommerzRevenue.toFixed(2)}
+              </h3>
+            </div>
           </div>
         </div>
 

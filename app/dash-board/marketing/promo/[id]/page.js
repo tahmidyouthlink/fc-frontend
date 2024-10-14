@@ -276,7 +276,7 @@ const EditPromo = () => {
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[350px]'>
 
                 <div>
-                  <label htmlFor='minAmount' className='flex justify-start font-medium text-[#D2016E]'>Minimum Order Amount</label>
+                  <label htmlFor='minAmount' className='flex justify-start font-medium text-[#D2016E]'>Minimum Order Amount *</label>
                   <input id='minAmount' {...register("minAmount", { required: true })} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="number" />
                   {errors.minAmount?.type === "required" && (
                     <p className="text-red-600 text-left">Min Amount is required</p>
@@ -284,7 +284,7 @@ const EditPromo = () => {
                 </div>
 
                 {promoDiscountType === "Percentage" && <div>
-                  <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#D2016E]'>Maximum Capped Amount</label>
+                  <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#D2016E]'>Maximum Capped Amount *</label>
                   <input id='maxAmount' {...register("maxAmount", { required: true })} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="number" />
                   {errors.maxAmount?.type === "required" && (
                     <p className="text-red-600 text-left">Max Amount is required</p>
