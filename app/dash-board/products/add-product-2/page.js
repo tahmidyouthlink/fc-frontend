@@ -124,6 +124,7 @@ const SecondStepOfAddProduct = () => {
     const storedMaterialCare = localStorage.getItem('materialCare');
     const storedSizeFit = localStorage.getItem('sizeFit');
     const storedCategory = localStorage.getItem('category');
+    const storedSeasons = JSON.parse(localStorage.getItem('season') || '[]');
     const storedSubCategories = JSON.parse(localStorage.getItem('subCategories') || '[]');
     const storedGroupOfSizes = JSON.parse(localStorage.getItem('groupOfSizes') || '[]');
     const storedAllSizes = JSON.parse(localStorage.getItem('allSizes') || '[]');
@@ -169,6 +170,7 @@ const SecondStepOfAddProduct = () => {
       tags: storedTags,
       productId: storedProductId,
       productVariants: formattedData,
+      season: storedSeasons,
       status: "draft",
     };
 
@@ -221,6 +223,7 @@ const SecondStepOfAddProduct = () => {
         localStorage.removeItem('sizeFit');
         localStorage.removeItem('category');
         localStorage.removeItem('productId');
+        JSON.parse(localStorage.removeItem('season') || '[]');
         JSON.parse(localStorage.removeItem('subCategories') || '[]');
         JSON.parse(localStorage.removeItem('groupOfSizes') || '[]');
         JSON.parse(localStorage.removeItem('allSizes') || '[]');

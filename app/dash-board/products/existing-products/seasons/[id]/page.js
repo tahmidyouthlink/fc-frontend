@@ -5,9 +5,9 @@ import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
-import arrowSvgImage from "../../../../../public/card-images/arrow.svg";
-import arrivals1 from "../../../../../public/card-images/arrivals1.svg";
-import arrivals2 from "../../../../../public/card-images/arrivals2.svg";
+import arrowSvgImage from "../../../../../../public/card-images/arrow.svg";
+import arrivals1 from "../../../../../../public/card-images/arrivals1.svg";
+import arrivals2 from "../../../../../../public/card-images/arrivals2.svg";
 import SmallHeightLoading from '@/app/components/shared/Loading/SmallHeightLoading';
 import { Button, Checkbox, CheckboxGroup, DateRangePicker, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
 import TabsOrder from '@/app/components/layout/TabsOrder';
@@ -16,18 +16,18 @@ import Link from 'next/link';
 import { IoMdClose } from 'react-icons/io';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
-const initialColumns = ['Product', 'Status', 'SKU', 'Season', 'Price', 'Discount (৳ / %)', 'Sizes', 'Colors', 'Vendor', 'Shipping Zones', 'Shipment Handlers'];
+const initialColumns = ['Product', 'Status', 'SKU', 'Category', 'Price', 'Discount (৳ / %)', 'Sizes', 'Colors', 'Vendor', 'Shipping Zones', 'Shipment Handlers'];
 
 const productStatusTab = ['All', 'Active', 'Draft', 'Archived'];
 
-const ProductPage = () => {
+const SeasonPage = () => {
 
   const axiosPublic = useAxiosPublic();
   const { id } = useParams();
   const router = useRouter();
 
   // Decode the URL-encoded category name
-  const decodedCategoryName = decodeURIComponent(id);
+  const decodedSeasonName = decodeURIComponent(id);
 
   const [productDetails, setProductDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // Loading state
@@ -43,8 +43,8 @@ const ProductPage = () => {
   const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
 
   useEffect(() => {
-    const savedColumns = JSON.parse(localStorage.getItem('selectedColumnsProductCategory'));
-    const savedExistingProduct = JSON.parse(localStorage.getItem('selectedExistingProduct'));
+    const savedColumns = JSON.parse(localStorage.getItem('selectedColumnsProductSeason'));
+    const savedExistingProduct = JSON.parse(localStorage.getItem('selectedExistingProductSeason'));
     if (savedColumns) {
       setSelectedColumns(savedColumns);
     }
@@ -68,8 +68,8 @@ const ProductPage = () => {
   };
 
   const handleSave = () => {
-    localStorage.setItem('selectedColumnsProductCategory', JSON.stringify(selectedColumns));
-    localStorage.setItem('selectedExistingProduct', JSON.stringify(columnOrder));
+    localStorage.setItem('selectedColumnsProductSeason', JSON.stringify(selectedColumns));
+    localStorage.setItem('selectedExistingProductSeason', JSON.stringify(columnOrder));
     setColumnModalOpen(false);
   };
 
@@ -86,7 +86,7 @@ const ProductPage = () => {
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
-        const { data } = await axiosPublic.get(`/productFromCategory/${decodedCategoryName}`);
+        const { data } = await axiosPublic.get(`/productFromSeason/${decodedSeasonName}`);
         setProductDetails(data);
       } catch (error) {
         toast.error("Failed to load product category details.");
@@ -96,7 +96,7 @@ const ProductPage = () => {
     };
 
     fetchProductDetails();
-  }, [decodedCategoryName, axiosPublic]);
+  }, [decodedSeasonName, axiosPublic]);
 
   // Convert dateTime string to Date object
   const parseDate = (dateString) => {
@@ -203,7 +203,8 @@ const ProductPage = () => {
   };
 
   const handleGoToEditPage = (id) => {
-    router.push(`/dash-board/products/${id}`);
+    const encodedSeasonName = encodeURIComponent(decodedSeasonName);
+    router.push(`/dash-board/products/${id}?season=${encodedSeasonName}`);
   }
 
   useEffect(() => {
@@ -235,7 +236,7 @@ const ProductPage = () => {
 
       <div className='max-w-screen-2xl mx-auto px-6 2xl:px-0 pt-6 pb-6 relative'>
         <div className='flex justify-between items-center'>
-          <h1 className='font-bold text-xl md:text-2xl lg:text-3xl'>Look at {decodedCategoryName}</h1>
+          <h1 className='font-bold text-xl md:text-2xl lg:text-3xl'>Look at {decodedSeasonName}</h1>
           <Link className='flex items-center gap-2 text-[10px] md:text-base' href="/dash-board/products/existing-products"> <span className='border border-black rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
@@ -370,13 +371,8 @@ const ProductPage = () => {
                                   ? `${product.productVariants.reduce((acc, variant) => acc + variant.sku, 0)} ${product.productVariants.reduce((acc, variant) => acc + variant.sku, 0) === 1 ? 'Item' : 'Items'}`
                                   : 'No Items'}</td>
                               )}
-                              {column === 'Season' && (
-                                <td className="text-xs p-3 text-gray-700 text-center">{product?.season?.map((season, index) => (
-                                  <span key={index}>
-                                    {season}
-                                    {index < product.season.length - 1 ? <>,<br /></> : null}
-                                  </span>
-                                )) || '--'}</td>
+                              {column === 'Category' && (
+                                <td className="text-xs p-3 text-gray-700 text-center">{product?.category}</td>
                               )}
                               {column === 'Price' && (
                                 <td className="text-xs p-3 text-gray-700 text-center">৳ {product?.regularPrice}</td>
@@ -417,7 +413,7 @@ const ProductPage = () => {
 
         ) : (
           <div className="min-h-[calc(100vh-300px)] flex justify-center items-center relative z-10 px-6">
-            <h1 className="text-center text-xl lg:text-2xl xl:text-3xl font-bold bg-gray-100 py-8">There are no products listed in this category yet.</h1>
+            <h1 className="text-center text-xl lg:text-2xl xl:text-3xl font-bold bg-gray-100 py-8">There are no products listed in this season yet.</h1>
           </div>
         )
       )}
@@ -508,4 +504,4 @@ const ProductPage = () => {
   );
 };
 
-export default ProductPage;
+export default SeasonPage;

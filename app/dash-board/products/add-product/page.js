@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from "react-hook-form";
 import toast from 'react-hot-toast';
 import ReactSelect from "react-select";
@@ -27,6 +27,7 @@ import useColors from '@/app/hooks/useColors';
 import Link from 'next/link';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
 import { FiSave } from "react-icons/fi";
+import useSeasons from '@/app/hooks/useSeasons';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
@@ -64,6 +65,68 @@ const FirstStepOfAddProduct = () => {
   const [sizeRangeList, isSizeRangePending] = useSizeRanges();
   const [subCategoryList, isSubCategoryPending] = useSubCategories();
   const [productList, isProductPending] = useProductsInformation();
+  const [seasonList, isSeasonPending] = useSeasons();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSeasons, setSelectedSeasons] = useState([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const [seasonError, setSeasonError] = useState(false);
+
+  // Filter categories based on search input and remove already selected categories
+  const filteredSeasons = seasonList?.filter((season) =>
+    season.seasonName.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    !selectedSeasons.includes(season.seasonName) // Exclude already selected categories
+  );
+
+  // Handle adding/removing category selection
+  const toggleSeasonSelection = (seasonName) => {
+    let updatedSelectedSeasons;
+    if (selectedSeasons.includes(seasonName)) {
+      // Remove category from selection
+      updatedSelectedSeasons = selectedSeasons.filter((season) => season !== seasonName);
+    } else {
+      // Add category to selection
+      updatedSelectedSeasons = [...selectedSeasons, seasonName];
+    }
+
+    setSelectedSeasons(updatedSelectedSeasons);
+    handleSeasonSelectionChange(updatedSelectedSeasons); // Pass selected categories to parent component
+  };
+
+  // Handle removing category directly from selected list
+  const removeSeason = (seasonName) => {
+    const updatedSelectedSeasons = selectedSeasons.filter((label) => label !== seasonName);
+    setSelectedSeasons(updatedSelectedSeasons);
+    handleSeasonSelectionChange(updatedSelectedSeasons); // Pass selected categories to parent component
+  };
+
+  const handleSeasonSelectionChange = async (selectedSea) => {
+    setSelectedSeasons(selectedSea);
+    if (selectedSea?.length === 0) {
+      setSeasonError(true);
+      return;
+    }
+    setSeasonError(false);
+  };
+
+  // Toggle dropdown visibility
+  const handleInputClick = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownRef]);
 
   const handleCategoryChange = (value) => {
     localStorage.setItem('category', value); // Save the selected category to local storage
@@ -324,6 +387,12 @@ const FirstStepOfAddProduct = () => {
         setValue('category', storedCategory);
       }
 
+      const storedSeason = JSON.parse(localStorage.getItem('season') || '[]');
+      if (Array.isArray(storedSeason)) {
+        setSelectedSeasons(storedSeason);
+        setValue('season', storedSeason);
+      }
+
       const storedSubCategories = JSON.parse(localStorage.getItem('subCategories') || '[]');
       if (Array.isArray(storedSubCategories)) {
         setSelectedSubCategories(storedSubCategories);
@@ -422,6 +491,11 @@ const FirstStepOfAddProduct = () => {
         return;
       }
       setSizeError4(false);
+      if (selectedSeasons?.length === 0) {
+        setSeasonError(true);
+        return;
+      }
+      setSeasonError(false);
 
       const currentDate = new Date();
       const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -436,6 +510,7 @@ const FirstStepOfAddProduct = () => {
       localStorage.setItem('discountType', discountType);
       localStorage.setItem('discountValue', parseFloat(data.discountValue || 0));
 
+      localStorage.setItem('season', JSON.stringify(selectedSeasons));
       localStorage.setItem('subCategories', JSON.stringify(selectedSubCategories));
       localStorage.setItem('availableColors', JSON.stringify(data.availableColors));
       localStorage.setItem('vendors', JSON.stringify(data.vendors));
@@ -471,6 +546,11 @@ const FirstStepOfAddProduct = () => {
       return;
     }
     setSizeError4(false);
+    if (selectedSeasons?.length === 0) {
+      setSeasonError(true);
+      return;
+    }
+    setSeasonError(false);
 
     const currentDate = new Date();
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -484,6 +564,7 @@ const FirstStepOfAddProduct = () => {
       groupOfSizes: groupSelected,
       allSizes: groupSelected2,
       productId,
+      season: selectedSeasons,
       status: "draft",
     };
 
@@ -535,6 +616,7 @@ const FirstStepOfAddProduct = () => {
         localStorage.removeItem('sizeFit');
         localStorage.removeItem('category');
         localStorage.removeItem('productId');
+        JSON.parse(localStorage.removeItem('season') || '[]');
         JSON.parse(localStorage.removeItem('subCategories') || '[]');
         JSON.parse(localStorage.removeItem('groupOfSizes') || '[]');
         JSON.parse(localStorage.removeItem('allSizes') || '[]');
@@ -556,7 +638,7 @@ const FirstStepOfAddProduct = () => {
     }
   }, [navigate, router]);
 
-  if (isCategoryPending || isSizeRangePending || isSubCategoryPending || isTagPending || isVendorPending || isColorPending || isProductPending) {
+  if (isCategoryPending || isSizeRangePending || isSubCategoryPending || isTagPending || isVendorPending || isColorPending || isProductPending || isSeasonPending) {
     return <Loading />
   }
 
@@ -597,7 +679,7 @@ const FirstStepOfAddProduct = () => {
               />
             </div>
 
-            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[560px]'>
+            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
               <div className='flex flex-col rounded-md relative'>
                 <label htmlFor="category" className='text-xs px-2'>Category</label>
@@ -765,6 +847,130 @@ const FirstStepOfAddProduct = () => {
             </div>
 
             <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+
+              <label htmlFor='tags' className='flex justify-start font-medium text-[#9F5216]'>Select Tag *</label>
+              <Controller
+                name="tags"
+                control={control}
+                defaultValue={selectedTags}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <div className="parent-container">
+                    <ReactSelect
+                      {...field}
+                      options={tagList}
+                      isMulti
+                      className="w-full border rounded-md creatable-select-container"
+                      value={selectedTags}
+                      menuPortalTarget={menuPortalTarget}
+                      styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                      menuPlacement="auto"
+                      onChange={(newValue) => {
+                        setSelectedTags(newValue);
+                        field.onChange(newValue);
+                      }}
+                    />
+                  </div>
+                )}
+              />
+              {errors.tags && (
+                <p className="text-red-600 text-left">Tags are required</p>
+              )}
+
+              <label htmlFor='vendors' className='flex justify-start font-medium text-[#9F5216]'>Select Vendor</label>
+              <Controller
+                name="vendors"
+                control={control}
+                defaultValue={selectedVendors}
+                render={({ field }) => (
+                  <div className="parent-container">
+                    <ReactSelect
+                      {...field}
+                      options={vendorList}
+                      isMulti
+                      className="w-full border rounded-md creatable-select-container"
+                      value={selectedVendors}
+                      menuPortalTarget={menuPortalTarget}
+                      styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                      menuPlacement="auto"
+                      onChange={(newValue) => {
+                        setSelectedVendors(newValue);
+                        field.onChange(newValue);
+                      }}
+                    />
+                  </div>
+                )}
+              />
+
+              <div className="w-full mx-auto" ref={dropdownRef}>
+                {/* Search Box */}
+                <label htmlFor='seasons' className='flex justify-start font-medium text-[#9F5216] pb-2'>Select Seasons *</label>
+
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onClick={handleInputClick} // Toggle dropdown on input click
+                  placeholder="Search & Select by Seasons"
+                  className="w-full p-2 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md mb-2"
+                />
+
+                {/* Dropdown list for search results */}
+                {isDropdownOpen && (
+                  <div className="border rounded p-2 max-h-64 overflow-y-auto">
+                    {filteredSeasons?.length > 0 ? (
+                      filteredSeasons?.map((season) => (
+                        <div
+                          key={season._id}
+                          className={`flex items-center p-2 cursor-pointer hover:bg-gray-100 ${selectedSeasons.includes(season.seasonName) ? 'bg-gray-200' : ''}`}
+                          onClick={() => toggleSeasonSelection(season.seasonName)}
+                        >
+                          <Image
+                            width={400}
+                            height={400}
+                            src={season.imageUrl}
+                            alt="season-imageUrl"
+                            className="h-8 w-8 object-cover rounded"
+                          />
+                          <span className="ml-2">{season.seasonName}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-gray-500">No seasons found</p>
+                    )}
+                  </div>
+                )}
+
+                {/* Selected categories display */}
+                {selectedSeasons?.length > 0 && (
+                  <div className="border p-2 rounded mt-2">
+                    <h4 className="text-sm font-semibold mb-2">Selected Seasons:</h4>
+                    <ul className="space-y-2">
+                      {selectedSeasons?.map((season, index) => (
+                        <li
+                          key={index}
+                          className="flex justify-between items-center bg-gray-100 p-2 rounded"
+                        >
+                          <span>{season}</span>
+                          <button
+                            onClick={() => removeSeason(season)}
+                            className="text-red-500 text-sm"
+                          >
+                            Remove
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {seasonError && <p className="text-red-600 text-left">Season is required</p>}
+
+              </div>
+
+            </div>
+
+            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
               <label htmlFor='materialCare' className='flex justify-start font-medium text-[#9F5216]'>Material Care</label>
               <Controller
                 name="materialCare"
@@ -863,64 +1069,6 @@ const FirstStepOfAddProduct = () => {
               </div>
 
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-
-                <label htmlFor='tags' className='flex justify-start font-medium text-[#9F5216]'>Select Tag *</label>
-                <Controller
-                  name="tags"
-                  control={control}
-                  defaultValue={selectedTags}
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <div className="parent-container">
-                      <ReactSelect
-                        {...field}
-                        options={tagList}
-                        isMulti
-                        className="w-full border rounded-md creatable-select-container"
-                        value={selectedTags}
-                        menuPortalTarget={menuPortalTarget}
-                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                        menuPlacement="auto"
-                        onChange={(newValue) => {
-                          setSelectedTags(newValue);
-                          field.onChange(newValue);
-                        }}
-                      />
-                    </div>
-                  )}
-                />
-                {errors.tags && (
-                  <p className="text-red-600 text-left">Tags are required</p>
-                )}
-
-                <label htmlFor='vendors' className='flex justify-start font-medium text-[#9F5216]'>Select Vendor</label>
-                <Controller
-                  name="vendors"
-                  control={control}
-                  defaultValue={selectedVendors}
-                  render={({ field }) => (
-                    <div className="parent-container">
-                      <ReactSelect
-                        {...field}
-                        options={vendorList}
-                        isMulti
-                        className="w-full border rounded-md creatable-select-container"
-                        value={selectedVendors}
-                        menuPortalTarget={menuPortalTarget}
-                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                        menuPlacement="auto"
-                        onChange={(newValue) => {
-                          setSelectedVendors(newValue);
-                          field.onChange(newValue);
-                        }}
-                      />
-                    </div>
-                  )}
-                />
-
-              </div>
-
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                 <div className='flex flex-col gap-4'>
                   <input
                     id='imageUpload'
@@ -957,7 +1105,7 @@ const FirstStepOfAddProduct = () => {
                           {...provided.droppableProps}
                           ref={provided.innerRef}
                         >
-                          <div className='image-upload-container custom-scrollbar'>
+                          <div>
                             <div className='grid grid-cols-2 gap-4 mt-4'>
                               {uploadedImageUrls.map((url, index) => (
                                 <Draggable key={url} draggableId={url} index={index}>

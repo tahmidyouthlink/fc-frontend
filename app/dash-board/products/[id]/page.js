@@ -16,8 +16,8 @@ import { generateSizes } from '@/app/utils/GenerateSizes/GenerateSizes';
 import { Button, CheckboxGroup, Radio, RadioGroup, Select, SelectItem, Tab, Tabs } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { Controller, useForm } from 'react-hook-form';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -29,6 +29,7 @@ import useShippingZones from '@/app/hooks/useShippingZones';
 import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
 import { HiOutlineArchive } from "react-icons/hi";
 import { RxUpdate } from "react-icons/rx";
+import useSeasons from '@/app/hooks/useSeasons';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
@@ -39,7 +40,11 @@ const EditProductPage = () => {
   const { register, handleSubmit, setValue, control, formState: { errors } } = useForm();
 
   const isAdmin = true;
-  const { id } = useParams();
+  const { id } = useParams(); // Get the route parameter (id)
+  const searchParams = useSearchParams(); // Get the query parameters
+  const season = searchParams.get('season'); // Get the 'season' query parameter
+  const decodedSeasonName = decodeURIComponent(season || ''); // Decode the season name
+
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
   const [productDetails, setProductDetails] = useState("");
@@ -77,6 +82,69 @@ const EditProductPage = () => {
   const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
   const [productStatus, setProductStatus] = useState("");
   const [productId, setProductId] = useState("");
+  const [seasonList, isSeasonPending] = useSeasons();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSeasons, setSelectedSeasons] = useState([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const [seasonError, setSeasonError] = useState(false);
+  const [activeTab, setActiveTab] = useState('product');
+
+  // Filter categories based on search input and remove already selected categories
+  const filteredSeasons = seasonList?.filter((season) =>
+    season.seasonName.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    !selectedSeasons.includes(season.seasonName) // Exclude already selected categories
+  );
+
+  // Handle adding/removing category selection
+  const toggleSeasonSelection = (seasonName) => {
+    let updatedSelectedSeasons;
+    if (selectedSeasons.includes(seasonName)) {
+      // Remove category from selection
+      updatedSelectedSeasons = selectedSeasons.filter((season) => season !== seasonName);
+    } else {
+      // Add category to selection
+      updatedSelectedSeasons = [...selectedSeasons, seasonName];
+    }
+
+    setSelectedSeasons(updatedSelectedSeasons);
+    handleSeasonSelectionChange(updatedSelectedSeasons); // Pass selected categories to parent component
+  };
+
+  // Handle removing category directly from selected list
+  const removeSeason = (seasonName) => {
+    const updatedSelectedSeasons = selectedSeasons.filter((label) => label !== seasonName);
+    setSelectedSeasons(updatedSelectedSeasons);
+    handleSeasonSelectionChange(updatedSelectedSeasons); // Pass selected categories to parent component
+  };
+
+  const handleSeasonSelectionChange = async (selectedSea) => {
+    setSelectedSeasons(selectedSea);
+    if (selectedSea?.length === 0) {
+      setSeasonError(true);
+      return;
+    }
+    setSeasonError(false);
+  };
+
+  // Toggle dropdown visibility
+  const handleInputClick = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownRef]);
 
   const toggleCardSelection = (shipping) => {
     const isSelected = selectedShipmentHandler.some(
@@ -337,6 +405,7 @@ const EditProductPage = () => {
         setProductId(data?.productId);
         setProductStatus(data?.status);
         setSelectedShipmentHandler(data?.shippingDetails || []);
+        setSelectedSeasons(data?.season || []);
 
         if (typeof document !== 'undefined') {
           setMenuPortalTarget(document.body);
@@ -408,53 +477,85 @@ const EditProductPage = () => {
     try {
       if (uploadedImageUrls.length === 0) {
         setSizeError(true);
+        toast.error("Please select at least one image");
         return;
       }
       setSizeError(false);
       if (groupSelected.length === 0) {
         setSizeError2(true);
+        toast.error("Please select at least one size range.");
         return;
       }
       setSizeError2(false);
       if (groupSelected2.length === 0) {
         setSizeError3(true);
+        toast.error("Please select at least one size.");
         return;
       }
       setSizeError3(false);
       if (selectedSubCategories.length === 0) {
         setSizeError4(true);
+        toast.error("Sub-Category is required");
         return;
       }
       setSizeError4(false);
 
       if (selectedShipmentHandler.length === 0) {
         setSizeError5(true);
+        toast.error("Please select at least one shipping handler.");
         return;
       }
       setSizeError5(false);
 
       if (selectedAvailableColors.length === 0) {
         setColorError(true);
+        toast.error("Colors are required");
         return;
       }
       setColorError(false);
 
       if (selectedTags.length === 0) {
         setTagError(true);
+        toast.error("Tags are required");
         return;
       }
       setTagError(false);
 
       if (selectedNewArrival === '') {
         setNewArrivalError(true);
+        toast.error("New Arrival is required");
         return;
       }
       setNewArrivalError(false);
 
+      if (selectedSeasons?.length === 0) {
+        setSeasonError(true);
+        toast.error("Season is required");
+        return;
+      }
+      setSeasonError(false);
+
+      // Initialize an array to hold error messages
+      let errors = [];
+
+      // Validate based on the active tab
+      if (activeTab === "inventory" || activeTab === "shipping") {
+        // Check required fields for product tab
+        if (!data.productTitle) errors.push("Title is required.");
+        if (!data.regularPrice) errors.push("Regular price is required.");
+        if (!data.batchCode) errors.push("Batch code is required.");
+      }
+
+      // If there are errors, set an error state and return
+      if (errors.length > 0) {
+        errors.forEach(error => toast.error(error));
+        return; // Prevent submission
+      }
+
       const formattedData = productVariants?.map((variant, index) => ({
         color: variant.color,
         size: variant.size,
-        sku: parseFloat(data[`sku-${index}`]),
+        sku: data[`sku-${index}`] ? parseFloat(data[`sku-${index}`]) : null,
         imageUrl: data[`imageUrl-${index}`] || ""
       }));
 
@@ -462,6 +563,13 @@ const EditProductPage = () => {
       const missingImage = formattedData.some(variant => variant.imageUrl === "");
       if (missingImage) {
         toast.error("Please select an image for each variant.");
+        return; // Stop submission if any image is missing
+      }
+
+      // Check if any variant is missing an image URL
+      const missingSKU = formattedData.some(variant => variant.sku === null);
+      if (missingSKU) {
+        toast.error("Please provide SKU for each variant.");
         return; // Stop submission if any image is missing
       }
 
@@ -487,6 +595,7 @@ const EditProductPage = () => {
         productVariants: formattedData,
         shippingDetails: selectedShipmentHandler,
         status: data?.status,
+        season: selectedSeasons,
       }
 
       const res = await axiosPublic.put(`/editProductDetails/${id}`, updatedProductData);
@@ -524,7 +633,13 @@ const EditProductPage = () => {
           position: "bottom-right",
           duration: 5000
         })
-        router.push(`/dash-board/products/existing-products/${selectedCategory}`);
+        if (decodedSeasonName) {
+          router.push(`/dash-board/products/existing-products/seasons/${decodedSeasonName}`);
+          return;
+        }
+        else {
+          router.push(`/dash-board/products/existing-products/${selectedCategory}`);
+        }
       } else {
         toast.error('No changes detected!');
       }
@@ -534,287 +649,250 @@ const EditProductPage = () => {
     }
   };
 
-  if (isCategoryPending || isSizeRangePending || isSubCategoryPending || isTagPending || isVendorPending || isColorPending || isShippingPending || isShipmentHandlerPending) {
+  if (isCategoryPending || isSizeRangePending || isSubCategoryPending || isTagPending || isVendorPending || isColorPending || isShippingPending || isShipmentHandlerPending || isSeasonPending) {
     return <Loading />
   }
 
   return (
     <div className='bg-gray-50 min-h-screen'>
+
+      <div className='max-w-screen-2xl mx-auto sticky top-0 px-6 py-2 md:px-6 md:py-6 z-10 bg-gray-50 flex justify-between gap-4'>
+        <div className="flex items-center gap-3 w-full">
+
+          <button
+            className={`relative py-1 transition-all duration-300
+${activeTab === 'product' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
+after:absolute after:left-0 after:right-0 hover:text-[#D2016E] after:bottom-0 
+after:h-[2px] after:bg-[#D2016E] after:transition-all after:duration-300
+${activeTab === 'product' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
+`}
+            onClick={() => setActiveTab('product')}
+          >
+            Product
+          </button>
+
+          <button
+            className={`relative py-1 transition-all duration-300
+${activeTab === 'inventory' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
+after:absolute after:left-0 after:right-0 after:bottom-0 
+after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300
+${activeTab === 'inventory' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
+`}
+            onClick={() => setActiveTab('inventory')}
+          >
+            Inventory
+          </button>
+
+          <button
+            className={`relative py-1 transition-all duration-300
+${activeTab === 'shipping' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
+after:absolute after:left-0 after:right-0 after:bottom-0 
+after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300
+${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
+`}
+            onClick={() => setActiveTab('shipping')}
+          >
+            Shipping
+          </button>
+
+        </div>
+        {decodedSeasonName ? (
+          <Link
+            className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full'
+            href={`/dash-board/products/existing-products/seasons/${decodedSeasonName}`}>
+            <span className='border border-black rounded-full p-1 md:p-2'>
+              <FaArrowLeft />
+            </span>
+            Go Back
+          </Link>
+        ) : (
+          <Link
+            className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full'
+            href={`/dash-board/products/existing-products/${selectedCategory}`}>
+            <span className='border border-black rounded-full p-1 md:p-2'>
+              <FaArrowLeft />
+            </span>
+            Go Back
+          </Link>
+        )}
+      </div>
+
       <form onSubmit={handleSubmit(onSubmit)}>
 
-        <div className='py-3 md:py-6 px-6 2xl:px-12 sticky top-0 z-10 bg-gray-50'>
-          <div className='flex items-center justify-between'>
+        {activeTab === "product" && <div>
+          <div className='max-w-screen-2xl px-6 mx-auto pb-3'>
             <h3 className='w-full font-semibold text-xl lg:text-2xl xl:text-3xl'>Update Product Details</h3>
-            <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={`/dash-board/products/existing-products/${selectedCategory}`}> <span className='border border-black rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
           </div>
-        </div>
 
-        <div className='max-w-screen-2xl mx-auto'>
-          <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
-            <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 px-6 py-3'>
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-                <p className='w-full'>Product ID: <strong>{productId}</strong></p>
-                <label htmlFor='productTitle' className='flex justify-start font-medium text-[#9F5216]'>Product Title *</label>
-                <input id='productTitle' {...register("productTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" placeholder='Enter Product Title' type="text" />
-                {errors.productTitle?.type === "required" && (
-                  <p className="text-red-600 text-left">Product Title is required</p>
-                )}
-                <label htmlFor='productDetails' className='flex justify-start font-medium text-[#9F5216]'>
-                  Details About This Product
-                </label>
-                <Controller
-                  name="productDetails"
-                  defaultValue=""
-                  control={control}
-                  render={() => <Editor
-                    value={productDetails}
-                    onChange={(value) => {
-                      setProductDetails(value);
-                    }}
-                  />}
-                />
-              </div>
-
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[560px]'>
-
-                <div className='flex flex-col rounded-md relative'>
-                  <label htmlFor="category" className='text-xs px-2'>Category</label>
-                  <select
-                    id="category"
-                    className={`bg-gray-100 p-2 rounded-md ${errors.category ? 'border-red-600' : ''}`}
-                    value={selectedCategory}
-                    {...register('category', { required: 'Category is required' })}
-                    onChange={(e) => {
-                      handleCategoryChange(e.target.value);
-                    }}
-                  >
-                    <option value="" disabled className='bg-white'>Select a category</option>
-                    {categoryList?.map((category) => (
-                      <option className='bg-white' key={category.key} value={category.label}>
-                        {category.label}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.category && (
-                    <p className="text-red-600 text-left">{errors.category.message}</p>
+          <div className='max-w-screen-2xl mx-auto'>
+            <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
+              <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 px-6 py-3'>
+                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+                  <p className='w-full text-xl'>Product ID: <strong>{productId}</strong></p>
+                  <label htmlFor='productTitle' className='flex justify-start font-medium text-[#9F5216]'>Product Title *</label>
+                  <input id='productTitle' {...register("productTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" placeholder='Enter Product Title' type="text" />
+                  {errors.productTitle?.type === "required" && (
+                    <p className="text-red-600 text-left">Product Title is required</p>
                   )}
-                </div>
-
-                {selectedCategory && sizeRangeList[selectedCategory] && (
-                  <div className="flex flex-col gap-1 w-full">
-                    <CheckboxGroup
-                      className="gap-1"
-                      label="Select size"
-                      orientation="horizontal"
-                      value={groupSelected}
-                      onChange={handleGroupSelectedChange}
-                    >
-                      {sizeRangeList[selectedCategory]?.map((size) => (
-                        <CustomCheckbox
-                          key={size}
-                          value={size}
-                          isDisabled={groupSelected?.length > 0 && !groupSelected?.includes(size)} // Disable other sizes if one is selected
-                        >
-                          {size}
-                        </CustomCheckbox>
-                      ))}
-                    </CheckboxGroup>
-                    {sizeError2 && (
-                      <p className="text-red-600 text-left">Please select at least one size.</p>
-                    )}
-                  </div>
-                )}
-
-                {groupSelected?.length > 0 && (
-                  <div className="flex flex-col gap-1 w-full">
-                    <CheckboxGroup
-                      className="gap-1"
-                      label="Unselect sizes"
-                      orientation="horizontal"
-                      value={groupSelected2}
-                      onChange={handleGroupSelected2Change}
-                    >
-                      {generateSizes(groupSelected[0] || '')?.map(size => (
-                        <CustomCheckbox2 key={size} value={size}>{size}</CustomCheckbox2>
-                      ))}
-                    </CheckboxGroup>
-                    <p className="mt-4 ml-1 text-default-500">
-                      Selected: {groupSelected2?.join(", ")}
-                    </p>
-                    {sizeError3 && (
-                      <p className="text-red-600 text-left">Please select at least one size.</p>
-                    )}
-                  </div>
-                )}
-
-                {groupSelected2?.length > 0 && (
-                  <div className="flex w-full flex-col gap-2">
-                    <Controller
-                      name="subCategories"
-                      control={control}
-                      defaultValue={selectedSubCategories}
-                      rules={{ required: 'Sub-Category is required' }}
-                      render={({ field }) => (
-                        <div>
-                          <Select
-                            label="Sub-categories"
-                            selectionMode="multiple"
-                            value={selectedSubCategories}
-                            placeholder="Select Sub-categories"
-                            selectedKeys={new Set(selectedSubCategories)}
-                            onSelectionChange={(keys) => {
-                              handleSubCategoryArray(keys);
-                              field.onChange([...keys]);
-                            }}
-                          >
-                            {subCategoryList[selectedCategory]?.map((subCategory) => (
-                              <SelectItem key={subCategory.key}>
-                                {subCategory.label}
-                              </SelectItem>
-                            ))}
-                          </Select>
-
-                          {/* Conditional Error Display */}
-                          {errors.subCategories ? (
-                            <p className="text-red-600 text-left">{errors.subCategories.message}</p>
-                          ) : (
-                            sizeError4 && <p className="text-red-600 text-left">Sub-Category is required.</p>
-                          )}
-                        </div>
-                      )}
-                    />
-                  </div>
-                )}
-
-                <label htmlFor='availableColors' className='flex justify-start font-medium text-[#9F5216]'>Select Available Colors *</label>
-                <div className="parent-container">
-                  <ReactSelect
-                    options={colorList}
-                    isMulti
-                    className="w-full border rounded-md creatable-select-container"
-                    components={{ Option: ColorOption }}
-                    menuPortalTarget={menuPortalTarget}
-                    styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                    menuPlacement="auto"
-                    value={selectedAvailableColors}
-                    onChange={handleColorChange}
+                  <label htmlFor='productDetails' className='flex justify-start font-medium text-[#9F5216]'>
+                    Details About This Product
+                  </label>
+                  <Controller
+                    name="productDetails"
+                    defaultValue=""
+                    control={control}
+                    render={() => <Editor
+                      value={productDetails}
+                      onChange={(value) => {
+                        setProductDetails(value);
+                      }}
+                    />}
                   />
                 </div>
-                {colorError && (
-                  <p className="text-red-600 text-left">Colors are required</p>
-                )}
-
-                <div className="flex flex-col gap-3">
-                  <RadioGroup
-                    label="Is New Arrival?"
-                    value={selectedNewArrival}
-                    onValueChange={handleNewArrivalChange}
-                    orientation="horizontal"
-                  >
-                    <Radio value="Yes">Yes</Radio>
-                    <Radio value="No">No</Radio>
-                  </RadioGroup>
-                  <p className="text-default-500 text-small">Selected: {selectedNewArrival}</p>
-                  {newArrivalError && (
-                    <p className="text-red-600 text-left">New Arrival Selection is required</p>
-                  )}
-                </div>
-              </div>
-
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-                <label htmlFor='materialCare' className='flex justify-start font-medium text-[#9F5216]'>Material Care</label>
-                <Controller
-                  name="materialCare"
-                  defaultValue=""
-                  control={control}
-                  render={() => <Editor
-                    value={materialCare}
-                    onChange={(value) => {
-                      setMaterialCare(value);
-                    }}
-                  />}
-                />
-
-                <label htmlFor='sizeFit' className='flex justify-start font-medium text-[#9F5216]'>Size Fit</label>
-                <Controller
-                  name="sizeFit"
-                  defaultValue=""
-                  control={control}
-                  render={() => <Editor
-                    value={sizeFit}
-                    onChange={(value) => {
-                      setSizeFit(value);
-                    }}
-                  />}
-                />
-              </div>
-            </div>
-
-            <div className='grid grid-cols-1 lg:col-span-5 xl:col-span-5 gap-8 px-6 py-3'>
-              <div className='flex flex-col gap-4 h-fit'>
-                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-                  <div>
-                    <label htmlFor='regularPrice' className='flex justify-start font-medium text-[#9F5216] mt-4'>Regular Price ৳ *</label>
-                    <input id='regularPrice' {...register("regularPrice", { required: true })} className="custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000" placeholder='Enter Product Price' type="number" />
-                    {errors.regularPrice?.type === "required" && (
-                      <p className="text-red-600 text-left">Product Price is required</p>
-                    )}
-                  </div>
-
-                  <div className="flex w-full flex-col">
-                    <Tabs isDisabled={!isAdmin}
-                      aria-label="Discount Type"
-                      selectedKey={discountType}
-                      onSelectionChange={handleTabChange}
-                    >
-                      <Tab key="Percentage" title="Percentage">Discount (%)</Tab>
-                      <Tab key="Flat" title="Flat">Flat Discount (taka)</Tab>
-                    </Tabs>
-
-                    <input
-                      type="number"
-                      disabled={!isAdmin}
-                      {...register('discountValue')}
-                      className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
-                      placeholder={`Enter ${discountType} Discount`} // Correct placeholder
-                    />
-                  </div>
-                </div>
 
                 <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-                  <div>
-                    <label htmlFor={`batchCode`} className='font-medium text-[#9F5216]'>Batch Code *</label>
-                    <input
-                      id={`batchCode`}
-                      autoComplete="off"
-                      {...register(`batchCode`, {
-                        required: 'Batch Code is required',
-                        pattern: {
-                          value: /^[A-Z0-9]*$/,
-                          message: 'Batch Code must be alphanumeric and uppercase',
-                        },
-                      })}
-                      placeholder={`Enter Batch Code`}
-                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mt-2"
-                      type="text"
+
+                  <div className='flex flex-col rounded-md relative'>
+                    <label htmlFor="category" className='text-xs px-2'>Category</label>
+                    <select
+                      id="category"
+                      className={`bg-gray-100 p-2 rounded-md ${errors.category ? 'border-red-600' : ''}`}
+                      value={selectedCategory}
+                      {...register('category', { required: 'Category is required' })}
                       onChange={(e) => {
-                        // Convert input to uppercase and remove non-alphanumeric characters
-                        e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                        handleCategoryChange(e.target.value);
                       }}
-                    />
-                    {errors.batchCode && (
-                      <p className="text-red-600 text-left">{errors.batchCode.message}</p>
+                    >
+                      <option value="" disabled className='bg-white'>Select a category</option>
+                      {categoryList?.map((category) => (
+                        <option className='bg-white' key={category.key} value={category.label}>
+                          {category.label}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.category && (
+                      <p className="text-red-600 text-left">{errors.category.message}</p>
                     )}
                   </div>
-                  <div>
-                    <label htmlFor={`weight`} className='font-medium text-[#9F5216]'>Weight</label>
-                    <input
-                      id={`weight`}
-                      {...register(`weight`)}
-                      placeholder={`Enter Weight`}
-                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mt-2"
-                      type="number"
+
+                  {selectedCategory && sizeRangeList[selectedCategory] && (
+                    <div className="flex flex-col gap-1 w-full">
+                      <CheckboxGroup
+                        className="gap-1"
+                        label="Select size"
+                        orientation="horizontal"
+                        value={groupSelected}
+                        onChange={handleGroupSelectedChange}
+                      >
+                        {sizeRangeList[selectedCategory]?.map((size) => (
+                          <CustomCheckbox
+                            key={size}
+                            value={size}
+                            isDisabled={groupSelected?.length > 0 && !groupSelected?.includes(size)} // Disable other sizes if one is selected
+                          >
+                            {size}
+                          </CustomCheckbox>
+                        ))}
+                      </CheckboxGroup>
+                      {sizeError2 && (
+                        <p className="text-red-600 text-left">Please select at least one size.</p>
+                      )}
+                    </div>
+                  )}
+
+                  {groupSelected?.length > 0 && (
+                    <div className="flex flex-col gap-1 w-full">
+                      <CheckboxGroup
+                        className="gap-1"
+                        label="Unselect sizes"
+                        orientation="horizontal"
+                        value={groupSelected2}
+                        onChange={handleGroupSelected2Change}
+                      >
+                        {generateSizes(groupSelected[0] || '')?.map(size => (
+                          <CustomCheckbox2 key={size} value={size}>{size}</CustomCheckbox2>
+                        ))}
+                      </CheckboxGroup>
+                      <p className="mt-4 ml-1 text-default-500">
+                        Selected: {groupSelected2?.join(", ")}
+                      </p>
+                      {sizeError3 && (
+                        <p className="text-red-600 text-left">Please select at least one size.</p>
+                      )}
+                    </div>
+                  )}
+
+                  {groupSelected2?.length > 0 && (
+                    <div className="flex w-full flex-col gap-2">
+                      <Controller
+                        name="subCategories"
+                        control={control}
+                        defaultValue={selectedSubCategories}
+                        rules={{ required: 'Sub-Category is required' }}
+                        render={({ field }) => (
+                          <div>
+                            <Select
+                              label="Sub-categories"
+                              selectionMode="multiple"
+                              value={selectedSubCategories}
+                              placeholder="Select Sub-categories"
+                              selectedKeys={new Set(selectedSubCategories)}
+                              onSelectionChange={(keys) => {
+                                handleSubCategoryArray(keys);
+                                field.onChange([...keys]);
+                              }}
+                            >
+                              {subCategoryList[selectedCategory]?.map((subCategory) => (
+                                <SelectItem key={subCategory.key}>
+                                  {subCategory.label}
+                                </SelectItem>
+                              ))}
+                            </Select>
+
+                            {/* Conditional Error Display */}
+                            {errors.subCategories ? (
+                              <p className="text-red-600 text-left">{errors.subCategories.message}</p>
+                            ) : (
+                              sizeError4 && <p className="text-red-600 text-left">Sub-Category is required.</p>
+                            )}
+                          </div>
+                        )}
+                      />
+                    </div>
+                  )}
+
+                  <label htmlFor='availableColors' className='flex justify-start font-medium text-[#9F5216]'>Select Available Colors *</label>
+                  <div className="parent-container">
+                    <ReactSelect
+                      options={colorList}
+                      isMulti
+                      className="w-full border rounded-md creatable-select-container"
+                      components={{ Option: ColorOption }}
+                      menuPortalTarget={menuPortalTarget}
+                      styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                      menuPlacement="auto"
+                      value={selectedAvailableColors}
+                      onChange={handleColorChange}
                     />
+                  </div>
+                  {colorError && (
+                    <p className="text-red-600 text-left">Colors are required</p>
+                  )}
+
+                  <div className="flex flex-col gap-3">
+                    <RadioGroup
+                      label="Is New Arrival?"
+                      value={selectedNewArrival}
+                      onValueChange={handleNewArrivalChange}
+                      orientation="horizontal"
+                    >
+                      <Radio value="Yes">Yes</Radio>
+                      <Radio value="No">No</Radio>
+                    </RadioGroup>
+                    <p className="text-default-500 text-small">Selected: {selectedNewArrival}</p>
+                    {newArrivalError && (
+                      <p className="text-red-600 text-left">New Arrival Selection is required</p>
+                    )}
                   </div>
                 </div>
 
@@ -837,7 +915,7 @@ const EditProductPage = () => {
                     <p className="text-red-600 text-left">Tags are required</p>
                   )}
 
-                  <label htmlFor='vendors' className='flex justify-start font-medium text-[#9F5216]'>Select Vendor *</label>
+                  <label htmlFor='vendors' className='flex justify-start font-medium text-[#9F5216]'>Select Vendor</label>
                   <div className="parent-container">
                     <ReactSelect
                       options={vendorList}
@@ -851,92 +929,256 @@ const EditProductPage = () => {
                     />
                   </div>
 
-                </div>
+                  <div className="w-full mx-auto" ref={dropdownRef}>
+                    {/* Search Box */}
+                    <label htmlFor='seasons' className='flex justify-start font-medium text-[#9F5216] pb-2'>Select Seasons *</label>
 
-                <div className={`flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg`}>
-                  <div className='flex flex-col gap-4'>
                     <input
-                      id='imageUpload'
-                      type='file'
-                      className='hidden'
-                      multiple
-                      onChange={handleImagesChange}
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onClick={handleInputClick} // Toggle dropdown on input click
+                      placeholder="Search & Select by Seasons"
+                      className="w-full p-2 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md mb-2"
                     />
-                    <label
-                      htmlFor='imageUpload'
-                      className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white'
-                      onDrop={handleDrop}
-                      onDragOver={handleDragOver}
-                    >
-                      <MdOutlineFileUpload size={60} />
-                      <div className='space-y-1.5 text-center'>
-                        <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                          Upload or Drag Media
-                        </h5>
-                        <p className='text-sm text-gray-500'>
-                          Photos Should be in PNG, JPEG or JPG format
-                        </p>
+
+                    {/* Dropdown list for search results */}
+                    {isDropdownOpen && (
+                      <div className="border rounded p-2 max-h-64 overflow-y-auto">
+                        {filteredSeasons?.length > 0 ? (
+                          filteredSeasons?.map((season) => (
+                            <div
+                              key={season._id}
+                              className={`flex items-center p-2 cursor-pointer hover:bg-gray-100 ${selectedSeasons.includes(season.seasonName) ? 'bg-gray-200' : ''}`}
+                              onClick={() => toggleSeasonSelection(season.seasonName)}
+                            >
+                              <Image
+                                width={400}
+                                height={400}
+                                src={season.imageUrl}
+                                alt="season-imageUrl"
+                                className="h-8 w-8 object-cover rounded"
+                              />
+                              <span className="ml-2">{season.seasonName}</span>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-gray-500">No seasons found</p>
+                        )}
                       </div>
-                    </label>
-                    {sizeError && (
-                      <p className="text-red-600 text-left">Please select at least one image</p>
                     )}
 
-                    <DragDropContext onDragEnd={handleOnDragEnd}>
-                      <Droppable droppableId="droppable">
-                        {(provided) => (
-                          <ul
-                            className="list-none p-0"
-                            {...provided.droppableProps}
-                            ref={provided.innerRef}
-                          >
-                            <div className='image-upload-container custom-scrollbar'>
-                              <div className='grid grid-cols-2 gap-4 mt-4'>
-                                {uploadedImageUrls.map((url, index) => (
-                                  <Draggable key={url} draggableId={url} index={index}>
-                                    {(provided) => (
-                                      <li
-                                        ref={provided.innerRef}
-                                        {...provided.draggableProps}
-                                        {...provided.dragHandleProps}
-                                        className="flex items-center mb-2 p-2 bg-white border border-gray-300 rounded-md relative"
-                                      >
-                                        <Image
-                                          src={url}
-                                          alt={`Uploaded image ${index + 1}`}
-                                          height={100}
-                                          width={200}
-                                          className='w-full h-auto max-h-[250px] rounded-md object-contain'
-                                        />
-                                        <button
-                                          onClick={() => handleImageRemove(index)}
-                                          className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
-                                        >
-                                          <RxCross2 size={24} />
-                                        </button>
-                                      </li>
-                                    )}
-                                  </Draggable>
-                                ))}
-                              </div>
-                            </div>
-                            {provided.placeholder}
-                          </ul>
-                        )}
-                      </Droppable>
-                    </DragDropContext>
+                    {/* Selected categories display */}
+                    {selectedSeasons?.length > 0 && (
+                      <div className="border p-2 rounded mt-2">
+                        <h4 className="text-sm font-semibold mb-2">Selected Seasons:</h4>
+                        <ul className="space-y-2">
+                          {selectedSeasons?.map((season, index) => (
+                            <li
+                              key={index}
+                              className="flex justify-between items-center bg-gray-100 p-2 rounded"
+                            >
+                              <span>{season}</span>
+                              <button
+                                onClick={() => removeSeason(season)}
+                                className="text-red-500 text-sm"
+                              >
+                                Remove
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {seasonError && <p className="text-red-600 text-left">Season is required</p>}
+
                   </div>
+
                 </div>
 
+                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+                  <label htmlFor='materialCare' className='flex justify-start font-medium text-[#9F5216]'>Material Care</label>
+                  <Controller
+                    name="materialCare"
+                    defaultValue=""
+                    control={control}
+                    render={() => <Editor
+                      value={materialCare}
+                      onChange={(value) => {
+                        setMaterialCare(value);
+                      }}
+                    />}
+                  />
+
+                  <label htmlFor='sizeFit' className='flex justify-start font-medium text-[#9F5216]'>Size Fit</label>
+                  <Controller
+                    name="sizeFit"
+                    defaultValue=""
+                    control={control}
+                    render={() => <Editor
+                      value={sizeFit}
+                      onChange={(value) => {
+                        setSizeFit(value);
+                      }}
+                    />}
+                  />
+                </div>
               </div>
+
+              <div className='grid grid-cols-1 lg:col-span-5 xl:col-span-5 gap-8 px-6 py-3'>
+                <div className='flex flex-col gap-4 h-fit'>
+                  <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+                    <div>
+                      <label htmlFor='regularPrice' className='flex justify-start font-medium text-[#9F5216] mt-4'>Regular Price ৳ *</label>
+                      <input id='regularPrice' {...register("regularPrice", { required: true })} className="custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000" placeholder='Enter Product Price' type="number" />
+                      {errors.regularPrice?.type === "required" && (
+                        <p className="text-red-600 text-left">Product Price is required</p>
+                      )}
+                    </div>
+
+                    <div className="flex w-full flex-col">
+                      <Tabs isDisabled={!isAdmin}
+                        aria-label="Discount Type"
+                        selectedKey={discountType}
+                        onSelectionChange={handleTabChange}
+                      >
+                        <Tab key="Percentage" title="Percentage">Discount (%)</Tab>
+                        <Tab key="Flat" title="Flat">Flat Discount (taka)</Tab>
+                      </Tabs>
+
+                      <input
+                        type="number"
+                        disabled={!isAdmin}
+                        {...register('discountValue')}
+                        className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
+                        placeholder={`Enter ${discountType} Discount`} // Correct placeholder
+                      />
+                    </div>
+                  </div>
+
+                  <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+                    <div>
+                      <label htmlFor={`batchCode`} className='font-medium text-[#9F5216]'>Batch Code *</label>
+                      <input
+                        id={`batchCode`}
+                        autoComplete="off"
+                        {...register(`batchCode`, {
+                          required: 'Batch Code is required',
+                          pattern: {
+                            value: /^[A-Z0-9]*$/,
+                            message: 'Batch Code must be alphanumeric and uppercase',
+                          },
+                        })}
+                        placeholder={`Enter Batch Code`}
+                        className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mt-2"
+                        type="text"
+                        onChange={(e) => {
+                          // Convert input to uppercase and remove non-alphanumeric characters
+                          e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                        }}
+                      />
+                      {errors.batchCode && (
+                        <p className="text-red-600 text-left">{errors.batchCode.message}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label htmlFor={`weight`} className='font-medium text-[#9F5216]'>Weight</label>
+                      <input
+                        id={`weight`}
+                        {...register(`weight`)}
+                        placeholder={`Enter Weight`}
+                        className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mt-2"
+                        type="number"
+                      />
+                    </div>
+                  </div>
+
+                  <div className={`flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg`}>
+                    <div className='flex flex-col gap-4'>
+                      <input
+                        id='imageUpload'
+                        type='file'
+                        className='hidden'
+                        multiple
+                        onChange={handleImagesChange}
+                      />
+                      <label
+                        htmlFor='imageUpload'
+                        className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white'
+                        onDrop={handleDrop}
+                        onDragOver={handleDragOver}
+                      >
+                        <MdOutlineFileUpload size={60} />
+                        <div className='space-y-1.5 text-center'>
+                          <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
+                            Upload or Drag Media
+                          </h5>
+                          <p className='text-sm text-gray-500'>
+                            Photos Should be in PNG, JPEG or JPG format
+                          </p>
+                        </div>
+                      </label>
+                      {sizeError && (
+                        <p className="text-red-600 text-left">Please select at least one image</p>
+                      )}
+
+                      <DragDropContext onDragEnd={handleOnDragEnd}>
+                        <Droppable droppableId="droppable">
+                          {(provided) => (
+                            <ul
+                              className="list-none p-0"
+                              {...provided.droppableProps}
+                              ref={provided.innerRef}
+                            >
+                              <div>
+                                <div className='grid grid-cols-2 gap-4 mt-4'>
+                                  {uploadedImageUrls.map((url, index) => (
+                                    <Draggable key={url} draggableId={url} index={index}>
+                                      {(provided) => (
+                                        <li
+                                          ref={provided.innerRef}
+                                          {...provided.draggableProps}
+                                          {...provided.dragHandleProps}
+                                          className="flex items-center mb-2 p-2 bg-white border border-gray-300 rounded-md relative"
+                                        >
+                                          <Image
+                                            src={url}
+                                            alt={`Uploaded image ${index + 1}`}
+                                            height={100}
+                                            width={200}
+                                            className='w-full h-auto max-h-[250px] rounded-md object-contain'
+                                          />
+                                          <button
+                                            onClick={() => handleImageRemove(index)}
+                                            className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                                          >
+                                            <RxCross2 size={24} />
+                                          </button>
+                                        </li>
+                                      )}
+                                    </Draggable>
+                                  ))}
+                                </div>
+                              </div>
+                              {provided.placeholder}
+                            </ul>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
             </div>
-
           </div>
-        </div>
+        </div>}
 
-        <div className='bg-white pb-4 xl:pb-8'>
-          <div className='2xl:max-w-screen-2xl 2xl:mx-auto mt-4 xl:mt-8'>
-            <div className='flex items-center justify-between  px-6 pt-2 md:pt-6'>
+        {activeTab === "inventory" && <div>
+          <div className='2xl:max-w-screen-2xl 2xl:mx-auto'>
+            <div className='flex items-center justify-between px-6'>
               <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl'>Update Inventory Variants</h3>
               <p className="font-semibold text-xl md:text-2xl xl:text-3xl">
                 {productVariants?.length > 0 ? (
@@ -969,7 +1211,7 @@ const EditProductPage = () => {
                       />
                     </div>
                     <div className='md:w-1/3'>
-                      <label htmlFor={`sku-${index}`} className='font-medium text-[#9F5216]'>SKU</label>
+                      <label htmlFor={`sku-${index}`} className='font-medium text-[#9F5216]'>SKU *</label>
                       <input
                         id={`sku-${index}`}
                         {...register(`sku-${index}`, { required: true })}
@@ -1004,12 +1246,12 @@ const EditProductPage = () => {
               ))}
             </div>
           </div>
-        </div>
+        </div>}
 
-        <div className='2xl:max-w-screen-2xl 2xl:mx-auto'>
-          <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl px-6 pt-2 md:pt-6'>Update Shipping Details</h3>
+        {activeTab === "shipping" && <div className='2xl:max-w-screen-2xl 2xl:mx-auto'>
+          <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl px-6 pb-6'>Update Shipping Details</h3>
           <div>
-            <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 px-6 pt-6'>
+            <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 px-6'>
               {shippingList?.map((shipping, index) => {
                 const isSelected = selectedShipmentHandler.some(
                   (handler) => handler.shippingZone === shipping?.shippingZone
@@ -1047,17 +1289,23 @@ const EditProductPage = () => {
               <p className='text-red-600 text-left mt-4 max-w-screen-xl px-6'>Please select at least one shipping handler.</p>
             )}
           </div>
-        </div>
+        </div>}
 
         <div className='2xl:max-w-screen-2xl 2xl:mx-auto flex justify-between px-6 pt-8 pb-16'>
+
           {productStatus === "active" &&
-            <Button color="danger" className='flex items-center gap-1' onClick={handleSubmit((formData) => {
-              setProductStatus("archive"); // Set status to archive
-              onSubmit({ ...formData, status: "archive" }); // Pass the updated status directly
-            })}
+            <Button color="danger" className='flex items-center gap-1'
+              onClick={handleSubmit(async (formData) => {
+                // Call onSubmit and wait for the result
+                const success = await onSubmit({ ...formData, status: "archive" }).catch(() => false);
+                if (success) {
+                  setProductStatus("archive"); // Only change status if onSubmit succeeded
+                }
+              })}
             >
               Archive <HiOutlineArchive size={20} />
-            </Button>}
+            </Button>
+          }
 
           <div className='flex items-center justify-end gap-6 w-full'>
             <Button
@@ -1071,16 +1319,20 @@ const EditProductPage = () => {
               Update <RxUpdate size={18} />
             </Button>
 
-            {productStatus === "archive" && <Button
-              className="flex items-center gap-1"
-              color="secondary"
-              onClick={handleSubmit((formData) => {
-                setProductStatus("active"); // Set status to active
-                onSubmit({ ...formData, status: "active" }); // Pass the updated status directly
-              })}
-            >
-              Publish Again <MdOutlineFileUpload size={18} />
-            </Button>}
+            {productStatus === "archive" &&
+              <Button className="flex items-center gap-1" color="secondary"
+                onClick={handleSubmit(async (formData) => {
+                  // Call onSubmit and wait for the result
+                  const success = await onSubmit({ ...formData, status: "active" }).catch(() => false);
+                  if (success) {
+                    setProductStatus("active"); // Only change status if onSubmit succeeded
+                  }
+                })}
+              >
+                Publish Again <MdOutlineFileUpload size={18} />
+              </Button>
+            }
+
           </div>
         </div>
       </form>

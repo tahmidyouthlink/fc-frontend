@@ -1,5 +1,5 @@
 "use client";
-import { FaBullhorn } from "react-icons/fa";
+import { FaBullhorn, FaGlobeAsia } from "react-icons/fa";
 import { PiUsersThreeLight, PiWarehouseBold } from "react-icons/pi";
 import { BiCategory } from "react-icons/bi";
 import { IoMdHome } from "react-icons/io";
@@ -76,6 +76,7 @@ const SideNavbar = ({ onClose }) => {
         { label: 'Shipment', link: '/dash-board/zone', icon: <BsBoxSeam /> },
         { label: 'Payment Methods', link: '/dash-board/payment-methods', icon: <MdPayment /> },
         { label: 'Categories', link: '/dash-board/categories', icon: <BiCategory /> },
+        { label: 'Seasons', link: '/dash-board/seasons', icon: <FaGlobeAsia /> },
         { label: 'Colors', link: '/dash-board/colors', icon: <IoColorPaletteOutline /> },
         { label: 'Vendors', link: '/dash-board/vendors', icon: <LuWarehouse /> },
         { label: 'Tags', link: '/dash-board/tags', icon: <BsTags /> },
