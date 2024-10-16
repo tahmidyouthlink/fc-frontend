@@ -55,6 +55,7 @@
     "transactionId": "TXN1234567890",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 10,
     "promoCode": "YOUTHLINK",
     "paymentStatus": "Paid"
@@ -115,6 +116,7 @@
     "transactionId": "TXN2234567890",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["SteadFast", "Sundarban"],
     "shippingCharge": 20,
     "promoCode": "SUMMER5",
     "paymentStatus": "Paid"
@@ -159,6 +161,7 @@
     "transactionId": "TXN3234567890",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["SteadFast", "Sundarban"],
     "shippingCharge": 15,
     "promoCode": "WINTERSALE",
     "paymentStatus": "Paid"
@@ -203,6 +206,7 @@
     "transactionId": "TXN4234567890",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["SteadFast", "Sundarban"],
     "shippingCharge": 25,
     "promoCode": "",
     "paymentStatus": "Refunded"
@@ -247,6 +251,7 @@
     "transactionId": "TXN5234567890",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["SteadFast", "Sundarban"],
     "shippingCharge": 30,
     "promoCode": "OFFICEWEAR",
     "paymentStatus": "Paid"
@@ -291,6 +296,7 @@
     "transactionId": "TXN6234567890",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 35,
     "promoCode": "FORMALWEAR",
     "paymentStatus": "Paid"
@@ -335,6 +341,7 @@
     "transactionId": "TXN7234567890",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 40,
     "promoCode": "WINTERDEAL",
     "paymentStatus": "Paid"
@@ -379,6 +386,7 @@
     "transactionId": "TXN8234567890",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 20,
     "promoCode": "FALLDISCOUNT",
     "paymentStatus": "Paid"
@@ -439,6 +447,7 @@
     "transactionId": "TXN9234567890",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 10,
     "promoCode": "",
     "paymentStatus": "Paid"
@@ -483,6 +492,7 @@
     "transactionId": "TXN0234567890",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 50,
     "promoCode": "FOOTWEARSALE",
     "paymentStatus": "Paid"
@@ -543,6 +553,7 @@
     "transactionId": "TXN0245678901",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 25,
     "promoCode": "SPRINGSALE",
     "paymentStatus": "Cancelled"
@@ -587,6 +598,7 @@
     "transactionId": "TXN1245678901",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 75,
     "promoCode": "PREMIUMBUY",
     "paymentStatus": "Cancelled"
@@ -647,6 +659,7 @@
     "transactionId": "TXN2245678901",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 50,
     "promoCode": "BUSINESSSTYLE",
     "paymentStatus": "Refunded"
@@ -691,6 +704,7 @@
     "transactionId": "TXN3245678901",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 20,
     "promoCode": "FITNESSDEAL",
     "paymentStatus": "Paid"
@@ -735,6 +749,7 @@
     "transactionId": "TXN4245678901",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 30,
     "promoCode": "ATHLETIC",
     "paymentStatus": "Paid"
@@ -795,6 +810,7 @@
     "transactionId": "TXN5245678901",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 40,
     "promoCode": "GLAMOUR",
     "paymentStatus": "Paid"
@@ -839,6 +855,7 @@
     "transactionId": "TXN24080118KS001",
     "trackingNumber": "TRA",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 15,
     "promoCode": "RUNFAST",
     "paymentStatus": "Paid"
@@ -883,6 +900,7 @@
     "transactionId": "TXN24080119DG002",
     "trackingNumber": "TRA",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 10,
     "promoCode": "DENIM10",
     "paymentStatus": "Paid"
@@ -927,6 +945,7 @@
     "transactionId": "TXN24080120SB003",
     "trackingNumber": "TRA",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 20,
     "promoCode": "JACKET20",
     "paymentStatus": "Pending"
@@ -971,6 +990,7 @@
     "transactionId": "TXN24080121JA004",
     "trackingNumber": "TRA",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 25,
     "promoCode": "JACKET20",
     "paymentStatus": "Pending"
@@ -1015,6 +1035,7 @@
     "transactionId": "TXN1234567910",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 15,
     "promoCode": "",
     "paymentStatus": "Paid"
@@ -1075,6 +1096,7 @@
     "transactionId": "TXN1234567920",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 10,
     "promoCode": "SUMMER10",
     "paymentStatus": "Paid"
@@ -1135,6 +1157,7 @@
     "transactionId": "TXN1234567930",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 15,
     "promoCode": "WINTER SALE",
     "paymentStatus": "Paid"
@@ -1195,6 +1218,7 @@
     "transactionId": "TXN1234567940",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 20,
     "promoCode": "BUY1GET1",
     "paymentStatus": "Paid"
@@ -1239,6 +1263,7 @@
     "transactionId": "TXN1234567950",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 10,
     "promoCode": "FLASH SALE",
     "paymentStatus": "Paid"
@@ -1283,6 +1308,7 @@
     "transactionId": "TXN1234567960",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 12,
     "promoCode": "",
     "paymentStatus": "Paid"
@@ -1327,6 +1353,7 @@
     "transactionId": "TXN1234567970",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 15,
     "promoCode": "WINTER10",
     "paymentStatus": "Paid"
@@ -1387,6 +1414,7 @@
     "transactionId": "TXN1234567980",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 18,
     "promoCode": "BUY2GET10",
     "paymentStatus": "Paid"
@@ -1431,6 +1459,7 @@
     "transactionId": "TXN1234567990",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 12,
     "promoCode": "SUMMER15",
     "paymentStatus": "Paid"
@@ -1475,6 +1504,7 @@
     "transactionId": "TXN1234568000",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 8,
     "promoCode": "CLEARANCE",
     "paymentStatus": "Paid"
@@ -1519,6 +1549,7 @@
     "transactionId": "TXN1234568010",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 10,
     "promoCode": "FALL2024",
     "paymentStatus": "Paid"
@@ -1563,6 +1594,7 @@
     "transactionId": "TXN1234568020",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 20,
     "promoCode": "WINTER20",
     "paymentStatus": "Paid"
@@ -1607,6 +1639,7 @@
     "transactionId": "TXN1234568030",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 8,
     "promoCode": "SUMMER5",
     "paymentStatus": "Paid"
@@ -1651,6 +1684,7 @@
     "transactionId": "TXN1234568040",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 12,
     "promoCode": "SPRING10",
     "paymentStatus": "Paid"
@@ -1695,6 +1729,7 @@
     "transactionId": "TXN1234568050",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 10,
     "promoCode": "ACCESSORY5",
     "paymentStatus": "Paid"
@@ -1739,6 +1774,7 @@
     "transactionId": "TXN1234568060",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 12,
     "promoCode": "",
     "paymentStatus": "Paid"
@@ -1783,6 +1819,7 @@
     "transactionId": "TXN1234568070",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 15,
     "promoCode": "SUIT2024",
     "paymentStatus": "Paid"
@@ -1827,6 +1864,7 @@
     "transactionId": "TXN1234568080",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 8,
     "promoCode": "WINTER5",
     "paymentStatus": "Paid"
@@ -1871,6 +1909,7 @@
     "transactionId": "TXN1234568090",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 10,
     "promoCode": "ACCESSORY10",
     "paymentStatus": "Paid"
@@ -1915,6 +1954,7 @@
     "transactionId": "TXN1234568100",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 8,
     "promoCode": "SUMMER5",
     "paymentStatus": "Paid"
@@ -1959,6 +1999,7 @@
     "transactionId": "TXN1234568110",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 12,
     "promoCode": "",
     "paymentStatus": "Paid"
@@ -2003,6 +2044,7 @@
     "transactionId": "TXN1234568120",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 15,
     "promoCode": "BOOTS10",
     "paymentStatus": "Paid"
@@ -2047,6 +2089,7 @@
     "transactionId": "TXN1234568130",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 8,
     "promoCode": "SUMMER2024",
     "paymentStatus": "Paid"
@@ -2091,6 +2134,7 @@
     "transactionId": "TXN1234568140",
     "trackingNumber": "",
     "shippingMethod": "Express Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 15,
     "promoCode": "",
     "paymentStatus": "Paid"
@@ -2135,6 +2179,7 @@
     "transactionId": "TXN1234568150",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 10,
     "promoCode": "BACKPACK10",
     "paymentStatus": "Paid"
@@ -2179,6 +2224,7 @@
     "transactionId": "TXN1234568150",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 10,
     "promoCode": "",
     "paymentStatus": "Paid"
@@ -2223,6 +2269,7 @@
     "transactionId": "TXN1234568150",
     "trackingNumber": "",
     "shippingMethod": "Standard Shipping",
+    "shipmentHandlers": ["Pathao", "RedX"],
     "shippingCharge": 10,
     "promoCode": "",
     "paymentStatus": "Paid"

@@ -1,7 +1,7 @@
 "use client";
 import * as XLSX from 'xlsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Checkbox, CheckboxGroup, DateRangePicker } from "@nextui-org/react";
+import { Button, Checkbox, CheckboxGroup, DateRangePicker, Input } from "@nextui-org/react";
 import emailjs from '@emailjs/browser';
 import Loading from '@/app/components/shared/Loading/Loading';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
@@ -24,6 +24,7 @@ import arrivals2 from "../../../public/card-images/arrivals2.svg";
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { parseISO, isBefore, subDays } from "date-fns";
 import { useSearchParams } from 'next/navigation';
+import CustomSwitch from '@/app/components/layout/CustomSwitch';
 
 const initialColumns = ['Order Number', 'Date & Time', 'Customer Name', 'Order Amount', 'Order Status', 'Action', 'Email', 'Phone Number', 'Alternative Phone Number', 'Shipping Zone', 'Shipping Method', 'Payment Status', 'Payment Method', 'Vendor'];
 
@@ -35,11 +36,11 @@ const orderStatusTabs = [
 ];
 
 const OrdersPage = () => {
- const isAdmin = false;
+ const isAdmin = true;
  const searchParams = useSearchParams();
  const promo = searchParams.get('promo');
  const offer = searchParams.get('offer');
- const { isOpen, onOpen, onClose } = useDisclosure();
+ const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
  const [selectedOrder, setSelectedOrder] = useState(null);
  const [orderList, isOrderListPending, refetchOrder] = useOrders();
  const axiosPublic = useAxiosPublic();
@@ -54,6 +55,12 @@ const OrdersPage = () => {
  const [columnOrder, setColumnOrder] = useState(initialColumns);
  const [isColumnModalOpen, setColumnModalOpen] = useState(false);
  const [selectedTab, setSelectedTab] = useState(orderStatusTabs[0]);
+ const [trackingNumber, setTrackingNumber] = useState("");
+ const [orderIdToUpdate, setOrderIdToUpdate] = useState(null); // Store order ID
+ const [orderToUpdate, setOrderToUpdate] = useState({}); // selected order for update
+ const [isTrackingModalOpen, setTrackingModalOpen] = useState(false);
+ const [isToggleOn, setIsToggleOn] = useState(true);
+ const [selectedHandler, setSelectedHandler] = useState(null);
 
  useEffect(() => {
   const savedColumns = JSON.parse(localStorage.getItem('selectedColumns'));
@@ -80,6 +87,25 @@ const OrdersPage = () => {
    setSearchQuery(offer);
   }
  }, [promo, offer]);
+
+ // Handler for toggle change
+ const handleToggleChange = () => {
+  setIsToggleOn(prev => {
+   const newToggleState = !prev;
+   if (!newToggleState) {
+    setTrackingNumber('Not Available'); // Set tracking number to "Not Available" when toggled off
+    setSelectedHandler(null); // Reset selected handler
+   } else {
+    setTrackingNumber(''); // Clear tracking number when toggled on
+   }
+   return newToggleState;
+  });
+ };
+
+ // Handler for selecting a shipment handler
+ const handleSelectHandler = (handler) => {
+  setSelectedHandler(handler);
+ };
 
  const handleColumnChange = (selected) => {
   setSelectedColumns(selected);
@@ -292,84 +318,105 @@ const OrdersPage = () => {
    confirmButtonText: "Yes"
   }).then(async (result) => {
    if (result.isConfirmed) {
-    let updateStatus;
-    if (isUndo) {
-     updateStatus = order?.previousStatus; // Set status to previous status on undo
-     localStorage.removeItem(`undoVisible_${id}`);
+    if (actionType === "shipped") {
+     // Open the modal for tracking number input only for 'shipped'
+     setOrderToUpdate(order);
+     setOrderIdToUpdate(id); // Set the order ID for modal
+     setTrackingModalOpen(true);  // Open the modal
     } else {
-     switch (actionType) {
-      case 'shipped':
-       updateStatus = 'Shipped';
-       break;
-      case 'onHold':
-       updateStatus = 'On Hold';
-       break;
-      case 'delivered':
-       updateStatus = 'Delivered';
-       break;
-      case 'requestedReturn':
-       updateStatus = 'Requested Return';
-       break;
-      case 'refunded':
-       updateStatus = 'Refunded';
-       break;
-      default:
-       updateStatus = 'Processing';
-       break;
-     }
-     localStorage.setItem(`undoVisible_${id}`, true);
-    }
-
-    try {
-     const res = await axiosPublic.patch(`/changeOrderStatus/${id}`, { orderStatus: updateStatus });
-     if (res?.data?.modifiedCount) {
-      if (isUndo) {
-       refetchOrder();
-       toast.custom((t) => (
-        <div
-         className={`${t.visible ? 'animate-enter' : 'animate-leave'
-          } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
-        >
-         <div className="pl-6">
-          <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
-         </div>
-         <div className="flex-1 w-0 p-4">
-          <div className="flex items-start">
-           <div className="ml-3 flex-1">
-            <p className="text-base font-bold text-gray-900">
-             Order Updated!
-            </p>
-            <p className="mt-1 text-sm text-gray-500">
-             Order status reverted successfully.
-            </p>
-           </div>
-          </div>
-         </div>
-         <div className="flex border-l border-gray-200">
-          <button
-           onClick={() => toast.dismiss(t.id)}
-           className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
-          >
-           <RxCross2 />
-          </button>
-         </div>
-        </div>
-       ), {
-        position: "bottom-right",
-        duration: 5000
-       })
-      } else {
-       sendOrderEmail(order, actionType); // Send the email with the appropriate message
-      }
-      refetchOrder(); // Refetch the orders to update the UI
-     } else {
-      toast.error("Failed to update order status");
-     }
-    } catch (error) {
-     toast.error("Error updating order status");
+     // For all other statuses, update order directly
+     updateOrderStatus(order, id, actionType, isUndo); // Keep the existing logic for non-shipped actions
     }
    }
   });
+ };
+
+ // Function to update order status
+ const updateOrderStatus = async (order, id, actionType, isUndo) => {
+  let updateStatus;
+
+  if (isUndo) {
+   updateStatus = order?.previousStatus; // Revert to previous status if undoing
+   localStorage.removeItem(`undoVisible_${id}`);
+  } else {
+   switch (actionType) {
+    case 'shipped':
+     updateStatus = 'Shipped';
+     break;
+    case 'onHold':
+     updateStatus = 'On Hold';
+     break;
+    case 'delivered':
+     updateStatus = 'Delivered';
+     break;
+    case 'requestedReturn':
+     updateStatus = 'Requested Return';
+     break;
+    case 'refunded':
+     updateStatus = 'Refunded';
+     break;
+    default:
+     updateStatus = 'Processing';
+     break;
+   }
+   localStorage.setItem(`undoVisible_${id}`, true);
+  }
+
+  const data = {
+   orderStatus: updateStatus,
+   ...(actionType === "shipped" && trackingNumber ? { trackingNumber } : {}), // Add tracking number if provided for shipped
+   ...(actionType === "shipped" && selectedHandler ? { selectedHandlerName: selectedHandler } : {}) // Add selectedHandler for shipped
+  };
+
+  try {
+   const res = await axiosPublic.patch(`/changeOrderStatus/${id}`, data);
+   if (res?.data?.modifiedCount) {
+    refetchOrder(); // Refresh orders list
+    if (isUndo) {
+     toast.custom((t) => (
+      <div
+       className={`${t.visible ? 'animate-enter' : 'animate-leave'
+        } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+      >
+       <div className="pl-6">
+        <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+       </div>
+       <div className="flex-1 w-0 p-4">
+        <div className="flex items-start">
+         <div className="ml-3 flex-1">
+          <p className="text-base font-bold text-gray-900">
+           Order Updated!
+          </p>
+          <p className="mt-1 text-sm text-gray-500">
+           Order status reverted successfully.
+          </p>
+         </div>
+        </div>
+       </div>
+       <div className="flex border-l border-gray-200">
+        <button
+         onClick={() => toast.dismiss(t.id)}
+         className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+        >
+         <RxCross2 />
+        </button>
+       </div>
+      </div>
+     ), {
+      position: "bottom-right",
+      duration: 5000
+     })
+    }
+    else {
+     sendOrderEmail(order, actionType); // Send notification email
+    }
+    refetchOrder();
+   } else {
+    toast.error("Failed to update order status");
+   }
+  } catch (error) {
+   toast.error("Error updating order status");
+  }
  };
 
  // Adjust this logic to correctly determine the visibility of the Undo button
@@ -1056,7 +1103,7 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
       <thead className="sticky top-0 z-[1] bg-white">
        <tr>
         {columnOrder.map((column) => selectedColumns.includes(column) && (
-         <th key={column} className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">{column}</th>
+         <th key={column} className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">{column}</th>
         ))}
        </tr>
       </thead>
@@ -1081,16 +1128,16 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                </td>
               )}
               {column === 'Date & Time' && (
-               <td key="dateTime" className="text-xs p-3 text-gray-700">{order?.dateTime}</td>
+               <td key="dateTime" className="text-xs p-3 text-gray-700 text-center">{order?.dateTime}</td>
               )}
               {column === 'Customer Name' && (
-               <td key="customerName" className="text-xs p-3 text-gray-700 uppercase">{order?.customerName}</td>
+               <td key="customerName" className="text-xs p-3 text-gray-700 uppercase text-center">{order?.customerName}</td>
               )}
               {column === 'Order Amount' && (
-               <td key="orderAmount" className="text-xs p-3 text-gray-700 pl-1 md:pl-2 lg:pl-4 xl:pl-9">৳ {order?.totalAmount.toFixed(2)}</td>
+               <td key="orderAmount" className="text-xs p-3 text-gray-700 text-right">৳ {order?.totalAmount.toFixed(2)}</td>
               )}
               {column === 'Order Status' && (
-               <td key="orderStatus" className="text-xs p-3 text-yellow-600">{order?.orderStatus}</td>
+               <td key="orderStatus" className="text-xs p-3 text-yellow-600 text-center">{order?.orderStatus}</td>
               )}
               {column === 'Action' && (
                <td className="p-3">
@@ -1172,25 +1219,25 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                <td key="email" className="text-xs p-3 text-gray-700">{order?.email}</td>
               )}
               {column === 'Phone Number' && (
-               <td key="phoneNumber" className="text-xs p-3 text-gray-700">{order?.phoneNumber}</td>
+               <td key="phoneNumber" className="text-xs p-3 text-gray-700 text-center">{order?.phoneNumber}</td>
               )}
               {column === 'Alternative Phone Number' && (
-               <td key="altPhoneNumber" className="text-xs p-3 text-gray-700">{order?.phoneNumber2 === 0 ? '--' : order?.phoneNumber2}</td>
+               <td key="altPhoneNumber" className="text-xs p-3 text-gray-700 text-center">{order?.phoneNumber2 === 0 ? '--' : order?.phoneNumber2}</td>
               )}
               {column === 'Shipping Zone' && (
-               <td key="shippingZone" className="text-xs p-3 text-gray-700">{order?.shippingZone}</td>
+               <td key="shippingZone" className="text-xs p-3 text-gray-700 text-center">{order?.shippingZone}</td>
               )}
               {column === 'Shipping Method' && (
-               <td key="shippingMethod" className="text-xs p-3 text-gray-700">{order?.shippingMethod}</td>
+               <td key="shippingMethod" className="text-xs p-3 text-gray-700 text-center">{order?.shippingMethod}</td>
               )}
               {column === 'Payment Status' && (
-               <td key="paymentStatus" className="text-xs p-3 text-gray-700">{order?.paymentStatus}</td>
+               <td key="paymentStatus" className="text-xs p-3 text-gray-700 text-center">{order?.paymentStatus}</td>
               )}
               {column === 'Payment Method' && (
-               <td key="paymentMethod" className="text-xs p-3 text-gray-700">{order?.paymentMethod}</td>
+               <td key="paymentMethod" className="text-xs p-3 text-gray-700 text-center">{order?.paymentMethod}</td>
               )}
               {column === 'Vendor' && (
-               <td key="vendor" className="text-xs p-3 text-gray-700">{order?.vendor}</td>
+               <td key="vendor" className="text-xs p-3 text-gray-700 text-center">{order?.vendor}</td>
               )}
              </>
             )
@@ -1329,6 +1376,72 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
       </ModalContent>
      </Modal>
     )}
+
+    {/* Modal of tracking number */}
+    <Modal isOpen={isTrackingModalOpen} onOpenChange={() => setTrackingModalOpen(false)}>
+     <ModalContent>
+      <ModalHeader className="flex flex-col gap-1">Select Shipment Handler</ModalHeader>
+      <ModalBody>
+       <CustomSwitch
+        checked={isToggleOn}
+        onChange={handleToggleChange}
+       />
+
+       <div className='flex flex-wrap items-center justify-center gap-2'>
+        {isToggleOn ? (
+         orderToUpdate?.shipmentHandlers?.map((handler, index) => (
+          <div
+           key={index}
+           className={`flex items-center gap-2 border rounded-lg px-6 py-1 cursor-pointer ${selectedHandler === handler ? 'border-[#ffddc2] bg-[#ffddc2]' : 'bg-white'
+            }`}
+           onClick={() => handleSelectHandler(handler)}
+          >
+           {handler}
+          </div>
+         ))
+        ) : (
+         <></>
+        )}
+       </div>
+
+       <Input
+        clearable
+        required={isToggleOn}  // Set required only when toggle is ON
+        bordered
+        fullWidth
+        size="lg"
+        label="Tracking Number *"
+        placeholder="Enter tracking number"
+        value={trackingNumber}
+        onChange={(e) => setTrackingNumber(e.target.value)}
+        disabled={!isToggleOn}  // Disable input when toggle is off
+       />
+
+      </ModalBody>
+      <ModalFooter>
+       <Button
+        color="primary"
+        onPress={async () => {
+         if (isToggleOn) {
+          // Ensure required fields are filled when toggle is on
+          if (!trackingNumber || !selectedHandler) {
+           toast.error("Please select a handler and enter a tracking number.");
+           return;  // Stop execution if validation fails
+          }
+         }
+
+         // Update status with tracking number and selected handler
+         await updateOrderStatus(orderToUpdate, orderIdToUpdate, "shipped", false, trackingNumber, selectedHandler);
+         setTrackingModalOpen(false); // Close modal after submission
+         setTrackingNumber(''); // Clear the input field
+         setSelectedHandler(null); // Clear the selected handler
+        }}
+       >
+        Confirm
+       </Button>
+      </ModalFooter>
+     </ModalContent>
+    </Modal>
 
     {/* Pagination Button */}
     <div className="flex flex-col mt-2 md:flex-row gap-4 justify-center items-center relative">
