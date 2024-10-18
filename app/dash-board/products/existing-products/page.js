@@ -105,14 +105,14 @@ ${activeTab === 'category' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w
 
           <button
             className={`relative py-1 transition-all duration-300
-${activeTab === 'season' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
+${activeTab === 'collection' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
 after:absolute after:left-0 after:right-0 after:bottom-0 
 after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300
-${activeTab === 'season' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
+${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
 `}
-            onClick={() => setActiveTab('season')}
+            onClick={() => setActiveTab('collection')}
           >
-            Season
+            Collection
           </button>
 
         </div>
@@ -158,8 +158,8 @@ ${activeTab === 'season' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
         </div>
       </div>}
 
-      {activeTab === "season" && <div>
-        <h3 className='w-full font-semibold text-xl lg:text-2xl max-w-screen-2xl mx-auto px-6 pb-6'>Look at Our Seasons</h3>
+      {activeTab === "collection" && <div>
+        <h3 className='w-full font-semibold text-xl lg:text-2xl max-w-screen-2xl mx-auto px-6 pb-6'>Look at Our Seasonal Collection</h3>
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 max-w-screen-2xl mx-auto px-6">
           {seasonList?.map((season, index) => {
             // Filter products that match the current season

@@ -133,6 +133,7 @@ const SecondStepOfAddProduct = () => {
     const storedVendors = JSON.parse(localStorage.getItem('vendors') || '[]');
     const storedTags = JSON.parse(localStorage.getItem('tags') || '[]');
     const storedProductId = localStorage.getItem('productId');
+    const storedSizeGuideImageUrl = localStorage.getItem('sizeGuideImageUrl');
 
     const formattedData = productVariants?.map((variant, index) => ({
       color: variant.color,
@@ -172,6 +173,7 @@ const SecondStepOfAddProduct = () => {
       productVariants: formattedData,
       season: storedSeasons,
       status: "draft",
+      sizeGuideImageUrl: storedSizeGuideImageUrl,
     };
 
     try {
@@ -223,6 +225,7 @@ const SecondStepOfAddProduct = () => {
         localStorage.removeItem('sizeFit');
         localStorage.removeItem('category');
         localStorage.removeItem('productId');
+        localStorage.removeItem('sizeGuideImageUrl');
         JSON.parse(localStorage.removeItem('season') || '[]');
         JSON.parse(localStorage.removeItem('subCategories') || '[]');
         JSON.parse(localStorage.removeItem('groupOfSizes') || '[]');

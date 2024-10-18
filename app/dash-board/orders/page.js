@@ -88,7 +88,6 @@ const OrdersPage = () => {
   }
  }, [promo, offer]);
 
- // Handler for toggle change
  const handleToggleChange = () => {
   setIsToggleOn(prev => {
    const newToggleState = !prev;
@@ -1266,8 +1265,8 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
          <p className='text-xs md:text-base'>Payment Method: {selectedOrder?.paymentMethod}</p>
          <p className='text-xs md:text-base'>Transaction Id: {selectedOrder?.transactionId}</p>
         </div>
-        <div className='flex items-center justify-between pr-10'>
-         <p className='text-xs md:text-base'>Shipping Method: {selectedOrder?.shippingMethod}</p>
+        <div className='flex flex-wrap items-center justify-between pr-10'>
+         <p className='text-xs md:text-base'>Shipment Handler: {selectedOrder?.selectedHandlerName === "" ? '--' : selectedOrder?.selectedHandlerName}</p>
          <p className='text-xs md:text-base'>Tracking Number: {selectedOrder?.trackingNumber === "" ? '--' : selectedOrder?.trackingNumber}</p>
         </div>
 
@@ -1378,63 +1377,65 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
     )}
 
     {/* Modal of tracking number */}
-    <Modal isOpen={isTrackingModalOpen} onOpenChange={() => setTrackingModalOpen(false)}>
-     <ModalContent>
+    <Modal size='lg' isOpen={isTrackingModalOpen} onOpenChange={() => setTrackingModalOpen(false)}>
+     <ModalContent className='px-2'>
       <ModalHeader className="flex flex-col gap-1">Select Shipment Handler</ModalHeader>
       <ModalBody>
-       <CustomSwitch
-        checked={isToggleOn}
-        onChange={handleToggleChange}
-       />
-
        <div className='flex flex-wrap items-center justify-center gap-2'>
-        {isToggleOn ? (
-         orderToUpdate?.shipmentHandlers?.map((handler, index) => (
-          <div
-           key={index}
-           className={`flex items-center gap-2 border rounded-lg px-6 py-1 cursor-pointer ${selectedHandler === handler ? 'border-[#ffddc2] bg-[#ffddc2]' : 'bg-white'
-            }`}
-           onClick={() => handleSelectHandler(handler)}
-          >
-           {handler}
-          </div>
-         ))
-        ) : (
-         <></>
-        )}
+        {orderToUpdate?.shipmentHandlers?.map((handler, index) => (
+         <div
+          key={index}
+          className={`flex items-center gap-2 border-2 rounded-lg font-semibold px-6 py-2 cursor-pointer ${selectedHandler === handler ? 'border-[#ffddc2] bg-[#ffddc2]' : 'bg-white'
+           }`}
+          onClick={() => handleSelectHandler(handler)}
+         >
+          {handler}
+         </div>
+        ))}
        </div>
 
-       <Input
-        clearable
-        required={isToggleOn}  // Set required only when toggle is ON
-        bordered
-        fullWidth
-        size="lg"
-        label="Tracking Number *"
-        placeholder="Enter tracking number"
-        value={trackingNumber}
-        onChange={(e) => setTrackingNumber(e.target.value)}
-        disabled={!isToggleOn}  // Disable input when toggle is off
-       />
+       <div className='flex justify-between items-center gap-2'>
+        <Input
+         clearable
+         required={isToggleOn} // Tracking number is required only when toggle is ON
+         bordered
+         fullWidth
+         size="lg"
+         label="Tracking Number *"
+         placeholder="Enter tracking number"
+         value={trackingNumber.toUpperCase()}
+         onChange={(e) => setTrackingNumber(e.target.value)}
+         disabled={!isToggleOn} // Disable input when toggle is off
+        />
+        <CustomSwitch
+         checked={isToggleOn}
+         onChange={handleToggleChange}
+        />
+       </div>
 
       </ModalBody>
       <ModalFooter>
        <Button
         color="primary"
         onPress={async () => {
-         if (isToggleOn) {
-          // Ensure required fields are filled when toggle is on
-          if (!trackingNumber || !selectedHandler) {
-           toast.error("Please select a handler and enter a tracking number.");
-           return;  // Stop execution if validation fails
-          }
+         // Check if handler is selected, regardless of toggle state
+         if (!selectedHandler) {
+          toast.error("Please select a shipment handler.");
+          return; // Stop execution if no handler is selected
          }
 
-         // Update status with tracking number and selected handler
+         // When toggle is ON, ensure tracking number is entered
+         if (isToggleOn && !trackingNumber) {
+          toast.error("Please enter a tracking number.");
+          return; // Stop execution if no tracking number is provided
+         }
+
+         // Update order status with tracking number and selected handler
          await updateOrderStatus(orderToUpdate, orderIdToUpdate, "shipped", false, trackingNumber, selectedHandler);
          setTrackingModalOpen(false); // Close modal after submission
-         setTrackingNumber(''); // Clear the input field
+         setTrackingNumber(''); // Clear input field
          setSelectedHandler(null); // Clear the selected handler
+         setIsToggleOn(true); // Reset toggle to true
         }}
        >
         Confirm

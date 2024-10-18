@@ -473,6 +473,39 @@ const EditProductPage = () => {
     }
   };
 
+  const getSizeImageForGroupSelected = (groupSelected, categoryList) => {
+    let selectedImageUrl = '';
+
+    // Check if categoryList is an array
+    if (!Array.isArray(categoryList)) {
+      console.error("categoryList is not an array or is undefined:", categoryList);
+      return selectedImageUrl; // Return an empty string or handle the case as needed
+    }
+
+    // Ensure groupSelected is an array or convert it to an array if it's a single string
+    const sizesToCheck = Array.isArray(groupSelected) ? groupSelected : [groupSelected];
+
+    // Loop through each category in the categoryList
+    for (const category of categoryList) {
+      // Check if groupSelected is present in the sizes array of the category
+      for (const size of sizesToCheck) {
+        if (category.sizeImages && category.sizeImages[size]) {
+          selectedImageUrl = category.sizeImages[size]; // Get the imageUrl for the selected size
+          break; // Break the loop if we found the matching size
+        }
+      }
+
+      // If we found the imageUrl, stop the outer loop as well
+      if (selectedImageUrl) {
+        break;
+      }
+    }
+
+    return selectedImageUrl; // Return the selected image URL if found
+  };
+
+  const selectedImageUrl = getSizeImageForGroupSelected(groupSelected, categoryList);
+
   const onSubmit = async (data) => {
     try {
       if (uploadedImageUrls.length === 0) {
@@ -596,6 +629,7 @@ const EditProductPage = () => {
         shippingDetails: selectedShipmentHandler,
         status: data?.status,
         season: selectedSeasons,
+        sizeGuideImageUrl: selectedImageUrl,
       }
 
       const res = await axiosPublic.put(`/editProductDetails/${id}`, updatedProductData);
@@ -931,14 +965,14 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
 
                   <div className="w-full mx-auto" ref={dropdownRef}>
                     {/* Search Box */}
-                    <label htmlFor='seasons' className='flex justify-start font-medium text-[#9F5216] pb-2'>Select Seasons *</label>
+                    <label htmlFor='seasons' className='flex justify-start font-medium text-[#9F5216] pb-2'>Select Collection *</label>
 
                     <input
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       onClick={handleInputClick} // Toggle dropdown on input click
-                      placeholder="Search & Select by Seasons"
+                      placeholder="Search & Select by Seasonal Collection"
                       className="w-full p-2 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md mb-2"
                     />
 
@@ -963,7 +997,7 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                             </div>
                           ))
                         ) : (
-                          <p className="text-gray-500">No seasons found</p>
+                          <p className="text-gray-500">No collection found</p>
                         )}
                       </div>
                     )}
@@ -971,7 +1005,7 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                     {/* Selected categories display */}
                     {selectedSeasons?.length > 0 && (
                       <div className="border p-2 rounded mt-2">
-                        <h4 className="text-sm font-semibold mb-2">Selected Seasons:</h4>
+                        <h4 className="text-sm font-semibold mb-2">Selected Collection:</h4>
                         <ul className="space-y-2">
                           {selectedSeasons?.map((season, index) => (
                             <li

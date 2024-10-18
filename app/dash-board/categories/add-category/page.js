@@ -42,18 +42,38 @@ const AddCategory = () => {
   const [selectedSubCategories, setSelectedSubCategories] = useState([]);
   const [fetchedSubCategories, setFetchedSubCategories] = useState([]);
   const [showSubCategorySuggestions, setShowSubCategorySuggestions] = useState(false);
+  const [sizeImages, setSizeImages] = useState({});
 
   const inputRef = useRef(null);
   const suggestionsRef = useRef(null);
   const inputRefCategory = useRef(null);
   const suggestionsRefCategory = useRef(null);
 
-  // Fetch all unique sizes from categoryList
   useEffect(() => {
-    const allSizes = Array.from(new Set(categoryList?.flatMap(category => category.sizes)));
+    const allSizes = [];
+    const images = {};
+    const allSubCategories = [];
+
+    categoryList?.forEach(category => {
+      // Collect unique sizes
+      category.sizes.forEach(size => {
+        if (!allSizes.includes(size)) {
+          allSizes.push(size);
+        }
+      });
+      // Collect images
+      Object.assign(images, category.sizeImages);
+      // Collect subcategories
+      category.subCategories.forEach(sub => {
+        if (!allSubCategories.includes(sub.label)) {
+          allSubCategories.push(sub.label);
+        }
+      });
+    });
+
     setFetchedSizes(allSizes);
-    const allSubCategories = Array.from(new Set(categoryList?.flatMap(category => category.subCategories.map(sub => sub.label))));
-    setFetchedSubCategories(allSubCategories);
+    setSizeImages(images);
+    setFetchedSubCategories(allSubCategories); // Set the state with fetched subcategories
   }, [categoryList]);
 
   // Close suggestions if clicking outside the input or suggestions
@@ -117,8 +137,9 @@ const AddCategory = () => {
 
   const uploadImageToImgbb = async (image) => {
     const formData = new FormData();
-    formData.append('image', image.file);
-    formData.append('key', apiKey);
+
+    formData.append('image', image);  // Pass the file directly
+    formData.append('key', apiKey);   // Use your API key for Imgbb
 
     try {
       const response = await axiosPublic.post(apiURL, formData, {
@@ -126,14 +147,17 @@ const AddCategory = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
+
       if (response.data && response.data.data && response.data.data.url) {
-        return response.data.data.url; // Return the single image URL
+        return response.data.data.url; // Return the image URL
       } else {
         toast.error('Failed to get image URL from response.');
       }
     } catch (error) {
       toast.error(`Upload failed: ${error.response?.data?.error?.message || error.message}`);
+      console.error("Upload error:", error);
     }
+
     return null;
   };
 
@@ -225,6 +249,27 @@ const AddCategory = () => {
     setSelectedSizes(prev => prev.filter((_, i) => i !== indexToRemove));
   };
 
+  const handleImageChangeForSizeRange = (size, event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSizeImages(prev => ({
+        ...prev,
+        [size]: {
+          src: URL.createObjectURL(file), // for preview
+          file, // for upload
+        }
+      }));
+    }
+  };
+
+  const handleImageRemoveForSizeRange = (size) => {
+    setSizeImages(prev => {
+      const updatedImages = { ...prev };
+      delete updatedImages[size]; // remove the image for the specific size
+      return updatedImages;
+    });
+  };
+
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     const { category } = data;
@@ -234,32 +279,72 @@ const AddCategory = () => {
       imageUrl = await uploadImageToImgbb(image);
       if (!imageUrl) {
         toast.error('Image upload failed, cannot proceed.');
+        setIsSubmitting(false); // Reset submit state
         return;
       }
     } else if (selectedDefaultImage) {
       imageUrl = selectedDefaultImage; // Use selected default image if no image is uploaded
     } else {
       toast.error('You must select or upload an image.');
-      setIsSubmitting(false);
+      setIsSubmitting(false); // Reset submit state
       return;
     }
 
-    // Validate sizes
+    const updatedSizeImages = {};
+
+    // Validate and handle size guide images
+    for (const size of selectedSizes) {
+      const imageData = sizeImages[size];
+
+      if (!imageData) {
+        // If no size guide image exists for the selected size, show an error
+        toast.error(`Size guide image is required for size ${size}.`);
+        setIsSubmitting(false); // Reset submit state
+        return;
+      }
+
+      if (typeof imageData === 'string') {
+        // Image is already a URL, just use it
+        updatedSizeImages[size] = imageData;
+      } else if (imageData?.file) {
+        // Image is a new file, upload it
+        try {
+          const uploadedImageUrl = await uploadImageToImgbb(imageData.file);
+
+          if (!uploadedImageUrl) {
+            toast.error(`Image upload failed for size ${size}.`);
+            setIsSubmitting(false);
+            return;
+          }
+
+          updatedSizeImages[size] = uploadedImageUrl;  // Save the new image URL
+        } catch (error) {
+          console.error(`Error uploading image for size ${size}:`, error);
+          toast.error(`Image upload failed for size ${size}, cannot proceed.`);
+          setIsSubmitting(false);
+          return;
+        }
+      } else {
+        console.warn(`No file to upload for size ${size}`);
+      }
+    }
+
+    // Validate selected sizes
     if (selectedSizes.length === 0) {
       toast.error('You must select at least one size.');
-      setIsSubmitting(false);
+      setIsSubmitting(false); // Reset submit state
       return;
     }
 
     // Validate subCategories (if required)
     if (selectedSubCategories.length === 0) {
       toast.error('You must select at least one sub-category.');
-      setIsSubmitting(false);
+      setIsSubmitting(false); // Reset submit state
       return;
     }
 
     const formattedSubCategories = selectedSubCategories.map((subCategory) => ({
-      key: subCategory, // Assuming subCategory is a string
+      key: subCategory,
       label: subCategory,
     }));
 
@@ -267,10 +352,12 @@ const AddCategory = () => {
       key: category,
       label: category,
       sizes: selectedSizes,
+      sizeImages: updatedSizeImages, // Updated size images
       subCategories: formattedSubCategories,
-      imageUrl
+      imageUrl,
     };
 
+    // Submit category data
     try {
       const response = await axiosPublic.post('/addCategory', categoryData);
 
@@ -307,15 +394,17 @@ const AddCategory = () => {
         ), {
           position: "bottom-right",
           duration: 5000
-        })
-        router.push("/dash-board/categories")
+        });
+
+        // Redirect after successful submission
+        router.push("/dash-board/categories");
       } else {
         throw new Error('Failed to add category');
       }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to add category or sizes. Please try again.');
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false); // Reset submit state at the end of submission
     }
   };
 
@@ -373,15 +462,25 @@ const AddCategory = () => {
               </div>
 
               {/* Display filtered size suggestions with a dropdown-like design */}
-              {showSuggestions && filteredSizes?.length > 0 && (
+              {showSuggestions && filteredSizes.length > 0 && (
                 <ul ref={suggestionsRef} className="w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto z-[9999]">
                   {filteredSizes.map((size, i) => (
                     <li
                       key={i}
-                      className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors duration-150"
+                      className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors duration-150 flex items-center gap-2"
                       onClick={() => handleSizeSelect(size)}
                     >
-                      {size}
+                      {/* Show the image next to the size */}
+                      {sizeImages[size] && (
+                        <Image
+                          src={sizeImages[size]}
+                          alt={`${size} size guide`}
+                          height={3000} // Adjust size as needed
+                          width={3000} // Adjust size as needed
+                          className="rounded-md h-12 w-12 object-contain"
+                        />
+                      )}
+                      <span>{size}</span>
                     </li>
                   ))}
                 </ul>
@@ -391,17 +490,70 @@ const AddCategory = () => {
             {/* Display selected sizes with a more polished look */}
             <div className="selected-sizes flex flex-wrap gap-3">
               {selectedSizes?.map((size, index) => (
-                <div key={index} className="flex items-center bg-gray-100 border border-gray-300 rounded-full py-1 px-3 text-sm text-gray-700">
-                  <span>{size}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleSizeRemove(index)}
-                    className="ml-2 text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-150"
-                  >
-                    <RxCross2 size={19} />
-                  </button>
+                <div key={index} className="flex flex-col items-start gap-2 bg-gray-100 border border-gray-300 rounded-md p-3">
+                  <div className="flex items-center justify-between w-full gap-2">
+                    <span className="text-sm font-bold text-gray-700">{size}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleSizeRemove(index)}
+                      className="ml-2 text-red-600 hover:text-red-900 focus:outline-none transition-colors duration-300 hover:scale-105"
+                    >
+                      <RxCross2 size={22} />
+                    </button>
+                  </div>
+
+                  {/* Image upload input - Only show this if there is no image for the selected size */}
+                  {!sizeImages[size] || (!sizeImages[size]?.src && typeof sizeImages[size] !== 'string') ? (
+                    <>
+                      {/* Image upload input field */}
+                      <input
+                        id={`imageUpload-${size}`}
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={(e) => handleImageChangeForSizeRange(size, e)} // Handle image upload
+                      />
+                      <label
+                        htmlFor={`imageUpload-${size}`}
+                        className="mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer"
+                      >
+                        <MdOutlineFileUpload size={60} />
+                        <div className="space-y-1.5 text-center">
+                          <h5 className="whitespace-nowrap text-lg font-medium tracking-tight">
+                            Upload Size Guide Image
+                          </h5>
+                          <p className="text-sm text-gray-500">
+                            Photo should be in PNG, JPEG, or JPG format
+                          </p>
+                        </div>
+                      </label>
+                    </>
+                  ) : (
+                    <div className="relative">
+                      {/* Show the uploaded size guide image */}
+                      <Image
+                        src={typeof sizeImages[size] === 'string' ? sizeImages[size] : sizeImages[size].src}
+                        alt={`${size} size guide`}
+                        height={2000} // Adjust height
+                        width={2000} // Adjust width
+                        className="h-44 w-44 rounded-lg object-contain"
+                      />
+
+                      {/* Show "X" icon only for newly uploaded images */}
+                      {!sizeImages[size] || typeof sizeImages[size] !== 'string' ? (
+                        <button
+                          onClick={() => handleImageRemoveForSizeRange(size)} // Remove the image
+                          className="absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold"
+                        >
+                          <RxCross2 size={24} />
+                        </button>
+                      ) : null}
+                    </div>
+                  )}
+
                 </div>
               ))}
+
             </div>
 
           </div>

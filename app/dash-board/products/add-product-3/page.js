@@ -88,6 +88,7 @@ const ThirdStepOfAddProduct = () => {
     const storedTags = JSON.parse(localStorage.getItem('tags') || '[]');
     const storedVariants = JSON.parse(localStorage.getItem('productVariants') || '[]');
     const storedProductId = localStorage.getItem('productId');
+    const storedSizeGuideImageUrl = localStorage.getItem('sizeGuideImageUrl');
 
     const wholeProductData = {
       publishDate: storedFormattedDate,
@@ -113,7 +114,8 @@ const ThirdStepOfAddProduct = () => {
       productVariants: storedVariants,
       shippingDetails: selectedShipmentHandler,
       productId: storedProductId,
-      status: "active"
+      status: "active",
+      sizeGuideImageUrl: storedSizeGuideImageUrl,
     }
 
     try {
@@ -176,6 +178,7 @@ const ThirdStepOfAddProduct = () => {
         JSON.parse(localStorage.removeItem('productVariants') || '[]');
         localStorage.removeItem('formattedDate');
         localStorage.removeItem('productId');
+        localStorage.removeItem('sizeGuideImageUrl');
         router.push("/dash-board/products/existing-products");
       }
     } catch (error) {

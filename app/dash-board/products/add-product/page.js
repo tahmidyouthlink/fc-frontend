@@ -469,6 +469,39 @@ const FirstStepOfAddProduct = () => {
     return productID;
   };
 
+  const getSizeImageForGroupSelected = (groupSelected, categoryList) => {
+    let selectedImageUrl = '';
+
+    // Check if categoryList is an array
+    if (!Array.isArray(categoryList)) {
+      console.error("categoryList is not an array or is undefined:", categoryList);
+      return selectedImageUrl; // Return an empty string or handle the case as needed
+    }
+
+    // Ensure groupSelected is an array or convert it to an array if it's a single string
+    const sizesToCheck = Array.isArray(groupSelected) ? groupSelected : [groupSelected];
+
+    // Loop through each category in the categoryList
+    for (const category of categoryList) {
+      // Check if groupSelected is present in the sizes array of the category
+      for (const size of sizesToCheck) {
+        if (category.sizeImages && category.sizeImages[size]) {
+          selectedImageUrl = category.sizeImages[size]; // Get the imageUrl for the selected size
+          break; // Break the loop if we found the matching size
+        }
+      }
+
+      // If we found the imageUrl, stop the outer loop as well
+      if (selectedImageUrl) {
+        break;
+      }
+    }
+
+    return selectedImageUrl; // Return the selected image URL if found
+  };
+
+  const selectedImageUrl = getSizeImageForGroupSelected(groupSelected, categoryList);
+
   const onSubmit = async (data) => {
     try {
       if (uploadedImageUrls.length === 0) {
@@ -509,6 +542,7 @@ const FirstStepOfAddProduct = () => {
       localStorage.setItem('regularPrice', parseFloat(data.regularPrice) || 0);
       localStorage.setItem('discountType', discountType);
       localStorage.setItem('discountValue', parseFloat(data.discountValue || 0));
+      localStorage.setItem('sizeGuideImageUrl', selectedImageUrl);
 
       localStorage.setItem('season', JSON.stringify(selectedSeasons));
       localStorage.setItem('subCategories', JSON.stringify(selectedSubCategories));
@@ -565,6 +599,7 @@ const FirstStepOfAddProduct = () => {
       allSizes: groupSelected2,
       productId,
       season: selectedSeasons,
+      sizeGuideImageUrl: selectedImageUrl,
       status: "draft",
     };
 
@@ -616,6 +651,7 @@ const FirstStepOfAddProduct = () => {
         localStorage.removeItem('sizeFit');
         localStorage.removeItem('category');
         localStorage.removeItem('productId');
+        localStorage.removeItem('sizeGuideImageUrl');
         JSON.parse(localStorage.removeItem('season') || '[]');
         JSON.parse(localStorage.removeItem('subCategories') || '[]');
         JSON.parse(localStorage.removeItem('groupOfSizes') || '[]');
@@ -904,14 +940,14 @@ const FirstStepOfAddProduct = () => {
 
               <div className="w-full mx-auto" ref={dropdownRef}>
                 {/* Search Box */}
-                <label htmlFor='seasons' className='flex justify-start font-medium text-[#9F5216] pb-2'>Select Seasons *</label>
+                <label htmlFor='seasons' className='flex justify-start font-medium text-[#9F5216] pb-2'>Select Collection *</label>
 
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onClick={handleInputClick} // Toggle dropdown on input click
-                  placeholder="Search & Select by Seasons"
+                  placeholder="Search & Select by Seasonal Collection"
                   className="w-full p-2 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md mb-2"
                 />
 
@@ -936,7 +972,7 @@ const FirstStepOfAddProduct = () => {
                         </div>
                       ))
                     ) : (
-                      <p className="text-gray-500">No seasons found</p>
+                      <p className="text-gray-500">No collection found</p>
                     )}
                   </div>
                 )}
@@ -944,7 +980,7 @@ const FirstStepOfAddProduct = () => {
                 {/* Selected categories display */}
                 {selectedSeasons?.length > 0 && (
                   <div className="border p-2 rounded mt-2">
-                    <h4 className="text-sm font-semibold mb-2">Selected Seasons:</h4>
+                    <h4 className="text-sm font-semibold mb-2">Selected Collection:</h4>
                     <ul className="space-y-2">
                       {selectedSeasons?.map((season, index) => (
                         <li
