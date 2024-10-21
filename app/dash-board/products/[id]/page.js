@@ -433,13 +433,29 @@ const EditProductPage = () => {
 
   const onImageClick = (variantIndex, imgUrl) => {
     setProductVariants(prevVariants =>
-      prevVariants.map((variant, index) =>
-        index === variantIndex ? { ...variant, imageUrl: imgUrl } : variant
-      )
+      prevVariants.map((variant, index) => {
+        if (index === variantIndex) {
+          const isSelected = variant.imageUrls?.includes(imgUrl);
+          let updatedImageUrls;
+
+          if (isSelected) {
+            // Remove the image if already selected, but ensure at least one image remains
+            updatedImageUrls = variant.imageUrls?.length > 1
+              ? variant.imageUrls.filter(url => url !== imgUrl)
+              : variant.imageUrls; // Do not allow deselecting the last image
+          } else {
+            // Add the image if not selected
+            updatedImageUrls = [...(variant.imageUrls || []), imgUrl];
+          }
+
+          return { ...variant, imageUrls: updatedImageUrls };
+        }
+        return variant;
+      })
     );
 
-    // Update form value for imageUrl
-    setValue(`imageUrl-${variantIndex}`, imgUrl);
+    // Update form value for imageUrls
+    setValue(`imageUrls-${variantIndex}`, productVariants[variantIndex]?.imageUrls);
   };
 
   const handleColorChange = (newValue) => {
@@ -589,14 +605,14 @@ const EditProductPage = () => {
         color: variant.color,
         size: variant.size,
         sku: data[`sku-${index}`] ? parseFloat(data[`sku-${index}`]) : null,
-        imageUrl: data[`imageUrl-${index}`] || ""
+        imageUrls: variant.imageUrls || []
       }));
 
       // Check if any variant is missing an image URL
-      const missingImage = formattedData.some(variant => variant.imageUrl === "");
+      const missingImage = formattedData?.some(variant => variant?.imageUrls?.length === 0);
       if (missingImage) {
-        toast.error("Please select an image for each variant.");
-        return; // Stop submission if any image is missing
+        toast.error("Please select at least one image for each variant.");
+        return;
       }
 
       // Check if any variant is missing an image URL
@@ -1265,10 +1281,10 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                       {uploadedImageUrls.map((url, imgIndex) => (
                         <div
                           key={imgIndex}
-                          className={`image-container ${variant.imageUrl === url ? 'selected' : ''}`}
+                          className={`image-container ${variant.imageUrls?.includes(url) ? 'selected' : ''}`}
                           onClick={() => onImageClick(index, url)}
                         >
-                          <Image src={url} alt={`image-${imgIndex}`} width={3000} height={3000} className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain' />
+                          <Image src={url} alt={`image-${imgIndex}`} width={3000} height={3000} className="w-full min-h-[200px] max-h-[200px] rounded-md object-contain" />
                         </div>
                       ))}
                     </div>
