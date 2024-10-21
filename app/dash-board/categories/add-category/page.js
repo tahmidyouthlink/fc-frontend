@@ -539,15 +539,13 @@ const AddCategory = () => {
                         className="h-44 w-44 rounded-lg object-contain"
                       />
 
-                      {/* Show "X" icon only for newly uploaded images */}
-                      {!sizeImages[size] || typeof sizeImages[size] !== 'string' ? (
-                        <button
-                          onClick={() => handleImageRemoveForSizeRange(size)} // Remove the image
-                          className="absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold"
-                        >
-                          <RxCross2 size={24} />
-                        </button>
-                      ) : null}
+                      {/* Show "X" icon to allow removal of the image */}
+                      <button
+                        onClick={() => handleImageRemoveForSizeRange(size)} // Remove the image
+                        className="absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold"
+                      >
+                        <RxCross2 size={24} />
+                      </button>
                     </div>
                   )}
 

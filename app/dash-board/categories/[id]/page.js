@@ -38,6 +38,8 @@ export default function EditCategory() {
   const [fetchedSubCategories, setFetchedSubCategories] = useState([]);
   const [showSubCategorySuggestions, setShowSubCategorySuggestions] = useState(false);
   const [sizeImages, setSizeImages] = useState({});
+  const [sizeImagesForSuggestion, setSizeImagesForSuggestion] = useState({});
+  const [categoryKey, setCategoryKey] = useState("");
 
   const { register, handleSubmit, control, setValue, formState: { errors, isSubmitting } } = useForm({
     defaultValues: { category: '', sizes: [{ size: '' }], subCategories: [{ subCategory: '' }] }
@@ -47,6 +49,7 @@ export default function EditCategory() {
   useEffect(() => {
     const allSizes = [];
     const images = {};
+    const imagesForSuggestion = {};
     const allSubCategories = [];
 
     categoryList?.forEach(category => {
@@ -56,8 +59,10 @@ export default function EditCategory() {
           allSizes.push(size);
         }
       });
+
       // Collect images
-      Object.assign(images, category.sizeImages);
+      images[category.label] = category.sizeImages || {};
+      Object.assign(imagesForSuggestion, category.sizeImages);
       // Collect subcategories
       category.subCategories.forEach(sub => {
         if (!allSubCategories.includes(sub.label)) {
@@ -68,6 +73,7 @@ export default function EditCategory() {
 
     setFetchedSizes(allSizes);
     setSizeImages(images);
+    setSizeImagesForSuggestion(imagesForSuggestion);
     setFetchedSubCategories(allSubCategories); // Set the state with fetched subcategories
   }, [categoryList]);
 
@@ -77,6 +83,7 @@ export default function EditCategory() {
         const res = await axiosPublic.get(`/allCategories/${params.id}`);
         const category = res.data;
         setValue('category', category?.label);
+        setCategoryKey(category?.key);
         setSelectedSizes(category?.sizes);
         setSelectedSubCategories(category?.subCategories.map(sub => sub.label));
         setImage(category?.imageUrl || null);
@@ -267,10 +274,13 @@ export default function EditCategory() {
     if (file) {
       setSizeImages(prev => ({
         ...prev,
-        [size]: {
-          src: URL.createObjectURL(file), // for preview
-          file, // for upload
-        }
+        [categoryKey]: {
+          ...prev[categoryKey],
+          [size]: {
+            src: URL.createObjectURL(file), // for preview
+            file, // for upload
+          },
+        },
       }));
     }
   };
@@ -278,7 +288,13 @@ export default function EditCategory() {
   const handleImageRemoveForSizeRange = (size) => {
     setSizeImages(prev => {
       const updatedImages = { ...prev };
-      delete updatedImages[size]; // remove the image for the specific size
+      if (updatedImages[categoryKey]) {
+        delete updatedImages[categoryKey][size]; // remove the image for the specific size
+        // Optionally clean up if there are no images left for the category
+        if (Object.keys(updatedImages[categoryKey]).length === 0) {
+          delete updatedImages[categoryKey]; // Remove the category key if empty
+        }
+      }
       return updatedImages;
     });
   };
@@ -305,7 +321,7 @@ export default function EditCategory() {
 
       // Validate and handle size guide images
       for (const size of selectedSizes) {
-        const imageData = sizeImages[size];
+        const imageData = sizeImages[categoryKey]?.[size];
 
         if (!imageData) {
           // If no size guide image exists for the selected size, show an error
@@ -471,9 +487,9 @@ export default function EditCategory() {
                     onClick={() => handleSizeSelect(size)}
                   >
                     {/* Show the image next to the size */}
-                    {sizeImages[size] && (
+                    {sizeImagesForSuggestion[size] && (
                       <Image
-                        src={sizeImages[size]}
+                        src={sizeImagesForSuggestion[size]}
                         alt={`${size} size guide`}
                         height={3000} // Adjust size as needed
                         width={3000} // Adjust size as needed
@@ -503,7 +519,7 @@ export default function EditCategory() {
                 </div>
 
                 {/* Image upload input - Only show this if there is no image for the selected size */}
-                {!sizeImages[size] || (!sizeImages[size]?.src && typeof sizeImages[size] !== 'string') ? (
+                {!sizeImages[categoryKey]?.[size] || (!sizeImages[categoryKey][size]?.src && typeof sizeImages[categoryKey][size] !== 'string') ? (
                   <>
                     {/* Image upload input field */}
                     <input
@@ -532,28 +548,25 @@ export default function EditCategory() {
                   <div className="relative">
                     {/* Show the uploaded size guide image */}
                     <Image
-                      src={typeof sizeImages[size] === 'string' ? sizeImages[size] : sizeImages[size].src}
+                      src={typeof sizeImages[categoryKey][size] === 'string' ? sizeImages[categoryKey][size] : sizeImages[categoryKey][size].src}
                       alt={`${size} size guide`}
                       height={2000} // Adjust height
                       width={2000} // Adjust width
                       className="h-44 w-44 rounded-lg object-contain"
                     />
 
-                    {/* Show "X" icon only for newly uploaded images */}
-                    {!sizeImages[size] || typeof sizeImages[size] !== 'string' ? (
-                      <button
-                        onClick={() => handleImageRemoveForSizeRange(size)} // Remove the image
-                        className="absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold"
-                      >
-                        <RxCross2 size={24} />
-                      </button>
-                    ) : null}
+                    {/* Show "X" icon to allow removal of the image */}
+                    <button
+                      onClick={() => handleImageRemoveForSizeRange(size)} // Remove the image
+                      className="absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold"
+                    >
+                      <RxCross2 size={24} />
+                    </button>
                   </div>
                 )}
 
               </div>
             ))}
-
           </div>
 
         </div>

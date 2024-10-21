@@ -25,9 +25,14 @@ import { BsBoxSeam } from "react-icons/bs";
 const SideNavbar = ({ onClose }) => {
   const pathname = usePathname();
   const [activeItem, setActiveItem] = useState(null);
+  const [activeSubItem, setActiveSubItem] = useState(null);  // State for submenu
 
   const handleItemClick = (name) => {
     setActiveItem(activeItem === name ? null : name);
+  };
+
+  const handleSubItemClick = (subName) => {
+    setActiveSubItem(activeSubItem === subName ? null : subName);
   };
 
   const adminList = [
@@ -42,7 +47,7 @@ const SideNavbar = ({ onClose }) => {
       path: "/dash-board/orders",
     },
     {
-      name: "Products",
+      name: "Inventory",
       icon: <LiaBoxOpenSolid />,
       path: "/dash-board/products",
     },
@@ -72,14 +77,22 @@ const SideNavbar = ({ onClose }) => {
       links: [
         { label: 'Permissions', link: '/dash-board/permissions', icon: <LiaUserLockSolid /> },
         { label: 'Reward Level', link: '/dash-board/reward-level', icon: <CiMedal /> },
-        { label: 'Warehouse', link: '/dash-board/ware-house', icon: <PiWarehouseBold /> },
-        { label: 'Shipment', link: '/dash-board/zone', icon: <BsBoxSeam /> },
         { label: 'Payment Methods', link: '/dash-board/payment-methods', icon: <MdPayment /> },
-        { label: 'Categories', link: '/dash-board/categories', icon: <BiCategory /> },
-        { label: 'Seasons', link: '/dash-board/seasons', icon: <FaGlobeAsia /> },
-        { label: 'Colors', link: '/dash-board/colors', icon: <IoColorPaletteOutline /> },
-        { label: 'Vendors', link: '/dash-board/vendors', icon: <LuWarehouse /> },
-        { label: 'Tags', link: '/dash-board/tags', icon: <BsTags /> },
+
+        // Product Configuration nested within Settings
+        {
+          name: "Inventory Settings",  // New section for product configuration
+          icon: <MdOutlineSettings />,   // You can change this to any other icon you prefer
+          links: [
+            { label: 'Categories', link: '/dash-board/categories', icon: <BiCategory /> },
+            { label: 'Seasons', link: '/dash-board/seasons', icon: <FaGlobeAsia /> },
+            { label: 'Colors', link: '/dash-board/colors', icon: <IoColorPaletteOutline /> },
+            { label: 'Vendors', link: '/dash-board/vendors', icon: <LuWarehouse /> },
+            { label: 'Tags', link: '/dash-board/tags', icon: <BsTags /> },
+            { label: 'Shipment', link: '/dash-board/zone', icon: <BsBoxSeam /> },
+            { label: 'Warehouse', link: '/dash-board/ware-house', icon: <PiWarehouseBold /> },
+          ]
+        },
       ]
     },
   ];
@@ -136,25 +149,60 @@ const SideNavbar = ({ onClose }) => {
                   </div>
                 )}
               </div>
+
+              {/* Render links under Settings or Product Configuration */}
               {item?.links && activeItem === item?.name && (
                 <div className="px-6 py-2 flex flex-col items-center gap-2">
                   {item?.links?.map((linkItem, linkIndex) => (
-                    <Link href={linkItem?.link} key={linkIndex} legacyBehavior>
-                      <a
-                        className={`flex items-center gap-2 w-full hover:bg-[#F9FBFA] hover:text-black px-4 ml-12 py-2 rounded-md ${pathname === linkItem.link || (linkItem.link === '/dash-board/zone' && pathname.startsWith('/dash-board/zone/add-shipping-zone')) || (linkItem.link === "/dash-board/variants" && pathname.startsWith("/dash-board/variants/add-color")) || (linkItem.link === "/dash-board/variants" && pathname.startsWith("/dash-board/variants/add-tag")) || (linkItem.link === "/dash-board/variants" && pathname.startsWith("/dash-board/variants/add-vendor")) || (linkItem.link === "/dash-board/categories" && pathname.startsWith("/dash-board/categories/add-category")) || (linkItem.link === "/dash-board/vendors" && pathname.startsWith("/dash-board/vendors/add-vendor")) || (linkItem.link === "/dash-board/tags" && pathname.startsWith("/dash-board/tags/add-tag")) || (linkItem.link === "/dash-board/colors" && pathname.startsWith("/dash-board/colors/add-color")) || (linkItem.link === "/dash-board/zone" && pathname.startsWith("/dash-board/zone/existing-zones")) ? "text-black bg-[#F9FBFA]" : ""}`}
-                        onClick={onClose}
-                      >
-                        <h2 className="p-1 text-2xl rounded-xl">{linkItem?.icon}</h2>
-                        <h2 className="font-semibold">{linkItem?.label}</h2>
-                      </a>
-                    </Link>
+                    linkItem?.links ? (
+                      // Render nested Product Configuration
+                      <div key={linkIndex}>
+                        <div
+                          onClick={() => handleSubItemClick(linkItem?.name)}
+                          className="flex items-center gap-2 w-full hover:bg-[#F9FBFA] hover:text-black px-4 ml-6 py-2 rounded-md cursor-pointer"
+                        >
+                          <h2 className="p-1 text-2xl rounded-xl">{linkItem?.icon}</h2>
+                          <h2 className="font-semibold">{linkItem?.name}</h2>
+                          <span className="ml-auto">
+                            {activeSubItem === linkItem?.name ? <FaAngleUp /> : <FaAngleDown />}
+                          </span>
+                        </div>
+
+                        {/* Render links under Product Configuration */}
+                        {linkItem?.links && activeSubItem === linkItem?.name && (
+                          <div className="px-6 py-2 flex flex-col items-center gap-2">
+                            {linkItem?.links?.map((subLink, subIndex) => (
+                              <Link href={subLink.link} key={subIndex} legacyBehavior>
+                                <a
+                                  className={`flex items-center gap-2 w-full hover:bg-[#F9FBFA] hover:text-black px-4 ml-12 py-2 rounded-md ${pathname === subLink.link ? "text-black bg-[#F9FBFA]" : ""}`}
+                                  onClick={onClose}
+                                >
+                                  <h2 className="p-1 text-2xl rounded-xl">{subLink.icon}</h2>
+                                  <h2 className="font-semibold">{subLink.label}</h2>
+                                </a>
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      // Render regular links in Settings
+                      <Link href={linkItem.link} key={linkIndex} legacyBehavior>
+                        <a
+                          className={`flex items-center gap-2 w-full hover:bg-[#F9FBFA] hover:text-black px-4 ml-12 py-2 rounded-md ${pathname === linkItem.link ? "text-black bg-[#F9FBFA]" : ""}`}
+                          onClick={onClose}
+                        >
+                          <h2 className="p-1 text-2xl rounded-xl">{linkItem.icon}</h2>
+                          <h2 className="font-semibold">{linkItem.label}</h2>
+                        </a>
+                      </Link>
+                    )
                   ))}
                 </div>
               )}
             </div>
           ))
         }
-
       </div>
     </div>
   );
