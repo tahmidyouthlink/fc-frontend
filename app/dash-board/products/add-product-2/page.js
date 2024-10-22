@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useForm } from "react-hook-form";
 import Link from 'next/link';
@@ -9,6 +9,9 @@ import { useRouter } from 'next/navigation';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import { FiSave } from 'react-icons/fi';
+import useLocations from '@/app/hooks/useLocations';
+import Loading from '@/app/components/shared/Loading/Loading';
+import ExitConfirmationModal from '@/app/components/layout/ExitConfirmationModal';
 
 const SecondStepOfAddProduct = () => {
 
@@ -18,6 +21,30 @@ const SecondStepOfAddProduct = () => {
   const [navigate, setNavigate] = useState(false);
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
+  const [locationList, isLocationPending] = useLocations();
+  const [showModal, setShowModal] = useState(false);
+
+  // Function to handle "Go Back" button click
+  const handleGoBackClick = (e) => {
+    e.preventDefault();  // Prevent immediate navigation
+    setShowModal(true);  // Show confirmation modal
+  };
+
+  // Function to handle "Yes" button (confirm navigation)
+  const handleConfirmExit = () => {
+    setShowModal(false);
+    router.push("/dash-board/products");  // Navigate to the "Go Back" page
+  };
+
+  // Function to close the modal without navigating
+  const handleCloseModal = () => {
+    setShowModal(false);
+    // Scroll to bottom of the page
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
+  };
 
   useEffect(() => {
     try {
@@ -102,13 +129,19 @@ const SecondStepOfAddProduct = () => {
     );
   };
 
+  // Memoize the primary location name based on locationList changes
+  const primaryLocationName = useMemo(() => {
+    return locationList?.find(location => location?.isPrimaryLocation)?.locationName || 'No primary location found';
+  }, [locationList]);
+
   const onSubmit = (data) => {
     try {
       const formattedData = productVariants?.map((variant, index) => ({
         color: variant.color,
         size: variant.size,
         sku: parseFloat(data[`sku-${index}`]),
-        imageUrls: variant.imageUrls || []
+        imageUrls: variant.imageUrls || [],
+        location: primaryLocationName,
       }));
 
       // Check if any variant is missing an image URL
@@ -155,7 +188,8 @@ const SecondStepOfAddProduct = () => {
       color: variant.color,
       size: variant.size,
       sku: parseFloat(formData[`sku-${index}`]),
-      imageUrls: variant.imageUrls || [] // Multiple image URLs for each variant
+      imageUrls: variant.imageUrls || [], // Multiple image URLs for each variant
+      location: primaryLocationName,
     }));
 
     // Check if any variant is missing an image URL
@@ -265,12 +299,31 @@ const SecondStepOfAddProduct = () => {
     }
   }, [navigate, router]);
 
+  if (isLocationPending) {
+    return <Loading />
+  }
+
   return (
     <div className='bg-gray-50 min-h-screen'>
-      <div className='max-w-screen-2xl mx-auto sticky top-0 z-10'>
-        <h3 className='text-left bg-gray-50 font-semibold text-xl md:text-2xl px-6 py-6'>Add Inventory Variants</h3>
+
+      <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
+        <div className='flex items-center justify-between'>
+          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Inventory Variants</h3>
+          <Link
+            className="flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
+            href="/dash-board/products"
+            onClick={handleGoBackClick}  // Trigger the modal on click
+          >
+            <span className="border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2">
+              <FaArrowLeft />
+            </span>
+            Go Back
+          </Link>
+        </div>
       </div>
+
       <form onSubmit={handleSubmit(onSubmit)} className='min-h-[90vh] flex flex-col justify-between'>
+        <h3 className='max-w-screen-2xl text-right bg-gray-50 font-medium text-sm md:text-base px-6'>Primary Location: <strong>{primaryLocationName}</strong></h3>
         <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 px-6 lg:px-8 xl:px-10 2xl:px-12 py-3'>
           {productVariants?.map((variant, index) => (
             <div key={index} className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
@@ -330,7 +383,7 @@ const SecondStepOfAddProduct = () => {
             </div>
           ))}
         </div>
-        <div className='flex justify-between px-6 lg:px-8 xl:px-10 2xl:px-12 py-3'>
+        <div className='flex flex-wrap gap-6 justify-between px-6 lg:px-8 xl:px-10 2xl:px-12 py-3'>
           <Link href='/dash-board/products/add-product' className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
             <FaArrowLeft /> Previous Step
           </Link>
@@ -344,6 +397,13 @@ const SecondStepOfAddProduct = () => {
           </div>
         </div>
       </form>
+
+      <ExitConfirmationModal
+        isOpen={showModal}
+        onClose={handleCloseModal}  // Handle "No" action
+        onConfirm={handleConfirmExit}  // Handle "Yes" action
+      />
+
     </div>
   );
 };

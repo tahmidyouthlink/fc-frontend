@@ -17,7 +17,7 @@ import { Button, CheckboxGroup, Radio, RadioGroup, Select, SelectItem, Tab, Tabs
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { Controller, useForm } from 'react-hook-form';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -30,6 +30,7 @@ import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
 import { HiOutlineArchive } from "react-icons/hi";
 import { RxUpdate } from "react-icons/rx";
 import useSeasons from '@/app/hooks/useSeasons';
+import useLocations from '@/app/hooks/useLocations';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
@@ -72,6 +73,7 @@ const EditProductPage = () => {
   const [unselectedGroupSelected2, setUnselectedGroupSelected2] = useState([]);
   const [tagList, isTagPending] = useTags();
   const [vendorList, isVendorPending] = useVendors();
+  const [locationList, isLocationPending] = useLocations();
   const [colorList, isColorPending] = useColors();
   const [selectedCategory, setSelectedCategory] = useState("");
   const [groupSelected, setGroupSelected] = React.useState();
@@ -489,7 +491,7 @@ const EditProductPage = () => {
     }
   };
 
-  const getSizeImageForGroupSelected = (groupSelected, categoryList) => {
+  const getSizeImageForGroupSelected = (groupSelected, selectedCategory, categoryList) => {
     let selectedImageUrl = '';
 
     // Check if categoryList is an array
@@ -501,26 +503,31 @@ const EditProductPage = () => {
     // Ensure groupSelected is an array or convert it to an array if it's a single string
     const sizesToCheck = Array.isArray(groupSelected) ? groupSelected : [groupSelected];
 
-    // Loop through each category in the categoryList
-    for (const category of categoryList) {
-      // Check if groupSelected is present in the sizes array of the category
-      for (const size of sizesToCheck) {
-        if (category.sizeImages && category.sizeImages[size]) {
-          selectedImageUrl = category.sizeImages[size]; // Get the imageUrl for the selected size
-          break; // Break the loop if we found the matching size
-        }
-      }
+    // Find the category that matches the selectedCategory (based on key or label)
+    const matchedCategory = categoryList.find(
+      category => category.key === selectedCategory || category.label === selectedCategory
+    );
 
-      // If we found the imageUrl, stop the outer loop as well
-      if (selectedImageUrl) {
-        break;
+    // If we found the matched category, search within its sizeImages
+    if (matchedCategory) {
+      for (const size of sizesToCheck) {
+        if (matchedCategory.sizeImages && matchedCategory.sizeImages[size]) {
+          selectedImageUrl = matchedCategory.sizeImages[size]; // Get the imageUrl for the selected size
+          break; // Stop once we find the matching size
+        }
       }
     }
 
     return selectedImageUrl; // Return the selected image URL if found
   };
 
-  const selectedImageUrl = getSizeImageForGroupSelected(groupSelected, categoryList);
+  // Example usage:
+  const selectedImageUrl = getSizeImageForGroupSelected(groupSelected, selectedCategory, categoryList);
+
+  // Memoize the primary location name based on locationList changes
+  const primaryLocationName = useMemo(() => {
+    return locationList?.find(location => location?.isPrimaryLocation)?.locationName || 'No primary location found';
+  }, [locationList]);
 
   const onSubmit = async (data) => {
     try {
@@ -605,7 +612,8 @@ const EditProductPage = () => {
         color: variant.color,
         size: variant.size,
         sku: data[`sku-${index}`] ? parseFloat(data[`sku-${index}`]) : null,
-        imageUrls: variant.imageUrls || []
+        imageUrls: variant.imageUrls || [],
+        location: primaryLocationName,
       }));
 
       // Check if any variant is missing an image URL
@@ -699,7 +707,7 @@ const EditProductPage = () => {
     }
   };
 
-  if (isCategoryPending || isSizeRangePending || isSubCategoryPending || isTagPending || isVendorPending || isColorPending || isShippingPending || isShipmentHandlerPending || isSeasonPending) {
+  if (isCategoryPending || isSizeRangePending || isSubCategoryPending || isTagPending || isVendorPending || isColorPending || isShippingPending || isShipmentHandlerPending || isSeasonPending || isLocationPending) {
     return <Loading />
   }
 
@@ -1228,8 +1236,9 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
 
         {activeTab === "inventory" && <div>
           <div className='2xl:max-w-screen-2xl 2xl:mx-auto'>
-            <div className='flex items-center justify-between px-6'>
+            <div className='flex flex-wrap items-center justify-between px-6 gap-4'>
               <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl'>Update Inventory Variants</h3>
+              <h3 className='max-w-screen-2xl text-right bg-gray-50 font-medium text-sm md:text-base'>Primary Location: <strong>{primaryLocationName}</strong></h3>
               <p className="font-semibold text-xl md:text-2xl xl:text-3xl">
                 {productVariants?.length > 0 ? (
                   `${productVariants.reduce((acc, variant) => acc + Number(variant.sku), 0)} ${productVariants.reduce((acc, variant) => acc + Number(variant.sku), 0) === 1 ? 'Item' : 'Items'}`

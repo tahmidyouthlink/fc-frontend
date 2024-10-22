@@ -1,4 +1,5 @@
 "use client";
+import ExitConfirmationModal from '@/app/components/layout/ExitConfirmationModal';
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
@@ -25,6 +26,29 @@ const ThirdStepOfAddProduct = () => {
   const [selectAll, setSelectAll] = useState(false); // State for "select all"
   const [sizeError, setSizeError] = useState(false);
   const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
+  const [showModal, setShowModal] = useState(false);
+
+  // Function to handle "Go Back" button click
+  const handleGoBackClick = (e) => {
+    e.preventDefault();  // Prevent immediate navigation
+    setShowModal(true);  // Show confirmation modal
+  };
+
+  // Function to handle "Yes" button (confirm navigation)
+  const handleConfirmExit = () => {
+    setShowModal(false);
+    router.push("/dash-board/products");  // Navigate to the "Go Back" page
+  };
+
+  // Function to close the modal without navigating
+  const handleCloseModal = () => {
+    setShowModal(false);
+    // Scroll to bottom of the page
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
+  };
 
   // Toggle card selection
   const toggleCardSelection = (shipping) => {
@@ -195,8 +219,20 @@ const ThirdStepOfAddProduct = () => {
   return (
     <div className='min-h-screen'>
 
-      <div className='max-w-screen-xl mx-auto sticky top-0 z-10'>
-        <h3 className='text-left bg-white font-semibold text-xl md:text-2xl px-6 py-6'>Add Select Shipping Details</h3>
+      <div className='max-w-screen-xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-white'>
+        <div className='flex items-center justify-between'>
+          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Add Select Shipping Details</h3>
+          <Link
+            className="flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
+            href="/dash-board/products"
+            onClick={handleGoBackClick}  // Trigger the modal on click
+          >
+            <span className="border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2">
+              <FaArrowLeft />
+            </span>
+            Go Back
+          </Link>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto mt-6 min-h-[85vh] flex flex-col justify-between'>
@@ -301,6 +337,12 @@ const ThirdStepOfAddProduct = () => {
 
         </div>
       </form>
+
+      <ExitConfirmationModal
+        isOpen={showModal}
+        onClose={handleCloseModal}  // Handle "No" action
+        onConfirm={handleConfirmExit}  // Handle "Yes" action
+      />
 
     </div>
   );

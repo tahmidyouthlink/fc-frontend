@@ -1,11 +1,10 @@
 "use client";
 import { FaBullhorn, FaGlobeAsia } from "react-icons/fa";
-import { PiUsersThreeLight, PiWarehouseBold } from "react-icons/pi";
+import { PiUsersThreeLight } from "react-icons/pi";
 import { BiCategory } from "react-icons/bi";
 import { IoMdHome } from "react-icons/io";
-import { MdOutlineSettings, MdPayment } from "react-icons/md";
+import { MdOutlineSettings, MdPayment, MdOutlineLocationOn, MdOutlineInventory2 } from "react-icons/md";
 import { TbClipboardList } from "react-icons/tb";
-import { LiaBoxOpenSolid } from "react-icons/lia";
 import { TbBuildingBank } from "react-icons/tb";
 import { TbBrandGoogleAnalytics } from "react-icons/tb";
 import Image from "next/image";
@@ -48,7 +47,7 @@ const SideNavbar = ({ onClose }) => {
     },
     {
       name: "Inventory",
-      icon: <LiaBoxOpenSolid />,
+      icon: <MdOutlineInventory2 />,
       path: "/dash-board/products",
     },
     {
@@ -90,7 +89,7 @@ const SideNavbar = ({ onClose }) => {
             { label: 'Vendors', link: '/dash-board/vendors', icon: <LuWarehouse /> },
             { label: 'Tags', link: '/dash-board/tags', icon: <BsTags /> },
             { label: 'Shipment', link: '/dash-board/zone', icon: <BsBoxSeam /> },
-            { label: 'Warehouse', link: '/dash-board/ware-house', icon: <PiWarehouseBold /> },
+            { label: 'Locations', link: '/dash-board/locations', icon: <MdOutlineLocationOn /> },
           ]
         },
       ]

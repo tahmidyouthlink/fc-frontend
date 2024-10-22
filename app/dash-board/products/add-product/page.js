@@ -28,6 +28,7 @@ import Link from 'next/link';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
 import { FiSave } from "react-icons/fi";
 import useSeasons from '@/app/hooks/useSeasons';
+import ExitConfirmationModal from '@/app/components/layout/ExitConfirmationModal';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
@@ -71,6 +72,29 @@ const FirstStepOfAddProduct = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [seasonError, setSeasonError] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
+  // Function to handle "Go Back" button click
+  const handleGoBackClick = (e) => {
+    e.preventDefault();  // Prevent immediate navigation
+    setShowModal(true);  // Show confirmation modal
+  };
+
+  // Function to handle "Yes" button (confirm navigation)
+  const handleConfirmExit = () => {
+    setShowModal(false);
+    router.push("/dash-board/products");  // Navigate to the "Go Back" page
+  };
+
+  // Function to close the modal without navigating
+  const handleCloseModal = () => {
+    setShowModal(false);
+    // Scroll to bottom of the page
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
+  };
 
   // Filter categories based on search input and remove already selected categories
   const filteredSeasons = seasonList?.filter((season) =>
@@ -469,7 +493,7 @@ const FirstStepOfAddProduct = () => {
     return productID;
   };
 
-  const getSizeImageForGroupSelected = (groupSelected, categoryList) => {
+  const getSizeImageForGroupSelected = (groupSelected, selectedCategory, categoryList) => {
     let selectedImageUrl = '';
 
     // Check if categoryList is an array
@@ -481,26 +505,26 @@ const FirstStepOfAddProduct = () => {
     // Ensure groupSelected is an array or convert it to an array if it's a single string
     const sizesToCheck = Array.isArray(groupSelected) ? groupSelected : [groupSelected];
 
-    // Loop through each category in the categoryList
-    for (const category of categoryList) {
-      // Check if groupSelected is present in the sizes array of the category
-      for (const size of sizesToCheck) {
-        if (category.sizeImages && category.sizeImages[size]) {
-          selectedImageUrl = category.sizeImages[size]; // Get the imageUrl for the selected size
-          break; // Break the loop if we found the matching size
-        }
-      }
+    // Find the category that matches the selectedCategory (based on key or label)
+    const matchedCategory = categoryList.find(
+      category => category.key === selectedCategory || category.label === selectedCategory
+    );
 
-      // If we found the imageUrl, stop the outer loop as well
-      if (selectedImageUrl) {
-        break;
+    // If we found the matched category, search within its sizeImages
+    if (matchedCategory) {
+      for (const size of sizesToCheck) {
+        if (matchedCategory.sizeImages && matchedCategory.sizeImages[size]) {
+          selectedImageUrl = matchedCategory.sizeImages[size]; // Get the imageUrl for the selected size
+          break; // Stop once we find the matching size
+        }
       }
     }
 
     return selectedImageUrl; // Return the selected image URL if found
   };
 
-  const selectedImageUrl = getSizeImageForGroupSelected(groupSelected, categoryList);
+  // Example usage:
+  const selectedImageUrl = getSizeImageForGroupSelected(groupSelected, selectedCategory, categoryList);
 
   const onSubmit = async (data) => {
     try {
@@ -684,7 +708,16 @@ const FirstStepOfAddProduct = () => {
       <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
         <div className='flex items-center justify-between'>
           <h3 className='w-full font-semibold text-xl lg:text-2xl'>Product Configuration</h3>
-          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/products"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+          <Link
+            className="flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
+            href="/dash-board/products"
+            onClick={handleGoBackClick}  // Trigger the modal on click
+          >
+            <span className="border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2">
+              <FaArrowLeft />
+            </span>
+            Go Back
+          </Link>
         </div>
       </div>
 
@@ -1194,6 +1227,13 @@ const FirstStepOfAddProduct = () => {
 
         </div>
       </form>
+
+      <ExitConfirmationModal
+        isOpen={showModal}
+        onClose={handleCloseModal}  // Handle "No" action
+        onConfirm={handleConfirmExit}  // Handle "Yes" action
+      />
+
     </div>
   );
 };
