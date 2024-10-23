@@ -53,38 +53,49 @@ const SecondStepOfAddProduct = () => {
       const storedImageUrls = JSON.parse(localStorage.getItem('uploadedImageUrls') || '[]');
       const storedVariants = JSON.parse(localStorage.getItem('productVariants') || '[]');
 
+      // Get the primary location's name
+      const primaryLocationName = locationList?.find(location => location?.isPrimaryLocation)?.locationName || '';
+
       if (storedColors.length === 0 || storedSizes.length === 0) {
         toast.error("Colors or sizes are missing. Please go back and select them.");
-        router.push("/add-product");
+        router.push("/dash-board/add-product");
         return;
       }
 
-      // Initialize variants based on current stored sizes and colors
-      const variants = storedVariants.filter(variant =>
-        storedSizes.includes(variant.size) && storedColors.some(color => color.value === variant.color.value)
+      // Filter to only include variants for the primary location and non-zero SKUs
+      const primaryLocationVariants = storedVariants.filter(variant =>
+        variant.location === primaryLocationName && variant.sku !== 0
       );
 
-      // If there are new sizes or colors, initialize those variants
+      // Initialize new variants if needed
+      const allVariants = [];
       for (const color of storedColors) {
         for (const size of storedSizes) {
-          if (!variants.some(variant => variant.color.value === color.value && variant.size === size)) {
-            variants.push({ color, size, sku: "", imageUrl: "" });
+          const existingVariant = primaryLocationVariants.find(variant =>
+            variant.color.value === color.value && variant.size === size
+          );
+
+          if (existingVariant) {
+            allVariants.push(existingVariant);
+          } else {
+            allVariants.push({ color, size, sku: "", imageUrl: "", location: primaryLocationName });
           }
         }
       }
 
-      setProductVariants(variants);
+      setProductVariants(allVariants);
       setUploadedImageUrls(storedImageUrls);
 
-      // Set form values for stored variants
-      variants.forEach((variant, index) => {
+      // Set form values for the variants
+      allVariants.forEach((variant, index) => {
         setValue(`sku-${index}`, variant.sku);
-        setValue(`imageUrl-${index}`, variant.imageUrl); // Set the image URL
+        setValue(`imageUrl-${index}`, variant.imageUrl);
       });
+
     } catch (e) {
-      return null;
+      console.error(e);
     }
-  }, [router, setValue]);
+  }, [router, setValue, locationList]);
 
   const handleVariantChange = (index, field, value) => {
     const updatedVariants = [...productVariants];
@@ -136,22 +147,29 @@ const SecondStepOfAddProduct = () => {
 
   const onSubmit = (data) => {
     try {
-      const formattedData = productVariants?.map((variant, index) => ({
-        color: variant.color,
-        size: variant.size,
-        sku: parseFloat(data[`sku-${index}`]),
-        imageUrls: variant.imageUrls || [],
-        location: primaryLocationName,
-      }));
+      const formattedData = productVariants.map((variant, index) => {
+        return locationList.map(location => ({
+          color: variant.color,
+          size: variant.size,
+          sku: location.isPrimaryLocation
+            ? parseFloat(data[`sku-${index}`]) // SKU for primary location
+            : 0, // Set SKU to 0 for others
+          imageUrls: variant.imageUrls || [],
+          location: location.locationName,
+        }));
+      });
+
+      // Flatten the array of variants for all locations
+      const finalData = formattedData.flat();
 
       // Check if any variant is missing an image URL
-      const missingImage = formattedData?.some(variant => variant?.imageUrls?.length === 0);
+      const missingImage = finalData.some(variant => variant?.imageUrls?.length === 0);
       if (missingImage) {
         toast.error("Please select at least one image for each variant.");
         return;
       }
 
-      localStorage.setItem('productVariants', JSON.stringify(formattedData));
+      localStorage.setItem('productVariants', JSON.stringify(finalData));
       setNavigate(true);
     } catch (error) {
       toast.error("Failed to save product variants.");
@@ -184,13 +202,20 @@ const SecondStepOfAddProduct = () => {
     const storedProductId = localStorage.getItem('productId');
     const storedSizeGuideImageUrl = localStorage.getItem('sizeGuideImageUrl');
 
-    const formattedData = productVariants?.map((variant, index) => ({
-      color: variant.color,
-      size: variant.size,
-      sku: parseFloat(formData[`sku-${index}`]),
-      imageUrls: variant.imageUrls || [], // Multiple image URLs for each variant
-      location: primaryLocationName,
-    }));
+    const formattedData = productVariants.map((variant, index) => {
+      return locationList.map(location => ({
+        color: variant.color,
+        size: variant.size,
+        sku: location.isPrimaryLocation
+          ? parseFloat(data[`sku-${index}`]) // SKU for primary location
+          : 0, // Set SKU to 0 for others
+        imageUrls: variant.imageUrls || [],
+        location: location.locationName,
+      }));
+    });
+
+    // Flatten the array of variants for all locations
+    const finalData = formattedData.flat();
 
     // Check if any variant is missing an image URL
     const missingImage = formattedData?.some(variant => variant?.imageUrls?.length === 0);
@@ -220,7 +245,7 @@ const SecondStepOfAddProduct = () => {
       vendors: storedVendors,
       tags: storedTags,
       productId: storedProductId,
-      productVariants: formattedData,
+      productVariants: finalData,
       season: storedSeasons,
       status: "draft",
       sizeGuideImageUrl: storedSizeGuideImageUrl,

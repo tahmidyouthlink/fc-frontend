@@ -187,6 +187,29 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 }
 
 /* Base styles for small screens (mobile) */
+.custom-max-h-inventory {
+  min-height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+@media (min-width: 768px) {
+  .custom-max-h-inventory {
+    min-height: calc(100vh - 180px);
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .custom-max-h-inventory {
+    min-height: calc(100vh - 150px);
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+  }
+}
+
+/* Base styles for small screens (mobile) */
 .custom-max-discount {
   min-height: calc(100vh - 100px);
   max-height: calc(100vh - 100px);

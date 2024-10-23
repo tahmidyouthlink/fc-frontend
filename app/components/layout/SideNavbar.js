@@ -3,7 +3,7 @@ import { FaBullhorn, FaGlobeAsia } from "react-icons/fa";
 import { PiUsersThreeLight } from "react-icons/pi";
 import { BiCategory } from "react-icons/bi";
 import { IoMdHome } from "react-icons/io";
-import { MdOutlineSettings, MdPayment, MdOutlineLocationOn, MdOutlineInventory2 } from "react-icons/md";
+import { MdOutlineSettings, MdPayment, MdOutlineLocationOn, MdOutlineInventory2, MdOutlineCategory } from "react-icons/md";
 import { TbClipboardList } from "react-icons/tb";
 import { TbBuildingBank } from "react-icons/tb";
 import { TbBrandGoogleAnalytics } from "react-icons/tb";
@@ -20,6 +20,8 @@ import { LuWarehouse } from "react-icons/lu";
 import { BsTags } from "react-icons/bs";
 import { CiMedal } from "react-icons/ci";
 import { BsBoxSeam } from "react-icons/bs";
+import { FiShoppingBag } from "react-icons/fi";
+import { BiPurchaseTagAlt, BiTransferAlt } from "react-icons/bi";
 
 const SideNavbar = ({ onClose }) => {
   const pathname = usePathname();
@@ -46,9 +48,14 @@ const SideNavbar = ({ onClose }) => {
       path: "/dash-board/orders",
     },
     {
-      name: "Inventory",
-      icon: <MdOutlineInventory2 />,
-      path: "/dash-board/products",
+      name: "Product Management",
+      icon: <MdOutlineCategory />,
+      links: [
+        { label: 'Products', link: '/dash-board/products', icon: <FiShoppingBag /> },
+        { label: 'Inventory', link: '/dash-board/inventory', icon: <MdOutlineInventory2 /> },
+        { label: 'Purchase Orders', link: '/dash-board/purchase-orders', icon: <BiPurchaseTagAlt /> },
+        { label: 'Transfers', link: '/dash-board/transfers', icon: <BiTransferAlt /> }
+      ]
     },
     {
       name: "Customers",
@@ -80,7 +87,7 @@ const SideNavbar = ({ onClose }) => {
 
         // Product Configuration nested within Settings
         {
-          name: "Inventory Settings",  // New section for product configuration
+          name: "Product Settings",  // New section for product configuration
           icon: <MdOutlineSettings />,   // You can change this to any other icon you prefer
           links: [
             { label: 'Categories', link: '/dash-board/categories', icon: <BiCategory /> },

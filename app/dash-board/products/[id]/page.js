@@ -91,6 +91,7 @@ const EditProductPage = () => {
   const dropdownRef = useRef(null);
   const [seasonError, setSeasonError] = useState(false);
   const [activeTab, setActiveTab] = useState('product');
+  const [existingVariants, setExistingVariants] = useState([]);
 
   // Filter categories based on search input and remove already selected categories
   const filteredSeasons = seasonList?.filter((season) =>
@@ -337,6 +338,11 @@ const EditProductPage = () => {
     setDiscountType(key);
   };
 
+  // Memoize the primary location name based on locationList changes
+  const primaryLocationName = useMemo(() => {
+    return locationList?.find(location => location?.isPrimaryLocation)?.locationName || 'No primary location found';
+  }, [locationList]);
+
   useEffect(() => {
     if (uploadedImageUrls.length > 0) {
       setProductVariants(prevVariants =>
@@ -349,16 +355,21 @@ const EditProductPage = () => {
   }, [uploadedImageUrls]);
 
   const initializeVariants = useCallback((colors, sizes, savedVariants) => {
-    // Filter saved variants based on available colors and sizes
+    // Get the primary location's name
+    const primaryLocationName = locationList?.find(location => location?.isPrimaryLocation)?.locationName || '';
+
+    // Filter saved variants based on available colors, sizes, and primary location
     const variants = savedVariants?.filter(variant =>
-      sizes.includes(variant.size) && colors.some(color => color.value === variant.color.value)
+      variant.location === primaryLocationName &&
+      sizes.includes(variant.size) &&
+      colors.some(color => color.value === variant.color.value)
     );
 
     // Add new variants for new sizes or colors
     for (const color of colors) {
       for (const size of sizes) {
         if (!variants.some(variant => variant.color.value === color.value && variant.size === size)) {
-          variants.push({ color, size, sku: "", imageUrl: "" });
+          variants.push({ color, size, sku: "", imageUrls: "", location: primaryLocationName });
         }
       }
     }
@@ -374,10 +385,10 @@ const EditProductPage = () => {
     // Set form values for each variant
     variants.forEach((variant, index) => {
       setValue(`sku-${index}`, variant.sku);
-      setValue(`imageUrl-${index}`, variant.imageUrl);
+      setValue(`imageUrls-${index}`, variant.imageUrl);
     });
 
-  }, [setValue]);
+  }, [setValue, locationList]);
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -409,6 +420,22 @@ const EditProductPage = () => {
         setSelectedShipmentHandler(data?.shippingDetails || []);
         setSelectedSeasons(data?.season || []);
 
+        // Assuming existingData.productVariants contains variants for all locations
+        setExistingVariants(data?.productVariants); // Store all variants
+
+        // Filter to show only the primary location variants in the form
+        const primaryLocationVariants = data?.productVariants.filter(variant =>
+          variant.location === primaryLocationName
+        );
+
+        setProductVariants(primaryLocationVariants);
+
+        // Initialize form values
+        primaryLocationVariants.forEach((variant, index) => {
+          setValue(`sku-${index}`, variant.sku);
+          setValue(`imageUrls-${index}`, variant.imageUrls || []);
+        });
+
         if (typeof document !== 'undefined') {
           setMenuPortalTarget(document.body);
         }
@@ -418,7 +445,7 @@ const EditProductPage = () => {
     };
 
     fetchProductDetails();
-  }, [id, setValue, axiosPublic, initializeVariants]);
+  }, [id, setValue, axiosPublic, initializeVariants, primaryLocationName]);
 
   // Only reinitialize variants when colors or sizes change, not productVariants itself
   useEffect(() => {
@@ -524,11 +551,6 @@ const EditProductPage = () => {
   // Example usage:
   const selectedImageUrl = getSizeImageForGroupSelected(groupSelected, selectedCategory, categoryList);
 
-  // Memoize the primary location name based on locationList changes
-  const primaryLocationName = useMemo(() => {
-    return locationList?.find(location => location?.isPrimaryLocation)?.locationName || 'No primary location found';
-  }, [locationList]);
-
   const onSubmit = async (data) => {
     try {
       if (uploadedImageUrls.length === 0) {
@@ -608,26 +630,52 @@ const EditProductPage = () => {
         return; // Prevent submission
       }
 
-      const formattedData = productVariants?.map((variant, index) => ({
-        color: variant.color,
-        size: variant.size,
-        sku: data[`sku-${index}`] ? parseFloat(data[`sku-${index}`]) : null,
-        imageUrls: variant.imageUrls || [],
-        location: primaryLocationName,
-      }));
+      // Get the primary location name
+      const primaryLocationName = locationList?.find(location => location?.isPrimaryLocation)?.locationName || '';
 
-      // Check if any variant is missing an image URL
-      const missingImage = formattedData?.some(variant => variant?.imageUrls?.length === 0);
-      if (missingImage) {
-        toast.error("Please select at least one image for each variant.");
-        return;
+      // Iterate over productVariants and update only the primary location SKU
+      const formattedData = productVariants.map((variant, index) => {
+        return locationList.map(location => {
+          // Check if this variant already exists for this location
+          const existingVariant = existingVariants.find(existing =>
+            existing.color.value === variant.color.value &&
+            existing.size === variant.size &&
+            existing.location === location.locationName
+          );
+
+          // Use primary location's imageUrls for all locations
+          const primaryImageUrls = variant.imageUrls || [];
+
+          return {
+            color: variant.color,
+            size: variant.size,
+            sku: location.isPrimaryLocation
+              ? parseFloat(data[`sku-${index}`]) // Update SKU for primary location
+              : existingVariant?.sku || 0, // Keep existing SKU for other locations (or set to 0 if new variant)
+            imageUrls: primaryImageUrls, // Use the same imageUrls for all locations
+            location: location.locationName,
+          };
+        });
+      });
+
+      // Flatten the array of variants for all locations
+      const finalData = formattedData.flat();
+
+      // Check if any primary location variant is missing a SKU
+      const missingSKU = finalData.some(variant =>
+        variant.location === primaryLocationName && !variant.sku
+      );
+
+      if (missingSKU) {
+        toast.error("Please provide SKU for each variant in the primary location.");
+        return; // Stop submission if any SKU is missing
       }
 
       // Check if any variant is missing an image URL
-      const missingSKU = formattedData.some(variant => variant.sku === null);
-      if (missingSKU) {
-        toast.error("Please provide SKU for each variant.");
-        return; // Stop submission if any image is missing
+      const missingImage = finalData?.some(variant => variant?.imageUrls?.length === 0);
+      if (missingImage) {
+        toast.error("Please select at least one image for each variant.");
+        return;
       }
 
       const updatedProductData = {
@@ -649,7 +697,7 @@ const EditProductPage = () => {
         newArrival: selectedNewArrival,
         vendors: selectedVendors,
         tags: selectedTags,
-        productVariants: formattedData,
+        productVariants: finalData,
         shippingDetails: selectedShipmentHandler,
         status: data?.status,
         season: selectedSeasons,
