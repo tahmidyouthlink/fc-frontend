@@ -53,26 +53,29 @@ const SecondStepOfAddProduct = () => {
       const storedImageUrls = JSON.parse(localStorage.getItem('uploadedImageUrls') || '[]');
       const storedVariants = JSON.parse(localStorage.getItem('productVariants') || '[]');
 
-      // Get the primary location's name
-      const primaryLocationName = locationList?.find(location => location?.isPrimaryLocation)?.locationName || '';
+      // Filter locations with status true
+      const activeLocations = locationList?.filter(location => location?.status === true);
+
+      // Get the primary location's name from active locations
+      const primaryLocationName = activeLocations?.find(location => location?.isPrimaryLocation)?.locationName || '';
 
       if (storedColors.length === 0 || storedSizes.length === 0) {
         toast.error("Colors or sizes are missing. Please go back and select them.");
-        router.push("/dash-board/add-product");
+        router.push("/dash-board/products/add-product");
         return;
       }
 
       // Filter to only include variants for the primary location and non-zero SKUs
       const primaryLocationVariants = storedVariants.filter(variant =>
-        variant.location === primaryLocationName && variant.sku !== 0
+        variant?.location === primaryLocationName && variant?.sku !== 0
       );
 
       // Initialize new variants if needed
       const allVariants = [];
       for (const color of storedColors) {
         for (const size of storedSizes) {
-          const existingVariant = primaryLocationVariants.find(variant =>
-            variant.color.value === color.value && variant.size === size
+          const existingVariant = primaryLocationVariants?.find(variant =>
+            variant?.color?.value === color?.value && variant?.size === size
           );
 
           if (existingVariant) {
@@ -87,9 +90,9 @@ const SecondStepOfAddProduct = () => {
       setUploadedImageUrls(storedImageUrls);
 
       // Set form values for the variants
-      allVariants.forEach((variant, index) => {
-        setValue(`sku-${index}`, variant.sku);
-        setValue(`imageUrl-${index}`, variant.imageUrl);
+      allVariants?.forEach((variant, index) => {
+        setValue(`sku-${index}`, variant?.sku);
+        setValue(`imageUrl-${index}`, variant?.imageUrl);
       });
 
     } catch (e) {
@@ -147,8 +150,12 @@ const SecondStepOfAddProduct = () => {
 
   const onSubmit = (data) => {
     try {
+
+      // Filter only locations with status true
+      const activeLocations = locationList?.filter(location => location.status === true);
+
       const formattedData = productVariants.map((variant, index) => {
-        return locationList.map(location => ({
+        return activeLocations?.map(location => ({
           color: variant.color,
           size: variant.size,
           sku: location.isPrimaryLocation
@@ -202,8 +209,11 @@ const SecondStepOfAddProduct = () => {
     const storedProductId = localStorage.getItem('productId');
     const storedSizeGuideImageUrl = localStorage.getItem('sizeGuideImageUrl');
 
+    // Filter only active locations
+    const activeLocations = locationList.filter(location => location.status === true);
+
     const formattedData = productVariants.map((variant, index) => {
-      return locationList.map(location => ({
+      return activeLocations?.map(location => ({
         color: variant.color,
         size: variant.size,
         sku: location.isPrimaryLocation

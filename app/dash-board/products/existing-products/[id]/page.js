@@ -324,7 +324,7 @@ const ProductPage = () => {
       ) : (
         paginatedProducts?.length > 0 ? (
           <div className='mx-6 2xl:mx-0 custom-max-h-orders'>
-            <div className="max-w-screen-2xl mx-auto overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
+            <div className="max-w-screen-2xl mx-auto custom-max-h-orders overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
               <table className="w-full text-left border-collapse">
                 <thead className="sticky top-0 z-[1] w-full bg-white">
                   <tr className='w-full'>

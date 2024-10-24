@@ -8,7 +8,7 @@ import { Checkbox } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -27,6 +27,31 @@ const ThirdStepOfAddProduct = () => {
   const [sizeError, setSizeError] = useState(false);
   const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
   const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    // Check if the necessary data from the first two steps are available in localStorage
+    const storedProductTitle = localStorage.getItem('productTitle');
+    const storedProductBatchCode = localStorage.getItem('batchCode');
+    const storedRegularPrice = localStorage.getItem('regularPrice');
+    const storedUploadedImageUrls = JSON.parse(localStorage.getItem('uploadedImageUrls') || '[]');
+    const storedCategory = localStorage.getItem('category');
+    const storedSeason = JSON.parse(localStorage.getItem('season') || '[]');
+    const storedSubCategories = JSON.parse(localStorage.getItem('subCategories') || '[]');
+    const storedGroupOfSizes = JSON.parse(localStorage.getItem('groupOfSizes') || '[]');
+    const storedAllSizes = JSON.parse(localStorage.getItem('allSizes') || '[]');
+    const storedAvailableColors = JSON.parse(localStorage.getItem('availableColors') || '[]');
+    const storedNewArrival = localStorage.getItem('newArrival');
+    const storedTags = JSON.parse(localStorage.getItem('tags') || '[]');
+    const storedProductId = localStorage.getItem('productId');
+    const storedSizeGuideImageUrl = localStorage.getItem('sizeGuideImageUrl');
+
+    // If any of these values are missing, redirect the user to the first step of the add-product process
+    if (!storedProductTitle || !storedProductBatchCode || !storedRegularPrice || !storedUploadedImageUrls || !storedCategory || !storedSeason || !storedSubCategories || !storedGroupOfSizes || !storedAllSizes || !storedAvailableColors || !storedNewArrival || !storedTags || !storedProductId || !storedSizeGuideImageUrl) {
+      toast.error("Colors or sizes are missing. Please go back and select them.");
+      router.push('/dash-board/products/add-product'); // Redirect to the first step
+      return;
+    }
+  }, [router]);
 
   // Function to handle "Go Back" button click
   const handleGoBackClick = (e) => {

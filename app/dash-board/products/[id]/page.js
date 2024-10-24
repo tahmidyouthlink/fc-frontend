@@ -355,20 +355,24 @@ const EditProductPage = () => {
   }, [uploadedImageUrls]);
 
   const initializeVariants = useCallback((colors, sizes, savedVariants) => {
+
+    // Filter active locations and find the primary location's name
+    const activeLocations = locationList?.filter(location => location.status) || [];
+
     // Get the primary location's name
-    const primaryLocationName = locationList?.find(location => location?.isPrimaryLocation)?.locationName || '';
+    const primaryLocationName = activeLocations?.find(location => location?.isPrimaryLocation)?.locationName || '';
 
     // Filter saved variants based on available colors, sizes, and primary location
     const variants = savedVariants?.filter(variant =>
-      variant.location === primaryLocationName &&
-      sizes.includes(variant.size) &&
-      colors.some(color => color.value === variant.color.value)
+      variant?.location === primaryLocationName &&
+      sizes?.includes(variant.size) &&
+      colors?.some(color => color?.value === variant?.color?.value)
     );
 
     // Add new variants for new sizes or colors
     for (const color of colors) {
       for (const size of sizes) {
-        if (!variants.some(variant => variant.color.value === color.value && variant.size === size)) {
+        if (!variants.some(variant => variant?.color?.value === color?.value && variant?.size === size)) {
           variants.push({ color, size, sku: "", imageUrls: "", location: primaryLocationName });
         }
       }
@@ -383,9 +387,9 @@ const EditProductPage = () => {
     });
 
     // Set form values for each variant
-    variants.forEach((variant, index) => {
-      setValue(`sku-${index}`, variant.sku);
-      setValue(`imageUrls-${index}`, variant.imageUrl);
+    variants?.forEach((variant, index) => {
+      setValue(`sku-${index}`, variant?.sku);
+      setValue(`imageUrls-${index}`, variant?.imageUrl);
     });
 
   }, [setValue, locationList]);
@@ -423,24 +427,8 @@ const EditProductPage = () => {
         // Assuming existingData.productVariants contains variants for all locations
         setExistingVariants(data?.productVariants); // Store all variants
 
-        // Filter to show only the primary location variants in the form
-        const primaryLocationVariants = data?.productVariants.filter(variant =>
-          variant.location === primaryLocationName
-        );
-
-        setProductVariants(primaryLocationVariants);
-
-        // Initialize form values
-        primaryLocationVariants.forEach((variant, index) => {
-          setValue(`sku-${index}`, variant.sku);
-          setValue(`imageUrls-${index}`, variant.imageUrls || []);
-        });
-
-        if (typeof document !== 'undefined') {
-          setMenuPortalTarget(document.body);
-        }
       } catch (error) {
-        toast.error("Failed to load shipping zone details.");
+        toast.error("Failed to load product details.");
       }
     };
 
@@ -633,11 +621,14 @@ const EditProductPage = () => {
       // Get the primary location name
       const primaryLocationName = locationList?.find(location => location?.isPrimaryLocation)?.locationName || '';
 
+      // Filter active locations
+      const activeLocations = locationList?.filter(location => location.status) || [];
+
       // Iterate over productVariants and update only the primary location SKU
       const formattedData = productVariants.map((variant, index) => {
-        return locationList.map(location => {
+        return activeLocations?.map(location => {
           // Check if this variant already exists for this location
-          const existingVariant = existingVariants.find(existing =>
+          const existingVariant = existingVariants?.find(existing =>
             existing.color.value === variant.color.value &&
             existing.size === variant.size &&
             existing.location === location.locationName
