@@ -21,6 +21,7 @@ const InventoryPage = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const dropdownRef = useRef(null);
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
+  const [locationNameForMessage, setLocationNameForMessage] = useState("");
 
   useEffect(() => {
     if (searchQuery) {
@@ -29,6 +30,10 @@ const InventoryPage = () => {
   }, [searchQuery, refetch]);
 
   const handleLocationSelect = (locationName) => {
+
+    // set location message for knowing customer no inventory location
+    setLocationNameForMessage(locationName);
+
     // Step 1: Filter product variants by the selected location
     const filteredVariants = productList?.flatMap((product) =>
       product.productVariants
@@ -72,8 +77,6 @@ const InventoryPage = () => {
     setFilteredProducts(groupedBySize);
   };
 
-  console.log(filteredProducts);
-
   // Filter products based on search query
   const searchedProducts = filteredProducts?.filter(product => {
     const query = searchQuery.toLowerCase();
@@ -93,7 +96,6 @@ const InventoryPage = () => {
       (isNumberQuery && sku === query) // Numeric comparison for SKU
     );
   });
-
 
   const handleItemsPerPageChange = (e) => {
     setItemsPerPage(parseInt(e.target.value));
@@ -368,9 +370,22 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedProducts?.length === 0 ? (
                 <tr>
-                  <td colSpan="4" className="text-center p-4 text-gray-500 py-96">
-                    No products available for this location.
+                  <td colSpan="4" className="text-center p-4 text-gray-500 py-80">
+                    <h1 className="text-xl font-semibold text-neutral-800">No Products Available!</h1>
+                    <div>
+                      {locationNameForMessage === "" ? (
+                        <span>Please  <span className='font-bold text-lg text-black'>select</span> a location to view inventory.</span>
+                      ) : (
+                        <div>
+                          <h1>Please update inventory for this location.</h1>
+                          <p>
+                            Currently, there are no products in stock for <span className='font-bold text-lg text-black'>{locationNameForMessage}</span>.
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </td>
+
                 </tr>
               ) : (
                 paginatedProducts?.map((product, index) => (
