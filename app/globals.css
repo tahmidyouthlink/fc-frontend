@@ -325,3 +325,24 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
   max-height: 150px; /* Restrict image height */
   object-fit: cover; /* Maintain aspect ratio */
 }
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-prefix,
+.input-suffix {
+  position: absolute;
+  top: 50%; /* Center vertically */
+  transform: translateY(-50%); /* Center adjustment */
+  font-size: 16px; /* Adjust font size */
+  color: #999; /* Color of the symbol */
+}
+
+.input-prefix {
+  left: 10px; /* Positioning for the dollar sign */
+}
+
+.input-suffix {
+  right: 10px; /* Positioning for the percentage sign */
+}

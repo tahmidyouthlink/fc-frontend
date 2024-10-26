@@ -4,22 +4,24 @@ import VendorSelect from '@/app/components/layout/VendorSelect';
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
-import { Button, DatePicker, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
+import useTags from '@/app/hooks/useTags';
+import { Button, Checkbox, DatePicker, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
+import ReactSelect from "react-select";
 
 const CreatePurchaseOrder = () => {
 
  const axiosPublic = useAxiosPublic();
  const [isSubmitting, setIsSubmitting] = useState(false);
  const router = useRouter();
- const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+ const { register, handleSubmit, setValue, control, formState: { errors } } = useForm();
  const [selectedVendor, setSelectedVendor] = useState("");
  const [selectedLocation, setSelectedLocation] = useState("");
  const [paymentTerms, setPaymentTerms] = useState("");
@@ -29,6 +31,38 @@ const CreatePurchaseOrder = () => {
  const { isOpen, onOpen, onOpenChange } = useDisclosure();
  const [filteredProducts, setFilteredProducts] = useState([]);
  const [selectedProducts, setSelectedProducts] = useState([]);
+ const [purchaseOrderVariants, setPurchaseOrderVariants] = useState([]);
+ const [tagList, isTagPending] = useTags();
+ const [selectedTags, setSelectedTags] = useState([]);
+ const [menuPortalTarget, setMenuPortalTarget] = useState(null);
+ const [shipping, setShipping] = useState(0);  // Initial value for shipping
+ const [discount, setDiscount] = useState(0);  // Initial value for discount
+
+ // Function to update the purchaseOrderVariant array for specific fields
+ const handleVariantChange = (index, field, value, productTitle, size) => {
+  setPurchaseOrderVariants(prevVariants => {
+   const updatedVariants = [...prevVariants];
+   if (!updatedVariants[index]) {
+    updatedVariants[index] = {};
+   }
+   updatedVariants[index][field] = value;
+
+   // Include productTitle and supplierSku in the variant data
+   updatedVariants[index].productTitle = productTitle;
+   updatedVariants[index].size = size;
+
+   return updatedVariants;
+  });
+ };
+
+ // Step 3: Handle input changes
+ const handleShippingChange = (e) => {
+  setShipping(parseFloat(e.target.value) || 0);  // Update state with parsed value
+ };
+
+ const handleDiscountChange = (e) => {
+  setDiscount(parseFloat(e.target.value) || 0);  // Update state with parsed value
+ };
 
  const handleSearchChange = (e) => {
   setSearchQuery(e.target.value);
@@ -95,8 +129,66 @@ const CreatePurchaseOrder = () => {
   return skuByProduct;
  };
 
+ // Function to toggle selection for a specific product size
+ const toggleProductSizeSelection = (product, size) => {
+  setSelectedProducts((prevSelectedProducts) => {
+   const isSelected = prevSelectedProducts.some(
+    (item) => item.productTitle === product.productTitle && item.size === size
+   );
+
+   if (isSelected) {
+    // Remove the selected size entry
+    return prevSelectedProducts.filter(
+     (item) => !(item.productTitle === product.productTitle && item.size === size)
+    );
+   } else {
+    // Add the selected size entry
+    return [
+     ...prevSelectedProducts,
+     { productTitle: product.productTitle, imageUrl: product.imageUrl, size }
+    ];
+   }
+  });
+ };
+
+ // Function to toggle selection for all sizes of a product
+ const toggleAllSizesForProduct = (product) => {
+  setSelectedProducts((prevSelectedProducts) => {
+   const allSizesSelected = Object.keys(product.skuBySize).every((size) =>
+    prevSelectedProducts.some(
+     (item) => item.productTitle === product.productTitle && item.size === size
+    )
+   );
+
+   if (allSizesSelected) {
+    // Deselect all sizes for the product
+    return prevSelectedProducts.filter(
+     (item) => item.productTitle !== product.productTitle
+    );
+   } else {
+    // Select all sizes for the product
+    const newSelections = Object.keys(product.skuBySize).map((size) => ({
+     productTitle: product.productTitle,
+     imageUrl: product.imageUrl,
+     size,
+    }));
+
+    // Filter out existing entries for this product, then add all sizes
+    return [
+     ...prevSelectedProducts.filter((item) => item.productTitle !== product.productTitle),
+     ...newSelections,
+    ];
+   }
+  });
+ };
+
  // Update filtered products whenever productList or searchQuery changes
  useEffect(() => {
+
+  if (typeof document !== 'undefined') {
+   setMenuPortalTarget(document.body);
+  }
+
   const totalSku = calculateSkuBySizeAndLocation(productList, selectedLocation);
   const filtered = totalSku.filter(product => {
    // Check if productTitle, sizes, locationSku, or totalSku match the search query
@@ -110,10 +202,42 @@ const CreatePurchaseOrder = () => {
   setFilteredProducts(filtered);
  }, [productList, searchQuery, selectedLocation]);
 
- const onSubmit = async (data) => {
-  setIsSubmitting(true);
+ // Assuming purchaseOrderVariants is your array of variants
+ const totals = purchaseOrderVariants.reduce(
+  (acc, variant) => {
+   const quantity = parseFloat(variant.quantity) || 0; // Default to 0 if undefined or NaN
+   const cost = parseFloat(variant.cost) || 0; // Default to 0 if undefined or NaN
+   const taxPercentage = parseFloat(variant.tax) || 0; // Default to 0 if undefined or NaN
 
-  const { estimatedArrival } = data;
+   // Calculate subtotal for this variant
+   const subtotal = quantity * cost; // Subtotal: cost based on quantity
+   const taxAmount = (subtotal * taxPercentage) / 100; // Calculate tax based on percentage
+
+   // Update totals
+   acc.totalQuantity += quantity; // Sum of quantities
+   acc.totalSubtotal += subtotal; // Total subtotal of all variants
+   acc.totalTax += taxAmount; // Sum of tax amounts
+
+   return acc; // Return the accumulator for the next iteration
+  },
+  {
+   totalQuantity: 0, // Initialize total quantity
+   totalSubtotal: 0, // Initialize total subtotal (costs before tax)
+   totalTax: 0, // Initialize total tax
+  }
+ );
+
+ // Access totals
+ const { totalQuantity, totalSubtotal, totalTax } = totals;
+
+ // Calculate total price including tax
+ const totalPrice = totalSubtotal + totalTax;
+ const total = totalPrice + shipping - discount;
+
+ const onSubmit = async (data) => {
+  // setIsSubmitting(true);
+
+  const { shipping, discount, referenceNumber, supplierNote, estimatedArrival } = data;
 
   // Get today's date (ignoring time)
   const today = new Date();
@@ -136,11 +260,41 @@ const CreatePurchaseOrder = () => {
   setDateError(false);
 
   const formattedEstimatedArrival = formatDate(estimatedArrival);
-  // console.log(formattedEstimatedArrival);
 
-  const vendorData = {
-
+  // Ensure required fields are filled
+  for (const variant of purchaseOrderVariants) {
+   if (!variant.quantity || variant.quantity <= 0) {
+    toast.error("Quantity must be greater than 0 for all products.");
+    return; // Prevent form submission
+   }
+   if (!variant.cost || variant.cost <= 0) {
+    toast.error("Cost must be greater than 0 for all products.");
+    return; // Prevent form submission
+   }
   }
+
+  const purchaseOrderData = {
+   estimatedArrival: formattedEstimatedArrival,
+   paymentTerms,
+   supplier: selectedVendor?.value,
+   destination: selectedLocation,
+   purchaseOrderVariants: purchaseOrderVariants?.map(variant => ({
+    productTitle: variant.productTitle,
+    supplierSku: parseFloat(variant.supplierSku) || null,
+    quantity: parseFloat(variant.quantity),
+    cost: parseFloat(variant.cost),
+    tax: parseFloat(variant.tax) || 0,
+    size: variant?.size
+   })),
+   tags: selectedTags,
+   referenceNumber,
+   supplierNote,
+   shippingCharge: parseFloat(shipping),
+   discountCharge: parseFloat(discount),
+   totalPrice: parseFloat(total)
+  }
+
+  console.log(purchaseOrderData);
 
   // try {
   //   const response = await axiosPublic.post('/addVendor', vendorData);
@@ -186,10 +340,9 @@ const CreatePurchaseOrder = () => {
   // }
  };
 
- // console.log(selectedVendor?.value, selectedLocation);
- // console.log(paymentTerms);
+ // console.log(selectedProducts);
 
- if (isProductPending) {
+ if (isProductPending || isTagPending) {
   return <Loading />
  }
 
@@ -262,7 +415,7 @@ const CreatePurchaseOrder = () => {
      <div className='bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
       <h1 className='font-bold text-lg'>Add products</h1>
       <div className='w-full pt-2'>
-       <li className="flex items-center relative group border-1.5 rounded-lg">
+       <li className="flex items-center relative group border-2 rounded-lg">
         <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
          <g>
           <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
@@ -278,6 +431,202 @@ const CreatePurchaseOrder = () => {
        </li>
       </div>
 
+      {selectedProducts?.length > 0 && <table className="w-full text-left border-collapse">
+       <thead className="sticky top-0 z-[1] bg-white">
+        <tr>
+         <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">
+          Products
+         </th>
+         <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">
+          Supplier SKU
+         </th>
+         <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">
+          Quantity
+         </th>
+         <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">
+          Cost
+         </th>
+         <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">
+          Tax
+         </th>
+         <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">
+          Total
+         </th>
+        </tr>
+       </thead>
+
+       <tbody className="bg-white divide-y divide-gray-200">
+        {selectedProducts?.map((product, index) => {
+         const quantity = parseFloat(purchaseOrderVariants[index]?.quantity) || 0; // Default to 0 if undefined or NaN
+         const cost = parseFloat(purchaseOrderVariants[index]?.cost) || 0; // Default to 0 if undefined or NaN
+         const taxPercentage = parseFloat(purchaseOrderVariants[index]?.tax) || 0; // Default to 0 if undefined or NaN
+
+         // Calculate total
+         const totalCost = quantity * cost; // Calculate cost based on quantity and cost per item
+         const taxAmount = (totalCost * taxPercentage) / 100; // Calculate tax based on percentage
+         const total = totalCost + taxAmount;
+
+         return (
+          <tr key={index} className="hover:bg-gray-50">
+           <td className="text-xs p-3 text-gray-700 text-center cursor-pointer flex flex-col lg:flex-row items-center gap-3">
+            <div>
+             <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt='productIMG' height={600} width={600} />
+            </div>
+            <div className='flex flex-col items-start'>
+             <p className='font-bold text-blue-700'>{product?.productTitle}</p>
+             <p className='font-medium text-neutral-800'>{product?.size}</p>
+            </div>
+           </td>
+           <td className="text-xs p-3 text-gray-700 text-center">
+            <input
+             id={`supplierSku-${index}`}
+             {...register(`supplierSku-${index}`)}
+             value={product.supplierSku}
+             onChange={(e) => handleVariantChange(index, 'supplierSku', e.target.value, product?.productTitle, product?.size)}
+             className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+             type="number"
+            />
+           </td>
+           <td className="text-xs p-3 text-gray-700 text-center">
+            <input
+             id={`quantity-${index}`}
+             {...register(`quantity-${index}`, { required: true })}
+             value={product.quantity}
+             onChange={(e) => handleVariantChange(index, 'quantity', e.target.value, product?.productTitle, product?.size)}
+             className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+             type="number"
+             min="0" // Prevents negative values in the input
+            />
+            {errors[`quantity-${index}`] && (
+             <p className="text-red-600 text-left">Quantity is required.</p>
+            )}
+           </td>
+           <td className="text-xs p-3 text-gray-700 text-center">
+            <div className="input-wrapper">
+             <span className="input-prefix">৳</span>
+             <input
+              id={`cost-${index}`}
+              {...register(`cost-${index}`, { required: true })}
+              value={product.cost}
+              onChange={(e) => handleVariantChange(index, 'cost', e.target.value, product?.productTitle, product?.size)}
+              className="pl-6 custom-number-input w-full pr-3 py-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+              type="number"
+              min="0" // Prevents negative values in the input
+             />
+             {errors[`cost-${index}`] && (
+              <p className="text-red-600 text-left">Cost is required.</p>
+             )}
+            </div>
+           </td>
+           <td className="text-xs p-3 text-gray-700 text-center">
+            <div className="input-wrapper">
+             <input
+              id={`tax-${index}`}
+              {...register(`tax-${index}`)} // No required validation here
+              value={product.tax} // Use tax from purchaseOrderVariants
+              onChange={(e) => handleVariantChange(index, 'tax', e.target.value, product?.productTitle, product?.size)}
+              className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+              type="number"
+             />
+             <span className="input-suffix">%</span>
+            </div>
+           </td>
+           <td className="text-xs p-3 text-gray-700 text-center">
+            <p className="font-bold">৳ {total.toFixed(2)}</p> {/* Display the total */}
+           </td>
+          </tr>
+         );
+        })}
+       </tbody>
+      </table>}
+      {selectedProducts?.length > 0 && <p className='px-4 pt-4 text-neutral-600 font-medium'>{selectedProducts?.length} variants on purchase order</p>}
+     </div>
+
+     <div className='flex w-full justify-between items-start gap-6'>
+      <div className='flex-1 flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+       <h1 className='font-semibold'>Additional Details</h1>
+       <div>
+        <label htmlFor='referenceNumber' className='flex justify-start font-medium text-neutral-800 pb-2'>Reference Number</label>
+        <input
+         id={`referenceNumber`}
+         {...register(`referenceNumber`)}
+         className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+         type="number"
+        />
+       </div>
+       <div>
+        <label htmlFor='supplierNote' className='flex justify-start font-medium text-neutral-800 pb-2'>Note to supplier</label>
+        <input
+         id={`supplierNote`}
+         {...register(`supplierNote`)}
+         className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+         type="text"
+        />
+       </div>
+       <div>
+        <label htmlFor='tags' className='flex justify-start font-medium pb-1'>Select Tag</label>
+        <Controller
+         name="tags"
+         control={control}
+         defaultValue={selectedTags}
+         render={({ field }) => (
+          <div className="parent-container">
+           <ReactSelect
+            {...field}
+            options={tagList}
+            isMulti
+            className="w-full border rounded-md creatable-select-container"
+            value={selectedTags}
+            menuPortalTarget={menuPortalTarget}
+            styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+            menuPlacement="auto"
+            onChange={(newValue) => {
+             setSelectedTags(newValue);
+             field.onChange(newValue);
+            }}
+           />
+          </div>
+         )}
+        />
+       </div>
+      </div>
+      <div className='flex-1 flex flex-col justify-between gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+       <h1 className='font-semibold'>Cost summary</h1>
+       <div className='flex justify-between items-center gap-6'>
+        <h2 className='font-medium'>Taxes (Included)</h2>
+        <p>৳ {totalTax.toFixed(2)}</p>
+       </div>
+       <div className='flex justify-between items-center gap-6'>
+        <h2 className='font-semibold'>Subtotal</h2>
+        <p>৳ {totalPrice.toFixed(2)}</p>
+       </div>
+       <p>{totalQuantity}  items</p>
+       <h1 className='font-semibold'>Cost adjustments</h1>
+       <div className='flex justify-between items-center gap-6'>
+        <label htmlFor='shipping' className='flex w-full justify-start font-medium text-neutral-800'>Shipping +</label>
+        <input
+         id='shipping'
+         {...register('shipping')}
+         className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+         type="number"
+         onChange={handleShippingChange}  // Step 3: Update shipping state on change
+        />
+       </div>
+       <div className='flex justify-between items-center gap-6'>
+        <label htmlFor='discount' className='flex w-full justify-start font-medium text-neutral-800'>Discount -</label>
+        <input
+         id='discount'
+         {...register('discount')}
+         className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+         type="number"
+         onChange={handleDiscountChange}  // Step 3: Update discount state on change
+        />
+       </div>
+       <div className='flex justify-between items-center gap-6'>
+        <p>Total</p>
+        <p className='font-bold'>৳ {total}</p>
+       </div>
+      </div>
      </div>
 
      {/* Submit Button */}
@@ -285,7 +634,7 @@ const CreatePurchaseOrder = () => {
       <button
        type='submit'
        disabled={isSubmitting}
-       className={`mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium ${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium`}
+       className={`mt-4 mb-8 bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold ${isSubmitting ? 'bg-gray-400' : 'bg-neutral-950 hover:bg-neutral-800'} text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}
       >
        {isSubmitting ? 'Saving...' : 'Save'}
       </button>
@@ -312,6 +661,7 @@ const CreatePurchaseOrder = () => {
            placeholder="Search products"
            value={searchQuery}
            onChange={handleSearchChange}
+           autoFocus
            className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-white text-[#0d0c22] transition duration-300 ease-in-out focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:bg-white  text-[12px] md:text-base"
           />
          </li>
@@ -334,56 +684,60 @@ const CreatePurchaseOrder = () => {
          </thead>
 
          <tbody className="bg-white divide-y divide-gray-200">
-          {filteredProducts?.length === 0 ? (
+          {filteredProducts.length === 0 ? (
            <tr>
             <td colSpan="3" className="text-center p-4 text-gray-500 py-32">
-             <h1 className="text-xl font-semibold text-neutral-800">
-              No Products Available!
-             </h1>
+             <h1 className="text-xl font-semibold text-neutral-800">No Products Available!</h1>
             </td>
            </tr>
           ) : (
-           filteredProducts?.map((product, index) => (
+           filteredProducts.map((product, index) => (
             <React.Fragment key={index}>
              <tr className="hover:bg-gray-50 transition-colors">
-              {/* Product Image and Title */}
               <td className="text-xs p-3 cursor-pointer flex items-center gap-3">
+               <Checkbox
+                isSelected={
+                 selectedProducts.some((p) => p.productTitle === product.productTitle) &&
+                 Object.keys(product.skuBySize).every((size) =>
+                  selectedProducts.some(
+                   (p) => p.productTitle === product.productTitle && p.size === size
+                  )
+                 )
+                }
+                onValueChange={() => toggleAllSizesForProduct(product)}
+               />
                <div>
                 <Image
                  className="h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5"
-                 src={product?.imageUrl}
+                 src={product.imageUrl}
                  alt="productIMG"
                  height={600}
                  width={600}
                 />
                </div>
                <div className="flex flex-col">
-                <p className="font-bold text-sm">{product?.productTitle}</p>
+                <p className="font-bold text-sm">{product.productTitle}</p>
                </div>
               </td>
-              {/* Empty cell in the first row for other columns */}
               <td colSpan="2"></td>
              </tr>
 
-             {/* SKU by Size Rows */}
-             {Object.keys(product?.skuBySize)?.map((size) => (
-              <tr
-               key={`${index}-${size}`}
-               className="hover:bg-gray-50 transition-colors"
-              >
-               {/* Display size in the product name column */}
-               <td className="pl-12 text-xs p-3 text-gray-600">
-                <span className="font-semibold">{size}</span>
+             {Object.keys(product.skuBySize).map((size) => (
+              <tr key={`${index}-${size}`} className="hover:bg-gray-50 transition-colors">
+               <td className="pl-12 text-xs p-3 text-gray-600 flex items-center">
+                <Checkbox
+                 isSelected={selectedProducts.some(
+                  (p) => p.productTitle === product.productTitle && p.size === size
+                 )}
+                 onValueChange={() => toggleProductSizeSelection(product, size)}
+                />
+                <span className="font-semibold ml-2">{size}</span>
                </td>
-
-               {/* Available at selected location */}
                <td className="text-center">
-                {product?.skuBySize[size]?.locationSku}
+                {product.skuBySize[size]?.locationSku}
                </td>
-
-               {/* Total SKU available for that size */}
                <td className="text-center">
-                {product?.skuBySize[size]?.totalSku}
+                {product.skuBySize[size]?.totalSku}
                </td>
               </tr>
              ))}
@@ -393,13 +747,18 @@ const CreatePurchaseOrder = () => {
          </tbody>
         </table>
        </ModalBody>
-       <ModalFooter>
-        <Button size='sm' variant="bordered" onPress={onClose}>
-         Cancel
-        </Button>
-        <Button size='sm' className='bg-neutral-700 text-white font-bold' onPress={onClose}>
-         Done
-        </Button>
+       <ModalFooter className='flex justify-between items-center'>
+        <div>
+         {selectedProducts?.length > 0 && <p className='border px-4 rounded-lg shadow py-1'>{selectedProducts?.length} variants selected</p>}
+        </div>
+        <div className='flex gap-4 items-center'>
+         <Button size='sm' variant="bordered" onPress={onClose}>
+          Cancel
+         </Button>
+         <Button size='sm' className='bg-neutral-700 text-white font-bold' onPress={onClose}>
+          Done
+         </Button>
+        </div>
        </ModalFooter>
       </>
      )}

@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import ReactSelect from "react-select";
 import ColorOption from '@/app/components/layout/ColorOption';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { CheckboxGroup, Select, SelectItem, Tabs, Tab, RadioGroup, Radio, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
+import { CheckboxGroup, Select, SelectItem, Tabs, Tab, RadioGroup, Radio } from "@nextui-org/react";
 import 'react-quill/dist/quill.snow.css';
 import dynamic from 'next/dynamic';
 import { CustomCheckbox } from '@/app/components/layout/CustomCheckBox';
