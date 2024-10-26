@@ -3,7 +3,7 @@ import useLocations from '@/app/hooks/useLocations';
 import React, { useMemo } from 'react';
 import Loading from '../shared/Loading/Loading';
 
-const LocationSelect = ({ selectedLocation, setSelectedLocation }) => {
+const LocationSelect = ({ selectedLocation, setSelectedLocation, register, errors }) => {
   const [locationList, isLocationPending] = useLocations();
 
   const activeLocation = useMemo(() => {
@@ -23,6 +23,8 @@ const LocationSelect = ({ selectedLocation, setSelectedLocation }) => {
     <div className='flex-1 space-y-3'>
       <h1 className='font-medium'>Destination</h1>
       <select
+        id="selectedLocation"
+        {...register('selectedLocation', { required: 'Please select a destination.' })}
         className='font-semibold text-lg'
         value={selectedLocation} // Set selected value here
         onChange={handleSelectChangeLocation}
@@ -36,9 +38,13 @@ const LocationSelect = ({ selectedLocation, setSelectedLocation }) => {
         ))}
       </select>
 
+      {errors.selectedLocation && (
+        <p className="text-red-600 text-left">{errors.selectedLocation.message}</p>
+      )}
+
       {selectedLocation && (
         <div>
-          <p className='text-neutral-600 font-medium'>{activeLocation?.find(loc => loc.locationName === selectedLocation)?.locationAddress}</p>
+          <p className='text-neutral-500 font-medium'>{activeLocation?.find(loc => loc.locationName === selectedLocation)?.locationAddress}</p>
         </div>
       )}
     </div>

@@ -3,7 +3,7 @@ import useVendors from '@/app/hooks/useVendors';
 import React from 'react';
 import Loading from '../shared/Loading/Loading';
 
-const VendorSelect = ({ selectedVendor, setSelectedVendor }) => {
+const VendorSelect = ({ selectedVendor, setSelectedVendor, register, errors }) => {
   const [vendorList, isVendorPending] = useVendors();
 
   const handleSelectChange = (e) => {
@@ -20,6 +20,8 @@ const VendorSelect = ({ selectedVendor, setSelectedVendor }) => {
     <div className='flex-1 space-y-3'>
       <h1 className='font-medium'>Supplier</h1>
       <select
+        id="selectedVendor"
+        {...register('selectedVendor', { required: 'Please select a supplier.' })}
         className='font-semibold text-lg'
         value={selectedVendor?.value || ""}
         onChange={handleSelectChange}
@@ -33,9 +35,13 @@ const VendorSelect = ({ selectedVendor, setSelectedVendor }) => {
         ))}
       </select>
 
+      {errors.selectedVendor && (
+        <p className="text-red-600 text-left">{errors.selectedVendor.message}</p>
+      )}
+
       {selectedVendor && (
         <div>
-          <p className='text-neutral-600 font-medium'>{selectedVendor.vendorAddress}</p>
+          <p className='text-neutral-500 font-medium'>{selectedVendor.vendorAddress}</p>
         </div>
       )}
     </div>
