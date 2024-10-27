@@ -23,7 +23,7 @@ const VendorSelect = ({ selectedVendor, setSelectedVendor, register, errors }) =
         id="selectedVendor"
         {...register('selectedVendor', { required: 'Please select a supplier.' })}
         className='font-semibold text-lg'
-        value={selectedVendor?.value || ""}
+        value={selectedVendor?.value || "" || selectedVendor}
         onChange={handleSelectChange}
         style={{ zIndex: 10, pointerEvents: 'auto', position: 'relative', outline: 'none' }}
       >
@@ -41,7 +41,11 @@ const VendorSelect = ({ selectedVendor, setSelectedVendor, register, errors }) =
 
       {selectedVendor && (
         <div>
-          <p className='text-neutral-500 font-medium'>{selectedVendor.vendorAddress}</p>
+          <p className="text-neutral-500 font-medium">
+            {selectedVendor?.value
+              ? vendorList.find(ven => ven.value === selectedVendor.value)?.vendorAddress
+              : vendorList.find(ven => ven.value === selectedVendor)?.vendorAddress}
+          </p>
         </div>
       )}
     </div>

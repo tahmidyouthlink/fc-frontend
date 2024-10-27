@@ -4,6 +4,7 @@ import VendorSelect from '@/app/components/layout/VendorSelect';
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
+import usePurchaseOrders from '@/app/hooks/usePurchaseOrders';
 import useTags from '@/app/hooks/useTags';
 import { Button, Checkbox, DatePicker, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import Image from 'next/image';
@@ -37,6 +38,7 @@ const CreatePurchaseOrder = () => {
 	const [menuPortalTarget, setMenuPortalTarget] = useState(null);
 	const [shipping, setShipping] = useState(0);  // Initial value for shipping
 	const [discount, setDiscount] = useState(0);  // Initial value for discount
+	const [purchaseOrderList, isPurchaseOrderPending] = usePurchaseOrders();
 
 	// Update handleVariantChange to initialize values if not set
 	const handleVariantChange = (index, field, value, productTitle, size) => {
@@ -286,6 +288,18 @@ const CreatePurchaseOrder = () => {
 	const totalPrice = totalSubtotal + totalTax;
 	const total = totalPrice + shipping - discount;
 
+	const getNextOrderNumber = () => {
+		if (!purchaseOrderList || purchaseOrderList.length === 0) {
+			return 1; // Start from 1 if no orders exist
+		}
+
+		// Extract existing order numbers and find the maximum
+		const existingOrderNumbers = purchaseOrderList.map(order =>
+			parseInt(order.purchaseOrderNumber.replace('P', '')) // Adjusted to use purchaseOrderNumber
+		);
+		return Math.max(...existingOrderNumbers) + 1; // Increment the maximum order number
+	};
+
 	const onSubmit = async (data) => {
 		setIsSubmitting(true);
 
@@ -305,6 +319,7 @@ const CreatePurchaseOrder = () => {
 		const selectedEstimatedArrival = new Date(estimatedArrival);
 		if (selectedEstimatedArrival < today) {
 			toast.error("Expiry date cannot be in the past.");
+			setIsSubmitting(false);
 			return;  // Prevent form submission
 		}
 
@@ -315,6 +330,7 @@ const CreatePurchaseOrder = () => {
 
 		if (selectedProducts.length === 0) {
 			toast.error("Please add product.");
+			setIsSubmitting(false);
 			return;
 		}
 
@@ -322,18 +338,23 @@ const CreatePurchaseOrder = () => {
 		for (const variant of purchaseOrderVariants) {
 			if (!variant.quantity || variant.quantity <= 0) {
 				toast.error("Quantity must be greater than 0 for all products.");
+				setIsSubmitting(false);
 				return; // Prevent form submission
 			}
 			if (!variant.cost || variant.cost <= 0) {
 				toast.error("Cost must be greater than 0 for all products.");
+				setIsSubmitting(false);
 				return; // Prevent form submission
 			}
 		}
 
+		const nextOrderNumber = getNextOrderNumber();
+		const purchaseOrderNumber = `P${nextOrderNumber.toString().padStart(3, '0')}`; // Create the new purchase order number
+
 		const purchaseOrderData = {
 			estimatedArrival: formattedEstimatedArrival,
 			paymentTerms,
-			supplier: selectedVendor?.value,
+			supplier: selectedVendor,
 			destination: selectedLocation,
 			purchaseOrderVariants: purchaseOrderVariants?.map(variant => ({
 				productTitle: variant.productTitle,
@@ -341,14 +362,17 @@ const CreatePurchaseOrder = () => {
 				quantity: parseFloat(variant.quantity),
 				cost: parseFloat(variant.cost),
 				tax: parseFloat(variant.tax) || 0,
-				size: variant?.size
+				size: variant?.size,
 			})),
 			tags: selectedTags,
 			referenceNumber,
 			supplierNote,
 			shippingCharge: parseFloat(shipping) || 0,
 			discountCharge: parseFloat(discount) || 0,
-			totalPrice: parseFloat(total)
+			totalPrice: parseFloat(total),
+			purchaseOrderNumber,
+			status: "pending",
+			selectedProducts
 		}
 
 		try {
@@ -395,7 +419,7 @@ const CreatePurchaseOrder = () => {
 		}
 	};
 
-	if (isProductPending || isTagPending) {
+	if (isProductPending || isTagPending || isPurchaseOrderPending) {
 		return <Loading />
 	}
 
@@ -570,7 +594,7 @@ const CreatePurchaseOrder = () => {
 																{...register(`cost-${index}`, { required: true })}
 																value={purchaseOrderVariants[index]?.cost || ''}
 																onChange={(e) => handleVariantChange(index, 'cost', e.target.value, product?.productTitle, product?.size)}
-																className="pl-6 custom-number-input w-full pr-3 py-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+																className="pl-7 custom-number-input w-full pr-3 py-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
 																type="number"
 																min="0" // Prevents negative values in the input
 															/>

@@ -12,7 +12,8 @@ const LocationSelect = ({ selectedLocation, setSelectedLocation, register, error
 
   const handleSelectChangeLocation = (e) => {
     const locationValue = e.target.value;
-    setSelectedLocation(locationValue);
+    const location = activeLocation?.find(l => l.locationName === locationValue);
+    setSelectedLocation(location);
   };
 
   if (isLocationPending) {
@@ -26,7 +27,7 @@ const LocationSelect = ({ selectedLocation, setSelectedLocation, register, error
         id="selectedLocation"
         {...register('selectedLocation', { required: 'Please select a destination.' })}
         className='font-semibold text-lg'
-        value={selectedLocation} // Set selected value here
+        value={selectedLocation?.locationName || "" || selectedLocation} // Set selected value here
         onChange={handleSelectChangeLocation}
         style={{ zIndex: 10, pointerEvents: 'auto', position: 'relative', outline: 'none' }}
       >
@@ -45,6 +46,11 @@ const LocationSelect = ({ selectedLocation, setSelectedLocation, register, error
       {selectedLocation && (
         <div>
           <p className='text-neutral-500 font-medium'>{activeLocation?.find(loc => loc.locationName === selectedLocation)?.locationAddress}</p>
+          <p className="text-neutral-500 font-medium">
+            {selectedLocation?.locationAddress
+              ? activeLocation.find(loc => loc.locationAddress === selectedLocation.locationAddress)?.locationAddress
+              : activeLocation.find(loc => loc.locationAddress === selectedLocation)?.locationAddress}
+          </p>
         </div>
       )}
     </div>
