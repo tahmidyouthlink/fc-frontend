@@ -4,8 +4,6 @@ import arrowSvgImage from "../../../public/card-images/arrow.svg";
 import arrivals1 from "../../../public/card-images/arrivals1.svg";
 import arrivals2 from "../../../public/card-images/arrivals2.svg";
 import CustomPagination from '@/app/components/layout/CustomPagination';
-import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import TabsOrder from '@/app/components/layout/TabsOrder';
 import Link from 'next/link';
 import usePurchaseOrders from '@/app/hooks/usePurchaseOrders';
@@ -17,7 +15,7 @@ const orderStatusTabs = [
   'Pending',
   'Ordered',
   'Received',
-  'Closed'
+  'Canceled'
 ];
 
 const PurchaseOrders = () => {
@@ -47,22 +45,22 @@ const PurchaseOrders = () => {
     return purchaseOrderList?.filter(order => {
       // Check if any product detail contains the search query
       const productMatch = order.purchaseOrderVariants.some(product => {
-        const productTitle = (product.productTitle || '').toString().toLowerCase();
+        const productTitle = (product.productTitle || '').toLowerCase();
         const size = (typeof product.size === 'string' ? product.size : '').toLowerCase();
-        const sku = (product.supplierSku || '').toString(); // SKU might be numeric, so keep it as a string
+        const sku = (product.supplierSku || '').toString();
 
         return (
           productTitle.includes(query) ||
           size.includes(query) ||
-          (isNumberQuery && sku === query) // Numeric comparison for SKU
+          (isNumberQuery && sku === query)
         );
       });
 
       // Check if order details match the search query
       const orderMatch = (
         (order.purchaseOrderNumber || '').toLowerCase().includes(query) ||
-        (order.supplier || '').toLowerCase().includes(query) ||
-        (order.destination || '').toLowerCase().includes(query) ||
+        (order.supplier.value || '').toLowerCase().includes(query) ||  // Access supplier name
+        (order.destination.locationName || '').toLowerCase().includes(query) ||  // Access destination location name
         (order.totalPrice || '').toString().includes(query) ||
         (order.status || '').toLowerCase().includes(query)
       );
@@ -87,8 +85,8 @@ const PurchaseOrders = () => {
       case 'Received':
         filtered = purchaseOrderList?.filter(order => order?.status === 'received');
         break;
-      case 'Closed':
-        filtered = purchaseOrderList?.filter(order => order?.status === 'closed');
+      case 'Canceled':
+        filtered = purchaseOrderList?.filter(order => order?.status === 'canceled');
         break;
       default:
         filtered = purchaseOrderList;
@@ -226,7 +224,7 @@ const PurchaseOrders = () => {
                   return (
                     <tr key={index} className="hover:bg-gray-50">
                       <td onClick={() => handleGoToEditPage(order?._id)} className="text-sm p-3 cursor-pointer text-blue-600 hover:text-blue-800">
-                        #{order?.purchaseOrderNumber}
+                        {order?.purchaseOrderNumber}
                       </td>
                       <td className="text-sm p-3 text-neutral-500 font-semibold">
                         {order?.supplier?.value}

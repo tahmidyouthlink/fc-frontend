@@ -45,12 +45,7 @@ const LocationSelect = ({ selectedLocation, setSelectedLocation, register, error
 
       {selectedLocation && (
         <div>
-          <p className='text-neutral-500 font-medium'>{activeLocation?.find(loc => loc.locationName === selectedLocation)?.locationAddress}</p>
-          <p className="text-neutral-500 font-medium">
-            {selectedLocation?.locationAddress
-              ? activeLocation.find(loc => loc.locationAddress === selectedLocation.locationAddress)?.locationAddress
-              : activeLocation.find(loc => loc.locationAddress === selectedLocation)?.locationAddress}
-          </p>
+          <p className='text-neutral-500 font-medium'>{selectedLocation?.locationName}, {selectedLocation?.cityName}, {selectedLocation?.postalCode}</p>
         </div>
       )}
     </div>
