@@ -121,8 +121,6 @@ const PurchaseOrders = () => {
     return <Loading />
   }
 
-  console.log(paginatedOrders);
-
   return (
     <div className='relative w-full min-h-screen bg-gray-100'>
 

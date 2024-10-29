@@ -3,7 +3,7 @@ import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -13,6 +13,7 @@ import VendorSelect from '@/app/components/layout/VendorSelect';
 import LocationSelect from '@/app/components/layout/LocationSelect';
 import Image from 'next/image';
 import { Button, Checkbox, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
+import Progressbar from '@/app/components/layout/Progressbar';
 
 const EditPurchaseOrderPage = () => {
 
@@ -345,6 +346,18 @@ const EditPurchaseOrderPage = () => {
   const totalPrice = totalSubtotal + totalTax;
   const total = totalPrice + shipping - discount;
 
+  const totalAcceptRejectValues = useMemo(() =>
+    purchaseOrderVariants?.reduce(
+      ({ totalQuantity, totalAccept, totalReject }, { quantity = 0, accept = 0, reject = 0 }) => ({
+        totalQuantity: totalQuantity + quantity,
+        totalAccept: totalAccept + accept,
+        totalReject: totalReject + reject,
+      }),
+      { totalQuantity: 0, totalAccept: 0, totalReject: 0 }
+    ),
+    [purchaseOrderVariants]
+  );
+
   const onSubmit = async (data) => {
 
     const { shipping, discount, referenceNumber, supplierNote, estimatedArrival, paymentTerms, status } = data;
@@ -566,7 +579,24 @@ const EditPurchaseOrderPage = () => {
           </div>
 
           <div className='bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-            <h1 className='font-bold text-lg'>{["ordered", "received", "canceled"].includes(purchaseOrderStatus) ? "Ordered products" : "Add products"}</h1>
+            <div className='flex justify-between items-center gap-6'>
+              <h1 className='font-bold text-lg flex-1'>{["ordered", "received", "canceled"].includes(purchaseOrderStatus) ? "Ordered products" : "Add products"}</h1>
+              <div className='flex-1'>
+                {purchaseOrderStatus === "received" ? <div className=''>
+                  <div className='flex flex-col'>
+                    <Progressbar
+                      accepted={totalAcceptRejectValues.totalAccept}
+                      rejected={totalAcceptRejectValues.totalReject}
+                      total={totalAcceptRejectValues.totalQuantity}
+                    />
+                    <div className="mt-1">
+                      {totalAcceptRejectValues.totalAccept} of {totalAcceptRejectValues.totalQuantity}
+                    </div>
+                  </div>
+                </div> : ""}
+              </div>
+            </div>
+
             {["ordered", "received", "canceled"].includes(purchaseOrderStatus) ? "" : <div className='w-full pt-2'>
               <li className="flex items-center relative group border-2 rounded-lg">
                 <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
@@ -737,7 +767,7 @@ const EditPurchaseOrderPage = () => {
                       id={`referenceNumber`}
                       {...register(`referenceNumber`)}
                       className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                      type="number"
+                      type="text"
                     />
                   </div>
                   <div>
@@ -973,16 +1003,6 @@ const EditPurchaseOrderPage = () => {
                                   {entry.size}
                                   <span className='flex items-center gap-2'>
                                     {entry.color.name}
-                                    <span
-                                      style={{
-                                        display: 'inline-block',
-                                        width: '20px',
-                                        height: '20px',
-                                        backgroundColor: entry.color.code || '#fff',
-                                        marginRight: '8px',
-                                        borderRadius: '4px'
-                                      }}
-                                    />
                                   </span>
                                 </span>
                               </td>

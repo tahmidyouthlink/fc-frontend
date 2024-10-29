@@ -1,10 +1,10 @@
 "use client";
-import LocationSelect from '@/app/components/layout/LocationSelect';
-import VendorSelect from '@/app/components/layout/VendorSelect';
+import DestinationSelect from '@/app/components/layout/DestinationSelect';
+import OriginSelect from '@/app/components/layout/OriginSelect';
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
-import usePurchaseOrders from '@/app/hooks/usePurchaseOrders';
+import useTransferOrders from '@/app/hooks/useTransferOrders';
 import { Button, Checkbox, DatePicker, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -15,29 +15,25 @@ import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 
-const CreatePurchaseOrder = () => {
+const CreateTransfer = () => {
 
-  const isAdmin = false;
-  const axiosPublic = useAxiosPublic();
   const router = useRouter();
+  const axiosPublic = useAxiosPublic();
   const { register, handleSubmit, setValue, formState: { errors } } = useForm();
-  const [selectedVendor, setSelectedVendor] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("");
-  const [paymentTerms, setPaymentTerms] = useState("");
+  const [selectedOrigin, setSelectedOrigin] = useState("");
+  const [selectedDestination, setSelectedDestination] = useState("");
   const [dateError, setDateError] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [productList, isProductPending] = useProductsInformation();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [productList, isProductPending] = useProductsInformation();
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
-  const [purchaseOrderVariants, setPurchaseOrderVariants] = useState([]);
-  const [shipping, setShipping] = useState(0);  // Initial value for shipping
-  const [discount, setDiscount] = useState(0);  // Initial value for discount
-  const [purchaseOrderList, isPurchaseOrderPending] = usePurchaseOrders();
+  const [transferOrderVariants, setTransferOrderVariants] = useState([]);
+  const [transferOrderList, isTransferOrderPending] = useTransferOrders();
 
   // Update handleVariantChange to initialize values if not set
   const handleVariantChange = (index, field, value, productTitle, size, colorName, colorCode) => {
-    setPurchaseOrderVariants((prevVariants) => {
+    setTransferOrderVariants((prevVariants) => {
       const updatedVariants = [...prevVariants];
 
       // Initialize the variant object if it does not exist
@@ -64,19 +60,6 @@ const CreatePurchaseOrder = () => {
     });
   };
 
-  // Step 3: Handle input changes
-  const handleShippingChange = (e) => {
-    setShipping(parseFloat(e.target.value) || 0);  // Update state with parsed value
-  };
-
-  const handleDiscountChange = (e) => {
-    setDiscount(parseFloat(e.target.value) || 0);  // Update state with parsed value
-  };
-
-  const handlePaymentTerms = (value) => {
-    setPaymentTerms(value);
-  }
-
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
     if (e.target.value) {
@@ -101,8 +84,8 @@ const CreatePurchaseOrder = () => {
   };
 
   // Function to calculate total SKU per size and SKU for selected location
-  const calculateSkuBySizeAndColorAndLocation = (productList, selectedLocation) => {
-    if (!productList || !selectedLocation) return [];
+  const calculateSkuBySizeAndColorAndLocation = (productList, selectedOrigin, selectedDestination) => {
+    if (!productList || !selectedOrigin || !selectedDestination) return [];
 
     const skuByProduct = [];
 
@@ -111,59 +94,71 @@ const CreatePurchaseOrder = () => {
 
       product.productVariants.forEach((variant) => {
         const size = variant.size;
-        const colorCode = variant.color?.color; // Hex code for the color
-        const colorName = variant.color?.value; // Name of the color
+        const colorCode = variant.color?.color;  // Hex code for the color
+        const colorName = variant.color?.value;  // Name of the color
         const sku = variant.sku || 0;
 
-        // Find an existing entry for this size and color
+        // Find or create an entry in skuEntries for this specific size and color
         let entry = skuEntries.find(
           (e) => e.size === size && e.color.code === colorCode
         );
 
         if (!entry) {
-          // If not found, initialize a new entry for this size and color
-          entry = { size, color: { code: colorCode, name: colorName }, locationSku: 0, totalSku: 0 };
+          // If entry does not exist, initialize it
+          entry = {
+            size,
+            color: { code: colorCode, name: colorName },
+            originSku: 0,
+            destinationSku: 0,
+          };
           skuEntries.push(entry);
         }
 
-        // Add to total SKU for this size and color
-        entry.totalSku += sku;
+        // Increment originSku if the location matches selectedOrigin location
+        if (variant.location === selectedOrigin.locationName) {
+          entry.originSku += sku;
+        }
 
-        // If the variant matches the selected location, add its SKU to locationSku
-        if (variant.location === selectedLocation) {
-          entry.locationSku += sku;
+        // Increment destinationSku if the location matches selectedDestination location
+        if (variant.location === selectedDestination.locationName) {
+          entry.destinationSku += sku;
         }
       });
 
+      // Push the completed SKU data for each product, including title and image
       skuByProduct.push({
         productTitle: product.productTitle,
-        skuBySizeAndColor: skuEntries,
         imageUrl: product?.imageUrls[0],
+        skuBySizeAndColor: skuEntries,
       });
     });
 
     return skuByProduct;
   };
 
-  // Function to toggle selection for a specific product size
-  const toggleProductSizeColorSelection = (product, size, colorCode, colorName) => {
+  // Function to toggle selection for a specific product size and originSku
+  const toggleProductSizeColorSelection = (product, size, colorCode, colorName, originSku) => {
     setSelectedProducts((prevSelectedProducts) => {
       const isSelected = prevSelectedProducts.some(
         (item) =>
           item.productTitle === product.productTitle &&
           item.size === size &&
-          item.color === colorCode && // Check color code
-          item.name === colorName // Check color name
+          item.color === colorCode &&
+          item.name === colorName &&
+          item.originSku === originSku // Check originSku
       );
 
       if (isSelected) {
         // Deselect the specific entry
         return prevSelectedProducts.filter(
           (item) =>
-            !(item.productTitle === product.productTitle &&
+            !(
+              item.productTitle === product.productTitle &&
               item.size === size &&
               item.color === colorCode &&
-              item.name === colorName)
+              item.name === colorName &&
+              item.originSku === originSku // Check originSku
+            )
         );
       } else {
         // Select the specific entry
@@ -173,15 +168,16 @@ const CreatePurchaseOrder = () => {
             productTitle: product.productTitle,
             imageUrl: product.imageUrl,
             size,
-            color: colorCode, // Store the color code
-            name: colorName, // Store the color name
+            color: colorCode,
+            name: colorName,
+            originSku, // Store originSku
           },
         ];
       }
     });
   };
 
-  // Function to toggle selection for all sizes of a product
+  // Function to toggle selection for all sizes of a product including originSku
   const toggleAllSizesAndColorsForProduct = (product) => {
     setSelectedProducts((prevSelectedProducts) => {
       const allSelected = product.skuBySizeAndColor.every((entry) =>
@@ -189,8 +185,9 @@ const CreatePurchaseOrder = () => {
           (item) =>
             item.productTitle === product.productTitle &&
             item.size === entry.size &&
-            item.color === entry.color?.code && // Ensure color is correctly accessed
-            item.name === entry.color?.name // Ensure color name is checked
+            item.color === entry.color?.code &&
+            item.name === entry.color?.name &&
+            item.originSku === entry.originSku // Check originSku
         )
       );
 
@@ -203,11 +200,12 @@ const CreatePurchaseOrder = () => {
           productTitle: product.productTitle,
           imageUrl: product.imageUrl,
           size: entry.size,
-          color: entry.color?.code, // Store color code
-          name: entry.color?.name, // Store color name
+          color: entry.color?.code,
+          name: entry.color?.name,
+          originSku: entry.originSku, // Store originSku
         }));
 
-        // Filter out existing entries for this product and add all sizes/colors
+        // Filter out existing entries for this product and add all sizes/colors with originSku
         return [
           ...prevSelectedProducts.filter((item) => item.productTitle !== product.productTitle),
           ...newSelections,
@@ -230,7 +228,7 @@ const CreatePurchaseOrder = () => {
       return updatedSelectedProducts;
     });
 
-    setPurchaseOrderVariants((prevVariants) => {
+    setTransferOrderVariants((prevVariants) => {
       const updatedVariants = prevVariants.filter((variant) => {
         const titleMatches = variant.productTitle === product.productTitle;
         const sizeMatches = variant.size === size;
@@ -244,89 +242,55 @@ const CreatePurchaseOrder = () => {
 
   // Update filtered products whenever productList or searchQuery changes
   useEffect(() => {
-    const totalSku = calculateSkuBySizeAndColorAndLocation(productList, selectedLocation?.locationName);
+    const totalSku = calculateSkuBySizeAndColorAndLocation(productList, selectedOrigin, selectedDestination);
 
-    const filtered = totalSku.filter(product => {
+    const filtered = totalSku.filter((product) => {
       // Check if productTitle matches the search query
       const titleMatches = product.productTitle.toLowerCase().includes(searchQuery.toLowerCase());
 
-      // Check if sizes, colors, locationSku, or totalSku match the search query
-      const sizeOrColorMatches = product.skuBySizeAndColor.some(entry => {
+      // Check if sizes, colors, originSku, or destinationSku match the search query
+      const sizeOrColorMatches = product.skuBySizeAndColor.some((entry) => {
         // Check if entry.size matches the search query
         const sizeMatches = entry.size.toString().toLowerCase().includes(searchQuery.toLowerCase());
 
-        // Assuming entry.color is an object with a 'name' property
+        // Check if entry.color name matches the search query
         const colorNameMatches = entry.color && typeof entry.color.name === 'string' && entry.color.name.toLowerCase().includes(searchQuery.toLowerCase());
 
         return sizeMatches || colorNameMatches;
       });
 
-      // Check if locationSku matches the search query
-      const locationSkuMatches = product.skuBySizeAndColor.some(entry => {
-        return entry.locationSku.toString().includes(searchQuery);
+      // Check if originSku matches the search query
+      const originSkuMatches = product.skuBySizeAndColor.some((entry) => {
+        return entry.originSku.toString().includes(searchQuery);
       });
 
-      // Check if totalSku matches the search query
-      const totalSkuMatches = product.skuBySizeAndColor.some(entry => {
-        return entry.totalSku.toString().includes(searchQuery);
+      // Check if destinationSku matches the search query
+      const destinationSkuMatches = product.skuBySizeAndColor.some((entry) => {
+        return entry.destinationSku.toString().includes(searchQuery);
       });
 
-      // Return true if title, size/color, locationSku, or totalSku matches the search query
-      return titleMatches || sizeOrColorMatches || locationSkuMatches || totalSkuMatches;
+      // Return true if title, size/color, originSku, or destinationSku matches the search query
+      return titleMatches || sizeOrColorMatches || originSkuMatches || destinationSkuMatches;
     });
 
     setFilteredProducts(filtered);
-  }, [productList, searchQuery, selectedLocation]);
-
-  // Assuming purchaseOrderVariants is your array of variants
-  const calculateTotals = () => {
-    return purchaseOrderVariants.reduce(
-      (acc, variant) => {
-        const quantity = parseFloat(variant.quantity) || 0; // Default to 0 if undefined or NaN
-        const cost = parseFloat(variant.cost) || 0; // Default to 0 if undefined or NaN
-        const taxPercentage = parseFloat(variant.tax) || 0; // Default to 0 if undefined or NaN
-
-        // Calculate subtotal for this variant
-        const subtotal = quantity * cost; // Subtotal: cost based on quantity
-        const taxAmount = (subtotal * taxPercentage) / 100; // Calculate tax based on percentage
-
-        // Update totals
-        acc.totalQuantity += quantity; // Sum of quantities
-        acc.totalSubtotal += subtotal; // Total subtotal of all variants
-        acc.totalTax += taxAmount; // Sum of tax amounts
-
-        return acc; // Return the accumulator for the next iteration
-      },
-      {
-        totalQuantity: 0, // Initialize total quantity
-        totalSubtotal: 0, // Initialize total subtotal (costs before tax)
-        totalTax: 0, // Initialize total tax
-      }
-    );
-  };
-  const totals = calculateTotals();
-  // Access totals
-  const { totalQuantity, totalSubtotal, totalTax } = totals;
-
-  // Calculate total price including tax
-  const totalPrice = totalSubtotal + totalTax;
-  const total = totalPrice + shipping - discount;
+  }, [productList, searchQuery, selectedOrigin, selectedDestination]);
 
   const getNextOrderNumber = () => {
-    if (!purchaseOrderList || purchaseOrderList.length === 0) {
+    if (!transferOrderList || transferOrderList.length === 0) {
       return 1; // Start from 1 if no orders exist
     }
 
     // Extract existing order numbers and find the maximum
-    const existingOrderNumbers = purchaseOrderList.map(order =>
-      parseInt(order.purchaseOrderNumber.replace('P', '')) // Adjusted to use purchaseOrderNumber
+    const existingOrderNumbers = transferOrderList?.map(order =>
+      parseInt(order.transferOrderNumber.replace('T', '')) // Adjusted to use purchaseOrderNumber
     );
     return Math.max(...existingOrderNumbers) + 1; // Increment the maximum order number
   };
 
   const onSubmit = async (data) => {
 
-    const { shipping, discount, referenceNumber, supplierNote, estimatedArrival, paymentTerms } = data;
+    const { shippingCarrier, trackingNumber, referenceNumber, supplierNote, estimatedArrival } = data;
 
     // Check if expiryDate is selected
     if (!estimatedArrival) {
@@ -345,48 +309,38 @@ const CreatePurchaseOrder = () => {
     }
 
     // Ensure required fields are filled
-    for (const variant of purchaseOrderVariants) {
+    for (const variant of transferOrderVariants) {
       if (!variant.quantity || variant.quantity <= 0) {
         toast.error("Quantity must be greater than 0 for all products.");
-        return; // Prevent form submission
-      }
-      if (!variant.cost || variant.cost <= 0) {
-        toast.error("Cost must be greater than 0 for all products.");
         return; // Prevent form submission
       }
     }
 
     const nextOrderNumber = getNextOrderNumber();
-    const purchaseOrderNumber = `P${nextOrderNumber.toString().padStart(3, '0')}`; // Create the new purchase order number
+    const transferOrderNumber = `T${nextOrderNumber.toString().padStart(3, '0')}`; // Create the new purchase order number
 
-    const orderStatus = isAdmin === true ? "ordered" : "pending";
-
-    const purchaseOrderData = {
-      estimatedArrival: formattedEstimatedArrival,
-      paymentTerms,
-      supplier: selectedVendor,
-      destination: selectedLocation,
-      purchaseOrderVariants: purchaseOrderVariants?.map(variant => ({
+    const transferOrderData = {
+      origin: selectedOrigin,
+      destination: selectedDestination,
+      transferOrderVariants: transferOrderVariants?.map(variant => ({
         productTitle: variant.productTitle,
         quantity: parseFloat(variant.quantity),
-        cost: parseFloat(variant.cost),
-        tax: parseFloat(variant.tax) || 0,
         size: variant?.size,
         colorCode: variant.color?.code,  // Include the color code
         colorName: variant.color?.name,   // Include the color name
       })),
-      referenceNumber,
-      supplierNote,
-      shippingCharge: parseFloat(shipping) || 0,
-      discountCharge: parseFloat(discount) || 0,
-      totalPrice: parseFloat(total),
-      purchaseOrderNumber,
-      status: orderStatus,
-      selectedProducts
+      transferOrderNumber,
+      status: "pending",
+      selectedProducts,
+      estimatedArrival: formattedEstimatedArrival,
+      referenceNumber: referenceNumber || "",
+      supplierNote: supplierNote || "",
+      shippingCarrier: shippingCarrier || "",
+      trackingNumber: trackingNumber || ""
     }
 
     try {
-      const response = await axiosPublic.post('/addPurchaseOrder', purchaseOrderData);
+      const response = await axiosPublic.post('/addTransferOrder', transferOrderData);
       if (response?.data?.insertedId) {
         toast.custom((t) => (
           <div
@@ -400,10 +354,10 @@ const CreatePurchaseOrder = () => {
               <div className="flex items-start">
                 <div className="ml-3 flex-1">
                   <p className="text-base font-bold text-gray-900">
-                    Purchase order added!
+                    Transfer order added!
                   </p>
                   <p className="mt-1 text-sm text-gray-500">
-                    Purchase order has been added successfully!
+                    Transfer order has been added successfully!
                   </p>
                 </div>
               </div>
@@ -421,7 +375,7 @@ const CreatePurchaseOrder = () => {
           position: "bottom-right",
           duration: 5000
         })
-        router.push("/dash-board/purchase-orders")
+        router.push("/dash-board/transfers");
       }
     } catch (error) {
       toast.error('Failed to add purchase order. Please try again!');
@@ -429,7 +383,7 @@ const CreatePurchaseOrder = () => {
 
   };
 
-  if (isProductPending || isPurchaseOrderPending) {
+  if (isProductPending || isTransferOrderPending) {
     return <Loading />
   }
 
@@ -438,8 +392,8 @@ const CreatePurchaseOrder = () => {
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
         <div className='flex items-center justify-between w-full'>
-          <h3 className='w-full font-semibold text-base md:text-xl lg:text-2xl'>Create purchase order</h3>
-          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/purchase-orders"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+          <h3 className='w-full font-semibold text-base md:text-xl lg:text-2xl'>Create transfer</h3>
+          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/transfers"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
 
@@ -448,61 +402,8 @@ const CreatePurchaseOrder = () => {
         <div className='max-w-screen-xl mx-auto py-6 flex flex-col gap-4'>
 
           <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-            <VendorSelect register={register} errors={errors} selectedVendor={selectedVendor} setSelectedVendor={setSelectedVendor} />
-            <LocationSelect register={register} errors={errors} selectedLocation={selectedLocation} setSelectedLocation={setSelectedLocation} />
-          </div>
-
-          <div className='bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-
-            <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
-
-              <div className='flex-1'>
-                <label htmlFor='paymentTerms' className='flex justify-start font-medium text-neutral-800 pb-2'>Payment Terms</label>
-                <select id="paymentTerms" value={paymentTerms}
-                  {...register('paymentTerms', { required: 'Please select payment terms.' })} className='lg:w-1/2 font-semibold' style={{ zIndex: 10, pointerEvents: 'auto', position: 'relative', outline: 'none' }}
-                  onChange={(e) => {
-                    handlePaymentTerms(e.target.value);
-                  }}
-                >
-                  <option value="" disabled>Select</option>
-                  <option key="Cash on delivery" value="Cash on delivery">
-                    Cash on delivery
-                  </option>
-                  <option key="Payment on receipt" value="Payment on receipt">
-                    Payment on receipt
-                  </option>
-                  <option key="Payment in advance" value="Payment in advance">
-                    Payment in advance
-                  </option>
-                </select>
-                {errors.paymentTerms && (
-                  <p className="text-red-600 text-left">{errors.paymentTerms.message}</p>
-                )}
-              </div>
-
-              <div className='flex-1'>
-                <label htmlFor='estimatedArrival' className='flex justify-start font-medium text-neutral-800 pb-2'>Estimated Arrival</label>
-                <DatePicker
-                  id='estimatedArrival'
-                  placeholder="Select date"
-                  aria-label="Select expiry date"
-                  onChange={(date) => {
-                    handleShowDateError(date);
-                    if (date instanceof Date && !isNaN(date)) {
-                      setValue('estimatedArrival', date.toISOString().split('T')[0]); // Ensure it's a valid Date object and format it as YYYY-MM-DD
-                    } else {
-                      setValue('estimatedArrival', date); // If DatePicker returns something else, handle it here
-                    }
-                  }}
-                  className="w-full outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md"
-                />
-                {dateError && (
-                  <p className="text-red-600 text-left">Please select estimated arrival date.</p>
-                )}
-              </div>
-
-            </div>
-
+            <OriginSelect register={register} errors={errors} selectedOrigin={selectedOrigin} setSelectedOrigin={setSelectedOrigin} />
+            <DestinationSelect register={register} errors={errors} selectedDestination={selectedDestination} setSelectedDestination={setSelectedDestination} />
           </div>
 
           <div className='bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
@@ -532,31 +433,20 @@ const CreatePurchaseOrder = () => {
                       <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b">
                         Products
                       </th>
-                      <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-center">
+                      <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b  text-center">
+                        Available at origin
+                      </th>
+                      <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-right">
                         Quantity
                       </th>
-                      <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-center">
-                        Cost
-                      </th>
-                      <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-center">
-                        Tax
-                      </th>
-                      <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-center">
-                        Total
+                      <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b">
+
                       </th>
                     </tr>
                   </thead>
 
                   <tbody className="bg-white divide-y divide-gray-200">
                     {selectedProducts?.map((product, index) => {
-                      const quantity = parseFloat(purchaseOrderVariants[index]?.quantity) || 0; // Default to 0 if undefined or NaN
-                      const cost = parseFloat(purchaseOrderVariants[index]?.cost) || 0; // Default to 0 if undefined or NaN
-                      const taxPercentage = parseFloat(purchaseOrderVariants[index]?.tax) || 0; // Default to 0 if undefined or NaN
-
-                      // Calculate total
-                      const totalCost = quantity * cost; // Calculate cost based on quantity and cost per item
-                      const taxAmount = (totalCost * taxPercentage) / 100; // Calculate tax based on percentage
-                      const total = totalCost + taxAmount;
 
                       return (
                         <tr key={index} className="hover:bg-gray-50">
@@ -582,62 +472,34 @@ const CreatePurchaseOrder = () => {
                               </span>
                             </div>
                           </td>
-                          <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
-                            <input
-                              id={`quantity-${index}`}
-                              {...register(`quantity-${index}`, { required: true })}
-                              value={purchaseOrderVariants[index]?.quantity || ''}
-                              onChange={(e) => handleVariantChange(index, 'quantity', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
-                              className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                              type="number"
-                              min="0" // Prevents negative values in the input
-                            />
-                            {errors[`quantity-${index}`] && (
-                              <p className="text-red-600 text-left">Quantity is required.</p>
-                            )}
+                          <td className="text-sm p-3 text-neutral-500 font-semibold text-center">
+                            {product?.originSku}
                           </td>
-                          <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
-                            <div className="input-wrapper">
-                              <span className="input-prefix">৳</span>
+                          <td className="text-sm p-3 text-neutral-500 font-semibold">
+                            <div className='flex flex-col justify-center items-end'>
                               <input
-                                id={`cost-${index}`}
-                                {...register(`cost-${index}`, { required: true })}
-                                value={purchaseOrderVariants[index]?.cost || ''}
-                                onChange={(e) => handleVariantChange(index, 'cost', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
-                                className="pl-7 custom-number-input w-full pr-3 py-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                                id={`quantity-${index}`}
+                                {...register(`quantity-${index}`, { required: true })}
+                                value={transferOrderVariants[index]?.quantity || ''}
+                                onChange={(e) => handleVariantChange(index, 'quantity', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
+                                className="custom-number-input p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                                 type="number"
                                 min="0" // Prevents negative values in the input
                               />
-                            </div>
-                            {errors[`cost-${index}`] && (
-                              <p className="text-red-600 text-left">Cost is required.</p>
-                            )}
-                          </td>
-                          <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
-                            <div className="input-wrapper">
-                              <input
-                                id={`tax-${index}`}
-                                {...register(`tax-${index}`)} // No required validation here
-                                value={purchaseOrderVariants[index]?.tax || ''}
-                                onChange={(e) => handleVariantChange(index, 'tax', e.target.value, product?.productTitle, product?.size, product?.name, product.color)}
-                                className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                                type="number"
-                              />
-                              <span className="input-suffix">%</span>
+                              {errors[`quantity-${index}`] && (
+                                <p className="text-red-600 text-left">Quantity is required.</p>
+                              )}
                             </div>
                           </td>
-                          <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
-                            <div className='flex gap-3 w-full justify-center items-center'>
-                              <p className="font-bold flex gap-1 text-neutral-500"><span>৳</span> {total.toFixed(2)}</p> {/* Display the total */}
-                              <button
-                                type="button"  // Set type to "button" to prevent form submission
-                                onClick={() => removeSelectedProduct(product, product.size, product.color)}
-                                className="hover:text-red-700 text-gray-700"
-                                aria-label="Remove product"
-                              >
-                                <RxCross2 size={18} />
-                              </button>
-                            </div>
+                          <td className="text-sm p-3 text-neutral-500 font-semibold">
+                            <button
+                              type="button"  // Set type to "button" to prevent form submission
+                              onClick={() => removeSelectedProduct(product, product.size, product.color)}
+                              className="hover:text-red-700 text-gray-700"
+                              aria-label="Remove product"
+                            >
+                              <RxCross2 size={18} />
+                            </button>
                           </td>
                         </tr>
                       );
@@ -646,12 +508,57 @@ const CreatePurchaseOrder = () => {
                 </table>
               </div>
             }
-            {selectedProducts?.length > 0 && <p className='px-4 pt-4 text-neutral-500 font-medium'>{selectedProducts?.length} variants on purchase order</p>}
+            {selectedProducts?.length > 0 && <p className='px-4 pt-4 text-neutral-500 font-medium'>{selectedProducts?.length} variants on transfer order</p>}
+
           </div>
 
           <div className='flex flex-col lg:flex-row w-full justify-between items-start gap-6'>
 
             <div className='w-full flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+              <h1 className='font-semibold'>Shipment Details</h1>
+
+              <div className='flex-1'>
+                <label htmlFor='estimatedArrival' className='flex justify-start font-medium text-neutral-800 pb-2'>Estimated Arrival</label>
+                <DatePicker
+                  id='estimatedArrival'
+                  placeholder="Select date"
+                  aria-label="Select expiry date"
+                  onChange={(date) => {
+                    handleShowDateError(date);
+                    if (date instanceof Date && !isNaN(date)) {
+                      setValue('estimatedArrival', date.toISOString().split('T')[0]); // Ensure it's a valid Date object and format it as YYYY-MM-DD
+                    } else {
+                      setValue('estimatedArrival', date); // If DatePicker returns something else, handle it here
+                    }
+                  }}
+                  className="w-full outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md"
+                />
+                {dateError && (
+                  <p className="text-red-600 text-left">Please select estimated arrival date.</p>
+                )}
+              </div>
+              <div>
+                <label htmlFor='shippingCarrier' className='flex justify-start font-medium text-neutral-500 pb-2'>Shipping carrier</label>
+                <input
+                  id={`shippingCarrier`}
+                  {...register(`shippingCarrier`)}
+                  className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                  type="text"
+                />
+              </div>
+              <div>
+                <label htmlFor='trackingNumber' className='flex justify-start font-medium text-neutral-500 pb-2'>Tracking Number</label>
+                <input
+                  id={`trackingNumber`}
+                  {...register(`trackingNumber`)}
+                  className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mb-[14px]"
+                  type="text"
+                />
+              </div>
+
+            </div>
+
+            <div className='w-full flex flex-col justify-between gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
               <h1 className='font-semibold'>Additional Details</h1>
               <div>
                 <label htmlFor='referenceNumber' className='flex justify-start font-medium text-neutral-500 pb-2'>Reference Number</label>
@@ -667,52 +574,10 @@ const CreatePurchaseOrder = () => {
                 <textarea
                   id="supplierNote"
                   {...register("supplierNote")}
-                  className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mb-[14px]"
+                  className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                   rows={5} // Set the number of rows for height adjustment
                 />
 
-              </div>
-            </div>
-
-            <div className='w-full flex flex-col justify-between gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-              <h1 className='font-semibold'>Cost summary</h1>
-              <div className='flex flex-col gap-2'>
-                <div className='flex justify-between items-center gap-6'>
-                  <h2 className='font-medium text-neutral-500'>Taxes</h2>
-                  <p className='text-neutral-500'>৳ {totalTax.toFixed(2)}</p>
-                </div>
-                <div className='flex justify-between items-center gap-6'>
-                  <h2 className='font-semibold'>Subtotal</h2>
-                  <p className='text-neutral-950 font-semibold'>৳ {totalPrice.toFixed(2)}</p>
-                </div>
-                <p className='text-neutral-500'>{totalQuantity}  items</p>
-              </div>
-              <div className='flex flex-col gap-2'>
-                <h1 className='font-semibold'>Cost adjustments</h1>
-                <div className='flex justify-between items-center gap-6'>
-                  <label htmlFor='shipping' className='flex w-full justify-start font-medium text-neutral-600'>+ Shipping</label>
-                  <input
-                    id='shipping'
-                    {...register('shipping')}
-                    className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                    type="number"
-                    onChange={handleShippingChange}  // Step 3: Update shipping state on change
-                  />
-                </div>
-                <div className='flex justify-between items-center gap-6'>
-                  <label htmlFor='discount' className='flex w-full justify-start font-medium text-neutral-600'>- Discount</label>
-                  <input
-                    id='discount'
-                    {...register('discount')}
-                    className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                    type="number"
-                    onChange={handleDiscountChange}  // Step 3: Update discount state on change
-                  />
-                </div>
-              </div>
-              <div className='flex justify-between items-center gap-6'>
-                <p className='text-neutral-950 font-semibold'>Total</p>
-                <p className='font-bold'>৳ {total}</p>
               </div>
             </div>
 
@@ -760,8 +625,8 @@ const CreatePurchaseOrder = () => {
                   <thead className="sticky top-0 z-[1] bg-white">
                     <tr>
                       <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b">Products</th>
-                      <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">Available at destination</th>
-                      <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">Total available</th>
+                      <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">Available at Origin</th>
+                      <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">Available at Destination</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -784,7 +649,8 @@ const CreatePurchaseOrder = () => {
                                       (p) => p.productTitle === product.productTitle &&
                                         p.size === entry.size &&
                                         p.color === entry.color?.code && // Ensure color is correctly accessed 
-                                        p.name === entry.color?.name
+                                        p.name === entry.color?.name &&
+                                        p.originSku === entry.originSku // Include originSku in selection
                                     )
                                   )
                                 }
@@ -817,9 +683,10 @@ const CreatePurchaseOrder = () => {
                                     (p) => p.productTitle === product.productTitle &&
                                       p.size === entry.size &&
                                       p.color === entry.color?.code && // Ensure color is correctly accessed
-                                      p.name === entry.color?.name
+                                      p.name === entry.color?.name &&
+                                      p.originSku === entry.originSku // Include originSku in selection
                                   )}
-                                  onValueChange={() => toggleProductSizeColorSelection(product, entry.size, entry.color?.code, entry.color?.name)}
+                                  onValueChange={() => toggleProductSizeColorSelection(product, entry.size, entry.color?.code, entry.color?.name, entry?.originSku)}
                                 />
                                 <span className="font-semibold ml-2">
                                   {entry.size}
@@ -828,8 +695,8 @@ const CreatePurchaseOrder = () => {
                                   </span>
                                 </span>
                               </td>
-                              <td className="text-center">{entry.locationSku}</td>
-                              <td className="text-center">{entry.totalSku}</td>
+                              <td className="text-center">{entry.originSku}</td>
+                              <td className="text-center">{entry.destinationSku}</td>
                             </tr>
                           ))}
                         </React.Fragment>
@@ -860,4 +727,4 @@ const CreatePurchaseOrder = () => {
   );
 };
 
-export default CreatePurchaseOrder;
+export default CreateTransfer;
