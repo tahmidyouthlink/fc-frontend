@@ -624,9 +624,13 @@ const EditProductPage = () => {
       // Filter active locations
       const activeLocations = locationList?.filter(location => location.status) || [];
 
-      // Iterate over productVariants and update only the primary location SKU
-      const formattedData = productVariants.map((variant, index) => {
-        return activeLocations?.map(location => {
+      // Initialize an array to hold final data
+      const finalData = [];
+
+      // Iterate over productVariants
+      productVariants.forEach((variant, index) => {
+        // Process active locations
+        activeLocations.forEach(location => {
           // Check if this variant already exists for this location
           const existingVariant = existingVariants?.find(existing =>
             existing.color.value === variant.color.value &&
@@ -637,20 +641,43 @@ const EditProductPage = () => {
           // Use primary location's imageUrls for all locations
           const primaryImageUrls = variant.imageUrls || [];
 
-          return {
+          // Initialize SKU for the current variant
+          let sku = 0; // Default SKU for new active locations
+
+          // If location is primary, update SKU based on user input
+          if (location.isPrimaryLocation) {
+            sku = parseFloat(data[`sku-${index}`]); // Update SKU for primary location
+          } else if (existingVariant) {
+            // If the variant exists for this active location, keep existing SKU
+            sku = existingVariant.sku;
+          }
+
+          // Add the variant to finalData
+          finalData.push({
             color: variant.color,
             size: variant.size,
-            sku: location.isPrimaryLocation
-              ? parseFloat(data[`sku-${index}`]) // Update SKU for primary location
-              : existingVariant?.sku || 0, // Keep existing SKU for other locations (or set to 0 if new variant)
+            sku: sku, // Assign SKU based on above conditions
             imageUrls: primaryImageUrls, // Use the same imageUrls for all locations
             location: location.locationName,
-          };
+          });
         });
       });
 
-      // Flatten the array of variants for all locations
-      const finalData = formattedData.flat();
+      // Handle non-active locations
+      const nonActiveLocations = locationList?.filter(location => !location.status) || [];
+
+      // Iterate over existingVariants to check for non-active locations
+      existingVariants.forEach(existing => {
+        // Check if the existing variant is for a non-active location
+        const isNonActiveLocation = nonActiveLocations.some(location =>
+          existing.location === location.locationName
+        );
+
+        // If the existing variant is for a non-active location, add it to finalData
+        if (isNonActiveLocation) {
+          finalData.push(existing);
+        }
+      });
 
       // Check if any primary location variant is missing a SKU
       const missingSKU = finalData.some(variant =>

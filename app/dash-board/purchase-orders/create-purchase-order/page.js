@@ -20,7 +20,7 @@ const CreatePurchaseOrder = () => {
   const isAdmin = false;
   const axiosPublic = useAxiosPublic();
   const router = useRouter();
-  const { register, handleSubmit, setValue, control, formState: { errors } } = useForm();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
   const [selectedVendor, setSelectedVendor] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [paymentTerms, setPaymentTerms] = useState("");

@@ -9,6 +9,7 @@ import Link from 'next/link';
 import usePurchaseOrders from '@/app/hooks/usePurchaseOrders';
 import Loading from '@/app/components/shared/Loading/Loading';
 import { useRouter } from 'next/navigation';
+import Progressbar from '@/app/components/layout/Progressbar';
 
 const orderStatusTabs = [
   'All',
@@ -120,6 +121,8 @@ const PurchaseOrders = () => {
     return <Loading />
   }
 
+  console.log(paginatedOrders);
+
   return (
     <div className='relative w-full min-h-screen bg-gray-100'>
 
@@ -199,10 +202,10 @@ const PurchaseOrders = () => {
                 <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b">
                   Status
                 </th>
-                <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b">
+                <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-center">
                   Received
                 </th>
-                <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b">
+                <th className="text-[10px] md:text-xs text-center font-bold p-2 xl:p-3 text-neutral-950 border-b">
                   Total
                 </th>
                 <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b">
@@ -220,7 +223,15 @@ const PurchaseOrders = () => {
                 </tr>
               ) : (
                 paginatedOrders?.map((order, index) => {
-
+                  const totals = order.purchaseOrderVariants?.reduce(
+                    (acc, variant) => {
+                      acc.totalQuantity += variant.quantity || 0;
+                      acc.totalAccept += variant.accept || 0;
+                      acc.totalReject += variant.reject || 0;
+                      return acc;
+                    },
+                    { totalQuantity: 0, totalAccept: 0, totalReject: 0 }
+                  );
                   return (
                     <tr key={index} className="hover:bg-gray-50">
                       <td onClick={() => handleGoToEditPage(order?._id)} className="text-sm p-3 cursor-pointer text-blue-600 hover:text-blue-800">
@@ -236,9 +247,18 @@ const PurchaseOrders = () => {
                         {order?.status}
                       </td>
                       <td className="text-sm p-3 text-neutral-500 font-semibold">
-                        0 of 0
+                        <div className='flex flex-col'>
+                          <Progressbar
+                            accepted={totals.totalAccept}
+                            rejected={totals.totalReject}
+                            total={totals.totalQuantity}
+                          />
+                          <div className="mt-1">
+                            {totals.totalAccept} of {totals.totalQuantity}
+                          </div>
+                        </div>
                       </td>
-                      <td className="text-sm p-3 text-neutral-500 font-semibold">
+                      <td className="text-sm p-3 text-neutral-500 font-semibold text-center">
                         ৳ {order?.totalPrice?.toFixed(2)}
                       </td>
                       <td className="text-sm p-3 text-neutral-500 font-semibold">

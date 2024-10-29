@@ -2,8 +2,8 @@
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -19,7 +19,6 @@ const EditPurchaseOrderPage = () => {
   const isAdmin = true;
   const { id } = useParams();
   const axiosPublic = useAxiosPublic();
-  const router = useRouter();
   const { register, handleSubmit, setValue, formState: { errors } } = useForm();
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -94,40 +93,41 @@ const EditPurchaseOrderPage = () => {
     }
   };
 
+  // Memoized function to fetch purchase order data
+  const fetchPurchaseOrderData = useCallback(async () => {
+    try {
+      const response = await axiosPublic.get(`/getSinglePurchaseOrder/${id}`);
+      const order = response?.data;
+
+      const fetchedEstimatedArrival = formatDateForInput(order.estimatedArrival);
+      setEstimatedArrival(fetchedEstimatedArrival);
+      setSelectedVendor(order?.supplier);
+      setSelectedLocation(order?.destination);
+      setPaymentTerms(order?.paymentTerms);
+      setValue('shipping', order?.shippingCharge);
+      setValue('discount', order?.discountCharge);
+      setValue('referenceNumber', order?.referenceNumber);
+      setValue('supplierNote', order?.supplierNote);
+      setShipping(order?.shippingCharge);
+      setDiscount(order?.discountCharge);
+      setSelectedProducts(order?.selectedProducts);
+      setPurchaseOrderVariants(order?.purchaseOrderVariants);
+      setPurchaseOrderStatus(order?.status);
+      setPurchaseOrderNumber(order?.purchaseOrderNumber);
+      setReferenceNumber(order?.referenceNumber);
+      setSupplierNote(order?.supplierNote);
+
+      setIsLoading(false);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch purchase order details!");
+    }
+  }, [id, setValue, axiosPublic]);
+
+  // Initial load useEffect
   useEffect(() => {
-    const fetchPurchaseOrderData = async () => {
-      try {
-        const response = await axiosPublic.get(`/getSinglePurchaseOrder/${id}`);
-        const order = response?.data;
-
-        // Ensure the expiry date is set to midnight to avoid timezone issues
-        const fetchedEstimatedArrival = formatDateForInput(order.estimatedArrival);
-        setEstimatedArrival(fetchedEstimatedArrival); // Ensure no time zone shift
-        setSelectedVendor(order?.supplier);
-        setSelectedLocation(order?.destination);
-        setPaymentTerms(order?.paymentTerms);
-        setValue('shipping', order?.shippingCharge);
-        setValue('discount', order?.discountCharge);
-        setValue('referenceNumber', order?.referenceNumber);
-        setValue('supplierNote', order?.supplierNote);
-        setShipping(order?.shippingCharge);
-        setDiscount(order?.discountCharge);
-        setSelectedProducts(order?.selectedProducts);
-        setPurchaseOrderVariants(order?.purchaseOrderVariants);
-        setPurchaseOrderStatus(order?.status);
-        setPurchaseOrderNumber(order?.purchaseOrderNumber);
-        setReferenceNumber(order?.referenceNumber);
-        setSupplierNote(order?.supplierNote);
-
-        setIsLoading(false);
-      } catch (err) {
-        console.error(err); // Log error to the console for debugging
-        toast.error("Failed to fetch purchase order details!");
-      }
-    };
-
     fetchPurchaseOrderData();
-  }, [id, axiosPublic, setValue]);
+  }, [fetchPurchaseOrderData]);
 
   // Function to calculate total SKU per size and SKU for selected location
   const calculateSkuBySizeAndColorAndLocation = (productList, selectedLocation) => {
@@ -436,7 +436,7 @@ const EditPurchaseOrderPage = () => {
           position: "bottom-right",
           duration: 5000
         })
-        router.push('/dash-board/purchase-orders');
+        fetchPurchaseOrderData();
       } else {
         toast.error('No changes detected.');
       }

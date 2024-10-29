@@ -5,7 +5,7 @@ import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -24,6 +24,7 @@ const EditReceiveInventory = () => {
   const [acceptError, setAcceptError] = useState(false);
   const [productList, isProductPending] = useProductsInformation();
   const [locationName, setLocationName] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchPurchaseOrderData = async () => {
@@ -123,6 +124,7 @@ const EditReceiveInventory = () => {
         accept: parseFloat(variant?.accept) || 0,
         reject: parseFloat(variant?.reject) || 0
       })),
+      status: 'received'
     };
 
     const modifiedProducts = new Set(); // To store only unique product IDs that need updating
@@ -130,20 +132,44 @@ const EditReceiveInventory = () => {
     purchaseOrderVariants?.forEach((variant) => {
       updatedProductList?.forEach((product) => {
         if (product.productTitle === variant.productTitle && product.productVariants) {
-          product.productVariants.forEach((variantItem) => {
-            if (
+          // Find if there is an exact match, including location
+          const existingVariant = product.productVariants.find(variantItem =>
+            variantItem.color.color === variant.colorCode &&
+            variantItem.color.value === variant.colorName &&
+            variantItem.size === variant.size &&
+            locationName.includes(variantItem.location)
+          );
+
+          if (existingVariant) {
+            // Update SKU if location matches
+            existingVariant.sku += variant.accept;
+            modifiedProducts.add(product._id);
+          } else {
+            // If location doesn't match but other fields do, create a new variant
+            const baseVariant = product.productVariants.find(variantItem =>
               variantItem.color.color === variant.colorCode &&
               variantItem.color.value === variant.colorName &&
-              variantItem.size === variant.size &&
-              locationName.includes(variantItem.location) // Check location match
-            ) {
-              // Update the SKU with the accept value
-              variantItem.sku += variant.accept;
+              variantItem.size === variant.size
+            );
 
-              // Add the product's _id to modifiedProducts set if SKU was updated
-              modifiedProducts.add(product._id);
+            if (baseVariant) {
+              // Check if variant.locationName is correctly set
+              if (!variant.locationName) {
+                console.warn("Location is undefined for variant:", variant);
+              }
+
+              // Create a new variant with existing color, size, and imageUrls, and new location and sku
+              const newVariant = {
+                ...baseVariant,
+                sku: variant.accept, // Set SKU based on accept value
+                location: locationName, // Ensure location is set
+              };
+
+              // Add the new variant to productVariants
+              product.productVariants.push(newVariant);
+              modifiedProducts.add(product._id); // Mark product as modified
             }
-          });
+          }
         }
       });
     });
@@ -164,7 +190,6 @@ const EditReceiveInventory = () => {
             return { productId, success: false, error: error.message };
           }
         } else {
-          // Handle case where the product is not found in updatedProductList
           console.warn(`Product with ID ${productId} not found in updatedProductList`);
           return { productId, success: false, error: 'Product not found' };
         }
@@ -172,50 +197,50 @@ const EditReceiveInventory = () => {
     );
 
     // Process the responses
-    updateResponses.forEach((update) => {
-      if (update.success) {
-        if (response1.data.modifiedCount > 0) {
-          toast.custom((t) => (
-            <div
-              className={`${t.visible ? 'animate-enter' : 'animate-leave'
-                } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
-            >
-              <div className="pl-6">
-                <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
-              </div>
-              <div className="flex-1 w-0 p-4">
-                <div className="flex items-start">
-                  <div className="ml-3 flex-1">
-                    <p className="text-base font-bold text-gray-900">
-                      Purchase order received!
-                    </p>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Purchase order has been successfully received!
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex border-l border-gray-200">
-                <button
-                  onClick={() => toast.dismiss(t.id)}
-                  className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
-                >
-                  <RxCross2 />
-                </button>
+    const successfulUpdates = updateResponses.filter((update) => update.success);
+    const failedUpdates = updateResponses.filter((update) => !update.success);
+
+    // Show single toast message based on the update results
+    if (successfulUpdates.length > 0 && response1.data.modifiedCount > 0) {
+      toast.custom((t) => (
+        <div
+          className={`${t.visible ? 'animate-enter' : 'animate-leave'
+            } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+        >
+          <div className="pl-6">
+            <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+          </div>
+          <div className="flex-1 w-0 p-4">
+            <div className="flex items-start">
+              <div className="ml-3 flex-1">
+                <p className="text-base font-bold text-gray-900">
+                  Purchase order received!
+                </p>
+                <p className="mt-1 text-sm text-gray-500">
+                  {successfulUpdates.length} product(s) successfully updated!
+                </p>
               </div>
             </div>
-          ), {
-            position: "bottom-right",
-            duration: 5000
-          })
-          router.push('/dash-board/purchase-orders');
-        } else {
-          toast.error('No changes detected.');
-        }
-      } else {
-        console.warn(`Product ${update.productId} failed to update: ${update.error}`);
-      }
-    });
+          </div>
+          <div className="flex border-l border-gray-200">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+            >
+              <RxCross2 />
+            </button>
+          </div>
+        </div>
+      ), {
+        position: "bottom-right",
+        duration: 5000
+      });
+
+      // Redirect after toast
+      router.push('/dash-board/purchase-orders');
+    } else if (successfulUpdates.length === 0 && failedUpdates.length > 0) {
+      toast.error('No changes detected or updates failed.');
+    }
 
   };
 
@@ -323,7 +348,6 @@ const EditReceiveInventory = () => {
                       </button>
                     </div>
                   </td>
-
                   <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
                     <Progressbar
                       accepted={purchaseOrderVariants[index]?.accept || 0}
@@ -345,8 +369,7 @@ const EditReceiveInventory = () => {
 
           <button
             type='submit'
-            className={`bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}
-          >
+            className={`bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}>
             Accept
           </button>
 
