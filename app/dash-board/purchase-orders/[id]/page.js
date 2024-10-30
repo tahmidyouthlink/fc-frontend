@@ -14,6 +14,7 @@ import LocationSelect from '@/app/components/layout/LocationSelect';
 import Image from 'next/image';
 import { Button, Checkbox, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import Progressbar from '@/app/components/layout/Progressbar';
+import { BsFiletypePdf } from 'react-icons/bs';
 
 const EditPurchaseOrderPage = () => {
 
@@ -467,9 +468,14 @@ const EditPurchaseOrderPage = () => {
     <div className='bg-gray-100 min-h-screen px-6'>
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
-        <div className='flex items-center justify-between w-full'>
+        <div className='flex flex-wrap md:flex-nowrap items-center justify-between w-full'>
           <h3 className='w-full font-semibold text-base md:text-xl lg:text-2xl'>#{purchaseOrderNumber} <span className=''>{purchaseOrderStatus}</span></h3>
-          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/purchase-orders"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+          <div className='flex justify-between md:justify-end gap-4 items-center w-full'>
+            <div>
+              <button className='flex justify-end gap-2 items-center bg-[#D2016E] hover:bg-[#d2016daf] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold'><span>Export</span><BsFiletypePdf size={16} /></button>
+            </div>
+            <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end' href={"/dash-board/purchase-orders"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+          </div>
         </div>
       </div>
 

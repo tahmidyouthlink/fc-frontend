@@ -17,13 +17,13 @@ const Progressbar = ({ accepted, rejected, total, width = 'w-full' }) => {
       onMouseLeave={() => setShowTooltip(false)}
     >
       {showTooltip && (
-        <div className="absolute -bottom-20 left-1/2 transform -translate-x-1/2 p-2 bg-gray-800 text-white text-xs font-semibold rounded-md shadow-lg z-50 transition-opacity duration-300 opacity-100">
-          <div className="flex items-center gap-1">
-            <span>✅ Accepted:</span>
+        <div className="absolute -bottom-20 left-1/2 transform -translate-x-1/2 p-2 bg-gray-800 text-white text-[10px] font-semibold rounded-md shadow-lg z-50 transition-opacity duration-300 opacity-100">
+          <div className="flex items-center gap-1 justify-center">
+            <span className='flex items-center gap-0.5'><span>✅</span> Accepted:</span>
             <span>{acceptedQuantity}</span>
           </div>
           <div className="flex items-center gap-1">
-            <span>❌ Rejected:</span>
+            <span className='flex items-center gap-0.5'><span>❌</span> Rejected:</span>
             <span>{rejectedQuantity}</span>
           </div>
           <div className="tooltip-arrow bg-gray-800"></div>

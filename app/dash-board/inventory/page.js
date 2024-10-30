@@ -30,8 +30,7 @@ const InventoryPage = () => {
   }, [searchQuery, refetch]);
 
   const handleLocationSelect = (locationName) => {
-
-    // set location message for knowing customer no inventory location
+    // Set location message to notify the user of the selected inventory location
     setLocationNameForMessage(locationName);
 
     // Step 1: Filter product variants by the selected location
@@ -41,40 +40,16 @@ const InventoryPage = () => {
         .map((variant) => ({
           productTitle: product?.productTitle,
           size: variant?.size,
+          color: variant?.color.label, // Display color label
+          colorCode: variant?.color.color, // Display color code for visualization
           sku: variant?.sku,
           imageUrl: variant?.imageUrls[0], // Assuming you want the first image
           productId: product?.productId,
         }))
     );
 
-    // Step 2: Group by size and sum the SKU correctly
-    const groupedBySize = filteredVariants?.reduce((acc, curr) => {
-      if (!curr) {
-        return acc; // Skip if curr is undefined
-      }
-
-      // Find existing entry for this size and product
-      const existing = acc.find((item) => item.size === curr.size && item.productId === curr.productId);
-
-      if (existing) {
-        // If size already exists, sum the SKU
-        existing.sku += curr.sku;
-      } else {
-        // If size doesn't exist, ensure curr has a valid sku
-        acc.push({
-          productTitle: curr.productTitle,
-          size: curr.size,
-          sku: curr.sku || 0, // Initialize SKU to 0 if undefined
-          imageUrl: curr.imageUrl,
-          productId: curr.productId,
-        });
-      }
-
-      return acc;
-    }, []);
-
-    // Step 3: Set the filtered and grouped products
-    setFilteredProducts(groupedBySize);
+    // Step 2: Set the filtered products with unique combinations of size and color
+    setFilteredProducts(filteredVariants);
   };
 
   // Filter products based on search query
@@ -85,14 +60,16 @@ const InventoryPage = () => {
     // Check if any product detail contains the search query
     const productTitle = (product.productTitle || '').toLowerCase();
     const productId = (product.productId || '').toLowerCase();
-    const size = (product.size || '').toString().toLowerCase(); // Ensure size is checked as a string
-    const sku = (product.sku || '').toString(); // Keep SKU as string
+    const size = (product.size !== undefined && product.size !== null) ? product.size.toString().toLowerCase() : ''; // Convert size to string
+    const color = (product.color || '').toLowerCase();
+    const sku = (product.sku || '').toString();
 
     // Check for matches
     return (
       productTitle.includes(query) ||
       productId.includes(query) ||
       size.includes(query) ||
+      color.includes(query) ||
       (isNumberQuery && sku === query) // Numeric comparison for SKU
     );
   });
@@ -114,79 +91,81 @@ const InventoryPage = () => {
 
   // Export to CSV
   const exportToCSV = () => {
-    let dataToExport = filteredProducts;
-
-    // Extract relevant product details for export
-    const filteredData = dataToExport.map(product => ({
+    const filteredData = filteredProducts.map(product => ({
       productName: product.productTitle,
       size: product.size,
-      sku: product.sku,
+      available: product.sku,
+      onHand: product.sku,
     }));
 
-    // Create filename
-    const fileName = `products_data`;
-
-    // Convert to CSV and trigger download
+    // Set filename and convert data to CSV format
+    const fileName = 'products_data';
     const csv = Papa.unparse(filteredData);
+
+    // Create blob and trigger download
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `${fileName}.csv`;
+    document.body.appendChild(link); // Append to body for Firefox compatibility
     link.click();
+    document.body.removeChild(link); // Clean up the DOM
   };
 
   // Export to PDF
   const exportToPDF = async () => {
-    const { jsPDF } = await import("jspdf");  // Dynamically import jsPDF
-    const autoTable = (await import("jspdf-autotable")).default;  // Import jsPDF-AutoTable
+    const { jsPDF } = await import("jspdf"); // Dynamic import of jsPDF
+    const autoTable = (await import("jspdf-autotable")).default; // Import autoTable
 
-    const doc = new jsPDF('landscape'); // Create new document in landscape mode
+    // Create PDF document in landscape orientation
+    const doc = new jsPDF('landscape');
 
-    // Define columns for the PDF
+    // Define table columns
     const columns = [
       { header: 'Product Name', dataKey: 'productName' },
       { header: 'Size', dataKey: 'size' },
-      { header: 'SKU', dataKey: 'sku' },
+      { header: 'Available', dataKey: 'available' },
+      { header: 'On hand', dataKey: 'onHand' },
     ];
 
-    // Map products to rows for the PDF
+    // Map product details to table rows
     const rows = filteredProducts.map(product => ({
       productName: product.productTitle,
       size: product.size,
-      sku: product.sku,
+      available: product.sku,
+      onHand: product.sku,
     }));
 
-    // Use jsPDF-AutoTable to create the table
+    // Generate table with autoTable
     autoTable(doc, {
-      columns: columns,
+      columns,
       body: rows,
       startY: 10,
       styles: { fontSize: 8, halign: 'center', valign: 'middle' },
-      headStyles: { halign: 'center', valign: 'middle' },
+      headStyles: { fillColor: [22, 160, 133] }, // Optional head style color
       theme: "striped",
     });
 
-    // Save the PDF document
+    // Save the PDF file
     doc.save('products_data.pdf');
   };
 
   // Export to XLSX
   const exportToXLS = () => {
-    let dataToExport = filteredProducts;
-
-    // Prepare data for XLSX export
-    const filteredData = dataToExport.map(product => ({
+    // Map filtered products to JSON format suitable for Excel
+    const filteredData = filteredProducts.map(product => ({
       productName: product.productTitle,
       size: product.size,
-      sku: product.sku,
+      available: product.sku,
+      onHand: product.sku,
     }));
 
-    // Create worksheet and workbook
+    // Convert JSON data to worksheet and create workbook
     const worksheet = XLSX.utils.json_to_sheet(filteredData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Products');
 
-    // Export the file as XLSX
+    // Export workbook as .xlsx file
     XLSX.writeFile(workbook, 'products_data.xlsx');
   };
 
@@ -361,9 +340,9 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
             <thead className="sticky top-0 z-[1] bg-white">
               <tr>
                 <th className="text-[10px] md:text-xs px-2 pr-2 xl:px-3 xl:pr-2 text-gray-700 border-b pl-20 xl:pl-20">Product</th>
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">SKU</th>
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">On process</th>
                 <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">Available</th>
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">On Hand</th>
+                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">On hand</th>
               </tr>
             </thead>
 
@@ -390,20 +369,31 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
               ) : (
                 paginatedProducts?.map((product, index) => (
                   <tr key={product?._id || index} className="hover:bg-gray-50 transition-colors">
-                    <td className="text-xs p-3 cursor-pointer flex flex-col lg:flex-row items-center gap-3">
+                    <td className="text-sm p-3 text-neutral-500 text-center cursor-pointer flex flex-col lg:flex-row items-center gap-3">
                       <div>
                         <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt='productIMG' height={600} width={600} />
                       </div>
-                      <div className='flex flex-col'>
-                        <p className='font-bold text-sm'>{product?.productTitle}</p>
-                        <div className='flex'>
-                          <span className='rounded-lg bg-gray-300 font-medium p-1'>{product?.size}</span>
-                        </div>
+                      <div className='flex flex-col items-start justify-start gap-1'>
+                        <p className='font-bold text-blue-700 text-start'>{product?.productTitle}</p>
+                        <p className='font-medium'>{product?.size}</p>
+                        <span className='flex items-center gap-2'>
+                          {product.color}
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              width: '20px',
+                              height: '20px',
+                              backgroundColor: product.colorCode || '#fff',
+                              marginRight: '8px',
+                              borderRadius: '4px'
+                            }}
+                          />
+                        </span>
                       </div>
                     </td>
+                    <td className='text-center'></td>
                     <td className='text-center'>{product?.sku}</td>
-                    <td className='text-center'></td>
-                    <td className='text-center'></td>
+                    <td className='text-center'>{product?.sku}</td>
                   </tr>
                 ))
               )}
