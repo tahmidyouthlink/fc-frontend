@@ -868,10 +868,7 @@ const EditPurchaseOrderPage = () => {
               <button
                 onClick={handleSubmit(async (formData) => {
                   // Call onSubmit and wait for the result
-                  const success = await onSubmit({ ...formData, status: "canceled" }); // Pass status as "canceled"
-                  if (success) {
-                    setStatusOrderedModalOpen(false); // Close modal only if the submission was successful
-                  }
+                  await onSubmit({ ...formData, status: "canceled" }); // Pass status as "canceled"
                 })}
                 type='submit'
                 className={`bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}
@@ -883,11 +880,7 @@ const EditPurchaseOrderPage = () => {
                 className="bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold"
                 onClick={handleSubmit(async (formData) => {
                   // Call onSubmit and wait for the result
-                  const success = await onSubmit({ ...formData, status: "ordered" }); // Pass status as "ordered"
-
-                  if (success) {
-                    setStatusOrderedModalOpen(false); // Close modal only if the submission was successful
-                  }
+                  await onSubmit({ ...formData, status: "ordered" }); // Pass status as "ordered"
                 })}
               >
                 Confirm Order

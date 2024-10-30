@@ -125,6 +125,8 @@ const Transfers = () => {
   return <Loading />
  }
 
+ console.log(paginatedOrders);
+
  return (
   <div className='relative w-full min-h-screen bg-gray-100'>
 
@@ -207,7 +209,7 @@ const Transfers = () => {
         <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-center">
          Received
         </th>
-        <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b">
+        <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-right">
          Expected Arrival
         </th>
        </tr>
@@ -222,7 +224,7 @@ const Transfers = () => {
         </tr>
        ) : (
         paginatedOrders?.map((order, index) => {
-         const totals = order.purchaseOrderVariants?.reduce(
+         const totals = order?.transferOrderVariants?.reduce(
           (acc, variant) => {
            acc.totalQuantity += variant.quantity || 0;
            acc.totalAccept += variant.accept || 0;
@@ -247,17 +249,17 @@ const Transfers = () => {
            </td>
            <td className="text-sm p-3 text-neutral-500 font-semibold">
             <div className='flex flex-col'>
-             {/* <Progressbar
-              accepted={totals.totalAccept}
-              rejected={totals.totalReject}
-              total={totals.totalQuantity}
+             <Progressbar
+              accepted={totals?.totalAccept}
+              rejected={totals?.totalReject}
+              total={totals?.totalQuantity}
              />
              <div className="mt-1">
-              {totals.totalAccept} of {totals.totalQuantity}
-             </div> */}
+              {totals?.totalAccept} of {totals?.totalQuantity}
+             </div>
             </div>
            </td>
-           <td className="text-sm p-3 text-neutral-500 font-semibold">
+           <td className="text-sm p-3 text-neutral-500 font-semibold text-right">
             {order?.estimatedArrival}
            </td>
           </tr>

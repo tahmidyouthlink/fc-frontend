@@ -324,7 +324,7 @@ const EditReceiveInventory = () => {
                       <button
                         type="button" // Prevent form submission
                         onClick={() => handleAddAllAccept(index)}
-                        className="bg-white drop-shadow text-black px-4 py-2 rounded"
+                        className="bg-white drop-shadow text-black px-4 py-2 rounded hover:bg-black hover:text-white"
                       >
                         All
                       </button>
