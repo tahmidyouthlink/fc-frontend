@@ -2,7 +2,7 @@
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -15,12 +15,15 @@ import Image from 'next/image';
 import { Button, Checkbox, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import Progressbar from '@/app/components/layout/Progressbar';
 import { BsFiletypePdf } from 'react-icons/bs';
+import { MdOutlineDelete } from 'react-icons/md';
+import Swal from 'sweetalert2';
 
 const EditPurchaseOrderPage = () => {
 
   const isAdmin = true;
   const { id } = useParams();
   const axiosPublic = useAxiosPublic();
+  const router = useRouter();
   const { register, handleSubmit, setValue, formState: { errors } } = useForm();
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -359,6 +362,63 @@ const EditPurchaseOrderPage = () => {
     [purchaseOrderVariants]
   );
 
+  // delete purchase order
+  const handleDeletePurchaseOrder = async (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await axiosPublic.delete(`/deletePurchaseOrder/${id}`);
+          if (res?.data?.deletedCount) {
+            toast.custom((t) => (
+              <div
+                className={`${t.visible ? 'animate-enter' : 'animate-leave'
+                  } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+              >
+                <div className="pl-6">
+                  <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+                </div>
+                <div className="flex-1 w-0 p-4">
+                  <div className="flex items-start">
+                    <div className="ml-3 flex-1">
+                      <p className="text-base font-bold text-gray-900">
+                        Purchase order removed!
+                      </p>
+                      <p className="mt-1 text-sm text-gray-500">
+                        Purchase order has been deleted successfully!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex border-l border-gray-200">
+                  <button
+                    onClick={() => toast.dismiss(t.id)}
+                    className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+                  >
+                    <RxCross2 />
+                  </button>
+                </div>
+              </div>
+            ), {
+              position: "bottom-right",
+              duration: 5000
+            })
+            router.push("/dash-board/purchase-orders")
+          }
+        } catch (error) {
+          toast.error('Failed to delete season. Please try again.');
+        }
+      }
+    });
+  }
+
   const onSubmit = async (data) => {
 
     const { shipping, discount, referenceNumber, supplierNote, estimatedArrival, paymentTerms, status } = data;
@@ -469,10 +529,48 @@ const EditPurchaseOrderPage = () => {
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
         <div className='flex flex-wrap md:flex-nowrap items-center justify-between w-full'>
-          <h3 className='w-full font-semibold text-base md:text-xl lg:text-2xl'>#{purchaseOrderNumber} <span className=''>{purchaseOrderStatus}</span></h3>
+          <h3 className='w-full font-semibold text-base md:text-xl lg:text-2xl'>#{purchaseOrderNumber} <span
+            className={`px-3 py-1 rounded-full font-semibold
+      ${purchaseOrderStatus === "pending" ? "bg-yellow-100 text-yellow-600"
+                : purchaseOrderStatus === "ordered" ? "bg-blue-100 text-blue-600"
+                  : purchaseOrderStatus === "received" ? "bg-green-100 text-green-600"
+                    : purchaseOrderStatus === "canceled" ? "bg-red-100 text-red-600"
+                      : "bg-gray-100 text-gray-600"}`}
+          >
+            {purchaseOrderStatus === "pending" ? "Pending"
+              : purchaseOrderStatus === "ordered" ? "Ordered"
+                : purchaseOrderStatus === "received" ? "Received"
+                  : purchaseOrderStatus === "canceled" ? "Canceled"
+                    : "Unknown"}
+          </span></h3>
           <div className='flex justify-between md:justify-end gap-4 items-center w-full'>
-            <div>
-              <button className='flex justify-end gap-2 items-center bg-[#D2016E] hover:bg-[#d2016daf] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold'><span>Export</span><BsFiletypePdf size={16} /></button>
+            <div className="flex gap-4 items-center">
+              <button onClick={() => handleDeletePurchaseOrder(id)}
+                class="group relative inline-flex items-center justify-center w-[40px] h-[40px] bg-[#D2016E] text-white rounded-full shadow-lg transform scale-100 transition-transform duration-300"
+              >
+                <svg
+                  width="25px"
+                  height="25px"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="rotate-0 transition ease-out duration-300 scale-100 group-hover:-rotate-45 group-hover:scale-75"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    stroke-width="2"
+                    stroke-linejoin="round"
+                    stroke-linecap="round"
+                  ></path>
+                </svg>
+              </button>
+
+              <button
+                class="group relative inline-flex items-center justify-center w-[40px] h-[40px] bg-[#D2016E] text-white rounded-full shadow-lg transform scale-100 transition-transform duration-300"
+              >
+                <BsFiletypePdf size={20} className="rotate-0 transition ease-out duration-300 scale-100 group-hover:-rotate-45 group-hover:scale-75" />
+              </button>
             </div>
             <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end' href={"/dash-board/purchase-orders"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
           </div>

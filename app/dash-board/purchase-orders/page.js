@@ -200,13 +200,13 @@ const PurchaseOrders = () => {
                 <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b">
                   Status
                 </th>
-                <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-center">
+                <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-right">
                   Received
                 </th>
-                <th className="text-[10px] md:text-xs text-center font-bold p-2 xl:p-3 text-neutral-950 border-b">
+                <th className="text-[10px] md:text-xs text-right font-bold p-2 xl:p-3 text-neutral-950 border-b">
                   Total
                 </th>
-                <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b">
+                <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-right">
                   Expected Arrival
                 </th>
               </tr>
@@ -241,8 +241,21 @@ const PurchaseOrders = () => {
                       <td className="text-sm p-3 text-neutral-500 font-semibold">
                         {order?.destination?.locationName}
                       </td>
-                      <td className="text-sm p-3 text-neutral-500 font-semibold">
-                        {order?.status}
+                      <td className="text-xs p-3 text-gray-700">
+                        <span
+                          className={`px-3 py-1 rounded-full font-semibold
+      ${order?.status === "pending" ? "bg-yellow-100 text-yellow-600"
+                              : order?.status === "ordered" ? "bg-blue-100 text-blue-600"
+                                : order?.status === "received" ? "bg-green-100 text-green-600"
+                                  : order?.status === "canceled" ? "bg-red-100 text-red-600"
+                                    : "bg-gray-100 text-gray-600"}`}
+                        >
+                          {order?.status === "pending" ? "Pending"
+                            : order?.status === "ordered" ? "Ordered"
+                              : order?.status === "received" ? "Received"
+                                : order?.status === "canceled" ? "Canceled"
+                                  : "Unknown"}
+                        </span>
                       </td>
                       <td className="text-sm p-3 text-neutral-500 font-semibold">
                         <div className='flex flex-col'>
@@ -256,10 +269,10 @@ const PurchaseOrders = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="text-sm p-3 text-neutral-500 font-semibold text-center">
+                      <td className="text-sm p-3 text-neutral-500 font-semibold text-right">
                         ৳ {order?.totalPrice?.toFixed(2)}
                       </td>
-                      <td className="text-sm p-3 text-neutral-500 font-semibold">
+                      <td className="text-sm p-3 text-neutral-500 font-semibold text-right">
                         {order?.estimatedArrival}
                       </td>
                     </tr>

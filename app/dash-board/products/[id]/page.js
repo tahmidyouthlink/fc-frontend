@@ -260,8 +260,8 @@ const EditProductPage = () => {
     }
 
     const totalImages = validFiles.length + uploadedImageUrls.length;
-    if (totalImages > 6) {
-      toast.error("You can only upload a maximum of 6 images.");
+    if (totalImages > 10) {
+      toast.error("You can only upload a maximum of 10 images.");
       return;
     }
 
@@ -273,7 +273,7 @@ const EditProductPage = () => {
     const imageUrls = await uploadImagesToImgbb(newImages);
     const updatedUrls = [...uploadedImageUrls, ...imageUrls];
 
-    const limitedUrls = updatedUrls.slice(-6);
+    const limitedUrls = updatedUrls.slice(-10);
     setUploadedImageUrls(limitedUrls);
 
     // Clear size error if there are valid images
