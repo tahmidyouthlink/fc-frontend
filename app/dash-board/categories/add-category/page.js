@@ -13,7 +13,7 @@ import { FaArrowLeft } from 'react-icons/fa6';
 import useCategories from '@/app/hooks/useCategories';
 import Loading from '@/app/components/shared/Loading/Loading';
 
-const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
+const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 const defaultImages = ["https://i.ibb.co.com/ZJ2Qy29/2892174.png",
   "https://i.ibb.co.com/dcRM6Fz/88768.png",
@@ -161,6 +161,28 @@ const AddCategory = () => {
     return null;
   };
 
+  const uploadImageToImgbb2 = async (image) => {
+    const formData = new FormData();
+    formData.append('image', image.file);
+    formData.append('key', apiKey);
+
+    try {
+      const response = await axiosPublic.post(apiURL, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      if (response.data && response.data.data && response.data.data.url) {
+        return response.data.data.url; // Return the single image URL
+      } else {
+        toast.error('Failed to get image URL from response.');
+      }
+    } catch (error) {
+      toast.error(`Upload failed: ${error.response?.data?.error?.message || error.message}`);
+    }
+    return null;
+  };
+
   // Handle input change for sub-categories
   const handleSubCategoryInputChange = (value) => {
     setSubCategoryInput(value);
@@ -276,7 +298,7 @@ const AddCategory = () => {
 
     let imageUrl = '';
     if (image) {
-      imageUrl = await uploadImageToImgbb(image);
+      imageUrl = await uploadImageToImgbb2(image);
       if (!imageUrl) {
         toast.error('Image upload failed, cannot proceed.');
         setIsSubmitting(false); // Reset submit state

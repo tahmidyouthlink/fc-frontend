@@ -10,7 +10,7 @@ import Image from 'next/image';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import { FaArrowLeft } from 'react-icons/fa6';
 
-const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
+const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 const defaultImages = ["https://i.ibb.co.com/b7TyG4Y/8271908.png",
   "https://i.ibb.co.com/PgJc6zx/halloween.png",

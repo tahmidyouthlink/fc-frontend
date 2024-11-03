@@ -18,7 +18,7 @@ import ProductSearchSelectId from '@/app/components/layout/ProductSearchSelectId
 import CategorySearchSelectId from '@/app/components/layout/CategorySearchSelectId';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
-const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
+const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 
 const EditOffer = () => {

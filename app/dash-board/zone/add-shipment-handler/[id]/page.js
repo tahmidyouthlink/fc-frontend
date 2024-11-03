@@ -13,7 +13,7 @@ import standardImage from "../../../../../public/logos/standard.png";
 import expressImage from "../../../../../public/logos/express.png";
 import defaultImage from "../../../../../public/logos/default-image.png";
 
-const apiKey = "bcc91618311b97a1be1dd7020d5af85f";
+const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 
 const EditShipmentHandler = () => {
