@@ -506,7 +506,7 @@ const EditProductPage = () => {
     }
   };
 
-  const getSizeImageForGroupSelected = (groupSelected, selectedCategory, categoryList) => {
+  const getSizeImageForGroupSelected = (groupSelected, selectedCategory, categoryList = []) => {
     let selectedImageUrl = '';
 
     // Check if categoryList is an array
@@ -537,7 +537,7 @@ const EditProductPage = () => {
   };
 
   // Example usage:
-  const selectedImageUrl = getSizeImageForGroupSelected(groupSelected, selectedCategory, categoryList);
+  const selectedImageUrl = getSizeImageForGroupSelected(groupSelected, selectedCategory, categoryList || []);
 
   const onSubmit = async (data) => {
     try {

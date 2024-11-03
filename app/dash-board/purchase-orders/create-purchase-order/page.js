@@ -569,16 +569,6 @@ const CreatePurchaseOrder = () => {
                               <p className='font-medium'>{product?.size}</p>
                               <span className='flex items-center gap-2'>
                                 {product.name}
-                                <span
-                                  style={{
-                                    display: 'inline-block',
-                                    width: '20px',
-                                    height: '20px',
-                                    backgroundColor: product.color || '#fff',
-                                    marginRight: '8px',
-                                    borderRadius: '4px'
-                                  }}
-                                />
                               </span>
                             </div>
                           </td>

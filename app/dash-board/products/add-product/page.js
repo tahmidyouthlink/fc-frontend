@@ -493,7 +493,7 @@ const FirstStepOfAddProduct = () => {
     return productID;
   };
 
-  const getSizeImageForGroupSelected = (groupSelected, selectedCategory, categoryList) => {
+  const getSizeImageForGroupSelected = (groupSelected, selectedCategory, categoryList = []) => {
     let selectedImageUrl = '';
 
     // Check if categoryList is an array
@@ -524,7 +524,7 @@ const FirstStepOfAddProduct = () => {
   };
 
   // Example usage:
-  const selectedImageUrl = getSizeImageForGroupSelected(groupSelected, selectedCategory, categoryList);
+  const selectedImageUrl = getSizeImageForGroupSelected(groupSelected, selectedCategory, categoryList || []);
 
   const onSubmit = async (data) => {
     try {

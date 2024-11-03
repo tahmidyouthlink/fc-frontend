@@ -41,7 +41,7 @@ export default function EditCategory() {
   const [sizeImagesForSuggestion, setSizeImagesForSuggestion] = useState({});
   const [categoryKey, setCategoryKey] = useState("");
 
-  const { register, handleSubmit, control, setValue, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
     defaultValues: { category: '', sizes: [{ size: '' }], subCategories: [{ subCategory: '' }] }
   });
 

@@ -378,16 +378,6 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                         <p className='font-medium'>{product?.size}</p>
                         <span className='flex items-center gap-2'>
                           {product.color}
-                          <span
-                            style={{
-                              display: 'inline-block',
-                              width: '20px',
-                              height: '20px',
-                              backgroundColor: product.colorCode || '#fff',
-                              marginRight: '8px',
-                              borderRadius: '4px'
-                            }}
-                          />
                         </span>
                       </div>
                     </td>
