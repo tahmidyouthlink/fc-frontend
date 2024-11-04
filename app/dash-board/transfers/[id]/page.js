@@ -12,7 +12,7 @@ import { FaArrowLeft } from 'react-icons/fa6';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import { BsFiletypePdf } from "react-icons/bs";
 import Swal from 'sweetalert2';
-import { MdOutlineDelete } from 'react-icons/md';
+import ExitConfirmationModalProduct from '@/app/components/layout/ExitConfirmModalProduct';
 
 const EditTransferOrder = () => {
 
@@ -32,6 +32,10 @@ const EditTransferOrder = () => {
   const [supplierNote, setSupplierNote] = useState("");
   const [shippingCarrier, setShippingCarrier] = useState("");
   const [trackingNumber, setTrackingNumber] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [headingMessage, setHeadingMessage] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState(null);
 
   // Format date to yyyy-mm-dd for date input field
   const formatDateForInput = (dateStr) => {
@@ -141,12 +145,20 @@ const EditTransferOrder = () => {
     });
   }
 
+  const handleCancelClick = () => {
+    setModalMessage("Once this transfer order is marked as canceled, you will no longer be able to track or update inventory transfers between locations. This transfer order cannot be reverted to pending status.");
+    setHeadingMessage(("canceled"));
+    setSelectedStatus("canceled");
+    setIsModalOpen(true);
+  };
+
+  const handleReceiveTransferClick = () => {
+    router.push(`/dash-board/transfers/receive-transfer/${id}`);
+  }
+
   const onSubmit = async (data) => {
 
-    if (data?.status === "received") {
-      router.push(`/dash-board/transfers/receive-transfer/${id}`);
-      return;
-    }
+    data.status = selectedStatus;
 
     try {
       const updatedTransferOrderData = {
@@ -206,6 +218,21 @@ const EditTransferOrder = () => {
       console.error('Error editing offer:', error);
       toast.error('Failed to update offer. Please try again!');
     }
+  };
+
+  const handleModalConfirm = () => {
+    setIsModalOpen(false); // Close the modal
+
+    // Attempt to submit the form
+    handleSubmit(onSubmit)()
+      .then(() => {
+        // If successful, you may handle any additional actions here
+      })
+      .catch((error) => {
+        // If there's an error in submission, open the modal again if needed
+        setIsModalOpen(true);
+        console.error("Submission error:", error);
+      });
   };
 
   if (isLoading) {
@@ -399,22 +426,17 @@ const EditTransferOrder = () => {
 
           {/* Submit Button */}
           {transferOrderStatus === "pending" && <div className='flex justify-between items-center'>
+
             <button
-              onClick={handleSubmit(async (formData) => {
-                // Call onSubmit and wait for the result
-                await onSubmit({ ...formData, status: "canceled" }); // Pass status as "canceled"
-              })}
-              type='submit'
-              className={`bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}
+              type='button'
+              onClick={handleCancelClick}
+              className="bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold"
             >
-              Cancel transfer
+              Cancel Order
             </button>
             <button
-              type='submit'
-              onClick={handleSubmit(async (formData) => {
-                // Call onSubmit and wait for the result
-                await onSubmit({ ...formData, status: "received" }); // Pass status as "canceled"
-              })}
+              type='button'
+              onClick={handleReceiveTransferClick}
               className={`mt-4 mb-8 bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}
             >
               Receive transfer
@@ -423,6 +445,14 @@ const EditTransferOrder = () => {
         </div>
 
       </form>
+
+      <ExitConfirmationModalProduct
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleModalConfirm}
+        message={modalMessage}
+        heading={headingMessage}
+      />
 
     </div>
   );

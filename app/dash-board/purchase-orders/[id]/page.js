@@ -15,8 +15,8 @@ import Image from 'next/image';
 import { Button, Checkbox, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import Progressbar from '@/app/components/layout/Progressbar';
 import { BsFiletypePdf } from 'react-icons/bs';
-import { MdOutlineDelete } from 'react-icons/md';
 import Swal from 'sweetalert2';
+import ExitConfirmationModalProduct from '@/app/components/layout/ExitConfirmModalProduct';
 
 const EditPurchaseOrderPage = () => {
 
@@ -43,6 +43,10 @@ const EditPurchaseOrderPage = () => {
   const [purchaseOrderNumber, setPurchaseOrderNumber] = useState("");
   const [referenceNumber, setReferenceNumber] = useState(0);  // Initial value for discount
   const [supplierNote, setSupplierNote] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [headingMessage, setHeadingMessage] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState(null);
 
   // Format date to yyyy-mm-dd for date input field
   const formatDateForInput = (dateStr) => {
@@ -419,9 +423,24 @@ const EditPurchaseOrderPage = () => {
     });
   }
 
+  const handleCancelClick = () => {
+    setModalMessage("After making as canceled you will not be able to receive incoming inventory from your supplier. This purchase order can't be turned into a pending again.");
+    setHeadingMessage(("canceled"));
+    setSelectedStatus("canceled");
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmClick = () => {
+    setHeadingMessage(("ordered"));
+    setModalMessage("After making as ordered you will be able to receive incoming inventory from your supplier. This purchase order can't be turned into a pending again.");
+    setSelectedStatus("ordered");
+    setIsModalOpen(true);
+  };
+
   const onSubmit = async (data) => {
 
-    const { shipping, discount, referenceNumber, supplierNote, estimatedArrival, paymentTerms, status } = data;
+    data.status = selectedStatus;
+    const { shipping, discount, referenceNumber, supplierNote, estimatedArrival, paymentTerms } = data;
 
     // Check if expiryDate is selected
     if (!estimatedArrival) {
@@ -471,7 +490,7 @@ const EditPurchaseOrderPage = () => {
         shippingCharge: parseFloat(shipping) || 0,
         discountCharge: parseFloat(discount) || 0,
         totalPrice: parseFloat(total),
-        status,
+        status: data?.status,
         selectedProducts
       };
 
@@ -514,10 +533,26 @@ const EditPurchaseOrderPage = () => {
       } else {
         toast.error('No changes detected.');
       }
+
     } catch (error) {
       console.error('Error editing offer:', error);
       toast.error('Failed to update offer. Please try again!');
     }
+  };
+
+  const handleModalConfirm = () => {
+    setIsModalOpen(false); // Close the modal
+
+    // Attempt to submit the form
+    handleSubmit(onSubmit)()
+      .then(() => {
+        // If successful, you may handle any additional actions here
+      })
+      .catch((error) => {
+        // If there's an error in submission, open the modal again if needed
+        setIsModalOpen(true);
+        console.error("Submission error:", error);
+      });
   };
 
   if (isLoading || isProductPending) {
@@ -959,23 +994,19 @@ const EditPurchaseOrderPage = () => {
           {/* Submit Button */}
           {purchaseOrderStatus === "pending" && isAdmin === true && (
             <div className='flex justify-between w-full gap-6 my-4'>
+
               <button
-                onClick={handleSubmit(async (formData) => {
-                  // Call onSubmit and wait for the result
-                  await onSubmit({ ...formData, status: "canceled" }); // Pass status as "canceled"
-                })}
-                type='submit'
-                className={`bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}
+                type='button'
+                onClick={handleCancelClick}
+                className="bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold"
               >
-                Cancel order
+                Cancel Order
               </button>
 
-              <button type='submit'
+              <button
+                type='button'
+                onClick={handleConfirmClick}
                 className="bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold"
-                onClick={handleSubmit(async (formData) => {
-                  // Call onSubmit and wait for the result
-                  await onSubmit({ ...formData, status: "ordered" }); // Pass status as "ordered"
-                })}
               >
                 Confirm Order
               </button>
@@ -1120,6 +1151,14 @@ const EditPurchaseOrderPage = () => {
           )}
         </ModalContent>
       </Modal>
+
+      <ExitConfirmationModalProduct
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleModalConfirm}
+        message={modalMessage}
+        heading={headingMessage}
+      />
 
     </div>
   );

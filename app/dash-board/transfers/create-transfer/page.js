@@ -579,7 +579,7 @@ const CreateTransfer = () => {
               type='submit'
               className={`mt-4 mb-8 bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}
             >
-              Create order
+              Create transfer
             </button>
           </div>
         </div>
