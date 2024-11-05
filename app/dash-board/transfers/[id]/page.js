@@ -432,7 +432,7 @@ const EditTransferOrder = () => {
               onClick={handleCancelClick}
               className="bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold"
             >
-              Cancel Order
+              Cancel transfer
             </button>
             <button
               type='button'

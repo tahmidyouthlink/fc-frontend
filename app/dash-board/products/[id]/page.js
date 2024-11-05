@@ -850,8 +850,8 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
 
           <div className='max-w-screen-2xl mx-auto'>
             <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
-              <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 px-6 py-3'>
-                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+              <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 px-6 py-3 h-fit'>
+                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
                   <p className='w-full text-xl'>Product ID: <strong>{productId}</strong></p>
                   <label htmlFor='productTitle' className='flex justify-start font-medium text-[#9F5216]'>Product Title *</label>
                   <input id='productTitle' {...register("productTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" placeholder='Enter Product Title' type="text" />
@@ -874,7 +874,7 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                   />
                 </div>
 
-                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
 
                   <div className='flex flex-col rounded-md relative'>
                     <label htmlFor="category" className='text-xs px-2'>Category</label>
@@ -1020,108 +1020,7 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                   </div>
                 </div>
 
-                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-
-                  <label htmlFor='tags' className='flex justify-start font-medium text-[#9F5216]'>Select Tag *</label>
-                  <div className="parent-container">
-                    <ReactSelect
-                      options={tagList}
-                      isMulti
-                      className="w-full border rounded-md creatable-select-container"
-                      value={selectedTags}
-                      menuPortalTarget={menuPortalTarget}
-                      styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                      menuPlacement="auto"
-                      onChange={handleTagChange}
-                    />
-                  </div>
-                  {tagError && (
-                    <p className="text-red-600 text-left">Tags are required</p>
-                  )}
-
-                  <label htmlFor='vendors' className='flex justify-start font-medium text-[#9F5216]'>Select Vendor</label>
-                  <div className="parent-container">
-                    <ReactSelect
-                      options={vendorList}
-                      isMulti
-                      className="w-full border rounded-md creatable-select-container"
-                      value={selectedVendors}
-                      menuPortalTarget={menuPortalTarget}
-                      styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                      menuPlacement="auto"
-                      onChange={handleVendorChange}
-                    />
-                  </div>
-
-                  <div className="w-full mx-auto" ref={dropdownRef}>
-                    {/* Search Box */}
-                    <label htmlFor='seasons' className='flex justify-start font-medium text-[#9F5216] pb-2'>Select Collection *</label>
-
-                    <input
-                      type="text"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      onClick={handleInputClick} // Toggle dropdown on input click
-                      placeholder="Search & Select by Seasonal Collection"
-                      className="w-full p-2 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md mb-2"
-                    />
-
-                    {/* Dropdown list for search results */}
-                    {isDropdownOpen && (
-                      <div className="border rounded p-2 max-h-64 overflow-y-auto">
-                        {filteredSeasons?.length > 0 ? (
-                          filteredSeasons?.map((season) => (
-                            <div
-                              key={season._id}
-                              className={`flex items-center p-2 cursor-pointer hover:bg-gray-100 ${selectedSeasons.includes(season.seasonName) ? 'bg-gray-200' : ''}`}
-                              onClick={() => toggleSeasonSelection(season.seasonName)}
-                            >
-                              <Image
-                                width={400}
-                                height={400}
-                                src={season.imageUrl}
-                                alt="season-imageUrl"
-                                className="h-8 w-8 object-cover rounded"
-                              />
-                              <span className="ml-2">{season.seasonName}</span>
-                            </div>
-                          ))
-                        ) : (
-                          <p className="text-gray-500">No collection found</p>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Selected categories display */}
-                    {selectedSeasons?.length > 0 && (
-                      <div className="border p-2 rounded mt-2">
-                        <h4 className="text-sm font-semibold mb-2">Selected Collection:</h4>
-                        <ul className="space-y-2">
-                          {selectedSeasons?.map((season, index) => (
-                            <li
-                              key={index}
-                              className="flex justify-between items-center bg-gray-100 p-2 rounded"
-                            >
-                              <span>{season}</span>
-                              <button
-                                onClick={() => removeSeason(season)}
-                                className="text-red-500 text-sm"
-                              >
-                                Remove
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {seasonError && <p className="text-red-600 text-left">Season is required</p>}
-
-                  </div>
-
-                </div>
-
-                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
                   <label htmlFor='materialCare' className='flex justify-start font-medium text-[#9F5216]'>Material Care</label>
                   <Controller
                     name="materialCare"
@@ -1218,6 +1117,107 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                     </div>
                   </div>
 
+                  <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
+
+                    <label htmlFor='tags' className='flex justify-start font-medium text-[#9F5216]'>Select Tag *</label>
+                    <div className="parent-container">
+                      <ReactSelect
+                        options={tagList}
+                        isMulti
+                        className="w-full border rounded-md creatable-select-container"
+                        value={selectedTags}
+                        menuPortalTarget={menuPortalTarget}
+                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                        menuPlacement="auto"
+                        onChange={handleTagChange}
+                      />
+                    </div>
+                    {tagError && (
+                      <p className="text-red-600 text-left">Tags are required</p>
+                    )}
+
+                    <label htmlFor='vendors' className='flex justify-start font-medium text-[#9F5216]'>Select Vendor</label>
+                    <div className="parent-container">
+                      <ReactSelect
+                        options={vendorList}
+                        isMulti
+                        className="w-full border rounded-md creatable-select-container"
+                        value={selectedVendors}
+                        menuPortalTarget={menuPortalTarget}
+                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                        menuPlacement="auto"
+                        onChange={handleVendorChange}
+                      />
+                    </div>
+
+                    <div className="w-full mx-auto" ref={dropdownRef}>
+                      {/* Search Box */}
+                      <label htmlFor='seasons' className='flex justify-start font-medium text-[#9F5216] pb-2'>Select Collection *</label>
+
+                      <input
+                        type="text"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onClick={handleInputClick} // Toggle dropdown on input click
+                        placeholder="Search & Select by Seasonal Collection"
+                        className="w-full p-2 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md mb-2"
+                      />
+
+                      {/* Dropdown list for search results */}
+                      {isDropdownOpen && (
+                        <div className="border rounded p-2 max-h-64 overflow-y-auto">
+                          {filteredSeasons?.length > 0 ? (
+                            filteredSeasons?.map((season) => (
+                              <div
+                                key={season._id}
+                                className={`flex items-center p-2 cursor-pointer hover:bg-gray-100 ${selectedSeasons.includes(season.seasonName) ? 'bg-gray-200' : ''}`}
+                                onClick={() => toggleSeasonSelection(season.seasonName)}
+                              >
+                                <Image
+                                  width={400}
+                                  height={400}
+                                  src={season.imageUrl}
+                                  alt="season-imageUrl"
+                                  className="h-8 w-8 object-cover rounded"
+                                />
+                                <span className="ml-2">{season.seasonName}</span>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-gray-500">No collection found</p>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Selected categories display */}
+                      {selectedSeasons?.length > 0 && (
+                        <div className="border p-2 rounded mt-2">
+                          <h4 className="text-sm font-semibold mb-2">Selected Collection:</h4>
+                          <ul className="space-y-2">
+                            {selectedSeasons?.map((season, index) => (
+                              <li
+                                key={index}
+                                className="flex justify-between items-center bg-gray-100 p-2 rounded"
+                              >
+                                <span>{season}</span>
+                                <button
+                                  onClick={() => removeSeason(season)}
+                                  className="text-red-500 text-sm"
+                                >
+                                  Remove
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {seasonError && <p className="text-red-600 text-left">Season is required</p>}
+
+                    </div>
+
+                  </div>
+
                   <div className={`flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg`}>
                     <div className='flex flex-col gap-4'>
                       <input
@@ -1255,8 +1255,8 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                               {...provided.droppableProps}
                               ref={provided.innerRef}
                             >
-                              <div>
-                                <div className='grid grid-cols-2 gap-4 mt-4'>
+                              <div className='overflow-y-auto max-h-[870px] custom-scrollbar'>
+                                <div className={`grid grid-cols-2 gap-4 mt-4 ${uploadedImageUrls.length > 6 ? 'overflow-y-auto' : ''}`}>
                                   {uploadedImageUrls.map((url, index) => (
                                     <Draggable key={url} draggableId={url} index={index}>
                                       {(provided) => (

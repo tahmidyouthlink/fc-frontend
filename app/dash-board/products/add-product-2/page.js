@@ -357,66 +357,68 @@ const SecondStepOfAddProduct = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className='min-h-[90vh] flex flex-col justify-between'>
-        <h3 className='max-w-screen-2xl text-right bg-gray-50 font-medium text-sm md:text-base px-6'>Primary Location: <strong>{primaryLocationName}</strong></h3>
-        <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 px-6 lg:px-8 xl:px-10 2xl:px-12 py-3'>
-          {productVariants?.map((variant, index) => (
-            <div key={index} className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-              <div className='flex items-center gap-2 md:gap-4'>
-                <div className='w-1/3'>
-                  <label className='font-medium text-[#9F5216]'>Color</label>
-                  <input
-                    type="text"
-                    value={variant.color.label}
-                    className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                    disabled
-                  />
+      <form onSubmit={handleSubmit(onSubmit)} className='min-h-[91vh] flex flex-col justify-between'>
+        <div>
+          <h3 className='max-w-screen-2xl text-right bg-gray-50 font-medium text-sm md:text-base px-6'>Primary Location: <strong>{primaryLocationName}</strong></h3>
+          <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 px-6 lg:px-8 xl:px-10 2xl:px-12 py-3'>
+            {productVariants?.map((variant, index) => (
+              <div key={index} className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+                <div className='flex items-center gap-2 md:gap-4'>
+                  <div className='w-1/3'>
+                    <label className='font-medium text-[#9F5216]'>Color</label>
+                    <input
+                      type="text"
+                      value={variant.color.label}
+                      className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                      disabled
+                    />
+                  </div>
+                  <div className='w-1/3'>
+                    <label className='font-medium text-[#9F5216]'>Size</label>
+                    <input
+                      type="text"
+                      value={variant.size}
+                      className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                      disabled
+                    />
+                  </div>
+                  <div className='md:w-1/3'>
+                    <label htmlFor={`sku-${index}`} className='font-medium text-[#9F5216]'>SKU *</label>
+                    <input
+                      id={`sku-${index}`}
+                      autocomplete="off"
+                      {...register(`sku-${index}`, { required: true })}
+                      value={variant.sku}
+                      onChange={(e) => handleVariantChange(index, 'sku', e.target.value)}
+                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                      type="number"
+                    />
+                    {errors[`sku-${index}`] && (
+                      <p className="text-red-600 text-left">SKU is required</p>
+                    )}
+                  </div>
                 </div>
-                <div className='w-1/3'>
-                  <label className='font-medium text-[#9F5216]'>Size</label>
-                  <input
-                    type="text"
-                    value={variant.size}
-                    className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                    disabled
-                  />
-                </div>
-                <div className='md:w-1/3'>
-                  <label htmlFor={`sku-${index}`} className='font-medium text-[#9F5216]'>SKU *</label>
-                  <input
-                    id={`sku-${index}`}
-                    autocomplete="off"
-                    {...register(`sku-${index}`, { required: true })}
-                    value={variant.sku}
-                    onChange={(e) => handleVariantChange(index, 'sku', e.target.value)}
-                    className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                    type="number"
-                  />
-                  {errors[`sku-${index}`] && (
-                    <p className="text-red-600 text-left">SKU is required</p>
+                <div className='flex flex-col gap-4'>
+                  <label className='font-medium text-[#9F5216]'>Select Media *</label>
+                  <div className='grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 2xl:grid-cols-4 gap-2'>
+                    {uploadedImageUrls.map((url, imgIndex) => (
+                      <div
+                        key={imgIndex}
+                        className={`image-container ${variant.imageUrls?.includes(url) ? 'selected' : ''}`}
+                        onClick={() => onImageClick(index, url)}
+                      >
+                        <Image src={url} alt={`image-${imgIndex}`} width={3000} height={3000} className="w-full min-h-[200px] max-h-[200px] rounded-md object-contain" />
+                      </div>
+                    ))}
+                  </div>
+                  {errors[`imageUrl-${index}`] && (
+                    <p className="text-red-600 text-left">Image selection is required</p>
                   )}
                 </div>
-              </div>
-              <div className='flex flex-col gap-4'>
-                <label className='font-medium text-[#9F5216]'>Select Media *</label>
-                <div className='grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 2xl:grid-cols-4 gap-2'>
-                  {uploadedImageUrls.map((url, imgIndex) => (
-                    <div
-                      key={imgIndex}
-                      className={`image-container ${variant.imageUrls?.includes(url) ? 'selected' : ''}`}
-                      onClick={() => onImageClick(index, url)}
-                    >
-                      <Image src={url} alt={`image-${imgIndex}`} width={3000} height={3000} className="w-full min-h-[200px] max-h-[200px] rounded-md object-contain" />
-                    </div>
-                  ))}
-                </div>
-                {errors[`imageUrl-${index}`] && (
-                  <p className="text-red-600 text-left">Image selection is required</p>
-                )}
-              </div>
 
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
         </div>
         <div className='flex flex-wrap gap-6 justify-between px-6 lg:px-8 xl:px-10 2xl:px-12 py-3'>
           <Link href='/dash-board/products/add-product' className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>

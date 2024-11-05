@@ -11,11 +11,11 @@ const ExitConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
       <ModalContent>
         {(onCloseModal) => (
           <>
-            <ModalHeader className="flex flex-col gap-1">Exit Without Saving?</ModalHeader>
+            <ModalHeader className="flex flex-col gap-1 bg-gray-200">Exit Without Saving?</ModalHeader>
             <ModalBody>
-              <p>Do you want to exit without saving your changes?</p>
+              <p className="py-2">Do you want to exit without saving your changes?</p>
             </ModalBody>
-            <ModalFooter>
+            <ModalFooter className="border">
               <Button color="danger" variant="light" onPress={onCloseModal}>
                 No
               </Button>
