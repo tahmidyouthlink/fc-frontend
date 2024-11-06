@@ -34,6 +34,7 @@ const CreatePurchaseOrder = () => {
   const [shipping, setShipping] = useState(0);  // Initial value for shipping
   const [discount, setDiscount] = useState(0);  // Initial value for discount
   const [purchaseOrderList, isPurchaseOrderPending] = usePurchaseOrders();
+  const [file, setFile] = useState(null);
 
   // Update handleVariantChange to initialize values if not set
   const handleVariantChange = (index, field, value, productTitle, size, colorName, colorCode) => {
@@ -324,9 +325,41 @@ const CreatePurchaseOrder = () => {
     return Math.max(...existingOrderNumbers) + 1; // Increment the maximum order number
   };
 
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const uploadFile = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('attachment', file); // Append the file to FormData
+
+      const response = await axiosPublic.post('/uploadFile', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response?.data?.fileUrl) {
+        return response.data.fileUrl; // Return the file URL or path from the response
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
+  };
+
   const onSubmit = async (data) => {
 
     const { shipping, discount, referenceNumber, supplierNote, estimatedArrival, paymentTerms } = data;
+
+    let fileUrl = '';
+    if (file) {
+      fileUrl = await uploadFile(file);
+      if (!fileUrl) {
+        toast.error('Upload failed, cannot proceed.');
+        return;
+      }
+    }
 
     // Check if expiryDate is selected
     if (!estimatedArrival) {
@@ -382,7 +415,8 @@ const CreatePurchaseOrder = () => {
       totalPrice: parseFloat(total),
       purchaseOrderNumber,
       status: orderStatus,
-      selectedProducts
+      selectedProducts,
+      attachment: fileUrl,
     }
 
     try {
@@ -653,13 +687,36 @@ const CreatePurchaseOrder = () => {
                 />
               </div>
               <div>
-                <label htmlFor='supplierNote' className='flex justify-start font-medium text-neutral-500 pb-2'>Note to supplier</label>
-                <textarea
-                  id="supplierNote"
-                  {...register("supplierNote")}
-                  className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mb-[14px]"
-                  rows={5} // Set the number of rows for height adjustment
+                <label htmlFor='supplierNote' className='flex justify-start font-medium text-neutral-500 pb-2 pt-[3px]'>Note to supplier</label>
+                <input
+                  id={`supplierNote`}
+                  {...register(`supplierNote`)}
+                  className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                  type="text"
                 />
+              </div>
+              <div>
+                <label htmlFor='attachment' className='flex justify-start font-medium text-neutral-500 pb-2 pt-[3px]'>Attachment</label>
+
+                <div className="flex items-center w-full max-w-md p-1 border border-gray-300 rounded-md bg-gray-100 shadow-sm">
+                  <label
+                    htmlFor="attachment"
+                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md cursor-pointer hover:bg-blue-700 transition duration-200"
+                  >
+                    Choose File
+                  </label>
+                  <span className="ml-4 text-gray-600 truncate">
+                    {file?.name || "No file chosen"}
+                  </span>
+                  <input
+                    id="attachment"
+                    {...register("attachment")}
+                    className="hidden"
+                    type="file"
+                    accept=".jpg, .jpeg, .png, .gif, .pdf"
+                    onChange={handleFileChange}
+                  />
+                </div>
 
               </div>
             </div>

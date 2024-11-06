@@ -344,7 +344,7 @@ const ProductPage = () => {
                           selectedColumns.includes(column) && (
                             <>
                               {column === 'Product' && (
-                                <td onClick={() => handleGoToEditPage(product?._id)} className="text-xs p-3 cursor-pointer text-blue-600 hover:text-blue-800 flex flex-col lg:flex-row items-center gap-3">
+                                <td key="Product" onClick={() => handleGoToEditPage(product?._id)} className="text-xs p-3 cursor-pointer text-blue-600 hover:text-blue-800 flex flex-col lg:flex-row items-center gap-3">
                                   <div>
                                     <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrls[0]} alt='productIMG' height={600} width={600} />
                                   </div>
@@ -355,7 +355,7 @@ const ProductPage = () => {
                                 </td>
                               )}
                               {column === 'Status' && (
-                                <td className="text-xs p-3 text-gray-700 text-center">
+                                <td key="Status" className="text-xs p-3 text-gray-700 text-center">
                                   <span className={`px-2 py-0.5 ${product?.status === "active" ? "bg-green-200 text-green-800 rounded-full"
                                     : product?.status === "archive" ? "bg-blue-200 text-blue-800 rounded-full"
                                       : "bg-yellow-200 text-yellow-800 rounded-full"}`}>
@@ -366,12 +366,12 @@ const ProductPage = () => {
                                 </td>
                               )}
                               {column === 'SKU' && (
-                                <td className="text-xs p-3 text-gray-700 text-center">{product?.productVariants?.length > 0
+                                <td key="SKU" className="text-xs p-3 text-gray-700 text-center">{product?.productVariants?.length > 0
                                   ? `${product.productVariants.reduce((acc, variant) => acc + variant.sku, 0)} ${product.productVariants.reduce((acc, variant) => acc + variant.sku, 0) === 1 ? 'Item' : 'Items'}`
                                   : 'No Items'}</td>
                               )}
                               {column === 'Season' && (
-                                <td className="text-xs p-3 text-gray-700 text-center">{product?.season?.map((season, index) => (
+                                <td key="Season" className="text-xs p-3 text-gray-700 text-center">{product?.season?.map((season, index) => (
                                   <span key={index}>
                                     {season}
                                     {index < product.season.length - 1 ? <>,<br /></> : null}
@@ -379,30 +379,30 @@ const ProductPage = () => {
                                 )) || '--'}</td>
                               )}
                               {column === 'Price' && (
-                                <td className="text-xs p-3 text-gray-700 text-center">৳ {product?.regularPrice}</td>
+                                <td key="Price" className="text-xs p-3 text-gray-700 text-center">৳ {product?.regularPrice}</td>
                               )}
                               {column === 'Discount (৳ / %)' && (
-                                <td className="text-xs p-3 text-gray-700 text-center">{product?.discountValue && product?.discountValue != 0 ?
+                                <td key="Discount (৳ / %)" className="text-xs p-3 text-gray-700 text-center">{product?.discountValue && product?.discountValue != 0 ?
                                   `${product?.discountType === 'Flat' ? '৳' : ''} ${product?.discountValue} ${product?.discountType === 'Percentage' ? '%' : ''}`
                                   : '--'}
                                 </td>
                               )}
                               {column === 'Sizes' && (
-                                <td className="text-xs p-3 text-gray-700 text-center">{product?.allSizes?.join(', ') || 'No sizes available'}</td>
+                                <td key="Sizes" className="text-xs p-3 text-gray-700 text-center">{product?.allSizes?.join(', ') || 'No sizes available'}</td>
                               )}
                               {column === 'Colors' && (
-                                <td className="text-xs p-3 text-gray-700 text-center">{product?.availableColors?.map(colorObj => (
+                                <td key="Colors" className="text-xs p-3 text-gray-700 text-center">{product?.availableColors?.map(colorObj => (
                                   <span key={colorObj._id} style={{ backgroundColor: colorObj.color }} className="inline-block w-5 h-5 mr-1 rounded-full text-center"></span>
                                 ))}</td>
                               )}
                               {column === 'Vendor' && (
-                                <td className="text-xs p-3 text-gray-700 text-center">{product?.vendors?.length > 0 ? <div>{product?.vendors?.map((vendor, index) => (<div key={index}>{vendor?.value}</div>))}</div> : <div>--</div>} </td>
+                                <td key="Vendor" className="text-xs p-3 text-gray-700 text-center">{product?.vendors?.length > 0 ? <div>{product?.vendors?.map((vendor, index) => (<div key={index}>{vendor?.value}</div>))}</div> : <div>--</div>} </td>
                               )}
                               {column === 'Shipping Zones' && (
-                                <td className="text-xs p-3 text-gray-700 text-center">{product?.shippingDetails?.map(detail => detail.shippingZone).join(', ') || '--'}</td>
+                                <td key="Shipping Zones" className="text-xs p-3 text-gray-700 text-center">{product?.shippingDetails?.map(detail => detail.shippingZone).join(', ') || '--'}</td>
                               )}
                               {column === 'Shipment Handlers' && (
-                                <td className="text-xs p-3 text-gray-700 text-center">{product?.shippingDetails?.map(detail => detail.selectedShipmentHandler.shipmentHandlerName).join(', ') || '--'}</td>
+                                <td key="Shipment Handlers" className="text-xs p-3 text-gray-700 text-center">{product?.shippingDetails?.map(detail => detail.selectedShipmentHandler.shipmentHandlerName).join(', ') || '--'}</td>
                               )}
                             </>
                           )

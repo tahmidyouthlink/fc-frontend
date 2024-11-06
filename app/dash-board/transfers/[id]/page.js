@@ -336,7 +336,10 @@ const EditTransferOrder = () => {
             </div>
 
             {selectedProducts?.length > 0 &&
-              <div className="max-w-screen-2xl mx-auto overflow-x-auto custom-scrollbar relative pt-4">
+              <div
+                className={`max-w-screen-2xl mx-auto overflow-x-auto ${selectedProducts.length > 4 ? "overflow-y-auto max-h-[430px]" : ""
+                  } custom-scrollbar relative mt-4`}
+              >
                 <table className="w-full text-left border-collapse">
                   <thead className="sticky top-0 z-[1] bg-white">
                     <tr>

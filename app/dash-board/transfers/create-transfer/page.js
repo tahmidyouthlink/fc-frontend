@@ -137,7 +137,7 @@ const CreateTransfer = () => {
   };
 
   // Function to toggle selection for a specific product size and originSku
-  const toggleProductSizeColorSelection = (product, size, colorCode, colorName, originSku) => {
+  const toggleProductSizeColorSelection = (product, size, colorCode, colorName, originSku, destinationSku) => {
     setSelectedProducts((prevSelectedProducts) => {
       const isSelected = prevSelectedProducts.some(
         (item) =>
@@ -145,7 +145,8 @@ const CreateTransfer = () => {
           item.size === size &&
           item.color === colorCode &&
           item.name === colorName &&
-          item.originSku === originSku // Check originSku
+          item.originSku === originSku && // Check originSku 
+          item.destinationSku === destinationSku // Check destinationSku 
       );
 
       if (isSelected) {
@@ -157,7 +158,8 @@ const CreateTransfer = () => {
               item.size === size &&
               item.color === colorCode &&
               item.name === colorName &&
-              item.originSku === originSku // Check originSku
+              item.originSku === originSku && // Check originSku 
+              item.destinationSku === destinationSku // Check destinationSku
             )
         );
       } else {
@@ -171,6 +173,7 @@ const CreateTransfer = () => {
             color: colorCode,
             name: colorName,
             originSku, // Store originSku
+            destinationSku,
           },
         ];
       }
@@ -187,7 +190,8 @@ const CreateTransfer = () => {
             item.size === entry.size &&
             item.color === entry.color?.code &&
             item.name === entry.color?.name &&
-            item.originSku === entry.originSku // Check originSku
+            item.originSku === entry?.originSku && // Check originSku
+            item.destinationSku === entry?.destinationSku
         )
       );
 
@@ -203,6 +207,7 @@ const CreateTransfer = () => {
           color: entry.color?.code,
           name: entry.color?.name,
           originSku: entry.originSku, // Store originSku
+          destinationSku: entry.destinationSku, // Store originSku
         }));
 
         // Filter out existing entries for this product and add all sizes/colors with originSku
@@ -436,6 +441,9 @@ const CreateTransfer = () => {
                       <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b  text-center">
                         Available at origin
                       </th>
+                      <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b  text-center">
+                        Available at Destination
+                      </th>
                       <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-right">
                         Quantity
                       </th>
@@ -447,7 +455,6 @@ const CreateTransfer = () => {
 
                   <tbody className="bg-white divide-y divide-gray-200">
                     {selectedProducts?.map((product, index) => {
-
                       return (
                         <tr key={index} className="hover:bg-gray-50">
                           <td className="text-sm p-3 text-neutral-500 text-center cursor-pointer flex flex-col lg:flex-row items-center gap-3">
@@ -464,6 +471,9 @@ const CreateTransfer = () => {
                           </td>
                           <td className="text-sm p-3 text-neutral-500 font-semibold text-center">
                             {product?.originSku}
+                          </td>
+                          <td className="text-sm p-3 text-neutral-500 font-semibold text-center">
+                            {product?.destinationSku}
                           </td>
                           <td className="text-sm p-3 text-neutral-500 font-semibold">
                             <div className='flex flex-col justify-center items-end'>
@@ -676,7 +686,7 @@ const CreateTransfer = () => {
                                       p.name === entry.color?.name &&
                                       p.originSku === entry.originSku // Include originSku in selection
                                   )}
-                                  onValueChange={() => toggleProductSizeColorSelection(product, entry.size, entry.color?.code, entry.color?.name, entry?.originSku)}
+                                  onValueChange={() => toggleProductSizeColorSelection(product, entry.size, entry.color?.code, entry.color?.name, entry?.originSku, entry?.destinationSku)}
                                 />
                                 <span className="font-semibold ml-2">
                                   {entry.size}

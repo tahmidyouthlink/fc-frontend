@@ -10,6 +10,8 @@ import useTransferOrders from '@/app/hooks/useTransferOrders';
 import Loading from '@/app/components/shared/Loading/Loading';
 import Progressbar from '@/app/components/layout/Progressbar';
 import { useRouter } from 'next/navigation';
+import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 const transferStatusTabs = [
   'All',
@@ -18,20 +20,66 @@ const transferStatusTabs = [
   'Canceled'
 ];
 
+const initialColumns = ['Purchase order', 'Origin', 'Destination', 'Status', 'Received', 'Expected Arrival'];
+
 const Transfers = () => {
 
+  const router = useRouter();
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   const [selectedTab, setSelectedTab] = useState(transferStatusTabs[0]);
   const [transferOrderList, isTransferOrderPending, refetch] = useTransferOrders();
-  const router = useRouter();
+  const [selectedColumns, setSelectedColumns] = useState([]);
+  const [columnOrder, setColumnOrder] = useState(initialColumns);
+  const [isColumnModalOpen, setColumnModalOpen] = useState(false);
+
+  useEffect(() => {
+    const savedColumns = JSON.parse(localStorage.getItem('selectedColumnsTransferOrder'));
+    const savedOrder = JSON.parse(localStorage.getItem('columnOrderTransferOrder'));
+    if (savedColumns) {
+      setSelectedColumns(savedColumns);
+    }
+    if (savedOrder) {
+      setColumnOrder(savedOrder);
+    }
+  }, []);
 
   useEffect(() => {
     if (searchQuery) {
       refetch();  // RefetchOrders when search query changes
     }
   }, [searchQuery, refetch]);
+
+  const handleColumnChange = (selected) => {
+    setSelectedColumns(selected);
+  };
+
+  const handleSelectAll = () => {
+    setSelectedColumns(initialColumns);
+    setColumnOrder(initialColumns);
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedColumns([]);
+    setColumnOrder([]);
+  };
+
+  const handleSave = () => {
+    localStorage.setItem('selectedColumnsTransferOrder', JSON.stringify(selectedColumns));
+    localStorage.setItem('columnOrderTransferOrder', JSON.stringify(columnOrder));
+    setColumnModalOpen(false);
+  };
+
+  const handleOnDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const reorderedColumns = Array.from(columnOrder);
+    const [draggedColumn] = reorderedColumns.splice(result.source.index, 1);
+    reorderedColumns.splice(result.destination.index, 0, draggedColumn);
+
+    setColumnOrder(reorderedColumns); // Update the column order both in modal and table
+  };
 
   const handleItemsPerPageChange = (e) => {
     setItemsPerPage(parseInt(e.target.value));
@@ -125,10 +173,8 @@ const Transfers = () => {
     return <Loading />
   }
 
-  console.log(paginatedOrders);
-
   return (
-    <div className='relative w-full min-h-screen bg-gray-100'>
+    <div className='relative w-full min-h-screen bg-gray-100 px-6'>
 
       <div
         style={{
@@ -149,9 +195,67 @@ const Transfers = () => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl px-0 md:px-6 2xl:px-0 mx-auto relative'>
+      {/* Column Selection Modal */}
+      <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
+        <ModalContent>
+          <ModalHeader>Choose Columns</ModalHeader>
+          <ModalBody className="modal-body-scroll">
+            <DragDropContext onDragEnd={handleOnDragEnd}>
+              <Droppable droppableId="droppable">
+                {(provided) => (
+                  <div ref={provided.innerRef} {...provided.droppableProps}>
+                    <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
+                      {columnOrder.map((column, index) => (
+                        <Draggable key={column} draggableId={column} index={index}>
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className="flex items-center justify-between p-2 border-b"
+                            >
+                              <Checkbox
+                                value={column}
+                                isChecked={selectedColumns.includes(column)}
+                                onChange={() => {
+                                  // Toggle column selection
+                                  if (selectedColumns.includes(column)) {
+                                    setSelectedColumns(selectedColumns.filter(col => col !== column));
+                                  } else {
+                                    setSelectedColumns([...selectedColumns, column]);
+                                  }
+                                }}
+                              >
+                                {column}
+                              </Checkbox>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </CheckboxGroup>
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
+              Select All
+            </Button>
+            <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
+              Deselect All
+            </Button>
+            <Button variant="solid" color="primary" size="sm" onClick={handleSave}>
+              Save
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
-        <div className='flex items-center justify-between py-2 md:py-5 gap-2 w-full'>
+      <div className='max-w-screen-2xl mx-auto relative'>
+
+        <div className='flex flex-wrap md:flex-nowrap items-center justify-between py-2 md:py-5 gap-2 w-full'>
 
           <h3 className='text-center md:text-start font-semibold text-xl lg:text-2xl'>Transfers</h3>
 
@@ -161,7 +265,7 @@ const Transfers = () => {
 
         </div>
 
-        <div className='flex justify-between items-center gap-6 w-full'>
+        <div className='flex flex-wrap lg:flex-nowrap justify-between items-center gap-6 w-full'>
           <div className='flex-1'>
             <TabsOrder
               tabs={transferStatusTabs}
@@ -170,8 +274,14 @@ const Transfers = () => {
             />
           </div>
 
+          <div>
+            <Button variant="solid" color="danger" onClick={() => { setColumnModalOpen(true) }} className="w-full">
+              Choose Columns
+            </Button>
+          </div>
+
           {/* Search Product Item */}
-          <div className='flex-1'>
+          <div className='flex-1 min-w-[300px]'>
             <li className="flex items-center relative group">
               <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
                 <g>
@@ -190,28 +300,13 @@ const Transfers = () => {
 
         </div>
 
-        <div className="max-w-screen-2xl mx-auto custom-max-h-orders overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg pt-4">
+        <div className="max-w-screen-2xl mx-auto custom-max-h-orders overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg mt-4">
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 z-[1] bg-white">
               <tr>
-                <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b">
-                  Purchase order
-                </th>
-                <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b">
-                  Origin
-                </th>
-                <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b">
-                  Destination
-                </th>
-                <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b">
-                  Status
-                </th>
-                <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-right">
-                  Received
-                </th>
-                <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-right">
-                  Expected Arrival
-                </th>
+                {columnOrder.map((column) => selectedColumns.includes(column) && (
+                  <th key={column} className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">{column}</th>
+                ))}
               </tr>
             </thead>
 
@@ -235,44 +330,63 @@ const Transfers = () => {
                   );
                   return (
                     <tr key={index} className="hover:bg-gray-50">
-                      <td onClick={() => handleGoToEditPage(order?._id)} className="text-sm p-3 cursor-pointer text-blue-600 hover:text-blue-800">
-                        {order?.transferOrderNumber}
-                      </td>
-                      <td className="text-sm p-3 text-neutral-500 font-semibold">
-                        {order?.origin?.locationName}
-                      </td>
-                      <td className="text-sm p-3 text-neutral-500 font-semibold">
-                        {order?.destination?.locationName}
-                      </td>
-                      <td className="text-xs p-3 font-semibold">
-                        <span
-                          className={`px-3 py-1 rounded-full
-      ${order?.status === "pending" ? "bg-yellow-100 text-yellow-600"
-                              : order?.status === "received" ? "bg-green-100 text-green-600"
-                                : order?.status === "canceled" ? "bg-red-100 text-red-600"
-                                  : "bg-gray-100 text-gray-600"}`}
-                        >
-                          {order?.status === "pending" ? "Pending"
-                            : order?.status === "received" ? "Received"
-                              : order?.status === "canceled" ? "Canceled"
-                                : "Unknown"}
-                        </span>
-                      </td>
-                      <td className="text-sm p-3 text-neutral-500 font-semibold">
-                        <div className='flex flex-col'>
-                          <Progressbar
-                            accepted={totals?.totalAccept}
-                            rejected={totals?.totalReject}
-                            total={totals?.totalQuantity}
-                          />
-                          <div className="mt-1">
-                            {totals?.totalAccept} of {totals?.totalQuantity}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="text-sm p-3 text-neutral-500 font-semibold text-right">
-                        {order?.estimatedArrival}
-                      </td>
+                      {columnOrder.map(
+                        (column) =>
+                          selectedColumns.includes(column) && (
+                            <>
+                              {column === 'Purchase order' && (
+                                <td key="Purchase order" onClick={() => handleGoToEditPage(order?._id)} className="text-sm p-3 cursor-pointer text-blue-600 hover:text-blue-800 text-center">
+                                  {order?.transferOrderNumber}
+                                </td>
+                              )}
+                              {column === 'Origin' && (
+                                <td key="Origin" className="text-sm p-3 text-neutral-500 font-semibold text-center">
+                                  {order?.origin?.locationName}
+                                </td>
+                              )}
+                              {column === 'Destination' && (
+                                <td key="Destination" className="text-sm p-3 text-neutral-500 font-semibold text-center">
+                                  {order?.destination?.locationName}
+                                </td>
+                              )}
+                              {column === 'Status' && (
+                                <td key="Status" className="text-xs p-3 font-semibold text-center">
+                                  <span
+                                    className={`px-3 py-1 rounded-full
+              ${order?.status === "pending" ? "bg-yellow-100 text-yellow-600"
+                                        : order?.status === "received" ? "bg-green-100 text-green-600"
+                                          : order?.status === "canceled" ? "bg-red-100 text-red-600"
+                                            : "bg-gray-100 text-gray-600"}`}
+                                  >
+                                    {order?.status === "pending" ? "Pending"
+                                      : order?.status === "received" ? "Received"
+                                        : order?.status === "canceled" ? "Canceled"
+                                          : "Unknown"}
+                                  </span>
+                                </td>
+                              )}
+                              {column === 'Received' && (
+                                <td key="Received" className="text-sm p-3 text-neutral-500 font-semibold">
+                                  <div className='flex flex-col'>
+                                    <Progressbar
+                                      accepted={totals?.totalAccept}
+                                      rejected={totals?.totalReject}
+                                      total={totals?.totalQuantity}
+                                    />
+                                    <div className="mt-1">
+                                      {totals?.totalAccept} of {totals?.totalQuantity}
+                                    </div>
+                                  </div>
+                                </td>
+                              )}
+                              {column === 'Expected Arrival' && (
+                                <td key="Expected Arrival" className="text-sm p-3 text-neutral-500 font-semibold text-center">
+                                  {order?.estimatedArrival}
+                                </td>
+                              )}
+                            </>
+                          )
+                      )}
                     </tr>
                   );
                 })

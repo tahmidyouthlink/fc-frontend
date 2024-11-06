@@ -47,6 +47,7 @@ const EditPurchaseOrderPage = () => {
   const [modalMessage, setModalMessage] = useState("");
   const [headingMessage, setHeadingMessage] = useState("");
   const [selectedStatus, setSelectedStatus] = useState(null);
+  const [attachment, setAttachment] = useState(null);
 
   // Format date to yyyy-mm-dd for date input field
   const formatDateForInput = (dateStr) => {
@@ -125,6 +126,7 @@ const EditPurchaseOrderPage = () => {
       setPurchaseOrderNumber(order?.purchaseOrderNumber);
       setReferenceNumber(order?.referenceNumber);
       setSupplierNote(order?.supplierNote);
+      setAttachment(order?.attachment || "");
 
       setIsLoading(false);
     } catch (err) {
@@ -491,7 +493,8 @@ const EditPurchaseOrderPage = () => {
         discountCharge: parseFloat(discount) || 0,
         totalPrice: parseFloat(total),
         status: data?.status,
-        selectedProducts
+        selectedProducts,
+        attachment: attachment
       };
 
       const res = await axiosPublic.put(`/editPurchaseOrder/${id}`, updatedPurchaseOrderData);
@@ -754,7 +757,10 @@ const EditPurchaseOrderPage = () => {
             </div>}
 
             {selectedProducts?.length > 0 &&
-              <div className="max-w-screen-2xl mx-auto overflow-x-auto custom-scrollbar relative pt-4">
+              <div
+                className={`max-w-screen-2xl mx-auto overflow-x-auto ${selectedProducts.length > 4 ? "overflow-y-auto max-h-[430px]" : ""
+                  } custom-scrollbar relative mt-4`}
+              >
                 <table className="w-full text-left border-collapse">
                   <thead className="sticky top-0 z-[1] bg-white">
                     <tr>
@@ -876,7 +882,7 @@ const EditPurchaseOrderPage = () => {
             {/* Additional Details */}
             <div className='flex-1 flex flex-col w-full gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
               {["ordered", "received", "canceled"].includes(purchaseOrderStatus) ? (
-                <div className='min-h-[270px] space-y-6'>
+                <div className='min-h-[272px] space-y-6'>
                   <h1 className='font-semibold'>Additional Details</h1>
                   <div>
                     <label htmlFor='referenceNumber' className='flex justify-start font-semibold text-neutral-900 pb-2'>Reference Number</label>
@@ -900,7 +906,7 @@ const EditPurchaseOrderPage = () => {
                     />
                   </div>
                   <div>
-                    <label htmlFor='supplierNote' className='flex justify-start font-medium text-neutral-500 pb-2'>Note to supplier</label>
+                    <label htmlFor='supplierNote' className='flex justify-start font-medium text-neutral-500 pb-2 pt-[2px]'>Note to supplier</label>
                     <textarea
                       id="supplierNote"
                       {...register("supplierNote")}

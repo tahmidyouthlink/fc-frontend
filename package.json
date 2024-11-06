@@ -16,6 +16,7 @@
     "axios": "^1.7.2",
     "canvg": "^3.0.0",
     "date-fns": "^3.6.0",
+    "file-saver": "^2.0.5",
     "framer-motion": "^11.3.2",
     "jsbarcode": "^3.11.6",
     "jspdf": "^2.5.1",
