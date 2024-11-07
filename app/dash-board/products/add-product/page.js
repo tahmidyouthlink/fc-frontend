@@ -276,7 +276,7 @@ const FirstStepOfAddProduct = () => {
   };
 
   const validateFiles = (files) => {
-    const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
     return files.filter(file => validTypes.includes(file.type));
   };
 
@@ -1158,7 +1158,7 @@ const FirstStepOfAddProduct = () => {
                         Upload or Drag Media
                       </h5>
                       <p className='text-sm text-gray-500'>
-                        Photos Should be in PNG, JPEG or JPG format
+                        Photos Should be in PNG, JPEG, JPG or WEBP format
                       </p>
                     </div>
                   </label>

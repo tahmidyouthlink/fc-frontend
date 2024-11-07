@@ -7,6 +7,7 @@ import promo from "../../../public/card-images/promo.jpg";
 import specialOffer from "../../../public/card-images/special-offer.jpg";
 import RecentPromotions from '@/app/components/layout/RecentPromotions';
 import PromotionPerformance from '@/app/components/layout/PromotionPerformance';
+import MarketingContent from '@/app/components/layout/MarketingContent';
 
 const Marketing = () => {
 
@@ -184,7 +185,7 @@ const Marketing = () => {
       {activeTab === "marketing content" && <div className='pt-6'>
         <h1 className='font-bold text-xl'>Recommended For You</h1>
         <p className='pt-1 pb-8 text-neutral-400 font-medium'>Our recommendations are tailored to suit your fashion commerce and customer preferences.</p>
-
+        <MarketingContent />
       </div>
       }
     </div>
