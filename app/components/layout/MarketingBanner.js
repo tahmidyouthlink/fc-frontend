@@ -309,7 +309,7 @@ const MarketingBanner = () => {
         {marketingBannerList?.map((marketing, index) => (
 
           <div key={index} className="rounded-lg bg-white p-5 md:p-7 drop-shadow dark:bg-[#18181B]">
-            <Image width={1200} height={1200} alt='marketing-banner' className="h-fit w-[650px] rounded-lg object-contain" src={marketing?.url} />
+            <Image width={1200} height={1200} alt='marketing-banner' className="h-fit lg:h-[285px] w-[650px] rounded-lg object-cover" src={marketing?.url} />
             <div className="flex justify-between pt-8">
               <p className='text-neutral-500'> <span>Position: </span>
                 {["left", "right", "center"].includes(marketing?.position)
