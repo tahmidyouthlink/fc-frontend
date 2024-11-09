@@ -17,7 +17,7 @@ const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 
 const MarketingBanner = () => {
 
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { handleSubmit } = useForm();
   const axiosPublic = useAxiosPublic();
   const [image, setImage] = useState(null);
   const [selectedPosition, setSelectedPosition] = useState("");
@@ -306,8 +306,8 @@ const MarketingBanner = () => {
         </div>
       </form>
       <div className='flex-1 flex flex-col gap-6 items-center justify-center my-6 h-fit'>
-        {marketingBannerList?.map((marketing, index) => (
 
+        {marketingBannerList?.map((marketing, index) => (
           <div key={index} className="rounded-lg bg-white p-5 md:p-7 drop-shadow dark:bg-[#18181B]">
             <Image width={1200} height={1200} alt='marketing-banner' className="h-fit lg:h-[285px] w-[650px] rounded-lg object-cover" src={marketing?.url} />
             <div className="flex justify-between pt-8">
@@ -339,6 +339,7 @@ const MarketingBanner = () => {
             </div>
           </div>
         ))}
+
       </div>
     </div>
   );
