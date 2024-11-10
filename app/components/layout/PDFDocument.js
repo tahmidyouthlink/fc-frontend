@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     textAlign: 'left',
     color: '#E74C3A',
-    marginTop: 30,
+    marginTop: 25,
     marginBottom: 10,
     fontWeight: 900,
   },
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',         // Arrange the details and "THANK YOU" in a row
     justifyContent: 'space-between', // Space between the two sections
     alignItems: 'flex-start',      // Align items at the top
-    paddingTop: 65,
+    paddingTop: 40,
     letterSpacing: 1,
   },
   footerDetails: {
@@ -346,21 +346,21 @@ const PDFDocument = ({ order }) => {
 
           <View style={styles.table}>
             <View style={styles.tableHeader}>
-              <Text style={styles.tableCellLeft}>TITLE</Text>    {/* Left-aligned */}
-              <Text style={styles.tableCellCenter}>VARIANT</Text>  {/* Left-aligned */}
-              <Text style={styles.tableCellCenter}>PRICE</Text>   {/* Right-aligned */}
-              <Text style={styles.tableCellCenter}>QTY</Text>     {/* Right-aligned */}
-              <Text style={styles.tableCellRight}>TOTAL</Text>   {/* Right-aligned */}
+              <Text style={styles.tableCellLeft}>TITLE</Text>
+              <Text style={styles.tableCellCenter}>VARIANT</Text>
+              <Text style={styles.tableCellCenter}>PRICE</Text>
+              <Text style={styles.tableCellCenter}>QTY</Text>
+              <Text style={styles.tableCellRight}>TOTAL</Text>
             </View>
 
             <View style={styles.tableRaw}>
               {productRows.map((product, index) => (
                 <View key={index} style={styles.row}>
-                  <Text style={styles.tableCellLeft}>{product[0]}</Text> {/* TITLE */}
-                  <Text style={styles.tableCellCenter}>{product[1]} - {product[2]}</Text> {/* VARIANT */}
-                  <Text style={styles.tableCellCenter}>{product[3]}</Text> {/* PRICE */}
-                  <Text style={styles.tableCellCenter}>{product[4]}</Text> {/* QTY */}
-                  <Text style={styles.tableCellRight}>{product[5]}</Text> {/* TOTAL */}
+                  <Text style={styles.tableCellLeft}>{product[0]}</Text>
+                  <Text style={styles.tableCellCenter}>{product[1]} - {product[2]}</Text>
+                  <Text style={styles.tableCellCenter}>{product[3]}</Text>
+                  <Text style={styles.tableCellCenter}>{product[4]}</Text>
+                  <Text style={styles.tableCellRight}>{product[5]}</Text>
                 </View>
               ))}
             </View>

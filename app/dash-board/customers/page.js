@@ -267,8 +267,6 @@ const Customers = () => {
     return <Loading />
   }
 
-  console.log(paginatedData);
-
   return (
     <div className='relative w-full min-h-screen bg-gray-100'>
 
