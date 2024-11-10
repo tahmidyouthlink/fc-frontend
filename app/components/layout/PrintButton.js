@@ -1,32 +1,51 @@
-// components/PrintButton.js
-import { pdf } from '@react-pdf/renderer';
-import PDFDocument from './PDFDocument';
+"use client";
+import { useState, useEffect } from 'react';
 import { Button } from '@nextui-org/react';
 import { PiDownloadBold } from 'react-icons/pi';
+import PDFDocument from './PDFDocument';
 
 const PrintButton = ({ selectedOrder }) => {
+  const [pdfModule, setPdfModule] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  if (!selectedOrder) {
-    return null; // or display a message like "No order selected"
-  }
+  useEffect(() => {
+    // Dynamically import @react-pdf/renderer for client-side rendering only
+    import('@react-pdf/renderer').then((module) => {
+      setPdfModule(module); // Store the pdf module for later use
+    }).catch((error) => {
+      console.error("Failed to load @react-pdf/renderer:", error);
+    });
+  }, []);
 
   const handlePreview = async () => {
-    const blob = await pdf(<PDFDocument order={selectedOrder} />).toBlob();
-    const pdfURL = URL.createObjectURL(blob);
-    const printWindow = window.open(pdfURL, '_blank'); // Opens the PDF in a new tab
-    // Automatically trigger print dialog
-    printWindow.onload = function () {
-      printWindow.focus(); // Make sure the window is focused
-      printWindow.print(); // Trigger the print dialog
-    };
+    if (!selectedOrder || !pdfModule) return;
+
+    setIsLoading(true); // Show loading state
+
+    try {
+      const { pdf } = pdfModule; // Use the dynamically imported pdf function
+      const blob = await pdf(<PDFDocument order={selectedOrder} />).toBlob();
+      const pdfURL = URL.createObjectURL(blob);
+      const printWindow = window.open(pdfURL, '_blank'); // Opens the PDF in a new tab
+
+      // Automatically trigger print dialog
+      printWindow.onload = function () {
+        printWindow.focus();
+        setTimeout(() => {
+          printWindow.print(); // Trigger the print dialog
+        }, 100); // Delay the print command
+      };
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    } finally {
+      setIsLoading(false); // Hide loading state
+    }
   };
 
   return (
-    <>
-      <Button color="primary" size='sm' onClick={handlePreview}>
-        Download Invoice <PiDownloadBold size={18} />
-      </Button>
-    </>
+    <Button color="primary" size="sm" onClick={handlePreview} isLoading={isLoading}>
+      Download Invoice <PiDownloadBold size={18} />
+    </Button>
   );
 };
 

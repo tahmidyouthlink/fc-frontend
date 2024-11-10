@@ -1,13 +1,5 @@
-// components/PDFDocument.js
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Image,
-  Font,
-} from '@react-pdf/renderer';
+import React, { useEffect } from 'react';
+import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer';
 import sidebarImageBase64 from './sidebarImageBase64';
 import JsBarcode from 'jsbarcode';
 import { montserratNormal } from './Base64NormalMontserrat';
@@ -15,6 +7,7 @@ import { montserratSemibold } from './MontserratSemibold';
 import { montserratBold } from './MontserratBold';
 import { montserratBlack } from './MontserratBlack';
 import { montserratMedium } from './MontserratMedium';
+import { lilitaOne } from './LilitaOne';
 
 // Generate Barcode as PNG Data URL
 const generateBarcodeData = (order) => {
@@ -32,33 +25,6 @@ const generateBarcodeData = (order) => {
   });
   return canvas.toDataURL('image/png');
 };
-
-// Register the Montserrat font
-Font.register({
-  family: 'Montserrat',
-  fonts: [
-    {
-      src: montserratNormal,
-      fontWeight: 400
-    },
-    {
-      src: montserratMedium,
-      fontWeight: 500
-    },
-    {
-      src: montserratSemibold,
-      fontWeight: 600
-    },
-    {
-      src: montserratBold,
-      fontWeight: 700
-    },
-    {
-      src: montserratBlack,
-      fontWeight: 900
-    },
-  ],
-});
 
 // Define styles
 const styles = StyleSheet.create({
@@ -119,40 +85,39 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginVertical: 2,
   },
+  subTable: {
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
+  },
   subtotal: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 60,
-    fontWeight: 'bold',
+    justifyContent: 'space-between',
+    width: "50%",
     marginBottom: 10,
     fontSize: 11,
     textTransform: "uppercase",
     letterSpacing: 2,
-    fontWeight: 600
   },
   discount: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 58,
-    fontWeight: 'bold',
+    justifyContent: 'space-between',
+    width: "50%",
     marginBottom: 10,
     fontSize: 11,
     textTransform: "uppercase",
     letterSpacing: 2,
-    fontWeight: 600
   },
   total: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 60,
-    fontWeight: 'bold',
+    justifyContent: 'space-between',
+    width: "50%",
     fontSize: 11,
     textTransform: "uppercase",
     letterSpacing: 2,
-    fontWeight: 600
   },
   table: {
     display: 'table',
@@ -161,7 +126,7 @@ const styles = StyleSheet.create({
     borderCollapse: 'collapse', // For a clean layout
     height: 250,
     letterSpacing: 1,
-    fontWeight: 600
+    fontWeight: 500,
   },
   tableHeader: {
     display: 'flex',
@@ -170,7 +135,9 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     width: "100%",
     color: '#00B8AC',
-    fontSize: 11,
+    fontSize: 12,
+    fontWeight: 400,
+    fontFamily: "Lilita One"
   },
   tableRaw: {
     marginVertical: 10,
@@ -213,11 +180,59 @@ const styles = StyleSheet.create({
     color: '#00B8AC',
     fontSize: 30,
     letterSpacing: 1,
-    fontWeight: 900
+    fontWeight: 400,
+    fontFamily: "Lilita One"
   }
 });
 
 const PDFDocument = ({ order }) => {
+
+  useEffect(() => {
+    // Register the Montserrat font
+    Font.register({
+      family: 'Montserrat',
+      fonts: [
+        {
+          src: montserratNormal,
+          fontWeight: 400
+        },
+        {
+          src: montserratMedium,
+          fontWeight: 500
+        },
+        {
+          src: montserratSemibold,
+          fontWeight: 600
+        },
+        {
+          src: montserratBold,
+          fontWeight: 700
+        },
+        {
+          src: montserratBlack,
+          fontWeight: 900
+        },
+      ],
+    });
+
+    // Register Lilita One font family
+    Font.register({
+      family: 'Lilita One',
+      fonts: [
+        {
+          src: lilitaOne, // Adjust the path to the font file
+          fontWeight: 400,  // Assuming only one weight
+        },
+      ],
+    });
+  }, []);
+
+  const barcodeDataUrl = React.useMemo(() => generateBarcodeData(order?.orderNumber), [order?.orderNumber]);
+
+  if (!order) {
+    console.error("Order data is missing");
+    return null;
+  }
 
   // Check if any product has an offer
   const hasOffers = order.productInformation.some(product => product.offerTitle);
@@ -285,8 +300,6 @@ const PDFDocument = ({ order }) => {
   });
 
   total = total.toFixed(2);
-
-  const barcodeDataUrl = generateBarcodeData(order?.orderNumber);
 
   return (
     <Document>
@@ -356,40 +369,51 @@ const PDFDocument = ({ order }) => {
 
           <View style={styles.border}></View>
 
-          {/* Subtotal, Promo Discount, Offer Discount, Shipping Charge, and Total */}
-          <View style={styles.subtotal}>
-            <Text style={{ color: "#E74C3A" }}>Subtotal</Text>
-            <Text>{subtotal.toFixed(2)}</Text>
-          </View>
-
-          {promoDiscount > 0 && (
-            <View style={styles.discount}>
-              <Text style={{ color: "#E74C3A" }}>{`Promo (${promoCode})`}</Text>
-              <Text>-{promoDiscount}</Text>
+          <View style={styles.subTable}>
+            {/* Subtotal, Promo Discount, Offer Discount, Shipping Charge, and Total */}
+            <View style={styles.subtotal}>
+              <Text style={{ color: "#E74C3A", fontWeight: 400, fontFamily: "Lilita One" }}>Subtotal</Text>
+              <Text style={{ fontWeight: 500 }}>{subtotal.toFixed(2)}</Text>
             </View>
-          )}
 
-          {hasOffers &&
-            productRows.map((product, index) => {
-              const offerDetails = product[6];
-              if (offerDetails) {
-                return (
-                  <View key={index} style={styles.discount}>
-                    <Text style={{ color: "#E74C3A" }}>{`Offer (${offerDetails.offerTitle}) on ${offerDetails.productTitle}`}</Text>
-                    <Text>-{offerDetails.offerDiscount}</Text>
-                  </View>
-                );
-              }
-            })}
+            {promoDiscount > 0 && (
+              <View style={styles.discount}>
+                <Text style={{
+                  color: "#E74C3A", fontWeight: 400, fontFamily: "Lilita One", flexWrap: 'wrap',
+                  width: '70%',
+                  marginBottom: 2,
+                }}>{`Promo (${promoCode})`}</Text>
+                <Text style={{ fontWeight: 500 }}>-{promoDiscount}</Text>
+              </View>
+            )}
 
-          <View style={styles.subtotal}>
-            <Text style={{ color: "#E74C3A" }}>Shipping</Text>
-            <Text>+{shippingCharge.toFixed(2)}</Text>
-          </View>
+            {hasOffers &&
+              productRows.map((product, index) => {
+                const offerDetails = product[6];
+                if (offerDetails) {
+                  return (
+                    <View key={index} style={styles.discount}>
+                      <Text style={{
+                        color: "#E74C3A", fontWeight: 400, fontFamily: "Lilita One", flexWrap: 'wrap',
+                        width: '70%',
+                        marginBottom: 2,
+                      }}>{`Offer (${offerDetails.offerTitle}) on ${offerDetails.productTitle}`}</Text>
+                      <Text style={{ fontWeight: 500 }}>-{offerDetails.offerDiscount}</Text>
+                    </View>
+                  );
+                }
+              })}
 
-          <View style={styles.total}>
-            <Text style={{ color: "#E74C3A" }}>Total</Text>
-            <Text>{total}</Text>
+            <View style={styles.subtotal}>
+              <Text style={{ color: "#E74C3A", fontWeight: 400, fontFamily: "Lilita One" }}>Shipping</Text>
+              <Text style={{ fontWeight: 500 }}>+{shippingCharge.toFixed(2)}</Text>
+            </View>
+
+            <View style={styles.total}>
+              <Text style={{ color: "#E74C3A", fontWeight: 400, fontFamily: "Lilita One" }}>Total</Text>
+              <Text style={{ fontWeight: 500 }}>{total}</Text>
+            </View>
+
           </View>
 
           {/* Footer */}

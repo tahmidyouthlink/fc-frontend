@@ -13,7 +13,6 @@ import Barcode from '@/app/components/layout/Barcode';
 import { IoMdClose } from 'react-icons/io';
 import Papa from 'papaparse';
 import useOrders from '@/app/hooks/useOrders';
-import PrintButton from '@/app/components/layout/PrintButton';
 import CustomPagination from '@/app/components/layout/CustomPagination';
 import TabsOrder from '@/app/components/layout/TabsOrder';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
@@ -24,6 +23,8 @@ import arrivals2 from "../../../public/card-images/arrivals2.svg";
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { parseISO, isBefore, subDays } from "date-fns";
 import { useSearchParams } from 'next/navigation';
+import dynamic from 'next/dynamic';
+const PrintButton = dynamic(() => import("@/app/components/layout/PrintButton"), { ssr: false });
 
 const initialColumns = ['Order Number', 'Date & Time', 'Customer Name', 'Order Amount', 'Order Status', 'Action', 'Email', 'Phone Number', 'Alternative Phone Number', 'Shipping Zone', 'Shipping Method', 'Payment Status', 'Payment Method', 'Vendor'];
 
@@ -39,7 +40,7 @@ const OrdersPage = () => {
   const searchParams = useSearchParams();
   const promo = searchParams.get('promo');
   const offer = searchParams.get('offer');
-  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderList, isOrderListPending, refetchOrder] = useOrders();
   const axiosPublic = useAxiosPublic();
