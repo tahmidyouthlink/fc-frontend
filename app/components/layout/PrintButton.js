@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@nextui-org/react';
 import { PiDownloadBold } from 'react-icons/pi';
 import PDFDocument from './PDFDocument';
+import { FaTruckLoading } from 'react-icons/fa';
 
 const PrintButton = ({ selectedOrder }) => {
   const [pdfModule, setPdfModule] = useState(null);
@@ -43,8 +44,13 @@ const PrintButton = ({ selectedOrder }) => {
   };
 
   return (
-    <Button color="primary" size="sm" onClick={handlePreview} isLoading={isLoading}>
-      Download Invoice <PiDownloadBold size={18} />
+    <Button
+      color="primary"
+      size="sm"
+      onClick={handlePreview}
+      isLoading={isLoading}
+    >
+      {isLoading ? 'Generating...' : 'Download Invoice'} <PiDownloadBold size={18} />
     </Button>
   );
 };

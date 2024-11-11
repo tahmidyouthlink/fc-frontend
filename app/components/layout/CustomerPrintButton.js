@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import PDFDocument from './PDFDocument';
 
-const PrintButton = ({ selectedOrder }) => {
+const CustomerPrintButton = ({ selectedOrder }) => {
   const [pdfModule, setPdfModule] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,11 +43,12 @@ const PrintButton = ({ selectedOrder }) => {
   return (
     <span
       className="text-sm font-mono cursor-pointer text-blue-600 hover:text-blue-800"
-      onClick={handlePreview} isLoading={isLoading}
+      onClick={handlePreview}
+      style={{ pointerEvents: isLoading ? 'none' : 'auto' }}
     >
-      {selectedOrder?.orderNumber}
+      {isLoading ? 'Generating...' : selectedOrder?.orderNumber}
     </span>
   );
 };
 
-export default PrintButton;
+export default CustomerPrintButton;
