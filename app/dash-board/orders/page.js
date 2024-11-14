@@ -23,6 +23,7 @@ import arrivals2 from "../../../public/card-images/arrivals2.svg";
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { parseISO, isBefore, subDays } from "date-fns";
 import { useSearchParams } from 'next/navigation';
+import { today, getLocalTimeZone } from "@internationalized/date";
 import dynamic from 'next/dynamic';
 const PrintButton = dynamic(() => import("@/app/components/layout/PrintButton"), { ssr: false });
 
@@ -143,6 +144,8 @@ const OrdersPage = () => {
   const startDate = selectedDateRange?.start ? new Date(selectedDateRange.start.year, selectedDateRange.start.month - 1, selectedDateRange.start.day) : null;
   const endDate = selectedDateRange?.end ? new Date(selectedDateRange.end.year, selectedDateRange.end.month - 1, selectedDateRange.end.day) : null; // Adjust end date to include the entire end day
   const adjustedEndDate = endDate ? new Date(endDate.getTime() + 24 * 60 * 60 * 1000 - 1) : null; // Add 1 day and subtract 1 ms
+
+  const currentDate = today(getLocalTimeZone());
 
   const handleReset = () => {
     setSelectedDateRange(null); // Reset the selected date range
@@ -1008,6 +1011,7 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                         visibleMonths={1}
                         onChange={(range) => setSelectedDateRange(range)} // Ensure range is an array
                         value={selectedDateRange} // Ensure this matches the expected format
+                        maxValue={currentDate}
                       />
 
                       {selectedDateRange && selectedDateRange.start && selectedDateRange.end && (

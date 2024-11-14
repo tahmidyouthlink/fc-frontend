@@ -5,6 +5,7 @@ import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
 import { format, startOfToday, endOfToday, startOfYesterday, endOfYesterday, subDays, subMonths, startOfMonth, endOfMonth, isValid } from 'date-fns';
 import { Checkbox, CheckboxGroup, DateRangePicker } from '@nextui-org/react';
 import { IoMdClose } from 'react-icons/io';
+import { today, getLocalTimeZone } from "@internationalized/date";
 
 const PromotionPerformanceChart = () => {
   const [orderList, isOrderPending] = useOrders();
@@ -400,6 +401,8 @@ const PromotionPerformanceChart = () => {
     return format(date, 'MM/dd');
   };
 
+  const currentDate = today(getLocalTimeZone());
+
   const maxDiscountedAmount = useMemo(() => {
     return Math.floor(Math.max(...hourlyPromotionData.map(data => data.discountedAmount), 0));
   }, [hourlyPromotionData]);
@@ -456,6 +459,7 @@ const PromotionPerformanceChart = () => {
             <DateRangePicker
               label="Select Date Range"
               visibleMonths={2}
+              maxValue={currentDate}
               onChange={(range) => {
                 if (range && range.start && range.end) {
                   normalizeDateRange(range.start, range.end);

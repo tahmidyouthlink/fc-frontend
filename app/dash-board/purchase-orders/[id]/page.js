@@ -22,11 +22,11 @@ import PendingModalProduct from '@/app/components/layout/PendingModalProduct';
 
 const EditPurchaseOrderPage = () => {
 
-  const isAdmin = false;
+  const isAdmin = true;
   const { id } = useParams();
   const axiosPublic = useAxiosPublic();
   const router = useRouter();
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+  const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm();
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [estimatedArrival, setEstimatedArrival] = useState(''); // Initial state set to an empty string
@@ -112,6 +112,15 @@ const EditPurchaseOrderPage = () => {
       const response = await axiosPublic.get(`/getSinglePurchaseOrder/${id}`);
       const order = response?.data;
 
+      // Reset the form with the new data from the response
+      reset({
+        shipping: order?.shippingCharge,
+        discount: order?.discountCharge,
+        referenceNumber: order?.referenceNumber,
+        supplierNote: order?.supplierNote,
+        estimatedArrival: formatDateForInput(order.estimatedArrival),
+      });
+
       const fetchedEstimatedArrival = formatDateForInput(order.estimatedArrival);
       setEstimatedArrival(fetchedEstimatedArrival);
       setSelectedVendor(order?.supplier);
@@ -136,7 +145,7 @@ const EditPurchaseOrderPage = () => {
       console.error(err);
       toast.error("Failed to fetch purchase order details!");
     }
-  }, [id, setValue, axiosPublic]);
+  }, [id, setValue, axiosPublic, reset]);
 
   // Initial load useEffect
   useEffect(() => {
@@ -443,8 +452,6 @@ const EditPurchaseOrderPage = () => {
   };
 
   const handleReverseStatusPending = () => {
-    setHeadingMessage(("pending"));
-    setModalMessage("After making as pending you will be able edit it.");
     setSelectedStatus("pending");
     setIsModalOpenPending(true);
   }
@@ -487,7 +494,7 @@ const EditPurchaseOrderPage = () => {
           position: "bottom-right",
           duration: 5000
         })
-        fetchPurchaseOrderData();
+        await fetchPurchaseOrderData();
       } else {
         toast.error('No changes detected.');
       }
@@ -607,7 +614,7 @@ const EditPurchaseOrderPage = () => {
     // Attempt to submit the form
     handleSubmit(onSubmit)()
       .then(() => {
-        // If successful, you may handle any additional actions here
+        // If success, you may handle any additional actions here
       })
       .catch((error) => {
         // If there's an error in submission, open the modal again if needed
@@ -1232,8 +1239,6 @@ const EditPurchaseOrderPage = () => {
         isOpen={isModalOpenPending}
         onClose={() => setIsModalOpenPending(false)}
         onConfirm={revertStatusToPending}
-        message={modalMessage}
-        heading={headingMessage}
       />
 
     </div>

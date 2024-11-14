@@ -13,6 +13,7 @@ import { Button, Checkbox, CheckboxGroup, DateRangePicker, Modal, ModalBody, Mod
 import TabsOrder from '@/app/components/layout/TabsOrder';
 import CustomPagination from '@/app/components/layout/CustomPagination';
 import Link from 'next/link';
+import { today, getLocalTimeZone } from "@internationalized/date";
 import { IoMdClose } from 'react-icons/io';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
@@ -121,6 +122,8 @@ const SeasonPage = () => {
   const startDate = selectedDateRange?.start ? new Date(selectedDateRange.start.year, selectedDateRange.start.month - 1, selectedDateRange.start.day) : null;
   const endDate = selectedDateRange?.end ? new Date(selectedDateRange.end.year, selectedDateRange.end.month - 1, selectedDateRange.end.day) : null; // Adjust end date to include the entire end day
   const adjustedEndDate = endDate ? new Date(endDate.getTime() + 24 * 60 * 60 * 1000 - 1) : null; // Add 1 day and subtract 1 ms
+
+  const currentDate = today(getLocalTimeZone());
 
   // Filter products based on search and selected tab
   const searchedProductDetails = productDetails?.filter((product) => {
@@ -303,6 +306,7 @@ const SeasonPage = () => {
                     visibleMonths={1}
                     onChange={(range) => setSelectedDateRange(range)} // Ensure range is an array
                     value={selectedDateRange} // Ensure this matches the expected format
+                    maxValue={currentDate}
                   />
 
                   {selectedDateRange && selectedDateRange.start && selectedDateRange.end && (

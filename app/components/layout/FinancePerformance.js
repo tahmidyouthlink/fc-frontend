@@ -5,6 +5,7 @@ import { Checkbox, CheckboxGroup, DateRangePicker } from '@nextui-org/react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
 import { IoMdClose } from 'react-icons/io';
 import { format, startOfToday, endOfToday, startOfYesterday, endOfYesterday, subDays, subMonths, startOfMonth, endOfMonth, isValid } from 'date-fns';
+import { today, getLocalTimeZone } from "@internationalized/date";
 
 const FinancePerformance = () => {
   const [orderList, isOrderPending] = useOrders();
@@ -55,6 +56,8 @@ const FinancePerformance = () => {
   const { startDate: filterStartDate, endDate: filterEndDate } = useMemo(() => {
     return getDateRange();
   }, [getDateRange]);
+
+  const currentDate = today(getLocalTimeZone());
 
   const normalizeDateRange = (startRange, endRange) => {
     const startDate = startRange ? new Date(startRange) : null;
@@ -456,6 +459,7 @@ const FinancePerformance = () => {
             <DateRangePicker
               label="Select Date Range"
               visibleMonths={2}
+              maxValue={currentDate}
               onChange={(range) => {
                 if (range && range.start && range.end) {
                   normalizeDateRange(range.start, range.end);
