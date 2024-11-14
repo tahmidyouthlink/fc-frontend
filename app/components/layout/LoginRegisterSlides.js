@@ -32,7 +32,7 @@ const LoginRegisterSlides = () => {
     const files = Array.from(event.target.files);
 
     // Prevent adding new images if there's already an array
-    if (loginRegisterImageList?.[0]?.urls?.length > 4) {
+    if (loginRegisterImageList?.[0]?.urls?.length > 10) {
       toast.error("Images already exist. Update or delete existing images instead.");
       return;
     }
@@ -55,8 +55,8 @@ const LoginRegisterSlides = () => {
     }
 
     const totalImages = validFiles.length + uploadedImageUrls.length;
-    if (totalImages > 4) {
-      toast.error("You can only upload a maximum of 4 images.");
+    if (totalImages > 10) {
+      toast.error("You can only upload a maximum of 10 images.");
       return;
     }
 
@@ -67,7 +67,7 @@ const LoginRegisterSlides = () => {
 
     const imageUrls = await uploadImagesToImgbb(newImages);
     const updatedUrls = [...uploadedImageUrls, ...imageUrls];
-    const limitedUrls = updatedUrls.slice(-4);
+    const limitedUrls = updatedUrls.slice(-10);
 
     setUploadedImageUrls(limitedUrls);
     if (limitedUrls.length > 0) {
@@ -226,11 +226,11 @@ const LoginRegisterSlides = () => {
   }
 
   return (
-    <div className='max-w-screen-md mx-auto my-3'>
+    <div className='max-w-screen-lg my-3'>
 
       <form onSubmit={handleSubmit(onSubmit)} className='grid grid-cols-1 gap-8 py-3 h-fit'>
 
-        <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
+        <div className='flex gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
           <input
             id='imageUpload'
             type='file'

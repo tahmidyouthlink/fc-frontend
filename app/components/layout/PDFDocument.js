@@ -58,20 +58,19 @@ const styles = StyleSheet.create({
   },
   orderInfo2: {
     marginTop: 10,
-    marginBottom: 10,
     fontWeight: 700
   },
   orderInfo3: {
-    marginTop: 40,
+    marginTop: 10,
     width: "100%",
     letterSpacing: 1,
     fontWeight: 500
   },
   barcode: {
     display: 'flex',
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
-    marginRight: -5,
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    marginLeft: -5,
   },
   row: {
     display: 'flex',
@@ -316,8 +315,11 @@ const PDFDocument = ({ order }) => {
           <View style={styles.orderInfo}>
             {/* Order Information */}
             <View style={styles.orderInfo2}>
-              <Text style={{ letterSpacing: 4, textTransform: 'uppercase', marginBottom: 5 }}>#{order.orderNumber}</Text>
-              <Text style={{ letterSpacing: 5, textTransform: 'uppercase', fontSize: 16, marginBottom: 5 }}>
+              <Text style={{ letterSpacing: 4, textTransform: 'uppercase' }}>#{order.orderNumber}</Text>
+              <View style={styles.barcode}>
+                <Image src={barcodeDataUrl} style={{ width: 180, height: 65 }} alt="Barcode" />
+              </View>
+              <Text style={{ letterSpacing: 4, textTransform: 'uppercase', fontSize: 14, marginBottom: 5 }}>
                 {order.customerName}
               </Text>
               <Text style={{ letterSpacing: 4, textTransform: 'uppercase', width: "40%", marginBottom: 5 }}>
@@ -331,16 +333,12 @@ const PDFDocument = ({ order }) => {
                   {order.phoneNumber2}
                 </Text>
               )}
-
             </View>
             <View style={styles.orderInfo3}>
               <Text style={{ textAlign: "right", marginBottom: 3 }}>{order?.dateTime}</Text>
               <Text style={{ textAlign: "right", marginBottom: 3 }}>Shipping Method : {order?.shippingMethod}</Text>
               <Text style={{ textAlign: "right", marginBottom: 3 }}>Payment Method : {order?.paymentMethod}</Text>
               <Text style={{ textAlign: "right" }}>Payment Status : {order?.paymentStatus}</Text>
-              <View style={styles.barcode}>
-                <Image src={barcodeDataUrl} style={{ width: 180, height: 60 }} alt="Barcode" />
-              </View>
             </View>
           </View>
 

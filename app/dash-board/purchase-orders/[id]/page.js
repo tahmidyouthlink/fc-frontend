@@ -17,10 +17,12 @@ import Progressbar from '@/app/components/layout/Progressbar';
 import { BsFiletypePdf } from 'react-icons/bs';
 import Swal from 'sweetalert2';
 import ExitConfirmationModalProduct from '@/app/components/layout/ExitConfirmModalProduct';
+import { FaUndo } from 'react-icons/fa';
+import PendingModalProduct from '@/app/components/layout/PendingModalProduct';
 
 const EditPurchaseOrderPage = () => {
 
-  const isAdmin = true;
+  const isAdmin = false;
   const { id } = useParams();
   const axiosPublic = useAxiosPublic();
   const router = useRouter();
@@ -44,6 +46,7 @@ const EditPurchaseOrderPage = () => {
   const [referenceNumber, setReferenceNumber] = useState(0);  // Initial value for discount
   const [supplierNote, setSupplierNote] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpenPending, setIsModalOpenPending] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [headingMessage, setHeadingMessage] = useState("");
   const [selectedStatus, setSelectedStatus] = useState(null);
@@ -439,6 +442,61 @@ const EditPurchaseOrderPage = () => {
     setIsModalOpen(true);
   };
 
+  const handleReverseStatusPending = () => {
+    setHeadingMessage(("pending"));
+    setModalMessage("After making as pending you will be able edit it.");
+    setSelectedStatus("pending");
+    setIsModalOpenPending(true);
+  }
+
+  const revertStatusToPending = async () => {
+    try {
+      const res = await axiosPublic.put(`/editPurchaseOrder/${id}`, { status: "pending" });
+
+      if (res.data.modifiedCount > 0) {
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="pl-6">
+              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    Purchase order updated to pending!
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Purchase order has been successfully updated to pending status!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        })
+        fetchPurchaseOrderData();
+      } else {
+        toast.error('No changes detected.');
+      }
+    } catch (error) {
+      console.error("Failed to revert status:", error);
+      toast.error("Failed to revert status. Please try again.");
+    }
+  };
+
   const onSubmit = async (data) => {
 
     data.status = selectedStatus;
@@ -582,7 +640,18 @@ const EditPurchaseOrderPage = () => {
                     : "Unknown"}
           </span></h3>
           <div className='flex justify-between md:justify-end gap-4 items-center w-full'>
+            <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end' href={"/dash-board/purchase-orders"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
             <div className="flex gap-4 items-center">
+              <button
+                class="group relative inline-flex items-center justify-center w-[40px] h-[40px] bg-[#D2016E] text-white rounded-full shadow-lg transform scale-100 transition-transform duration-300"
+              >
+                <BsFiletypePdf size={20} className="rotate-0 transition ease-out duration-300 scale-100 group-hover:-rotate-45 group-hover:scale-75" />
+              </button>
+              {["ordered", "canceled"].includes(purchaseOrderStatus) && isAdmin === true && <button type='button' onClick={handleReverseStatusPending}
+                class="group relative inline-flex items-center justify-center w-[40px] h-[40px] bg-[#D2016E] text-white rounded-full shadow-lg transform scale-100 transition-transform duration-300"
+              >
+                <FaUndo size={20} className="rotate-0 transition ease-out duration-300 scale-100 group-hover:-rotate-45 group-hover:scale-75" />
+              </button>}
               <button onClick={() => handleDeletePurchaseOrder(id)}
                 class="group relative inline-flex items-center justify-center w-[40px] h-[40px] bg-[#D2016E] text-white rounded-full shadow-lg transform scale-100 transition-transform duration-300"
               >
@@ -603,14 +672,7 @@ const EditPurchaseOrderPage = () => {
                   ></path>
                 </svg>
               </button>
-
-              <button
-                class="group relative inline-flex items-center justify-center w-[40px] h-[40px] bg-[#D2016E] text-white rounded-full shadow-lg transform scale-100 transition-transform duration-300"
-              >
-                <BsFiletypePdf size={20} className="rotate-0 transition ease-out duration-300 scale-100 group-hover:-rotate-45 group-hover:scale-75" />
-              </button>
             </div>
-            <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end' href={"/dash-board/purchase-orders"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
           </div>
         </div>
       </div>
@@ -1162,6 +1224,14 @@ const EditPurchaseOrderPage = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleModalConfirm}
+        message={modalMessage}
+        heading={headingMessage}
+      />
+
+      <PendingModalProduct
+        isOpen={isModalOpenPending}
+        onClose={() => setIsModalOpenPending(false)}
+        onConfirm={revertStatusToPending}
         message={modalMessage}
         heading={headingMessage}
       />

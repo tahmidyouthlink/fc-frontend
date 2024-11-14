@@ -12,7 +12,6 @@ import { useRouter } from 'next/navigation';
 import Progressbar from '@/app/components/layout/Progressbar';
 import { saveAs } from 'file-saver';
 import { FaFileAlt } from 'react-icons/fa';
-import { LuDownload } from 'react-icons/lu';
 import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
@@ -312,6 +311,7 @@ const PurchaseOrders = () => {
 
         </div>
 
+        {/* table */}
         <div className="max-w-screen-2xl mx-auto custom-max-h-orders overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg mt-4">
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 z-[1] bg-white">
@@ -411,7 +411,7 @@ const PurchaseOrders = () => {
                                         onClick={() => handleDownload(order.attachment)}
                                         className="text-blue-600 hover:text-blue-800"
                                       >
-                                        <LuDownload size={20} />
+                                        <FaFileAlt size={20} />
                                       </button>
                                       <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">Download</span>
                                     </div>
@@ -420,7 +420,7 @@ const PurchaseOrders = () => {
                                       <button>
                                         <FaFileAlt size={20} />
                                       </button>
-                                      <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">N/A</span>
+                                      <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">Unavailable</span>
                                     </div>
                                   )}
                                 </td>

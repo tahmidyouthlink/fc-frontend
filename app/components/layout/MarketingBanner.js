@@ -127,6 +127,7 @@ const MarketingBanner = () => {
   const selectOptions = [
     { key: "left", label: "Left" },
     { key: "center", label: "Center" },
+    { key: "right", label: "Right" },
   ]
 
   const onSubmit = async () => {

@@ -256,8 +256,8 @@ const AddOffer = () => {
         <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto pt-1 pb-6 flex flex-col'>
 
           <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
-            <div className='grid grid-cols-1 lg:col-span-7 gap-8 mt-3 py-3 max-h-[650px]'>
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[300px]'>
+            <div className='grid grid-cols-1 lg:col-span-7 gap-8 mt-3 py-3 h-fit'>
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
                 <div>
                   <label htmlFor='offerTitle' className='flex justify-start font-medium text-[#D2016E] pb-2'>Offer Title *</label>
                   <input id='offerTitle' placeholder='Enter Offer Title'  {...register("offerTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="text" />
@@ -289,7 +289,7 @@ const AddOffer = () => {
 
               </div>
 
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[350px]'>
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
 
                 <div>
                   <label htmlFor='minAmount' className='flex justify-start font-medium text-[#D2016E] pb-2'>Minimum Order Amount *</label>
