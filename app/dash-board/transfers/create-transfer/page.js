@@ -31,6 +31,11 @@ const CreateTransfer = () => {
   const [transferOrderVariants, setTransferOrderVariants] = useState([]);
   const [transferOrderList, isTransferOrderPending] = useTransferOrders();
 
+  useEffect(() => {
+    // Reset selected products whenever origin or destination changes
+    setSelectedProducts([]);
+  }, [selectedOrigin, selectedDestination]);
+
   // Update handleVariantChange to initialize values if not set
   const handleVariantChange = (index, field, value, productTitle, size, colorName, colorCode) => {
     setTransferOrderVariants((prevVariants) => {
@@ -585,12 +590,12 @@ const CreateTransfer = () => {
 
           {/* Submit Button */}
           <div className='flex justify-end items-center'>
-            <button
+            <Button
               type='submit'
-              className={`mt-4 mb-8 bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}
+              className={`mt-4 mb-8 bg-neutral-800 hover:bg-neutral-700 text-white cursor-pointer font-bold`}
             >
               Create transfer
-            </button>
+            </Button>
           </div>
         </div>
 

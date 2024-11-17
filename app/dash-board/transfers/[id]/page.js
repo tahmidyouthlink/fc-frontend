@@ -10,9 +10,10 @@ import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
-import { BsFiletypePdf } from "react-icons/bs";
 import Swal from 'sweetalert2';
 import ExitConfirmationModalProduct from '@/app/components/layout/ExitConfirmModalProduct';
+import dynamic from 'next/dynamic';
+const TransferOrderPDFButton = dynamic(() => import("@/app/components/layout/TransferOrderPDFButton"), { ssr: false });
 
 const EditTransferOrder = () => {
 
@@ -279,11 +280,17 @@ const EditTransferOrder = () => {
                 </svg>
               </button>
 
-              <button
-                class="group relative inline-flex items-center justify-center w-[40px] h-[40px] bg-[#D2016E] text-white rounded-full shadow-lg transform scale-100 transition-transform duration-300"
-              >
-                <BsFiletypePdf size={20} className="rotate-0 transition ease-out duration-300 scale-100 group-hover:-rotate-45 group-hover:scale-75" />
-              </button>
+              <TransferOrderPDFButton transferOrderNumber={transferOrderNumber}
+                transferOrderStatus={transferOrderStatus}
+                selectedOrigin={selectedOrigin}
+                selectedDestination={selectedDestination}
+                estimatedArrival={estimatedArrival}
+                selectedProducts={selectedProducts}
+                transferOrderVariants={transferOrderVariants}
+                referenceNumber={referenceNumber}
+                supplierNote={supplierNote}
+                trackingNumber={trackingNumber}
+                shippingCarrier={shippingCarrier} />
             </div>
             <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end' href={"/dash-board/transfers"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
           </div>
@@ -359,7 +366,7 @@ const EditTransferOrder = () => {
                         <tr key={index} className="hover:bg-gray-50">
                           <td className="text-sm p-3 text-neutral-500 text-center cursor-pointer flex flex-col lg:flex-row items-center gap-3">
                             <div>
-                              <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt='productIMG' height={600} width={600} />
+                              <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt='productIMG' height={6000} width={6000} />
                             </div>
                             <div className='flex flex-col items-start justify-start gap-1'>
                               <p className='font-bold text-blue-700 text-start'>{product?.productTitle}</p>
@@ -401,7 +408,7 @@ const EditTransferOrder = () => {
 
               <div className='flex-1'>
                 <label htmlFor='estimatedArrival' className='flex justify-start font-medium text-neutral-800 pb-2'>Estimated Arrival</label>
-                <p className='font-semibold'>{estimatedArrival}</p>
+                <p className='text-neutral-500'>{estimatedArrival}</p>
               </div>
               <div>
                 <label htmlFor='shippingCarrier' className='flex justify-start font-medium text-neutral-500 pb-2'>Shipping carrier</label>

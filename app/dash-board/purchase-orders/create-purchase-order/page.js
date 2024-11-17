@@ -767,12 +767,12 @@ const CreatePurchaseOrder = () => {
 
 					{/* Submit Button */}
 					<div className='flex justify-end items-center'>
-						<button
+						<Button
 							type='submit'
-							className={`mt-4 mb-8 bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}
+							className={`mt-4 mb-8 bg-neutral-800 hover:bg-neutral-700 text-white cursor-pointer font-bold`}
 						>
 							Create order
-						</button>
+						</Button>
 					</div>
 				</div>
 

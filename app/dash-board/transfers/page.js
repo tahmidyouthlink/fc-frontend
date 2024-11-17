@@ -161,6 +161,10 @@ const Transfers = () => {
 
   const handleGoToEditPage = (id) => {
     router.push(`/dash-board/transfers/${id}`);
+  };
+
+  const handleGoToTransferPage = () => {
+    router.push(`/dash-board/transfers/create-transfer`);
   }
 
   useEffect(() => {
@@ -259,9 +263,9 @@ const Transfers = () => {
 
           <h3 className='text-center md:text-start font-semibold text-xl lg:text-2xl'>Transfers</h3>
 
-          <button className="cursor-pointer hover:bg-neutral-950 bg-neutral-800 text-white shadow-lg font-semibold px-4 py-2 rounded-lg">
-            <Link href={"/dash-board/transfers/create-transfer"}>Create transfer</Link>
-          </button>
+          <Button variant="solid" color="danger" onClick={handleGoToTransferPage}>
+            Create transfer
+          </Button>
 
         </div>
 
@@ -300,6 +304,7 @@ const Transfers = () => {
 
         </div>
 
+        {/* Table */}
         <div className="max-w-screen-2xl mx-auto custom-max-h-orders overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg mt-4">
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 z-[1] bg-white">
@@ -313,7 +318,7 @@ const Transfers = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedOrders?.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center p-4 text-gray-500 py-36 md:py-44 xl:py-52 2xl:py-80">
+                  <td colSpan={6} className="text-center p-4 text-gray-500 py-36 md:py-44 xl:py-52 2xl:py-80">
                     No purchase orders found. Please adjust your filters or check back later.
                   </td>
                 </tr>

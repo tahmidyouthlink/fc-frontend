@@ -14,11 +14,13 @@ import LocationSelect from '@/app/components/layout/LocationSelect';
 import Image from 'next/image';
 import { Button, Checkbox, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import Progressbar from '@/app/components/layout/Progressbar';
-import { BsFiletypePdf } from 'react-icons/bs';
 import Swal from 'sweetalert2';
 import ExitConfirmationModalProduct from '@/app/components/layout/ExitConfirmModalProduct';
 import { FaUndo } from 'react-icons/fa';
 import PendingModalProduct from '@/app/components/layout/PendingModalProduct';
+
+import dynamic from 'next/dynamic';
+const PurchaseOrderPDFButton = dynamic(() => import("@/app/components/layout/PurchaseOrderPDFButton"), { ssr: false });
 
 const EditPurchaseOrderPage = () => {
 
@@ -649,11 +651,7 @@ const EditPurchaseOrderPage = () => {
           <div className='flex justify-between md:justify-end gap-4 items-center w-full'>
             <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end' href={"/dash-board/purchase-orders"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
             <div className="flex gap-4 items-center">
-              <button
-                class="group relative inline-flex items-center justify-center w-[40px] h-[40px] bg-[#D2016E] text-white rounded-full shadow-lg transform scale-100 transition-transform duration-300"
-              >
-                <BsFiletypePdf size={20} className="rotate-0 transition ease-out duration-300 scale-100 group-hover:-rotate-45 group-hover:scale-75" />
-              </button>
+              <PurchaseOrderPDFButton selectedVendor={selectedVendor} selectedLocation={selectedLocation} paymentTerms={paymentTerms} estimatedArrival={estimatedArrival} referenceNumber={referenceNumber} supplierNote={supplierNote} shipping={shipping} discount={discount} selectedProducts={selectedProducts} purchaseOrderVariants={purchaseOrderVariants} purchaseOrderNumber={purchaseOrderNumber} purchaseOrderStatus={purchaseOrderStatus} />
               {["ordered", "canceled"].includes(purchaseOrderStatus) && isAdmin === true && <button type='button' onClick={handleReverseStatusPending}
                 class="group relative inline-flex items-center justify-center w-[40px] h-[40px] bg-[#D2016E] text-white rounded-full shadow-lg transform scale-100 transition-transform duration-300"
               >
