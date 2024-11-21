@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { BsFiletypePdf } from "react-icons/bs";
-import TransferOrderPDF from "./TransferOrderPdf";
+import TransferOrderPDF from "./TransferOrderPDF";
 
 const TransferOrderPDFButton = ({
   transferOrderNumber,
