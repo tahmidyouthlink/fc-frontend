@@ -4,6 +4,7 @@ import OriginSelect from '@/app/components/layout/OriginSelect';
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
+import usePurchaseOrders from '@/app/hooks/usePurchaseOrders';
 import useTransferOrders from '@/app/hooks/useTransferOrders';
 import { Button, Checkbox, DatePicker, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 import Image from 'next/image';
@@ -29,6 +30,7 @@ const CreateTransfer = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [transferOrderVariants, setTransferOrderVariants] = useState([]);
+  const [purchaseOrderList, isPurchaseOrderPending] = usePurchaseOrders();
   const [transferOrderList, isTransferOrderPending] = useTransferOrders();
 
   useEffect(() => {
@@ -44,7 +46,18 @@ const CreateTransfer = () => {
       // Initialize the variant object if it does not exist
       if (!updatedVariants[index]) {
         updatedVariants[index] = {};
-      }
+      };
+
+      // Check if the productTitle, size, and color match with the purchaseOrderList
+      const matchedItem = purchaseOrderList.filter(po => po.status === "received").flatMap(po => po.purchaseOrderVariants).filter(
+        (variant) =>
+          variant.productTitle === productTitle &&
+          variant.size === size &&
+          variant.colorCode === colorCode &&
+          variant.colorName === colorName
+      );
+
+      const lastMatchedItem = matchedItem[matchedItem.length - 1];
 
       // Set product title, size, and color properties
       if (!updatedVariants[index].productTitle) {
@@ -60,6 +73,12 @@ const CreateTransfer = () => {
 
       // Update the specific field (in this case, quantity)
       updatedVariants[index][field] = value;
+
+      // If a match is found in purchaseOrderList, update tax and cost from the last matched item
+      if (lastMatchedItem) {
+        updatedVariants[index].tax = lastMatchedItem.tax;
+        updatedVariants[index].cost = lastMatchedItem.cost;
+      }
 
       return updatedVariants;
     });
@@ -338,6 +357,8 @@ const CreateTransfer = () => {
         size: variant?.size,
         colorCode: variant.color?.code,  // Include the color code
         colorName: variant.color?.name,   // Include the color name
+        cost: variant.cost || 0,
+        tax: variant.tax || 0,
       })),
       transferOrderNumber,
       status: "pending",
@@ -347,7 +368,7 @@ const CreateTransfer = () => {
       supplierNote: supplierNote || "",
       shippingCarrier: shippingCarrier || "",
       trackingNumber: trackingNumber || ""
-    }
+    };
 
     try {
       const response = await axiosPublic.post('/addTransferOrder', transferOrderData);
@@ -393,9 +414,9 @@ const CreateTransfer = () => {
 
   };
 
-  if (isProductPending || isTransferOrderPending) {
+  if (isProductPending || isTransferOrderPending || isPurchaseOrderPending) {
     return <Loading />
-  }
+  };
 
   return (
     <div className='bg-gray-100 min-h-screen px-6'>

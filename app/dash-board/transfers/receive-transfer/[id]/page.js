@@ -87,130 +87,6 @@ const ReceiveTransferOrder = () => {
     });
   };
 
-  // const onSubmit = async () => {
-  //   // Validate accept values
-  //   const invalidVariantsForZero = transferOrderVariants.filter(variant => variant.accept <= 0);
-  //   const invalidVariants = transferOrderVariants.filter(variant => variant.accept === undefined);
-
-  //   if (invalidVariantsForZero.length > 0) {
-  //     toast.error('Accept value must be greater than 0');
-  //     return; // Stop the submission
-  //   }
-
-  //   if (invalidVariants.length > 0) {
-  //     setAcceptError(true);
-  //     return; // Stop the submission
-  //   }
-  //   setAcceptError(false);
-
-  //   const updatedProductList = [...productList]; // Clone productList to modify
-
-  //   const receivedOrderData = {
-  //     transferOrderVariants: transferOrderVariants?.map(variant => ({
-  //       productTitle: variant.productTitle,
-  //       quantity: parseFloat(variant.quantity),
-  //       size: variant?.size,
-  //       colorCode: variant.colorCode,  // Include the color code
-  //       colorName: variant.colorName,   // Include the color name
-  //       accept: parseFloat(variant?.accept) || 0,
-  //       reject: parseFloat(variant?.reject) || 0
-  //     })),
-  //     status: 'received'
-  //   };
-
-  //   const modifiedProducts = new Set(); // To store only unique product IDs that need updating
-
-  //   // SKU adjustment based on origin and destination
-  //   const acceptValueMap = new Map(); // To track SKU adjustments for each variant
-
-  //   // Iterate through each transfer order variant
-  //   transferOrderVariants.forEach(variant => {
-  //     const { productTitle, size, colorCode, colorName, accept } = variant;
-
-  //     // Update product variants based on originName
-  //     updatedProductList.forEach(product => {
-  //       if (product.productTitle === productTitle && product.productVariants) {
-  //         product.productVariants.forEach(variantItem => {
-  //           // Check if location matches and other attributes match
-  //           if (variantItem.location === originName &&
-  //             variantItem.color.color === colorCode &&
-  //             variantItem.color.value === colorName &&
-  //             variantItem.size === size) {
-  //             // Subtract accept value from SKU
-  //             variantItem.sku = Math.max(0, variantItem.sku - accept);
-  //           }
-
-  //           // Check for destinationName
-  //           if (variantItem.location === destinationName &&
-  //             variantItem.color.color === colorCode &&
-  //             variantItem.color.value === colorName &&
-  //             variantItem.size === size) {
-  //             // Add accept value to SKU
-  //             variantItem.sku += accept;
-  //           }
-  //         });
-  //       }
-  //     });
-  //   });
-
-  //   console.log(updatedProductList, "updatedProductList");
-
-  //   // API call for updating purchase order
-  //   // const response1 = await axiosPublic.put(`/editPurchaseOrder/${id}`, receivedOrderData);
-
-  //   // const updateResponses = await Promise.all(
-  //   //   Array.from(modifiedProducts).map(async (productId) => {
-  //   //     const updatedProduct = updatedProductList.find((product) => product._id === productId);
-  //   //     if (updatedProduct) {
-  //   //       try {
-  //   //         // Send the update request for each modified product
-  //   //         const response = await axiosPublic.put(`/editProductDetailsInventory/${productId}`, updatedProduct);
-  //   //         return { productId, success: true, response: response.data };
-  //   //       } catch (error) {
-  //   //         console.error(`Failed to update product ${productId}:`, error.response?.data || error.message);
-  //   //         return { productId, success: false, error: error.message };
-  //   //       }
-  //   //     } else {
-  //   //       console.warn(`Product with ID ${productId} not found in updatedProductList`);
-  //   //       return { productId, success: false, error: 'Product not found' };
-  //   //     }
-  //   //   })
-  //   // );
-
-  //   // Process the responses
-  //   // const successfulUpdates = updateResponses.filter((update) => update.success);
-  //   // const failedUpdates = updateResponses.filter((update) => !update.success);
-
-  //   // Show single toast message based on the update results
-  //   // if (successfulUpdates.length > 0 && response1.data.modifiedCount > 0) {
-  //   //   toast.custom((t) => (
-  //   //     <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}>
-  //   //       <div className="pl-6">
-  //   //         <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
-  //   //       </div>
-  //   //       <div className="flex-1 w-0 p-4">
-  //   //         <div className="flex items-start">
-  //   //           <div className="ml-3 flex-1">
-  //   //             <p className="text-base font-bold text-gray-900">Purchase order received!</p>
-  //   //             <p className="mt-1 text-sm text-gray-500">{successfulUpdates.length} product(s) successfully updated!</p>
-  //   //           </div>
-  //   //         </div>
-  //   //       </div>
-  //   //       <div className="flex border-l border-gray-200">
-  //   //         <button onClick={() => toast.dismiss(t.id)} className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl">
-  //   //           <RxCross2 />
-  //   //         </button>
-  //   //       </div>
-  //   //     </div>
-  //   //   ), { position: "bottom-right", duration: 5000 });
-
-  //   //   // Redirect after toast
-  //   //   router.push('/dash-board/purchase-orders');
-  //   // } else if (successfulUpdates.length === 0 && failedUpdates.length > 0) {
-  //   //   toast.error('No changes detected or updates failed.');
-  //   // }
-  // };
-
   const onSubmit = async () => {
     // Validate transferOrderVariants
     const invalidVariantsForZero = transferOrderVariants.filter(variant => variant.accept <= 0);
@@ -307,6 +183,8 @@ const ReceiveTransferOrder = () => {
         colorName: variant.colorName,
         accept: parseFloat(variant.accept) || 0,
         reject: parseFloat(variant.reject) || 0,
+        tax: variant.tax || 0, // Include tax
+        cost: variant.cost || 0, // Include cost
       })),
       status: 'received'
     };

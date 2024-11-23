@@ -238,7 +238,7 @@ const EditTransferOrder = () => {
 
   if (isLoading) {
     return <Loading />;
-  }
+  };
 
   return (
     <div className='bg-gray-100 min-h-screen px-6'>

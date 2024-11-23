@@ -132,6 +132,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
     marginTop: 20,
+  },
+  transferOrderValue: {
+    marginBottom: 5,
   }
 });
 
@@ -149,9 +152,20 @@ const TransferOrderPDF = ({ data }) => {
     [data?.transferOrderVariants]
   );
 
+  // Calculate total transfer order value
+  const totalTransferOrderValue = useMemo(() => {
+    return data?.transferOrderVariants?.reduce((total, variant) => {
+      const { accept = 0, cost = 0, tax = 0 } = variant; // Default to 0 for missing values
+      // Calculate variant value: accept * (cost + (cost * tax / 100))
+      const variantValue = accept * (cost + (cost * tax / 100));
+      return total + variantValue;
+    }, 0) || 0; // Default to 0 if no variants
+  }, [data?.transferOrderVariants]);
+
   return (
     <Document>
       <Page size="A4" style={styles.container}>
+
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.heading}>#{data?.transferOrderNumber}</Text>
@@ -224,6 +238,10 @@ const TransferOrderPDF = ({ data }) => {
               </View>
             ))}
           </View>
+        </View>
+
+        <View style={styles.transferOrderValue}>
+          <Text style={styles.subHeading}>Transfer order amount : {totalTransferOrderValue.toFixed(2)}</Text>
         </View>
 
         <View style={styles.footerDiv}>

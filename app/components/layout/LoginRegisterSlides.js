@@ -120,11 +120,16 @@ const LoginRegisterSlides = () => {
   };
 
   const handleOnDragEnd = (result) => {
-    if (!result.destination) return;
-    const items = Array.from(uploadedImageUrls);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    setUploadedImageUrls(items);
+    const { destination, source } = result;
+    if (!destination) return;
+
+    // Reorder the items only if the position changes
+    if (destination.index !== source.index) {
+      const items = Array.from(uploadedImageUrls);
+      const [reorderedItem] = items.splice(source.index, 1);
+      items.splice(destination.index, 0, reorderedItem);
+      setUploadedImageUrls(items);
+    }
   };
 
   const onSubmit = async () => {
@@ -226,11 +231,11 @@ const LoginRegisterSlides = () => {
   }
 
   return (
-    <div className='max-w-screen-lg my-3'>
+    <div className='max-w-screen-2xl my-3'>
 
       <form onSubmit={handleSubmit(onSubmit)} className='grid grid-cols-1 gap-8 py-3 h-fit'>
 
-        <div className='flex gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
+        <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
           <input
             id='imageUpload'
             type='file'
@@ -240,7 +245,7 @@ const LoginRegisterSlides = () => {
           />
           <label
             htmlFor='imageUpload'
-            className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white'
+            className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 py-16 px-6 bg-white w-full'
             onDrop={handleDrop}
             onDragOver={handleDragOver}
           >
@@ -259,45 +264,41 @@ const LoginRegisterSlides = () => {
           )}
 
           <DragDropContext onDragEnd={handleOnDragEnd}>
-            <Droppable droppableId="droppable">
+            <Droppable droppableId="droppable" direction="horizontal">
               {(provided) => (
-                <ul
-                  className="list-none p-0"
+                <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
+                  className="grid grid-cols-3 lg:grid-cols-5 gap-4 mt-4"
                 >
-                  <div className='overflow-y-auto max-h-[870px] custom-scrollbar'>
-                    <div className={`grid grid-cols-2 gap-4 mt-4`}>
-                      {uploadedImageUrls.map((url, index) => (
-                        <Draggable key={url} draggableId={url} index={index}>
-                          {(provided) => (
-                            <li
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className="flex items-center mb-2 p-2 bg-white border border-gray-300 rounded-md relative"
-                            >
-                              <Image
-                                src={url}
-                                alt={`Uploaded image ${index + 1}`}
-                                height={3000}
-                                width={3000}
-                                className='w-full h-auto max-h-[250px] rounded-md object-contain'
-                              />
-                              <button
-                                onClick={() => handleImageRemove(index)}
-                                className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
-                              >
-                                <RxCross2 size={24} />
-                              </button>
-                            </li>
-                          )}
-                        </Draggable>
-                      ))}
-                    </div>
-                  </div>
+                  {uploadedImageUrls.map((url, index) => (
+                    <Draggable key={url} draggableId={url} index={index}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className="flex items-center mb-2 p-2 bg-white border border-gray-300 rounded-md relative"
+                        >
+                          <Image
+                            src={url}
+                            height={2000}
+                            width={2000}
+                            alt={`Uploaded image ${index + 1}`}
+                            className="w-full h-auto max-h-[250px] rounded-md object-contain"
+                          />
+                          <button
+                            onClick={() => handleImageRemove(index)}
+                            className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                          >
+                            <RxCross2 size={24} />
+                          </button>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
                   {provided.placeholder}
-                </ul>
+                </div>
               )}
             </Droppable>
           </DragDropContext>
