@@ -264,15 +264,16 @@ const LoginRegisterSlides = () => {
           )}
 
           <DragDropContext onDragEnd={handleOnDragEnd}>
-            <Droppable droppableId="droppable" direction="horizontal">
+            {/* First Row: Images 0–4 */}
+            <Droppable droppableId="row1" direction="horizontal">
               {(provided) => (
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
                   className="grid grid-cols-3 lg:grid-cols-5 gap-4 mt-4"
                 >
-                  {uploadedImageUrls.map((url, index) => (
-                    <Draggable key={url} draggableId={url} index={index}>
+                  {uploadedImageUrls.slice(0, 5).map((url, index) => (
+                    <Draggable key={url} draggableId={`row1-${url}`} index={index}>
                       {(provided) => (
                         <div
                           ref={provided.innerRef}
@@ -289,7 +290,46 @@ const LoginRegisterSlides = () => {
                           />
                           <button
                             onClick={() => handleImageRemove(index)}
-                            className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                            className="absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold"
+                          >
+                            <RxCross2 size={24} />
+                          </button>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+
+            {/* Second Row: Images 5–9 */}
+            <Droppable droppableId="row2" direction="horizontal">
+              {(provided) => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className="grid grid-cols-3 lg:grid-cols-5 gap-4 mt-4"
+                >
+                  {uploadedImageUrls.slice(5).map((url, index) => (
+                    <Draggable key={url} draggableId={`row2-${url}`} index={index}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className="flex items-center mb-2 p-2 bg-white border border-gray-300 rounded-md relative"
+                        >
+                          <Image
+                            src={url}
+                            height={2000}
+                            width={2000}
+                            alt={`Uploaded image ${index + 6}`}
+                            className="w-full h-auto max-h-[250px] rounded-md object-contain"
+                          />
+                          <button
+                            onClick={() => handleImageRemove(index + 5)}
+                            className="absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold"
                           >
                             <RxCross2 size={24} />
                           </button>
@@ -302,6 +342,7 @@ const LoginRegisterSlides = () => {
               )}
             </Droppable>
           </DragDropContext>
+
         </div>
 
         {/* Submit Button */}
