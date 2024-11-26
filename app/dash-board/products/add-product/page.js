@@ -68,10 +68,15 @@ const FirstStepOfAddProduct = () => {
   const [productList, isProductPending] = useProductsInformation();
   const [seasonList, isSeasonPending] = useSeasons();
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchTermForCompleteOutfit, setSearchTermForCompleteOutfit] = useState('');
   const [selectedSeasons, setSelectedSeasons] = useState([]);
+  const [selectedProductIds, setSelectedProductIds] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isDropdownOpenForCompleteOutfit, setIsDropdownOpenForCompleteOutfit] = useState(false);
   const dropdownRef = useRef(null);
+  const dropdownRefForCompleteOutfit = useRef(null);
   const [seasonError, setSeasonError] = useState(false);
+  const [productError, setProductError] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   // Function to handle "Go Back" button click
@@ -100,6 +105,13 @@ const FirstStepOfAddProduct = () => {
   const filteredSeasons = seasonList?.filter((season) =>
     season.seasonName.toLowerCase().includes(searchTerm.toLowerCase()) &&
     !selectedSeasons.includes(season.seasonName) // Exclude already selected categories
+  );
+
+  // Filter products based on search input and remove already selected products
+  const filteredProducts = productList?.filter((product) =>
+    (product.productId.toLowerCase().includes(searchTermForCompleteOutfit.toLowerCase()) ||
+      product.productTitle.toLowerCase().includes(searchTermForCompleteOutfit.toLowerCase())) &&
+    !selectedProductIds.some((p) => p.productId === product.productId) // Exclude already selected products
   );
 
   // Handle adding/removing category selection
@@ -133,6 +145,39 @@ const FirstStepOfAddProduct = () => {
     setSeasonError(false);
   };
 
+  // Handle adding/removing category selection
+  const toggleProductSelection = (productId, productTitle, id, imageUrl) => {
+    let updatedSelectedProducts;
+
+    // Check if the product is already selected (based on productId)
+    if (selectedProductIds.some((p) => p.productId === productId)) {
+      // Remove product from selection
+      updatedSelectedProducts = selectedProductIds.filter((p) => p.productId !== productId);
+    } else {
+      // Add product to selection
+      updatedSelectedProducts = [...selectedProductIds, { productId, productTitle, id, imageUrl }];
+    }
+
+    setSelectedProductIds(updatedSelectedProducts);
+    handleProductSelectionChange(updatedSelectedProducts); // Pass selected categories to parent component
+  };
+
+  // Handle removing category directly from selected list
+  const removeProduct = (productId) => {
+    const updatedSelectedProducts = selectedProductIds.filter((p) => p.productId !== productId);
+    setSelectedProductIds(updatedSelectedProducts);
+    handleProductSelectionChange(updatedSelectedProducts); // Pass updated list to parent component
+  };
+
+  const handleProductSelectionChange = (selectedProducts) => {
+    setSelectedProductIds(selectedProducts); // Update the state with selected products
+    if (selectedProducts.length === 0) {
+      setProductError(true);
+      return;
+    }
+    setProductError(false);
+  };
+
   // Toggle dropdown visibility
   const handleInputClick = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -151,6 +196,23 @@ const FirstStepOfAddProduct = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [dropdownRef]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRefForCompleteOutfit.current && !dropdownRefForCompleteOutfit.current.contains(event.target)) {
+        setIsDropdownOpenForCompleteOutfit(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownRefForCompleteOutfit]);
+
+  const handleInputClickForCompleteOutfit = () => {
+    setIsDropdownOpenForCompleteOutfit(!isDropdownOpenForCompleteOutfit);
+  };
 
   const handleCategoryChange = (value) => {
     localStorage.setItem('category', value); // Save the selected category to local storage
@@ -417,6 +479,12 @@ const FirstStepOfAddProduct = () => {
         setValue('season', storedSeason);
       }
 
+      const storedProducts = JSON.parse(localStorage.getItem('restOfOutfit') || '[]');
+      if (Array.isArray(storedProducts)) {
+        setSelectedProductIds(storedProducts);
+        setValue('restOfOutfit', storedProducts);
+      }
+
       const storedSubCategories = JSON.parse(localStorage.getItem('subCategories') || '[]');
       if (Array.isArray(storedSubCategories)) {
         setSelectedSubCategories(storedSubCategories);
@@ -553,6 +621,11 @@ const FirstStepOfAddProduct = () => {
         return;
       }
       setSeasonError(false);
+      if (selectedProductIds?.length === 0) {
+        setProductError(true);
+        return;
+      }
+      setProductError(false);
 
       const currentDate = new Date();
       const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -569,6 +642,7 @@ const FirstStepOfAddProduct = () => {
       localStorage.setItem('sizeGuideImageUrl', selectedImageUrl);
 
       localStorage.setItem('season', JSON.stringify(selectedSeasons));
+      localStorage.setItem('restOfOutfit', JSON.stringify(selectedProductIds));
       localStorage.setItem('subCategories', JSON.stringify(selectedSubCategories));
       localStorage.setItem('availableColors', JSON.stringify(data.availableColors));
       localStorage.setItem('vendors', JSON.stringify(data.vendors));
@@ -609,6 +683,11 @@ const FirstStepOfAddProduct = () => {
       return;
     }
     setSeasonError(false);
+    if (selectedProductIds?.length === 0) {
+      setProductError(true);
+      return;
+    }
+    setProductError(false);
 
     const currentDate = new Date();
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -625,6 +704,7 @@ const FirstStepOfAddProduct = () => {
       season: selectedSeasons,
       sizeGuideImageUrl: selectedImageUrl,
       status: "draft",
+      restOfOutfit: selectedProductIds,
     };
 
     try {
@@ -684,6 +764,7 @@ const FirstStepOfAddProduct = () => {
         localStorage.removeItem('newArrival');
         JSON.parse(localStorage.removeItem('vendors') || '[]');
         JSON.parse(localStorage.removeItem('tags') || '[]');
+        JSON.parse(localStorage.removeItem('restOfOutfit') || '[]');
         router.push("/dash-board/products/existing-products");
       }
     } catch (err) {
@@ -700,7 +781,7 @@ const FirstStepOfAddProduct = () => {
 
   if (isCategoryPending || isSizeRangePending || isSubCategoryPending || isTagPending || isVendorPending || isColorPending || isProductPending || isSeasonPending) {
     return <Loading />
-  }
+  };
 
   return (
     <div className='bg-gray-50 min-h-screen'>
@@ -1132,6 +1213,87 @@ const FirstStepOfAddProduct = () => {
                   )}
 
                   {seasonError && <p className="text-red-600 text-left">Season is required</p>}
+
+                </div>
+
+                <div className="w-full mx-auto" ref={dropdownRefForCompleteOutfit}>
+                  {/* Search Box */}
+                  <label htmlFor='completeOutfit' className='flex justify-start font-medium text-[#9F5216] pb-2'>Select Complete Outfit Section *</label>
+
+                  <input
+                    type="text"
+                    value={searchTermForCompleteOutfit}
+                    onChange={(e) => setSearchTermForCompleteOutfit(e.target.value)}
+                    onClick={handleInputClickForCompleteOutfit} // Toggle dropdown on input click
+                    placeholder="Search & Select by Seasonal Collection"
+                    className="w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mb-2"
+                  />
+
+                  {/* Dropdown list for search results */}
+                  {isDropdownOpenForCompleteOutfit && (
+                    <div className="border rounded p-2 max-h-64 overflow-y-auto">
+                      {filteredProducts?.length > 0 ? (
+                        filteredProducts?.map((product) => (
+                          <div
+                            key={product._id}
+                            className={`flex items-center p-2 cursor-pointer rounded-lg hover:bg-gray-100 ${selectedProductIds.includes(product.productTitle) || selectedProductIds.includes(product.productId) ? 'bg-gray-200' : ''}`}
+                            onClick={() => toggleProductSelection(product?.productId, product?.productTitle, product?._id, product?.imageUrls[0])}
+                          >
+                            <Image
+                              width={400}
+                              height={400}
+                              src={product.imageUrls[0]}
+                              alt="season-imageUrl"
+                              className="h-8 w-8 object-cover rounded"
+                            />
+                            <div className='flex flex-col'>
+                              <span className="ml-2">{product.productId}</span>
+                              <span className="ml-2">{product.productTitle}</span>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-gray-500">No product found</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Selected categories display */}
+                  {selectedProductIds?.length > 0 && (
+                    <div className="border p-2 rounded mt-2">
+                      <h4 className="text-sm font-semibold mb-2">Selected Products:</h4>
+                      <ul className="space-y-2">
+                        {selectedProductIds?.map((product, index) => (
+                          <li
+                            key={index}
+                            className="flex justify-between items-center bg-gray-100 p-2 rounded"
+                          >
+                            <div className='flex items-center gap-1'>
+                              <Image
+                                width={400}
+                                height={400}
+                                src={product.imageUrl}
+                                alt="season-imageUrl"
+                                className="h-8 w-8 object-cover rounded"
+                              />
+                              <div className='flex flex-col'>
+                                <span className="ml-2">{product.productId}</span>
+                                <span className="ml-2">{product.productTitle}</span>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => removeProduct(product?.productId)}
+                              className="text-red-500 text-sm"
+                            >
+                              Remove
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {productError && <p className="text-red-600 text-left">Product selection is required</p>}
 
                 </div>
 

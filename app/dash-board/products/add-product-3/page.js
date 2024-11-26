@@ -121,6 +121,7 @@ const ThirdStepOfAddProduct = () => {
     const storedProductBatchCode = localStorage.getItem('batchCode');
     const storedRegularPrice = localStorage.getItem('regularPrice');
     const storedUploadedImageUrls = JSON.parse(localStorage.getItem('uploadedImageUrls') || '[]');
+    const storedRestOfOutfit = JSON.parse(localStorage.getItem('restOfOutfit') || '[]');
     const storedDiscountType = localStorage.getItem('discountType');
     const storedDiscountValue = localStorage.getItem('discountValue');
     const storedProductDetails = localStorage.getItem('productDetails');
@@ -165,6 +166,7 @@ const ThirdStepOfAddProduct = () => {
       productId: storedProductId,
       status: "active",
       sizeGuideImageUrl: storedSizeGuideImageUrl,
+      restOfOutfit: storedRestOfOutfit,
     }
 
     try {
@@ -223,6 +225,7 @@ const ThirdStepOfAddProduct = () => {
         JSON.parse(localStorage.removeItem('availableColors') || '[]');
         localStorage.removeItem('newArrival');
         JSON.parse(localStorage.removeItem('vendors') || '[]');
+        JSON.parse(localStorage.removeItem('restOfOutfit') || '[]');
         JSON.parse(localStorage.removeItem('tags') || '[]');
         JSON.parse(localStorage.removeItem('productVariants') || '[]');
         localStorage.removeItem('formattedDate');

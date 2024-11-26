@@ -192,6 +192,7 @@ const SecondStepOfAddProduct = () => {
     const storedProductBatchCode = localStorage.getItem('batchCode');
     const storedRegularPrice = localStorage.getItem('regularPrice');
     const storedUploadedImageUrls = JSON.parse(localStorage.getItem('uploadedImageUrls') || '[]');
+    const storedRestOfOutfit = JSON.parse(localStorage.getItem('restOfOutfit') || '[]');
     const storedDiscountType = localStorage.getItem('discountType');
     const storedDiscountValue = localStorage.getItem('discountValue');
     const storedProductDetails = localStorage.getItem('productDetails');
@@ -217,7 +218,7 @@ const SecondStepOfAddProduct = () => {
         color: variant.color,
         size: variant.size,
         sku: location.isPrimaryLocation
-          ? parseFloat(data[`sku-${index}`]) // SKU for primary location
+          ? parseFloat(formData[`sku-${index}`]) // SKU for primary location
           : 0, // Set SKU to 0 for others
         imageUrls: variant.imageUrls || [],
         location: location.locationName,
@@ -259,6 +260,7 @@ const SecondStepOfAddProduct = () => {
       season: storedSeasons,
       status: "draft",
       sizeGuideImageUrl: storedSizeGuideImageUrl,
+      restOfOutfit: storedRestOfOutfit,
     };
 
     try {
@@ -320,6 +322,7 @@ const SecondStepOfAddProduct = () => {
         JSON.parse(localStorage.removeItem('vendors') || '[]');
         JSON.parse(localStorage.removeItem('tags') || '[]');
         JSON.parse(localStorage.removeItem('productVariants') || '[]');
+        JSON.parse(localStorage.removeItem('restOfOutfit') || '[]');
         router.push("/dash-board/products/existing-products");
       }
     } catch (err) {
