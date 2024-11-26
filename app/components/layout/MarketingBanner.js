@@ -128,7 +128,37 @@ const MarketingBanner = () => {
     { key: "left", label: "Left" },
     { key: "center", label: "Center" },
     { key: "right", label: "Right" },
-  ]
+  ];
+
+  const handleGoToPreviewPageBeforeUpload = async () => {
+
+    if (image === null) {
+      setSizeError(true);
+      return;
+    }
+    setSizeError(false);
+
+    let imageUrl = '';
+    if (image) {
+      imageUrl = await uploadImageToImgbb(image);
+      if (!imageUrl) {
+        toast.error('Image upload failed, cannot proceed.');
+        return;
+      }
+    }
+
+    if (imageUrl && selectedPosition) {
+      const previewURL = `/preview?image=${encodeURIComponent(imageUrl)}&position=${encodeURIComponent(selectedPosition)}`;
+      window.open(previewURL, '_blank');
+    } else {
+      toast.error("Please upload an image and select a position.");
+    }
+  };
+
+  const handleGoToPreviewPageAfterUpload = (imageUrl, position) => {
+    const previewURL = `/preview?image=${encodeURIComponent(imageUrl)}&position=${encodeURIComponent(position)}`;
+    window.open(previewURL, '_blank');
+  }
 
   const onSubmit = async () => {
 
@@ -235,7 +265,7 @@ const MarketingBanner = () => {
 
   if (isMarketingBannerPending) {
     return <Loading />
-  }
+  };
 
   return (
     <div className='max-w-screen-2xl flex flex-col xl:flex-row justify-between gap-6'>
@@ -297,7 +327,10 @@ const MarketingBanner = () => {
         </div>
 
         {/* Submit Button */}
-        <div className='flex justify-end items-center px-5 md:px-7'>
+        <div className={`flex ${image && selectedPosition ? "justify-between" : "justify-end"} items-center px-5 md:px-7`}>
+          {image && selectedPosition && <button type='button' className='text-blue-600 border-blue-500 font-bold border-b' onClick={handleGoToPreviewPageBeforeUpload}>
+            Preview
+          </button>}
           <button
             type='submit'
             className={`bg-[#D2016E] hover:bg-[#d2016dbd] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}
@@ -310,13 +343,18 @@ const MarketingBanner = () => {
 
         {marketingBannerList?.map((marketing, index) => (
           <div key={index} className="rounded-lg bg-white p-5 md:p-7 drop-shadow dark:bg-[#18181B]">
-            <Image width={1200} height={1200} alt='marketing-banner' className="h-fit lg:h-[285px] w-[650px] rounded-lg object-cover" src={marketing?.url} />
+            <Image width={1200} height={1200} alt='marketing-banner' className="h-fit lg:h-[285px] w-[650px] rounded-lg object-contain" src={marketing?.url} />
             <div className="flex justify-between pt-8">
-              <p className='text-neutral-500'> <span>Position: </span>
-                {["left", "right", "center"].includes(marketing?.position)
-                  ? marketing.position.charAt(0).toUpperCase() + marketing.position.slice(1)
-                  : marketing.position}
-              </p>
+              <div className='flex flex-col items-start gap-3'>
+                <p className='text-neutral-500'> <span>Position: </span>
+                  {["left", "right", "center"].includes(marketing?.position)
+                    ? marketing.position.charAt(0).toUpperCase() + marketing.position.slice(1)
+                    : marketing.position}
+                </p>
+                <button type='button' className='text-blue-600 font-bold border-b border-blue-500' onClick={() => handleGoToPreviewPageAfterUpload(marketing?.url, marketing?.position)}>
+                  Preview
+                </button>
+              </div>
               <button onClick={() => handleDeleteBanner(marketing?._id)}
                 class="group relative inline-flex items-center justify-center w-[40px] h-[40px] bg-[#D2016E] text-white rounded-full shadow-lg transform scale-100 transition-transform duration-300"
               >

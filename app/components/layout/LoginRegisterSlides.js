@@ -121,15 +121,40 @@ const LoginRegisterSlides = () => {
 
   const handleOnDragEnd = (result) => {
     const { destination, source } = result;
+
+    // If there's no destination, exit early
     if (!destination) return;
 
-    // Reorder the items only if the position changes
-    if (destination.index !== source.index) {
-      const items = Array.from(uploadedImageUrls);
-      const [reorderedItem] = items.splice(source.index, 1);
-      items.splice(destination.index, 0, reorderedItem);
-      setUploadedImageUrls(items);
+    // If source and destination are the same, and index hasn't changed, do nothing
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
     }
+
+    // Create deep copies of row1 and row2 lists
+    const updatedRow1 = [...uploadedImageUrls.slice(0, 5)];
+    const updatedRow2 = [...uploadedImageUrls.slice(5)];
+
+    let draggedItem;
+
+    // Remove the dragged item from the source row
+    if (source.droppableId === "row1") {
+      draggedItem = updatedRow1.splice(source.index, 1)[0];
+    } else {
+      draggedItem = updatedRow2.splice(source.index, 1)[0];
+    }
+
+    // Add the dragged item to the destination row
+    if (destination.droppableId === "row1") {
+      updatedRow1.splice(destination.index, 0, draggedItem);
+    } else {
+      updatedRow2.splice(destination.index, 0, draggedItem);
+    }
+
+    // Update the `uploadedImageUrls` state
+    setUploadedImageUrls([...updatedRow1, ...updatedRow2]);
   };
 
   const onSubmit = async () => {
