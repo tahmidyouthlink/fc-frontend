@@ -141,6 +141,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 5
   },
   costAdjustmentSubHeading: {
     fontSize: 14,
@@ -148,6 +149,9 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontWeight: 'bold'
   },
+  borderOfTotal: {
+    borderTop: 2,
+  }
 });
 
 const PurchaseOrderPDF = ({ data }) => {
@@ -312,39 +316,40 @@ const PurchaseOrderPDF = ({ data }) => {
           {/* Additional Details */}
           <View style={styles.shipmentDetails}>
             <Text style={styles.subHeading}>Additional Details</Text>
-            <Text style={styles.text}>Reference Number: {data?.referenceNumber === "" ? "--" : data?.referenceNumber}</Text>
-            <Text style={styles.text}>Supplier Note: {data?.supplierNote === "" ? "--" : data?.supplierNote}</Text>
+            <Text style={styles.text}>Reference Number</Text>
+            <Text>{data?.referenceNumber === "" ? " " : data?.referenceNumber}</Text>
+            <Text style={styles.text}>Supplier Note</Text>
+            <Text>{data?.supplierNote === "" ? " " : data?.supplierNote}</Text>
           </View>
+
           {/* Cost summary */}
           <View style={styles.additionalDetails}>
             <Text style={styles.subHeading}>Cost summary</Text>
             <View style={styles.costSummaryDiv}>
-              <Text style={styles.text}>Taxes:</Text>
+              <Text style={[styles.text]}>Taxes <Text style={[styles.text, { color: '#9CA3AF' }]}>(included)</Text></Text>
               <Text style={styles.text}>{totalTax.toFixed(2)}</Text>
             </View>
             <View style={styles.costSummaryDiv}>
-              <Text style={styles.text}>Subtotal:</Text>
+              <Text style={styles.text}>Subtotal <Text style={[styles.text, { color: '#9CA3AF' }]}>({totalQuantity} items)</Text></Text>
               <Text style={styles.text}>{totalPrice.toFixed(2)}</Text>
             </View>
-            <Text style={styles.text}>{totalQuantity} items</Text>
-            <Text style={styles.costAdjustmentSubHeading}>Cost adjustment</Text>
             <View style={styles.costSummaryDiv}>
-              <Text style={styles.text}>+Shipping:</Text>
+              <Text style={styles.text}>+Shipping</Text>
               <Text style={styles.text}>{data?.shipping}</Text>
             </View>
             <View style={styles.costSummaryDiv}>
-              <Text style={styles.text}>-Discount:</Text>
+              <Text style={styles.text}>-Discount</Text>
               <Text style={styles.text}>{data?.discount}</Text>
             </View>
-            <View style={styles.costSummaryDiv}>
-              <Text style={styles.text}>Total:</Text>
+            <View style={[styles.costSummaryDiv, styles.borderOfTotal]}>
+              <Text style={[styles.text, { marginTop: 5 }]}>Total</Text>
               <Text style={styles.text}>{total}</Text>
             </View>
           </View>
         </View>
 
       </Page>
-    </Document>
+    </Document >
   )
 };
 

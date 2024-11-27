@@ -248,15 +248,20 @@ const TransferOrderPDF = ({ data }) => {
           {/* Shipment Details */}
           <View style={styles.shipmentDetails}>
             <Text style={styles.subHeading}>Shipment Details</Text>
-            <Text style={styles.text}>Estimated Arrival: {data?.estimatedArrival}</Text>
-            <Text style={styles.text}>Shipping Carrier: {data?.shippingCarrier === "" ? "--" : data?.shippingCarrier}</Text>
-            <Text style={styles.text}>Tracking Number: {data?.trackingNumber === "" ? "--" : data?.trackingNumber}</Text>
+            <Text style={[styles.text, { marginTop: 5 }]}>Estimated Arrival</Text>
+            <Text style={[styles.text, { marginBottom: 10 }]}>{data?.estimatedArrival ? data?.estimatedArrival : " "}</Text>
+            <Text style={[styles.text]}>Shipping Carrier</Text>
+            <Text style={[styles.text, { marginBottom: 10 }]}>{data?.shippingCarrier === "" ? " " : data?.shippingCarrier}</Text>
+            <Text style={[styles.text]}>Tracking Number</Text>
+            <Text style={[styles.text, { marginBottom: 10 }]}>{data?.trackingNumber === "" ? " " : data?.trackingNumber}</Text>
           </View>
           {/* Additional Details */}
           <View style={styles.additionalDetails}>
             <Text style={styles.subHeading}>Additional Details</Text>
-            <Text style={styles.text}>Reference Number: {data?.referenceNumber === "" ? "--" : data?.referenceNumber}</Text>
-            <Text style={styles.text}>Supplier Note: {data?.supplierNote === "" ? "--" : data?.supplierNote}</Text>
+            <Text style={[styles.text, { marginTop: 5 }]}>Reference Number</Text>
+            <Text style={[styles.text, { marginBottom: 10 }]}>{data?.referenceNumber === "" ? " " : data?.referenceNumber}</Text>
+            <Text style={[styles.text]}>Supplier Note</Text>
+            <Text style={[styles.text, { marginBottom: 10 }]}>{data?.supplierNote === "" ? " " : data?.supplierNote}</Text>
           </View>
         </View>
 
