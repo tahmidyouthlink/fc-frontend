@@ -33,6 +33,7 @@ const EditShipmentHandler = () => {
         contactPersonName: '',
         contactPersonNumber: '',
         officeAddress: '',
+        trackingUrl: '',
         imageUrl: '',
         deliveryType: []
       }
@@ -46,6 +47,7 @@ const EditShipmentHandler = () => {
         setValue('contactPersonName', data?.contactPersonName);
         setValue('contactPersonNumber', data?.contactPersonNumber);
         setValue('officeAddress', data?.officeAddress);
+        setValue('trackingUrl', data?.trackingUrl);
         setDeliveryType(data?.deliveryType || []);
         setValue('deliveryType', data?.deliveryType || []);
         setImage(data?.imageUrl);
@@ -68,7 +70,6 @@ const EditShipmentHandler = () => {
     setDeliveryType(deliveryTypes);
     setValue('deliveryType', deliveryTypes); // Update the form value
     trigger('deliveryType'); // Manually trigger validation
-    console.log('Updated selected options:', deliveryTypes);
   };
 
   const uploadToImgbb = async (imageFile) => {
@@ -140,6 +141,7 @@ const EditShipmentHandler = () => {
         contactPersonName: data?.contactPersonName,
         contactPersonNumber: data?.contactPersonNumber,
         officeAddress: data?.officeAddress,
+        trackingUrl: data?.trackingUrl ? data?.trackingUrl : "",
         imageUrl,
         deliveryType
       };
@@ -253,6 +255,17 @@ const EditShipmentHandler = () => {
                 type="text"
                 placeholder="Add Office Address"
                 {...register('officeAddress')}
+                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+              />
+            </div>
+
+            {/* Tracking URL of the Shipment handler Input */}
+            <div className="w-full">
+              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Tracking URL</label>
+              <input
+                type="text"
+                placeholder="Add tracking url"
+                {...register('trackingUrl')}
                 className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
               />
             </div>

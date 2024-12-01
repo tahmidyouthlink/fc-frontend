@@ -154,15 +154,8 @@ const ReceiveTransferOrder = () => {
 
             // Create a new variant based on the matching variant
             const newVariant = {
-              color: {
-                _id: variant.colorCode, // Assuming colorCode can be used as ID
-                value: variant.colorName,
-                label: variant.colorName,
-                color: variant.colorCode,
-              },
-              size: variant.size,
+              ...matchingVariant,
               sku: variant.accept,
-              imageUrls: matchingVariant ? matchingVariant.imageUrls : [], // Use the imageUrls of the matching variant
               location: destinationName, // New location
             };
 

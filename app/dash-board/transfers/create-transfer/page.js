@@ -165,39 +165,88 @@ const CreateTransfer = () => {
     setSelectedProducts((prevSelectedProducts) => {
       const isSelected = prevSelectedProducts.some(
         (item) =>
-          item.productTitle === product.productTitle &&
-          item.size === size &&
-          item.color === colorCode &&
-          item.name === colorName &&
-          item.originSku === originSku && // Check originSku 
-          item.destinationSku === destinationSku // Check destinationSku 
+          item?.productTitle === product?.productTitle &&
+          item?.size === size &&
+          item?.color === colorCode &&
+          item?.name === colorName &&
+          item?.originSku === originSku &&  // Check originSku
+          item?.destinationSku === destinationSku // Check destinationSku
       );
 
       if (isSelected) {
         // Deselect the specific entry
+        setTransferOrderVariants((prevVariants) =>
+          prevVariants.filter(
+            (variant) =>
+              !(
+                variant?.productTitle === product?.productTitle &&
+                variant?.size === size &&
+                variant?.color?.code === colorCode &&
+                variant?.color?.name === colorName &&
+                variant?.originSku === originSku &&  // Check originSku
+                variant?.destinationSku === destinationSku // Check destinationSku
+              )
+          )
+        );
+
+        // Reset quantity to 0 for deselected variant
+        setTransferOrderVariants((prevVariants) => {
+          const updatedVariants = [...prevVariants];
+
+          const variantIndex = updatedVariants.findIndex(
+            (variant) =>
+              variant.productTitle === product.productTitle &&
+              variant.size === size &&
+              variant.color.code === colorCode &&
+              variant.color.name === colorName &&
+              variant.originSku === originSku &&
+              variant.destinationSku === destinationSku
+          );
+
+          if (variantIndex !== -1) {
+            updatedVariants[variantIndex].quantity = 0; // Reset quantity to 0
+          }
+
+          return updatedVariants;
+        });
+
         return prevSelectedProducts.filter(
           (item) =>
             !(
-              item.productTitle === product.productTitle &&
-              item.size === size &&
-              item.color === colorCode &&
-              item.name === colorName &&
-              item.originSku === originSku && // Check originSku 
-              item.destinationSku === destinationSku // Check destinationSku
+              item?.productTitle === product?.productTitle &&
+              item?.size === size &&
+              item?.color === colorCode &&
+              item?.name === colorName &&
+              item?.originSku === originSku && // Check originSku
+              item?.destinationSku === destinationSku // Check destinationSku
             )
         );
       } else {
-        // Select the specific entry
+        // Select the specific entry and initialize quantity to 0
+        setTransferOrderVariants((prevVariants) => [
+          ...prevVariants,
+          {
+            productTitle: product?.productTitle,
+            size,
+            color: { code: colorCode, name: colorName },
+            originSku, // Store originSku
+            destinationSku, // Store destinationSku
+            quantity: 0, // Initialize quantity to 0
+            cost: 0, // Initialize cost to 0
+            tax: 0, // Initialize tax to 0
+          },
+        ]);
+
         return [
           ...prevSelectedProducts,
           {
-            productTitle: product.productTitle,
-            imageUrl: product.imageUrl,
+            productTitle: product?.productTitle,
+            imageUrl: product?.imageUrl,
             size,
             color: colorCode,
             name: colorName,
             originSku, // Store originSku
-            destinationSku,
+            destinationSku, // Store destinationSku
           },
         ];
       }
@@ -207,34 +256,51 @@ const CreateTransfer = () => {
   // Function to toggle selection for all sizes of a product including originSku
   const toggleAllSizesAndColorsForProduct = (product) => {
     setSelectedProducts((prevSelectedProducts) => {
-      const allSelected = product.skuBySizeAndColor.every((entry) =>
+      const allSelected = product?.skuBySizeAndColor.every((entry) =>
         prevSelectedProducts.some(
           (item) =>
-            item.productTitle === product.productTitle &&
-            item.size === entry.size &&
-            item.color === entry.color?.code &&
-            item.name === entry.color?.name &&
-            item.originSku === entry?.originSku && // Check originSku
-            item.destinationSku === entry?.destinationSku
+            item?.productTitle === product?.productTitle &&
+            item?.size === entry?.size &&
+            item?.color === entry?.color?.code &&
+            item?.name === entry?.color?.name &&
+            item?.originSku === entry?.originSku && // Check originSku
+            item?.destinationSku === entry?.destinationSku // Check destinationSku
         )
       );
 
       if (allSelected) {
         // Deselect all sizes and colors for this product
+        setTransferOrderVariants((prevVariants) =>
+          prevVariants.filter((variant) => variant.productTitle !== product.productTitle)
+        );
+
         return prevSelectedProducts.filter((item) => item.productTitle !== product.productTitle);
       } else {
         // Select all sizes and colors for this product
         const newSelections = product.skuBySizeAndColor.map((entry) => ({
-          productTitle: product.productTitle,
-          imageUrl: product.imageUrl,
-          size: entry.size,
-          color: entry.color?.code,
-          name: entry.color?.name,
-          originSku: entry.originSku, // Store originSku
-          destinationSku: entry.destinationSku, // Store originSku
+          productTitle: product?.productTitle,
+          imageUrl: product?.imageUrl,
+          size: entry?.size,
+          color: entry?.color?.code,
+          name: entry?.color?.name,
+          originSku: entry?.originSku, // Store originSku
+          destinationSku: entry?.destinationSku, // Store destinationSku
         }));
 
-        // Filter out existing entries for this product and add all sizes/colors with originSku
+        setTransferOrderVariants((prevVariants) => [
+          ...prevVariants.filter((variant) => variant.productTitle !== product.productTitle),
+          ...product.skuBySizeAndColor.map((entry) => ({
+            productTitle: product?.productTitle,
+            size: entry?.size,
+            color: { code: entry?.color?.code, name: entry?.color?.name },
+            originSku: entry?.originSku, // Store originSku
+            destinationSku: entry?.destinationSku, // Store destinationSku
+            quantity: 0, // Initialize quantity to 0
+            cost: 0, // Initialize cost to 0
+            tax: 0, // Initialize tax to 0
+          })),
+        ]);
+
         return [
           ...prevSelectedProducts.filter((item) => item.productTitle !== product.productTitle),
           ...newSelections,

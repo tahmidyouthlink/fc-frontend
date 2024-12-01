@@ -16,15 +16,10 @@ import arrivals2 from "../../../public/card-images/arrivals2.svg";
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import dynamic from 'next/dynamic';
 const CustomerPrintButton = dynamic(() => import("@/app/components/layout/CustomerPrintButton"), { ssr: false });
-// import RatingModal from '@/app/components/layout/RatingModal';
-// import toast from 'react-hot-toast';
-// import { PiFlagPennantFill } from "react-icons/pi";
-// import { getColorClass } from '@/app/components/layout/getColorClass';
 
 const Customers = () => {
 
   // const isAdmin = true;
-  const dropdownRef = useRef(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [orderList, isOrderListPending] = useOrders();
   const [customerDetails, isCustomerPending] = useCustomers();
@@ -32,15 +27,11 @@ const Customers = () => {
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const initialColumns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alternative Phone Number', 'NewsLetter', 'Verification', 'Status'];
+  const initialColumns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alternative Phone Number', 'NewsLetter', 'Status'];
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
-  const [isOpenDropdown, setIsOpenDropdown] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(''); // State for search query
-  // const [isRatingModalOpen, setRatingModalOpen] = useState(false);
-  // const [selectedCustomer, setSelectedCustomer] = useState(null);
-  // const [ratings, setRatings] = useState({});
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedCustomer'));
@@ -82,20 +73,6 @@ const Customers = () => {
 
     setColumnOrder(reorderedColumns); // Update the column order both in modal and table
   };
-
-  const toggleDropdown = () => setIsOpenDropdown(!isOpenDropdown);
-
-  // Close dropdown when clicking outside
-  const handleClickOutside = (event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setIsOpenDropdown(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const { data: { result, totalCustomerList } = [], isCustomerListPending, refetch } = useQuery({
     queryKey: ["customerList", page, itemsPerPage],
@@ -171,7 +148,8 @@ const Customers = () => {
         normalizeString(customer.paymentMethods).includes(searchTerm) ||
         normalizeString(customer.shippingMethods).includes(searchTerm) ||
         normalizeString(customer.emailVerified).includes(searchTerm) ||
-        normalizeString(customer.alternativePhoneNumber).includes(searchTerm)
+        normalizeString(customer.alternativePhoneNumber).includes(searchTerm) ||
+        normalizeString(customer.status).includes(searchTerm)
       );
     };
 
@@ -222,46 +200,6 @@ const Customers = () => {
         return null; // Default icon if status is unknown
     }
   };
-
-  // const handleRateClick = (customer) => {
-  //   setSelectedCustomer(customer);
-  //   setRatingModalOpen(true);
-  // };
-
-  // const handleSaveRating = async (ratingColor) => {
-  //   if (selectedCustomer) {
-  //     try {
-  //       const response = await axiosPublic.patch(`/addRatingToCustomer/${selectedCustomer.customerId}`, { rating: ratingColor });
-
-  //       if (response.status === 200) {
-  //         setRatings({
-  //           ...ratings,
-  //           [selectedCustomer.customerId]: ratingColor // Update with the selected color
-  //         });
-  //         toast.success(`Rating updated successfully for customer ${selectedCustomer.customerId}`);
-  //       } else {
-  //         toast.error('Failed to save rating: ' + response.data.message);
-  //       }
-  //     } catch (error) {
-  //       console.error('Error saving rating:', error);
-  //       toast.error('Error saving rating. Please try again.');
-  //     }
-  //   }
-
-  //   setRatingModalOpen(false);
-  // };
-
-  // const handleCloseModal = () => {
-  //   // Reset rating for the selected customer
-  //   if (selectedCustomer) {
-  //     setRatings({
-  //       ...ratings,
-  //       [selectedCustomer.customerId]: 0 // Or any default value
-  //     });
-  //   }
-  //   setSelectedCustomer(null);
-  //   setRatingModalOpen(false);
-  // };
 
   if (isCustomerListPending || isOrderListPending || isCustomerPending) {
     return <Loading />
@@ -320,36 +258,6 @@ const Customers = () => {
                   Choose Columns
                 </Button>
               </div>
-
-              {/* <div ref={dropdownRef} className="relative inline-block text-left">
-      <Button onClick={toggleDropdown} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
-        Customize
-        <svg
-          className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${isOpenDropdown ? 'rotate-180' : ''}`}
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-        </svg>
-      </Button>
-
-      {isOpenDropdown && (
-        <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-          <div className="p-1">
-
-            
-            <div className="py-1">
-              <Button variant="solid" color="danger" onClick={() => { setColumnModalOpen(true) }} className="w-full">
-                Choose Columns
-              </Button>
-            </div>
-
-          </div>
-        </div>
-      )}
-    </div> */}
 
             </div>
           </div>
@@ -433,8 +341,6 @@ const Customers = () => {
                 </tr>
               ) : (
                 paginatedData?.map((customer, index) => {
-                  // Determine the color class based on customer.rating or ratings[customer.customerId]
-                  // const ratingColorClass = getColorClass(ratings[customer.customerId] || customer.rating);
                   const formattedStatus = customer?.status.charAt(0).toUpperCase() + customer?.status.slice(1);
                   return (
                     <tr key={customer?._id || index} className="hover:bg-gray-50 bg-white transition-colors">
@@ -454,7 +360,7 @@ const Customers = () => {
                                 </td>
                               )}
                               {column === 'Email' && (
-                                <td key="email" className={`text-xs p-3 ${customer?.emailVerified === "Verified" ? "text-green-600 font-semibold" : "text-gray-700"}`}>
+                                <td key="email" className={`text-xs p-3 text-gray-700`}>
                                   {customer?.email}
                                 </td>
                               )}
@@ -505,11 +411,6 @@ const Customers = () => {
                                   {customer?.isNewsletterSubscribe ? <FaCheck className='text-blue-600' size={20} /> : <RxCross2 className='text-red-600' size={26} />}
                                 </td>
                               )}
-                              {column === 'Verification' && (
-                                <td key="verification" className="text-xs p-3 text-gray-700 text-center">
-                                  {customer?.emailVerified}
-                                </td>
-                              )}
                               {column === 'Status' && (
                                 <td key="status" className="text-xs p-3 text-gray-700 whitespace-nowrap text-center">
                                   <span
@@ -521,13 +422,6 @@ const Customers = () => {
                                   </span>
                                 </td>
                               )}
-                              {/* <button
-                    onClick={() => handleRateClick(customer)}
-                    disabled={!isAdmin}
-                    className={ratingColorClass} // Apply the color class
-                  >
-                    <PiFlagPennantFill size={24} />
-                  </button> */}
                             </>
                           )
                       )}
@@ -538,17 +432,6 @@ const Customers = () => {
             </tbody>
           </table>
         </div>
-
-        {/* Add Rating Modal */}
-        {/* {selectedCustomer && (
-  <RatingModal
-    isOpen={isRatingModalOpen}
-    onClose={handleCloseModal}
-    onSave={handleSaveRating}
-    initialRating={ratings[selectedCustomer.customerId] || 'default'}
-    selectedCustomer={selectedCustomer}
-  />
-)} */}
 
         {selectedOrder && (
           <Modal className='mx-4 lg:mx-0 px-4' isOpen={isOpen} onOpenChange={onClose} size='2xl'>

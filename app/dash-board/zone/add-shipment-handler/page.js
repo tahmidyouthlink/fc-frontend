@@ -79,7 +79,7 @@ const AddShipmentHandler = () => {
 
     setIsSubmitting(true);
 
-    const { shipmentHandlerName, contactPersonName, contactPersonNumber, officeAddress } = data;
+    const { shipmentHandlerName, contactPersonName, contactPersonNumber, officeAddress, trackingUrl } = data;
 
     let imageUrl = '';
     if (image) {
@@ -99,6 +99,7 @@ const AddShipmentHandler = () => {
       contactPersonName,
       contactPersonNumber,
       officeAddress,
+      trackingUrl,
       imageUrl,
       deliveryType
     };
@@ -213,6 +214,17 @@ const AddShipmentHandler = () => {
                 type="text"
                 placeholder="Add Office Address"
                 {...register('officeAddress')}
+                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+              />
+            </div>
+
+            {/* Tracking URL of the Shipment handler Input */}
+            <div className="w-full">
+              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Tracking URL</label>
+              <input
+                type="text"
+                placeholder="Add tracking url"
+                {...register('trackingUrl')}
                 className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
               />
             </div>

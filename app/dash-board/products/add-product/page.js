@@ -1165,12 +1165,12 @@ const FirstStepOfAddProduct = () => {
 
                   {/* Dropdown list for search results */}
                   {isDropdownOpen && (
-                    <div className="border rounded p-2 max-h-64 overflow-y-auto">
+                    <div className="rounded max-h-64 overflow-y-auto">
                       {filteredSeasons?.length > 0 ? (
                         filteredSeasons?.map((season) => (
                           <div
                             key={season._id}
-                            className={`flex items-center p-2 cursor-pointer hover:bg-gray-100 ${selectedSeasons.includes(season.seasonName) ? 'bg-gray-200' : ''}`}
+                            className={`flex items-center p-2 cursor-pointer rounded-lg hover:bg-gray-100 border ${selectedSeasons.includes(season.seasonName) ? 'bg-gray-200' : ''}`}
                             onClick={() => toggleSeasonSelection(season.seasonName)}
                           >
                             <Image
@@ -1199,7 +1199,7 @@ const FirstStepOfAddProduct = () => {
                             key={index}
                             className="flex justify-between items-center bg-gray-100 p-2 rounded"
                           >
-                            <span>{season}</span>
+                            <span className='font-semibold'>{season}</span>
                             <button
                               onClick={() => removeSeason(season)}
                               className="text-red-500 text-sm"
@@ -1217,6 +1217,7 @@ const FirstStepOfAddProduct = () => {
                 </div>
 
                 <div className="w-full mx-auto" ref={dropdownRefForCompleteOutfit}>
+
                   {/* Search Box */}
                   <label htmlFor='completeOutfit' className='flex justify-start font-medium text-[#9F5216] pb-2'>Select Complete Outfit Section *</label>
 
@@ -1231,12 +1232,12 @@ const FirstStepOfAddProduct = () => {
 
                   {/* Dropdown list for search results */}
                   {isDropdownOpenForCompleteOutfit && (
-                    <div className="border rounded p-2 max-h-64 overflow-y-auto">
+                    <div className="rounded max-h-64 overflow-y-auto">
                       {filteredProducts?.length > 0 ? (
                         filteredProducts?.map((product) => (
                           <div
                             key={product._id}
-                            className={`flex items-center p-2 cursor-pointer rounded-lg hover:bg-gray-100 ${selectedProductIds.includes(product.productTitle) || selectedProductIds.includes(product.productId) ? 'bg-gray-200' : ''}`}
+                            className={`flex items-center p-1.5 cursor-pointer rounded-lg hover:bg-gray-100 border ${selectedProductIds.includes(product.productTitle) || selectedProductIds.includes(product.productId) ? 'bg-gray-200' : ''}`}
                             onClick={() => toggleProductSelection(product?.productId, product?.productTitle, product?._id, product?.imageUrls[0])}
                           >
                             <Image
@@ -1247,8 +1248,8 @@ const FirstStepOfAddProduct = () => {
                               className="h-8 w-8 object-cover rounded"
                             />
                             <div className='flex flex-col'>
-                              <span className="ml-2">{product.productId}</span>
-                              <span className="ml-2">{product.productTitle}</span>
+                              <span className="ml-2 font-bold">{product.productId}</span>
+                              <span className="ml-2 text-sm">{product.productTitle}</span>
                             </div>
                           </div>
                         ))
@@ -1277,8 +1278,8 @@ const FirstStepOfAddProduct = () => {
                                 className="h-8 w-8 object-cover rounded"
                               />
                               <div className='flex flex-col'>
-                                <span className="ml-2">{product.productId}</span>
-                                <span className="ml-2">{product.productTitle}</span>
+                                <span className="ml-2 font-bold">{product.productId}</span>
+                                <span className="ml-2 text-sm">{product.productTitle}</span>
                               </div>
                             </div>
                             <button

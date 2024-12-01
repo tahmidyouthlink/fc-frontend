@@ -29,7 +29,6 @@ const EditVendor = () => {
     const fetchVendorDetails = async () => {
       try {
         const { data } = await axiosPublic.get(`/getSingleVendorDetails/${id}`);
-        console.log(data);
 
         setValue('vendorName', data?.value);
         setValue('contactPersonName', data?.contactPersonName);

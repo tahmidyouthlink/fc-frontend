@@ -1,15 +1,13 @@
 "use client";
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useMarketingBanners from '@/app/hooks/useMarketingBanners';
-import { Select, SelectItem } from '@nextui-org/react';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Loading from '../shared/Loading/Loading';
-import Swal from 'sweetalert2';
 import { ImCross } from 'react-icons/im';
 
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
@@ -22,7 +20,14 @@ const MarketingBanner = () => {
   const [image, setImage] = useState(null);
   const [selectedPosition, setSelectedPosition] = useState("");
   const [sizeError, setSizeError] = useState(false);
-  const [marketingBannerList, isMarketingBannerPending, refetch] = useMarketingBanners();
+  const [marketingBannerList = [], isMarketingBannerPending, refetch] = useMarketingBanners();
+
+  useEffect(() => {
+    if (marketingBannerList && marketingBannerList.length > 0) {
+      setSelectedPosition(marketingBannerList[0]?.position); // Assuming you want the first banner's position
+      setImage({ src: marketingBannerList[0]?.url, file: null });
+    }
+  }, [marketingBannerList]);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -68,83 +73,25 @@ const MarketingBanner = () => {
     setSelectedPosition(e.target.value);
   };
 
-  const handleDeleteBanner = async (id) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!"
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const res = await axiosPublic.delete(`/deleteMarketingBanner/${id}`);
-          if (res?.data?.deletedCount) {
-            refetch(); // Call your refetch function to refresh data
-            toast.custom((t) => (
-              <div
-                className={`${t.visible ? 'animate-enter' : 'animate-leave'
-                  } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
-              >
-                <div className="pl-6">
-                  <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
-                </div>
-                <div className="flex-1 w-0 p-4">
-                  <div className="flex items-start">
-                    <div className="ml-3 flex-1">
-                      <p className="text-base font-bold text-gray-900">
-                        Marketing banner Removed!
-                      </p>
-                      <p className="mt-1 text-sm text-gray-500">
-                        Marketing banner has been deleted successfully!
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex border-l border-gray-200">
-                  <button
-                    onClick={() => toast.dismiss(t.id)}
-                    className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
-                  >
-                    <RxCross2 />
-                  </button>
-                </div>
-              </div>
-            ), {
-              position: "bottom-right",
-              duration: 5000
-            })
-          }
-        } catch (error) {
-          toast.error('Failed to delete marketing banner. Please try again.');
-        }
-      }
-    });
-  };
-
-  const selectOptions = [
-    { key: "left", label: "Left" },
-    { key: "center", label: "Center" },
-    { key: "right", label: "Right" },
-  ];
-
   const handleGoToPreviewPageBeforeUpload = async () => {
 
-    if (image === null) {
+    if (!image && !marketingBannerList?.length) {
       setSizeError(true);
       return;
     }
     setSizeError(false);
 
     let imageUrl = '';
-    if (image) {
+    // If the image is new, upload it
+    if (image?.file) {
       imageUrl = await uploadImageToImgbb(image);
       if (!imageUrl) {
         toast.error('Image upload failed, cannot proceed.');
         return;
       }
+    } else if (marketingBannerList?.length > 0) {
+      // Use the existing URL if no new image was uploaded
+      imageUrl = marketingBannerList[0]?.url;
     }
 
     if (imageUrl && selectedPosition) {
@@ -162,104 +109,78 @@ const MarketingBanner = () => {
 
   const onSubmit = async () => {
 
-    if (image === null) {
+    if (!image && !marketingBannerList?.length) {
       setSizeError(true);
       return;
     }
     setSizeError(false);
 
     let imageUrl = '';
-    if (image) {
+    // If the image is new, upload it
+    if (image?.file) {
       imageUrl = await uploadImageToImgbb(image);
       if (!imageUrl) {
         toast.error('Image upload failed, cannot proceed.');
         return;
       }
+    } else if (marketingBannerList?.length > 0) {
+      // Use the existing URL if no new image was uploaded
+      imageUrl = marketingBannerList[0]?.url;
     }
 
     if (marketingBannerList?.length > 0) {
-      toast.custom((t) => (
-        <div
-          className={`${t.visible ? 'animate-enter' : 'animate-leave'
-            } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
-        >
-          <div className="pl-6">
-            <ImCross className="h-7 w-7 p-1 bg-red-600 text-white rounded-full" />
-          </div>
-          <div className="flex-1 w-0 p-4">
-            <div className="flex items-start">
-              <div className="ml-3 flex-1">
-                <p className="text-base font-bold text-gray-900">
-                  A photo with a position already exists.
-                </p>
-                <p className="mt-1 text-sm text-gray-500">
-                  Please delete it first before uploading a new one.
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="flex border-l border-gray-200">
-            <button
-              onClick={() => toast.dismiss(t.id)}
-              className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
-            >
-              <RxCross2 />
-            </button>
-          </div>
-        </div>
-      ), {
-        position: "bottom-right",
-        duration: 5000
-      })
-      return;
-    }
+      const bannerId = marketingBannerList[0]?._id;
 
-    try {
       const bannerData = {
         url: imageUrl,
         position: selectedPosition
       };
 
-      const response = await axiosPublic.post('/addMarketingBanner', bannerData);
-      if (response.data.insertedId) {
-        toast.custom((t) => (
-          <div
-            className={`${t.visible ? 'animate-enter' : 'animate-leave'
-              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
-          >
-            <div className="pl-6">
-              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
-            </div>
-            <div className="flex-1 w-0 p-4">
-              <div className="flex items-start">
-                <div className="ml-3 flex-1">
-                  <p className="text-base font-bold text-gray-900">
-                    Marketing details published!
-                  </p>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Marketing details has been successfully launched!
-                  </p>
+      try {
+
+        const response = await axiosPublic.put(`/editMarketingBanner/${bannerId}`, bannerData);
+        if (response.data.modifiedCount > 0) {
+          toast.custom((t) => (
+            <div
+              className={`${t.visible ? 'animate-enter' : 'animate-leave'
+                } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+            >
+              <div className="pl-6">
+                <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+              </div>
+              <div className="flex-1 w-0 p-4">
+                <div className="flex items-start">
+                  <div className="ml-3 flex-1">
+                    <p className="text-base font-bold text-gray-900">
+                      Marketing banner updated!
+                    </p>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Marketing banner has been successfully updated!
+                    </p>
+                  </div>
                 </div>
               </div>
+              <div className="flex border-l border-gray-200">
+                <button
+                  onClick={() => toast.dismiss(t.id)}
+                  className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+                >
+                  <RxCross2 />
+                </button>
+              </div>
             </div>
-            <div className="flex border-l border-gray-200">
-              <button
-                onClick={() => toast.dismiss(t.id)}
-                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
-              >
-                <RxCross2 />
-              </button>
-            </div>
-          </div>
-        ), {
-          position: "bottom-right",
-          duration: 5000
-        })
-        refetch();
-        setImage(null);
+          ), {
+            position: "bottom-right",
+            duration: 5000
+          })
+          refetch();
+        }
+        else {
+          toast.error('No changes detected.');
+        }
+      } catch (err) {
+        toast.error("Failed to publish marketing details!");
       }
-    } catch (err) {
-      toast.error("Failed to publish marketing details!");
     }
   };
 
@@ -270,18 +191,32 @@ const MarketingBanner = () => {
   return (
     <div className='max-w-screen-2xl flex flex-col xl:flex-row justify-between gap-6'>
       <form onSubmit={handleSubmit(onSubmit)} className='flex-1 flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg my-6 h-fit'>
-        <Select
-          isRequired
-          label="Content layout position"
-          placeholder="Select a position"
-          onChange={handleSelectChange}
-        >
-          {selectOptions.map((option) => (
-            <SelectItem key={option.key} value={option.key}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </Select>
+
+        <div className='flex flex-col w-full'>
+          <label htmlFor='selectedPosition' className='font-semibold text-gray-700 mb-1'>
+            Content Layout Position
+          </label>
+          <div className='relative'>
+            <select
+              id="selectedPosition"
+              required
+              aria-label="Content layout position"
+              onChange={handleSelectChange}
+              value={selectedPosition}
+              className='appearance-none block w-full px-4 py-2 pr-8 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-0 transition-colors duration-1000 focus:ring-[#9F5216] focus:border-[#9F5216] text-gray-700'
+            >
+              <option value="left">Left</option>
+              <option value="center">Center</option>
+              <option value="right">Right</option>
+            </select>
+            <div className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500'>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
         <div className='flex flex-col gap-4 p-5 md:p-7'>
           <input
             id='imageUpload'
@@ -335,10 +270,12 @@ const MarketingBanner = () => {
             type='submit'
             className={`bg-[#D2016E] hover:bg-[#d2016dbd] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}
           >
-            Upload
+            Update
           </button>
         </div>
+
       </form>
+
       <div className='flex-1 flex flex-col gap-6 items-center justify-center my-6 h-fit'>
 
         {marketingBannerList?.map((marketing, index) => (
@@ -351,35 +288,16 @@ const MarketingBanner = () => {
                     ? marketing.position.charAt(0).toUpperCase() + marketing.position.slice(1)
                     : marketing.position}
                 </p>
-                <button type='button' className='text-blue-600 font-bold border-b border-blue-500' onClick={() => handleGoToPreviewPageAfterUpload(marketing?.url, marketing?.position)}>
-                  Preview
-                </button>
               </div>
-              <button onClick={() => handleDeleteBanner(marketing?._id)}
-                class="group relative inline-flex items-center justify-center w-[40px] h-[40px] bg-[#D2016E] text-white rounded-full shadow-lg transform scale-100 transition-transform duration-300"
-              >
-                <svg
-                  width="25px"
-                  height="25px"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="rotate-0 transition ease-out duration-300 scale-100 group-hover:-rotate-45 group-hover:scale-75"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    stroke-width="2"
-                    stroke-linejoin="round"
-                    stroke-linecap="round"
-                  ></path>
-                </svg>
+              <button type='button' className='text-blue-600 font-bold border-b border-blue-500' onClick={() => handleGoToPreviewPageAfterUpload(marketing?.url, marketing?.position)}>
+                Preview
               </button>
             </div>
           </div>
         ))}
 
       </div>
+
     </div>
   );
 };
