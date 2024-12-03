@@ -165,6 +165,7 @@ const ThirdStepOfAddProduct = () => {
       shippingDetails: selectedShipmentHandler,
       productId: storedProductId,
       status: "active",
+      salesThisMonth: 0,
       sizeGuideImageUrl: storedSizeGuideImageUrl,
       restOfOutfit: storedRestOfOutfit,
     }

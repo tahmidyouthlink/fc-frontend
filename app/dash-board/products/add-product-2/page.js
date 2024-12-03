@@ -259,6 +259,7 @@ const SecondStepOfAddProduct = () => {
       productVariants: finalData,
       season: storedSeasons,
       status: "draft",
+      salesThisMonth: 0,
       sizeGuideImageUrl: storedSizeGuideImageUrl,
       restOfOutfit: storedRestOfOutfit,
     };

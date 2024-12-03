@@ -704,6 +704,7 @@ const FirstStepOfAddProduct = () => {
       season: selectedSeasons,
       sizeGuideImageUrl: selectedImageUrl,
       status: "draft",
+      salesThisMonth: 0,
       restOfOutfit: selectedProductIds,
     };
 
