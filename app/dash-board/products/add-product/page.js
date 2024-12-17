@@ -76,7 +76,6 @@ const FirstStepOfAddProduct = () => {
   const dropdownRef = useRef(null);
   const dropdownRefForCompleteOutfit = useRef(null);
   const [seasonError, setSeasonError] = useState(false);
-  const [productError, setProductError] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   // Function to handle "Go Back" button click
@@ -171,11 +170,6 @@ const FirstStepOfAddProduct = () => {
 
   const handleProductSelectionChange = (selectedProducts) => {
     setSelectedProductIds(selectedProducts); // Update the state with selected products
-    if (selectedProducts.length === 0) {
-      setProductError(true);
-      return;
-    }
-    setProductError(false);
   };
 
   // Toggle dropdown visibility
@@ -621,11 +615,6 @@ const FirstStepOfAddProduct = () => {
         return;
       }
       setSeasonError(false);
-      if (selectedProductIds?.length === 0) {
-        setProductError(true);
-        return;
-      }
-      setProductError(false);
 
       const currentDate = new Date();
       const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -683,11 +672,6 @@ const FirstStepOfAddProduct = () => {
       return;
     }
     setSeasonError(false);
-    if (selectedProductIds?.length === 0) {
-      setProductError(true);
-      return;
-    }
-    setProductError(false);
 
     const currentDate = new Date();
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -1294,8 +1278,6 @@ const FirstStepOfAddProduct = () => {
                       </ul>
                     </div>
                   )}
-
-                  {productError && <p className="text-red-600 text-left">Product selection is required</p>}
 
                 </div>
 

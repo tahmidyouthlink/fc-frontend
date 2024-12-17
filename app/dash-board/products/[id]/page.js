@@ -98,7 +98,6 @@ const EditProductPage = () => {
   const [selectedProductIds, setSelectedProductIds] = useState([]);
   const [isDropdownOpenForCompleteOutfit, setIsDropdownOpenForCompleteOutfit] = useState(false);
   const dropdownRefForCompleteOutfit = useRef(null);
-  const [productError, setProductError] = useState(false);
 
   // Filter categories based on search input and remove already selected categories
   const filteredSeasons = seasonList?.filter((season) =>
@@ -170,11 +169,6 @@ const EditProductPage = () => {
 
   const handleProductSelectionChange = (selectedProducts) => {
     setSelectedProductIds(selectedProducts); // Update the state with selected products
-    if (selectedProducts.length === 0) {
-      setProductError(true);
-      return;
-    }
-    setProductError(false);
   };
 
   // Toggle dropdown visibility
@@ -665,11 +659,6 @@ const EditProductPage = () => {
         return;
       }
       setSeasonError(false);
-      if (selectedProductIds?.length === 0) {
-        setProductError(true);
-        return;
-      }
-      setProductError(false);
 
       // Initialize an array to hold error messages
       let errors = [];
@@ -1364,8 +1353,6 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                           </ul>
                         </div>
                       )}
-
-                      {productError && <p className="text-red-600 text-left">Product selection is required</p>}
 
                     </div>
 
