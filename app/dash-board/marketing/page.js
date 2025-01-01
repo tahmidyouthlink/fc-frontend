@@ -8,6 +8,7 @@ import specialOffer from "../../../public/card-images/special-offer.jpg";
 import RecentPromotions from '@/app/components/layout/RecentPromotions';
 import PromotionPerformance from '@/app/components/layout/PromotionPerformance';
 import MarketingContent from '@/app/components/layout/MarketingContent';
+import HomepageContent from '@/app/components/layout/HomepageContent';
 
 const Marketing = () => {
 
@@ -33,6 +34,7 @@ const Marketing = () => {
 
   return (
     <div className='px-6 md:px-10'>
+
       <div className="bg-white sticky top-0 z-10">
         <h1 className="font-bold text-lg lg:text-xl 2xl:text-2xl py-1 2xl:py-3 bg-white">Marketing</h1>
 
@@ -72,6 +74,18 @@ const Marketing = () => {
             onClick={() => setActiveTab('marketing content')}
           >
             Marketing Content
+          </button>
+
+          <button
+            className={`relative text-sm py-1 transition-all duration-300
+        ${activeTab === 'homepage content' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
+        after:absolute after:left-0 after:right-0 hover:text-[#D2016E] after:bottom-0 
+        after:h-[2px] after:bg-[#D2016E] after:transition-all after:duration-300
+        ${activeTab === 'homepage content' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
+      `}
+            onClick={() => setActiveTab('homepage content')}
+          >
+            Homepage Content
           </button>
 
         </div>
@@ -182,12 +196,21 @@ const Marketing = () => {
 
       </div>
       }
+
       {activeTab === "marketing content" && <div className='pt-6'>
         <h1 className='font-bold text-xl'>Recommended For You</h1>
         <p className='pt-1 pb-8 text-neutral-400 font-medium'>Our recommendations are tailored to suit your fashion commerce and customer preferences.</p>
         <MarketingContent />
       </div>
       }
+
+      {activeTab === "homepage content" && <div className='pt-6'>
+        <h1 className='font-bold text-xl'>Recommended For You</h1>
+        <p className='pt-1 pb-8 text-neutral-400 font-medium'>Our recommendations are tailored to suit your fashion commerce and customer preferences.</p>
+        <HomepageContent />
+      </div>
+      }
+
     </div>
   );
 };

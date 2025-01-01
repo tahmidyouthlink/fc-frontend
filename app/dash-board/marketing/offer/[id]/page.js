@@ -78,6 +78,7 @@ const EditOffer = () => {
 
         // Set form fields with fetched offer data
         setValue('offerTitle', offer?.offerTitle);
+        setValue('badgeTitle', offer?.badgeTitle);
         setValue('offerDiscountValue', offer?.offerDiscountValue);
         setExpiryDate(fetchedExpiryDate); // Ensure no time zone shift
         setValue('maxAmount', offer?.maxAmount || 0);
@@ -166,7 +167,7 @@ const EditOffer = () => {
   };
 
   const onSubmit = async (data) => {
-    const { offerTitle, offerDiscountValue, maxAmount, minAmount } = data;
+    const { offerTitle, offerDiscountValue, maxAmount, minAmount, badgeTitle } = data;
 
     let hasError = false;
 
@@ -220,6 +221,7 @@ const EditOffer = () => {
     try {
       const updatedDiscount = {
         offerTitle,
+        badgeTitle,
         offerDiscountValue,
         offerDiscountType,
         expiryDate,
@@ -297,13 +299,20 @@ const EditOffer = () => {
         <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto pt-1 pb-6 flex flex-col gap-6'>
 
           <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
-            <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 mt-3 py-3 max-h-[650px]'>
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[300px]'>
+            <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 mt-3 py-3 h-fit'>
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
                 <div>
                   <label htmlFor='offerTitle' className='flex justify-start font-medium text-[#D2016E]'>Offer Title *</label>
                   <input id='offerTitle' {...register("offerTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="text" />
                   {errors.offerTitle?.type === "required" && (
                     <p className="text-red-600 text-left">Offer Title is required</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor='badgeTitle' className='flex justify-start font-medium text-[#D2016E] pb-2'>Badge Title *</label>
+                  <input id='badgeTitle' placeholder='Enter Badge Title'  {...register("badgeTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="text" />
+                  {errors.badgeTitle?.type === "required" && (
+                    <p className="text-red-600 text-left">Badge Title is required</p>
                   )}
                 </div>
 
@@ -330,7 +339,7 @@ const EditOffer = () => {
 
               </div>
 
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[350px]'>
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
 
                 <div>
                   <label htmlFor='minAmount' className='flex justify-start font-medium text-[#D2016E]'>Minimum Order Amount *</label>

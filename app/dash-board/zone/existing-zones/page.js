@@ -5,7 +5,7 @@ import useShippingZones from '@/app/hooks/useShippingZones';
 import { Button } from '@nextui-org/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
@@ -16,6 +16,41 @@ const ExistingZones = () => {
   const axiosPublic = useAxiosPublic();
   const [shippingList, isShippingPending, refetch] = useShippingZones();
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState('inside dhaka');
+
+  const dhakaSuburbs = ["Savar", "Nabinagar", "Ashulia", "Keraniganj", "Tongi"];
+
+  // Filter data based on the active tab
+  const filteredShippingList = shippingList?.filter((zone) => {
+    if (activeTab === "inside dhaka") {
+      return zone?.selectedCity?.includes("Dhaka");
+    }
+    if (activeTab === "dhaka suburbs") {
+      return zone?.selectedCity?.some((city) => dhakaSuburbs.includes(city));
+    }
+    if (activeTab === "outside dhaka") {
+      return !zone?.selectedCity?.includes("Dhaka") &&
+        !zone?.selectedCity?.some((city) => dhakaSuburbs.includes(city));
+    }
+    return false;
+  });
+
+  // Ensure the code runs only on the client
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedTab = localStorage.getItem('activeTabForShippingManagementPage');
+      if (savedTab) {
+        setActiveTab(savedTab);
+      }
+    }
+  }, []);
+
+  // Save the activeTab to localStorage when it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('activeTabForShippingManagementPage', activeTab);
+    }
+  }, [activeTab]);
 
   const handleDelete = async (zoneId) => {
     Swal.fire({
@@ -78,64 +113,133 @@ const ExistingZones = () => {
   }
 
   return (
-    <div>
+    <div className='px-5 2xl:px-16'>
 
-      <div className='px-5 2xl:px-16 py-4 w-full flex justify-between'>
+      <div className='py-4 w-full flex justify-between'>
         <h3 className='text-start font-medium md:font-semibold text-[14px] md:text-xl lg:text-2xl w-full'>Shipping Management</h3>
         <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/zone"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
       </div>
 
-      <div className="max-w-screen-2xl mx-auto px-0 md:px-4 lg:px-6 custom-max-h overflow-x-auto modal-body-scroll">
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-100 sticky top-0 z-[1] shadow-md">
-            <tr>
-              <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Shipping Zone</th>
-              <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Cities</th>
-              <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Shipping Handlers</th>
-              <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Shipping Charge</th>
-              <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Shipping Hour</th>
-              <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {shippingList?.map((zone, index) => (
-              <tr key={index} className="hover:bg-gray-50 transition-colors">
-                <td className="text-xs p-3 text-gray-700">
-                  {zone?.shippingZone}
-                </td>
-                <td className="text-xs p-3 text-gray-700">{zone?.selectedCity.join(', ')}</td>
-                <td className="text-xs p-3 text-gray-700">
-                  {zone?.selectedShipmentHandler?.shipmentHandlerName}
-                </td>
-                <td className="text-xs p-3 text-gray-700">
-                  {zone?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
-                    <div key={idx}>
-                      {type}: ৳ {zone?.shippingCharges[type]}
-                    </div>
-                  ))}
-                </td>
-                <td className="text-xs p-3 text-gray-700">
-                  {zone?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
-                    <div key={idx}>
-                      {type}: {zone?.shippingHours[type]} Hours
-                    </div>
-                  ))}
-                </td>
+      <div className='flex flex-wrap items-center gap-3 bg-white'>
+        <button
+          className={`relative text-sm py-1 transition-all duration-300
+        ${activeTab === 'inside dhaka' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
+        after:absolute after:left-0 after:right-0 hover:text-[#D2016E] after:bottom-0 
+        after:h-[2px] after:bg-[#D2016E] after:transition-all after:duration-300
+        ${activeTab === 'inside dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
+      `}
+          onClick={() => setActiveTab('inside dhaka')}
+        >
+          Inside Dhaka
+        </button>
 
-                <td className="p-3">
-                  <div className="flex gap-2 items-center">
-                    <Button onClick={() => router.push(`/dash-board/zone/${zone?._id}`)} size="sm" className="text-xs" color="primary" variant="flat">
-                      Edit
-                    </Button>
+        <button
+          className={`relative text-sm py-1 transition-all duration-300
+        ${activeTab === 'dhaka suburbs' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
+        after:absolute after:left-0 after:right-0 hover:text-[#D2016E] after:bottom-0 
+        after:h-[2px] after:bg-[#D2016E] after:transition-all after:duration-300
+        ${activeTab === 'dhaka suburbs' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
+      `}
+          onClick={() => setActiveTab('dhaka suburbs')}
+        >
+          Dhaka Suburbs
+        </button>
 
-                    <Button size="sm" className="text-xs" color="danger" variant="flat" onPress={() => handleDelete(zone?._id)}>Delete</Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <button
+          className={`relative text-sm py-1 transition-all duration-300
+        ${activeTab === 'outside dhaka' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
+        after:absolute after:left-0 after:right-0 hover:text-[#D2016E] after:bottom-0 
+        after:h-[2px] after:bg-[#D2016E] after:transition-all after:duration-300
+        ${activeTab === 'outside dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
+      `}
+          onClick={() => setActiveTab('outside dhaka')}
+        >
+          Outside Dhaka
+        </button>
       </div>
+
+      <div className="pt-2">
+
+        <p className="pt-1 pb-4 text-neutral-400 font-medium">
+          {activeTab === "inside dhaka"
+            ? "Only Dhaka"
+            : activeTab === "dhaka suburbs"
+              ? "Savar, Nabinagar, Ashulia, Keraniganj, Tongi"
+              : "Nationwide Areas Only without Dhaka"}
+        </p>
+
+        <div className="custom-max-h overflow-x-auto modal-body-scroll">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-gray-100 sticky top-0 z-[1] shadow-md">
+              <tr>
+                <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                  Shipping Handlers
+                </th>
+                <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                  Shipping Charge
+                </th>
+                <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                  Shipping Hour
+                </th>
+                <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredShippingList?.map((zone, index) => (
+                <tr key={index} className="hover:bg-gray-50 transition-colors">
+                  <td className="text-xs p-3 text-gray-700">
+                    {zone?.selectedShipmentHandler?.shipmentHandlerName}
+                  </td>
+                  <td className="text-xs p-3 text-gray-700">
+                    {zone?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
+                      <div key={idx}>
+                        {type}: ৳ {zone?.shippingCharges[type]}
+                      </div>
+                    ))}
+                  </td>
+                  <td className="text-xs p-3 text-gray-700">
+                    {zone?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
+                      <div key={idx}>
+                        {type}: {zone?.shippingHours[type]} Hours
+                      </div>
+                    ))}
+                  </td>
+                  <td className="p-3">
+                    <div className="flex gap-2 items-center">
+                      <Button
+                        onClick={() => router.push(`/dash-board/zone/${zone?._id}`)}
+                        size="sm"
+                        className="text-xs"
+                        color="primary"
+                        variant="flat"
+                      >
+                        Edit
+                      </Button>
+
+                      <Button
+                        size="sm"
+                        className="text-xs"
+                        color="danger"
+                        variant="flat"
+                        onPress={() => handleDelete(zone?._id)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
     </div>
   );
 };

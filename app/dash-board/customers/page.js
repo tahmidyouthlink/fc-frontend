@@ -27,7 +27,7 @@ const Customers = () => {
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const initialColumns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alternative Phone Number', 'NewsLetter', 'Status'];
+  const initialColumns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alternative Phone Number', 'NewsLetter', 'Hometown', 'Status'];
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
@@ -102,33 +102,39 @@ const Customers = () => {
 
   const combinedData = useMemo(() => {
     return customerDetails?.map((customer) => {
-      const customerOrders = (orderList || []).filter(order => order.customerId === customer.customerId);
+      const { userInfo } = customer;
+      const personalInfo = userInfo?.personalInfo || {};
+      const deliveryAddresses = userInfo?.deliveryAddresses || [];
+      const customerOrders = (orderList || []).filter(order => order.customerId === userInfo?.customerId);
 
       const aggregatedOrderDetails = customerOrders.reduce((acc, order) => {
-        acc.city = order.city || acc.city;
-        acc.postalCode = order.postalCode || acc.postalCode;
-        acc.streetAddress = `${order.address1} ${order.address2}` || acc.streetAddress;
         acc.paymentMethods.add(order.paymentMethod);
         acc.shippingMethods.add(order.shippingMethod);
-        acc.alternativePhoneNumber = order.phoneNumber2 || acc.alternativePhoneNumber;
         return acc;
       }, {
-        city: '',
-        postalCode: '',
-        streetAddress: '',
         paymentMethods: new Set(),
         shippingMethods: new Set(),
-        alternativePhoneNumber: '',
       });
 
+      // Extract unique values for delivery address fields
+      const uniqueCities = Array.from(new Set(deliveryAddresses.map(address => address.city))).join(", ") || "--";
+      const uniquePostalCodes = Array.from(new Set(deliveryAddresses.map(address => address.postalCode))).join(", ") || "--";
+      const uniqueStreetAddresses = Array.from(new Set(deliveryAddresses.map(address => `${address.address1} ${address.address2}`.trim()))).join(" | ") || "--";
+
       return {
-        ...customer,
-        city: aggregatedOrderDetails.city || "--",
-        postalCode: aggregatedOrderDetails.postalCode || "--",
-        streetAddress: aggregatedOrderDetails.streetAddress || "--",
+        customerId: userInfo?.customerId,
+        email: customer.email,
+        customerName: personalInfo?.customerName || "--",
+        phoneNumber: personalInfo?.phoneNumber || "--",
+        city: uniqueCities,
+        postalCode: uniquePostalCodes,
+        streetAddress: uniqueStreetAddresses,
         paymentMethods: Array.from(aggregatedOrderDetails.paymentMethods).join(', ') || "--",
         shippingMethods: Array.from(aggregatedOrderDetails.shippingMethods).join(', ') || "--",
-        alternativePhoneNumber: aggregatedOrderDetails.alternativePhoneNumber || '--',
+        alternativePhoneNumber: personalInfo?.phoneNumber2 || "--",
+        hometown: personalInfo.hometown || "--",
+        isNewsletterSubscribe: userInfo?.isNewsletterSubscribe,
+        score: userInfo?.score
       };
     });
   }, [customerDetails, orderList]);
@@ -147,9 +153,9 @@ const Customers = () => {
         normalizeString(customer.streetAddress).includes(searchTerm) ||
         normalizeString(customer.paymentMethods).includes(searchTerm) ||
         normalizeString(customer.shippingMethods).includes(searchTerm) ||
-        normalizeString(customer.emailVerified).includes(searchTerm) ||
         normalizeString(customer.alternativePhoneNumber).includes(searchTerm) ||
-        normalizeString(customer.status).includes(searchTerm)
+        normalizeString(customer.hometown).includes(searchTerm) ||
+        normalizeString(customer.score).includes(searchTerm)
       );
     };
 
@@ -203,7 +209,10 @@ const Customers = () => {
 
   if (isCustomerListPending || isOrderListPending || isCustomerPending) {
     return <Loading />
-  }
+  };
+
+  console.log(customerDetails, "customerDetails");
+  console.log(paginatedData, "paginatedData");
 
   return (
     <div className='relative w-full min-h-screen bg-gray-100'>
@@ -341,7 +350,6 @@ const Customers = () => {
                 </tr>
               ) : (
                 paginatedData?.map((customer, index) => {
-                  const formattedStatus = customer?.status.charAt(0).toUpperCase() + customer?.status.slice(1);
                   return (
                     <tr key={customer?._id || index} className="hover:bg-gray-50 bg-white transition-colors">
 
@@ -411,15 +419,14 @@ const Customers = () => {
                                   {customer?.isNewsletterSubscribe ? <FaCheck className='text-blue-600' size={20} /> : <RxCross2 className='text-red-600' size={26} />}
                                 </td>
                               )}
+                              {column === 'Hometown' && (
+                                <td key="hometown" className="text-xs p-3 text-gray-700 text-center">
+                                  {customer?.hometown}
+                                </td>
+                              )}
                               {column === 'Status' && (
                                 <td key="status" className="text-xs p-3 text-gray-700 whitespace-nowrap text-center">
-                                  <span
-                                    className={`inline-flex items-center rounded-md py-1 px-2 text-white font-medium ${statusColors[customer?.status]} transition duration-300 ease-in-out transform hover:scale-105`}
-                                    title={formattedStatus}
-                                  >
-                                    {getStatusIcon(customer?.status)}
-                                    <span className="ml-1">{formattedStatus}</span>
-                                  </span>
+                                  {customer?.score}
                                 </td>
                               )}
                             </>
