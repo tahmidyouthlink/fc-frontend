@@ -25,9 +25,10 @@ import { parseISO, isBefore, subDays } from "date-fns";
 import { useSearchParams } from 'next/navigation';
 import { today, getLocalTimeZone } from "@internationalized/date";
 import dynamic from 'next/dynamic';
+import useShippingZones from '@/app/hooks/useShippingZones';
 const PrintButton = dynamic(() => import("@/app/components/layout/PrintButton"), { ssr: false });
 
-const initialColumns = ['Order Number', 'Date & Time', 'Customer Name', 'Order Amount', 'Order Status', 'Action', 'Email', 'Phone Number', 'Alternative Phone Number', 'Shipping Zone', 'Shipping Method', 'Payment Status', 'Payment Method', 'Vendor'];
+const initialColumns = ['Order Number', 'Date & Time', 'Customer Name', 'Order Amount', 'Order Status', 'Action', 'Email', 'Phone Number', 'Alternative Phone Number', 'Shipping Method', 'Payment Status', 'Payment Method'];
 
 const orderStatusTabs = [
   'New Orders',
@@ -60,7 +61,12 @@ const OrdersPage = () => {
   const [orderIdToUpdate, setOrderIdToUpdate] = useState(null); // Store order ID
   const [orderToUpdate, setOrderToUpdate] = useState({}); // selected order for update
   const [isTrackingModalOpen, setTrackingModalOpen] = useState(false);
+  const [orderIdToUpdateOnHold, setOrderIdToUpdateOnHold] = useState(null); // Store order ID
+  const [orderToUpdateOnHold, setOrderToUpdateOnHold] = useState({}); // selected order for update
+  const [onHoldReason, setOnHoldReason] = useState("");
+  const [isOnHoldModalOpen, setOnHoldModalOpen] = useState(false);
   const [isToggleOn, setIsToggleOn] = useState(true);
+  const [shippingList, isShippingPending] = useShippingZones();
   const [selectedHandler, setSelectedHandler] = useState(null);
 
   useEffect(() => {
@@ -165,9 +171,9 @@ const OrdersPage = () => {
 
   // Filter orders based on search query and date range
   const searchedOrders = orderList?.filter(order => {
+
     const query = searchQuery.toLowerCase();
     const isNumberQuery = !isNaN(query) && query.trim() !== '';
-    const queryParts = query.split(' ');
 
     // Date range filtering
     const orderDate = parseDate(order.dateTime);
@@ -176,15 +182,15 @@ const OrdersPage = () => {
       : true;
 
     // Check if any product detail contains the search query
-    const productMatch = order.productInformation?.some(product => {
-      const productTitle = (product.productTitle || '').toString().toLowerCase();
-      const productId = (product.productId || '').toString().toLowerCase();
-      const size = (typeof product.size === 'string' ? product.size : '').toLowerCase();
-      const color = (product.color?.label || '').toString().toLowerCase();
-      const batchCode = (product.batchCode || '').toString().toLowerCase();
-      const offerTitle = (product.offerTitle || '').toString().toLowerCase();
-      const offerDiscountValue = (product.offerDiscountValue || '').toString();
-      const sku = (product.sku || '').toString(); // SKU might be numeric, so keep it as a string
+    const productMatch = order?.productInformation?.some(product => {
+      const productTitle = (product?.productTitle || '').toString().toLowerCase();
+      const productId = (product?.productId || '').toString().toLowerCase();
+      const size = (typeof product?.size === 'string' ? product.size : '').toLowerCase();
+      const color = (product?.color?.label || '').toString().toLowerCase();
+      const batchCode = (product?.batchCode || '').toString().toLowerCase();
+      const offerTitle = (product?.offerInfo?.offerTitle || '').toString().toLowerCase();
+      const offerDiscountValue = (product?.offerInfo?.offerDiscountValue || '').toString();
+      const sku = (product?.sku || '').toString(); // SKU might be numeric, so keep it as a string
 
       return (
         productTitle.includes(query) ||
@@ -200,47 +206,38 @@ const OrdersPage = () => {
 
     // Check if order details match the search query
     const orderMatch = (
-      (order.orderNumber || '').toLowerCase().includes(query) ||
-      (order.dateTime || '').toLowerCase().includes(query) ||
-      (order.customerName || '').toLowerCase().includes(query) || // Added customerName search
-      (order.email || '').toLowerCase().includes(query) ||
-      (order.phoneNumber || '').toString().includes(query) ||
-      (order.phoneNumber2 || '').toString().includes(query) ||
-      (order.address1 || '').toLowerCase().includes(query) ||
-      (order.address2 || '').toLowerCase().includes(query) ||
-      (order.city || '').toLowerCase().includes(query) ||
-      (order.postalCode || '').toString().includes(query) ||
-      (order.orderStatus || '').toLowerCase().includes(query) ||
-      (order.totalAmount || '').toString().includes(query) ||
-      (order.paymentMethod || '').toLowerCase().includes(query) ||
-      (order.vendor || '').toLowerCase().includes(query) ||
-      (order.shippingZone || '').toLowerCase().includes(query) ||
-      (order.promoDiscountValue || '').toString().includes(query) ||
-      (order.offerDiscountValue || '').toString().includes(query) ||
-      (order.promoCode || '').toLowerCase().includes(query) ||
-      (order.offerTitle || '').toLowerCase().includes(query) ||
-      (order.transactionId || '').toLowerCase().includes(query) ||
-      (order.trackingNumber || '').toLowerCase().includes(query) ||
-      (order.shippingMethod || '').toLowerCase().includes(query) ||
-      (order.paymentStatus || '').toLowerCase().includes(query) ||
-      (order.customerId || '').toLowerCase().includes(query)
-    );
-
-    // Check if query parts match first and last names
-    const nameMatch = queryParts.length === 2 && (
-      (order.firstName || '').toLowerCase().includes(queryParts[0]) &&
-      (order.lastName || '').toLowerCase().includes(queryParts[1])
+      (order?.orderNumber || '').toLowerCase().includes(query) ||
+      (order?.dateTime || '').toLowerCase().includes(query) ||
+      (order?.customerInfo?.customerName || '').toLowerCase().includes(query) || // Added customerName search
+      (order?.customerInfo?.email || '').toLowerCase().includes(query) ||
+      (order?.customerInfo?.phoneNumber || '').toString().includes(query) ||
+      (order?.customerInfo?.phoneNumber2 || '').toString().includes(query) ||
+      (order?.deliveryInfo?.address1 || '').toLowerCase().includes(query) ||
+      (order?.deliveryInfo?.address2 || '').toLowerCase().includes(query) ||
+      (order?.deliveryInfo?.city || '').toLowerCase().includes(query) ||
+      (order?.deliveryInfo?.postalCode || '').toString().includes(query) ||
+      (order?.orderStatus || '').toLowerCase().includes(query) ||
+      (order?.total || '').toString().includes(query) ||
+      (order?.paymentInfo?.paymentMethod || '').toLowerCase().includes(query) ||
+      (order?.promoInfo?.promoDiscountValue || '').toString().includes(query) ||
+      (order?.promoInfo?.promoCode || '').toLowerCase().includes(query) ||
+      (order?.paymentInfo?.transactionId || '').toLowerCase().includes(query) ||
+      (order?.shipmentInfo?.trackingNumber || '').toLowerCase().includes(query) ||
+      (order?.shipmentInfo?.selectedShipmentHandlerName || '').toLowerCase().includes(query) ||
+      (order?.deliveryInfo?.deliveryMethod || '').toLowerCase().includes(query) ||
+      (order?.paymentInfo?.paymentStatus || '').toLowerCase().includes(query) ||
+      (order?.customerInfo?.customerId || '').toLowerCase().includes(query)
     );
 
     // Check if query matches date in specific format
-    const dateMatch = (order.dateTime || '').toLowerCase().includes(query);
+    const dateMatch = (order?.dateTime || '').toLowerCase().includes(query);
 
     // Check if promo or offer exists and the order is 'Paid'
     const isPromoOrOffer = promo || offer;
-    const isPaidOrder = order.paymentStatus === 'Paid';
+    const isPaidOrder = order?.paymentInfo?.paymentStatus === 'Paid';
 
     // Combine all filters
-    return isDateInRange && (productMatch || orderMatch || nameMatch || dateMatch) && (!isPromoOrOffer || isPaidOrder);
+    return isDateInRange && (productMatch || orderMatch || dateMatch) && (!isPromoOrOffer || isPaidOrder);
   });
 
   // Function to get filtered orders based on the selected tab and sort by last status change
@@ -312,7 +309,13 @@ const OrdersPage = () => {
           setOrderToUpdate(order);
           setOrderIdToUpdate(id); // Set the order ID for modal
           setTrackingModalOpen(true);  // Open the modal
-        } else {
+        } else if (actionType === "onHold") {
+          // Open the modal for on hold input only for 'onHold'
+          setOrderToUpdateOnHold(order);
+          setOrderIdToUpdateOnHold(id); // Set the order ID for modal
+          setOnHoldModalOpen(true);  // Open the modal
+        }
+        else {
           // For all other statuses, update order directly
           updateOrderStatus(order, id, actionType, isUndo); // Keep the existing logic for non-shipped actions
         }
@@ -353,8 +356,22 @@ const OrdersPage = () => {
 
     const data = {
       orderStatus: updateStatus,
+      ...(actionType === "shipped" && {
+        shippedAt: new Date(), // Add shippedAt timestamp
+      }),
+      ...(actionType === "delivered" && {
+        deliveredAt: new Date(), // Add deliveredAt timestamp
+      }),
       ...(actionType === "shipped" && trackingNumber ? { trackingNumber } : {}), // Add tracking number if provided for shipped
-      ...(actionType === "shipped" && selectedHandler ? { selectedHandlerName: selectedHandler } : {}) // Add selectedHandler for shipped
+      ...(actionType === "shipped" && selectedHandler
+        ? {
+          selectedShipmentHandlerName: selectedHandler?.shipmentHandlerName,
+          trackingUrl: selectedHandler?.trackingUrl,
+          imageUrl: selectedHandler?.imageUrl,
+        }
+        : {}), // Add selectedHandler details if provided for shipped
+      ...(isUndo && { isUndo: true }),
+      ...(actionType === "onHold" && onHoldReason ? { onHoldReason } : {})
     };
 
     try {
@@ -566,43 +583,37 @@ const OrdersPage = () => {
         if (selectedColumns.includes(col)) {
           switch (col) {
             case 'Order Number':
-              data.orderNumber = row.orderNumber;
+              data.orderNumber = row?.orderNumber;
               break;
             case 'Date & Time':
-              data.dateTime = row.dateTime;
+              data.dateTime = row?.dateTime;
               break;
             case 'Customer Name':
-              data.customerName = row.customerName;
+              data.customerName = row?.customerInfo?.customerName;
               break;
             case 'Order Amount':
-              data.totalAmount = row.totalAmount;
+              data.totalAmount = row?.total;
               break;
             case 'Order Status':
-              data.orderStatus = row.orderStatus;
+              data.orderStatus = row?.orderStatus;
               break;
             case 'Email':
-              data.email = row.email;
+              data.email = row?.customerInfo?.email;
               break;
             case 'Phone Number':
-              data.phoneNumber = row.phoneNumber;
+              data.phoneNumber = row?.customerInfo?.phoneNumber;
               break;
             case 'Alternative Phone Number':
-              data.phoneNumber2 = row.phoneNumber2 || "--";
-              break;
-            case 'Shipping Zone':
-              data.shippingZone = row.shippingZone;
+              data.phoneNumber2 = row?.customerInfo?.phoneNumber2 || "--";
               break;
             case 'Shipping Method':
-              data.shippingMethod = row.shippingMethod;
+              data.shippingMethod = row?.deliveryInfo?.deliveryMethod;
               break;
             case 'Payment Status':
-              data.paymentStatus = row.paymentStatus;
+              data.paymentStatus = row?.paymentInfo?.paymentStatus;
               break;
             case 'Payment Method':
-              data.paymentMethod = row.paymentMethod;
-              break;
-            case 'Vendor':
-              data.vendor = row.vendor;
+              data.paymentMethod = row?.paymentInfo?.paymentMethod;
               break;
             default:
               break;
@@ -651,43 +662,37 @@ const OrdersPage = () => {
         if (selectedColumns.includes(col)) {
           switch (col) {
             case "Order Number":
-              rowData["Order Number"] = order.orderNumber;
+              rowData["Order Number"] = order?.orderNumber;
               break;
             case "Date & Time":
-              rowData["Date & Time"] = order.dateTime;
+              rowData["Date & Time"] = order?.dateTime;
               break;
             case "Customer Name":
-              rowData["Customer Name"] = order.customerName;
+              rowData["Customer Name"] = order?.customerInfo?.customerName;
               break;
             case "Order Amount":
-              rowData["Order Amount"] = `${order.totalAmount.toFixed(2)}`;
+              rowData["Order Amount"] = `${order?.total?.toFixed(2)}`;
               break;
             case "Order Status":
-              rowData["Order Status"] = order.orderStatus;
+              rowData["Order Status"] = order?.orderStatus;
               break;
             case "Email":
-              rowData["Email"] = order.email;
+              rowData["Email"] = order?.customerInfo?.email;
               break;
             case "Phone Number":
-              rowData["Phone Number"] = order.phoneNumber;
+              rowData["Phone Number"] = order?.customerInfo?.phoneNumber;
               break;
             case "Alternative Phone Number":
-              rowData["Alternative Phone Number"] = order.phoneNumber2 || "--";
-              break;
-            case "Shipping Zone":
-              rowData["Shipping Zone"] = order.shippingZone;
+              rowData["Alternative Phone Number"] = order?.customerInfo?.phoneNumber2 || "--";
               break;
             case "Shipping Method":
-              rowData["Shipping Method"] = order.shippingMethod;
+              rowData["Shipping Method"] = order?.deliveryInfo?.deliveryMethod;
               break;
             case "Payment Status":
-              rowData["Payment Status"] = order.paymentStatus;
+              rowData["Payment Status"] = order?.paymentInfo?.paymentStatus;
               break;
             case "Payment Method":
-              rowData["Payment Method"] = order.paymentMethod;
-              break;
-            case "Vendor":
-              rowData["Vendor"] = order.vendor;
+              rowData["Payment Method"] = order?.paymentInfo?.paymentMethod;
               break;
             default:
               break;
@@ -743,43 +748,37 @@ const OrdersPage = () => {
         if (selectedColumns.includes(col)) {
           switch (col) {
             case 'Order Number':
-              data["Order Number"] = row.orderNumber || "";  // Include empty cells
+              data["Order Number"] = row?.orderNumber || "";  // Include empty cells
               break;
             case 'Date & Time':
-              data["Date & Time"] = row.dateTime || "";  // Include empty cells
+              data["Date & Time"] = row?.dateTime || "";  // Include empty cells
               break;
             case 'Customer Name':
-              data["Customer Name"] = row.customerName || "";  // Include empty cells
+              data["Customer Name"] = row?.customerInfo?.customerName || "";  // Include empty cells
               break;
             case 'Order Amount':
-              data["Order Amount"] = row.totalAmount || "";  // Include empty cells
+              data["Order Amount"] = row?.total || "";  // Include empty cells
               break;
             case 'Order Status':
-              data["Order Status"] = row.orderStatus || "";  // Include empty cells
+              data["Order Status"] = row?.orderStatus || "";  // Include empty cells
               break;
             case 'Email':
-              data["Email"] = row.email || "";  // Include empty cells
+              data["Email"] = row?.customerInfo?.email || "";  // Include empty cells
               break;
             case 'Phone Number':
-              data["Phone Number"] = row.phoneNumber || "";  // Include empty cells
+              data["Phone Number"] = row?.customerInfo?.phoneNumber || "";  // Include empty cells
               break;
             case 'Alternative Phone Number':
-              data["Alternative Phone Number"] = row.phoneNumber2 || "";  // Include empty cells
-              break;
-            case 'Shipping Zone':
-              data["Shipping Zone"] = row.shippingZone || "";  // Include empty cells
+              data["Alternative Phone Number"] = row?.customerInfo?.phoneNumber2 || "";  // Include empty cells
               break;
             case 'Shipping Method':
-              data["Shipping Method"] = row.shippingMethod || "";  // Include empty cells
+              data["Shipping Method"] = row?.deliveryInfo?.deliveryMethod || "";  // Include empty cells
               break;
             case 'Payment Status':
-              data["Payment Status"] = row.paymentStatus || "";  // Include empty cells
+              data["Payment Status"] = row?.paymentInfo?.paymentStatus || "";  // Include empty cells
               break;
             case 'Payment Method':
-              data["Payment Method"] = row.paymentMethod || "";  // Include empty cells
-              break;
-            case 'Vendor':
-              data["Vendor"] = row.vendor || "";  // Include empty cells
+              data["Payment Method"] = row?.paymentInfo?.paymentMethod || "";  // Include empty cells
               break;
             default:
               break;
@@ -820,15 +819,22 @@ const OrdersPage = () => {
     return false;
   };
 
+  const matchingShipmentHandlers = useMemo(() => {
+    if (!shippingList || !orderToUpdate?.deliveryInfo?.city) return [];
+
+    return shippingList?.filter(zone => zone?.selectedCity?.includes(orderToUpdate?.deliveryInfo?.city))?.map(zone => zone?.selectedShipmentHandler).filter(Boolean) || []; // Ensure no null or undefined values
+
+  }, [shippingList, orderToUpdate?.deliveryInfo?.city]);
+
   useEffect(() => {
     if (paginatedOrders?.length === 0) {
       setPage(0); // Reset to the first page if no data
     }
   }, [paginatedOrders]);
 
-  if (isOrderListPending) {
+  if (isOrderListPending || isShippingPending) {
     return <Loading />;
-  }
+  };
 
   return (
     <div className='relative w-full min-h-screen bg-gray-100'>
@@ -1121,10 +1127,10 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                               <td key="dateTime" className="text-xs p-3 text-gray-700 text-center">{order?.dateTime}</td>
                             )}
                             {column === 'Customer Name' && (
-                              <td key="customerName" className="text-xs p-3 text-gray-700 uppercase text-center">{order?.customerName}</td>
+                              <td key="customerName" className="text-xs p-3 text-gray-700 uppercase text-center">{order?.customerInfo?.customerName}</td>
                             )}
                             {column === 'Order Amount' && (
-                              <td key="orderAmount" className="text-xs p-3 text-gray-700 text-right">৳ {order?.totalAmount.toFixed(2)}</td>
+                              <td key="orderAmount" className="text-xs p-3 text-gray-700 text-right">৳ {order?.total?.toFixed(2)}</td>
                             )}
                             {column === 'Order Status' && (
                               <td key="orderStatus" className="text-xs p-3 text-yellow-600 text-center">{order?.orderStatus}</td>
@@ -1206,28 +1212,22 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                               </td>
                             )}
                             {column === 'Email' && (
-                              <td key="email" className="text-xs p-3 text-gray-700">{order?.email}</td>
+                              <td key="email" className="text-xs p-3 text-gray-700">{order?.customerInfo?.email}</td>
                             )}
                             {column === 'Phone Number' && (
-                              <td key="phoneNumber" className="text-xs p-3 text-gray-700 text-center">{order?.phoneNumber}</td>
+                              <td key="phoneNumber" className="text-xs p-3 text-gray-700 text-center">{order?.customerInfo?.phoneNumber}</td>
                             )}
                             {column === 'Alternative Phone Number' && (
-                              <td key="altPhoneNumber" className="text-xs p-3 text-gray-700 text-center">{order?.phoneNumber2 === 0 ? '--' : order?.phoneNumber2}</td>
-                            )}
-                            {column === 'Shipping Zone' && (
-                              <td key="shippingZone" className="text-xs p-3 text-gray-700 text-center">{order?.shippingZone}</td>
+                              <td key="altPhoneNumber" className="text-xs p-3 text-gray-700 text-center">{order?.customerInfo?.phoneNumber2 === "" ? '--' : order?.customerInfo?.phoneNumber2}</td>
                             )}
                             {column === 'Shipping Method' && (
-                              <td key="shippingMethod" className="text-xs p-3 text-gray-700 text-center">{order?.shippingMethod}</td>
+                              <td key="shippingMethod" className="text-xs p-3 text-gray-700 text-center">{order?.deliveryInfo?.deliveryMethod}</td>
                             )}
                             {column === 'Payment Status' && (
-                              <td key="paymentStatus" className="text-xs p-3 text-gray-700 text-center">{order?.paymentStatus}</td>
+                              <td key="paymentStatus" className="text-xs p-3 text-gray-700 text-center">{order?.paymentInfo?.paymentStatus}</td>
                             )}
                             {column === 'Payment Method' && (
-                              <td key="paymentMethod" className="text-xs p-3 text-gray-700 text-center">{order?.paymentMethod}</td>
-                            )}
-                            {column === 'Vendor' && (
-                              <td key="vendor" className="text-xs p-3 text-gray-700 text-center">{order?.vendor}</td>
+                              <td key="paymentMethod" className="text-xs p-3 text-gray-700 text-center">{order?.paymentInfo?.paymentMethod}</td>
                             )}
                           </>
                         )
@@ -1249,17 +1249,20 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
               <ModalBody className="modal-body-scroll">
                 <div className='flex items-center justify-between w-full pr-10'>
                   <p>Order Id - <strong>#{selectedOrder?.orderNumber}</strong></p>
-                  <p>Customer Id - <strong>{selectedOrder?.customerId}</strong></p>
+                  <p>Customer Id - <strong>{selectedOrder?.customerInfo?.customerId}</strong></p>
                 </div>
-                <p className='text-xs md:text-base'>Address: {selectedOrder?.address1} {selectedOrder?.address2}, {selectedOrder?.city}, {selectedOrder?.postalCode}</p>
+                <p className='text-xs md:text-base'>Address: {selectedOrder?.deliveryInfo?.address1} {selectedOrder?.deliveryInfo?.address2}, {selectedOrder?.deliveryInfo?.city}, {selectedOrder?.deliveryInfo?.postalCode}</p>
                 <div className='flex items-center justify-between pr-10'>
-                  <p className='text-xs md:text-base'>Payment Method: {selectedOrder?.paymentMethod}</p>
-                  <p className='text-xs md:text-base'>Transaction Id: {selectedOrder?.transactionId}</p>
+                  <p className='text-xs md:text-base'>Payment Method: {selectedOrder?.paymentInfo?.paymentMethod}</p>
+                  <p className='text-xs md:text-base'>Transaction Id: {selectedOrder?.paymentInfo?.transactionId}</p>
                 </div>
                 <div className='flex flex-wrap items-center justify-between pr-10'>
-                  <p className='text-xs md:text-base'>Shipment Handler: {selectedOrder?.selectedHandlerName === undefined ? '--' : selectedOrder?.selectedHandlerName}</p>
-                  <p className='text-xs md:text-base'>Tracking Number: {selectedOrder?.trackingNumber === "" ? '--' : selectedOrder?.trackingNumber}</p>
+                  <p className='text-xs md:text-base'>Shipment Handler: {selectedOrder?.shipmentInfo?.selectedShipmentHandlerName === undefined ? '--' : selectedOrder?.shipmentInfo?.selectedShipmentHandlerName}</p>
+                  <p className='text-xs md:text-base'>Tracking Number: {selectedOrder?.shipmentInfo?.trackingNumber === "" ? '--' : selectedOrder?.shipmentInfo?.trackingNumber}</p>
                 </div>
+                {selectedOrder?.deliveryInfo?.noteToSeller && <p className='text-xs md:text-base'>Customer Note: <strong>{selectedOrder?.deliveryInfo?.noteToSeller}</strong></p>}
+
+                {selectedOrder?.onHoldReason && <p className='text-xs md:text-base'>On Hold reason: <strong>{selectedOrder?.onHoldReason}</strong></p>}
 
                 <h4 className="mt-4 text-lg font-semibold">Product Information</h4>
                 {/* Display product and promo/offer information */}
@@ -1286,83 +1289,112 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                               />
                             </p>
                             <p><strong>Batch Code:</strong> {product?.batchCode}</p>
-                            <p><strong>Unit Price:</strong> {product?.unitPrice}</p>
+                            <p><strong>Unit Price:</strong> {product?.offerInfo ? product?.regularPrice : product?.finalPrice}</p>
+                            {product.offerInfo && <p><strong>Offer Price:</strong> {product?.finalPrice}</p>}
                             <p><strong>SKU:</strong> {product?.sku}</p>
+                            <p className='flex gap-0.5'><strong>Vendors:</strong>{product?.vendors?.length > 0 ? product?.vendors?.map((vendor, index) => (
+                              <p key={index}>{vendor}</p>
+                            )) : "--"}</p>
                           </div>
                         ))}
                       </>
                     )}
                   </div>
                   <div className='flex flex-col items-center text-sm md:text-base w-60'>
-                    <p className='w-full'><strong>Total Amount:</strong>  ৳ {selectedOrder?.totalAmount.toFixed(2)}</p>
+                    <p className='w-full'><strong>Sub Total:</strong>  ৳ {selectedOrder?.subtotal?.toFixed(2)}</p>
                     <p className='w-full'>
-                      {selectedOrder?.promoCode || selectedOrder?.productInformation?.some((product) => product.offerTitle) ? (
-                        (() => {
-                          // Calculate promo discount only if it's greater than 0
-                          const promoDiscount =
-                            selectedOrder.promoDiscountType === 'Percentage'
-                              ? (selectedOrder.totalAmount * selectedOrder.promoDiscountValue) / 100
-                              : selectedOrder.promoDiscountValue;
+                      {selectedOrder?.promoInfo?.promoCode || selectedOrder?.productInformation?.some((product) => product?.offerInfo?.offerTitle) ?
+                        (
+                          (() => {
+                            // Calculate promo discount only if it's greater than 0
+                            const promoDiscount =
+                              selectedOrder?.promoInfo?.promoDiscountType === 'Percentage'
+                                ? (selectedOrder.finalPrice * selectedOrder?.promoInfo?.promoDiscountValue) / 100
+                                : selectedOrder?.promoInfo?.promoDiscountValue;
 
-                          // Extract offer discounts from productInformation and filter out 0-value offers
-                          const offerDetails = selectedOrder.productInformation
-                            .map((product) => {
+                            // Extract offer discounts from productInformation and filter out 0-value offers
+                            const offerDetails = selectedOrder?.productInformation?.map((product) => {
                               const offerDiscount =
-                                product.offerDiscountType === 'Percentage'
-                                  ? (product.unitPrice * product.offerDiscountValue) / 100
-                                  : product.offerDiscountValue;
+                                product?.offerInfo?.offerDiscountType === 'Percentage'
+                                  ? (product.unitPrice * product?.offerInfo?.offerDiscountValue) / 100
+                                  : product?.offerInfo?.offerDiscountValue;
 
                               return {
-                                offerTitle: product.offerTitle,
-                                offerDiscountType: product.offerDiscountType,
-                                offerDiscountValue: product.offerDiscountValue,
+                                offerTitle: product?.offerTitle,
+                                offerDiscountType: product?.offerInfo?.offerDiscountType,
+                                offerDiscountValue: product?.offerInfo?.offerDiscountValue,
                                 offerDiscountAmount: offerDiscount,
                               };
                             })
-                            .filter((offer) => offer.offerDiscountAmount > 0); // Filter out 0-value offers
+                              .filter((offer) => offer?.offerDiscountAmount > 0); // Filter out 0-value offers
 
-                          return (
-                            <div className='flex flex-col gap-2'>
-                              {/* Show promo discount if applied */}
-                              {selectedOrder.promoCode && promoDiscount > 0 ? (
-                                <div>
-                                  <strong>Promo applied:</strong> {selectedOrder.promoCode} ({selectedOrder.promoDiscountType === 'Percentage'
-                                    ? `${selectedOrder.promoDiscountValue.toFixed(2)}%`
-                                    : `৳ ${selectedOrder.promoDiscountValue.toFixed(2)}`})
-                                  <br />
-                                  <br />
-                                </div>
-                              ) : null}
+                            return (
+                              <div className='flex flex-col gap-2'>
+                                {/* Show promo discount if applied */}
+                                {selectedOrder?.promoInfo?.promoCode && promoDiscount > 0 ? (
+                                  <div>
+                                    <strong>Promo applied:</strong> {selectedOrder?.promoInfo?.promoCode} ({selectedOrder?.promoInfo?.promoDiscountType === 'Percentage'
+                                      ? `${selectedOrder?.promoInfo?.promoDiscountValue.toFixed(2)}%`
+                                      : `৳ ${selectedOrder?.promoInfo?.promoDiscountValue.toFixed(2)}`})
+                                    <br />
+                                    <br />
+                                  </div>
+                                ) : null}
 
-                              {/* Show multiple offers if they are applied */}
-                              {offerDetails.length > 0 ? (
-                                <div>
-                                  {offerDetails.map((offer, index) => (
-                                    <span key={index}>
-                                      <strong>Offer applied</strong> ({offer.offerTitle}):{' '}
-                                      {offer.offerDiscountType === 'Percentage'
-                                        ? `${offer.offerDiscountValue.toFixed(2)}%`
-                                        : `৳ ${offer.offerDiscountAmount.toFixed(2)}`}
-                                      <br />
-                                    </span>
-                                  ))}
-                                </div>
-                              ) : null}
-                            </div>
-                          );
-                        })()
-                      ) : (
-                        <div>
-                          <strong>Promo/Offer applied:</strong> X
-                        </div>
-                      )}
+                                {/* Show multiple offers if they are applied */}
+                                {offerDetails.length > 0 ? (
+                                  <div>
+                                    {offerDetails.map((offer, index) => (
+                                      <span key={index}>
+                                        <strong>Offer applied</strong> ({offer?.offerInfo?.offerTitle}):{' '}
+                                        {offer?.offerInfo?.offerDiscountType === 'Percentage'
+                                          ? `${offer?.offerInfo?.offerDiscountValue.toFixed(2)}%`
+                                          : `৳ ${offer?.offerInfo?.offerDiscountAmount.toFixed(2)}`}
+                                        <br />
+                                      </span>
+                                    ))}
+                                  </div>
+                                ) : null}
+                              </div>
+                            );
+                          })()
+                        )
+                        : (
+                          <div>
+                            <strong>Promo/Offer applied:</strong> X
+                          </div>
+                        )}
                     </p>
+                    <p className='w-full'><strong>Shipping Charge:</strong>  ৳ {selectedOrder?.shippingCharge}</p>
+                    <p className='w-full'><strong>Total Amount:</strong>  ৳ {selectedOrder?.total?.toFixed(2)}</p>
                   </div>
                 </div>
               </ModalBody>
-              <ModalFooter className='flex items-center justify-end'>
+
+              <ModalFooter className={`flex items-center ${selectedOrder?.lastStatusChange ? "justify-between" : "justify-end"} `}>
+                {
+                  selectedOrder?.lastStatusChange ? (
+                    <i>
+                      Last updated on{" "}
+                      {(() => {
+                        const rawDate = selectedOrder.lastStatusChange;
+                        const date = new Date(rawDate);
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const year = String(date.getFullYear()).slice(-2);
+                        const hours = String(date.getHours()).padStart(2, '0');
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
+                        return `${day}-${month}-${year} | ${hours}:${minutes}`;
+                      })()}
+                      {" "} by {" "}
+                    </i>
+                  ) : (
+                    ""
+                  )
+                }
                 <PrintButton selectedOrder={selectedOrder} />
               </ModalFooter>
+
             </ModalContent>
           </Modal>
         )}
@@ -1373,14 +1405,14 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
             <ModalHeader className="flex flex-col gap-1">Select Shipment Handler</ModalHeader>
             <ModalBody>
               <div className='flex flex-wrap items-center justify-center gap-2'>
-                {orderToUpdate?.shipmentHandlers?.map((handler, index) => (
+                {matchingShipmentHandlers?.map((handler, index) => (
                   <div
                     key={index}
-                    className={`flex items-center gap-2 border-2 rounded-lg font-semibold px-6 py-2 cursor-pointer ${selectedHandler === handler ? 'border-[#ffddc2] bg-[#ffddc2]' : 'bg-white'
+                    className={`flex items-center gap-2 border-2 rounded-lg font-semibold px-6 py-2 cursor-pointer ${selectedHandler?.shipmentHandlerName === handler?.shipmentHandlerName ? 'border-[#ffddc2] bg-[#ffddc2]' : 'bg-white'
                       }`}
                     onClick={() => handleSelectHandler(handler)}
                   >
-                    {handler}
+                    {handler?.shipmentHandlerName}
                   </div>
                 ))}
               </div>
@@ -1420,6 +1452,50 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                   setTrackingModalOpen(false); // Close modal after submission
                   setTrackingNumber(''); // Clear input field
                   setSelectedHandler(null); // Clear the selected handler
+                  setIsToggleOn(true); // Reset toggle to true
+                }}
+              >
+                Confirm
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
+        {/* Modal of on hold */}
+        <Modal size='lg' isOpen={isOnHoldModalOpen} onOpenChange={() => setOnHoldModalOpen(false)}>
+          <ModalContent className='px-2'>
+            <ModalHeader className="flex flex-col gap-1">On Hold Reason</ModalHeader>
+            <ModalBody>
+
+              <div className='flex justify-between items-center gap-2'>
+                <Input
+                  clearable
+                  bordered
+                  fullWidth
+                  size="lg"
+                  label="On Hold Reason *"
+                  placeholder="Enter on hold reason"
+                  value={onHoldReason}
+                  onChange={(e) => setOnHoldReason(e.target.value)}
+                />
+              </div>
+
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                color="primary"
+                onPress={async () => {
+
+                  // When toggle is ON, ensure tracking number is entered
+                  if (!onHoldReason) {
+                    toast.error("Please enter on hold reason.");
+                    return; // Stop execution if no tracking number is provided
+                  }
+
+                  // Update order status with tracking number and selected handler
+                  await updateOrderStatus(orderToUpdateOnHold, orderIdToUpdateOnHold, "onHold", false, onHoldReason);
+                  setOnHoldModalOpen(false); // Close modal after submission
+                  setOnHoldReason(''); // Clear input field
                   setIsToggleOn(true); // Reset toggle to true
                 }}
               >

@@ -461,7 +461,8 @@ const EditProductPage = () => {
         setValue('batchCode', data?.batchCode);
         setValue('weight', data?.weight);
         setValue('regularPrice', data?.regularPrice);
-        setValue('discountValue', data?.discountValue)
+        setValue('discountValue', data?.discountValue);
+        setValue('productDetails', data?.productDetails);
         setUploadedImageUrls(data?.imageUrls);
         setDiscountType(data?.discountType);
         setProductDetails(data?.productDetails);
@@ -919,19 +920,25 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                     <p className="text-red-600 text-left">Product Title is required</p>
                   )}
                   <label htmlFor='productDetails' className='flex justify-start font-medium text-[#9F5216]'>
-                    Details About This Product
+                    Details About This Product *
                   </label>
                   <Controller
                     name="productDetails"
                     defaultValue=""
                     control={control}
-                    render={() => <Editor
-                      value={productDetails}
+                    rules={{ required: true }}
+                    render={({ field }) => <Editor
+                      // value={productDetails}
+                      value={field.value}
                       onChange={(value) => {
+                        field.onChange(value);
                         setProductDetails(value);
                       }}
                     />}
                   />
+                  {errors.productDetails?.type === "required" && (
+                    <p className="text-red-600 text-left pt-1">Product details is required</ p>
+                  )}
                 </div>
 
                 <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
@@ -1279,7 +1286,7 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
 
                     <div className="w-full mx-auto" ref={dropdownRefForCompleteOutfit}>
                       {/* Search Box */}
-                      <label htmlFor='completeOutfit' className='flex justify-start font-medium text-[#9F5216] pb-2'>Select Complete Outfit Section *</label>
+                      <label htmlFor='completeOutfit' className='flex justify-start font-medium text-[#9F5216] pb-2'>Complete Your Outfit Section</label>
 
                       <input
                         type="text"

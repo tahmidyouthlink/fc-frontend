@@ -310,7 +310,7 @@ const EditOffer = () => {
                 </div>
                 <div>
                   <label htmlFor='badgeTitle' className='flex justify-start font-medium text-[#D2016E] pb-2'>Badge Title *</label>
-                  <input id='badgeTitle' placeholder='Enter Badge Title'  {...register("badgeTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="text" />
+                  <input id='badgeTitle' placeholder='Enter Badge Title'  {...register("badgeTitle", { required: true, maxLength: 12 })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" maxLength="12" type="text" />
                   {errors.badgeTitle?.type === "required" && (
                     <p className="text-red-600 text-left">Badge Title is required</p>
                   )}

@@ -35,6 +35,8 @@ const ProductPage = () => {
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
+  const [isSkuModalOpen, setSkuModalOpen] = useState(false);
+  const [groupedByLocation, setGroupedByLocation] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTab, setSelectedTab] = useState(productStatusTab[0]);
   const dropdownRef = useRef(null);
@@ -207,7 +209,29 @@ const ProductPage = () => {
 
   const handleGoToEditPage = (id) => {
     router.push(`/dash-board/products/${id}`);
-  }
+  };
+
+  const handlePassProduct = (product) => {
+
+    // Process the data to group by location
+    const groupedByLocation = product?.productVariants?.reduce((acc, variant) => {
+      const { location, color, size, sku } = variant;
+
+      if (!acc[location]) {
+        acc[location] = { colors: new Set(), sizes: new Set(), totalSku: 0 };
+      }
+
+      acc[location].colors.add(color.label);
+      acc[location].sizes.add(size);
+      acc[location].totalSku += sku;
+
+      return acc;
+    }, {});
+
+    // Store the processed data in a state to pass to the modal
+    setGroupedByLocation(groupedByLocation);
+    setSkuModalOpen(true); // Open the modal
+  };
 
   useEffect(() => {
     if (paginatedProducts?.length === 0) {
@@ -370,7 +394,7 @@ const ProductPage = () => {
                                 </td>
                               )}
                               {column === 'SKU' && (
-                                <td key="SKU" className="text-xs p-3 text-gray-700 text-center">{product?.productVariants?.length > 0
+                                <td key="SKU" onClick={() => { handlePassProduct(product), setSkuModalOpen(true) }} className="text-xs p-3 text-center text-blue-500 hover:underline hover:cursor-pointer">{product?.productVariants?.length > 0
                                   ? `${product.productVariants.reduce((acc, variant) => acc + variant.sku, 0)} ${product.productVariants.reduce((acc, variant) => acc + variant.sku, 0) === 1 ? 'Item' : 'Items'}`
                                   : 'No Items'}</td>
                               )}
@@ -480,6 +504,36 @@ const ProductPage = () => {
             <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
               Save
             </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Modal of tracking number */}
+      <Modal size='2xl' isOpen={isSkuModalOpen} onOpenChange={() => setSkuModalOpen(false)}>
+        <ModalContent className='mx-4 lg:mx-0'>
+          <ModalHeader className="flex flex-col gap-1 bg-gray-200 px-8">
+            Details
+          </ModalHeader>
+          <ModalBody>
+            <div className='flex flex-wrap items-center justify-between gap-2'>
+              {Object.entries(groupedByLocation)?.map(([location, details]) => (
+                <div key={location} className="border-l p-3">
+                  <h3 className="font-bold text-lg mb-2">Location: {location}</h3>
+                  <p className="text-gray-700">
+                    <strong>Colors:</strong> {details.colors.size}
+                  </p>
+                  <p className="text-gray-700">
+                    <strong>Sizes:</strong> {details.sizes.size}
+                  </p>
+                  <p className="text-gray-700">
+                    <strong>Total SKUs:</strong> {details.totalSku}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </ModalBody>
+          <ModalFooter className='border'>
+            <Button variant='light' color="danger" onClick={() => setSkuModalOpen(false)}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

@@ -234,17 +234,18 @@ const PDFDocument = ({ order }) => {
   }
 
   // Check if any product has an offer
-  const hasOffers = order.productInformation.some(product => product.offerTitle);
+  const hasOffers = order?.productInformation.some(product => product.offerTitle);
 
   // Prepare the product rows without applying discount at this point
-  const productRows = order.productInformation.map(product => {
-    const productTotal = (product.unitPrice * product.sku).toFixed(2); // Original price without discount
+  const productRows = order?.productInformation.map(product => {
+    const productTotal = (
+      product?.offerInfo ? (Number(product?.regularPrice) || 0) : product?.finalPrice * product?.sku).toFixed(2);    // Original price without discount
 
     return [
       product.productTitle,   // Title
       product.color?.label || '',  // Color
       product.size || '',         // Size
-      `${product.unitPrice}`, // Unit Price
+      `${product?.offerInfo ? product?.regularPrice : product?.finalPrice}`, // Unit Price
       product.sku,                // QTY
       `${productTotal}`,       // Total (without discount)
       product.offerTitle ? { offerTitle: product.offerTitle, offerDiscount: 0, productTitle: product.productTitle } : null // Store offer details without applying discount yet
@@ -315,30 +316,30 @@ const PDFDocument = ({ order }) => {
           <View style={styles.orderInfo}>
             {/* Order Information */}
             <View style={styles.orderInfo2}>
-              <Text style={{ letterSpacing: 4, textTransform: 'uppercase' }}>#{order.orderNumber}</Text>
+              <Text style={{ letterSpacing: 4, textTransform: 'uppercase' }}>#{order?.orderNumber}</Text>
               <View style={styles.barcode}>
                 <Image src={barcodeDataUrl} style={{ width: 180, height: 65 }} alt="Barcode" />
               </View>
               <Text style={{ letterSpacing: 4, textTransform: 'uppercase', fontSize: 14, marginBottom: 5 }}>
-                {order.customerName}
+                {order?.customerInfo?.customerName}
               </Text>
-              <Text style={{ letterSpacing: 4, textTransform: 'uppercase', width: "40%", marginBottom: 5 }}>
-                {`${order.address1}${order.address2 ? ' ' + order.address2 : ' '} ${order.city} ${order.postalCode}`}
+              <Text style={{ letterSpacing: 4, textTransform: 'uppercase', width: "70%", marginBottom: 5 }}>
+                {`${order?.deliveryInfo?.address1}${order?.deliveryInfo?.address2 ? ' ' + order?.deliveryInfo?.address2 : ' '} ${order?.deliveryInfo?.city} ${order?.deliveryInfo?.postalCode}`}
               </Text>
               <Text style={{ letterSpacing: 4, textTransform: 'uppercase' }}>
-                {order?.phoneNumber}
+                {order?.customerInfo?.phoneNumber}
               </Text>
-              {order?.phoneNumber2 && order.phoneNumber2 !== "0" && (
+              {order?.customerInfo?.phoneNumber2 && order?.customerInfo?.phoneNumber2 !== "0" && (
                 <Text style={{ letterSpacing: 4, textTransform: 'uppercase' }}>
-                  {order.phoneNumber2}
+                  {order?.customerInfo?.phoneNumber2}
                 </Text>
               )}
             </View>
             <View style={styles.orderInfo3}>
               <Text style={{ textAlign: "right", marginBottom: 3 }}>{order?.dateTime}</Text>
-              <Text style={{ textAlign: "right", marginBottom: 3 }}>Shipping Method : {order?.shippingMethod}</Text>
-              <Text style={{ textAlign: "right", marginBottom: 3 }}>Payment Method : {order?.paymentMethod}</Text>
-              <Text style={{ textAlign: "right" }}>Payment Status : {order?.paymentStatus}</Text>
+              <Text style={{ textAlign: "right", marginBottom: 3 }}>Shipping Method : {order?.deliveryInfo?.deliveryMethod}</Text>
+              <Text style={{ textAlign: "right", marginBottom: 3 }}>Payment Method : {order?.paymentInfo?.paymentMethod}</Text>
+              <Text style={{ textAlign: "right" }}>Payment Status : {order?.paymentInfo?.paymentStatus}</Text>
             </View>
           </View>
 

@@ -3,10 +3,9 @@ import { FaBullhorn, FaGlobeAsia } from "react-icons/fa";
 import { PiUsersThreeLight } from "react-icons/pi";
 import { BiCategory } from "react-icons/bi";
 import { IoMdHome } from "react-icons/io";
-import { MdOutlineSettings, MdPayment, MdOutlineLocationOn, MdOutlineInventory2, MdOutlineCategory } from "react-icons/md";
-import { TbClipboardList } from "react-icons/tb";
-import { TbBuildingBank } from "react-icons/tb";
-import { TbBrandGoogleAnalytics } from "react-icons/tb";
+import { MdOutlineSettings, MdPayment, MdOutlineLocationOn, MdOutlineInventory2, MdOutlineCategory, MdOutlinePolicy, MdOutlinePrivacyTip, MdOutlineLocalShipping } from "react-icons/md";
+import { RiContractLine } from "react-icons/ri";
+import { TbBrandGoogleAnalytics, TbMessageCircleQuestion, TbClipboardList, TbBuildingBank } from "react-icons/tb";
 import Image from "next/image";
 import logoWhiteImage from "../../../public/logos/fc-logo.png";
 import Link from "next/link";
@@ -22,6 +21,8 @@ import { CiMedal } from "react-icons/ci";
 import { BsBoxSeam } from "react-icons/bs";
 import { FiShoppingBag } from "react-icons/fi";
 import { BiPurchaseTagAlt, BiTransferAlt } from "react-icons/bi";
+import { HiOutlineReceiptRefund } from "react-icons/hi2";
+import { IoIosReturnLeft } from "react-icons/io";
 
 const SideNavbar = ({ onClose }) => {
   const pathname = usePathname();
@@ -84,6 +85,18 @@ const SideNavbar = ({ onClose }) => {
         { label: 'Permissions', link: '/dash-board/permissions', icon: <LiaUserLockSolid /> },
         { label: 'Reward Level', link: '/dash-board/reward-level', icon: <CiMedal /> },
         { label: 'Payment Methods', link: '/dash-board/payment-methods', icon: <MdPayment /> },
+        {
+          name: "T and C Policies",
+          icon: <MdOutlinePolicy />,
+          links: [
+            { label: 'Terms & Conditions', link: '/dash-board/terms-condition', icon: <RiContractLine /> },
+            { label: 'Privacy Policy', link: '/dash-board/privacy-policy', icon: <MdOutlinePrivacyTip /> },
+            { label: 'Refund Policy', link: '/dash-board/refund-policy', icon: <HiOutlineReceiptRefund /> },
+            { label: 'Shipping Policy', link: '/dash-board/shipping-policy', icon: <MdOutlineLocalShipping /> },
+            { label: 'Return Policy', link: '/dash-board/return-policy', icon: <IoIosReturnLeft /> },
+            { label: 'FAQ', link: '/dash-board/faq', icon: <TbMessageCircleQuestion /> },
+          ]
+        },
 
         // Product Configuration nested within Settings
         {
@@ -180,7 +193,7 @@ const SideNavbar = ({ onClose }) => {
                             {linkItem?.links?.map((subLink, subIndex) => (
                               <Link href={subLink.link} key={subIndex} legacyBehavior>
                                 <a
-                                  className={`flex items-center gap-2 w-full hover:bg-[#F9FBFA] hover:text-black px-4 ml-12 py-2 rounded-md ${pathname === subLink.link ? "text-black bg-[#F9FBFA]" : ""}`}
+                                  className={`flex items-center gap-2 w-full hover:bg-[#F9FBFA] hover:text-black px-4 ml-8 py-2 rounded-md ${pathname === subLink.link ? "text-black bg-[#F9FBFA]" : ""}`}
                                   onClick={onClose}
                                 >
                                   <h2 className="p-1 text-2xl rounded-xl">{subLink.icon}</h2>
@@ -195,7 +208,7 @@ const SideNavbar = ({ onClose }) => {
                       // Render regular links in Settings
                       <Link href={linkItem.link} key={linkIndex} legacyBehavior>
                         <a
-                          className={`flex items-center gap-2 w-full hover:bg-[#F9FBFA] hover:text-black px-4 ml-12 py-2 rounded-md ${pathname === linkItem.link ? "text-black bg-[#F9FBFA]" : ""}`}
+                          className={`flex items-center gap-2 w-full hover:bg-[#F9FBFA] hover:text-black px-4 ml-8 py-2 rounded-md ${pathname === linkItem.link ? "text-black bg-[#F9FBFA]" : ""}`}
                           onClick={onClose}
                         >
                           <h2 className="p-1 text-2xl rounded-xl">{linkItem.icon}</h2>

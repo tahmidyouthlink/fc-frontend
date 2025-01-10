@@ -86,14 +86,15 @@ export default function EditShippingZone() {
     setCityError(selectedArray.length === 0);
   };
 
-  const toggleLogoSelection = (shipmentHandler) => {
-    if (selectedShipmentHandler?._id === shipmentHandler._id) {
-      setSelectedShipmentHandler(null);
-    } else {
-      setSelectedShipmentHandler(shipmentHandler);
-      setSizeError(false); // Clear error when a handler is selected
-    }
-  };
+  // if needed then apply edit option for logo selection
+  // const toggleLogoSelection = (shipmentHandler) => {
+  //   if (selectedShipmentHandler?._id === shipmentHandler._id) {
+  //     setSelectedShipmentHandler(null);
+  //   } else {
+  //     setSelectedShipmentHandler(shipmentHandler);
+  //     setSizeError(false); // Clear error when a handler is selected
+  //   }
+  // };
 
   const onSubmit = async (formData) => {
     let hasError = false;
@@ -194,6 +195,7 @@ export default function EditShippingZone() {
 
   return (
     <div className='bg-gray-50 min-h-screen'>
+
       <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
         <div className='flex items-center justify-between'>
           <h3 className='w-full font-semibold text-xl lg:text-2xl'>Shipping Settings</h3>
@@ -212,6 +214,7 @@ export default function EditShippingZone() {
               <label className="flex justify-start font-medium text-[#9F5216] pb-2">Shipping Zone</label>
               <input
                 type="text"
+                disabled
                 placeholder="Add Shipping Zone"
                 {...register('shippingZone', { required: 'Shipping Zone is required' })}
                 className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
@@ -265,12 +268,12 @@ export default function EditShippingZone() {
             <div className="flex flex-wrap items-center justify-start gap-4">
               {shipmentHandlerList?.map((shipmentHandler) => (
                 <div
-                  key={shipmentHandler._id}  // Always use unique keys
-                  onClick={() => toggleLogoSelection(shipmentHandler)}
+                  key={shipmentHandler?._id}  // Always use unique keys
+                  // onClick={() => toggleLogoSelection(shipmentHandler)}
                   className={`cursor-pointer border-2 rounded-md p-2 ${selectedShipmentHandler?._id === shipmentHandler._id ? 'border-blue-500' : 'border-gray-300'}`}
                 >
                   {shipmentHandler?.imageUrl && <Image src={shipmentHandler?.imageUrl} alt="shipment" height={300} width={300} className="h-24 w-24 xl:h-32 xl:w-32 object-contain" />}
-                  <p className="text-center">{shipmentHandler.shipmentHandlerName}</p>
+                  <p className="text-center">{shipmentHandler?.shipmentHandlerName}</p>
                 </div>
               ))}
               {/* Display error message if no shipment handler is selected */}
@@ -287,6 +290,7 @@ export default function EditShippingZone() {
                   </label>
                   <input
                     type="number"
+                    disabled
                     placeholder={`Enter Shipping Charge for ${selectedShipmentHandler?.deliveryType[0]}`}
                     {...register('shippingCharge', { required: 'Shipping Charge is required' })}
                     className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
@@ -302,6 +306,7 @@ export default function EditShippingZone() {
                   </label>
                   <input
                     type="number"
+                    disabled
                     placeholder={`Enter Shipping hours for ${selectedShipmentHandler?.deliveryType[0]}`}
                     {...register('shippingHour', { required: 'Shipping Hour is required' })}
                     className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
@@ -326,6 +331,7 @@ export default function EditShippingZone() {
                     </label>
                     <input
                       type="number"
+                      disabled
                       placeholder="Enter Shipping Charge for STANDARD"
                       {...register('shippingChargeStandard', { required: 'STANDARD Shipping Charge is required' })}
                       className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
@@ -341,6 +347,7 @@ export default function EditShippingZone() {
                     </label>
                     <input
                       type="text"
+                      disabled
                       placeholder="Enter Shipping hour for STANDARD"
                       {...register('shippingHourStandard', { required: 'STANDARD Shipping hour is required' })}
                       className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
@@ -359,6 +366,7 @@ export default function EditShippingZone() {
                     </label>
                     <input
                       type="number"
+                      disabled
                       placeholder="Add Shipping Charge for EXPRESS"
                       {...register('shippingChargeExpress', { required: 'EXPRESS Shipping Charge is required' })}
                       className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
@@ -374,6 +382,7 @@ export default function EditShippingZone() {
                     </label>
                     <input
                       type="text"
+                      disabled
                       placeholder="Add Shipping hour for EXPRESS"
                       {...register('shippingHourExpress', { required: 'EXPRESS Shipping hour is required' })}
                       className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
@@ -386,6 +395,7 @@ export default function EditShippingZone() {
               </div>
             </div>}
           </div>
+
           <div className='flex justify-end items-center'>
 
             <button
@@ -396,6 +406,7 @@ export default function EditShippingZone() {
               {isSubmitting ? 'Submitting...' : 'Submit'}
             </button>
           </div>
+
         </div>
       </form>
     </div>

@@ -18,7 +18,7 @@ const ExistingZones = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('inside dhaka');
 
-  const dhakaSuburbs = ["Savar", "Nabinagar", "Ashulia", "Keraniganj", "Tongi"];
+  const dhakaSuburbs = ["Savar", "Nabinagar", "Ashulia", "Keraniganj", "Tongi", "Gazipur", "Narayanganj"];
 
   // Filter data based on the active tab
   const filteredShippingList = shippingList?.filter((zone) => {
@@ -81,7 +81,7 @@ const ExistingZones = () => {
                       <p className="text-base font-bold text-gray-900">
                         Shipment Removed!
                       </p>
-                      <p className="mt-1 text-sm text-gray-500">
+                      <p className="mt-1 text-base text-gray-500">
                         Shipment Handler deleted successfully!
                       </p>
                     </div>
@@ -116,11 +116,11 @@ const ExistingZones = () => {
     <div className='px-5 2xl:px-16'>
 
       <div className='py-4 w-full flex justify-between'>
-        <h3 className='text-start font-medium md:font-semibold text-[14px] md:text-xl lg:text-2xl w-full'>Shipping Management</h3>
+        <h3 className='text-start font-medium md:font-semibold text-[14px] md:text-2xl lg:text-3xl w-full'>Shipping Management</h3>
         <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/zone"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
       </div>
 
-      <div className='flex flex-wrap items-center gap-3 bg-white'>
+      <div className='flex flex-wrap items-center gap-3 bg-white pt-2'>
         <button
           className={`relative text-sm py-1 transition-all duration-300
         ${activeTab === 'inside dhaka' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
@@ -160,7 +160,7 @@ const ExistingZones = () => {
 
       <div className="pt-2">
 
-        <p className="pt-1 pb-4 text-neutral-400 font-medium">
+        <p className="pt-1 pb-4 text-neutral-800 font-semibold">
           {activeTab === "inside dhaka"
             ? "Only Dhaka"
             : activeTab === "dhaka suburbs"
@@ -168,20 +168,23 @@ const ExistingZones = () => {
               : "Nationwide Areas Only without Dhaka"}
         </p>
 
-        <div className="custom-max-h overflow-x-auto modal-body-scroll">
+        <div className="custom-max-h overflow-x-auto modal-body-scroll mt-3">
           <table className="w-full text-left border-collapse">
             <thead className="bg-gray-100 sticky top-0 z-[1] shadow-md">
               <tr>
-                <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                <th className="text-sm md:text-base p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                  Shipping Zone
+                </th>
+                <th className="text-sm md:text-base p-2 xl:p-3 text-gray-700 border-b border-gray-300">
                   Shipping Handlers
                 </th>
-                <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                <th className="text-sm md:text-base p-2 xl:p-3 text-gray-700 border-b border-gray-300">
                   Shipping Charge
                 </th>
-                <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                <th className="text-sm md:text-base p-2 xl:p-3 text-gray-700 border-b border-gray-300">
                   Shipping Hour
                 </th>
-                <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
+                <th className="text-sm md:text-base p-2 xl:p-3 text-gray-700 border-b border-gray-300">
                   Actions
                 </th>
               </tr>
@@ -190,17 +193,20 @@ const ExistingZones = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredShippingList?.map((zone, index) => (
                 <tr key={index} className="hover:bg-gray-50 transition-colors">
-                  <td className="text-xs p-3 text-gray-700">
+                  <td className="text-xs md:text-sm font-medium p-3 text-neutral-950">
+                    {zone?.shippingZone}
+                  </td>
+                  <td className="text-xs md:text-sm font-medium p-3 text-neutral-950">
                     {zone?.selectedShipmentHandler?.shipmentHandlerName}
                   </td>
-                  <td className="text-xs p-3 text-gray-700">
+                  <td className="text-xs md:text-sm font-medium p-3 text-neutral-950">
                     {zone?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
                       <div key={idx}>
                         {type}: ৳ {zone?.shippingCharges[type]}
                       </div>
                     ))}
                   </td>
-                  <td className="text-xs p-3 text-gray-700">
+                  <td className="text-xs md:text-sm font-medium p-3 text-neutral-950">
                     {zone?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
                       <div key={idx}>
                         {type}: {zone?.shippingHours[type]} Hours
@@ -211,18 +217,18 @@ const ExistingZones = () => {
                     <div className="flex gap-2 items-center">
                       <Button
                         onClick={() => router.push(`/dash-board/zone/${zone?._id}`)}
-                        size="sm"
-                        className="text-xs"
-                        color="primary"
+                        size="md"
+                        className="text-xs md:text-sm font-medium"
+                        neutral-95text-neutral-950 color="primary"
                         variant="flat"
                       >
                         Edit
                       </Button>
 
                       <Button
-                        size="sm"
-                        className="text-xs"
-                        color="danger"
+                        size="md"
+                        className="text-xs md:text-sm font-medium"
+                        neutral-95text-neutral-950 color="danger"
                         variant="flat"
                         onPress={() => handleDelete(zone?._id)}
                       >

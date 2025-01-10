@@ -21,6 +21,7 @@ const Customers = () => {
 
   // const isAdmin = true;
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isOpenCustomerModal, onOpen: openCustomerModal, onClose: onCloseCustomerModal } = useDisclosure();
   const [orderList, isOrderListPending] = useOrders();
   const [customerDetails, isCustomerPending] = useCustomers();
   const axiosPublic = useAxiosPublic();
@@ -29,6 +30,7 @@ const Customers = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const initialColumns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alternative Phone Number', 'NewsLetter', 'Hometown', 'Status'];
   const [selectedColumns, setSelectedColumns] = useState([]);
+  const [selectedCustomerInfo, setSelectedCustomerInfo] = useState({});
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -95,25 +97,34 @@ const Customers = () => {
   };
 
   const handleViewClick = async (orderId) => {
-    const orderDetails = orderList?.filter(order => order?.customerId === orderId);
+    const orderDetails = orderList?.filter(order => order?.customerInfo?.customerId === orderId);
     setSelectedOrder(orderDetails);
     onOpen();
   };
+
+  const handleCustomerInfoClick = (customer) => {
+    setSelectedCustomerInfo(customer);
+    openCustomerModal();
+  }
 
   const combinedData = useMemo(() => {
     return customerDetails?.map((customer) => {
       const { userInfo } = customer;
       const personalInfo = userInfo?.personalInfo || {};
       const deliveryAddresses = userInfo?.deliveryAddresses || [];
-      const customerOrders = (orderList || []).filter(order => order.customerId === userInfo?.customerId);
+      const customerOrders = (orderList || []).filter(order => order?.customerInfo?.customerId === userInfo?.customerId);
 
       const aggregatedOrderDetails = customerOrders.reduce((acc, order) => {
-        acc.paymentMethods.add(order.paymentMethod);
-        acc.shippingMethods.add(order.shippingMethod);
+        acc.paymentMethods.add(order?.paymentInfo?.paymentMethod);
+        acc.shippingMethods.add(order?.deliveryInfo?.deliveryMethod);
+        acc.orderNumber.add(order?.orderNumber);
+        acc.total.add(order?.total);
         return acc;
       }, {
         paymentMethods: new Set(),
         shippingMethods: new Set(),
+        orderNumber: new Set(),
+        total: new Set(),
       });
 
       // Extract unique values for delivery address fields
@@ -123,7 +134,8 @@ const Customers = () => {
 
       return {
         customerId: userInfo?.customerId,
-        email: customer.email,
+        email: customer?.email,
+        dob: customer?.userInfo?.personalInfo?.dob,
         customerName: personalInfo?.customerName || "--",
         phoneNumber: personalInfo?.phoneNumber || "--",
         city: uniqueCities,
@@ -134,7 +146,9 @@ const Customers = () => {
         alternativePhoneNumber: personalInfo?.phoneNumber2 || "--",
         hometown: personalInfo.hometown || "--",
         isNewsletterSubscribe: userInfo?.isNewsletterSubscribe,
-        score: userInfo?.score
+        score: userInfo?.score,
+        orderNumber: Array.from(aggregatedOrderDetails?.orderNumber),
+        total: Array.from(aggregatedOrderDetails?.total),
       };
     });
   }, [customerDetails, orderList]);
@@ -155,7 +169,9 @@ const Customers = () => {
         normalizeString(customer.shippingMethods).includes(searchTerm) ||
         normalizeString(customer.alternativePhoneNumber).includes(searchTerm) ||
         normalizeString(customer.hometown).includes(searchTerm) ||
-        normalizeString(customer.score).includes(searchTerm)
+        normalizeString(customer.score).includes(searchTerm) ||
+        normalizeString(customer.orderNumber).includes(searchTerm) ||
+        normalizeString(customer.total).includes(searchTerm)
       );
     };
 
@@ -210,9 +226,6 @@ const Customers = () => {
   if (isCustomerListPending || isOrderListPending || isCustomerPending) {
     return <Loading />
   };
-
-  console.log(customerDetails, "customerDetails");
-  console.log(paginatedData, "paginatedData");
 
   return (
     <div className='relative w-full min-h-screen bg-gray-100'>
@@ -358,7 +371,7 @@ const Customers = () => {
                           selectedColumns.includes(column) && (
                             <>
                               {column === 'Customer ID' && (
-                                <td key="customerId" className="text-xs p-3 font-mono text-center">
+                                <td key="customerId" onClick={() => handleCustomerInfoClick(customer)} className="text-xs p-3 font-mono text-center cursor-pointer text-blue-600 hover:text-blue-800">
                                   {customer?.customerId}
                                 </td>
                               )}
@@ -441,49 +454,75 @@ const Customers = () => {
         </div>
 
         {selectedOrder && (
-          <Modal className='mx-4 lg:mx-0 px-4' isOpen={isOpen} onOpenChange={onClose} size='2xl'>
+          <Modal className='mx-4 lg:mx-0' isOpen={isOpen} onOpenChange={onClose} size='2xl'>
             <ModalContent>
-              <ModalHeader className="text-lg">
+              <ModalHeader className="flex flex-col gap-1 bg-gray-200 px-8">
                 Order History
               </ModalHeader>
-              <ModalBody className="modal-body-scroll space-y-6">
-                {selectedOrder.length > 0 ? (
-                  selectedOrder.map((order, index) => (
-                    <div key={index} className="bg-white px-5 md:px-10 py-5 rounded-lg flex flex-col md:flex-row justify-between shadow-md border border-gray-200">
-                      <div>
-                        <p className='text-sm font-medium text-gray-700 flex items-center gap-1'>
-                          <strong>Order ID : </strong><CustomerPrintButton selectedOrder={order} />
-                        </p>
-                        <p className='text-sm font-medium text-gray-700'>
-                          <span className="font-semibold">Order Amount:</span> ৳ {order?.totalAmount.toFixed(2)}
-                        </p>
-                        <p className='text-sm font-medium text-gray-700'>
-                          <span className="font-semibold">Payment Method:</span> {order?.paymentMethod}
-                        </p>
-                        <p className='text-sm font-medium text-gray-700'>
-                          <span className="font-semibold">Shipping Method:</span> {order?.shippingMethod}
-                        </p>
+              <ModalBody className="modal-body-scroll">
+                {selectedOrder?.length > 0 ?
+                  (
+                    selectedOrder.map((order, index) => (
+                      <div key={index} className={`bg-white px-5 md:px-10 py-5 rounded-lg flex flex-col md:flex-row justify-between ${selectedOrder.length > 1 ? "border" : ""}`}>
+                        <div>
+                          <p className='text-sm font-medium text-gray-700 flex items-center gap-1'>
+                            <strong>Order ID : </strong><CustomerPrintButton selectedOrder={order} />
+                          </p>
+                          <p className='text-sm font-medium text-gray-700'>
+                            <span className="font-semibold">Order Amount:</span> ৳ {order?.total?.toFixed(2)}
+                          </p>
+                          <p className='text-sm font-medium text-gray-700'>
+                            <span className="font-semibold">Payment Method:</span> {order?.paymentInfo?.paymentMethod}
+                          </p>
+                          <p className='text-sm font-medium text-gray-700'>
+                            <span className="font-semibold">Shipping Method:</span> {order?.deliveryInfo?.deliveryMethod}
+                          </p>
+                        </div>
+                        <div>
+                          <p className='text-sm font-medium text-gray-700'>
+                            <span className="font-semibold">Date & Time:</span> {order?.dateTime}
+                          </p>
+                          <p className='text-sm font-medium text-gray-700'>
+                            <span className="font-semibold">Order Status:</span> {order?.orderStatus}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className='text-sm font-medium text-gray-700'>
-                          <span className="font-semibold">Date & Time:</span> {order?.dateTime}
-                        </p>
-                        <p className='text-sm font-medium text-gray-700'>
-                          <span className="font-semibold">Order Status:</span> {order?.orderStatus}
-                        </p>
-                      </div>
+                    ))
+                  )
+                  : (
+                    <div className="text-center py-6">
+                      <p className="text-gray-700 text-lg font-medium">This customer has not ordered anything yet.</p>
                     </div>
-                  ))
-                ) : (
-                  <div className="text-center py-6">
-                    <p className="text-gray-700 text-lg font-medium">This customer has not ordered anything yet.</p>
-                  </div>
-                )}
+                  )}
               </ModalBody>
-              <ModalFooter className='flex justify-end border-gray-300 pt-2'>
-                <Button
-                  onClick={onClose} color="danger" size='sm'
-                >
+              <ModalFooter className={`flex justify-end border-gray-300 pt-2 ${selectedOrder.length > 1 ? "" : "border"}`}>
+                <Button onClick={onClose} color="danger" variant='flat' size='sm'>
+                  Close
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+        )}
+
+        {selectedCustomerInfo && (
+          <Modal className='mx-4 lg:mx-0' isOpen={isOpenCustomerModal} onOpenChange={onCloseCustomerModal} size='xl'>
+            <ModalContent>
+              <ModalHeader className="flex flex-col gap-1 bg-gray-200 px-8">
+                Customer Informations
+              </ModalHeader>
+              <ModalBody className="modal-body-scroll mt-4 mb-2 mx-2">
+                <p className='text-xs md:text-sm'><span className='text-neutral-950 font-semibold'>Preferred Payment Methods:</span> <span className='text-neutral-800'>{selectedCustomerInfo?.paymentMethods}</span></p>
+                <p className='text-xs md:text-sm'><span className='text-neutral-950 font-semibold'>Alternative Phone Number:</span> <span className='text-neutral-800'>{selectedCustomerInfo?.alternativePhoneNumber}</span></p>
+                <p className='text-xs md:text-sm'><span className='text-neutral-950 font-semibold'>Shipping Methods :</span> <span className='text-neutral-800'>{selectedCustomerInfo?.shippingMethods}</span></p>
+                <p className='text-xs md:text-sm'><span className='text-neutral-950 font-semibold'>Date of Birth :</span> <span className='text-neutral-800'>{selectedCustomerInfo?.dob}</span></p>
+                <p className='text-xs md:text-sm'><span className='text-neutral-950 font-semibold'>Addresses:</span> <span className='text-neutral-800'>{selectedCustomerInfo?.streetAddress}</span></p>
+                <div className='flex flex-wrap items-center justify-between pr-10'>
+                  <p className='text-xs md:text-sm'><span className='text-neutral-950 font-semibold'>Cities :</span> <span className='text-neutral-800'>{selectedCustomerInfo?.city}</span></p>
+                  <p className='text-xs md:text-sm'><span className='text-neutral-950 font-semibold'>Postal Codes :</span> <span className='text-neutral-800'>{selectedCustomerInfo?.postalCode}</span></p>
+                </div>
+              </ModalBody>
+              <ModalFooter className='border'>
+                <Button color="danger" variant="light" onPress={onCloseCustomerModal}>
                   Close
                 </Button>
               </ModalFooter>
