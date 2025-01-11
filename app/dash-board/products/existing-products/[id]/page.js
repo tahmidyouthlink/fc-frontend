@@ -516,7 +516,7 @@ const ProductPage = () => {
           </ModalHeader>
           <ModalBody>
             <div className='flex flex-wrap items-center justify-between gap-2'>
-              {Object.entries(groupedByLocation)?.map(([location, details]) => (
+              {Object?.entries(groupedByLocation)?.map(([location, details]) => (
                 <div key={location} className="border-l p-3">
                   <h3 className="font-bold text-lg mb-2">Location: {location}</h3>
                   <p className="text-gray-700">

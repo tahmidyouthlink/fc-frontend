@@ -55,23 +55,29 @@ export default function EditShippingZone() {
               }
             }
           }
+        }
+
+        // Set shipping durations based on delivery types
+        if (data?.shippingDurations) {
+          const deliveryTypes = data?.selectedShipmentHandler?.deliveryType;
 
           if (deliveryTypes) {
             if (deliveryTypes.length === 1) {
-              // Only one delivery type, set the single shipping charge
+              // Only one delivery type, set the single shipping duration
               const deliveryType = deliveryTypes[0];
-              setValue('shippingHour', data.shippingHours[deliveryType]);
+              setValue('shippingTime', data.shippingDurations[deliveryType]);
             } else if (deliveryTypes.length > 1) {
-              // Set values for both STANDARD and EXPRESS charges
-              if (data.shippingCharges.STANDARD) {
-                setValue('shippingHourStandard', data.shippingHours.STANDARD);
+              // Set values for both STANDARD and EXPRESS durations
+              if (data.shippingDurations.STANDARD) {
+                setValue('shippingDaysStandard', data.shippingDurations.STANDARD);
               }
-              if (data.shippingCharges.EXPRESS) {
-                setValue('shippingHourExpress', data.shippingHours.EXPRESS);
+              if (data.shippingDurations.EXPRESS) {
+                setValue('shippingHourExpress', data.shippingDurations.EXPRESS);
               }
             }
           }
         }
+
       } catch (error) {
         toast.error("Failed to load shipping zone details.");
       }
@@ -105,32 +111,26 @@ export default function EditShippingZone() {
       hasError = true;
     }
 
+    // Prepare shipping charges and times objects
     let shippingCharges = {};
+    let shippingDurations = {};
 
+    // Handle single delivery type
     if (selectedShipmentHandler?.deliveryType.length === 1) {
-      shippingCharges[selectedShipmentHandler.deliveryType[0]] = formData.shippingCharge;
-    } else {
-      if (selectedShipmentHandler?.deliveryType.includes('STANDARD')) {
-        shippingCharges['STANDARD'] = formData.shippingChargeStandard;
-      }
-      if (selectedShipmentHandler?.deliveryType.includes('EXPRESS')) {
-        shippingCharges['EXPRESS'] = formData.shippingChargeExpress;
-      }
+      const deliveryType = selectedShipmentHandler.deliveryType[0];
+      shippingCharges[deliveryType] = formData.shippingCharge;
+      shippingDurations[deliveryType] = formData.shippingTime;
     }
 
-    let shippingHours = {};
-
-    // Build the shipping charges object based on the delivery types
-    if (selectedShipmentHandler.deliveryType.length === 1) {
-      // Use the single input for the charge
-      shippingHours[selectedShipmentHandler.deliveryType[0]] = formData.shippingHour;
-    } else {
-      // Handle multiple delivery types
+    // Handle multiple delivery types (STANDARD and EXPRESS)
+    if (selectedShipmentHandler?.deliveryType.length === 2) {
       if (selectedShipmentHandler.deliveryType.includes('STANDARD')) {
-        shippingHours['STANDARD'] = formData.shippingHourStandard;
+        shippingCharges['STANDARD'] = formData.shippingChargeStandard;
+        shippingDurations['STANDARD'] = formData.shippingDaysStandard;
       }
       if (selectedShipmentHandler.deliveryType.includes('EXPRESS')) {
-        shippingHours['EXPRESS'] = formData.shippingHourExpress;
+        shippingCharges['EXPRESS'] = formData.shippingChargeExpress;
+        shippingDurations['EXPRESS'] = formData.shippingHourExpress;
       }
     }
 
@@ -141,7 +141,7 @@ export default function EditShippingZone() {
         shippingZone: formData.shippingZone,
         selectedShipmentHandler: selectedShipmentHandler,
         shippingCharges,
-        shippingHours,
+        shippingDurations,
         selectedCity: selectedCity
       };
 
@@ -280,7 +280,6 @@ export default function EditShippingZone() {
               {sizeError && <p className='text-red-600 text-left mt-1'>Please select at least one shipment handler.</p>}
             </div>
 
-            {/* Shipping Charge Fields */}
             {selectedShipmentHandler?.deliveryType.length === 1 && <div className="w-full mt-4">
               {/* Conditionally render shipping charge input fields based on deliveryType */}
               <div className='flex flex-col md:flex-row gap-6 items-center justify-between w-full'>
@@ -302,23 +301,23 @@ export default function EditShippingZone() {
 
                 <div className='w-full'>
                   <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                    {selectedShipmentHandler?.deliveryType[0]} Shipping Hours
+                    {selectedShipmentHandler?.deliveryType[0]} Shipping {selectedShipmentHandler?.deliveryType[0] === "express" ? "Hours" : "Days"}
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     disabled
-                    placeholder={`Enter Shipping hours for ${selectedShipmentHandler?.deliveryType[0]}`}
-                    {...register('shippingHour', { required: 'Shipping Hour is required' })}
+                    placeholder={`Enter Shipping ${selectedShipmentHandler?.deliveryType[0] === "express" ? "hours" : "days"} for ${selectedShipmentHandler?.deliveryType[0]}`}
+                    {...register('shippingTime', { required: `Shipping ${selectedShipmentHandler?.deliveryType[0] === "express" ? "Hour" : "Days"} is required` })}
                     className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                   />
-                  {errors.shippingHour && (
-                    <p className="text-red-600 text-left">{errors?.shippingHour?.message}</p>
+                  {errors.shippingTime && (
+                    <p className="text-red-600 text-left">{errors?.shippingTime?.message}</p>
                   )}
                 </div>
               </div>
             </div>}
-            {/* Shipping Charge Input */}
 
+            {/* Shipping Charge Input */}
             {selectedShipmentHandler?.deliveryType?.length === 2 && <div className="w-full mt-4">
               {/* Conditionally render shipping charge input fields based on deliveryType */}
 
@@ -343,17 +342,17 @@ export default function EditShippingZone() {
                   <div className='w-full'>
                     {/* Input for STANDARD shipping charge */}
                     <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                      STANDARD Hours
+                      STANDARD Days
                     </label>
                     <input
                       type="text"
                       disabled
-                      placeholder="Enter Shipping hour for STANDARD"
-                      {...register('shippingHourStandard', { required: 'STANDARD Shipping hour is required' })}
+                      placeholder="Enter Shipping days for STANDARD"
+                      {...register('shippingDaysStandard', { required: 'STANDARD Shipping days is required' })}
                       className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                     />
-                    {errors.shippingHourStandard && (
-                      <p className="text-red-600 text-left">{errors?.shippingHourStandard?.message}</p>
+                    {errors.shippingDaysStandard && (
+                      <p className="text-red-600 text-left">{errors?.shippingDaysStandard?.message}</p>
                     )}
                   </div>
                 </div>
@@ -394,6 +393,7 @@ export default function EditShippingZone() {
                 </div>
               </div>
             </div>}
+
           </div>
 
           <div className='flex justify-end items-center'>

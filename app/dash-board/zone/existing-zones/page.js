@@ -209,7 +209,7 @@ const ExistingZones = () => {
                   <td className="text-xs md:text-sm font-medium p-3 text-neutral-950">
                     {zone?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
                       <div key={idx}>
-                        {type}: {zone?.shippingHours[type]} Hours
+                        {type}: {zone?.shippingDurations[type]} {type === "EXPRESS" ? "hours" : "days"}
                       </div>
                     ))}
                   </td>

@@ -144,35 +144,26 @@ const AddShippingZone = () => {
       return;
     }
 
+    // Prepare shipping charges and times objects
     let shippingCharges = {};
+    let shippingDurations = {};
 
-    // Build the shipping charges object based on the delivery types
-    if (selectedShipmentHandler.deliveryType.length === 1) {
-      // Use the single input for the charge
-      shippingCharges[selectedShipmentHandler.deliveryType[0]] = data.shippingCharge;
-    } else {
-      // Handle multiple delivery types
+    // Handle single delivery type
+    if (selectedShipmentHandler?.deliveryType.length === 1) {
+      const deliveryType = selectedShipmentHandler.deliveryType[0];
+      shippingCharges[deliveryType] = data.shippingCharge;
+      shippingDurations[deliveryType] = data.shippingTime;
+    }
+
+    // Handle multiple delivery types (STANDARD and EXPRESS)
+    if (selectedShipmentHandler?.deliveryType.length === 2) {
       if (selectedShipmentHandler.deliveryType.includes('STANDARD')) {
         shippingCharges['STANDARD'] = data.shippingChargeStandard;
+        shippingDurations['STANDARD'] = data.shippingDaysStandard;
       }
       if (selectedShipmentHandler.deliveryType.includes('EXPRESS')) {
         shippingCharges['EXPRESS'] = data.shippingChargeExpress;
-      }
-    }
-
-    let shippingHours = {};
-
-    // Build the shipping charges object based on the delivery types
-    if (selectedShipmentHandler.deliveryType.length === 1) {
-      // Use the single input for the charge
-      shippingHours[selectedShipmentHandler.deliveryType[0]] = data.shippingHour;
-    } else {
-      // Handle multiple delivery types
-      if (selectedShipmentHandler.deliveryType.includes('STANDARD')) {
-        shippingHours['STANDARD'] = data.shippingHourStandard;
-      }
-      if (selectedShipmentHandler.deliveryType.includes('EXPRESS')) {
-        shippingHours['EXPRESS'] = data.shippingHourExpress;
+        shippingDurations['EXPRESS'] = data.shippingHourExpress;
       }
     }
 
@@ -180,55 +171,55 @@ const AddShippingZone = () => {
       shippingZone,
       selectedShipmentHandler,
       shippingCharges,
-      shippingHours,
+      shippingDurations,
       selectedCity
     };
 
-    // try {
-    //   const response = await axiosPublic.post('/addShippingZone', shippingData);
-    //   if (response?.data?.insertedId) {
-    //     toast.custom((t) => (
-    //       <div
-    //         className={`${t.visible ? 'animate-enter' : 'animate-leave'
-    //           } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
-    //       >
-    //         <div className="pl-6">
-    //           <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
-    //         </div>
-    //         <div className="flex-1 w-0 p-4">
-    //           <div className="flex items-start">
-    //             <div className="ml-3 flex-1">
-    //               <p className="text-base font-bold text-gray-900">
-    //                 Shipment Added!
-    //               </p>
-    //               <p className="mt-1 text-sm text-gray-500">
-    //                 Shipment added successfully!
-    //               </p>
-    //             </div>
-    //           </div>
-    //         </div>
-    //         <div className="flex border-l border-gray-200">
-    //           <button
-    //             onClick={() => toast.dismiss(t.id)}
-    //             className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
-    //           >
-    //             <RxCross2 />
-    //           </button>
-    //         </div>
-    //       </div>
-    //     ), {
-    //       position: "bottom-right",
-    //       duration: 5000
-    //     })
-    //     router.push("/dash-board/zone/existing-zones");
-    //   } else {
-    //     throw new Error('Failed to add shipping zone');
-    //   }
-    // } catch (error) {
-    //   toast.error(error.response?.data?.message || 'Failed to add shipping zone. Please try again.');
-    // } finally {
-    //   setIsSubmitting(false);
-    // }
+    try {
+      const response = await axiosPublic.post('/addShippingZone', shippingData);
+      if (response?.data?.insertedId) {
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="pl-6">
+              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    Shipment Added!
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Shipment added successfully!
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        })
+        router.push("/dash-board/zone/existing-zones");
+      } else {
+        throw new Error('Failed to add shipping zone');
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to add shipping zone. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isShipmentHandlerPending) {
@@ -380,22 +371,22 @@ const AddShippingZone = () => {
 
                 <div className='w-full'>
                   <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                    {selectedShipmentHandler?.deliveryType[0]} Shipping Hours
+                    {selectedShipmentHandler?.deliveryType[0]} Shipping {selectedShipmentHandler?.deliveryType[0] === "express" ? "Hours" : "Days"}
                   </label>
                   <input
                     type="text"
-                    placeholder={`Enter Shipping hours for ${selectedShipmentHandler?.deliveryType[0]}`}
-                    {...register('shippingHour', { required: 'Shipping Hour is required' })}
+                    placeholder={`Enter Shipping ${selectedShipmentHandler?.deliveryType[0] === "express" ? "hours" : "days"} for ${selectedShipmentHandler?.deliveryType[0]}`}
+                    {...register('shippingTime', { required: `Shipping ${selectedShipmentHandler?.deliveryType[0] === "express" ? "Hour" : "Days"} is required` })}
                     className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                   />
-                  {errors.shippingHour && (
-                    <p className="text-red-600 text-left">{errors?.shippingHour?.message}</p>
+                  {errors.shippingTime && (
+                    <p className="text-red-600 text-left">{errors?.shippingTime?.message}</p>
                   )}
                 </div>
               </div>
             </div>}
-            {/* Shipping Charge Input */}
 
+            {/* Shipping Charge Input */}
             {selectedShipmentHandler?.deliveryType?.length === 2 && <div className="w-full mt-4">
               {/* Conditionally render shipping charge input fields based on deliveryType */}
 
@@ -419,16 +410,16 @@ const AddShippingZone = () => {
                   <div className='w-full'>
                     {/* Input for STANDARD shipping charge */}
                     <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                      STANDARD Hours
+                      STANDARD Days
                     </label>
                     <input
                       type="text"
-                      placeholder="Enter Shipping hour for STANDARD"
-                      {...register('shippingHourStandard', { required: 'STANDARD Shipping hour is required' })}
+                      placeholder="Enter Shipping days for STANDARD"
+                      {...register('shippingDaysStandard', { required: 'STANDARD Shipping days is required' })}
                       className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                     />
-                    {errors.shippingHourStandard && (
-                      <p className="text-red-600 text-left">{errors?.shippingHourStandard?.message}</p>
+                    {errors.shippingDaysStandard && (
+                      <p className="text-red-600 text-left">{errors?.shippingDaysStandard?.message}</p>
                     )}
                   </div>
                 </div>
