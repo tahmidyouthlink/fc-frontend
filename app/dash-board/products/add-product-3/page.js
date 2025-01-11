@@ -429,7 +429,7 @@ ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:af
 
                     <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{shipping?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
                       <div key={idx}>
-                        {type}: {shipping?.shippingHours[type]} Hours
+                        {type}: {shipping?.shippingDurations[type]} {type === "EXPRESS" ? "hours" : "days"}
                       </div>
                     ))}</td>
                   </tr>

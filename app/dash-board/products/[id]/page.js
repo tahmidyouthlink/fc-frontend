@@ -740,14 +740,14 @@ const EditProductPage = () => {
       });
 
       // Check if any primary location variant is missing a SKU
-      const missingSKU = finalData.some(variant =>
-        variant.location === primaryLocationName && !variant.sku
-      );
+      // const missingSKU = finalData.some(variant =>
+      //   variant.location === primaryLocationName
+      // );
 
-      if (missingSKU) {
-        toast.error("Please provide SKU for each variant in the primary location.");
-        return; // Stop submission if any SKU is missing
-      }
+      // if (missingSKU) {
+      //   toast.error("Please provide SKU for each variant in the primary location.");
+      //   return; // Stop submission if any SKU is missing
+      // }
 
       // Check if any variant is missing an image URL
       const missingImage = finalData?.some(variant => variant?.imageUrls?.length === 0);

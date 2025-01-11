@@ -67,7 +67,7 @@ const SecondStepOfAddProduct = () => {
 
       // Filter to only include variants for the primary location and non-zero SKUs
       const primaryLocationVariants = storedVariants.filter(variant =>
-        variant?.location === primaryLocationName && variant?.sku !== 0
+        variant?.location === primaryLocationName
       );
 
       // Initialize new variants if needed
@@ -91,7 +91,7 @@ const SecondStepOfAddProduct = () => {
 
       // Set form values for the variants
       allVariants?.forEach((variant, index) => {
-        setValue(`sku-${index}`, variant?.sku);
+        setValue(`sku-${index}`, variant?.sku || 0);
         setValue(`imageUrl-${index}`, variant?.imageUrl);
       });
 
@@ -159,7 +159,7 @@ const SecondStepOfAddProduct = () => {
           color: variant.color,
           size: variant.size,
           sku: location.isPrimaryLocation
-            ? parseFloat(data[`sku-${index}`]) // SKU for primary location
+            ? parseFloat(data[`sku-${index}`]) || 0 // SKU for primary location
             : 0, // Set SKU to 0 for others
           imageUrls: variant.imageUrls || [],
           location: location.locationName,
@@ -218,7 +218,7 @@ const SecondStepOfAddProduct = () => {
         color: variant.color,
         size: variant.size,
         sku: location.isPrimaryLocation
-          ? parseFloat(formData[`sku-${index}`]) // SKU for primary location
+          ? parseFloat(formData[`sku-${index}`]) || 0 // SKU for primary location
           : 0, // Set SKU to 0 for others
         imageUrls: variant.imageUrls || [],
         location: location.locationName,
