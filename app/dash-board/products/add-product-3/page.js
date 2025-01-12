@@ -26,7 +26,7 @@ const ThirdStepOfAddProduct = () => {
   const [activeTab, setActiveTab] = useState('Inside Dhaka');
   const [tabSelections, setTabSelections] = useState({});
 
-  const dhakaSuburbs = ["Savar", "Nabinagar", "Ashulia", "Keraniganj", "Tongi"];
+  const dhakaSuburbs = ["Savar", "Nabinagar", "Ashulia", "Keraniganj", "Tongi", "Gazipur", "Narayanganj"];
 
   // Filtered shipping list for the active tab
   const filteredShippingList = shippingList?.filter((zone) => {

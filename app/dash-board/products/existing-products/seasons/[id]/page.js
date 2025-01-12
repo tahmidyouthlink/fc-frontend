@@ -426,7 +426,12 @@ const SeasonPage = () => {
                                 <td className="text-xs p-3 text-gray-700 text-center">{product?.shippingDetails?.map(detail => detail.shippingZone).join(', ') || '--'}</td>
                               )}
                               {column === 'Shipment Handlers' && (
-                                <td className="text-xs p-3 text-gray-700 text-center">{product?.shippingDetails?.map(detail => detail.selectedShipmentHandler.shipmentHandlerName).join(', ') || '--'}</td>
+                                <td key="Shipment Handlers" className="text-xs p-3 text-gray-700 text-center">
+                                  {product?.shippingDetails
+                                    ? Array.from(new Set(product.shippingDetails.map(detail => detail.selectedShipmentHandler.shipmentHandlerName)))
+                                      .join(', ')
+                                    : '--'}
+                                </td>
                               )}
                             </>
                           )

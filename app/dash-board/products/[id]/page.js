@@ -13,7 +13,7 @@ import useSubCategories from '@/app/hooks/useSubCategories';
 import useTags from '@/app/hooks/useTags';
 import useVendors from '@/app/hooks/useVendors';
 import { generateSizes } from '@/app/utils/GenerateSizes/GenerateSizes';
-import { Button, CheckboxGroup, Radio, RadioGroup, Select, SelectItem, Tab, Tabs } from '@nextui-org/react';
+import { Button, Checkbox, CheckboxGroup, Radio, RadioGroup, Select, SelectItem, Tab, Tabs } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
@@ -36,6 +36,8 @@ import useProductsInformation from '@/app/hooks/useProductsInformation';
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
+
+const dhakaSuburbs = ["Savar", "Nabinagar", "Ashulia", "Keraniganj", "Tongi", "Gazipur", "Narayanganj"];
 
 const EditProductPage = () => {
 
@@ -61,7 +63,6 @@ const EditProductPage = () => {
   const [sizeError2, setSizeError2] = useState(false);
   const [sizeError3, setSizeError3] = useState(false);
   const [sizeError4, setSizeError4] = useState(false);
-  const [sizeError5, setSizeError5] = useState(false);
   const [colorError, setColorError] = useState(false);
   const [tagError, setTagError] = useState(false);
   const [newArrivalError, setNewArrivalError] = useState(false);
@@ -80,7 +81,6 @@ const EditProductPage = () => {
   const [groupSelected, setGroupSelected] = React.useState();
   const [groupSelected2, setGroupSelected2] = React.useState();
   const [productVariants, setProductVariants] = useState([]);
-  const [selectedShipmentHandler, setSelectedShipmentHandler] = useState([]);
   const [shippingList, isShippingPending] = useShippingZones();
   const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
   const [productStatus, setProductStatus] = useState("");
@@ -98,6 +98,8 @@ const EditProductPage = () => {
   const [selectedProductIds, setSelectedProductIds] = useState([]);
   const [isDropdownOpenForCompleteOutfit, setIsDropdownOpenForCompleteOutfit] = useState(false);
   const dropdownRefForCompleteOutfit = useRef(null);
+  const [activeTab2, setActiveTab2] = useState('Inside Dhaka');
+  const [tabSelections, setTabSelections] = useState({});
 
   // Filter categories based on search input and remove already selected categories
   const filteredSeasons = seasonList?.filter((season) =>
@@ -207,26 +209,66 @@ const EditProductPage = () => {
     setIsDropdownOpenForCompleteOutfit(!isDropdownOpenForCompleteOutfit);
   };
 
+  // Filtered shipping list for the active tab
+  const filteredShippingList = shippingList?.filter((zone) => {
+    if (activeTab2 === "Inside Dhaka") return zone?.selectedCity?.includes("Dhaka");
+    if (activeTab2 === "Dhaka Suburbs") return zone?.selectedCity?.some((city) => dhakaSuburbs?.includes(city));
+    if (activeTab2 === "Outside Dhaka") {
+      // Exclude zones in Dhaka and Dhaka Suburbs
+      return !zone?.selectedCity?.includes("Dhaka") &&
+        !zone?.selectedCity?.some((city) => dhakaSuburbs?.includes(city));
+    }
+    return false;
+  });
+
+  // Unified selection list from all tabs
+  const selectedShipmentHandler = Object.values(tabSelections).flat();
+
+  // Toggle selection for an individual item
   const toggleCardSelection = (shipping) => {
-    const isSelected = selectedShipmentHandler.some(
-      (handler) => handler.shippingZone === shipping.shippingZone
-    );
-
-    if (isSelected) {
-      // If already selected, remove from selectedShipmentHandler
-      const updatedSelection = selectedShipmentHandler.filter(
-        (handler) => handler.shippingZone !== shipping.shippingZone
+    setTabSelections((prev) => {
+      const currentTabSelections = prev[activeTab2] || [];
+      const isSelected = currentTabSelections.some(
+        (item) => item.shippingZone === shipping.shippingZone
       );
-      setSelectedShipmentHandler(updatedSelection);
-    } else {
-      // Add the full shipping object to the selectedShipmentHandler
-      const updatedSelection = [...selectedShipmentHandler, shipping];
-      setSelectedShipmentHandler(updatedSelection);
+      const updatedTabSelections = isSelected
+        ? currentTabSelections.filter(
+          (item) => item.shippingZone !== shipping.shippingZone
+        )
+        : [...currentTabSelections, shipping];
+      return { ...prev, [activeTab2]: updatedTabSelections };
+    });
+  };
 
-      if (sizeError5) {
-        setSizeError5(false);
+  // Handle "Select All" for the active tab
+  const toggleSelectAll = () => {
+    setTabSelections((prev) => {
+      const currentTabSelections = prev[activeTab2] || [];
+      const allSelected = currentTabSelections.length === filteredShippingList.length;
+      return {
+        ...prev,
+        [activeTab2]: allSelected ? [] : [...filteredShippingList],
+      };
+    });
+  };
+
+  const validateSelections = () => {
+    const tabs = ["Inside Dhaka", "Dhaka Suburbs", "Outside Dhaka"];
+
+    // Loop through each tab to check if there are selections
+    for (const tab of tabs) {
+      // Check if tabSelections for the current tab exists and has items selected
+      if (!tabSelections[tab] || tabSelections[tab].length === 0) {
+        toast.error(`Select at least one item in the ${tab}`);
+        return false;
       }
     }
+
+    return true;
+  };
+
+  const handleTabChange2 = (tab) => {
+    setActiveTab2(tab);
   };
 
   const handleCategoryChange = (value) => {
@@ -480,12 +522,34 @@ const EditProductPage = () => {
         initializeVariants(data?.availableColors || [], data?.allSizes || [], data?.productVariants || []);
         setProductId(data?.productId);
         setProductStatus(data?.status);
-        setSelectedShipmentHandler(data?.shippingDetails || []);
         setSelectedSeasons(data?.season || []);
         setSelectedProductIds(data?.restOfOutfit || []);
 
         // Assuming existingData.productVariants contains variants for all locations
         setExistingVariants(data?.productVariants); // Store all variants
+
+        // Set tabSelections based on shippingDetails
+        const dhakaSuburb = ["Savar", "Nabinagar", "Ashulia", "Keraniganj", "Tongi", "Gazipur", "Narayanganj"];
+
+        const groupedSelections = {
+          "Inside Dhaka": [],
+          "Dhaka Suburbs": [],
+          "Outside Dhaka": [],
+        };
+
+        data?.shippingDetails?.forEach((shipping) => {
+          if (shipping?.selectedCity?.includes("Dhaka")) {
+            groupedSelections["Inside Dhaka"].push({ ...shipping, selected: true });
+          } else if (
+            shipping?.selectedCity?.some((city) => dhakaSuburb.includes(city))
+          ) {
+            groupedSelections["Dhaka Suburbs"].push({ ...shipping, selected: true });
+          } else {
+            groupedSelections["Outside Dhaka"].push({ ...shipping, selected: true });
+          }
+        });
+
+        setTabSelections(groupedSelections); // Update tabSelections with grouped data
 
       } catch (error) {
         toast.error("Failed to load product details.");
@@ -600,6 +664,9 @@ const EditProductPage = () => {
   const selectedImageUrl = getSizeImageForGroupSelected(groupSelected, selectedCategory, categoryList || []);
 
   const onSubmit = async (data) => {
+
+    if (!validateSelections()) return;
+
     try {
       if (uploadedImageUrls.length === 0) {
         setSizeError(true);
@@ -625,13 +692,6 @@ const EditProductPage = () => {
         return;
       }
       setSizeError4(false);
-
-      if (selectedShipmentHandler.length === 0) {
-        setSizeError5(true);
-        toast.error("Please select at least one shipping handler.");
-        return;
-      }
-      setSizeError5(false);
 
       if (selectedAvailableColors.length === 0) {
         setColorError(true);
@@ -679,7 +739,7 @@ const EditProductPage = () => {
       }
 
       // Get the primary location name
-      const primaryLocationName = locationList?.find(location => location?.isPrimaryLocation)?.locationName || '';
+      // const primaryLocationName = locationList?.find(location => location?.isPrimaryLocation)?.locationName || '';
 
       // Filter active locations
       const activeLocations = locationList?.filter(location => location.status) || [];
@@ -1521,45 +1581,134 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
         </div>}
 
         {activeTab === "shipping" && <div className='2xl:max-w-screen-2xl 2xl:mx-auto'>
+
           <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl px-6 pb-6'>Update Shipping Details</h3>
-          <div>
-            <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 px-6'>
-              {shippingList?.map((shipping, index) => {
-                const isSelected = selectedShipmentHandler.some(
-                  (handler) => handler.shippingZone === shipping?.shippingZone
-                );
-                return (
-                  <div
-                    key={index}
-                    onClick={() => toggleCardSelection(shipping)}
-                    className={`cursor-pointer flex flex-col gap-4 p-5 md:p-7 rounded-lg transition-all duration-300 ${isSelected ? 'border-2 border-blue-500 bg-white duration-300' : 'border border-gray-200 bg-gray-100'
-                      }`}
-                  >
-                    <h1 className="text-2xl font-bold text-gray-900 text-center">{shipping?.shippingZone}</h1>
-                    <div className='flex items-center justify-center gap-4'>
-                      {shipmentHandlerList?.map((handler, handlerIndex) => (
-                        shipping?.selectedShipmentHandler?.shipmentHandlerName === handler?.shipmentHandlerName && (
-                          <div key={handlerIndex} className="p-4 rounded-lg flex flex-col items-center justify-center h-40 w-40">
-                            {handler?.imageUrl && (
-                              <Image
-                                src={handler.imageUrl}
-                                alt="shipping"
-                                width={100}
-                                height={100}
-                                className="mb-2 object-contain h-32 w-32"
-                              />
-                            )}
+
+          <div className='flex flex-wrap items-center gap-3 mt-2 px-6 pb-6'>
+
+            <button
+              type='button'
+              className={`relative text-sm py-1 transition-all duration-300
+${activeTab2 === 'Inside Dhaka' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
+after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
+after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
+${activeTab2 === 'Inside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
+`}
+              onClick={() => handleTabChange2("Inside Dhaka")}
+            >
+              Inside Dhaka
+            </button>
+
+            <button type='button'
+              className={`relative text-sm py-1 transition-all duration-300
+${activeTab2 === 'Dhaka Suburbs' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
+after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
+after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
+${activeTab2 === 'Dhaka Suburbs' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
+`}
+              onClick={() => handleTabChange2("Dhaka Suburbs")}
+            >
+              Dhaka Suburbs
+            </button>
+
+            <button type='button'
+              className={`relative text-sm py-1 transition-all duration-300
+${activeTab2 === 'Outside Dhaka' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
+after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
+after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
+${activeTab2 === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
+`}
+              onClick={() => handleTabChange2("Outside Dhaka")}
+            >
+              Outside Dhaka
+            </button>
+
+          </div>
+
+          <div className='px-6'>
+            <div className="overflow-x-auto">
+              <table className="min-w-full table-auto">
+
+                <thead>
+                  <tr>
+                    <th className="px-2 py-1 md:px-4 md:py-2 border-b border-gray-300">
+                      <Checkbox
+                        isSelected={filteredShippingList?.length > 0 && (tabSelections[activeTab2]?.length === filteredShippingList.length)}
+                        onChange={toggleSelectAll}
+                        color="success"
+                        size="lg"
+                      />
+                    </th>
+                    <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipping Zone</th>
+                    <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipment Handlers</th>
+                    <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipping Charges</th>
+                    <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipping Hours</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {filteredShippingList?.map((shipping, index) => {
+                    const isSelected = selectedShipmentHandler.some(
+                      (handler) => handler.shippingZone === shipping?.shippingZone
+                    );
+
+                    return (
+                      <tr key={index}
+                        className={`cursor-pointer transition-all duration-200 ${isSelected ? 'bg-gray-50' : 'bg-white'}`}>
+                        {/* Checkbox for selecting a row */}
+                        <td className="text-center">
+                          <Checkbox
+                            isSelected={isSelected}
+                            onChange={() => toggleCardSelection(shipping)}
+                            color="success"
+                            size='lg'
+                          />
+                        </td>
+
+                        {/* Shipping Zone Title */}
+                        <td className="text-xs md:text-base text-center font-bold text-gray-900">
+                          {shipping?.shippingZone}
+                        </td>
+
+                        {/* Shipment Handlers */}
+                        <td className="px-2 py-1 md:px-4 md:py-2">
+                          <div className="flex items-center justify-center md:gap-4">
+                            {shipmentHandlerList?.map((handler, handlerIndex) => (
+                              shipping?.selectedShipmentHandler?.shipmentHandlerName === handler?.shipmentHandlerName && (
+                                <div key={handlerIndex} className="p-4 rounded-lg flex flex-col items-center justify-center h-40 w-40">
+                                  {handler?.imageUrl && (
+                                    <Image
+                                      src={handler.imageUrl}
+                                      alt="shipping"
+                                      width={100}
+                                      height={100}
+                                      className="mb-2 object-contain h-32 w-32"
+                                    />
+                                  )}
+                                </div>
+                              )
+                            ))}
                           </div>
-                        )
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
+                        </td>
+
+                        <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{shipping?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
+                          <div key={idx}>
+                            {type}: ৳ {shipping?.shippingCharges[type]}
+                          </div>
+                        ))}</td>
+
+                        <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{shipping?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
+                          <div key={idx}>
+                            {type}: {shipping?.shippingDurations[type]} {type === "EXPRESS" ? "hours" : "days"}
+                          </div>
+                        ))}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+
+              </table>
             </div>
-            {sizeError5 && (
-              <p className='text-red-600 text-left mt-4 max-w-screen-xl px-6'>Please select at least one shipping handler.</p>
-            )}
           </div>
         </div>}
 
