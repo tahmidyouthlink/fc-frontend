@@ -6,6 +6,7 @@ import CustomPagination from './CustomPagination';
 import { Button, Checkbox, CheckboxGroup, DateRangePicker, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
 import { IoMdClose } from 'react-icons/io';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { getLocalTimeZone, today } from '@internationalized/date';
 
 const initialColumns = ["Date & Time", 'Order ID', 'Customer Name', 'Payment Method', 'Transaction ID', 'Payment Status'];
 
@@ -104,6 +105,8 @@ const FinanceTable = () => {
   const endDate = selectedDateRange?.end ? new Date(selectedDateRange.end.year, selectedDateRange.end.month - 1, selectedDateRange.end.day) : null; // Adjust end date to include the entire end day
   const adjustedEndDate = endDate ? new Date(endDate.getTime() + 24 * 60 * 60 * 1000 - 1) : null; // Add 1 day and subtract 1 ms
 
+  const currentDate = today(getLocalTimeZone());
+
   const handleReset = () => {
     setSelectedDateRange(null); // Reset the selected date range
   };
@@ -119,15 +122,15 @@ const FinanceTable = () => {
       : true;
 
     // Payment status filtering
-    const isStatusMatch = selectedPaymentStatus === 'All' || order.paymentStatus === selectedPaymentStatus;
+    const isStatusMatch = selectedPaymentStatus === 'All' || order?.paymentInfo?.paymentStatus === selectedPaymentStatus;
 
     // Check if order details match the search query
     const orderMatch = (
       (order.orderNumber || '').toLowerCase().includes(query) ||
-      (order.customerName || '').toLowerCase().includes(query) || // Added customerName search
-      (order.paymentMethod || '').toLowerCase().includes(query) ||
-      (order.transactionId || '').toLowerCase().includes(query) ||
-      (order.paymentStatus || '').toLowerCase().includes(query)
+      (order.customerInfo.customerName || '').toLowerCase().includes(query) || // Added customerName search
+      (order.paymentInfo.paymentMethod || '').toLowerCase().includes(query) ||
+      (order.paymentInfo.transactionId || '').toLowerCase().includes(query) ||
+      (order.paymentInfo.paymentStatus || '').toLowerCase().includes(query)
     );
 
     // Check if query matches date in specific format
@@ -215,6 +218,7 @@ const FinanceTable = () => {
                     visibleMonths={1}
                     onChange={(range) => setSelectedDateRange(range)} // Ensure range is an array
                     value={selectedDateRange} // Ensure this matches the expected format
+                    maxValue={currentDate}
                   />
 
                   {selectedDateRange && selectedDateRange.start && selectedDateRange.end && (
@@ -296,6 +300,7 @@ const FinanceTable = () => {
         </ModalContent>
       </Modal>
 
+      {/* TABLE */}
       <div className="max-w-screen-2xl mx-auto custom-scrollbar custom-max-discount overflow-x-auto mt-6 drop-shadow rounded-lg">
         <table className="w-full text-left border-collapse">
           <thead className="bg-white sticky top-0 z-[1] rounded-md">
@@ -309,7 +314,7 @@ const FinanceTable = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedOrders?.length === 0 ?
               <tr>
-                <td colSpan={selectedColumns.length} className="text-center p-4 text-gray-500 md:pt-40 pt-32 lg:pt-52 xl:pt-60 2xl:pt-72">
+                <td colSpan={selectedColumns.length} className="text-center p-4 text-gray-500 md:pt-40 pt-32 lg:pt-48 xl:pt-56 2xl:py-60">
                   No orders found matching your criteria. Please adjust your filters or check back later.
                 </td>
               </tr>
@@ -335,22 +340,22 @@ const FinanceTable = () => {
                               )}
                               {column === 'Customer Name' && (
                                 <td key="customerName" className="text-xs p-3 text-gray-700">
-                                  {order?.customerName}
+                                  {order?.customerInfo?.customerName}
                                 </td>
                               )}
                               {column === 'Payment Method' && (
                                 <td key="paymentMethod" className="text-xs p-3 text-gray-700">
-                                  {order?.paymentMethod}
+                                  {order?.paymentInfo?.paymentMethod}
                                 </td>
                               )}
                               {column === 'Transaction ID' && (
                                 <td key="transactionId" className="text-xs p-3 text-gray-700">
-                                  {order?.transactionId ? order.transactionId : '--'}
+                                  {order?.paymentInfo?.transactionId ? order?.paymentInfo?.transactionId : '--'}
                                 </td>
                               )}
                               {column === 'Payment Status' && (
                                 <td key="paymentStatus" className="text-xs p-3 text-gray-700">
-                                  {order?.paymentStatus}
+                                  {order?.paymentInfo?.paymentStatus}
                                 </td>
                               )}
                             </>
@@ -366,6 +371,7 @@ const FinanceTable = () => {
         </table>
 
       </div>
+
       <div className="flex flex-col md:flex-row gap-4 justify-center items-center py-3">
         <CustomPagination
           totalPages={totalPages}
@@ -388,6 +394,7 @@ const FinanceTable = () => {
           </svg>
         </div>
       </div>
+
     </div>
   );
 };

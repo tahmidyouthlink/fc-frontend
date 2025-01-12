@@ -15,8 +15,6 @@ import Swal from 'sweetalert2';
 import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import * as XLSX from 'xlsx';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable'; // Also install this package
 import Papa from 'papaparse';
 
 const RecentPromotions = () => {
@@ -127,7 +125,7 @@ const RecentPromotions = () => {
   }, [promoList, offerList]);
 
   const calculateTotalPromoApplied = (promoCode) => {
-    return orderList?.filter(order => order.promoCode === promoCode && order.paymentStatus === "Paid").length || 0;
+    return orderList?.filter(order => order?.promoInfo?.promoCode === promoCode && order?.paymentInfo?.paymentStatus === "Paid").length || 0;
   };
 
   const calculateTotalAmountDiscounted = (promoCode) => {
@@ -162,8 +160,8 @@ const RecentPromotions = () => {
 
   const calculateTotalOfferApplied = (offerTitle) => {
     return orderList?.reduce((count, order) => {
-      const offerCount = (order.paymentStatus === "Paid" && order.productInformation.filter(
-        product => product.offerTitle === offerTitle
+      const offerCount = (order?.paymentInfo?.paymentStatus === "Paid" && order?.productInformation.filter(
+        product => product?.offerInfo?.offerTitle === offerTitle
       ).length) || 0; // Check for payment status
       return count + offerCount;
     }, 0) || 0;
@@ -198,7 +196,7 @@ const RecentPromotions = () => {
     const productTitles = [];
 
     orderList.forEach(order => {
-      if (order.promoCode === promoCode && order.paymentStatus === "Paid") { // Check for payment status
+      if (order?.promoInfo?.promoCode === promoCode && order.paymentInfo.paymentStatus === "Paid") { // Check for payment status
         order.productInformation.forEach(product => {
           productTitles.push(product.productTitle); // Adjust this to your actual product title field
         });
@@ -212,9 +210,9 @@ const RecentPromotions = () => {
     const productTitles = [];
 
     orderList.forEach(order => {
-      if (order.paymentStatus === "Paid") { // Check for payment status
+      if (order.paymentInfo.paymentStatus === "Paid") { // Check for payment status
         order.productInformation.forEach(product => {
-          if (product.offerTitle === offerTitle) {
+          if (product?.offerInfo?.offerTitle === offerTitle) {
             productTitles.push(product.productTitle); // Adjust this to your actual product title field
           }
         });
@@ -226,6 +224,7 @@ const RecentPromotions = () => {
 
   // Function to filter based on the search query and tab/dropdown selection
   const filterItems = (items) => {
+
     if (!searchQuery) return items;
     const query = searchQuery.toLowerCase();
 

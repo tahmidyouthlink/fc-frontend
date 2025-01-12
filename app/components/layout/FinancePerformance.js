@@ -97,7 +97,7 @@ const FinancePerformance = () => {
     if (activeFilter === "all" && activeFilter === "all") {
       // Count the transactions and calculate total revenue for each payment method without any date filtering
       orderList?.forEach((order) => {
-        if (order.paymentStatus === "Paid") { // Only consider paid orders
+        if (order?.paymentInfo?.paymentStatus === "Paid") { // Only consider paid orders
           // Calculate subtotal
           let subtotal = parseFloat(
             order.productInformation.reduce((total, product) => {
@@ -483,6 +483,7 @@ const FinancePerformance = () => {
           )}
         </div>
       </div>
+
       <div className='flex flex-col lg:flex-row items-center justify-center gap-6'>
 
         {/* Summary Section */}

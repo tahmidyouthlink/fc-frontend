@@ -303,7 +303,7 @@ const AddShippingZone = () => {
               <button
                 type="button"
                 onClick={handleSelectAll}
-                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-150"
+                className="bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-3 rounded transition duration-150 text-sm"
               >
                 Select All
               </button>

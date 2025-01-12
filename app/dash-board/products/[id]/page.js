@@ -841,7 +841,7 @@ const EditProductPage = () => {
         season: selectedSeasons,
         sizeGuideImageUrl: selectedImageUrl,
         restOfOutfit: selectedProductIds,
-      }
+      };
 
       const res = await axiosPublic.put(`/editProductDetails/${id}`, updatedProductData);
       if (res.data.modifiedCount > 0) {
