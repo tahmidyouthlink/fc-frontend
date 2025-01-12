@@ -3,12 +3,11 @@ import { cities } from '@/app/components/layout/cities';
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
-import { Button, Select, SelectItem } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import React, { useEffect, useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaPlusCircle } from 'react-icons/fa';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -23,16 +22,48 @@ const AddShippingZone = () => {
   const router = useRouter();
   const [selectedShipmentHandler, setSelectedShipmentHandler] = useState(null);
   const [sizeError, setSizeError] = useState(false);
-  const [selectedCity, setSelectedCity] = useState([]);
-  const [cityError, setCityError] = useState(false);
   const [shipmentHandlerList, isShipmentHandlerPending, refetch] = useShipmentHandlers();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCities, setSelectedCities] = useState([]);
+  const [cityError, setCityError] = useState(false);
+  const [showCitySuggestions, setShowCitySuggestions] = useState(false);
+  const suggestionsRefCity = useRef(null);
 
-  const { register, handleSubmit, control, resetField, formState: { errors } } = useForm();
+  const { register, handleSubmit, resetField, formState: { errors } } = useForm();
 
-  const handleSelectedCityArray = (keys) => {
-    const selectedArray = [...keys];
-    setSelectedCity(selectedArray);
-    setCityError(selectedArray.length === 0);
+  // Filter cities based on the search term and exclude selected cities
+  const filteredCities = cities.filter(
+    (city) =>
+      city.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      !selectedCities.includes(city)
+  );
+
+  // Handle city selection
+  const handleCitySelect = (city) => {
+    if (!selectedCities.includes(city)) {
+      setSelectedCities([...selectedCities, city]);
+    }
+    setSearchTerm(""); // Clear input
+    setShowCitySuggestions(false); // Close suggestions
+    setCityError(false);
+  };
+
+  // Remove selected city
+  const handleCityRemove = (index) => {
+    const updatedCities = [...selectedCities];
+    updatedCities.splice(index, 1);
+    setSelectedCities(updatedCities);
+  };
+
+  // Select all cities
+  const handleSelectAll = () => {
+    setSelectedCities(cities);
+    setCityError(false);
+  };
+
+  // Handle input focus
+  const handleInputFocus = () => {
+    setShowCitySuggestions(true);
   };
 
   // Function to handle selection (only one allowed)
@@ -122,7 +153,7 @@ const AddShippingZone = () => {
   }, [selectedShipmentHandler, resetField]);
 
   const onSubmit = async (data) => {
-    // setIsSubmitting(true);
+    setIsSubmitting(true);
     const { shippingZone } = data;
 
     // Check if cities and shipping handlers are selected
@@ -133,7 +164,7 @@ const AddShippingZone = () => {
       hasError = true;
     }
 
-    if (selectedCity.length === 0) {
+    if (selectedCities.length === 0) {
       setCityError(true);
       hasError = true;
     }
@@ -172,7 +203,7 @@ const AddShippingZone = () => {
       selectedShipmentHandler,
       shippingCharges,
       shippingDurations,
-      selectedCity
+      selectedCity: selectedCities
     };
 
     try {
@@ -237,6 +268,7 @@ const AddShippingZone = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
+
         <div className='max-w-screen-xl mx-auto p-6 flex flex-col gap-4'>
 
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
@@ -255,34 +287,68 @@ const AddShippingZone = () => {
             </div>
 
             {/* City Selection */}
-            <div>
-              <Controller
-                name="cities"
-                control={control}
-                defaultValue={selectedCity}
-                render={({ field }) => (
-                  <div>
-                    <Select
-                      label="Select Cities"
-                      selectionMode="multiple"
-                      searchable
-                      placeholder="Select cities"
-                      selectedKeys={new Set(selectedCity)}
-                      onSelectionChange={(keys) => {
-                        handleSelectedCityArray(keys);
-                        field.onChange([...keys]);
-                      }}
-                    >
-                      {cities.map((city) => (
-                        <SelectItem key={city.key}>
-                          {city.label}
-                        </SelectItem>
-                      ))}
-                    </Select>
-                    {cityError && <p className="text-red-600 text-left">Cities are required.</p>}
-                  </div>
-                )}
+            <div className='flex items-center justify-center gap-4'>
+
+              <input
+                type="text"
+                placeholder="Search or select a city"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={handleInputFocus}
+                onBlur={() => setTimeout(() => setShowCitySuggestions(false), 200)} // Delay to allow selection
+                className="p-2 border border-gray-300 rounded w-full flex-1"
               />
+
+              {/* Select All Button */}
+              <button
+                type="button"
+                onClick={handleSelectAll}
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-150"
+              >
+                Select All
+              </button>
+            </div>
+
+            {/* Suggestions Dropdown */}
+            {showCitySuggestions && filteredCities.length > 0 && (
+              <ul
+                ref={suggestionsRefCity}
+                className="w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto z-[9999]"
+              >
+                {filteredCities.map((city, i) => (
+                  <li
+                    key={i}
+                    className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors duration-150"
+                    onClick={() => handleCitySelect(city)}
+                  >
+                    {city}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {cityError && <p className='text-red-600 text-left'>City selection is required.</p>}
+
+            {/* Selected Cities */}
+            <div>
+              {selectedCities?.length > 0 && <h3 className="mt-2 mb-2 font-semibold">Selected Cities</h3>}
+              <div className='flex flex-wrap gap-3 mb-4'>
+                {selectedCities.map((city, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center bg-gray-100 border border-gray-300 rounded-full py-1 px-3 text-sm text-gray-700"
+                  >
+                    <span>{city}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCityRemove(index)}
+                      className="ml-2 text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-150"
+                    >
+                      <RxCross2 size={19} />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
 
           </div>
@@ -472,6 +538,7 @@ const AddShippingZone = () => {
             </button>
           </div>
         </div>
+
       </form>
     </div>
   );

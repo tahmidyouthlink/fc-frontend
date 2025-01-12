@@ -2,7 +2,7 @@
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { Select, SelectItem } from '@nextui-org/react';
 import { useRouter, useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
@@ -20,8 +20,11 @@ export default function EditShippingZone() {
   const [selectedShipmentHandler, setSelectedShipmentHandler] = useState(null);
   const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
   const [sizeError, setSizeError] = useState(false);
-  const [selectedCity, setSelectedCity] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCities, setSelectedCities] = useState([]);
   const [cityError, setCityError] = useState(false);
+  const [showCitySuggestions, setShowCitySuggestions] = useState(false);
+  const suggestionsRefCity = useRef(null);
 
   const {
     register, handleSubmit, setValue, control, formState: { errors, isSubmitting }
@@ -33,7 +36,7 @@ export default function EditShippingZone() {
         const { data } = await axiosPublic.get(`/getSingleShippingZone/${params.id}`);
 
         setValue('shippingZone', data?.shippingZone);
-        setSelectedCity(data?.selectedCity);
+        setSelectedCities(data?.selectedCity);
         setSelectedShipmentHandler(data?.selectedShipmentHandler);
 
         // Set shipping charges based on delivery types
@@ -86,10 +89,37 @@ export default function EditShippingZone() {
     fetchShippingZone();
   }, [params.id, setValue, axiosPublic]);
 
-  const handleSelectedCityArray = (keys) => {
-    const selectedArray = [...keys];
-    setSelectedCity(selectedArray);
-    setCityError(selectedArray.length === 0);
+  // Filter cities based on the search term and exclude selected cities
+  const filteredCities = cities.filter((city) => city.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    !selectedCities.includes(city)
+  );
+
+  // Handle city selection
+  const handleCitySelect = (city) => {
+    if (!selectedCities.includes(city)) {
+      setSelectedCities([...selectedCities, city]);
+    }
+    setSearchTerm(""); // Clear input
+    setShowCitySuggestions(false); // Close suggestions
+    setCityError(false);
+  };
+
+  // Remove selected city
+  const handleCityRemove = (index) => {
+    const updatedCities = [...selectedCities];
+    updatedCities.splice(index, 1);
+    setSelectedCities(updatedCities);
+  };
+
+  // Select all cities
+  const handleSelectAll = () => {
+    setSelectedCities(cities);
+    setCityError(false);
+  };
+
+  // Handle input focus
+  const handleInputFocus = () => {
+    setShowCitySuggestions(true);
   };
 
   // if needed then apply edit option for logo selection
@@ -108,6 +138,11 @@ export default function EditShippingZone() {
     // Validate shipment handler selection
     if (!selectedShipmentHandler) {
       setSizeError(true);
+      hasError = true;
+    };
+
+    if (selectedCities.length === 0) {
+      setCityError(true);
       hasError = true;
     }
 
@@ -142,7 +177,7 @@ export default function EditShippingZone() {
         selectedShipmentHandler: selectedShipmentHandler,
         shippingCharges,
         shippingDurations,
-        selectedCity: selectedCity
+        selectedCity: selectedCities
       };
 
       const res = await axiosPublic.put(`/editShippingZone/${params.id}`, updatedShippingZone);
@@ -224,39 +259,69 @@ export default function EditShippingZone() {
               )}
             </div>
 
-            {/* Selected City */}
-            <div>
-              <Controller
-                name="cities"
-                control={control}
-                defaultValue={selectedCity}
-                render={({ field }) => (
-                  <div>
-                    <Select
-                      label="Select Cities"
-                      selectionMode="multiple"
-                      value={selectedCity}
-                      searchable
-                      placeholder="Select cities"
-                      selectedKeys={new Set(selectedCity)}
-                      onSelectionChange={(keys) => {
-                        handleSelectedCityArray(keys);
-                        field.onChange([...keys]);
-                      }}
-                    >
-                      {cities?.map((city) => (
-                        <SelectItem key={city.key}>
-                          {city.label}
-                        </SelectItem>
-                      ))}
-                    </Select>
-                    {/* Display error message if no cities are selected */}
-                    {cityError && (
-                      <p className="text-red-600 text-left mt-1 text-sm">At least one city must be selected.</p>
-                    )}
-                  </div>
-                )}
+            {/* City Selection */}
+            <div className='flex items-center justify-center gap-4'>
+
+              <input
+                type="text"
+                placeholder="Search or select a city"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={handleInputFocus}
+                onBlur={() => setTimeout(() => setShowCitySuggestions(false), 200)} // Delay to allow selection
+                className="p-2 border border-gray-300 rounded w-full flex-1"
               />
+
+              {/* Select All Button */}
+              <button
+                type="button"
+                onClick={handleSelectAll}
+                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-150"
+              >
+                Select All
+              </button>
+            </div>
+
+            {/* Suggestions Dropdown */}
+            {showCitySuggestions && filteredCities.length > 0 && (
+              <ul
+                ref={suggestionsRefCity}
+                className="w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto z-[9999]"
+              >
+                {filteredCities.map((city, i) => (
+                  <li
+                    key={i}
+                    className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors duration-150"
+                    onClick={() => handleCitySelect(city)}
+                  >
+                    {city}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {cityError && <p className='text-red-600 text-left'>City selection is required.</p>}
+
+            {/* Selected Cities */}
+            <div>
+              {selectedCities?.length > 0 && <h3 className="mt-2 mb-2 font-semibold">Selected Cities</h3>}
+              <div className='flex flex-wrap gap-3 mb-4'>
+                {selectedCities.map((city, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center bg-gray-100 border border-gray-300 rounded-full py-1 px-3 text-sm text-gray-700"
+                  >
+                    <span>{city}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCityRemove(index)}
+                      className="ml-2 text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-150"
+                    >
+                      <RxCross2 size={19} />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
 
           </div>

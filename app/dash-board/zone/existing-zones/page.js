@@ -164,7 +164,7 @@ const ExistingZones = () => {
           {activeTab === "inside dhaka"
             ? "Only Dhaka"
             : activeTab === "dhaka suburbs"
-              ? "Savar, Nabinagar, Ashulia, Keraniganj, Tongi"
+              ? "Savar, Nabinagar, Ashulia, Keraniganj, Tongi, Gazipur, Narayanganj"
               : "Nationwide Areas Only without Dhaka"}
         </p>
 
