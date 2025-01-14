@@ -1258,7 +1258,7 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                 </div>
                 <div className='flex flex-wrap items-center justify-between pr-10'>
                   <p className='text-xs md:text-base'>Shipment Handler: {selectedOrder?.shipmentInfo?.selectedShipmentHandlerName === undefined ? '--' : selectedOrder?.shipmentInfo?.selectedShipmentHandlerName}</p>
-                  <p className='text-xs md:text-base'>Tracking Number: {selectedOrder?.shipmentInfo?.trackingNumber === "" ? '--' : selectedOrder?.shipmentInfo?.trackingNumber}</p>
+                  <p className='text-xs md:text-base'>Tracking Number: {selectedOrder?.shipmentInfo?.trackingNumber ? selectedOrder?.shipmentInfo?.trackingNumber : "--"}</p>
                 </div>
                 {selectedOrder?.deliveryInfo?.noteToSeller && <p className='text-xs md:text-base'>Customer Note: <strong>{selectedOrder?.deliveryInfo?.noteToSeller}</strong></p>}
 
@@ -1289,8 +1289,13 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                               />
                             </p>
                             <p><strong>Batch Code:</strong> {product?.batchCode}</p>
-                            <p><strong>Unit Price:</strong> {product?.offerInfo ? product?.regularPrice : product?.finalPrice}</p>
-                            {product.offerInfo && <p><strong>Offer Price:</strong> {product?.finalPrice}</p>}
+                            <p><strong>Unit Price:</strong> ৳ {product?.discountInfo ? product?.discountInfo?.finalPriceAfterDiscount : product?.regularPrice}</p>
+                            {product.offerInfo && (
+                              <p>
+                                <strong>Offer Price:</strong> ৳{" "}
+                                {(product?.regularPrice - (product?.regularPrice * product?.offerInfo?.offerDiscountValue / 100))}
+                              </p>
+                            )}
                             <p><strong>SKU:</strong> {product?.sku}</p>
                             <p className='flex gap-0.5'><strong>Vendors:</strong>{product?.vendors?.length > 0 ? product?.vendors?.map((vendor, index) => (
                               <p key={index}>{vendor}</p>
@@ -1364,6 +1369,15 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                             <strong>Promo/Offer applied:</strong> X
                           </div>
                         )}
+                    </p>
+                    <p className='w-full'>
+                      {selectedOrder?.totalSpecialOfferDiscount > 0 ? (
+                        <span> <strong>Offer Discount:</strong> ৳{selectedOrder?.totalSpecialOfferDiscount}</span>
+                      ) : selectedOrder?.promoInfo ? (
+                        <span> <strong>Promo Discount:</strong> ৳{selectedOrder?.promoInfo.appliedPromoDiscount}</span>
+                      ) : (
+                        <span> Promo/Offer applied: X</span>
+                      )}
                     </p>
                     <p className='w-full'><strong>Shipping Charge:</strong>  ৳ {selectedOrder?.shippingCharge}</p>
                     <p className='w-full'><strong>Total Amount:</strong>  ৳ {selectedOrder?.total?.toFixed(2)}</p>

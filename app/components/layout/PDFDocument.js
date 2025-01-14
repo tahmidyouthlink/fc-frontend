@@ -239,67 +239,20 @@ const PDFDocument = ({ order }) => {
   // Prepare the product rows without applying discount at this point
   const productRows = order?.productInformation.map(product => {
     const productTotal = (
-      product?.offerInfo ? (Number(product?.regularPrice) || 0) : product?.finalPrice * product?.sku).toFixed(2);    // Original price without discount
+      product?.discountInfo ? product?.discountInfo?.finalPriceAfterDiscount * product?.sku.toFixed(2) : product?.regularPrice * product?.sku).toFixed(2);    // Original price without discount
 
     return [
       product.productTitle,   // Title
       product.color?.label || '',  // Color
       product.size || '',         // Size
-      `${product?.offerInfo ? product?.regularPrice : product?.finalPrice}`, // Unit Price
+      `${product?.discountInfo ? product?.discountInfo?.finalPriceAfterDiscount : product?.regularPrice}`, // Unit Price
       product.sku,                // QTY
       `${productTotal}`,       // Total (without discount)
       product.offerTitle ? { offerTitle: product.offerTitle, offerDiscount: 0, productTitle: product.productTitle } : null // Store offer details without applying discount yet
     ];
   });
 
-  // Calculate subtotal without offer discounts initially
-  const subtotal = parseFloat(
-    order.productInformation.reduce((total, product) => {
-      const productTotal = product.unitPrice * product.sku;
-      return total + productTotal;
-    }, 0).toFixed(2)
-  );
-
-  // Apply promo discount based on subtotal
-  const promoCode = order.promoCode;
-  const promoDiscountValue = parseFloat(order.promoDiscountValue || 0);
-  let promoDiscount = 0;
-
-  if (promoCode) {
-    if (order.promoDiscountType === 'Percentage') {
-      promoDiscount = (subtotal * (promoDiscountValue / 100)).toFixed(2);
-    } else if (order.promoDiscountType === 'Amount') {
-      promoDiscount = promoDiscountValue.toFixed(2);
-    }
-  }
-
-  const shippingCharge = parseFloat(order.shippingCharge || 0);
-  let total = subtotal - promoDiscount + shippingCharge;
-
-  // Add the offer discount after calculating the promo
-  productRows.forEach((productRow, index) => {
-    const offerDetails = productRow[6];
-    if (offerDetails) {
-      let offerDiscount = 0;
-      const productInfo = order.productInformation[index]; // Get the current product's info
-      const productTotal = parseFloat((productInfo.unitPrice * productInfo.sku).toFixed(2)); // Recalculate product total
-
-      // Apply offer discount for this product
-      if (offerDetails.offerTitle) {
-        if (productInfo.offerDiscountType === 'Percentage') {
-          offerDiscount = (productTotal * (productInfo.offerDiscountValue / 100)).toFixed(2);
-        } else if (productInfo.offerDiscountType === 'Amount') {
-          offerDiscount = productInfo.offerDiscountValue.toFixed(2);
-        }
-        total -= offerDiscount; // Reduce total by the offer discount for this product
-      }
-
-      // Update the offer details with the actual discount applied
-      offerDetails.offerDiscount = offerDiscount;
-    }
-  });
-
-  total = total.toFixed(2);
+  console.log(order);
 
   return (
     <Document>
@@ -372,45 +325,33 @@ const PDFDocument = ({ order }) => {
             {/* Subtotal, Promo Discount, Offer Discount, Shipping Charge, and Total */}
             <View style={styles.subtotal}>
               <Text style={{ color: "#E74C3A", fontWeight: 400, fontFamily: "Lilita One" }}>Subtotal</Text>
-              <Text style={{ fontWeight: 500 }}>{subtotal.toFixed(2)}</Text>
+              <Text style={{ fontWeight: 500 }}>{order?.subtotal?.toFixed(2)}</Text>
             </View>
 
-            {promoDiscount > 0 && (
-              <View style={styles.discount}>
-                <Text style={{
-                  color: "#E74C3A", fontWeight: 400, fontFamily: "Lilita One", flexWrap: 'wrap',
-                  width: '70%',
-                  marginBottom: 2,
-                }}>{`Promo (${promoCode})`}</Text>
-                <Text style={{ fontWeight: 500 }}>-{promoDiscount}</Text>
+            {(order?.promoInfo || order?.totalSpecialOfferDiscount > 0) && (
+              <View style={styles.subtotal}>
+                {/* Discount Label */}
+                <Text style={{ color: "#E74C3A", fontWeight: 400, fontFamily: "Lilita One" }}>
+                  Discount
+                </Text>
+
+                {/* Discount Value */}
+                <Text style={{ fontWeight: 500 }}>
+                  {order?.totalSpecialOfferDiscount > 0
+                    ? `-${order?.totalSpecialOfferDiscount}`
+                    : `-${order?.promoInfo?.appliedPromoDiscount}`}
+                </Text>
               </View>
             )}
 
-            {hasOffers &&
-              productRows.map((product, index) => {
-                const offerDetails = product[6];
-                if (offerDetails) {
-                  return (
-                    <View key={index} style={styles.discount}>
-                      <Text style={{
-                        color: "#E74C3A", fontWeight: 400, fontFamily: "Lilita One", flexWrap: 'wrap',
-                        width: '70%',
-                        marginBottom: 2,
-                      }}>{`Offer (${offerDetails.offerTitle}) on ${offerDetails.productTitle}`}</Text>
-                      <Text style={{ fontWeight: 500 }}>-{offerDetails.offerDiscount}</Text>
-                    </View>
-                  );
-                }
-              })}
-
             <View style={styles.subtotal}>
               <Text style={{ color: "#E74C3A", fontWeight: 400, fontFamily: "Lilita One" }}>Shipping</Text>
-              <Text style={{ fontWeight: 500 }}>+{shippingCharge.toFixed(2)}</Text>
+              <Text style={{ fontWeight: 500 }}>+{order?.shippingCharge?.toFixed(2)}</Text>
             </View>
 
             <View style={styles.total}>
               <Text style={{ color: "#E74C3A", fontWeight: 400, fontFamily: "Lilita One" }}>Total</Text>
-              <Text style={{ fontWeight: 500 }}>{total}</Text>
+              <Text style={{ fontWeight: 500 }}>{order?.total?.toFixed(2)}</Text>
             </View>
 
           </View>
