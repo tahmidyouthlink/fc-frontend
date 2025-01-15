@@ -128,34 +128,21 @@ const RecentPromotions = () => {
     return orderList?.filter(order => order?.promoInfo?.promoCode === promoCode && order?.paymentInfo?.paymentStatus === "Paid").length || 0;
   };
 
-  const calculateTotalAmountDiscounted = (promoCode) => {
+  const calculateTotalPromoAmountDiscounted = (promoCode) => {
+    // Use reduce and ensure acc always starts as a number
     const totalDiscount = orderList?.reduce((acc, order) => {
-      if (order.promoCode !== promoCode || order.paymentStatus !== "Paid") return acc; // Check for payment status
-
-      let offerDiscountTotal = 0;
-      order.productInformation.forEach(product => {
-        if (product.offerTitle && product.offerDiscountValue > 0) {
-          const productTotal = product.unitPrice * product.sku;
-          if (product.offerDiscountType === 'Percentage') {
-            offerDiscountTotal += (product.offerDiscountValue / 100) * productTotal;
-          } else if (product.offerDiscountType === 'Amount') {
-            offerDiscountTotal += product.offerDiscountValue;
-          }
-        }
-      });
-
-      const adjustedOrderTotal = order.totalAmount - offerDiscountTotal;
-      let promoDiscount = 0;
-      if (order.promoDiscountType === 'Percentage') {
-        promoDiscount = (order.promoDiscountValue / 100) * adjustedOrderTotal;
-      } else if (order.promoDiscountType === 'Amount') {
-        promoDiscount = order.promoDiscountValue;
+      // Check if the promoCode matches and payment is paid
+      if (order?.promoInfo?.promoCode !== promoCode || order?.paymentInfo?.paymentStatus !== "Paid") {
+        return acc;
       }
 
+      // Add appliedPromoDiscount if it exists, otherwise add 0
+      const promoDiscount = parseFloat(order?.promoInfo?.appliedPromoDiscount) || 0;
       return acc + promoDiscount;
-    }, 0) || 0;
+    }, 0) || 0; // Default to 0 if reduce returns undefined
 
-    return totalDiscount.toFixed(2);
+    // Ensure totalDiscount is a number before calling toFixed
+    return Number(totalDiscount).toFixed(2);
   };
 
   const calculateTotalOfferApplied = (offerTitle) => {
@@ -169,27 +156,23 @@ const RecentPromotions = () => {
 
   const calculateTotalOfferAmountDiscounted = (offerTitle) => {
     const totalDiscount = orderList?.reduce((acc, order) => {
-      if (order.paymentStatus !== "Paid") return acc; // Check for payment status
+      // Skip orders where payment status is not "Paid"
+      if (order.paymentInfo.paymentStatus !== "Paid") return acc;
 
+      // Calculate total applied offer discount for the given offer title
       const offerDiscountTotal = order.productInformation.reduce((prodAcc, product) => {
-        if (product.offerTitle !== offerTitle) return prodAcc;
+        // Skip products where the offer title does not match
+        if (product.offerInfo?.offerTitle !== offerTitle) return prodAcc;
 
-        const productSubtotal = product.unitPrice * product.sku;
-        let discount = 0;
-
-        if (product.offerDiscountType === 'Percentage') {
-          discount = (product.offerDiscountValue / 100) * productSubtotal;
-        } else if (product.offerDiscountType === 'Amount') {
-          discount = product.offerDiscountValue;
-        }
-
-        return prodAcc + discount;
+        // Add the applied offer discount
+        return prodAcc + (product.offerInfo.appliedOfferDiscount || 0);
       }, 0);
 
       return acc + offerDiscountTotal;
     }, 0) || 0;
 
-    return totalDiscount.toFixed(2);
+    // Ensure totalDiscount is a valid number and format it
+    return Number(totalDiscount).toFixed(2);
   };
 
   const getProductTitlesForPromo = (promoCode) => {
@@ -232,7 +215,7 @@ const RecentPromotions = () => {
 
       // Get calculated totals for promo/offer
       const totalPromoApplied = item?.promoCode ? calculateTotalPromoApplied(item.promoCode) : 0;
-      const totalAmountDiscounted = item?.promoCode ? calculateTotalAmountDiscounted(item.promoCode) : '0.00';
+      const totalAmountDiscounted = item?.promoCode ? calculateTotalPromoAmountDiscounted(item.promoCode) : '0.00';
       const totalOfferApplied = item?.offerTitle ? calculateTotalOfferApplied(item.offerTitle) : 0;
       const totalOfferAmountDiscounted = item?.offerTitle ? calculateTotalOfferAmountDiscounted(item.offerTitle) : '0.00';
 
@@ -522,13 +505,13 @@ const RecentPromotions = () => {
             ? calculateTotalPromoApplied(item?.promoCode)
             : 0;
 
-          const totalAmountDiscounted = item?.promoCode
-            ? calculateTotalAmountDiscounted(item?.promoCode)
-            : '0.00';
-
           const totalOfferApplied = item?.offerTitle
             ? calculateTotalOfferApplied(item?.offerTitle)
             : 0;
+
+          const totalPromoAmountDiscounted = item?.promoCode
+            ? calculateTotalPromoAmountDiscounted(item?.promoCode)
+            : '0.00';
 
           const totalOfferAmountDiscounted = item?.offerTitle
             ? calculateTotalOfferAmountDiscounted(item?.offerTitle)
@@ -584,7 +567,7 @@ const RecentPromotions = () => {
                       {column === 'Total Discount Given' && (
                         <td key="totalDiscountGiven" className="text-xs p-3 text-gray-700 text-center">
                           {item?.promoCode
-                            ? `৳ ${totalAmountDiscounted}`
+                            ? `৳ ${totalPromoAmountDiscounted}`
                             : `৳ ${totalOfferAmountDiscounted}`}
                         </td>
                       )}
@@ -768,7 +751,7 @@ const RecentPromotions = () => {
               data['Total Times Applied'] = item.promoCode ? calculateTotalPromoApplied(item.promoCode) : calculateTotalOfferApplied(item.offerTitle);
               break;
             case 'Total Discount Given':
-              data['Total Discount Given'] = item.promoCode ? calculateTotalAmountDiscounted(item.promoCode) : calculateTotalOfferAmountDiscounted(item.offerTitle) || '0.00';
+              data['Total Discount Given'] = item.promoCode ? calculateTotalPromoAmountDiscounted(item.promoCode) : calculateTotalOfferAmountDiscounted(item.offerTitle) || '0.00';
               break;
             case 'Min Order Amount':
               data['Min Order Amount'] = item.minAmount || '0';
@@ -777,7 +760,8 @@ const RecentPromotions = () => {
               data['Max Capped Amount'] = item.maxAmount || '0';
               break;
             case 'Status':
-              data['Status'] = item.promoStatus ? 'Active' : 'Inactive';
+              const isActive = item.promoStatus || item.offerStatus;
+              data['Status'] = isActive ? 'Active' : 'Inactive';
               break;
             default:
               break;
@@ -834,7 +818,7 @@ const RecentPromotions = () => {
               rowData['Total Times Applied'] = item.promoCode ? calculateTotalPromoApplied(item.promoCode) : calculateTotalOfferApplied(item.offerTitle);
               break;
             case 'Total Discount Given':
-              rowData['Total Discount Given'] = item.promoCode ? calculateTotalAmountDiscounted(item.promoCode) : calculateTotalOfferAmountDiscounted(item.offerTitle) || '0.00';
+              rowData['Total Discount Given'] = item.promoCode ? calculateTotalPromoAmountDiscounted(item.promoCode) : calculateTotalOfferAmountDiscounted(item.offerTitle) || '0.00';
               break;
             case 'Min Order Amount':
               rowData['Min Order Amount'] = item.minAmount || '0';
@@ -843,7 +827,8 @@ const RecentPromotions = () => {
               rowData['Max Capped Amount'] = item.maxAmount || '0';
               break;
             case 'Status':
-              rowData['Status'] = item.promoStatus ? 'Active' : 'Inactive';
+              const isActive = item.promoStatus || item.offerStatus;
+              rowData['Status'] = isActive ? 'Active' : 'Inactive';
               break;
             default:
               break;
@@ -891,7 +876,7 @@ const RecentPromotions = () => {
               data['Total Times Applied'] = item.promoCode ? calculateTotalPromoApplied(item.promoCode) : calculateTotalOfferApplied(item.offerTitle) || "";
               break;
             case 'Total Discount Given':
-              data['Total Discount Given'] = item.promoCode ? calculateTotalAmountDiscounted(item.promoCode) : calculateTotalOfferAmountDiscounted(item.offerTitle) || "0.00";
+              data['Total Discount Given'] = item.promoCode ? calculateTotalPromoAmountDiscounted(item.promoCode) : calculateTotalOfferAmountDiscounted(item.offerTitle) || "0.00";
               break;
             case 'Min Order Amount':
               data['Min Order Amount'] = item.minAmount || "0";
@@ -900,7 +885,8 @@ const RecentPromotions = () => {
               data['Max Capped Amount'] = item.maxAmount || "0";
               break;
             case 'Status':
-              data['Status'] = item.promoStatus ? 'Active' : 'Inactive';
+              const isActive = item.promoStatus || item.offerStatus;
+              data['Status'] = isActive ? 'Active' : 'Inactive';
               break;
             default:
               break;

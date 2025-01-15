@@ -1308,75 +1308,14 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                   <div className='flex flex-col items-center text-sm md:text-base w-60'>
                     <p className='w-full'><strong>Sub Total:</strong>  ৳ {selectedOrder?.subtotal?.toFixed(2)}</p>
                     <p className='w-full'>
-                      {selectedOrder?.promoInfo?.promoCode || selectedOrder?.productInformation?.some((product) => product?.offerInfo?.offerTitle) ?
-                        (
-                          (() => {
-                            // Calculate promo discount only if it's greater than 0
-                            const promoDiscount =
-                              selectedOrder?.promoInfo?.promoDiscountType === 'Percentage'
-                                ? (selectedOrder.finalPrice * selectedOrder?.promoInfo?.promoDiscountValue) / 100
-                                : selectedOrder?.promoInfo?.promoDiscountValue;
-
-                            // Extract offer discounts from productInformation and filter out 0-value offers
-                            const offerDetails = selectedOrder?.productInformation?.map((product) => {
-                              const offerDiscount =
-                                product?.offerInfo?.offerDiscountType === 'Percentage'
-                                  ? (product.unitPrice * product?.offerInfo?.offerDiscountValue) / 100
-                                  : product?.offerInfo?.offerDiscountValue;
-
-                              return {
-                                offerTitle: product?.offerTitle,
-                                offerDiscountType: product?.offerInfo?.offerDiscountType,
-                                offerDiscountValue: product?.offerInfo?.offerDiscountValue,
-                                offerDiscountAmount: offerDiscount,
-                              };
-                            })
-                              .filter((offer) => offer?.offerDiscountAmount > 0); // Filter out 0-value offers
-
-                            return (
-                              <div className='flex flex-col gap-2'>
-                                {/* Show promo discount if applied */}
-                                {selectedOrder?.promoInfo?.promoCode && promoDiscount > 0 ? (
-                                  <div>
-                                    <strong>Promo applied:</strong> {selectedOrder?.promoInfo?.promoCode} ({selectedOrder?.promoInfo?.promoDiscountType === 'Percentage'
-                                      ? `${selectedOrder?.promoInfo?.promoDiscountValue.toFixed(2)}%`
-                                      : `৳ ${selectedOrder?.promoInfo?.promoDiscountValue.toFixed(2)}`})
-                                    <br />
-                                    <br />
-                                  </div>
-                                ) : null}
-
-                                {/* Show multiple offers if they are applied */}
-                                {offerDetails.length > 0 ? (
-                                  <div>
-                                    {offerDetails.map((offer, index) => (
-                                      <span key={index}>
-                                        <strong>Offer applied</strong> ({offer?.offerInfo?.offerTitle}):{' '}
-                                        {offer?.offerInfo?.offerDiscountType === 'Percentage'
-                                          ? `${offer?.offerInfo?.offerDiscountValue.toFixed(2)}%`
-                                          : `৳ ${offer?.offerInfo?.offerDiscountAmount.toFixed(2)}`}
-                                        <br />
-                                      </span>
-                                    ))}
-                                  </div>
-                                ) : null}
-                              </div>
-                            );
-                          })()
-                        )
-                        : (
-                          <div>
-                            <strong>Promo/Offer applied:</strong> X
-                          </div>
-                        )}
-                    </p>
-                    <p className='w-full'>
                       {selectedOrder?.totalSpecialOfferDiscount > 0 ? (
                         <span> <strong>Offer Discount:</strong> ৳{selectedOrder?.totalSpecialOfferDiscount}</span>
                       ) : selectedOrder?.promoInfo ? (
                         <span> <strong>Promo Discount:</strong> ৳{selectedOrder?.promoInfo.appliedPromoDiscount}</span>
                       ) : (
-                        <span> Promo/Offer applied: X</span>
+                        <p>
+                          <strong> Promo/Offer applied: </strong><span>X</span>
+                        </p>
                       )}
                     </p>
                     <p className='w-full'><strong>Shipping Charge:</strong>  ৳ {selectedOrder?.shippingCharge}</p>

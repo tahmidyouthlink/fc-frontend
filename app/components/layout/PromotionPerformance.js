@@ -181,8 +181,8 @@ const PromotionPerformanceChart = () => {
 
     // Filter and process each order
     orderList?.forEach((order) => {
-      if (order.paymentStatus !== 'Paid') return;
-      const orderDate = parseDate(order.dateTime);
+      if (order?.paymentInfo?.paymentStatus !== 'Paid') return;
+      const orderDate = parseDate(order?.dateTime);
 
       // Check if the order is within the specified date range
       if (orderDate >= adjustedStartDate && orderDate <= adjustedEndDate) {
@@ -194,7 +194,7 @@ const PromotionPerformanceChart = () => {
 
         // Calculate total offer discounts for the order
         order.productInformation.forEach((product) => {
-          if (product.offerTitle?.trim()) {
+          if (product.offerInfo.offerTitle?.trim()) {
             hasOfferApplied = true; // Track if any offer is applied
             let productTotal = product.unitPrice * product.sku;
             let productOfferDiscount = 0;
@@ -213,7 +213,7 @@ const PromotionPerformanceChart = () => {
         const adjustedOrderTotal = order.totalAmount - offerDiscount;
 
         // Calculate promo discount based on adjusted order total
-        if (order.promoCode?.trim()) {
+        if (order.promoInfo.promoCode?.trim()) {
           hasPromoApplied = true; // Track if promo code is applied
           if (order.promoDiscountType === 'Percentage') {
             promoDiscount = (order.promoDiscountValue / 100) * adjustedOrderTotal;
@@ -249,7 +249,7 @@ const PromotionPerformanceChart = () => {
     let filteredOrders;
     if (activeFilter === "all") {
       // If activeFilter is "all", consider all "Paid" orders without date filtering
-      filteredOrders = orderList?.filter((order) => order.paymentStatus === "Paid");
+      filteredOrders = orderList?.filter((order) => order.paymentInfo.paymentStatus === "Paid");
     } else {
       // Apply date filtering if activeFilter is not "all"
       if (!filterStartDate || !filterEndDate) return []; // Return empty if filters are not set
@@ -260,7 +260,7 @@ const PromotionPerformanceChart = () => {
 
       filteredOrders = orderList?.filter((order) => {
         const orderDate = parseDate(order.dateTime);
-        return orderDate >= startDateObj && orderDate <= endDateObj && order.paymentStatus === "Paid";
+        return orderDate >= startDateObj && orderDate <= endDateObj && order.paymentInfo.paymentStatus === "Paid";
       });
     }
 
