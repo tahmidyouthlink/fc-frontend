@@ -95,66 +95,43 @@ const PromotionPerformanceChart = () => {
     let totalPromoAndOfferApplied = 0;
     let totalDiscount = 0;
 
-    // If activeFilter is "all", we ignore the date filters and calculate for all orders
-    const filteredOrders = activeFilter === "all" ? orderList?.filter((order) => order.paymentStatus === "Paid")
-      : orderList?.filter((order) => {
-        // Date filter only applies if activeFilter is not "all"
-        if (!filterStartDate || !filterEndDate) {
-          return false; // No filter applied yet, return empty
-        }
-
-        const startDateObj = new Date(filterStartDate);
-        const endDateObj = new Date(filterEndDate);
-        const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0)); // Start of day
-        const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999)); // End of day
-        const orderDate = parseDate(order.dateTime);
-
-        // Return only orders that fall within the date range and are "Paid"
-        return orderDate >= adjustedStartDate && orderDate <= adjustedEndDate && order.paymentStatus === "Paid";
-      });
-
-    filteredOrders?.forEach((order) => {
-      let promoDiscount = 0;
-      let offerDiscount = 0;
-      let offerAppliedCount = 0;
-
-      // Calculate total offer discounts for the order
-      order.productInformation.forEach((product) => {
-        if (product.offerTitle?.trim()) {
-          offerAppliedCount += 1; // Count how many offers were applied
-          let productTotal = product.unitPrice * product.sku;
-          let productOfferDiscount = 0;
-
-          if (product.offerDiscountType === 'Percentage') {
-            productOfferDiscount = (product.offerDiscountValue / 100) * productTotal;
-          } else {
-            productOfferDiscount = product.offerDiscountValue;
+    // Filter orders based on payment status and date range if applicable
+    const filteredOrders =
+      activeFilter === "all"
+        ? orderList?.filter((order) => order.paymentInfo.paymentStatus === "Paid")
+        : orderList?.filter((order) => {
+          if (!filterStartDate || !filterEndDate) {
+            return false; // No filter applied
           }
 
-          offerDiscount += productOfferDiscount; // Sum up offer discounts
-        }
-      });
+          const startDateObj = new Date(filterStartDate);
+          const endDateObj = new Date(filterEndDate);
+          const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0)); // Start of day
+          const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999)); // End of day
+          const orderDate = parseDate(order.dateTime);
 
-      // Add to total counts if any offers were applied
-      if (offerDiscount > 0) {
-        totalPromoAndOfferApplied += offerAppliedCount; // Add number of offers applied
+          return (
+            orderDate >= adjustedStartDate &&
+            orderDate <= adjustedEndDate &&
+            order.paymentInfo.paymentStatus === "Paid"
+          );
+        });
+
+    filteredOrders?.forEach((order) => {
+      const { promoInfo, totalSpecialOfferDiscount } = order;
+
+      // Check if promoInfo exists or totalSpecialOfferDiscount > 0
+      if (promoInfo || totalSpecialOfferDiscount > 0) {
+        totalPromoAndOfferApplied += 1; // Count this order as having promo/offer applied
       }
 
-      // Calculate adjusted order total after offer discounts
-      const adjustedOrderTotal = order.totalAmount - offerDiscount;
+      // Calculate total discount from promoInfo and special offer discount
+      const promoDiscount = promoInfo?.appliedPromoDiscount
+        ? parseFloat(promoInfo.appliedPromoDiscount)
+        : 0;
+      const offerDiscount = totalSpecialOfferDiscount || 0;
 
-      // Calculate promo discount based on adjusted order total
-      if (order.promoCode?.trim()) {
-        if (order.promoDiscountType === 'Percentage') {
-          promoDiscount = (order.promoDiscountValue / 100) * adjustedOrderTotal;
-        } else {
-          promoDiscount = order.promoDiscountValue;
-        }
-        totalPromoAndOfferApplied += 1; // Count the promo applied
-      }
-
-      // Sum total discounts from offers and promo codes
-      totalDiscount += offerDiscount + promoDiscount;
+      totalDiscount += promoDiscount + offerDiscount;
     });
 
     return { totalPromoAndOfferApplied, totalDiscount };
@@ -163,7 +140,7 @@ const PromotionPerformanceChart = () => {
   const hourlyPromotionData = useMemo(() => {
     if (!filterStartDate || !filterEndDate) return [];
 
-    const isTodayOrYesterday = activeFilter === 'today' || activeFilter === 'yesterday';
+    const isTodayOrYesterday = activeFilter === "today" || activeFilter === "yesterday";
     if (!isTodayOrYesterday) return [];
 
     // Normalize the start and end date to include the full day range
@@ -181,58 +158,31 @@ const PromotionPerformanceChart = () => {
 
     // Filter and process each order
     orderList?.forEach((order) => {
-      if (order?.paymentInfo?.paymentStatus !== 'Paid') return;
+      if (order?.paymentInfo?.paymentStatus !== "Paid") return;
+
       const orderDate = parseDate(order?.dateTime);
 
       // Check if the order is within the specified date range
       if (orderDate >= adjustedStartDate && orderDate <= adjustedEndDate) {
         const hour = orderDate.getHours();
-        let offerDiscount = 0;
-        let promoDiscount = 0;
-        let hasOfferApplied = false;
-        let hasPromoApplied = false;
 
-        // Calculate total offer discounts for the order
-        order.productInformation.forEach((product) => {
-          if (product.offerInfo.offerTitle?.trim()) {
-            hasOfferApplied = true; // Track if any offer is applied
-            let productTotal = product.unitPrice * product.sku;
-            let productOfferDiscount = 0;
+        // Calculate total discounts
+        const promoDiscount = order.promoInfo?.appliedPromoDiscount
+          ? parseFloat(order.promoInfo.appliedPromoDiscount)
+          : 0;
+        const offerDiscount = order.totalSpecialOfferDiscount || 0;
 
-            if (product.offerDiscountType === 'Percentage') {
-              productOfferDiscount = (product.offerDiscountValue / 100) * productTotal;
-            } else {
-              productOfferDiscount = product.offerDiscountValue;
-            }
+        const totalOrderDiscount = promoDiscount + offerDiscount;
 
-            offerDiscount += productOfferDiscount;
-          }
-        });
-
-        // Calculate adjusted order total after offer discounts
-        const adjustedOrderTotal = order.totalAmount - offerDiscount;
-
-        // Calculate promo discount based on adjusted order total
-        if (order.promoInfo.promoCode?.trim()) {
-          hasPromoApplied = true; // Track if promo code is applied
-          if (order.promoDiscountType === 'Percentage') {
-            promoDiscount = (order.promoDiscountValue / 100) * adjustedOrderTotal;
-          } else {
-            promoDiscount = order.promoDiscountValue;
-          }
-        }
-
-        // Calculate total discount from offers and promo codes
-        const totalOrderDiscount = offerDiscount + promoDiscount;
+        // Check if any discount was applied
+        const hasPromoApplied = !!order.promoInfo;
+        const hasOfferApplied = offerDiscount > 0;
 
         // Update the hourly data
         hourlyData[hour].discountedAmount += totalOrderDiscount;
 
         // Increment discountedOrders for each type of discount applied
-        if (hasOfferApplied) {
-          hourlyData[hour].discountedOrders += 1;
-        }
-        if (hasPromoApplied) {
+        if (hasPromoApplied || hasOfferApplied) {
           hourlyData[hour].discountedOrders += 1;
         }
       }
@@ -260,48 +210,29 @@ const PromotionPerformanceChart = () => {
 
       filteredOrders = orderList?.filter((order) => {
         const orderDate = parseDate(order.dateTime);
-        return orderDate >= startDateObj && orderDate <= endDateObj && order.paymentInfo.paymentStatus === "Paid";
+        return (
+          orderDate >= startDateObj &&
+          orderDate <= endDateObj &&
+          order.paymentInfo.paymentStatus === "Paid"
+        );
       });
     }
 
     // Process each filtered order
     filteredOrders?.forEach((order) => {
       const orderDate = parseDate(order.dateTime);
-      const orderDateFormatted = format(orderDate, 'yyyy-MM-dd');
-      let offerDiscount = 0;
-      let promoDiscount = 0;
-      let hasOfferApplied = false;
-      let hasPromoApplied = false;
+      const orderDateFormatted = format(orderDate, "yyyy-MM-dd");
 
-      // Calculate total offer discounts for the order
-      order.productInformation.forEach((product) => {
-        if (product.offerTitle?.trim()) {
-          hasOfferApplied = true; // Track if any offer is applied
-          let productTotal = product.unitPrice * product.sku;
-          let productOfferDiscount = 0;
+      // Extract discounts from order data
+      const promoDiscount = order.promoInfo?.appliedPromoDiscount
+        ? parseFloat(order.promoInfo.appliedPromoDiscount)
+        : 0;
+      const offerDiscount = order.totalSpecialOfferDiscount || 0;
 
-          if (product.offerDiscountType === 'Percentage') {
-            productOfferDiscount = (product.offerDiscountValue / 100) * productTotal;
-          } else {
-            productOfferDiscount = product.offerDiscountValue;
-          }
+      const totalDiscount = promoDiscount + offerDiscount;
 
-          offerDiscount += productOfferDiscount;
-        }
-      });
-
-      // Calculate adjusted order total after offer discounts
-      const adjustedOrderTotal = order.totalAmount - offerDiscount;
-
-      // Calculate promo discount based on adjusted order total
-      if (order.promoCode?.trim()) {
-        hasPromoApplied = true; // Track if promo code is applied
-        if (order.promoDiscountType === 'Percentage') {
-          promoDiscount = (order.promoDiscountValue / 100) * adjustedOrderTotal;
-        } else {
-          promoDiscount = order.promoDiscountValue;
-        }
-      }
+      const hasPromoApplied = !!order.promoInfo;
+      const hasOfferApplied = offerDiscount > 0;
 
       // Initialize dailyData for the specific date if it doesn't exist
       if (!dailyData[orderDateFormatted]) {
@@ -314,7 +245,7 @@ const PromotionPerformanceChart = () => {
       }
 
       // Update the daily data with the calculated discounts
-      dailyData[orderDateFormatted].discountedAmount += offerDiscount + promoDiscount;
+      dailyData[orderDateFormatted].discountedAmount += totalDiscount;
 
       // Increment discountedOrders for each type of discount applied
       if (hasOfferApplied) {

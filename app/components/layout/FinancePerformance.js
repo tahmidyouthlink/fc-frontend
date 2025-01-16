@@ -93,204 +93,93 @@ const FinancePerformance = () => {
     let totalBKashRevenue = 0; // Initialize total revenue for bKash
     let totalSSLCommerzRevenue = 0; // Initialize total revenue for SSLCommerz
 
-    // Check if the filter is "all"
-    if (activeFilter === "all" && activeFilter === "all") {
-      // Count the transactions and calculate total revenue for each payment method without any date filtering
-      orderList?.forEach((order) => {
+    const calculateTotals = (orders) => {
+      orders?.forEach((order) => {
         if (order?.paymentInfo?.paymentStatus === "Paid") { // Only consider paid orders
-          // Calculate subtotal
-          let subtotal = parseFloat(
-            order.productInformation.reduce((total, product) => {
-              const productTotal = product.unitPrice * product.sku; // Assuming sku represents quantity
-              return total + productTotal;
-            }, 0).toFixed(2)
-          );
+          const orderTotal = order.total || 0; // Use the total from the order
 
-          // Apply promo discount
-          const promoDiscountValue = parseFloat(order.promoDiscountValue || 0);
-          let promoDiscount = 0;
-
-          if (order.promoCode) {
-            if (order.promoDiscountType === 'Percentage') {
-              promoDiscount = (subtotal * (promoDiscountValue / 100)).toFixed(2);
-            } else if (order.promoDiscountType === 'Amount') {
-              promoDiscount = promoDiscountValue.toFixed(2);
-            }
-          }
-
-          // Calculate total after applying promo discount
-          let total = subtotal - promoDiscount;
-
-          // Apply offer discounts
-          order.productInformation.forEach((product) => {
-            let offerDiscount = 0;
-            const productTotal = parseFloat((product.unitPrice * product.sku).toFixed(2)); // Recalculate product total
-
-            // Apply offer discount for this product
-            if (product.offerDiscountType === 'Percentage') {
-              offerDiscount = (productTotal * (product.offerDiscountValue / 100)).toFixed(2);
-            } else if (product.offerDiscountType === 'Amount') {
-              offerDiscount = product.offerDiscountValue.toFixed(2);
-            }
-            total -= offerDiscount; // Reduce total by the offer discount for this product
-          });
-
-          // Ensure total is not negative after all discounts
-          const orderTotal = Math.max(parseFloat(total), 0);
-
-          // Count the transactions based on the payment method
-          if (order.paymentMethod === 'bKash') {
+          if (order?.paymentInfo?.paymentMethod === "bKash") {
             bKashTransactions += 1;
-            totalBKashRevenue += orderTotal; // Add to total revenue for bKash
-          } else if (order.paymentMethod === 'SSLCommerz') {
+            totalBKashRevenue += orderTotal;
+          } else if (order?.paymentInfo?.paymentMethod === "SSL") {
             sslCommerzTransactions += 1;
-            totalSSLCommerzRevenue += orderTotal; // Add to total revenue for SSLCommerz
+            totalSSLCommerzRevenue += orderTotal;
           }
         }
       });
+    };
 
-      return { bKashTransactions, sslCommerzTransactions, totalBKashRevenue, totalSSLCommerzRevenue };
-    }
+    if (activeFilter === "all") {
+      // Process all orders without date filtering
+      calculateTotals(orderList);
+    } else {
+      // Convert filter dates to Date objects
+      const startDateObj = new Date(filterStartDate);
+      const endDateObj = new Date(filterEndDate);
 
-    // Convert filter dates to Date objects and normalize them to start and end of day
-    const startDateObj = new Date(filterStartDate);
-    const endDateObj = new Date(filterEndDate);
+      // Normalize dates to start and end of the day
+      const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0));
+      const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999));
 
-    const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0)); // Start of day
-    const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999)); // End of day
+      // Filter orders within the date range
+      const filteredOrders = orderList?.filter((order) => {
+        const orderDate = parseDate(order?.dateTime);
 
-    // Filter orders based on the normalized date range and paymentStatus = "Paid"
-    const filteredOrders = orderList?.filter((order) => {
-      const orderDate = parseDate(order.dateTime); // Assuming parseDate is a function to parse order date
-      return orderDate >= adjustedStartDate && orderDate <= adjustedEndDate && order.paymentStatus === "Paid";
-    });
-
-    // Count the number of transactions and calculate total revenue for each payment method
-    filteredOrders?.forEach((order) => {
-      // Calculate subtotal
-      let subtotal = parseFloat(
-        order.productInformation.reduce((total, product) => {
-          const productTotal = product.unitPrice * product.sku; // Assuming sku represents quantity
-          return total + productTotal;
-        }, 0).toFixed(2)
-      );
-
-      // Apply promo discount
-      const promoDiscountValue = parseFloat(order.promoDiscountValue || 0);
-      let promoDiscount = 0;
-
-      if (order.promoCode) {
-        if (order.promoDiscountType === 'Percentage') {
-          promoDiscount = (subtotal * (promoDiscountValue / 100)).toFixed(2);
-        } else if (order.promoDiscountType === 'Amount') {
-          promoDiscount = promoDiscountValue.toFixed(2);
-        }
-      }
-
-      // Calculate total after applying promo discount
-      let total = subtotal - promoDiscount;
-
-      // Apply offer discounts
-      order.productInformation.forEach((product) => {
-        let offerDiscount = 0;
-        const productTotal = parseFloat((product.unitPrice * product.sku).toFixed(2)); // Recalculate product total
-
-        // Apply offer discount for this product
-        if (product.offerDiscountType === 'Percentage') {
-          offerDiscount = (productTotal * (product.offerDiscountValue / 100)).toFixed(2);
-        } else if (product.offerDiscountType === 'Amount') {
-          offerDiscount = product.offerDiscountValue.toFixed(2);
-        }
-        total -= offerDiscount; // Reduce total by the offer discount for this product
+        return (
+          orderDate >= adjustedStartDate &&
+          orderDate <= adjustedEndDate &&
+          order?.paymentInfo?.paymentStatus === "Paid"
+        );
       });
 
-      // Ensure total is not negative after all discounts
-      const orderTotal = Math.max(parseFloat(total), 0);
-
-      // Count the transactions based on the payment method
-      if (order.paymentMethod === 'bKash') {
-        bKashTransactions += 1;
-        totalBKashRevenue += orderTotal; // Add to total revenue for bKash
-      } else if (order.paymentMethod === 'SSLCommerz') {
-        sslCommerzTransactions += 1;
-        totalSSLCommerzRevenue += orderTotal; // Add to total revenue for SSLCommerz
-      }
-    });
+      calculateTotals(filteredOrders);
+    }
 
     return { bKashTransactions, sslCommerzTransactions, totalBKashRevenue, totalSSLCommerzRevenue };
   }, [orderList, filterStartDate, filterEndDate, activeFilter]);
 
-  const getTotalTransactions = (bKashTransactions, sslCommerzTransactions) => {
-    return bKashTransactions + sslCommerzTransactions;
-  };
-
-  const getTotalRevenue = (totalBKashRevenue, totalSSLCommerzRevenue) => {
-    return totalBKashRevenue + totalSSLCommerzRevenue;
-  };
-
   const paymentMethodData = useMemo(() => {
     const dailyData = {};
 
-    // Handle "all" filter
-    if (activeFilter === "all" && activeFilter === "all") {
-      // Count transactions for all orders
+    if (activeFilter === "all") {
       orderList?.forEach((order) => {
-        if (order.paymentStatus === "Paid") { // Only consider paid orders
+        if (order?.paymentInfo?.paymentStatus === "Paid") {
           const orderDate = parseDate(order.dateTime);
           const orderDateFormatted = format(orderDate, 'yyyy-MM-dd');
-
-          // Initialize the date key if not already present
           if (!dailyData[orderDateFormatted]) {
-            dailyData[orderDateFormatted] = {
-              bKashTransactions: 0,
-              sslCommerzTransactions: 0,
-            };
+            dailyData[orderDateFormatted] = { bKashTransactions: 0, sslCommerzTransactions: 0 };
           }
-
-          // Count the transactions based on the payment method
-          if (order.paymentMethod === 'bKash') {
+          if (order.paymentInfo.paymentMethod === "bKash") {
             dailyData[orderDateFormatted].bKashTransactions += 1;
-          } else if (order.paymentMethod === 'SSLCommerz') {
+          } else if (order.paymentInfo.paymentMethod === "SSL") {
             dailyData[orderDateFormatted].sslCommerzTransactions += 1;
           }
         }
       });
     } else {
-      // Convert filter dates to Date objects and normalize them to start and end of day
       const startDateObj = new Date(filterStartDate);
       const endDateObj = new Date(filterEndDate);
+      const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0));
+      const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999));
 
-      const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0)); // Start of day
-      const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999)); // End of day
-
-      // Count transactions for the specified date range
       orderList?.forEach((order) => {
         const orderDate = parseDate(order.dateTime);
         const orderDateFormatted = format(orderDate, 'yyyy-MM-dd');
-
-        // Check if orderDate is within the selected date range and paymentStatus is "Paid"
-        if (orderDate >= adjustedStartDate && orderDate <= adjustedEndDate && order.paymentStatus === "Paid") {
-          // Initialize the date key if not already present
+        if (orderDate >= adjustedStartDate && orderDate <= adjustedEndDate && order?.paymentInfo?.paymentStatus === "Paid") {
           if (!dailyData[orderDateFormatted]) {
-            dailyData[orderDateFormatted] = {
-              bKashTransactions: 0,
-              sslCommerzTransactions: 0,
-            };
+            dailyData[orderDateFormatted] = { bKashTransactions: 0, sslCommerzTransactions: 0 };
           }
-
-          // Count the transactions based on the payment method
-          if (order.paymentMethod === 'bKash') {
+          if (order.paymentInfo.paymentMethod === "bKash") {
             dailyData[orderDateFormatted].bKashTransactions += 1;
-          } else if (order.paymentMethod === 'SSLCommerz') {
+          } else if (order.paymentInfo.paymentMethod === "SSL") {
             dailyData[orderDateFormatted].sslCommerzTransactions += 1;
           }
         }
       });
     }
 
-    // Convert the data to the format expected by the chart
     return Object.keys(dailyData).map((date) => ({
-      date,  // Use this as the label for the x-axis
+      date,
       bKashTransactions: dailyData[date].bKashTransactions,
       sslCommerzTransactions: dailyData[date].sslCommerzTransactions,
     }));
@@ -298,37 +187,44 @@ const FinancePerformance = () => {
 
   // Memoize filtered data to group by hour for today or yesterday
   const hourlyPaymentData = useMemo(() => {
-    if (!filterStartDate || !filterEndDate) return [];
-
-    const isTodayOrYesterday = activeFilter === 'today' || activeFilter === 'yesterday';
-    if (!isTodayOrYesterday) return [];
+    if (!filterStartDate || !filterEndDate || !["today", "yesterday"].includes(activeFilter)) return [];
 
     const startDateObj = new Date(filterStartDate);
     const endDateObj = new Date(filterEndDate);
 
-    const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0));
-    const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999));
+    if (startDateObj > endDateObj) return [];  // Invalid date range
 
+    const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0)); // Start of the day
+    const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999)); // End of the day
+
+    // Filter orders within the specified date range and paid status
     const filteredOrders = orderList?.filter((order) => {
       const orderDate = parseDate(order.dateTime);
-      return orderDate >= adjustedStartDate && orderDate <= adjustedEndDate && order.paymentStatus === "Paid";
+      return orderDate >= adjustedStartDate &&
+        orderDate <= adjustedEndDate &&
+        order.paymentInfo?.paymentStatus === "Paid";
     });
 
-    // Initialize an object with keys for each hour (0-23)
-    const hourlyData = Array(24).fill().map((_, hour) => ({
+    if (!filteredOrders.length) return Array.from({ length: 24 }, (_, hour) => ({
+      hour: `${hour}:00`,
+      bKashTransactions: 0,
+      sslCommerzTransactions: 0,
+    }));
+
+    // Initialize hourly data
+    const hourlyData = Array.from({ length: 24 }, (_, hour) => ({
       hour: `${hour}:00`,
       bKashTransactions: 0,
       sslCommerzTransactions: 0,
     }));
 
     // Group orders by the hour
-    filteredOrders?.forEach((order) => {
+    filteredOrders.forEach((order) => {
       const orderDate = parseDate(order.dateTime);
       const hour = orderDate.getHours();
-
-      if (order.paymentMethod === 'bKash') {
+      if (order.paymentInfo?.paymentMethod === "bKash") {
         hourlyData[hour].bKashTransactions += 1;
-      } else if (order.paymentMethod === 'SSLCommerz') {
+      } else if (order.paymentInfo?.paymentMethod === "SSL") {
         hourlyData[hour].sslCommerzTransactions += 1;
       }
     });
@@ -401,8 +297,8 @@ const FinancePerformance = () => {
     return format(date, 'MM/dd');
   };
 
-  const totalTransactions = getTotalTransactions(bKashTransactions, sslCommerzTransactions);
-  const totalRevenue = getTotalRevenue(totalBKashRevenue, totalSSLCommerzRevenue);
+  const totalTransactions = bKashTransactions + sslCommerzTransactions;
+  const totalRevenue = totalBKashRevenue + totalSSLCommerzRevenue;
 
   // Calculate the maximum value for the Y-axis
   const maxBKash = Math.max(...paymentMethodData.map(data => data.bKashTransactions), 0);
@@ -414,8 +310,8 @@ const FinancePerformance = () => {
   const maxYValue = Math.max(Math.ceil(Math.max(maxBKash, maxSSLCommerz, maxHourlyBKash, maxHourlySSLCommerz) * 1.1)); // Ensure minimum of 20
 
   if (isOrderPending) {
-    return <SmallHeightLoading />;
-  }
+    return <SmallHeightLoading />
+  };
 
   return (
     <div className="space-y-5">
