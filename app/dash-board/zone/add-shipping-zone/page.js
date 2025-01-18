@@ -61,6 +61,12 @@ const AddShippingZone = () => {
     setCityError(false);
   };
 
+  // Unselect all cities
+  const handleUnselectAll = () => {
+    setSelectedCities([]);
+    setCityError(true);
+  };
+
   // Handle input focus
   const handleInputFocus = () => {
     setShowCitySuggestions(true);
@@ -255,7 +261,7 @@ const AddShippingZone = () => {
 
   if (isShipmentHandlerPending) {
     return <Loading />
-  }
+  };
 
   return (
     <div className='bg-gray-50 min-h-screen'>
@@ -300,31 +306,45 @@ const AddShippingZone = () => {
               />
 
               {/* Select All Button */}
-              <button
+              {selectedCities?.length > 71 ? "" : <button
                 type="button"
                 onClick={handleSelectAll}
                 className="bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-3 rounded transition duration-150 text-sm"
               >
                 Select All
-              </button>
+              </button>}
+
+              {/* Unselect All Button */}
+              {selectedCities?.length > 2 && <button
+                type="button"
+                onClick={handleUnselectAll}
+                className="bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-3 rounded transition duration-150 text-sm"
+              >
+                Unselect All
+              </button>}
+
             </div>
 
             {/* Suggestions Dropdown */}
-            {showCitySuggestions && filteredCities.length > 0 && (
-              <ul
-                ref={suggestionsRefCity}
-                className="w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto z-[9999]"
-              >
-                {filteredCities.map((city, i) => (
-                  <li
-                    key={i}
-                    className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors duration-150"
-                    onClick={() => handleCitySelect(city)}
+            {showCitySuggestions && (
+              <div>
+                {filteredCities?.length > 0 ?
+                  <ul
+                    ref={suggestionsRefCity}
+                    className="w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto z-[9999]"
                   >
-                    {city}
-                  </li>
-                ))}
-              </ul>
+                    {filteredCities.map((city, i) => (
+                      <li
+                        key={i}
+                        className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors duration-150"
+                        onClick={() => handleCitySelect(city)}
+                      >
+                        {city}
+                      </li>
+                    ))}
+                  </ul> : <p>No city matches your search.</p>
+                }
+              </div>
             )}
 
             {cityError && <p className='text-red-600 text-left'>City selection is required.</p>}
