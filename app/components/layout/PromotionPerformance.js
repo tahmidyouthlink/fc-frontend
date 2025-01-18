@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import useOrders from '@/app/hooks/useOrders';
 import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
 import { format, startOfToday, endOfToday, startOfYesterday, endOfYesterday, subDays, subMonths, startOfMonth, endOfMonth, isValid } from 'date-fns';
@@ -416,6 +416,7 @@ const PromotionPerformanceChart = () => {
       </div>
 
       <div className="flex flex-col lg:flex-row items-center justify-center gap-6">
+
         {/* Summary Section */}
         <div className='flex lg:flex-col xl:flex-row items-center justify-center gap-6 w-1/3 xl:w-3/4 lg:min-h-[150px] lg:max-h-[150px]'>
           <div className="border rounded-lg p-4 md:p-8 space-y-3">
@@ -431,11 +432,15 @@ const PromotionPerformanceChart = () => {
         </div>
 
         <div className="w-full h-[400px] flex items-center justify-center mt-2 lg:mt-6 xl:mt-2 2xl:mt-0">
+
           {dailyData.length === 0 ? (
+
             <div className="text-center text-gray-500">
               <p className="text-lg font-medium text-gray-500">No data available for the selected day.<br /> Please choose a different date or date range to see results.</p>
             </div>
+
           ) : (
+
             <div className='w-full'>
               <ResponsiveContainer width="100%" height={400}>
                 <BarChart data={activeFilter === 'today' || activeFilter === 'yesterday' ? hourlyPromotionData : dailyData}>
@@ -462,7 +467,9 @@ const PromotionPerformanceChart = () => {
                 </CheckboxGroup>
               </div>
             </div>
+
           )}
+
         </div>
 
       </div>

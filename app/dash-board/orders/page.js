@@ -279,6 +279,13 @@ const OrdersPage = () => {
   const handleActions = async (id, actionType, isUndo = false) => {
     const order = paginatedOrders?.find(order => order._id === id);
 
+    const dataToSend = order?.productInformation.map(product => ({
+      productId: product.productId,
+      sku: product.sku,
+      size: product.size,
+      color: product.color
+    }));
+
     if (!order) {
       toast.error("Order not found");
       return;
@@ -304,7 +311,29 @@ const OrdersPage = () => {
       confirmButtonText: "Yes"
     }).then(async (result) => {
       if (result.isConfirmed) {
-        if (actionType === "shipped") {
+        if (actionType === undefined) {
+          try {
+            const response = await axiosPublic.put("/decreaseSkuFromProduct", dataToSend);
+
+            // Check the results array from the response
+            const updateResults = response?.data?.results;
+
+            if (updateResults && Array.isArray(updateResults)) {
+              const successfulUpdates = updateResults.filter((result) => !result.error); // Filter out successful updates
+
+              if (successfulUpdates.length > 0) {
+                updateOrderStatus(order, id, actionType, isUndo); // Call your function only if there are successful updates
+              } else {
+                console.error("No successful updates occurred");
+              }
+            } else {
+              console.error("Unexpected response format:", response?.data);
+            }
+          } catch (error) {
+            console.error("Error making API request:", error);
+          }
+        }
+        else if (actionType === "shipped") {
           // Open the modal for tracking number input only for 'shipped'
           setOrderToUpdate(order);
           setOrderIdToUpdate(id); // Set the order ID for modal
