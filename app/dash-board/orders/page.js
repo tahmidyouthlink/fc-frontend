@@ -1,7 +1,7 @@
 "use client";
 import * as XLSX from 'xlsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Checkbox, CheckboxGroup, DateRangePicker, Input } from "@nextui-org/react";
+import { Accordion, AccordionItem, Button, Checkbox, CheckboxGroup, DateRangePicker, Input } from "@nextui-org/react";
 import emailjs from '@emailjs/browser';
 import Loading from '@/app/components/shared/Loading/Loading';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
@@ -1397,81 +1397,121 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                 <ModalHeader className="text-sm md:text-base"><Barcode selectedOrder={selectedOrder} /></ModalHeader>
               </div>
               <ModalBody className="modal-body-scroll">
-                <div className='flex items-center justify-between w-full pr-10'>
-                  <p>Order Id - <strong>#{selectedOrder?.orderNumber}</strong></p>
-                  <p>Customer Id - <strong>{selectedOrder?.customerInfo?.customerId}</strong></p>
-                </div>
-                <p className='text-xs md:text-base'>Address: {selectedOrder?.deliveryInfo?.address1} {selectedOrder?.deliveryInfo?.address2}, {selectedOrder?.deliveryInfo?.city}, {selectedOrder?.deliveryInfo?.postalCode}</p>
-                <div className='flex items-center justify-between pr-10'>
-                  <p className='text-xs md:text-base'>Payment Method: {selectedOrder?.paymentInfo?.paymentMethod}</p>
-                  <p className='text-xs md:text-base'>Transaction Id: {selectedOrder?.paymentInfo?.transactionId}</p>
-                </div>
-                <div className='flex flex-wrap items-center justify-between pr-10'>
-                  <p className='text-xs md:text-base'>Shipment Handler: {selectedOrder?.shipmentInfo?.selectedShipmentHandlerName === undefined ? '--' : selectedOrder?.shipmentInfo?.selectedShipmentHandlerName}</p>
-                  <p className='text-xs md:text-base'>Tracking Number: {selectedOrder?.shipmentInfo?.trackingNumber ? selectedOrder?.shipmentInfo?.trackingNumber : "--"}</p>
-                </div>
-                {selectedOrder?.deliveryInfo?.noteToSeller && <p className='text-xs md:text-base'>Customer Note: <strong>{selectedOrder?.deliveryInfo?.noteToSeller}</strong></p>}
 
-                {selectedOrder?.onHoldReason && <p className='text-xs md:text-base'>On Hold reason: <strong>{selectedOrder?.onHoldReason}</strong></p>}
+                <Accordion defaultExpandedKeys={["1"]}>
 
-                <h4 className="mt-4 text-lg font-semibold">Product Information</h4>
-                {/* Display product and promo/offer information */}
-                <div className='flex justify-between gap-6 pr-6'>
-                  <div>
-                    {selectedOrder.productInformation && selectedOrder.productInformation.length > 0 && (
-                      <>
-                        {selectedOrder.productInformation.map((product, index) => (
-                          <div key={index} className="mb-4">
-                            <p><strong>Product : </strong> {product?.productTitle}</p>
-                            <p><strong>Product ID : </strong> {product?.productId}</p>
-                            <p><strong>Size:</strong>  {product?.size}</p>
-                            <p className='flex items-center gap-2'><strong>Color:</strong>
-                              {product?.color?.label}
-                              <span
-                                style={{
-                                  display: 'inline-block',
-                                  width: '20px',
-                                  height: '20px',
-                                  backgroundColor: product.color?.color || '#fff',
-                                  marginRight: '8px',
-                                  borderRadius: '4px'
-                                }}
-                              />
+                  <AccordionItem
+                    key="1"
+                    aria-label="Order Information"
+                    title="Order Information"
+                  >
+                    <div className='flex justify-between mb-3'>
+                      <div className='flex flex-col gap-2.5 w-full'>
+                        <p>Order Id - <strong>#{selectedOrder?.orderNumber}</strong></p>
+                        <p className='text-xs md:text-base'>Payment Method: {selectedOrder?.paymentInfo?.paymentMethod}</p>
+                        {selectedOrder?.deliveryInfo?.noteToSeller && <p className='text-xs md:text-base'>Customer Note: <strong>{selectedOrder?.deliveryInfo?.noteToSeller}</strong></p>}
+                        <p className='text-xs md:text-base'>Transaction Id: {selectedOrder?.paymentInfo?.transactionId}</p>
+                      </div>
+                      <div className='flex flex-col gap-2.5 w-full'>
+                        <p>Customer Id - <strong>{selectedOrder?.customerInfo?.customerId}</strong></p>
+                        <p>Customer Name - <strong>{selectedOrder?.customerInfo?.customerName}</strong></p>
+                        <p className='text-xs md:text-base'>Address: {selectedOrder?.deliveryInfo?.address1} {selectedOrder?.deliveryInfo?.address2}, {selectedOrder?.deliveryInfo?.city}, {selectedOrder?.deliveryInfo?.postalCode}</p>
+                      </div>
+                    </div>
+                  </AccordionItem>
+
+                  <AccordionItem
+                    key="2"
+                    aria-label="Shipment Information"
+                    title="Shipment Information"
+                  >
+                    <div className='mb-3 flex flex-col gap-2 pr-10'>
+                      <div className='flex justify-between items-center'>
+                        <p className='text-xs md:text-base'>Shipment Handler: {selectedOrder?.shipmentInfo?.selectedShipmentHandlerName === undefined ? '--' : selectedOrder?.shipmentInfo?.selectedShipmentHandlerName}</p>
+                        <p className='text-xs md:text-base'>Tracking Number: {selectedOrder?.shipmentInfo?.trackingNumber ? selectedOrder?.shipmentInfo?.trackingNumber : "--"}</p>
+                      </div>
+                      {selectedOrder?.onHoldReason && <p className='text-xs md:text-base'>On Hold reason: <strong>{selectedOrder?.onHoldReason}</strong></p>}
+                    </div>
+                  </AccordionItem>
+
+                  <AccordionItem
+                    key="3"
+                    aria-label="Product Information"
+                    title="Product Information"
+                  >
+                    {/* Display product and promo/offer information */}
+                    <div className='flex justify-between gap-6 pr-6'>
+                      <div>
+                        {selectedOrder.productInformation && selectedOrder.productInformation.length > 0 && (
+                          <>
+                            {selectedOrder.productInformation.map((product, index) => (
+                              <div key={index} className="mb-4">
+                                <p><strong>Product : </strong> {product?.productTitle}</p>
+                                <p><strong>Product ID : </strong> {product?.productId}</p>
+                                <p><strong>Size:</strong>  {product?.size}</p>
+                                <p className='flex items-center gap-2'><strong>Color:</strong>
+                                  {product?.color?.label}
+                                  <span
+                                    style={{
+                                      display: 'inline-block',
+                                      width: '20px',
+                                      height: '20px',
+                                      backgroundColor: product.color?.color || '#fff',
+                                      marginRight: '8px',
+                                      borderRadius: '4px'
+                                    }}
+                                  />
+                                </p>
+                                <p><strong>Batch Code:</strong> {product?.batchCode}</p>
+                                <p><strong>Unit Price:</strong> ৳ {product?.discountInfo ? product?.discountInfo?.finalPriceAfterDiscount : product?.regularPrice}</p>
+                                {product.offerInfo && (
+                                  <p>
+                                    <strong>Offer Price:</strong> ৳{" "}
+                                    {(product?.regularPrice - (product?.regularPrice * product?.offerInfo?.offerDiscountValue / 100))}
+                                  </p>
+                                )}
+                                <p><strong>SKU:</strong> {product?.sku}</p>
+                                <p className='flex gap-0.5'><strong>Vendors:</strong>{product?.vendors?.length > 0 ? product?.vendors?.map((vendor, index) => (
+                                  <p key={index}>{vendor}</p>
+                                )) : "--"}</p>
+                              </div>
+                            ))}
+                          </>
+                        )}
+                      </div>
+                      <div className='flex flex-col items-center text-sm md:text-base w-60'>
+                        <p className='w-full'><strong>Sub Total:</strong>  ৳ {selectedOrder?.subtotal?.toFixed(2)}</p>
+                        <p className='w-full'>
+                          {selectedOrder?.totalSpecialOfferDiscount > 0 ? (
+                            <span> <strong>Offer Discount:</strong> ৳{selectedOrder?.totalSpecialOfferDiscount}</span>
+                          ) : selectedOrder?.promoInfo ? (
+                            <span> <strong>Promo Discount:</strong> ৳{selectedOrder?.promoInfo.appliedPromoDiscount}</span>
+                          ) : (
+                            <p>
+                              <strong> Promo/Offer applied: </strong><span>X</span>
                             </p>
-                            <p><strong>Batch Code:</strong> {product?.batchCode}</p>
-                            <p><strong>Unit Price:</strong> ৳ {product?.discountInfo ? product?.discountInfo?.finalPriceAfterDiscount : product?.regularPrice}</p>
-                            {product.offerInfo && (
-                              <p>
-                                <strong>Offer Price:</strong> ৳{" "}
-                                {(product?.regularPrice - (product?.regularPrice * product?.offerInfo?.offerDiscountValue / 100))}
-                              </p>
-                            )}
-                            <p><strong>SKU:</strong> {product?.sku}</p>
-                            <p className='flex gap-0.5'><strong>Vendors:</strong>{product?.vendors?.length > 0 ? product?.vendors?.map((vendor, index) => (
-                              <p key={index}>{vendor}</p>
-                            )) : "--"}</p>
-                          </div>
-                        ))}
-                      </>
-                    )}
-                  </div>
-                  <div className='flex flex-col items-center text-sm md:text-base w-60'>
-                    <p className='w-full'><strong>Sub Total:</strong>  ৳ {selectedOrder?.subtotal?.toFixed(2)}</p>
-                    <p className='w-full'>
-                      {selectedOrder?.totalSpecialOfferDiscount > 0 ? (
-                        <span> <strong>Offer Discount:</strong> ৳{selectedOrder?.totalSpecialOfferDiscount}</span>
-                      ) : selectedOrder?.promoInfo ? (
-                        <span> <strong>Promo Discount:</strong> ৳{selectedOrder?.promoInfo.appliedPromoDiscount}</span>
-                      ) : (
-                        <p>
-                          <strong> Promo/Offer applied: </strong><span>X</span>
+                          )}
                         </p>
-                      )}
-                    </p>
-                    <p className='w-full'><strong>Shipping Charge:</strong>  ৳ {selectedOrder?.shippingCharge}</p>
-                    <p className='w-full'><strong>Total Amount:</strong>  ৳ {selectedOrder?.total?.toFixed(2)}</p>
-                  </div>
-                </div>
+                        <p className='w-full'><strong>Shipping Charge:</strong>  ৳ {selectedOrder?.shippingCharge}</p>
+                        <p className='w-full'><strong>Total Amount:</strong>  ৳ {selectedOrder?.total?.toFixed(2)}</p>
+                      </div>
+                    </div>
+                  </AccordionItem>
+
+                  {selectedOrder?.returnInfo && <AccordionItem key="4"
+                    aria-label="Return Information"
+                    title="Return Information">
+
+                  </AccordionItem>}
+
+                  {selectedOrder?.returnInfo && <AccordionItem key="5"
+                    aria-label="Attachments"
+                    title="Attachments">
+
+                  </AccordionItem >}
+
+                </Accordion>
+
               </ModalBody>
 
               <ModalFooter className={`flex items-center ${selectedOrder?.lastStatusChange ? "justify-between" : "justify-end"} `}>
