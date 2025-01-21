@@ -29,9 +29,16 @@ const FinanceTable = () => {
     const savedColumnsFinancesPage = JSON.parse(localStorage.getItem('selectedColumnsFinancesPage'));
     if (savedColumns) {
       setSelectedColumns(savedColumns);
+    } else {
+      // Set to default if no saved columns exist
+      setSelectedColumns(initialColumns);
     }
+
     if (savedColumnsFinancesPage) {
       setColumnOrder(savedColumnsFinancesPage);
+    } else {
+      // Set to default column order if no saved order exists
+      setColumnOrder(initialColumns);
     }
   }, []);
 
@@ -52,7 +59,6 @@ const FinanceTable = () => {
 
   const handleDeselectAll = () => {
     setSelectedColumns([]);
-    setColumnOrder([]);
   };
 
   const handleSave = () => {

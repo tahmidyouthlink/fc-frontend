@@ -17,6 +17,8 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 
+const initialColumns = ["Promo Code / Offer Title", "Type", "Discount Value", "Expiry Date", "Total Times Applied", "Total Discount Given", "Min Order Amount", "Max Capped Amount", "Actions", "Status"];
+
 const RecentPromotions = () => {
 
   const dropdownRef = useRef(null);
@@ -30,7 +32,6 @@ const RecentPromotions = () => {
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   // const [isExpanded, setIsExpanded] = useState(null); // To track which row is expanded
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
-  const initialColumns = ["Promo Code / Offer Title", "Type", "Discount Value", "Expiry Date", "Total Times Applied", "Total Discount Given", "Min Order Amount", "Max Capped Amount", "Actions", "Status"];
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
@@ -40,9 +41,16 @@ const RecentPromotions = () => {
     const savedMarketingColumns = JSON.parse(localStorage.getItem('selectedMarketingColumns'));
     if (savedColumns) {
       setSelectedColumns(savedColumns);
+    } else {
+      // Set to default if no saved columns exist
+      setSelectedColumns(initialColumns);
     }
+
     if (savedMarketingColumns) {
       setColumnOrder(savedMarketingColumns);
+    } else {
+      // Set to default column order if no saved order exists
+      setColumnOrder(initialColumns);
     }
   }, []);
 
@@ -57,7 +65,6 @@ const RecentPromotions = () => {
 
   const handleDeselectAll = () => {
     setSelectedColumns([]);
-    setColumnOrder([]);
   };
 
   const handleSave = () => {

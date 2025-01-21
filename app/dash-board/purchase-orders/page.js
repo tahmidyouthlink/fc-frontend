@@ -39,11 +39,19 @@ const PurchaseOrders = () => {
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedColumnsPurchaseOrder'));
     const savedOrder = JSON.parse(localStorage.getItem('columnOrderPurchaseOrder'));
+
     if (savedColumns) {
       setSelectedColumns(savedColumns);
+    } else {
+      // Set to default if no saved columns exist
+      setSelectedColumns(initialColumns);
     }
+
     if (savedOrder) {
       setColumnOrder(savedOrder);
+    } else {
+      // Set to default column order if no saved order exists
+      setColumnOrder(initialColumns);
     }
   }, []);
 
@@ -64,7 +72,6 @@ const PurchaseOrders = () => {
 
   const handleDeselectAll = () => {
     setSelectedColumns([]);
-    setColumnOrder([]);
   };
 
   const handleSave = () => {

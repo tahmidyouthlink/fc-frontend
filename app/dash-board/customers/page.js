@@ -17,6 +17,8 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import dynamic from 'next/dynamic';
 const CustomerPrintButton = dynamic(() => import("@/app/components/layout/CustomerPrintButton"), { ssr: false });
 
+const initialColumns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alternative Phone Number', 'NewsLetter', 'Hometown', 'Status'];
+
 const Customers = () => {
 
   // const isAdmin = true;
@@ -28,7 +30,6 @@ const Customers = () => {
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const initialColumns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alternative Phone Number', 'NewsLetter', 'Hometown', 'Status'];
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [selectedCustomerInfo, setSelectedCustomerInfo] = useState({});
   const [columnOrder, setColumnOrder] = useState(initialColumns);
@@ -38,12 +39,21 @@ const Customers = () => {
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedCustomer'));
     const savedCustomerColumns = JSON.parse(localStorage.getItem('selectedCustomerColumns'));
+
     if (savedColumns) {
       setSelectedColumns(savedColumns);
+    } else {
+      // Set to default if no saved columns exist
+      setSelectedColumns(initialColumns);
     }
+
     if (savedCustomerColumns) {
       setColumnOrder(savedCustomerColumns);
+    } else {
+      // Set to default column order if no saved order exists
+      setColumnOrder(initialColumns);
     }
+
   }, []);
 
   const handleColumnChange = (selected) => {
@@ -57,7 +67,6 @@ const Customers = () => {
 
   const handleDeselectAll = () => {
     setSelectedColumns([]);
-    setColumnOrder([]);
   };
 
   const handleSave = () => {

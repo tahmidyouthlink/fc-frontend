@@ -11,6 +11,8 @@ import LocationDropdown from '@/app/components/layout/LocationDropdown';
 import Image from 'next/image';
 import CustomPagination from '@/app/components/layout/CustomPagination';
 import { Button } from '@nextui-org/react';
+import useOrders from '@/app/hooks/useOrders';
+import useLocations from '@/app/hooks/useLocations';
 
 const InventoryPage = () => {
 
@@ -18,6 +20,8 @@ const InventoryPage = () => {
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   const [productList, isProductPending, refetch] = useProductsInformation();
+  const [orderList, isOrderPending] = useOrders();
+  const [locationList, isLocationPending] = useLocations();
   const [filteredProducts, setFilteredProducts] = useState([]);
   const dropdownRef = useRef(null);
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
@@ -187,9 +191,11 @@ const InventoryPage = () => {
     }
   }, [paginatedProducts]);
 
-  if (isProductPending) {
+  if (isProductPending || isOrderPending || isLocationPending) {
     return <Loading />
-  }
+  };
+
+  console.log(locationNameForMessage, "locationList");
 
   return (
     <div className='relative w-full min-h-screen bg-gray-100'>
@@ -339,10 +345,10 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 z-[1] bg-white">
               <tr>
-                <th className="text-[10px] md:text-xs px-2 pr-2 xl:px-3 xl:pr-2 text-gray-700 border-b pl-20 xl:pl-20">Product</th>
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">On process</th>
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">Available</th>
-                <th className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">On hand</th>
+                <th key="product" className="text-[10px] md:text-xs px-2 pr-2 xl:px-3 xl:pr-2 text-gray-700 border-b pl-20 xl:pl-20">Product</th>
+                <th key="onProcess" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">On process</th>
+                <th key="available" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">Available</th>
+                <th key="onHand" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">On hand</th>
               </tr>
             </thead>
 
@@ -367,25 +373,63 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
 
                 </tr>
               ) : (
-                paginatedProducts?.map((product, index) => (
-                  <tr key={product?._id || index} className="hover:bg-gray-50 transition-colors">
-                    <td className="text-sm p-3 text-neutral-500 text-center cursor-pointer flex flex-col lg:flex-row items-center gap-3">
-                      <div>
-                        <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt='productIMG' height={600} width={600} />
-                      </div>
-                      <div className='flex flex-col items-start justify-start gap-1'>
-                        <p className='font-bold text-blue-700 text-start'>{product?.productTitle}</p>
-                        <p className='font-medium'>{product?.size}</p>
-                        <span className='flex items-center gap-2'>
-                          {product.color}
-                        </span>
-                      </div>
-                    </td>
-                    <td className='text-center'></td>
-                    <td className='text-center'>{product?.sku}</td>
-                    <td className='text-center'>{product?.sku}</td>
-                  </tr>
-                ))
+                paginatedProducts?.map((product, index) => {
+                  // Calculate "onProcess" and "available"
+                  let onProcess = 0; // Default value
+                  let available = product?.sku; // Default value is the product's SKU
+
+                  // Check for matching products in the orderList
+                  orderList?.forEach(order => {
+                    order?.productInformation.forEach(orderProduct => {
+                      const isMatchingProduct =
+                        product?.productTitle === orderProduct?.productTitle &&
+                        product?.productId === orderProduct?.productId &&
+                        product?.size === orderProduct?.size &&
+                        product?.colorCode === orderProduct.color?.color;
+
+                      if (isMatchingProduct) {
+                        if (order?.orderStatus === "Pending") {
+                          // Add to "onProcess"
+                          onProcess += orderProduct?.sku;
+                        } else if (order?.orderStatus === "Processing") {
+                          // Subtract from "available"
+                          onProcess += orderProduct?.sku;
+                          available -= orderProduct?.sku;
+                        }
+                      }
+                    });
+                  });
+
+                  // Find the primary location
+                  const primaryLocation = locationList?.find(location => location.isPrimaryLocation)?.locationName;
+
+                  // Check if the primary location matches the selected location
+                  const isMatchingLocation = primaryLocation === locationNameForMessage;
+
+                  return (
+                    <tr key={product?._id || index} className="hover:bg-gray-50 transition-colors">
+                      <td key="product" className="text-sm p-3 text-neutral-500 text-center cursor-pointer flex flex-col lg:flex-row items-center gap-3">
+                        <div>
+                          <Image
+                            className="h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5"
+                            src={product?.imageUrl}
+                            alt="productIMG"
+                            height={600}
+                            width={600}
+                          />
+                        </div>
+                        <div className="flex flex-col items-start justify-start gap-1">
+                          <p className="font-bold text-blue-700 text-start">{product?.productTitle}</p>
+                          <p className="font-medium">{product?.size}</p>
+                          <span className="flex items-center gap-2">{product.color}</span>
+                        </div>
+                      </td>
+                      <td key="onProcess" className="text-center"> {isMatchingLocation ? onProcess : 0}</td>
+                      <td key="available" className="text-center"> {isMatchingLocation ? available : product?.sku}</td>
+                      <td key="onHand" className="text-center">{product?.sku}</td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

@@ -34,8 +34,15 @@ const orderStatusTabs = [
   'New Orders',
   'Active Orders',
   'Completed Orders',
-  'Canceled Orders',
+  'Returns & Refunds',
 ];
+
+const columnsConfig = {
+  'New Orders': [...initialColumns],
+  'Active Orders': [...initialColumns],
+  'Completed Orders': [...initialColumns],
+  'Returns & Refunds': ['Return Number', 'Date & Time', 'Customer Name', 'Refund Amount', 'Status', 'Action', 'Email', 'Phone Number', 'Alternative Phone Number', 'Shipping Method', 'Payment Status', 'Payment Method'],
+};
 
 const OrdersPage = () => {
   const isAdmin = true;
@@ -52,11 +59,11 @@ const OrdersPage = () => {
   const [openDropdown, setOpenDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const dropdownRefDownload = useRef(null);
-  const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
-  const [selectedColumns, setSelectedColumns] = useState([]);
-  const [columnOrder, setColumnOrder] = useState(initialColumns);
-  const [isColumnModalOpen, setColumnModalOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState(orderStatusTabs[0]);
+  const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
+  const [selectedColumns, setSelectedColumns] = useState(columnsConfig[selectedTab]);
+  const [columnOrder, setColumnOrder] = useState(columnsConfig[selectedTab]);
+  const [isColumnModalOpen, setColumnModalOpen] = useState(false);
   const [trackingNumber, setTrackingNumber] = useState("");
   const [orderIdToUpdate, setOrderIdToUpdate] = useState(null); // Store order ID
   const [orderToUpdate, setOrderToUpdate] = useState({}); // selected order for update
@@ -69,16 +76,26 @@ const OrdersPage = () => {
   const [shippingList, isShippingPending] = useShippingZones();
   const [selectedHandler, setSelectedHandler] = useState(null);
 
+  // Load saved state from localStorage or use defaults
   useEffect(() => {
-    const savedColumns = JSON.parse(localStorage.getItem('selectedColumns'));
-    const savedOrder = JSON.parse(localStorage.getItem('columnOrder'));
-    if (savedColumns) {
-      setSelectedColumns(savedColumns);
+    const cleanTab = selectedTab.split(" (")[0]; // Clean the tab name
+    const savedSelectedColumns = JSON.parse(localStorage.getItem(`selectedColumns_${cleanTab}`));
+    const savedColumnOrder = JSON.parse(localStorage.getItem(`columnOrder_${cleanTab}`));
+    const allColumns = columnsConfig[cleanTab]; // Default columns for the tab
+
+    if (savedSelectedColumns && savedColumnOrder) {
+      // Ensure all columns are shown in the modal (unselected columns included)
+      const completeColumns = allColumns.map((col) =>
+        savedSelectedColumns.includes(col) ? col : col
+      );
+      setSelectedColumns(savedSelectedColumns);
+      setColumnOrder(savedColumnOrder.filter((col) => completeColumns.includes(col)));
+    } else {
+      // Fallback to default columns if nothing is saved
+      setSelectedColumns(allColumns);
+      setColumnOrder(allColumns);
     }
-    if (savedOrder) {
-      setColumnOrder(savedOrder);
-    }
-  }, []);
+  }, [selectedTab]);
 
   useEffect(() => {
     if (searchQuery) {
@@ -105,18 +122,18 @@ const OrdersPage = () => {
   };
 
   const handleSelectAll = () => {
-    setSelectedColumns(initialColumns);
-    setColumnOrder(initialColumns);
+    setSelectedColumns(columnsConfig[selectedTab]);
+    setColumnOrder(columnsConfig[selectedTab]);
   };
 
   const handleDeselectAll = () => {
     setSelectedColumns([]);
-    setColumnOrder([]);
   };
 
   const handleSave = () => {
-    localStorage.setItem('selectedColumns', JSON.stringify(selectedColumns));
-    localStorage.setItem('columnOrder', JSON.stringify(columnOrder));
+    const cleanTab = selectedTab.split(" (")[0]; // Clean the tab name
+    localStorage.setItem(`selectedColumns_${cleanTab}`, JSON.stringify(selectedColumns));
+    localStorage.setItem(`columnOrder_${cleanTab}`, JSON.stringify(columnOrder));
     setColumnModalOpen(false);
   };
 
@@ -127,7 +144,10 @@ const OrdersPage = () => {
     const [draggedColumn] = reorderedColumns.splice(result.source.index, 1);
     reorderedColumns.splice(result.destination.index, 0, draggedColumn);
 
-    setColumnOrder(reorderedColumns); // Update the column order both in modal and table
+    setColumnOrder(reorderedColumns);
+    setSelectedColumns((prevSelected) =>
+      reorderedColumns.filter((col) => prevSelected.includes(col))
+    );
   };
 
   // Convert dateTime string to Date object
@@ -240,11 +260,30 @@ const OrdersPage = () => {
     return isDateInRange && (productMatch || orderMatch || dateMatch) && (!isPromoOrOffer || isPaidOrder);
   });
 
+  // Function to calculate counts for each tab
+  const getOrderCounts = () => {
+    return {
+      'New Orders': orderList?.filter(order => order?.orderStatus === 'Pending').length || 0,
+      'Active Orders': orderList?.filter(order => ['Processing', 'Shipped', 'On Hold'].includes(order?.orderStatus)).length || 0,
+      'Completed Orders': orderList?.filter(order => order?.orderStatus === 'Delivered').length || 0,
+      'Returns & Refunds': orderList?.filter(order => ['Return Requested', 'Request Accepted', 'Request Declined', 'Return Initiated', 'Refunded'].includes(order?.orderStatus)).length || 0,
+    };
+  };
+
+  // Memoize counts to prevent unnecessary recalculations
+  const counts = useMemo(getOrderCounts, [orderList]);
+
+  // Append counts to tabs
+  const tabsWithCounts = useMemo(() => {
+    return orderStatusTabs?.map(tab => `${tab} (${counts[tab] || 0})`);
+  }, [counts]);
+
   // Function to get filtered orders based on the selected tab and sort by last status change
   const getFilteredOrders = () => {
+    const cleanTab = selectedTab.split(' (')[0];
     let filtered = [];
 
-    switch (selectedTab) {
+    switch (cleanTab) {
       case 'New Orders':
         filtered = orderList?.filter(order => order?.orderStatus === 'Pending');
         break;
@@ -254,8 +293,8 @@ const OrdersPage = () => {
       case 'Completed Orders':
         filtered = orderList?.filter(order => order?.orderStatus === 'Delivered');
         break;
-      case 'Canceled Orders':
-        filtered = orderList?.filter(order => ['Requested Return', 'Refunded'].includes(order?.orderStatus));
+      case 'Returns & Refunds':
+        filtered = orderList?.filter(order => ['Return Requested', 'Request Accepted', 'Request Declined', 'Return Initiated', 'Refunded'].includes(order?.orderStatus));
         break;
       default:
         filtered = orderList;
@@ -277,6 +316,7 @@ const OrdersPage = () => {
   const totalPages = Math.ceil(filteredOrders?.length / itemsPerPage);
 
   const handleActions = async (id, actionType, isUndo = false) => {
+
     const order = paginatedOrders?.find(order => order._id === id);
 
     const dataToSend = order?.productInformation.map(product => ({
@@ -296,7 +336,9 @@ const OrdersPage = () => {
       shipped: "Do you want to ship this order?",
       onHold: "Do you want to put this order on hold?",
       delivered: "Do you want to mark this order as delivered?",
-      requestedReturn: "Do you want to approve a return request for this order?",
+      approved: "Do you want to mark this order as accepted?",
+      declined: "Do you want to mark this order as declined?",
+      returned: "Do you want to mark this order as returned?",
       refunded: "Do you want to refund this order?",
       "": "Do you want to revert this order?"
     };
@@ -312,6 +354,29 @@ const OrdersPage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         if (actionType === undefined) {
+          // try {
+          //   const response = await axiosPublic.put("/decreaseSkuFromProduct", dataToSend);
+
+          //   // Check the results array from the response
+          //   const updateResults = response?.data?.results;
+
+          //   if (updateResults && Array.isArray(updateResults)) {
+          //     const successfulUpdates = updateResults.filter((result) => !result.error); // Filter out successful updates
+
+          //     if (successfulUpdates.length > 0) {
+          //       updateOrderStatus(order, id, actionType, isUndo); // Call your function only if there are successful updates
+          //     } else {
+          //       console.error("No successful updates occurred");
+          //     }
+          //   } else {
+          //     console.error("Unexpected response format:", response?.data);
+          //   }
+          // } catch (error) {
+          //   console.error("Error making API request:", error);
+          // }
+          updateOrderStatus(order, id, actionType, isUndo);
+        }
+        else if (actionType === "shipped") {
           try {
             const response = await axiosPublic.put("/decreaseSkuFromProduct", dataToSend);
 
@@ -322,7 +387,10 @@ const OrdersPage = () => {
               const successfulUpdates = updateResults.filter((result) => !result.error); // Filter out successful updates
 
               if (successfulUpdates.length > 0) {
-                updateOrderStatus(order, id, actionType, isUndo); // Call your function only if there are successful updates
+                // Open the modal for tracking number input only for 'shipped'
+                setOrderToUpdate(order);
+                setOrderIdToUpdate(id); // Set the order ID for modal
+                setTrackingModalOpen(true);  // Open the modal
               } else {
                 console.error("No successful updates occurred");
               }
@@ -333,12 +401,7 @@ const OrdersPage = () => {
             console.error("Error making API request:", error);
           }
         }
-        else if (actionType === "shipped") {
-          // Open the modal for tracking number input only for 'shipped'
-          setOrderToUpdate(order);
-          setOrderIdToUpdate(id); // Set the order ID for modal
-          setTrackingModalOpen(true);  // Open the modal
-        } else if (actionType === "onHold") {
+        else if (actionType === "onHold") {
           // Open the modal for on hold input only for 'onHold'
           setOrderToUpdateOnHold(order);
           setOrderIdToUpdateOnHold(id); // Set the order ID for modal
@@ -370,8 +433,14 @@ const OrdersPage = () => {
         case 'delivered':
           updateStatus = 'Delivered';
           break;
-        case 'requestedReturn':
-          updateStatus = 'Requested Return';
+        case 'approved':
+          updateStatus = 'Request Accepted';
+          break;
+        case 'declined':
+          updateStatus = 'Request Declined';
+          break;
+        case 'returned':
+          updateStatus = 'Return Initiated';
           break;
         case 'refunded':
           updateStatus = 'Refunded';
@@ -483,7 +552,15 @@ const OrdersPage = () => {
         message = "We have received your return request and will process it shortly. You will be contacted with further instructions on how to return your items.";
         successToastMessage = "Shipment is on hold.";
         break;
-      case 'requestedReturn':
+      case 'approved':
+        message = "We have received your return request and will process it shortly. You will be contacted with further instructions on how to return your items.";
+        successToastMessage = "Approved request has been initiated!";
+        break;
+      case 'declined':
+        message = "We have received your return request and will process it shortly. You will be contacted with further instructions on how to return your items.";
+        successToastMessage = "Declined request has been initiated!";
+        break;
+      case 'returned':
         message = "We have received your return request and will process it shortly. You will be contacted with further instructions on how to return your items.";
         successToastMessage = "Return request has been initiated!";
         break;
@@ -833,20 +910,21 @@ const OrdersPage = () => {
     XLSX.writeFile(workbook, `${fileName}.xlsx`);
   };
 
-  const isSevenDaysOrMore = (lastStatusChange) => {
-    const today = new Date();
-    const sevenDaysAgo = subDays(today, 7);
-    return isBefore(parseISO(lastStatusChange), sevenDaysAgo);
-  };
+  // After delivered, only admin can change this within 7 days of order
+  // const isSevenDaysOrMore = (lastStatusChange) => {
+  //   const today = new Date();
+  //   const sevenDaysAgo = subDays(today, 7);
+  //   return isBefore(parseISO(lastStatusChange), sevenDaysAgo);
+  // };
 
-  // Disable the button based on conditions
-  const shouldDisableButton = (orderStatus, lastStatusChange, isAdmin) => {
-    if (isAdmin) return false; // If admin, do not disable
-    if (['Delivered', 'Requested Return', 'Refunded'].includes(orderStatus)) {
-      return isSevenDaysOrMore(lastStatusChange); // Disable if last status change was 7 or more days ago
-    }
-    return false;
-  };
+  // Disable the button based on admins or staffs
+  // const shouldDisableButton = (orderStatus, lastStatusChange, isAdmin) => {
+  //   if (!isAdmin) return false; // If admin, do not disable
+  //   if (['Delivered', 'Requested Return', 'Refunded'].includes(orderStatus)) {
+  //     return isSevenDaysOrMore(lastStatusChange); // Disable if last status change was 7 or more days ago
+  //   }
+  //   return false;
+  // };
 
   const matchingShipmentHandlers = useMemo(() => {
     if (!shippingList || !orderToUpdate?.deliveryInfo?.city) return [];
@@ -918,9 +996,9 @@ const OrdersPage = () => {
         <div className='pb-3 px-6 md:px-0 pt-3 md:pt-0 flex flex-wrap lg:flex-nowrap gap-3 lg:gap-0 justify-center md:justify-between'>
           <div className='flex justify-center md:justify-start w-full'>
             <TabsOrder
-              tabs={orderStatusTabs}
-              selectedTab={selectedTab}
-              onTabChange={setSelectedTab} // This passes the function to change the tab
+              tabs={tabsWithCounts}
+              selectedTab={`${selectedTab} (${counts[selectedTab] || 0})`} // Pass the selected tab with the count
+              onTabChange={(tab) => setSelectedTab(tab.split(' (')[0])} // Extract the tab name without the count
             />
           </div>
 
@@ -1152,6 +1230,11 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                                 {order?.orderNumber}
                               </td>
                             )}
+                            {column === 'Return Number' && (
+                              <td key="returnNumber" className="text-xs p-3 font-mono cursor-pointer text-blue-600 hover:text-blue-800" onClick={() => handleOrderClick(order)}>
+                                {order?.orderNumber}
+                              </td>
+                            )}
                             {column === 'Date & Time' && (
                               <td key="dateTime" className="text-xs p-3 text-gray-700 text-center">{order?.dateTime}</td>
                             )}
@@ -1161,22 +1244,31 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                             {column === 'Order Amount' && (
                               <td key="orderAmount" className="text-xs p-3 text-gray-700 text-right">৳ {order?.total?.toFixed(2)}</td>
                             )}
+                            {column === 'Refund Amount' && (
+                              <td key="refundAmount" className="text-xs p-3 text-gray-700 text-right">৳ {order?.total?.toFixed(2)}</td>
+                            )}
                             {column === 'Order Status' && (
                               <td key="orderStatus" className="text-xs p-3 text-yellow-600 text-center">{order?.orderStatus}</td>
+                            )}
+                            {column === 'Status' && (
+                              <td key="status" className="text-xs p-3 text-yellow-600 text-center">{order?.orderStatus}</td>
                             )}
                             {column === 'Action' && (
                               <td className="p-3">
                                 <div className="flex gap-2 items-center">
+
                                   {order.orderStatus === 'Pending' && (
                                     <Button onClick={() => handleActions(order._id)} size="sm" className="text-xs w-20" color="primary" variant="flat">
                                       Confirm
                                     </Button>
                                   )}
+
                                   {order.orderStatus === 'Processing' && (
                                     <Button onClick={() => handleActions(order._id, 'shipped')} size="sm" className="text-xs w-20" color="secondary" variant="flat">
                                       Shipped
                                     </Button>
                                   )}
+
                                   {order.orderStatus === 'Shipped' && (
                                     <div className="flex items-center gap-2">
                                       <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'onHold')} size="sm" color="warning" variant="flat">
@@ -1187,6 +1279,7 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                                       </Button>
                                     </div>
                                   )}
+
                                   {order.orderStatus === 'On Hold' && (
                                     <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'delivered')} size="sm" color="success" variant="flat">
                                       Delivered
@@ -1196,30 +1289,57 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                                   {order.orderStatus === 'Delivered' && (
                                     <Button
                                       className="text-xs w-20"
-                                      onClick={() => handleActions(order._id, 'requestedReturn')}
                                       size="sm"
-                                      color="danger"
-                                      variant="flat"
-                                      isDisabled={shouldDisableButton(order.orderStatus, order.lastStatusChange, isAdmin)}
+                                      isDisabled
                                     >
-                                      Return
+                                      Completed
                                     </Button>
                                   )}
-                                  {order.orderStatus === 'Requested Return' && (
+
+                                  {order.orderStatus === 'Return Requested' && (
+                                    <div className="flex items-center gap-2">
+                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'approved')} size="sm" color="warning" variant="flat">
+                                        Approved
+                                      </Button>
+                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'declined')} size="sm" color="success" variant="flat">
+                                        Declined
+                                      </Button>
+                                    </div>
+                                  )}
+
+                                  {order.orderStatus === 'Request Accepted' && (
+                                    <div className="flex items-center gap-2">
+                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'returned')} size="sm" color="warning" variant="flat">
+                                        Return
+                                      </Button>
+                                    </div>
+                                  )}
+
+                                  {order.orderStatus === 'Request Declined' && (
+                                    <div className="flex items-center gap-2">
+                                      <Button className="text-xs w-20"
+                                        isDisabled size="sm"
+                                        color="default">
+                                        Declined
+                                      </Button>
+                                    </div>
+                                  )}
+
+                                  {order.orderStatus === 'Return Initiated' && (
                                     <Button
                                       className="text-xs w-20"
-                                      onClick={() => handleActions(order._id, 'refunded')}
                                       size="sm"
-                                      color="danger"
-                                      variant="flat"
-                                      isDisabled={shouldDisableButton(order.orderStatus, order.lastStatusChange, isAdmin)}
+                                      color="warning"
+                                      variant='flat'
+                                      onClick={() => handleActions(order._id, 'refunded')}
                                     >
                                       Refund
                                     </Button>
                                   )}
+
                                   {order.orderStatus === 'Refunded' && (
                                     <Button
-                                      className="text-xs w-20 cursor-not-allowed"
+                                      className="text-xs w-20"
                                       size="sm"
                                       color="default"
                                       isDisabled
@@ -1237,6 +1357,7 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                                       <FaUndo />
                                     </button>
                                   )}
+
                                 </div>
                               </td>
                             )}

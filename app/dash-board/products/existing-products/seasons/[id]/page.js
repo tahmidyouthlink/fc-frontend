@@ -48,12 +48,21 @@ const SeasonPage = () => {
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedColumnsProductSeason'));
     const savedExistingProduct = JSON.parse(localStorage.getItem('selectedExistingProductSeason'));
+
     if (savedColumns) {
       setSelectedColumns(savedColumns);
+    } else {
+      // Set to default if no saved columns exist
+      setSelectedColumns(initialColumns);
     }
+
     if (savedExistingProduct) {
       setColumnOrder(savedExistingProduct);
+    } else {
+      // Set to default column order if no saved order exists
+      setColumnOrder(initialColumns);
     }
+
   }, []);
 
   const handleColumnChange = (selected) => {
@@ -67,7 +76,6 @@ const SeasonPage = () => {
 
   const handleDeselectAll = () => {
     setSelectedColumns([]);
-    setColumnOrder([]);
   };
 
   const handleSave = () => {
