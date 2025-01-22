@@ -689,37 +689,46 @@ const OrdersPage = () => {
         if (selectedColumns.includes(col)) {
           switch (col) {
             case 'Order Number':
-              data.orderNumber = row?.orderNumber;
+              data["Order Number"] = row?.orderNumber;
+              break;
+            case 'Return Number':
+              data['Return Number'] = row?.orderNumber;
               break;
             case 'Date & Time':
-              data.dateTime = row?.dateTime;
+              data['Date & Time'] = row?.dateTime;
               break;
             case 'Customer Name':
-              data.customerName = row?.customerInfo?.customerName;
+              data['Customer Name'] = row?.customerInfo?.customerName;
               break;
             case 'Order Amount':
-              data.totalAmount = row?.total;
+              data['Order Amount'] = row?.total;
+              break;
+            case 'Refund Amount':
+              data['Refund Amount'] = row?.total;
               break;
             case 'Order Status':
-              data.orderStatus = row?.orderStatus;
+              data['Order Status'] = row?.orderStatus;
+              break;
+            case 'Status':
+              data['Status'] = row?.orderStatus;
               break;
             case 'Email':
-              data.email = row?.customerInfo?.email;
+              data['Email'] = row?.customerInfo?.email;
               break;
             case 'Phone Number':
-              data.phoneNumber = row?.customerInfo?.phoneNumber;
+              data['Phone Number'] = row?.customerInfo?.phoneNumber;
               break;
             case 'Alternative Phone Number':
-              data.phoneNumber2 = row?.customerInfo?.phoneNumber2 || "--";
+              data['Alternative Phone Number'] = row?.customerInfo?.phoneNumber2 || "--";
               break;
             case 'Shipping Method':
-              data.shippingMethod = row?.deliveryInfo?.deliveryMethod;
+              data['Shipping Method'] = row?.deliveryInfo?.deliveryMethod;
               break;
             case 'Payment Status':
-              data.paymentStatus = row?.paymentInfo?.paymentStatus;
+              data['Payment Status'] = row?.paymentInfo?.paymentStatus;
               break;
             case 'Payment Method':
-              data.paymentMethod = row?.paymentInfo?.paymentMethod;
+              data['Payment Method'] = row?.paymentInfo?.paymentMethod;
               break;
             default:
               break;
@@ -770,6 +779,9 @@ const OrdersPage = () => {
             case "Order Number":
               rowData["Order Number"] = order?.orderNumber;
               break;
+            case "Return Number":
+              rowData["Return Number"] = order?.orderNumber;
+              break;
             case "Date & Time":
               rowData["Date & Time"] = order?.dateTime;
               break;
@@ -779,8 +791,14 @@ const OrdersPage = () => {
             case "Order Amount":
               rowData["Order Amount"] = `${order?.total?.toFixed(2)}`;
               break;
+            case "Refund Amount":
+              rowData["Refund Amount"] = `${order?.total?.toFixed(2)}`;
+              break;
             case "Order Status":
               rowData["Order Status"] = order?.orderStatus;
+              break;
+            case "Status":
+              rowData["Status"] = order?.orderStatus;
               break;
             case "Email":
               rowData["Email"] = order?.customerInfo?.email;
@@ -856,6 +874,9 @@ const OrdersPage = () => {
             case 'Order Number':
               data["Order Number"] = row?.orderNumber || "";  // Include empty cells
               break;
+            case 'Return Number':
+              data["Return Number"] = row?.orderNumber || "";  // Include empty cells
+              break;
             case 'Date & Time':
               data["Date & Time"] = row?.dateTime || "";  // Include empty cells
               break;
@@ -865,8 +886,14 @@ const OrdersPage = () => {
             case 'Order Amount':
               data["Order Amount"] = row?.total || "";  // Include empty cells
               break;
+            case 'Refund Amount':
+              data["Refund Amount"] = row?.total || "";  // Include empty cells
+              break;
             case 'Order Status':
               data["Order Status"] = row?.orderStatus || "";  // Include empty cells
+              break;
+            case 'Status':
+              data["Status"] = row?.orderStatus || "";  // Include empty cells
               break;
             case 'Email':
               data["Email"] = row?.customerInfo?.email || "";  // Include empty cells
