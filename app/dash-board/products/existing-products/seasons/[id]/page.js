@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { IoMdClose } from 'react-icons/io';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { TbColumnInsertRight } from 'react-icons/tb';
 
 const initialColumns = ['Product', 'Status', 'SKU', 'Category', 'Price', 'Discount (৳ / %)', 'Sizes', 'Colors', 'Vendor', 'Shipping Zones', 'Shipment Handlers'];
 
@@ -166,6 +167,23 @@ const SeasonPage = () => {
     return isDateInRange && matchesSearch;
   });
 
+  const getOrderCounts = () => {
+    return {
+      'All': productDetails?.filter(product => product?.status).length || 0,
+      'Active': productDetails?.filter(product => product?.status === 'active').length || 0,
+      'Draft': productDetails?.filter(product => product?.status === 'draft').length || 0,
+      'Archived': productDetails?.filter(product => product?.status === "archive").length || 0,
+    };
+  };
+
+  // Memoize counts to prevent unnecessary recalculations
+  const counts = useMemo(getOrderCounts, [productDetails]);
+
+  // Append counts to tabs
+  const tabsWithCounts = useMemo(() => {
+    return productStatusTab?.map(tab => `${tab} (${counts[tab] || 0})`);
+  }, [counts]);
+
   const getFilteredProducts = () => {
     switch (selectedTab) {
       case 'Active':
@@ -279,9 +297,9 @@ const SeasonPage = () => {
       <div className='flex justify-between flex-wrap items-center gap-3 md:gap-0 max-w-screen-2xl mx-auto pb-3 px-6 2xl:px-0'>
 
         <TabsOrder
-          tabs={productStatusTab}
-          selectedTab={selectedTab}
-          onTabChange={setSelectedTab}
+          tabs={tabsWithCounts}
+          selectedTab={`${selectedTab} (${counts[selectedTab] || 0})`} // Pass the selected tab with the count
+          onTabChange={(tab) => setSelectedTab(tab.split(' (')[0])} // Extract the tab name without the count
         />
 
         <div className='min-w-[40%]'>
@@ -311,8 +329,8 @@ const SeasonPage = () => {
         </div>
 
         <div ref={dropdownRef} className="relative inline-block text-left z-50">
-          <Button onClick={() => toggleDropdown('other')} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
-            Customize
+          <button onClick={() => toggleDropdown('other')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[10px] md:text-[14px] text-neutral-700">
+            CUSTOMIZE
             <svg
               className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown === "other" ? 'rotate-180' : ''}`}
               xmlns="http://www.w3.org/2000/svg"
@@ -322,15 +340,11 @@ const SeasonPage = () => {
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
             </svg>
-          </Button>
+          </button>
 
           {openDropdown === 'other' && (
             <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="p-1 flex flex-col gap-2">
-
-                <Button color="danger" size='sm' onClick={() => { setColumnModalOpen(true) }}>
-                  Choose Columns
-                </Button>
 
                 <div className='flex items-center gap-2'>
                   <DateRangePicker
@@ -348,12 +362,20 @@ const SeasonPage = () => {
                   )}
                 </div>
 
+                {/* Choose Columns Button */}
+                <button className="relative z-[1] flex items-center justify-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700 w-full" onClick={() => { setColumnModalOpen(true) }}>
+                  Choose Columns <TbColumnInsertRight size={20} />
+                </button>
+
               </div>
             </div>
           )}
+
         </div>
+
       </div>
 
+      {/* TABLE */}
       {isLoading ? (
         <div className="min-h-[700px] flex justify-center items-center relative z-10">
           <SmallHeightLoading />
@@ -383,7 +405,7 @@ const SeasonPage = () => {
                               {column === 'Product' && (
                                 <td onClick={() => handleGoToEditPage(product?._id)} className="text-xs p-3 cursor-pointer text-blue-600 hover:text-blue-800 flex flex-col lg:flex-row items-center gap-3">
                                   <div>
-                                    <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrls[0]} alt='productIMG' height={600} width={600} />
+                                    <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.thumbnailImageUrl} alt='productIMG' height={600} width={600} />
                                   </div>
                                   <div className='flex flex-col'>
                                     <p>{product?.productTitle}</p>
@@ -462,7 +484,7 @@ const SeasonPage = () => {
       {/* Column Selection Modal */}
       <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
         <ModalContent>
-          <ModalHeader>Choose Columns</ModalHeader>
+          <ModalHeader className='bg-gray-200'>Choose Columns</ModalHeader>
           <ModalBody className="modal-body-scroll">
             <DragDropContext onDragEnd={handleOnDragEnd}>
               <Droppable droppableId="droppable">
@@ -503,13 +525,15 @@ const SeasonPage = () => {
               </Droppable>
             </DragDropContext>
           </ModalBody>
-          <ModalFooter>
-            <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
-              Select All
-            </Button>
-            <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
-              Deselect All
-            </Button>
+          <ModalFooter className='flex justify-between items-center'>
+            <div className='flex items-center gap-2'>
+              <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
+                Deselect All
+              </Button>
+              <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
+                Select All
+              </Button>
+            </div>
             <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
               Save
             </Button>

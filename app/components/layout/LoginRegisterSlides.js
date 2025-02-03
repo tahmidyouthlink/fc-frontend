@@ -374,7 +374,7 @@ const LoginRegisterSlides = () => {
         <div className='flex justify-end items-center'>
           <button
             type='submit'
-            className={`bg-[#D2016E] hover:bg-[#d2016dbd] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}
+            className={`bg-[#d4ffce] hover:bg-[#bdf6b4] text-neutral-700 py-2 px-4 text-sm rounded-lg cursor-pointer font-bold transition-[background-color] duration-300`}
           >
             Upload
           </button>

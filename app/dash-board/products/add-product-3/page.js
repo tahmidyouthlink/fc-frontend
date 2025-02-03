@@ -170,7 +170,7 @@ const ThirdStepOfAddProduct = () => {
     const storedProductWeight = localStorage.getItem('weight');
     const storedProductBatchCode = localStorage.getItem('batchCode');
     const storedRegularPrice = localStorage.getItem('regularPrice');
-    const storedUploadedImageUrls = JSON.parse(localStorage.getItem('uploadedImageUrls') || '[]');
+    const storedUploadedImageUrl = localStorage.getItem('uploadedImageUrl');
     const storedRestOfOutfit = JSON.parse(localStorage.getItem('restOfOutfit') || '[]');
     const storedDiscountType = localStorage.getItem('discountType');
     const storedDiscountValue = localStorage.getItem('discountValue');
@@ -196,7 +196,7 @@ const ThirdStepOfAddProduct = () => {
       weight: storedProductWeight,
       batchCode: storedProductBatchCode,
       regularPrice: storedRegularPrice,
-      imageUrls: storedUploadedImageUrls,
+      thumbnailImageUrl: storedUploadedImageUrl,
       discountType: storedDiscountType,
       discountValue: storedDiscountValue,
       productDetails: storedProductDetails,
@@ -215,7 +215,6 @@ const ThirdStepOfAddProduct = () => {
       shippingDetails: selectedShipmentHandler,
       productId: storedProductId,
       status: "active",
-      salesThisMonth: 0,
       sizeGuideImageUrl: storedSizeGuideImageUrl,
       restOfOutfit: storedRestOfOutfit,
     }
@@ -262,7 +261,7 @@ const ThirdStepOfAddProduct = () => {
         localStorage.removeItem('batchCode');
         localStorage.removeItem('weight');
         localStorage.removeItem('regularPrice');
-        JSON.parse(localStorage.removeItem('uploadedImageUrls') || '[]');
+        localStorage.removeItem('uploadedImageUrl');
         localStorage.removeItem('discountType');
         localStorage.removeItem('discountValue');
         localStorage.removeItem('productDetails');
@@ -299,7 +298,7 @@ const ThirdStepOfAddProduct = () => {
 
       <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-white'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Select Shipping Details</h3>
+          <h3 className='w-full font-semibold text-xl lg:text-2xl'>SELECT SHIPPING DETAILS</h3>
           <Link
             className="flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
             href="/dash-board/products"
@@ -312,7 +311,7 @@ const ThirdStepOfAddProduct = () => {
           </Link>
         </div>
 
-        <div className='flex flex-wrap items-center gap-3 bg-white mt-2'>
+        <div className='flex flex-wrap items-center gap-3 bg-white mt-4'>
 
           <button
             className={`relative text-sm py-1 transition-all duration-300
@@ -440,14 +439,14 @@ ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:af
           </table>
         </div>
 
-        <div className='flex justify-between mt-6 px-6 2xl:px-0'>
-          <Link href='/dash-board/products/add-product-2' className='flex items-center gap-2 mt-4 mb-8 bg-[#9F5216] hover:bg-[#804010] text-white py-2 px-4 rounded-md cursor-pointer font-medium'>
+        <div className='flex justify-between px-6 2xl:px-0 py-6'>
+          <Link href='/dash-board/products/add-product-2' className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'>
             <FaArrowLeft /> Previous Step
           </Link>
 
           <div className='flex items-center gap-6'>
 
-            <button type='submit' className={`bg-[#9F5216] hover:bg-[#804010] text-white py-2 px-4 flex items-center justify-center gap-2 rounded-md cursor-pointer font-medium`}>
+            <button type='submit' className={`relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700`}>
               Publish <MdOutlineFileUpload size={20} />
             </button>
           </div>

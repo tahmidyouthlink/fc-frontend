@@ -12,6 +12,8 @@ import Image from 'next/image';
 import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
 import Loading from '@/app/components/shared/Loading/Loading';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
+import { MdCheckBox, MdCheckBoxOutlineBlank } from 'react-icons/md';
+import { FiSave } from 'react-icons/fi';
 
 export default function EditShippingZone() {
   const router = useRouter();
@@ -282,18 +284,18 @@ export default function EditShippingZone() {
               {selectedCities?.length > 71 ? "" : <button
                 type="button"
                 onClick={handleSelectAll}
-                className="bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-3 rounded transition duration-150 text-sm"
+                className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700"
               >
-                Select All
+                <MdCheckBox size={18} /> Select All
               </button>}
 
               {/* Unselect All Button */}
               {selectedCities?.length > 2 && <button
                 type="button"
                 onClick={handleUnselectAll}
-                className="bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-3 rounded transition duration-150 text-sm"
+                className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700"
               >
-                Unselect All
+                <MdCheckBoxOutlineBlank size={20} /> Unselect All
               </button>}
 
             </div>
@@ -481,14 +483,15 @@ export default function EditShippingZone() {
 
           </div>
 
+          {/* Submit Button */}
           <div className='flex justify-end items-center'>
 
             <button
               type='submit'
               disabled={isSubmitting}
-              className={`mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium ${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium`}
+              className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700 mt-4 mb-8`}
             >
-              {isSubmitting ? 'Submitting...' : 'Submit'}
+              {isSubmitting ? 'Saving...' : 'Save Changes'} <FiSave size={20} />
             </button>
           </div>
 

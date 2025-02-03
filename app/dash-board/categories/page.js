@@ -7,10 +7,10 @@ import { useRouter } from 'next/navigation';
 import useCategories from '@/app/hooks/useCategories';
 import Loading from '@/app/components/shared/Loading/Loading';
 import { RiDeleteBinLine } from 'react-icons/ri';
-import { MdOutlineModeEdit } from 'react-icons/md';
+import { AiOutlineEdit } from "react-icons/ai";
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
-import { FaStar } from "react-icons/fa6";
+import { FaPlus, FaStar } from "react-icons/fa6";
 
 const CategoriesOverview = () => {
   const axiosPublic = useAxiosPublic();
@@ -150,24 +150,37 @@ const CategoriesOverview = () => {
     <div className='bg-gray-50 min-h-screen'>
 
       <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between max-w-screen-2xl mx-auto px-6 pt-6'>
-        <h1 className='font-semibold text-center md:text-xl lg:text-2xl'>Category Management</h1>
-        <Button onClick={handleSelectFeaturedCategory} className='bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium'>
-          Select Featured Category
-        </Button>
-        <Button onClick={() => router.push('/dash-board/categories/add-category')} className='bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium'>
-          New Category
-        </Button>
+        <h1 className='font-semibold text-center md:text-xl lg:text-2xl'>CATEGORY MANAGEMENT</h1>
+        <button onClick={handleSelectFeaturedCategory} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700">
+          <FaStar size={17} className='text-neutral-700' /> Select Featured Category
+        </button>
+        <button onClick={() => router.push('/dash-board/categories/add-category')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
+          <FaPlus size={15} className='text-neutral-700' /> Add
+        </button>
       </div>
 
       <div className='max-w-screen-2xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 px-6'>
         {categoryList?.map(category => (
-          <div key={category?._id} className='category-item border p-4 rounded-md shadow-md'>
+          <div key={category?._id} className='category-item border p-4 rounded-md'>
             <div className='flex justify-between items-center'>
               <h4 className='font-bold text-lg'>{category?.label}</h4>
-              {category?.isFeatured && <span className="text-green-500 text-2xl"><FaStar /></span>}
+              <div className='flex justify-end items-center gap-2'>
+
+                {/* Edit Button */}
+                <button onClick={() => router.push(`/dash-board/categories/${category._id}`)}>
+                  <span className='flex items-center gap-1.5 rounded-md bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4'><AiOutlineEdit size={16} /> Edit </span>
+                </button>
+
+                {/* Delete Button */}
+                <button onClick={() => handleDelete(category?._id)}>
+                  <span className='flex items-center gap-1.5 rounded-md bg-red-50 p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-red-100 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs'> <RiDeleteBinLine size={16} />Delete </span>
+                </button>
+
+              </div>
             </div>
-            <div className='mt-2'>
-              <strong>Sizes:</strong> {category.sizes.join(', ')}
+            <div className='mt-4 flex items-center justify-between'>
+              <p><strong>Sizes:</strong> {category.sizes.join(', ')}</p>
+              {category?.isFeatured && <span className="text-green-500 text-2xl"><FaStar /></span>}
             </div>
             <div className='mt-2'>
               <strong>Sub-Categories: </strong>
@@ -186,18 +199,6 @@ const CategoriesOverview = () => {
                 </button>
               )}
             </div>
-            <div className='flex gap-2 mt-4'>
-              {/* Edit Button */}
-              <button onClick={() => router.push(`/dash-board/categories/${category._id}`)}>
-                <span className='flex items-center gap-3 text-orange-600 border py-[3px] px-5 rounded border-orange-600 hover:bg-gradient-to-tr hover:from-pink-500 hover:to-yellow-500 hover:text-white hover:border-0'>Edit <MdOutlineModeEdit size={16} /></span>
-              </button>
-
-              {/* Delete Button */}
-              <button onClick={() => handleDelete(category?._id)}>
-                <span className='flex items-center gap-3 text-red-600 border py-[3px] px-5 rounded border-red-600 hover:bg-red-600 hover:text-white hover:border-0'>Delete <RiDeleteBinLine size={16} /></span>
-              </button>
-
-            </div>
           </div>
         ))}
       </div>
@@ -205,7 +206,7 @@ const CategoriesOverview = () => {
       <Modal className='mx-4 lg:mx-0' isOpen={isOpen} onOpenChange={onClose} size='xl'>
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1 bg-gray-200 px-8">
-            Select Featured Categories
+            Select Featured Categories (Only 4 can be selected)
           </ModalHeader>
           <ModalBody className="modal-body-scroll">
             <div className="grid grid-cols-2 gap-4">
@@ -222,7 +223,7 @@ const CategoriesOverview = () => {
             </div>
 
           </ModalBody>
-          <ModalFooter className='flex items-center justify-end'>
+          <ModalFooter className='flex items-center justify-end border'>
             <Button onClick={onClose} color="danger" variant='light' size='sm'>
               Close
             </Button>

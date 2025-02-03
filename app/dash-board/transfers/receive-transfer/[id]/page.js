@@ -126,6 +126,8 @@ const ReceiveTransferOrder = () => {
               if (prodVariant.sku >= variant.accept) {
                 // Subtract accept value from SKU
                 prodVariant.sku -= variant.accept;
+                // Update onHandSku
+                prodVariant.onHandSku = (prodVariant.onHandSku || 0) - variant.accept;
                 modifiedProducts.add(product._id); // Track modified product
               }
             }
@@ -139,6 +141,8 @@ const ReceiveTransferOrder = () => {
 
               // Add accept value to SKU
               prodVariant.sku += variant.accept;
+              // Update onHandSku
+              prodVariant.onHandSku = (prodVariant.onHandSku || 0) + variant.accept;
               modifiedProducts.add(product._id); // Track modified product
             }
           });
@@ -156,6 +160,7 @@ const ReceiveTransferOrder = () => {
             const newVariant = {
               ...matchingVariant,
               sku: variant.accept,
+              onHandSku: variant.accept, // Initialize onHandSku
               location: destinationName, // New location
             };
 

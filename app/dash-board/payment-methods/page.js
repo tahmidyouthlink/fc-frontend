@@ -6,13 +6,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FaPlusCircle } from 'react-icons/fa';
 import MarkdownRenderer from '@/app/utils/Markdown/MarkdownRenderer';
-import { MdOutlineModeEdit } from 'react-icons/md';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import Loading from '@/app/components/shared/Loading/Loading';
 import CustomSwitchPaymentMethod from '@/app/components/layout/CustomSwitchPaymentMethod';
 import usePaymentMethods from '@/app/hooks/usePaymentMethods';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
+import { AiOutlineEdit } from 'react-icons/ai';
 
 const PaymentMethods = () => {
 
@@ -142,7 +142,7 @@ const PaymentMethods = () => {
   return (
     <div className='bg-gray-50 min-h-screen'>
       <div className='max-w-screen-2xl mx-auto flex items-center pt-3 md:pt-6'>
-        <h3 className='w-full font-semibold text-xl lg:text-2xl'>Payment Management</h3>
+        <h3 className='w-full font-semibold text-xl lg:text-2xl'>PAYMENT MANAGEMENT</h3>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-center gap-6 max-w-screen-2xl mx-auto my-6">
         {
@@ -197,7 +197,7 @@ const PaymentMethods = () => {
 
                   <div className="group relative">
                     <Link href={`/dash-board/payment-methods/${payment?._id}`}>
-                      <MdOutlineModeEdit
+                      <AiOutlineEdit
                         size={22}
                         className={`text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200`}
                       />

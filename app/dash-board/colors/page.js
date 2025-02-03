@@ -6,6 +6,7 @@ import { Button } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
+import { FaPlus } from 'react-icons/fa6';
 import { MdDeleteOutline } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
@@ -79,10 +80,10 @@ const ColorsPage = () => {
   return (
     <div className='relative'>
       <div className='sticky top-0 z-10 bg-white flex items-center justify-between p-6'>
-        <h1 className='font-semibold text-center md:text-xl lg:text-2xl'>Color Management</h1>
-        <Button onClick={() => router.push('/dash-board/colors/add-color')} className='bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium'>
-          New Color
-        </Button>
+        <h1 className='font-semibold text-center md:text-xl lg:text-2xl'>COLOR MANAGEMENT</h1>
+        <button onClick={() => router.push('/dash-board/colors/add-color')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
+          <FaPlus size={15} className='text-neutral-700' /> Add
+        </button>
       </div>
 
       <div className='w-full divide-y divide-gray-200 pt-2'>

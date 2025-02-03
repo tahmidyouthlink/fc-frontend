@@ -141,8 +141,9 @@ const EditReceiveInventory = () => {
           );
 
           if (existingVariant) {
-            // Update SKU if location matches
+            // Update SKU and onHoldSku if location matches
             existingVariant.sku += variant.accept;
+            existingVariant.onHandSku = (existingVariant.onHandSku || 0) + variant.accept;
             modifiedProducts.add(product._id);
           } else {
             // If location doesn't match but other fields do, create a new variant
@@ -162,6 +163,7 @@ const EditReceiveInventory = () => {
               const newVariant = {
                 ...baseVariant,
                 sku: variant.accept, // Set SKU based on accept value
+                onHandSku: variant.accept, // Set onHandSku based on accept value
                 location: locationName, // Ensure location is set
               };
 

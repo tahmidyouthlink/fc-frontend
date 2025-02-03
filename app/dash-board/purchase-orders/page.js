@@ -13,6 +13,8 @@ import { saveAs } from 'file-saver';
 import { FaFileAlt } from 'react-icons/fa';
 import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { TbColumnInsertRight } from "react-icons/tb";
+import { FaPlus } from 'react-icons/fa6';
 
 const orderStatusTabs = [
   'All',
@@ -127,6 +129,25 @@ const PurchaseOrders = () => {
     });
   };
 
+  // Function to calculate counts for each tab
+  const getOrderCounts = () => {
+    return {
+      'Pending': purchaseOrderList?.filter(order => order?.status === 'pending').length || 0,
+      'Ordered': purchaseOrderList?.filter(order => order?.status === 'ordered').length || 0,
+      'Received': purchaseOrderList?.filter(order => order?.status === 'received').length || 0,
+      'Canceled': purchaseOrderList?.filter(order => order?.status === 'canceled').length || 0,
+      'All': purchaseOrderList?.filter(order => order?.status).length || 0,
+    };
+  };
+
+  // Memoize counts to prevent unnecessary recalculations
+  const counts = useMemo(getOrderCounts, [purchaseOrderList]);
+
+  // Append counts to tabs
+  const tabsWithCounts = useMemo(() => {
+    return orderStatusTabs?.map(tab => `${tab} (${counts[tab] || 0})`);
+  }, [counts]);
+
   const searchedOrders = filterPurchaseOrders(purchaseOrderList, searchQuery);
 
   const getFilteredOrders = () => {
@@ -195,7 +216,7 @@ const PurchaseOrders = () => {
   }
 
   return (
-    <div className='relative w-full min-h-screen bg-gray-100 px-6'>
+    <div className='relative w-full min-h-screen bg-[#FAFAFA] px-6'>
 
       <div
         style={{
@@ -219,7 +240,7 @@ const PurchaseOrders = () => {
       {/* Column Selection Modal */}
       <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
         <ModalContent>
-          <ModalHeader>Choose Columns</ModalHeader>
+          <ModalHeader className='bg-gray-200'>Choose Columns</ModalHeader>
           <ModalBody className="modal-body-scroll">
             <DragDropContext onDragEnd={handleOnDragEnd}>
               <Droppable droppableId="droppable">
@@ -260,14 +281,16 @@ const PurchaseOrders = () => {
               </Droppable>
             </DragDropContext>
           </ModalBody>
-          <ModalFooter>
-            <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
-              Select All
-            </Button>
-            <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
-              Deselect All
-            </Button>
-            <Button variant="solid" color="primary" size="sm" onClick={handleSave}>
+          <ModalFooter className='flex justify-between items-center'>
+            <div className='flex items-center gap-2'>
+              <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
+                Deselect All
+              </Button>
+              <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
+                Select All
+              </Button>
+            </div>
+            <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
               Save
             </Button>
           </ModalFooter>
@@ -278,27 +301,26 @@ const PurchaseOrders = () => {
 
         <div className='flex flex-wrap md:flex-nowrap items-center justify-between py-2 md:py-5 gap-2 w-full'>
 
-          <h3 className='text-center md:text-start font-semibold text-xl lg:text-2xl'>Purchase orders</h3>
+          <h3 className='text-center md:text-start font-semibold text-xl lg:text-2xl'>PURCHASE ORDERS</h3>
 
-          <Button variant="solid" color="danger" onClick={handleGoToPurchaseOrderPage}>
-            Create purchase order
-          </Button>
-
+          <button onClick={handleGoToPurchaseOrderPage} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700">
+            <FaPlus size={15} className='text-neutral-700' /> ADD
+          </button>
         </div>
 
         <div className='flex flex-wrap lg:flex-nowrap justify-between items-center gap-6 w-full'>
           <div className='flex-1'>
             <TabsOrder
-              tabs={orderStatusTabs}
-              selectedTab={selectedTab}
-              onTabChange={setSelectedTab} // This passes the function to change the tab
+              tabs={tabsWithCounts}
+              selectedTab={`${selectedTab} (${counts[selectedTab] || 0})`} // Pass the selected tab with the count
+              onTabChange={(tab) => setSelectedTab(tab.split(' (')[0])} // Extract the tab name without the count
             />
           </div>
 
           <div>
-            <Button variant="solid" color="danger" onClick={() => { setColumnModalOpen(true) }} className="w-full">
-              Choose Columns
-            </Button>
+            <button variant="solid" color="danger" onClick={() => { setColumnModalOpen(true) }} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[18px] py-3 transition-colors duration-300 ease-in-out hover:bg-[#bdf6b4] font-semibold text-[14px] text-neutral-700">
+              Choose Columns <TbColumnInsertRight size={20} />
+            </button>
           </div>
 
           {/* Search Product Item */}
@@ -375,10 +397,10 @@ const PurchaseOrders = () => {
                                 <td key="Status" className="text-xs p-3 text-gray-700 text-center">
                                   <span
                                     className={`px-3 py-1 rounded-full font-semibold
-              ${order?.status === "pending" ? "bg-yellow-100 text-yellow-600"
+              ${order?.status === "pending" ? "bg-red-100 text-red-600"
                                         : order?.status === "ordered" ? "bg-blue-100 text-blue-600"
                                           : order?.status === "received" ? "bg-green-100 text-green-600"
-                                            : order?.status === "canceled" ? "bg-red-100 text-red-600"
+                                            : order?.status === "canceled" ? "bg-yellow-100 text-yellow-600"
                                               : "bg-gray-100 text-gray-600"}`}
                                   >
                                     {order?.status === "pending" ? "Pending"

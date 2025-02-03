@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaPlusCircle } from 'react-icons/fa';
 import { FaArrowLeft } from 'react-icons/fa6';
-import { MdOutlineModeEdit } from 'react-icons/md';
+import { MdCheckBox, MdCheckBoxOutlineBlank, MdOutlineFileUpload, MdOutlineModeEdit } from 'react-icons/md';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
@@ -309,18 +309,18 @@ const AddShippingZone = () => {
               {selectedCities?.length > 71 ? "" : <button
                 type="button"
                 onClick={handleSelectAll}
-                className="bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-3 rounded transition duration-150 text-sm"
+                className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700"
               >
-                Select All
+                <MdCheckBox size={18} /> Select All
               </button>}
 
               {/* Unselect All Button */}
               {selectedCities?.length > 2 && <button
                 type="button"
                 onClick={handleUnselectAll}
-                className="bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-3 rounded transition duration-150 text-sm"
+                className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700"
               >
-                Unselect All
+                <MdCheckBoxOutlineBlank size={20} />  Unselect All
               </button>}
 
             </div>
@@ -464,6 +464,12 @@ const AddShippingZone = () => {
                     placeholder={`Enter Shipping ${selectedShipmentHandler?.deliveryType[0] === "express" ? "hours" : "days"} for ${selectedShipmentHandler?.deliveryType[0]}`}
                     {...register('shippingTime', { required: `Shipping ${selectedShipmentHandler?.deliveryType[0] === "express" ? "Hour" : "Days"} is required` })}
                     className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                    onKeyDown={(e) => {
+                      const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', '-'];
+                      if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+                        e.preventDefault();
+                      }
+                    }}
                   />
                   {errors.shippingTime && (
                     <p className="text-red-600 text-left">{errors?.shippingTime?.message}</p>
@@ -503,6 +509,12 @@ const AddShippingZone = () => {
                       placeholder="Enter Shipping days for STANDARD"
                       {...register('shippingDaysStandard', { required: 'STANDARD Shipping days is required' })}
                       className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                      onKeyDown={(e) => {
+                        const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', '-'];
+                        if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                     />
                     {errors.shippingDaysStandard && (
                       <p className="text-red-600 text-left">{errors?.shippingDaysStandard?.message}</p>
@@ -536,6 +548,12 @@ const AddShippingZone = () => {
                       placeholder="Add Shipping hour for EXPRESS"
                       {...register('shippingHourExpress', { required: 'EXPRESS Shipping hour is required' })}
                       className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                      onKeyDown={(e) => {
+                        const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', '-'];
+                        if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                     />
                     {errors.shippingHourExpress && (
                       <p className="text-red-600 text-left">{errors?.shippingHourExpress?.message}</p>
@@ -549,12 +567,8 @@ const AddShippingZone = () => {
 
           {/* Submit Button */}
           <div className='flex justify-end items-center'>
-            <button
-              type='submit'
-              disabled={isSubmitting}
-              className={`mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium ${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium`}
-            >
-              {isSubmitting ? 'Submitting...' : 'Submit'}
+            <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700 mt-4 mb-8`}>
+              {isSubmitting ? 'Submitting...' : 'Submit'} <MdOutlineFileUpload size={20} />
             </button>
           </div>
         </div>

@@ -1,10 +1,9 @@
 "use client";
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from "react-hook-form";
 import toast from 'react-hot-toast';
 import ReactSelect from "react-select";
 import ColorOption from '@/app/components/layout/ColorOption';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { CheckboxGroup, Select, SelectItem, Tabs, Tab, RadioGroup, Radio } from "@nextui-org/react";
 import 'react-quill/dist/quill.snow.css';
 import dynamic from 'next/dynamic';
@@ -57,11 +56,11 @@ const FirstStepOfAddProduct = () => {
   const [selectedVendors, setSelectedVendors] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [unselectedGroupSelected2, setUnselectedGroupSelected2] = React.useState([]);
-  const [productDetails, setProductDetails] = useState("");
   const [materialCare, setMaterialCare] = useState("");
   const [sizeFit, setSizeFit] = useState("");
   const [discountType, setDiscountType] = useState('Percentage');
-  const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
+  const [dragging, setDragging] = useState(false);
+  const [image, setImage] = useState(null);
   const [categoryList, isCategoryPending] = useCategories();
   const [sizeRangeList, isSizeRangePending] = useSizeRanges();
   const [subCategoryList, isSubCategoryPending] = useSubCategories();
@@ -146,19 +145,25 @@ const FirstStepOfAddProduct = () => {
 
   // Handle adding/removing category selection
   const toggleProductSelection = (productId, productTitle, id, imageUrl) => {
-    let updatedSelectedProducts;
+    let updatedSelectedProducts = [...selectedProductIds];
 
-    // Check if the product is already selected (based on productId)
-    if (selectedProductIds.some((p) => p.productId === productId)) {
-      // Remove product from selection
-      updatedSelectedProducts = selectedProductIds.filter((p) => p.productId !== productId);
+    // Check if the product is already selected
+    const isAlreadySelected = updatedSelectedProducts.some((p) => p.productId === productId);
+
+    if (isAlreadySelected) {
+      // Remove the product if it's already selected
+      updatedSelectedProducts = updatedSelectedProducts.filter((p) => p.productId !== productId);
     } else {
-      // Add product to selection
-      updatedSelectedProducts = [...selectedProductIds, { productId, productTitle, id, imageUrl }];
+      // Allow adding only if there are less than 4 selected products
+      if (updatedSelectedProducts.length < 4) {
+        updatedSelectedProducts.push({ productId, productTitle, id, imageUrl });
+      } else {
+        toast.error("You can select up to 4 products only."); // Optional: Show a warning message
+      }
     }
 
     setSelectedProductIds(updatedSelectedProducts);
-    handleProductSelectionChange(updatedSelectedProducts); // Pass selected categories to parent component
+    handleProductSelectionChange(updatedSelectedProducts);
   };
 
   // Handle removing category directly from selected list
@@ -236,153 +241,119 @@ const FirstStepOfAddProduct = () => {
 
   const handleGroupSelectedChange = (sizes) => {
     if (sizes.length > 1) {
-      return; // Prevent selecting more than one size
+      return; // Prevent selecting more than one size range at a time
     }
 
-    // Clear the sizeError2 if at least one size is selected
     if (sizes.length > 0) {
       setSizeError2(false);
     }
 
     localStorage.setItem('groupOfSizes', JSON.stringify(sizes));
 
-    // Generate related sizes based on the selected size range
+    // Generate sizes based on the selected size range
     const newRelatedSizes = sizes.flatMap(size => generateSizes(size) || []);
+
     setGroupSelected(sizes);
 
-    setGroupSelected2(prevSelected => {
-      // Ensure prevSelected is an array
-      const prevSelectedArray = Array.isArray(prevSelected) ? prevSelected : [];
+    setUnselectedGroupSelected2([]); // Reset previously unselected sizes
 
-      // Filter the sizes that are included in newRelatedSizes
-      const filteredSizes = prevSelectedArray.filter(size => newRelatedSizes.includes(size));
+    setGroupSelected2(newRelatedSizes); // Directly set new sizes
 
-      // Filter out sizes that are not already selected and not unselected
-      const newSizes = newRelatedSizes.filter(size => !filteredSizes.includes(size) && !unselectedGroupSelected2.includes(size));
-
-      // Combine the filtered sizes and new sizes
-      const updatedGroupSelected2 = [...filteredSizes, ...newSizes];
-
-      localStorage.setItem('allSizes', JSON.stringify(updatedGroupSelected2));
-
-      return updatedGroupSelected2;
-    });
+    localStorage.setItem('allSizes', JSON.stringify(newRelatedSizes));
   };
 
   const handleGroupSelected2Change = (sizes) => {
-    localStorage.setItem('allSizes', JSON.stringify(sizes));
-    setGroupSelected2(sizes);
+    const sizeOrder = ["XXXS", "XXS", "XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL", "6XL", "7XL", "8XL", "9XL", "10XL"];
+
+    const isNumeric = (size) => !isNaN(size);
+    const sortSizes = (sizesArray) => {
+      return sizesArray.sort((a, b) => {
+        if (isNumeric(a) && isNumeric(b)) {
+          return Number(a) - Number(b);
+        } else if (!isNumeric(a) && !isNumeric(b)) {
+          return sizeOrder.indexOf(a) - sizeOrder.indexOf(b);
+        } else {
+          return isNumeric(a) ? 1 : -1;
+        }
+      });
+    };
+
+    // Save to local storage
+    localStorage.setItem("allSizes", JSON.stringify(sizes));
+
+    setGroupSelected2((prevSizes) => {
+      const updatedSizes = [...sizes]; // Create a new array with the latest sizes
+      const sortedSizes = sortSizes(updatedSizes); // Ensure correct sorting
+      localStorage.setItem("allSizes", JSON.stringify(sortedSizes));
+      return sortedSizes;
+    });
 
     if (sizes.length > 0) {
       setSizeError3(false);
     }
 
-    setUnselectedGroupSelected2(prevUnselected => {
-      // Ensure groupSelected2 and sizes are arrays
-      const groupSelected2Array = Array.isArray(groupSelected2) ? groupSelected2 : [];
+    setUnselectedGroupSelected2((prevUnselected) => {
       const sizesArray = Array.isArray(sizes) ? sizes : [];
-
-      const newlyUnselected = groupSelected2Array.filter(size => !sizesArray.includes(size));
+      const newlyUnselected = groupSelected2.filter(size => !sizesArray.includes(size));
       return [...prevUnselected, ...newlyUnselected];
     });
   };
 
-  const handleImagesChange = async (event) => {
-    const files = Array.from(event.target.files);
-
-    if (files.length === 0) {
-      setSizeError(true);
-      return;
-    } else {
-      setSizeError(false);
-    }
-
-    await processFiles(files);
-  };
-
-  const processFiles = async (files) => {
-    const validFiles = validateFiles(files);
-    if (validFiles.length === 0) {
-      toast.error("Please select valid image files (PNG, JPEG, JPG).");
-      return;
-    }
-
-    const totalImages = validFiles.length + uploadedImageUrls.length;
-    if (totalImages > 10) {
-      toast.error("You can only upload a maximum of 10 images.");
-      return;
-    }
-
-    const newImages = validFiles.map((file) => ({
-      url: URL.createObjectURL(file),
-      file,
-    }));
-
-    const imageUrls = await uploadImagesToImgbb(newImages);
-    const updatedUrls = [...uploadedImageUrls, ...imageUrls];
-
-    const limitedUrls = updatedUrls.slice(-10);
-    setUploadedImageUrls(limitedUrls);
-    localStorage.setItem('uploadedImageUrls', JSON.stringify(limitedUrls));
-
-    // Clear size error if there are valid images
-    if (limitedUrls.length > 0) {
-      setSizeError(false);
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setImage({
+        src: URL.createObjectURL(file),
+        file
+      });
     }
   };
 
-  const validateFiles = (files) => {
-    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-    return files.filter(file => validTypes.includes(file.type));
+  const handleImageRemove = () => {
+    setImage(null);
   };
 
-  const uploadImagesToImgbb = async (images) => {
-    const imageUrls = [];
-    for (const image of images) {
-      const formData = new FormData();
-      formData.append('image', image.file);
-      formData.append('key', apiKey);
-      try {
-        const response = await axiosPublic.post(apiURL, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        if (response.data && response.data.data && response.data.data.url) {
-          imageUrls.push(response.data.data.url);
-        } else {
-          toast.error("Failed to get image URL from response.");
-        }
-      } catch (error) {
-        toast.error(`Upload failed: ${error.response?.data?.error?.message || error.message}`);
+  const uploadImageToImgbb = async (image) => {
+    const formData = new FormData();
+    formData.append('image', image.file);
+    formData.append('key', apiKey);
+
+    try {
+      const response = await axiosPublic.post(apiURL, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      if (response.data && response.data.data && response.data.data.url) {
+        return response.data.data.url; // Return the single image URL
+      } else {
+        toast.error('Failed to get image URL from response.');
       }
+    } catch (error) {
+      toast.error(`Upload failed: ${error.response?.data?.error?.message || error.message}`);
     }
-    return imageUrls;
-  };
-
-  const handleDrop = async (event) => {
-    event.preventDefault();
-    const files = Array.from(event.dataTransfer.files);
-    await processFiles(files);
+    return null;
   };
 
   const handleDragOver = (event) => {
     event.preventDefault();
+    setDragging(true);
   };
 
-  const handleImageRemove = (index) => {
-    const updatedUrls = uploadedImageUrls.filter((_, i) => i !== index);
-    setUploadedImageUrls(updatedUrls);
-    localStorage.setItem('uploadedImageUrls', JSON.stringify(updatedUrls));
+  const handleDragLeave = () => {
+    setDragging(false);
   };
 
-  const handleOnDragEnd = (result) => {
-    if (!result.destination) return;
-    const items = Array.from(uploadedImageUrls);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    setUploadedImageUrls(items);
-    localStorage.setItem('uploadedImageUrls', JSON.stringify(items));
+  const handleDrop = (event) => {
+    event.preventDefault();
+    setDragging(false);
+    const file = event.dataTransfer.files[0];
+    if (file) {
+      setImage({
+        src: URL.createObjectURL(file),
+        file,
+      });
+    }
   };
 
   const handleTabChange = (key) => {
@@ -428,9 +399,9 @@ const FirstStepOfAddProduct = () => {
       const storedRegularPrice = localStorage.getItem('regularPrice');
       if (storedRegularPrice) setValue('regularPrice', storedRegularPrice);
 
-      const storedUploadedImageUrls = JSON.parse(localStorage.getItem('uploadedImageUrls') || '[]');
-      if (Array.isArray(storedUploadedImageUrls)) {
-        setUploadedImageUrls(storedUploadedImageUrls);
+      const storedUploadedImageUrl = localStorage.getItem('uploadedImageUrl');
+      if (storedUploadedImageUrl) {
+        setImage(storedUploadedImageUrl);
       }
 
       const storedDiscountType = localStorage.getItem('discountType');
@@ -445,7 +416,6 @@ const FirstStepOfAddProduct = () => {
 
       const storedProductDetails = localStorage.getItem('productDetails');
       if (storedProductDetails) {
-        setProductDetails(storedProductDetails); // Initialize state
         setValue('productDetails', storedProductDetails); // Set form default value
       }
 
@@ -590,26 +560,42 @@ const FirstStepOfAddProduct = () => {
 
   const onSubmit = async (data) => {
     try {
-      if (uploadedImageUrls.length === 0) {
+
+      if (!image) {
         setSizeError(true);
         return;
       }
       setSizeError(false);
+
+      let imageUrl = '';
+      if (image?.src && image?.file) {
+        imageUrl = await uploadImageToImgbb(image);
+        if (!imageUrl) {
+          toast.error('Image upload failed, cannot proceed.');
+          return;
+        }
+      } else {
+        imageUrl = image;
+      }
+
       if (groupSelected.length === 0) {
         setSizeError2(true);
         return;
       }
       setSizeError2(false);
+
       if (groupSelected2.length === 0) {
         setSizeError3(true);
         return;
       }
       setSizeError3(false);
+
       if (selectedSubCategories.length === 0) {
         setSizeError4(true);
         return;
       }
       setSizeError4(false);
+
       if (selectedSeasons?.length === 0) {
         setSeasonError(true);
         return;
@@ -629,7 +615,7 @@ const FirstStepOfAddProduct = () => {
       localStorage.setItem('discountType', discountType);
       localStorage.setItem('discountValue', parseFloat(data.discountValue || 0));
       localStorage.setItem('sizeGuideImageUrl', selectedImageUrl);
-
+      localStorage.setItem('uploadedImageUrl', imageUrl);
       localStorage.setItem('season', JSON.stringify(selectedSeasons));
       localStorage.setItem('restOfOutfit', JSON.stringify(selectedProductIds));
       localStorage.setItem('subCategories', JSON.stringify(selectedSubCategories));
@@ -647,26 +633,41 @@ const FirstStepOfAddProduct = () => {
   // New function for "Save for Now" button
   const onSaveForNow = async (formData) => {
 
-    if (uploadedImageUrls.length === 0) {
+    if (!image) {
       setSizeError(true);
       return;
     }
     setSizeError(false);
+
+    let imageUrl = '';
+    if (image?.src && image?.file) {
+      imageUrl = await uploadImageToImgbb(image);
+      if (!imageUrl) {
+        toast.error('Image upload failed, cannot proceed.');
+        return;
+      }
+    } else {
+      imageUrl = image;
+    }
+
     if (groupSelected.length === 0) {
       setSizeError2(true);
       return;
     }
     setSizeError2(false);
+
     if (groupSelected2.length === 0) {
       setSizeError3(true);
       return;
     }
     setSizeError3(false);
+
     if (selectedSubCategories.length === 0) {
       setSizeError4(true);
       return;
     }
     setSizeError4(false);
+
     if (selectedSeasons?.length === 0) {
       setSeasonError(true);
       return;
@@ -679,7 +680,7 @@ const FirstStepOfAddProduct = () => {
     const productId = generateProductID(selectedCategory);
     const productData = {
       ...formData,
-      imageUrls: uploadedImageUrls,
+      thumbnailImageUrl: imageUrl,
       discountType,
       publishDate,
       groupOfSizes: groupSelected,
@@ -688,7 +689,6 @@ const FirstStepOfAddProduct = () => {
       season: selectedSeasons,
       sizeGuideImageUrl: selectedImageUrl,
       status: "draft",
-      salesThisMonth: 0,
       restOfOutfit: selectedProductIds,
     };
 
@@ -732,7 +732,7 @@ const FirstStepOfAddProduct = () => {
         localStorage.removeItem('batchCode');
         localStorage.removeItem('weight');
         localStorage.removeItem('regularPrice');
-        JSON.parse(localStorage.removeItem('uploadedImageUrls') || '[]');
+        localStorage.removeItem('uploadedImageUrl');
         localStorage.removeItem('discountType');
         localStorage.removeItem('discountValue');
         localStorage.removeItem('productDetails');
@@ -773,7 +773,7 @@ const FirstStepOfAddProduct = () => {
 
       <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Product Configuration</h3>
+          <h3 className='w-full font-semibold text-xl lg:text-2xl'>PRODUCT CONFIGURATION</h3>
           <Link
             className="flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
             href="/dash-board/products"
@@ -788,6 +788,7 @@ const FirstStepOfAddProduct = () => {
       </div>
 
       <form className='2xl:max-w-screen-2xl 2xl:mx-auto' onSubmit={handleSubmit(onSubmit)}>
+
         <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
 
           <div className='grid grid-cols-1 lg:col-span-7 gap-8 px-6 py-3 h-fit'>
@@ -809,7 +810,6 @@ const FirstStepOfAddProduct = () => {
                 render={({ field }) => <Editor
                   value={field.value}
                   onChange={(value) => {
-                    setProductDetails(value);
                     field.onChange(value);
                     localStorage.setItem('productDetails', value); // Update local storage
                   }}
@@ -1229,12 +1229,12 @@ const FirstStepOfAddProduct = () => {
                           <div
                             key={product._id}
                             className={`flex items-center p-1.5 cursor-pointer rounded-lg hover:bg-gray-100 border ${selectedProductIds.includes(product.productTitle) || selectedProductIds.includes(product.productId) ? 'bg-gray-200' : ''}`}
-                            onClick={() => toggleProductSelection(product?.productId, product?.productTitle, product?._id, product?.imageUrls[0])}
+                            onClick={() => toggleProductSelection(product?.productId, product?.productTitle, product?._id, product?.thumbnailImageUrl)}
                           >
                             <Image
                               width={400}
                               height={400}
-                              src={product.imageUrls[0]}
+                              src={product.thumbnailImageUrl}
                               alt="season-imageUrl"
                               className="h-8 w-8 object-cover rounded"
                             />
@@ -1276,6 +1276,7 @@ const FirstStepOfAddProduct = () => {
                             <button
                               onClick={() => removeProduct(product?.productId)}
                               className="text-red-500 text-sm"
+                              type='button'
                             >
                               Remove
                             </button>
@@ -1290,19 +1291,21 @@ const FirstStepOfAddProduct = () => {
               </div>
 
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+
                 <div className='flex flex-col gap-4'>
                   <input
                     id='imageUpload'
                     type='file'
                     className='hidden'
-                    multiple
-                    onChange={handleImagesChange}
+                    onChange={handleImageChange}
                   />
                   <label
                     htmlFor='imageUpload'
-                    className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white'
-                    onDrop={handleDrop}
+                    className={`mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed hover:bg-blue-50 ${dragging ? "border-blue-300 bg-blue-50" : "border-gray-400 bg-white"
+                      } p-6 cursor-pointer`}
                     onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
                   >
                     <MdOutlineFileUpload size={60} />
                     <div className='space-y-1.5 text-center'>
@@ -1310,74 +1313,51 @@ const FirstStepOfAddProduct = () => {
                         Upload or Drag Media
                       </h5>
                       <p className='text-sm text-gray-500'>
-                        Photos Should be in PNG, JPEG, JPG or WEBP format
+                        Photo Should be in PNG, JPEG or JPG format
                       </p>
                     </div>
                   </label>
                   {sizeError && (
-                    <p className="text-red-600 text-center">Please select at least one image</p>
+                    <p className="text-red-600 text-center">Select image</p>
                   )}
-
-                  <DragDropContext onDragEnd={handleOnDragEnd}>
-                    <Droppable droppableId="droppable">
-                      {(provided) => (
-                        <ul
-                          className="list-none p-0"
-                          {...provided.droppableProps}
-                          ref={provided.innerRef}
-                        >
-                          <div className='overflow-y-auto max-h-[870px] custom-scrollbar'>
-                            <div className={`grid grid-cols-2 gap-4 mt-4 ${uploadedImageUrls.length > 6 ? 'overflow-y-auto' : ''}`}>
-                              {uploadedImageUrls.map((url, index) => (
-                                <Draggable key={url} draggableId={url} index={index}>
-                                  {(provided) => (
-                                    <li
-                                      ref={provided.innerRef}
-                                      {...provided.draggableProps}
-                                      {...provided.dragHandleProps}
-                                      className="flex items-center mb-2 p-2 bg-white border border-gray-300 rounded-md relative"
-                                    >
-                                      <Image
-                                        src={url}
-                                        alt={`Uploaded image ${index + 1}`}
-                                        height={3000}
-                                        width={3000}
-                                        className='w-full h-auto max-h-[250px] rounded-md object-contain'
-                                      />
-                                      <button
-                                        onClick={() => handleImageRemove(index)}
-                                        className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
-                                      >
-                                        <RxCross2 size={24} />
-                                      </button>
-                                    </li>
-                                  )}
-                                </Draggable>
-                              ))}
-                            </div>
-                          </div>
-                          {provided.placeholder}
-                        </ul>
-                      )}
-                    </Droppable>
-                  </DragDropContext>
+                  {image && (
+                    <div className='relative'>
+                      <Image
+                        src={image.src || image}
+                        alt='Uploaded image'
+                        height={3000}
+                        width={3000}
+                        className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
+                      />
+                      <button
+                        onClick={handleImageRemove}
+                        className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                      >
+                        <RxCross2 size={24} />
+                      </button>
+                    </div>
+                  )}
                 </div>
+
               </div>
+
             </div>
           </div>
 
         </div>
+
         <div className='flex justify-end gap-6 px-6 py-8'>
 
-          <button type="button" onClick={handleSubmit(onSaveForNow)} className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
+          <button type="button" onClick={handleSubmit(onSaveForNow)} className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700'>
             Save For Now <FiSave size={19} />
           </button>
 
-          <button type='submit' className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
+          <button type='submit' className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'>
             Next Step <FaArrowRight />
           </button>
 
         </div>
+
       </form>
 
       <ExitConfirmationModal

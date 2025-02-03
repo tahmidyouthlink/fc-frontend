@@ -136,10 +136,17 @@ const CreatePurchaseOrder = () => {
 				}
 			});
 
+			// Find the first image URL from a variant matching the selected location
+			// const variantWithLocation = product.productVariants.find(
+			// 	(variant) => variant.location === selectedLocation
+			// );
+			// const imageUrl = variantWithLocation?.imageUrls?.[0] || null;
+
 			skuByProduct.push({
 				productTitle: product?.productTitle,
 				skuBySizeAndColor: skuEntries,
-				imageUrl: product?.imageUrls[0],
+				imageUrl: product?.thumbnailImageUrl,
+				// imageUrl,
 			});
 		});
 

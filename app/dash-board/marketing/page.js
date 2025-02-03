@@ -36,15 +36,15 @@ const Marketing = () => {
     <div className='px-6 md:px-10'>
 
       <div className="bg-white sticky top-0 z-10">
-        <h1 className="font-bold text-lg lg:text-xl 2xl:text-2xl py-1 2xl:py-3 bg-white">Marketing</h1>
+        <h1 className="font-bold text-lg lg:text-xl 2xl:text-2xl py-1 2xl:py-3 bg-white">MARKETING</h1>
 
         <div className="flex flex-wrap items-center gap-3 bg-white">
 
           <button
             className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'view performance' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
-        after:absolute after:left-0 after:right-0 hover:text-[#D2016E] after:bottom-0 
-        after:h-[2px] after:bg-[#D2016E] after:transition-all after:duration-300
+        ${activeTab === 'view performance' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
+        after:absolute after:left-0 after:right-0 hover:text-green-600 after:bottom-0 
+        after:h-[2px] after:bg-green-600 after:transition-all after:duration-300
         ${activeTab === 'view performance' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
       `}
             onClick={() => setActiveTab('view performance')}
@@ -54,9 +54,9 @@ const Marketing = () => {
 
           <button
             className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'create promotions' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
+        ${activeTab === 'create promotions' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
         after:absolute after:left-0 after:right-0 after:bottom-0 
-        after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300
+        after:h-[2px] after:bg-green-600 hover:text-green-600 after:transition-all after:duration-300
         ${activeTab === 'create promotions' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
       `}
             onClick={() => setActiveTab('create promotions')}
@@ -66,9 +66,9 @@ const Marketing = () => {
 
           <button
             className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'marketing content' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
+        ${activeTab === 'marketing content' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
         after:absolute after:left-0 after:right-0 after:bottom-0 
-        after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300
+        after:h-[2px] after:bg-green-600 hover:text-green-600 after:transition-all after:duration-300
         ${activeTab === 'marketing content' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
       `}
             onClick={() => setActiveTab('marketing content')}
@@ -78,9 +78,9 @@ const Marketing = () => {
 
           <button
             className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'homepage content' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
-        after:absolute after:left-0 after:right-0 hover:text-[#D2016E] after:bottom-0 
-        after:h-[2px] after:bg-[#D2016E] after:transition-all after:duration-300
+        ${activeTab === 'homepage content' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
+        after:absolute after:left-0 after:right-0 hover:text-green-600 after:bottom-0 
+        after:h-[2px] after:bg-green-600 after:transition-all after:duration-300
         ${activeTab === 'homepage content' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
       `}
             onClick={() => setActiveTab('homepage content')}
@@ -127,12 +127,12 @@ const Marketing = () => {
                 with your brand and drives conversions. Customize the offer, set the
                 duration, and monitor its performance—all in one place.
               </p>
-              <Button
+              <button
                 onClick={() => router.push('/dash-board/marketing/promo/add-promo')}
-                className="bg-[#D2016E] hover:bg-[#d2016deb] text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium mt-4"
+                className="w-full rounded-lg bg-[#d4ffce] py-2.5 text-center text-sm transition-[background-color] duration-300 hover:bg-[#bdf6b4] font-semibold text-neutral-700"
               >
                 Create Promo
-              </Button>
+              </button>
             </div>
           </div>
 
@@ -159,7 +159,7 @@ const Marketing = () => {
               </p>
               <button
                 onClick={() => router.push('/dash-board/marketing/offer/add-offer')}
-                className="bg-[#D2016E] hover:bg-[#d2016dca] text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium mt-4"
+                className="w-full rounded-lg bg-[#d4ffce] py-2.5 text-center text-sm transition-[background-color] duration-300 hover:bg-[#bdf6b4] font-semibold text-neutral-700 mt-4"
               >
                 Create Offer
               </button>
@@ -185,11 +185,11 @@ const Marketing = () => {
                 Avail exciting cashback offers with bKash. Use bKash to pay for your purchases and get instant cashback directly to your account. Hurry, limited-time offer!
                 Enjoy seamless transactions and more rewards with bKash.
               </p>
-              <Button
-                className="bg-[#D2016E] hover:bg-[#d2016deb] text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium mt-4"
+              <button
+                className="w-full rounded-lg bg-[#d4ffce] py-2.5 text-center text-sm transition-[background-color] duration-300 hover:bg-[#bdf6b4] font-semibold text-neutral-700 mt-4"
               >
                 Start Cashback
-              </Button>
+              </button>
             </div>
           </div>
         </div>

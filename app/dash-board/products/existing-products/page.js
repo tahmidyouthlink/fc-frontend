@@ -93,9 +93,9 @@ const EditProduct = () => {
 
           <button
             className={`relative py-1 transition-all duration-300
-${activeTab === 'category' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
-after:absolute after:left-0 after:right-0 hover:text-[#D2016E] after:bottom-0 
-after:h-[2px] after:bg-[#D2016E] after:transition-all after:duration-300
+${activeTab === 'category' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
+after:absolute after:left-0 after:right-0 hover:text-green-600 after:bottom-0 
+after:h-[2px] after:bg-green-600 after:transition-all after:duration-300
 ${activeTab === 'category' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
 `}
             onClick={() => setActiveTab('category')}
@@ -105,9 +105,9 @@ ${activeTab === 'category' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w
 
           <button
             className={`relative py-1 transition-all duration-300
-${activeTab === 'collection' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
+${activeTab === 'collection' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
 after:absolute after:left-0 after:right-0 after:bottom-0 
-after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300
+after:h-[2px] after:bg-green-600 hover:text-green-600 after:transition-all after:duration-300
 ${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
 `}
             onClick={() => setActiveTab('collection')}
@@ -127,7 +127,7 @@ ${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
             const productCount = productList?.filter(product => product?.category === category?.label).length;
 
             return (
-              <div key={index} className="w-full h-48 2xl:h-60 relative group cursor-pointer hover:scale-105 transition-all duration-300 rounded-lg" onClick={() => handleGoToCategoryPage(category?.label)}>
+              <div key={index} className="w-full h-48 2xl:h-60 relative group cursor-pointer hover:scale-105 transition-all duration-300 rounded-lg border" onClick={() => handleGoToCategoryPage(category?.label)}>
                 {/* Image */}
                 <Image
                   className="object-cover rounded-lg"
@@ -147,7 +147,7 @@ ${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                 </div>
 
                 {/* Product Count - Hidden initially, appears on hover with animation */}
-                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg">
                   <h4 className="text-white text-sm md:text-lg font-semibold">
                     {productCount} Products
                   </h4>
@@ -168,11 +168,11 @@ ${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
             ).length || 0;
 
             return (
-              <div key={index} className="w-full h-48 2xl:h-60 relative group cursor-pointer hover:scale-105 transition-all duration-300 rounded-lg" onClick={() => handleGoToSeasonPage(season?.seasonName)}>
+              <div key={index} className="w-full h-48 2xl:h-60 relative group cursor-pointer hover:scale-105 transition-all duration-300 rounded-lg border" onClick={() => handleGoToSeasonPage(season?.seasonName)}>
 
                 {/* Image */}
                 <Image
-                  className="object-cover rounded-lg"
+                  className="object-cover rounded-lg px-4"
                   src={season?.imageUrl}
                   alt="season-image"
                   layout="fill"
@@ -189,7 +189,7 @@ ${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                 </div>
 
                 {/* Product Count - Hidden initially, appears on hover with animation */}
-                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg">
                   <h4 className="text-white text-sm md:text-lg font-semibold">
                     {productCount} Products
                   </h4>

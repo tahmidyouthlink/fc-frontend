@@ -7,9 +7,9 @@ const TabsOrder = ({ tabs, selectedTab, onTabChange }) => {
         <button
           key={tab}
           className={`relative text-sm py-1 transition-all duration-300
-            ${selectedTab === tab ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
+            ${selectedTab === tab ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
             after:absolute after:left-0 after:right-0 after:bottom-0 
-            after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300
+            after:h-[2px] after:bg-green-600 hover:text-green-600 after:transition-all after:duration-300
             ${selectedTab === tab ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
           `}
           onClick={() => onTabChange(tab)}

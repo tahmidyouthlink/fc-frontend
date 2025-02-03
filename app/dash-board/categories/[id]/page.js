@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
+import { FiSave } from 'react-icons/fi';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 
@@ -471,7 +472,7 @@ export default function EditCategory() {
                 type="button"
                 onClick={handleAddSize}
                 disabled={!sizeInput}
-                className={`px-4 py-2 rounded-md ${sizeInput ? 'bg-[#9F5216] text-white hover:bg-[#804010]' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                className={`px-4 py-2 rounded-md font-semibold ${sizeInput ? 'bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
               >
                 Add Size
               </Button>
@@ -588,7 +589,7 @@ export default function EditCategory() {
                 type="button"
                 onClick={handleAddSubCategory}
                 disabled={!subCategoryInput}
-                className={`px-4 py-2 rounded-md ${subCategoryInput ? 'bg-[#9F5216] text-white hover:bg-[#804010]' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                className={`px-5 py-3 rounded-md font-semibold ${subCategoryInput ? 'bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
               >
                 Add Sub-Category
               </Button>
@@ -674,9 +675,9 @@ export default function EditCategory() {
           <button
             type='submit'
             disabled={isSubmitting}
-            className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium flex items-center gap-2`}
+            className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}
           >
-            {isSubmitting ? 'Save Changes...' : 'Saved'}
+            {isSubmitting ? 'Saving...' : 'Save Changes'} <FiSave size={20} />
           </button>
         </div>
 

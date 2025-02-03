@@ -8,6 +8,8 @@ import Link from 'next/link';
 import { RxCheck, RxCross2 } from "react-icons/rx";
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa6';
+import { MdOutlineFileUpload } from 'react-icons/md';
+import { FiPlus } from 'react-icons/fi';
 
 const AddColor = () => {
   const axiosPublic = useAxiosPublic();
@@ -84,7 +86,7 @@ const AddColor = () => {
 
       <div className='max-w-screen-lg mx-auto pt-3 md:pt-6'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Create New Colors</h3>
+          <h3 className='w-full font-semibold text-xl lg:text-2xl'>CREATE NEW COLORS</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/colors"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
@@ -126,13 +128,15 @@ const AddColor = () => {
           <button
             type="button"
             onClick={() => appendColor({ colorName: '', colorCode: '#FFFFFF' })}
-            className="mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2"
+            className="mt-4 mb-8 bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700 py-2 px-4 text-sm rounded-md cursor-pointer font-semibold flex items-center gap-2"
           >
-            Add Color
+            <FiPlus size={18} /> Add Color
           </button>
         </div>
         <div className='flex justify-end items-center my-8'>
-          <button type='submit' className=' bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium flex items-center gap-2'>{isSubmitting ? 'Submitting...' : 'Submit Colors'}</button>
+          <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}>
+            <MdOutlineFileUpload size={20} /> {isSubmitting ? 'Submitting...' : 'Submit'}
+          </button>
         </div>
       </form>
 

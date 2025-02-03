@@ -12,6 +12,7 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 import standardImage from "../../../../../public/logos/standard.png";
 import expressImage from "../../../../../public/logos/express.png";
 import defaultImage from "../../../../../public/logos/default-image.png";
+import { FiSave } from 'react-icons/fi';
 
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
@@ -367,9 +368,9 @@ const EditShipmentHandler = () => {
             <button
               type='submit'
               disabled={isSubmitting}
-              className={`mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium ${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium`}
+              className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700 mt-4 mb-8`}
             >
-              {isSubmitting ? 'Saving Changes...' : 'Save Changes'}
+              {isSubmitting ? 'Saving...' : 'Save Changes'} <FiSave size={20} />
             </button>
           </div>
         </div>

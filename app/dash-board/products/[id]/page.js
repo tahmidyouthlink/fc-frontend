@@ -19,6 +19,7 @@ import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { LuImagePlus } from "react-icons/lu";
 import { Controller, useForm } from 'react-hook-form';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { MdOutlineFileUpload } from 'react-icons/md';
@@ -63,6 +64,7 @@ const EditProductPage = () => {
   const [sizeError2, setSizeError2] = useState(false);
   const [sizeError3, setSizeError3] = useState(false);
   const [sizeError4, setSizeError4] = useState(false);
+  const [sizeError5, setSizeError5] = useState(false);
   const [colorError, setColorError] = useState(false);
   const [tagError, setTagError] = useState(false);
   const [newArrivalError, setNewArrivalError] = useState(false);
@@ -100,6 +102,8 @@ const EditProductPage = () => {
   const dropdownRefForCompleteOutfit = useRef(null);
   const [activeTab2, setActiveTab2] = useState('Inside Dhaka');
   const [tabSelections, setTabSelections] = useState({});
+  const [dragging, setDragging] = useState(false);
+  const [image, setImage] = useState(null);
 
   // Filter categories based on search input and remove already selected categories
   const filteredSeasons = seasonList?.filter((season) =>
@@ -147,19 +151,25 @@ const EditProductPage = () => {
 
   // Handle adding/removing category selection
   const toggleProductSelection = (productId, productTitle, id, imageUrl) => {
-    let updatedSelectedProducts;
+    let updatedSelectedProducts = [...selectedProductIds];
 
-    // Check if the product is already selected (based on productId)
-    if (selectedProductIds.some((p) => p.productId === productId)) {
-      // Remove product from selection
-      updatedSelectedProducts = selectedProductIds.filter((p) => p.productId !== productId);
+    // Check if the product is already selected
+    const isAlreadySelected = updatedSelectedProducts.some((p) => p.productId === productId);
+
+    if (isAlreadySelected) {
+      // Remove the product if it's already selected
+      updatedSelectedProducts = updatedSelectedProducts.filter((p) => p.productId !== productId);
     } else {
-      // Add product to selection
-      updatedSelectedProducts = [...selectedProductIds, { productId, productTitle, id, imageUrl }];
+      // Allow adding only if there are less than 4 selected products
+      if (updatedSelectedProducts.length < 4) {
+        updatedSelectedProducts.push({ productId, productTitle, id, imageUrl });
+      } else {
+        toast.error("You can select up to 4 products only."); // Optional: Show a warning message
+      }
     }
 
     setSelectedProductIds(updatedSelectedProducts);
-    handleProductSelectionChange(updatedSelectedProducts); // Pass selected categories to parent component
+    handleProductSelectionChange(updatedSelectedProducts);
   };
 
   // Handle removing category directly from selected list
@@ -293,63 +303,150 @@ const EditProductPage = () => {
 
   const handleGroupSelectedChange = (sizes) => {
     if (sizes.length > 1) {
-      return; // Prevent selecting more than one size
+      return; // Prevent selecting more than one size range at a time
     }
 
-    // Clear the sizeError2 if at least one size is selected
     if (sizes.length > 0) {
       setSizeError2(false);
     }
 
-    // Generate related sizes based on the selected size range
+    // Generate sizes based on the selected size range
     const newRelatedSizes = sizes.flatMap(size => generateSizes(size) || []);
+
     setGroupSelected(sizes);
 
-    setGroupSelected2(prevSelected => {
-      // Ensure prevSelected is an array
-      const prevSelectedArray = Array.isArray(prevSelected) ? prevSelected : [];
+    setUnselectedGroupSelected2([]); // Reset previously unselected sizes
 
-      // Filter the sizes that are included in newRelatedSizes
-      const filteredSizes = prevSelectedArray.filter(size => newRelatedSizes.includes(size));
-
-      // Filter out sizes that are not already selected and not unselected
-      const newSizes = newRelatedSizes.filter(size => !filteredSizes.includes(size) && !unselectedGroupSelected2.includes(size));
-
-      // Combine the filtered sizes and new sizes
-      const updatedGroupSelected2 = [...filteredSizes, ...newSizes];
-
-      return updatedGroupSelected2;
-    });
+    setGroupSelected2(newRelatedSizes); // Directly set new sizes
   };
 
   const handleGroupSelected2Change = (sizes) => {
-    setGroupSelected2(sizes);
+    const sizeOrder = ["XXXS", "XXS", "XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL", "6XL", "7XL", "8XL", "9XL", "10XL"];
+
+    const isNumeric = (size) => !isNaN(size);
+    const sortSizes = (sizesArray) => {
+      return sizesArray.sort((a, b) => {
+        if (isNumeric(a) && isNumeric(b)) {
+          return Number(a) - Number(b);
+        } else if (!isNumeric(a) && !isNumeric(b)) {
+          return sizeOrder.indexOf(a) - sizeOrder.indexOf(b);
+        } else {
+          return isNumeric(a) ? 1 : -1;
+        }
+      });
+    };
+
+    setGroupSelected2((prevSizes) => {
+      const updatedSizes = [...sizes]; // Create a new array with the latest sizes
+      const sortedSizes = sortSizes(updatedSizes); // Ensure correct sorting
+      return sortedSizes;
+    });
 
     if (sizes.length > 0) {
       setSizeError3(false);
     }
 
-    setUnselectedGroupSelected2(prevUnselected => {
-      // Ensure groupSelected2 and sizes are arrays
-      const groupSelected2Array = Array.isArray(groupSelected2) ? groupSelected2 : [];
+    setUnselectedGroupSelected2((prevUnselected) => {
       const sizesArray = Array.isArray(sizes) ? sizes : [];
-
-      const newlyUnselected = groupSelected2Array.filter(size => !sizesArray.includes(size));
+      const newlyUnselected = groupSelected2.filter(size => !sizesArray.includes(size));
       return [...prevUnselected, ...newlyUnselected];
     });
   };
 
-  const handleImagesChange = async (event) => {
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setImage({
+        src: URL.createObjectURL(file),
+        file
+      });
+    }
+  };
+
+  const handleImageRemove = () => {
+    setImage(null);
+  };
+
+  const uploadImageToImgbb = async (image) => {
+    const formData = new FormData();
+    formData.append('image', image.file);
+    formData.append('key', apiKey);
+
+    try {
+      const response = await axiosPublic.post(apiURL, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      if (response.data && response.data.data && response.data.data.url) {
+        return response.data.data.url; // Return the single image URL
+      } else {
+        toast.error('Failed to get image URL from response.');
+      }
+    } catch (error) {
+      toast.error(`Upload failed: ${error.response?.data?.error?.message || error.message}`);
+    }
+    return null;
+  };
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
+    setDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setDragging(false);
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    setDragging(false);
+    const file = event.dataTransfer.files[0];
+    if (file) {
+      setImage({
+        src: URL.createObjectURL(file),
+        file,
+      });
+    }
+  };
+
+  const handleImagesChange = async (event, variantIndex) => {
     const files = Array.from(event.target.files);
 
     if (files.length === 0) {
-      setSizeError(true);
+      toast.error("No files selected.");
       return;
-    } else {
-      setSizeError(false);
     }
 
-    await processFiles(files);
+    const validFiles = validateFiles(files);
+    if (validFiles.length === 0) {
+      toast.error("Please select valid image files (PNG, JPEG, JPG, WEBP).");
+      return;
+    }
+
+    const currentImages = productVariants[variantIndex]?.imageUrls || [];
+    const totalImages = currentImages.length + validFiles.length;
+
+    if (totalImages > 6) {
+      toast.error("You can only upload a maximum of 6 images per variant.");
+      return;
+    }
+
+    const newImages = validFiles.map((file) => ({
+      url: URL.createObjectURL(file),
+      file,
+    }));
+
+    const imageUrls = await uploadImagesToImgbb(newImages);
+
+    setProductVariants((prevVariants) => {
+      const updatedVariants = [...prevVariants];
+      updatedVariants[variantIndex].imageUrls = [
+        ...currentImages,
+        ...imageUrls,
+      ].slice(0, 6);
+      return updatedVariants;
+    });
   };
 
   const processFiles = async (files) => {
@@ -360,8 +457,8 @@ const EditProductPage = () => {
     }
 
     const totalImages = validFiles.length + uploadedImageUrls.length;
-    if (totalImages > 10) {
-      toast.error("You can only upload a maximum of 10 images.");
+    if (totalImages > 6) {
+      toast.error("You can only upload a maximum of 6 images.");
       return;
     }
 
@@ -373,12 +470,12 @@ const EditProductPage = () => {
     const imageUrls = await uploadImagesToImgbb(newImages);
     const updatedUrls = [...uploadedImageUrls, ...imageUrls];
 
-    const limitedUrls = updatedUrls.slice(-10);
+    const limitedUrls = updatedUrls.slice(-6);
     setUploadedImageUrls(limitedUrls);
 
     // Clear size error if there are valid images
     if (limitedUrls.length > 0) {
-      setSizeError(false);
+      setSizeError5(false);
     }
   };
 
@@ -411,27 +508,65 @@ const EditProductPage = () => {
     return imageUrls;
   };
 
-  const handleDrop = async (event) => {
+  const handleDrops = async (event, variantIndex) => {
     event.preventDefault();
     const files = Array.from(event.dataTransfer.files);
     await processFiles(files);
+
+    // After processing files, update the variant's imageUrls
+    const validFiles = validateFiles(files);
+    const currentImages = productVariants[variantIndex]?.imageUrls || [];
+    const newImages = validFiles.map((file) => ({
+      url: URL.createObjectURL(file),
+      file,
+    }));
+
+    const imageUrls = await uploadImagesToImgbb(newImages);
+
+    setProductVariants((prevVariants) => {
+      const updatedVariants = [...prevVariants];
+      updatedVariants[variantIndex].imageUrls = [
+        ...currentImages,
+        ...imageUrls,
+      ].slice(0, 6); // Limit to 6 images
+      return updatedVariants;
+    });
   };
 
-  const handleDragOver = (event) => {
+  const handleDragOvers = (event) => {
     event.preventDefault();
   };
 
-  const handleImageRemove = (index) => {
-    const updatedUrls = uploadedImageUrls.filter((_, i) => i !== index);
-    setUploadedImageUrls(updatedUrls);
+  const handleImageRemoves = (variantIndex, imgIndex) => {
+    setProductVariants((prevVariants) => {
+      const updatedVariants = [...prevVariants];
+      updatedVariants[variantIndex].imageUrls = updatedVariants[variantIndex].imageUrls.filter(
+        (_, index) => index !== imgIndex
+      );
+      return updatedVariants;
+    });
   };
 
-  const handleOnDragEnd = (result) => {
-    if (!result.destination) return;
-    const items = Array.from(uploadedImageUrls);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    setUploadedImageUrls(items);
+  const handleOnDragEnd = (result, variantIndex) => {
+    const { source, destination } = result;
+
+    if (!destination) return;
+
+    setProductVariants((prevVariants) => {
+      const updatedVariants = [...prevVariants];
+      const items = [...updatedVariants[variantIndex].imageUrls];
+
+      // Remove the dragged item
+      const [movedItem] = items.splice(source.index, 1);
+
+      // Insert the dragged item at the destination
+      items.splice(destination.index, 0, movedItem);
+
+      // Update the variant's imageUrls array
+      updatedVariants[variantIndex].imageUrls = items;
+
+      return updatedVariants;
+    });
   };
 
   const handleTabChange = (key) => {
@@ -442,17 +577,6 @@ const EditProductPage = () => {
   const primaryLocationName = useMemo(() => {
     return locationList?.find(location => location?.isPrimaryLocation)?.locationName || 'No primary location found';
   }, [locationList]);
-
-  useEffect(() => {
-    if (uploadedImageUrls.length > 0) {
-      setProductVariants(prevVariants =>
-        prevVariants.map(variant => ({
-          ...variant,
-          imageUrl: "", // Reset image URL for each variant
-        }))
-      );
-    }
-  }, [uploadedImageUrls]);
 
   const initializeVariants = useCallback((colors, sizes, savedVariants) => {
 
@@ -473,7 +597,7 @@ const EditProductPage = () => {
     for (const color of colors) {
       for (const size of sizes) {
         if (!variants.some(variant => variant?.color?.value === color?.value && variant?.size === size)) {
-          variants.push({ color, size, sku: "", imageUrls: "", location: primaryLocationName });
+          variants.push({ color, size, sku: "", onHandSku: "", imageUrls: [], location: primaryLocationName });
         }
       }
     }
@@ -489,7 +613,6 @@ const EditProductPage = () => {
     // Set form values for each variant
     variants?.forEach((variant, index) => {
       setValue(`sku-${index}`, variant?.sku);
-      setValue(`imageUrls-${index}`, variant?.imageUrl);
     });
 
   }, [setValue, locationList]);
@@ -505,7 +628,7 @@ const EditProductPage = () => {
         setValue('regularPrice', data?.regularPrice);
         setValue('discountValue', data?.discountValue);
         setValue('productDetails', data?.productDetails);
-        setUploadedImageUrls(data?.imageUrls);
+        setImage(data?.thumbnailImageUrl);
         setDiscountType(data?.discountType);
         setProductDetails(data?.productDetails);
         setMaterialCare(data?.materialCare);
@@ -568,35 +691,16 @@ const EditProductPage = () => {
 
   const handleVariantChange = (index, field, value) => {
     const updatedVariants = [...productVariants];
+
+    // Update the field value
     updatedVariants[index][field] = value;
+
+    // If the field is 'sku', update 'onHandSku' with the same value
+    if (field === "sku") {
+      updatedVariants[index]["onHandSku"] = value;
+    }
+
     setProductVariants(updatedVariants);
-  };
-
-  const onImageClick = (variantIndex, imgUrl) => {
-    setProductVariants(prevVariants =>
-      prevVariants.map((variant, index) => {
-        if (index === variantIndex) {
-          const isSelected = variant.imageUrls?.includes(imgUrl);
-          let updatedImageUrls;
-
-          if (isSelected) {
-            // Remove the image if already selected, but ensure at least one image remains
-            updatedImageUrls = variant.imageUrls?.length > 1
-              ? variant.imageUrls.filter(url => url !== imgUrl)
-              : variant.imageUrls; // Do not allow deselecting the last image
-          } else {
-            // Add the image if not selected
-            updatedImageUrls = [...(variant.imageUrls || []), imgUrl];
-          }
-
-          return { ...variant, imageUrls: updatedImageUrls };
-        }
-        return variant;
-      })
-    );
-
-    // Update form value for imageUrls
-    setValue(`imageUrls-${variantIndex}`, productVariants[variantIndex]?.imageUrls);
   };
 
   const handleColorChange = (newValue) => {
@@ -668,12 +772,24 @@ const EditProductPage = () => {
     if (!validateSelections()) return;
 
     try {
-      if (uploadedImageUrls.length === 0) {
+      if (!image) {
         setSizeError(true);
-        toast.error("Please select at least one image");
+        toast.error("Please upload a thumbnail!")
         return;
       }
       setSizeError(false);
+
+      let imageUrl = '';
+      if (image?.src && image?.file) {
+        imageUrl = await uploadImageToImgbb(image);
+        if (!imageUrl) {
+          toast.error('Image upload failed, cannot proceed.');
+          return;
+        }
+      } else {
+        imageUrl = image;
+      }
+
       if (groupSelected.length === 0) {
         setSizeError2(true);
         toast.error("Please select at least one size range.");
@@ -721,6 +837,16 @@ const EditProductPage = () => {
       }
       setSeasonError(false);
 
+      // Check if any variant is missing an image URL
+      const invalidVariants = productVariants?.filter(
+        (variant) => variant.imageUrls.length < 3
+      );
+
+      if (invalidVariants?.length > 0) {
+        toast.error("Each variant must have at least 3 images.");
+        return;
+      }
+
       // Initialize an array to hold error messages
       let errors = [];
 
@@ -763,13 +889,16 @@ const EditProductPage = () => {
 
           // Initialize SKU for the current variant
           let sku = 0; // Default SKU for new active locations
+          let onHandSku = 0; // Default SKU for new active locations
 
           // If location is primary, update SKU based on user input
           if (location.isPrimaryLocation) {
             sku = parseFloat(data[`sku-${index}`]); // Update SKU for primary location
+            onHandSku = parseFloat(data[`sku-${index}`]); // Update SKU for primary location
           } else if (existingVariant) {
             // If the variant exists for this active location, keep existing SKU
             sku = existingVariant.sku;
+            onHandSku = existingVariant.sku;
           }
 
           // Add the variant to finalData
@@ -777,6 +906,7 @@ const EditProductPage = () => {
             color: variant.color,
             size: variant.size,
             sku: sku, // Assign SKU based on above conditions
+            onHandSku: onHandSku, // Assign SKU based on above conditions
             imageUrls: primaryImageUrls, // Use the same imageUrls for all locations
             location: location.locationName,
           });
@@ -810,18 +940,18 @@ const EditProductPage = () => {
       // }
 
       // Check if any variant is missing an image URL
-      const missingImage = finalData?.some(variant => variant?.imageUrls?.length === 0);
-      if (missingImage) {
-        toast.error("Please select at least one image for each variant.");
-        return;
-      }
+      // const missingImage = finalData?.some(variant => variant?.imageUrls?.length === 0);
+      // if (missingImage) {
+      //   toast.error("Please select at least one image for each variant.");
+      //   return;
+      // }
 
       const updatedProductData = {
         productTitle: data?.productTitle,
         regularPrice: data?.regularPrice,
         weight: data?.weight,
         batchCode: data?.batchCode,
-        imageUrls: uploadedImageUrls,
+        thumbnailImageUrl: imageUrl,
         discountType: discountType,
         discountValue: data?.discountValue,
         productDetails: productDetails,
@@ -904,43 +1034,35 @@ const EditProductPage = () => {
       <div className='max-w-screen-2xl mx-auto sticky top-0 px-6 py-2 md:px-6 md:py-6 z-10 bg-gray-50 flex justify-between gap-4'>
         <div className="flex items-center gap-3 w-full">
 
-          <button
-            className={`relative py-1 transition-all duration-300
-${activeTab === 'product' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
-after:absolute after:left-0 after:right-0 hover:text-[#D2016E] after:bottom-0 
-after:h-[2px] after:bg-[#D2016E] after:transition-all after:duration-300
-${activeTab === 'product' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
-`}
-            onClick={() => setActiveTab('product')}
-          >
+          <button className={`relative py-1 transition-all duration-300
+            ${activeTab === 'product' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
+            after:absolute after:left-0 after:right-0 hover:text-green-600 after:bottom-0 
+            after:h-[2px] after:bg-green-600 after:transition-all after:duration-300
+            ${activeTab === 'product' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}`}
+            onClick={() => setActiveTab('product')}>
             Product
           </button>
 
-          <button
-            className={`relative py-1 transition-all duration-300
-${activeTab === 'inventory' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
-after:absolute after:left-0 after:right-0 after:bottom-0 
-after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300
-${activeTab === 'inventory' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
-`}
-            onClick={() => setActiveTab('inventory')}
-          >
+          <button className={`relative py-1 transition-all duration-300
+          ${activeTab === 'inventory' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
+          after:absolute after:left-0 after:right-0 after:bottom-0 
+          after:h-[2px] after:bg-green-600 hover:text-green-600 after:transition-all after:duration-300
+          ${activeTab === 'inventory' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
+            onClick={() => setActiveTab('inventory')}>
             Inventory
           </button>
 
-          <button
-            className={`relative py-1 transition-all duration-300
-${activeTab === 'shipping' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
-after:absolute after:left-0 after:right-0 after:bottom-0 
-after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300
-${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
-`}
-            onClick={() => setActiveTab('shipping')}
-          >
+          <button className={`relative py-1 transition-all duration-300
+          ${activeTab === 'shipping' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
+          after:absolute after:left-0 after:right-0 after:bottom-0 
+          after:h-[2px] after:bg-green-600 hover:text-green-600 after:transition-all after:duration-300
+          ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
+            onClick={() => setActiveTab('shipping')}>
             Shipping
           </button>
 
         </div>
+
         {decodedSeasonName ? (
           <Link
             className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full'
@@ -966,14 +1088,14 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
 
         {activeTab === "product" && <div>
           <div className='max-w-screen-2xl px-6 mx-auto pb-3'>
-            <h3 className='w-full font-semibold text-xl lg:text-2xl xl:text-3xl'>Update Product Details</h3>
+            <h3 className='w-full font-semibold text-xl lg:text-2xl xl:text-3xl text-neutral-700'>UPDATE PRODUCT DETAILS</h3>
           </div>
 
           <div className='max-w-screen-2xl mx-auto'>
             <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
               <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 px-6 py-3 h-fit'>
                 <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
-                  <p className='w-full text-xl'>Product ID: <strong>{productId}</strong></p>
+                  <p className='w-full text-xl text-neutral-700'>PRODUCT ID: <strong>{productId}</strong></p>
                   <label htmlFor='productTitle' className='flex justify-start font-medium text-[#9F5216]'>Product Title *</label>
                   <input id='productTitle' {...register("productTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" placeholder='Enter Product Title' type="text" />
                   {errors.productTitle?.type === "required" && (
@@ -1365,12 +1487,12 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                               <div
                                 key={product._id}
                                 className={`flex items-center p-1.5 cursor-pointer rounded-lg hover:bg-gray-100 border ${selectedProductIds.includes(product.productTitle) || selectedProductIds.includes(product.productId) ? 'bg-gray-200' : ''}`}
-                                onClick={() => toggleProductSelection(product?.productId, product?.productTitle, product?._id, product?.imageUrls[0])}
+                                onClick={() => toggleProductSelection(product?.productId, product?.productTitle, product?._id, product?.thumbnailImageUrl)}
                               >
                                 <Image
                                   width={400}
                                   height={400}
-                                  src={product.imageUrls[0]}
+                                  src={product.thumbnailImageUrl}
                                   alt="season-imageUrl"
                                   className="h-8 w-8 object-cover rounded"
                                 />
@@ -1412,6 +1534,7 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                                 <button
                                   onClick={() => removeProduct(product?.productId)}
                                   className="text-red-500 text-sm"
+                                  type='button'
                                 >
                                   Remove
                                 </button>
@@ -1425,20 +1548,22 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
 
                   </div>
 
-                  <div className={`flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg`}>
+                  <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+
                     <div className='flex flex-col gap-4'>
                       <input
                         id='imageUpload'
                         type='file'
                         className='hidden'
-                        multiple
-                        onChange={handleImagesChange}
+                        onChange={handleImageChange}
                       />
                       <label
                         htmlFor='imageUpload'
-                        className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white'
-                        onDrop={handleDrop}
+                        className={`mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed hover:bg-blue-50 ${dragging ? "border-blue-300 bg-blue-50" : "border-gray-400 bg-white"
+                          } p-6 cursor-pointer`}
                         onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
                       >
                         <MdOutlineFileUpload size={60} />
                         <div className='space-y-1.5 text-center'>
@@ -1446,58 +1571,32 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                             Upload or Drag Media
                           </h5>
                           <p className='text-sm text-gray-500'>
-                            Photos Should be in PNG, JPEG, JPG or WEBP format
+                            Photo Should be in PNG, JPEG or JPG format
                           </p>
                         </div>
                       </label>
                       {sizeError && (
-                        <p className="text-red-600 text-left">Please select at least one image</p>
+                        <p className="text-red-600 text-center">Select image</p>
                       )}
-
-                      <DragDropContext onDragEnd={handleOnDragEnd}>
-                        <Droppable droppableId="droppable">
-                          {(provided) => (
-                            <ul
-                              className="list-none p-0"
-                              {...provided.droppableProps}
-                              ref={provided.innerRef}
-                            >
-                              <div className='overflow-y-auto max-h-[870px] custom-scrollbar'>
-                                <div className={`grid grid-cols-2 gap-4 mt-4 ${uploadedImageUrls.length > 6 ? 'overflow-y-auto' : ''}`}>
-                                  {uploadedImageUrls.map((url, index) => (
-                                    <Draggable key={url} draggableId={url} index={index}>
-                                      {(provided) => (
-                                        <li
-                                          ref={provided.innerRef}
-                                          {...provided.draggableProps}
-                                          {...provided.dragHandleProps}
-                                          className="flex items-center mb-2 p-2 bg-white border border-gray-300 rounded-md relative"
-                                        >
-                                          <Image
-                                            src={url}
-                                            alt={`Uploaded image ${index + 1}`}
-                                            height={100}
-                                            width={200}
-                                            className='w-full h-auto max-h-[250px] rounded-md object-contain'
-                                          />
-                                          <button
-                                            onClick={() => handleImageRemove(index)}
-                                            className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
-                                          >
-                                            <RxCross2 size={24} />
-                                          </button>
-                                        </li>
-                                      )}
-                                    </Draggable>
-                                  ))}
-                                </div>
-                              </div>
-                              {provided.placeholder}
-                            </ul>
-                          )}
-                        </Droppable>
-                      </DragDropContext>
+                      {image && (
+                        <div className='relative'>
+                          <Image
+                            src={image.src || image}
+                            alt='Uploaded image'
+                            height={3000}
+                            width={3000}
+                            className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
+                          />
+                          <button
+                            onClick={handleImageRemove}
+                            className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                          >
+                            <RxCross2 size={24} />
+                          </button>
+                        </div>
+                      )}
                     </div>
+
                   </div>
 
                 </div>
@@ -1509,8 +1608,8 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
 
         {activeTab === "inventory" && <div>
           <div className='2xl:max-w-screen-2xl 2xl:mx-auto'>
-            <div className='flex flex-wrap items-center justify-between px-6 gap-4'>
-              <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl'>Update Inventory Variants</h3>
+            <div className='flex flex-wrap items-center justify-between px-6 gap-4 text-neutral-700'>
+              <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl'>UPDATE INVENTORY VARIANTS</h3>
               <h3 className='max-w-screen-2xl text-right bg-gray-50 font-medium text-sm md:text-base'>Primary Location: <strong>{primaryLocationName}</strong></h3>
               <p className="font-semibold text-xl md:text-2xl xl:text-3xl">
                 {productVariants?.length > 0 ? (
@@ -1557,22 +1656,121 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                       )}
                     </div>
                   </div>
-                  <div className='flex flex-col gap-4'>
-                    <label className='font-medium text-[#9F5216]'>Select Media</label>
-                    <div className={`grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 2xl:grid-cols-4 gap-2`}>
-                      {uploadedImageUrls.map((url, imgIndex) => (
-                        <div
-                          key={imgIndex}
-                          className={`image-container ${variant.imageUrls?.includes(url) ? 'selected' : ''}`}
-                          onClick={() => onImageClick(index, url)}
-                        >
-                          <Image src={url} alt={`image-${imgIndex}`} width={3000} height={3000} className="w-full min-h-[200px] max-h-[200px] rounded-md object-contain" />
+                  <div className='flex flex-col lg:flex-row gap-3 mt-6 h-fit'>
+                    <input
+                      id={`imageUpload-${index}`}
+                      type='file'
+                      className='hidden'
+                      multiple
+                      disabled={!isAdmin}
+                      onChange={(event) => handleImagesChange(event, index)}
+                    />
+                    {variant?.imageUrls?.length < 6 && isAdmin === true && (
+                      <label
+                        htmlFor={`imageUpload-${index}`}
+                        className='flex flex-col items-center justify-center space-y-3 rounded-xl border-2 border-dashed border-gray-400 px-3 2xl:px-5 py-6 min-h-[350px] max-h-[350px] bg-white hover:bg-blue-50 cursor-pointer'
+                        onDrop={(event) => handleDrops(event, index)}
+                        onDragOver={handleDragOvers}
+                      >
+                        <LuImagePlus size={30} />
+                        <div className='space-y-1.5 text-center'>
+                          <h5 className='whitespace-nowrap text-xs font-medium tracking-tight'>
+                            <span className='text-blue-500 underline'>Click to upload</span> or <br />
+                            drag and drop
+                          </h5>
                         </div>
-                      ))}
-                    </div>
-                    {errors[`imageUrl-${index}`] && (
-                      <p className="text-red-600 text-left">Image selection is required</p>
+                      </label>
                     )}
+                    {sizeError5 && (
+                      <p className="text-red-600 text-center">Please select at least one image</p>
+                    )}
+
+                    <div>
+
+                      <DragDropContext onDragEnd={(result) => {
+                        if (isAdmin) {
+                          handleOnDragEnd(result, index); // Allow dragging only if isAdmin is true
+                        }
+                      }}>
+                        <Droppable droppableId="row1" direction="horizontal">
+                          {(provided) => (
+                            <div
+                              className="grid grid-cols-3 gap-4"
+                              {...provided.droppableProps}
+                              ref={provided.innerRef}
+                            >
+                              {variant.imageUrls?.slice(0, 3).map((url, imgIndex) => (
+                                <Draggable key={url} draggableId={`row1-${url}`} index={imgIndex}>
+                                  {(provided) => (
+                                    <li
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      {...provided.dragHandleProps}
+                                      className="flex items-center p-2 bg-white border border-gray-300 rounded-md relative"
+                                    >
+                                      <Image
+                                        src={url}
+                                        alt={`Variant ${index} Image ${imgIndex}`}
+                                        height={3000}
+                                        width={3000}
+                                        className="w-full h-auto min-h-[150px] max-h-[150px] rounded-md object-cover"
+                                      />
+                                      {isAdmin && <button
+                                        onClick={() => handleImageRemoves(index, imgIndex)}
+                                        className="absolute top-1 right-1 rounded-full p-0.5 bg-red-600 hover:bg-red-700 text-white font-bold"
+                                      >
+                                        <RxCross2 size={20} />
+                                      </button>}
+                                    </li>
+                                  )}
+                                </Draggable>
+                              ))}
+                              {provided.placeholder}
+                            </div>
+                          )}
+                        </Droppable>
+
+                        <Droppable droppableId="row2" direction="horizontal">
+                          {(provided) => (
+                            <div
+                              className="grid grid-cols-3 gap-4 mt-4"
+                              {...provided.droppableProps}
+                              ref={provided.innerRef}
+                            >
+                              {variant.imageUrls?.slice(3).map((url, imgIndex) => (
+                                <Draggable key={url} draggableId={`row2-${url}`} index={imgIndex + 3}>
+                                  {(provided) => (
+                                    <li
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      {...provided.dragHandleProps}
+                                      className="flex items-center p-2 bg-white border border-gray-300 rounded-md relative"
+                                    >
+                                      <Image
+                                        src={url}
+                                        alt={`Variant ${index} Image ${imgIndex + 3}`}
+                                        height={3000}
+                                        width={3000}
+                                        className="w-full h-auto min-h-[150px] max-h-[150px] rounded-md object-contain"
+                                      />
+                                      {isAdmin && <button
+                                        onClick={() => handleImageRemoves(index, imgIndex + 3)}
+                                        className="absolute top-1 right-1 rounded-full p-0.5 bg-red-600 hover:bg-red-700 text-white font-bold"
+                                      >
+                                        <RxCross2 size={20} />
+                                      </button>}
+                                    </li>
+                                  )}
+                                </Draggable>
+                              ))}
+                              {provided.placeholder}
+                            </div>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+
+                    </div>
+
                   </div>
                 </div>
               ))}
@@ -1582,7 +1780,7 @@ ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
 
         {activeTab === "shipping" && <div className='2xl:max-w-screen-2xl 2xl:mx-auto'>
 
-          <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl px-6 pb-6'>Update Shipping Details</h3>
+          <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl px-6 pb-6 text-neutral-700'>UPDATE SHIPPING DETAILS</h3>
 
           <div className='flex flex-wrap items-center gap-3 mt-2 px-6 pb-6'>
 
@@ -1715,7 +1913,7 @@ ${activeTab2 === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:a
         <div className='2xl:max-w-screen-2xl 2xl:mx-auto flex justify-between px-6 pt-8 pb-16'>
 
           {productStatus === "active" &&
-            <Button color="danger" className='flex items-center gap-1'
+            <button color="danger" className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700'
               onClick={handleSubmit(async (formData) => {
                 // Call onSubmit and wait for the result
                 const success = await onSubmit({ ...formData, status: "archive" }).catch(() => false);
@@ -1725,23 +1923,23 @@ ${activeTab2 === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:a
               })}
             >
               Archive <HiOutlineArchive size={20} />
-            </Button>
+            </button>
           }
 
           <div className='flex items-center justify-end gap-6 w-full'>
-            <Button
+            <button
               type='button'
-              className='bg-[#9F5216] hover:bg-[#804010] text-white '
+              className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'
               onClick={handleSubmit((formData) => {
                 const newStatus = productStatus === "draft" ? "active" : productStatus; // Change draft to active
                 onSubmit({ ...formData, status: newStatus }); // Pass the updated status directly
               })}
             >
               Update <RxUpdate size={18} />
-            </Button>
+            </button>
 
             {productStatus === "archive" &&
-              <Button className="flex items-center gap-1" color="secondary"
+              <button className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700"
                 onClick={handleSubmit(async (formData) => {
                   // Call onSubmit and wait for the result
                   const success = await onSubmit({ ...formData, status: "active" }).catch(() => false);
@@ -1751,11 +1949,12 @@ ${activeTab2 === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:a
                 })}
               >
                 Publish Again <MdOutlineFileUpload size={18} />
-              </Button>
+              </button>
             }
 
           </div>
         </div>
+
       </form>
     </div>
   );

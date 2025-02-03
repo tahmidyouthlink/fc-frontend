@@ -15,6 +15,7 @@ import arrivals1 from "../../../public/card-images/arrivals1.svg";
 import arrivals2 from "../../../public/card-images/arrivals2.svg";
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import dynamic from 'next/dynamic';
+import { TbColumnInsertRight } from 'react-icons/tb';
 const CustomerPrintButton = dynamic(() => import("@/app/components/layout/CustomerPrintButton"), { ssr: false });
 
 const initialColumns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alternative Phone Number', 'NewsLetter', 'Hometown', 'Status'];
@@ -282,13 +283,10 @@ const Customers = () => {
               </li>
             </div>
 
-            <div className='flex items-center max-w-screen-2xl mx-auto justify-center md:justify-end md:gap-6'>
-
-              <div>
-                <Button variant="solid" color="danger" onClick={() => { setColumnModalOpen(true) }} className="w-full">
-                  Choose Columns
-                </Button>
-              </div>
+            <div className='flex items-center max-w-screen-2xl mx-auto justify-center md:justify-end md:gap-6 w-full'>
+              <button className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700" onClick={() => { setColumnModalOpen(true) }}>
+                Choose Columns <TbColumnInsertRight size={20} />
+              </button>
 
             </div>
           </div>
@@ -297,7 +295,7 @@ const Customers = () => {
         {/* Column Selection Modal */}
         <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
           <ModalContent>
-            <ModalHeader>Choose Columns</ModalHeader>
+            <ModalHeader className='bg-gray-200'>Choose Columns</ModalHeader>
             <ModalBody className="modal-body-scroll">
               <DragDropContext onDragEnd={handleOnDragEnd}>
                 <Droppable droppableId="droppable">
@@ -338,14 +336,16 @@ const Customers = () => {
                 </Droppable>
               </DragDropContext>
             </ModalBody>
-            <ModalFooter>
-              <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
-                Select All
-              </Button>
-              <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
-                Deselect All
-              </Button>
-              <Button variant="solid" size='sm' color="primary" onClick={handleSave}>
+            <ModalFooter className='flex justify-between items-center'>
+              <div className='flex items-center gap-2'>
+                <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
+                  Deselect All
+                </Button>
+                <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
+                  Select All
+                </Button>
+              </div>
+              <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
                 Save
               </Button>
             </ModalFooter>
@@ -531,7 +531,7 @@ const Customers = () => {
                 </div>
               </ModalBody>
               <ModalFooter className='border'>
-                <Button color="danger" variant="light" onPress={onCloseCustomerModal}>
+                <Button color="danger" variant='flat' size='sm' onPress={onCloseCustomerModal}>
                   Close
                 </Button>
               </ModalFooter>

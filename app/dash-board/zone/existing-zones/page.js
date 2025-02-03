@@ -7,7 +7,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { AiOutlineEdit } from 'react-icons/ai';
 import { FaArrowLeft } from 'react-icons/fa6';
+import { RiDeleteBinLine } from 'react-icons/ri';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 
@@ -116,16 +118,16 @@ const ExistingZones = () => {
     <div className='px-5 2xl:px-16'>
 
       <div className='py-4 w-full flex justify-between'>
-        <h3 className='text-start font-medium md:font-semibold text-[14px] md:text-2xl lg:text-3xl w-full'>Shipping Management</h3>
+        <h3 className='text-start font-medium md:font-semibold text-[14px] md:text-2xl lg:text-3xl w-full'>SHIPPING MANAGEMENT</h3>
         <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/zone"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
       </div>
 
       <div className='flex flex-wrap items-center gap-3 bg-white pt-2'>
         <button
           className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'inside dhaka' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
-        after:absolute after:left-0 after:right-0 hover:text-[#D2016E] after:bottom-0 
-        after:h-[2px] after:bg-[#D2016E] after:transition-all after:duration-300
+        ${activeTab === 'inside dhaka' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
+        after:absolute after:left-0 after:right-0 hover:text-green-600 after:bottom-0 
+        after:h-[2px] after:bg-green-600 after:transition-all after:duration-300
         ${activeTab === 'inside dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
       `}
           onClick={() => setActiveTab('inside dhaka')}
@@ -135,9 +137,9 @@ const ExistingZones = () => {
 
         <button
           className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'dhaka suburbs' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
-        after:absolute after:left-0 after:right-0 hover:text-[#D2016E] after:bottom-0 
-        after:h-[2px] after:bg-[#D2016E] after:transition-all after:duration-300
+        ${activeTab === 'dhaka suburbs' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
+        after:absolute after:left-0 after:right-0 hover:text-green-600 after:bottom-0 
+        after:h-[2px] after:bg-green-600 after:transition-all after:duration-300
         ${activeTab === 'dhaka suburbs' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
       `}
           onClick={() => setActiveTab('dhaka suburbs')}
@@ -147,9 +149,9 @@ const ExistingZones = () => {
 
         <button
           className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'outside dhaka' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'}
-        after:absolute after:left-0 after:right-0 hover:text-[#D2016E] after:bottom-0 
-        after:h-[2px] after:bg-[#D2016E] after:transition-all after:duration-300
+        ${activeTab === 'outside dhaka' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
+        after:absolute after:left-0 after:right-0 hover:text-green-600 after:bottom-0 
+        after:h-[2px] after:bg-green-600 after:transition-all after:duration-300
         ${activeTab === 'outside dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
       `}
           onClick={() => setActiveTab('outside dhaka')}
@@ -215,25 +217,19 @@ const ExistingZones = () => {
                   </td>
                   <td className="p-3">
                     <div className="flex gap-2 items-center">
-                      <Button
-                        onClick={() => router.push(`/dash-board/zone/${zone?._id}`)}
-                        size="md"
-                        className="text-xs md:text-sm font-medium"
-                        neutral-95text-neutral-950 color="primary"
-                        variant="flat"
-                      >
-                        Edit
-                      </Button>
+                      <div className='flex justify-end items-center gap-2'>
 
-                      <Button
-                        size="md"
-                        className="text-xs md:text-sm font-medium"
-                        neutral-95text-neutral-950 color="danger"
-                        variant="flat"
-                        onPress={() => handleDelete(zone?._id)}
-                      >
-                        Delete
-                      </Button>
+                        {/* Edit Button */}
+                        <button onClick={() => router.push(`/dash-board/zone/${zone?._id}`)}>
+                          <span className='flex items-center gap-1.5 rounded-md bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4'><AiOutlineEdit size={16} /> Edit </span>
+                        </button>
+
+                        {/* Delete Button */}
+                        <button onClick={() => handleDelete(zone?._id)}>
+                          <span className='flex items-center gap-1.5 rounded-md bg-red-50 p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-red-100 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs'> <RiDeleteBinLine size={16} />Delete </span>
+                        </button>
+
+                      </div>
                     </div>
                   </td>
                 </tr>

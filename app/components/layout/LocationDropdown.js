@@ -1,35 +1,73 @@
 import useLocations from '@/app/hooks/useLocations';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Loading from '../shared/Loading/Loading';
+import { Select, SelectItem } from '@nextui-org/react';
 
 const LocationDropdown = ({ onLocationSelect }) => {
-
   const [locationList, isLocationPending] = useLocations();
-  const [selectedLocation, setSelectedLocation] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState(new Set());
 
-  const handleChange = (e) => {
-    const selectedValue = e.target.value;
-    setSelectedLocation(selectedValue); // Update the selected location in state
-    onLocationSelect(selectedValue); // Pass selected location to parent component
-  };
+  // Set the first item as default when the location list loads
+  useEffect(() => {
+    if (locationList?.length && selectedLocation.size === 0) {
+      const firstLocation = locationList[0].locationName;
+      setSelectedLocation(new Set([firstLocation]));
+      onLocationSelect(firstLocation);
+    }
+  }, [locationList, onLocationSelect, selectedLocation.size]); // Runs only when locationList changes
+
+  const isSelected = selectedLocation.size > 0 && Array.from(selectedLocation)[0] !== undefined;
 
   if (isLocationPending) {
-    return <Loading />
+    return <Loading />;
   }
 
+
   return (
-    <select
-      value={selectedLocation}
-      onChange={handleChange} className='bg-gray-100 font-semibold text-xl lg:text-2xl'
-      style={{ zIndex: 10, pointerEvents: 'auto', position: 'relative', outline: 'none' }}
+    <Select
+      className="w-fit"
+      label={
+        <>
+          {isSelected ? (
+            <span className='font-semibold text-neutral-700'>
+              Selected Location :
+            </span>
+          ) : (
+            <span className='text-neutral-700 font-semibold'>Select Location</span>
+          )}
+          {!!selectedLocation.size && (
+            <span className="ml-2 font-bold text-neutral-950">
+              {Array.from(selectedLocation)[0]}
+            </span>
+          )}
+        </>
+      }
+      selectionMode="single"
+      size="sm"
+      selectedKeys={selectedLocation}
+      onSelectionChange={(newSelectedKeys) => {
+        const selectedValue = Array.from(newSelectedKeys)[0];
+        setSelectedLocation(new Set([selectedValue])); // Update selected location
+        onLocationSelect(selectedValue); // Pass to parent
+      }}
+      classNames={{
+        mainWrapper: [
+          `z-[1] text-neutral-700 [&>button]:px-4 [&>button]:duration-300 hover:[&>button]:bg-[#F4D3BA] ${isSelected ? "[&>button]:bg-[#F4D3BA]" : "[&>button]:bg-[#FBEDE2]"
+          }`,
+        ],
+        label: [
+          "text-neutral-700 static mr-4 group-data-[filled=true]:scale-100 group-data-[filled=true]:-translate-y-0",
+        ],
+        innerWrapper: ["hidden"],
+        popoverContent: ["min-w-60 w-fit"],
+      }}
     >
-      <option disabled value="">Select Location</option>
       {locationList?.map((location) => (
-        <option key={location._id} value={location.locationName}>
+        <SelectItem key={location.locationName} value={location.locationName}>
           {location.locationName}
-        </option>
+        </SelectItem>
       ))}
-    </select>
+    </Select>
   );
 };
 

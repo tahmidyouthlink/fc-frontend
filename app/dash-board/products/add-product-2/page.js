@@ -12,6 +12,11 @@ import { FiSave } from 'react-icons/fi';
 import useLocations from '@/app/hooks/useLocations';
 import Loading from '@/app/components/shared/Loading/Loading';
 import ExitConfirmationModal from '@/app/components/layout/ExitConfirmationModal';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { LuImagePlus } from "react-icons/lu";
+
+const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
+const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 
 const SecondStepOfAddProduct = () => {
 
@@ -23,6 +28,7 @@ const SecondStepOfAddProduct = () => {
   const axiosPublic = useAxiosPublic();
   const [locationList, isLocationPending] = useLocations();
   const [showModal, setShowModal] = useState(false);
+  const [sizeError, setSizeError] = useState(false);
 
   // Function to handle "Go Back" button click
   const handleGoBackClick = (e) => {
@@ -50,7 +56,6 @@ const SecondStepOfAddProduct = () => {
     try {
       const storedColors = JSON.parse(localStorage.getItem('availableColors') || '[]');
       const storedSizes = JSON.parse(localStorage.getItem('allSizes') || '[]');
-      const storedImageUrls = JSON.parse(localStorage.getItem('uploadedImageUrls') || '[]');
       const storedVariants = JSON.parse(localStorage.getItem('productVariants') || '[]');
 
       // Filter locations with status true
@@ -81,18 +86,16 @@ const SecondStepOfAddProduct = () => {
           if (existingVariant) {
             allVariants.push(existingVariant);
           } else {
-            allVariants.push({ color, size, sku: "", imageUrl: "", location: primaryLocationName });
+            allVariants.push({ color, size, sku: "", onHandSku: "", imageUrls: [], location: primaryLocationName });
           }
         }
       }
 
       setProductVariants(allVariants);
-      setUploadedImageUrls(storedImageUrls);
 
       // Set form values for the variants
       allVariants?.forEach((variant, index) => {
         setValue(`sku-${index}`, variant?.sku || 0);
-        setValue(`imageUrl-${index}`, variant?.imageUrl);
       });
 
     } catch (e) {
@@ -102,45 +105,16 @@ const SecondStepOfAddProduct = () => {
 
   const handleVariantChange = (index, field, value) => {
     const updatedVariants = [...productVariants];
+
+    // Update the field value
     updatedVariants[index][field] = value;
+
+    // If the field is 'sku', update 'onHandSku' with the same value
+    if (field === "sku") {
+      updatedVariants[index]["onHandSku"] = value;
+    }
+
     setProductVariants(updatedVariants);
-  };
-
-  const onImageClick = (variantIndex, imgUrl) => {
-    setProductVariants(prevVariants =>
-      prevVariants.map((variant, index) => {
-        if (index === variantIndex) {
-          const isSelected = variant.imageUrls?.includes(imgUrl);
-          let updatedImageUrls;
-
-          if (isSelected) {
-            // Remove the image if already selected, but ensure at least one image remains
-            updatedImageUrls = variant.imageUrls?.length > 1
-              ? variant.imageUrls.filter(url => url !== imgUrl)
-              : variant.imageUrls; // Do not allow deselecting the last image
-          } else {
-            // Add the image if not selected
-            updatedImageUrls = [...(variant.imageUrls || []), imgUrl];
-          }
-
-          return { ...variant, imageUrls: updatedImageUrls };
-        }
-        return variant;
-      })
-    );
-
-    // Update form value for imageUrls
-    setValue(`imageUrls-${variantIndex}`, productVariants[variantIndex]?.imageUrls);
-
-    // Save updated variants to local storage
-    localStorage.setItem(
-      'productVariants',
-      JSON.stringify(
-        productVariants.map((variant, index) =>
-          index === variantIndex ? { ...variant, imageUrls: productVariants[variantIndex]?.imageUrls } : variant
-        )
-      )
-    );
   };
 
   // Memoize the primary location name based on locationList changes
@@ -148,33 +122,195 @@ const SecondStepOfAddProduct = () => {
     return locationList?.find(location => location?.isPrimaryLocation)?.locationName || 'No primary location found';
   }, [locationList]);
 
+  const handleImagesChange = async (event, variantIndex) => {
+    const files = Array.from(event.target.files);
+
+    if (files.length === 0) {
+      toast.error("No files selected.");
+      return;
+    }
+
+    const validFiles = validateFiles(files);
+    if (validFiles.length === 0) {
+      toast.error("Please select valid image files (PNG, JPEG, JPG, WEBP).");
+      return;
+    }
+
+    const currentImages = productVariants[variantIndex]?.imageUrls || [];
+    const totalImages = currentImages.length + validFiles.length;
+
+    if (totalImages > 6) {
+      toast.error("You can only upload a maximum of 6 images per variant.");
+      return;
+    }
+
+    const newImages = validFiles.map((file) => ({
+      url: URL.createObjectURL(file),
+      file,
+    }));
+
+    const imageUrls = await uploadImagesToImgbb(newImages);
+
+    setProductVariants((prevVariants) => {
+      const updatedVariants = [...prevVariants];
+      updatedVariants[variantIndex].imageUrls = [
+        ...currentImages,
+        ...imageUrls,
+      ].slice(0, 6);
+      return updatedVariants;
+    });
+  };
+
+  const processFiles = async (files) => {
+    const validFiles = validateFiles(files);
+    if (validFiles.length === 0) {
+      toast.error("Please select valid image files (PNG, JPEG, JPG).");
+      return;
+    }
+
+    const totalImages = validFiles.length + uploadedImageUrls.length;
+    if (totalImages > 6) {
+      toast.error("You can only upload a maximum of 6 images.");
+      return;
+    }
+
+    const newImages = validFiles.map((file) => ({
+      url: URL.createObjectURL(file),
+      file,
+    }));
+
+    const imageUrls = await uploadImagesToImgbb(newImages);
+    const updatedUrls = [...uploadedImageUrls, ...imageUrls];
+
+    const limitedUrls = updatedUrls.slice(-6);
+    setUploadedImageUrls(limitedUrls);
+
+    // Clear size error if there are valid images
+    if (limitedUrls.length > 0) {
+      setSizeError(false);
+    }
+  };
+
+  const validateFiles = (files) => {
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    return files.filter(file => validTypes.includes(file.type));
+  };
+
+  const uploadImagesToImgbb = async (images) => {
+    const imageUrls = [];
+    for (const image of images) {
+      const formData = new FormData();
+      formData.append('image', image.file);
+      formData.append('key', apiKey);
+      try {
+        const response = await axiosPublic.post(apiURL, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        if (response.data && response.data.data && response.data.data.url) {
+          imageUrls.push(response.data.data.url);
+        } else {
+          toast.error("Failed to get image URL from response.");
+        }
+      } catch (error) {
+        toast.error(`Upload failed: ${error.response?.data?.error?.message || error.message}`);
+      }
+    }
+    return imageUrls;
+  };
+
+  const handleDrop = async (event, variantIndex) => {
+    event.preventDefault();
+    const files = Array.from(event.dataTransfer.files);
+    await processFiles(files);
+
+    // After processing files, update the variant's imageUrls
+    const validFiles = validateFiles(files);
+    const currentImages = productVariants[variantIndex]?.imageUrls || [];
+    const newImages = validFiles.map((file) => ({
+      url: URL.createObjectURL(file),
+      file,
+    }));
+
+    const imageUrls = await uploadImagesToImgbb(newImages);
+
+    setProductVariants((prevVariants) => {
+      const updatedVariants = [...prevVariants];
+      updatedVariants[variantIndex].imageUrls = [
+        ...currentImages,
+        ...imageUrls,
+      ].slice(0, 6); // Limit to 6 images
+      return updatedVariants;
+    });
+  };
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
+  };
+
+  const handleImageRemove = (variantIndex, imgIndex) => {
+    setProductVariants((prevVariants) => {
+      const updatedVariants = [...prevVariants];
+      updatedVariants[variantIndex].imageUrls = updatedVariants[variantIndex].imageUrls.filter(
+        (_, index) => index !== imgIndex
+      );
+      return updatedVariants;
+    });
+  };
+
+  const handleOnDragEnd = (result, variantIndex) => {
+    const { source, destination } = result;
+
+    if (!destination) return;
+
+    setProductVariants((prevVariants) => {
+      const updatedVariants = [...prevVariants];
+      const items = [...updatedVariants[variantIndex].imageUrls];
+
+      // Remove the dragged item
+      const [movedItem] = items.splice(source.index, 1);
+
+      // Insert the dragged item at the destination
+      items.splice(destination.index, 0, movedItem);
+
+      // Update the variant's imageUrls array
+      updatedVariants[variantIndex].imageUrls = items;
+
+      return updatedVariants;
+    });
+  };
+
   const onSubmit = (data) => {
     try {
+
+      const invalidVariants = productVariants.filter(
+        (variant) => variant.imageUrls.length < 3
+      );
+
+      if (invalidVariants.length > 0) {
+        toast.error("Each variant must have at least 3 images.");
+        return;
+      }
 
       // Filter only locations with status true
       const activeLocations = locationList?.filter(location => location.status === true);
 
       const formattedData = productVariants.map((variant, index) => {
         return activeLocations?.map(location => ({
-          color: variant.color,
-          size: variant.size,
+          ...variant,
           sku: location.isPrimaryLocation
             ? parseFloat(data[`sku-${index}`]) || 0 // SKU for primary location
             : 0, // Set SKU to 0 for others
-          imageUrls: variant.imageUrls || [],
+          onHandSku: location.isPrimaryLocation
+            ? parseFloat(data[`sku-${index}`]) || 0 // SKU for primary location
+            : 0, // Set SKU to 0 for others
           location: location.locationName,
         }));
       });
 
       // Flatten the array of variants for all locations
       const finalData = formattedData.flat();
-
-      // Check if any variant is missing an image URL
-      const missingImage = finalData.some(variant => variant?.imageUrls?.length === 0);
-      if (missingImage) {
-        toast.error("Please select at least one image for each variant.");
-        return;
-      }
 
       localStorage.setItem('productVariants', JSON.stringify(finalData));
       setNavigate(true);
@@ -191,7 +327,7 @@ const SecondStepOfAddProduct = () => {
     const storedProductWeight = localStorage.getItem('weight');
     const storedProductBatchCode = localStorage.getItem('batchCode');
     const storedRegularPrice = localStorage.getItem('regularPrice');
-    const storedUploadedImageUrls = JSON.parse(localStorage.getItem('uploadedImageUrls') || '[]');
+    const storedUploadedImageUrl = localStorage.getItem('uploadedImageUrl');
     const storedRestOfOutfit = JSON.parse(localStorage.getItem('restOfOutfit') || '[]');
     const storedDiscountType = localStorage.getItem('discountType');
     const storedDiscountValue = localStorage.getItem('discountValue');
@@ -215,12 +351,13 @@ const SecondStepOfAddProduct = () => {
 
     const formattedData = productVariants.map((variant, index) => {
       return activeLocations?.map(location => ({
-        color: variant.color,
-        size: variant.size,
+        ...variant,
         sku: location.isPrimaryLocation
           ? parseFloat(formData[`sku-${index}`]) || 0 // SKU for primary location
           : 0, // Set SKU to 0 for others
-        imageUrls: variant.imageUrls || [],
+        onHandSku: location.isPrimaryLocation
+          ? parseFloat(data[`sku-${index}`]) || 0 // SKU for primary location
+          : 0, // Set SKU to 0 for others
         location: location.locationName,
       }));
     });
@@ -229,9 +366,12 @@ const SecondStepOfAddProduct = () => {
     const finalData = formattedData.flat();
 
     // Check if any variant is missing an image URL
-    const missingImage = formattedData?.some(variant => variant?.imageUrls?.length === 0);
-    if (missingImage) {
-      toast.error("Please select at least one image for each variant.");
+    const invalidVariants = productVariants?.filter(
+      (variant) => variant.imageUrls.length < 4
+    );
+
+    if (invalidVariants?.length > 0) {
+      toast.error("Each variant must have at least 4 images.");
       return;
     }
 
@@ -241,7 +381,7 @@ const SecondStepOfAddProduct = () => {
       weight: storedProductWeight,
       batchCode: storedProductBatchCode,
       regularPrice: storedRegularPrice,
-      imageUrls: storedUploadedImageUrls,
+      thumbnailImageUrl: storedUploadedImageUrl,
       discountType: storedDiscountType,
       discountValue: storedDiscountValue,
       productDetails: storedProductDetails,
@@ -259,7 +399,6 @@ const SecondStepOfAddProduct = () => {
       productVariants: finalData,
       season: storedSeasons,
       status: "draft",
-      salesThisMonth: 0,
       sizeGuideImageUrl: storedSizeGuideImageUrl,
       restOfOutfit: storedRestOfOutfit,
     };
@@ -305,7 +444,7 @@ const SecondStepOfAddProduct = () => {
         localStorage.removeItem('batchCode');
         localStorage.removeItem('weight');
         localStorage.removeItem('regularPrice');
-        JSON.parse(localStorage.removeItem('uploadedImageUrls') || '[]');
+        localStorage.removeItem('uploadedImageUrl');
         localStorage.removeItem('discountType');
         localStorage.removeItem('discountValue');
         localStorage.removeItem('productDetails');
@@ -343,11 +482,12 @@ const SecondStepOfAddProduct = () => {
   }
 
   return (
-    <div className='bg-gray-50 min-h-screen'>
+    <div className='bg-gray-50 min-h-screen px-6'>
 
-      <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
-        <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Inventory Variants</h3>
+      <div className='max-w-screen-2xl mx-auto py-3 md:py-4 sticky top-0 z-10 bg-gray-50'>
+        <div className='flex flex-wrap lg:flex-nowrap items-center justify-between'>
+          <h3 className='w-full font-semibold text-xl lg:text-2xl'>INVENTORY VARIANTS</h3>
+          <h3 className='font-medium text-sm md:text-base w-full'>Primary Location: <strong>{primaryLocationName}</strong></h3>
           <Link
             className="flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
             href="/dash-board/products"
@@ -361,13 +501,12 @@ const SecondStepOfAddProduct = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className='min-h-[91vh] flex flex-col justify-between'>
+      <form onSubmit={handleSubmit(onSubmit)} className='min-h-[91vh] flex flex-col justify-between max-w-screen-2xl mx-auto'>
         <div>
-          <h3 className='max-w-screen-2xl text-right bg-gray-50 font-medium text-sm md:text-base px-6'>Primary Location: <strong>{primaryLocationName}</strong></h3>
-          <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 px-6 lg:px-8 xl:px-10 2xl:px-12 py-3'>
+          <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 pt-3 pb-12'>
             {productVariants?.map((variant, index) => (
-              <div key={index} className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-                <div className='flex items-center gap-2 md:gap-4'>
+              <div key={index} className='flex flex-col bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+                <div className='flex items-center gap-2 md:gap-4 h-fit'>
                   <div className='w-1/3'>
                     <label className='font-medium text-[#9F5216]'>Color</label>
                     <input
@@ -402,41 +541,138 @@ const SecondStepOfAddProduct = () => {
                     )}
                   </div>
                 </div>
-                <div className='flex flex-col gap-4'>
-                  <label className='font-medium text-[#9F5216]'>Select Media *</label>
-                  <div className='grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 2xl:grid-cols-4 gap-2'>
-                    {uploadedImageUrls.map((url, imgIndex) => (
-                      <div
-                        key={imgIndex}
-                        className={`image-container ${variant.imageUrls?.includes(url) ? 'selected' : ''}`}
-                        onClick={() => onImageClick(index, url)}
-                      >
-                        <Image src={url} alt={`image-${imgIndex}`} width={3000} height={3000} className="w-full min-h-[200px] max-h-[200px] rounded-md object-contain" />
+
+                <div className='flex flex-col lg:flex-row gap-3 mt-6 h-fit'>
+                  <input
+                    id={`imageUpload-${index}`}
+                    type='file'
+                    className='hidden'
+                    multiple
+                    onChange={(event) => handleImagesChange(event, index)}
+                  />
+                  {variant?.imageUrls?.length < 6 && (
+                    <label
+                      htmlFor={`imageUpload-${index}`}
+                      className='flex flex-col items-center justify-center space-y-3 rounded-xl border-2 border-dashed border-gray-400 px-3 2xl:px-5 py-6 min-h-[350px] max-h-[350px] bg-white hover:bg-blue-50 cursor-pointer'
+                      onDrop={(event) => handleDrop(event, index)}
+                      onDragOver={handleDragOver}
+                    >
+                      <LuImagePlus size={30} />
+                      <div className='space-y-1.5 text-center'>
+                        <h5 className='whitespace-nowrap text-xs font-medium tracking-tight'>
+                          <span className='text-blue-500 underline'>Click to upload</span> or <br />
+                          drag and drop
+                        </h5>
                       </div>
-                    ))}
-                  </div>
-                  {errors[`imageUrl-${index}`] && (
-                    <p className="text-red-600 text-left">Image selection is required</p>
+                    </label>
                   )}
+                  {sizeError && (
+                    <p className="text-red-600 text-center">Please select at least one image</p>
+                  )}
+
+                  <div>
+                    <DragDropContext onDragEnd={(result) => handleOnDragEnd(result, index)}>
+                      <Droppable droppableId="row1" direction="horizontal">
+                        {(provided) => (
+                          <div
+                            className="grid grid-cols-3 gap-4"
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                          >
+                            {variant.imageUrls?.slice(0, 3).map((url, imgIndex) => (
+                              <Draggable key={url} draggableId={`row1-${url}`} index={imgIndex}>
+                                {(provided) => (
+                                  <li
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    className="flex items-center p-2 bg-white border border-gray-300 rounded-md relative"
+                                  >
+                                    <Image
+                                      src={url}
+                                      alt={`Variant ${index} Image ${imgIndex}`}
+                                      height={3000}
+                                      width={3000}
+                                      className="w-full h-auto min-h-[150px] max-h-[150px] rounded-md object-cover"
+                                    />
+                                    <button
+                                      onClick={() => handleImageRemove(index, imgIndex)}
+                                      className="absolute top-1 right-1 rounded-full p-0.5 bg-red-600 hover:bg-red-700 text-white font-bold"
+                                    >
+                                      <RxCross2 size={20} />
+                                    </button>
+                                  </li>
+                                )}
+                              </Draggable>
+                            ))}
+                            {provided.placeholder}
+                          </div>
+                        )}
+                      </Droppable>
+
+                      <Droppable droppableId="row2" direction="horizontal">
+                        {(provided) => (
+                          <div
+                            className="grid grid-cols-3 gap-4 mt-4"
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                          >
+                            {variant.imageUrls?.slice(3).map((url, imgIndex) => (
+                              <Draggable key={url} draggableId={`row2-${url}`} index={imgIndex + 3}>
+                                {(provided) => (
+                                  <li
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    className="flex items-center p-2 bg-white border border-gray-300 rounded-md relative"
+                                  >
+                                    <Image
+                                      src={url}
+                                      alt={`Variant ${index} Image ${imgIndex + 3}`}
+                                      height={3000}
+                                      width={3000}
+                                      className="w-full h-auto min-h-[150px] max-h-[150px] rounded-md object-contain"
+                                    />
+                                    <button
+                                      onClick={() => handleImageRemove(index, imgIndex + 3)}
+                                      className="absolute top-1 right-1 rounded-full p-0.5 bg-red-600 hover:bg-red-700 text-white font-bold"
+                                    >
+                                      <RxCross2 size={20} />
+                                    </button>
+                                  </li>
+                                )}
+                              </Draggable>
+                            ))}
+                            {provided.placeholder}
+                          </div>
+                        )}
+                      </Droppable>
+                    </DragDropContext>
+
+                  </div>
+
                 </div>
 
               </div>
             ))}
           </div>
+
         </div>
-        <div className='flex flex-wrap gap-6 justify-between px-6 lg:px-8 xl:px-10 2xl:px-12 py-3'>
-          <Link href='/dash-board/products/add-product' className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
+
+        <div className='flex flex-wrap gap-6 justify-between py-8'>
+          <Link href='/dash-board/products/add-product' className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'>
             <FaArrowLeft /> Previous Step
           </Link>
           <div className='flex items-center gap-6'>
-            <button type="button" onClick={handleSubmit(onSaveForNow)} className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
+            <button type="button" onClick={handleSubmit(onSaveForNow)} className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700'>
               Save For Now <FiSave size={19} />
             </button>
-            <button type='submit' className='bg-[#9F5216] hover:bg-[#804010] text-white px-4 py-2 rounded-md flex items-center gap-2'>
+            <button type='submit' className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'>
               Next Step <FaArrowRight />
             </button>
           </div>
         </div>
+
       </form>
 
       <ExitConfirmationModal

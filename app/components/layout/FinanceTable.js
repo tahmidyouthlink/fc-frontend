@@ -7,6 +7,7 @@ import { Button, Checkbox, CheckboxGroup, DateRangePicker, Modal, ModalBody, Mod
 import { IoMdClose } from 'react-icons/io';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { getLocalTimeZone, today } from '@internationalized/date';
+import { TbColumnInsertRight } from 'react-icons/tb';
 
 const initialColumns = ["Date & Time", 'Order ID', 'Customer Name', 'Payment Method', 'Transaction ID', 'Payment Status'];
 
@@ -201,8 +202,8 @@ const FinanceTable = () => {
         </div>
 
         <div ref={dropdownRef} className="relative inline-block text-left z-50">
-          <Button onClick={() => toggleDropdown('other')} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
-            Customize
+          <button onClick={() => toggleDropdown('other')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[10px] md:text-[14px] text-neutral-700">
+            CUSTOMIZE
             <svg
               className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown === "other" ? 'rotate-180' : ''}`}
               xmlns="http://www.w3.org/2000/svg"
@@ -212,13 +213,15 @@ const FinanceTable = () => {
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
             </svg>
-          </Button>
+          </button>
 
           {openDropdown === 'other' && (
             <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+
               <div className='p-1'>
 
-                <div className='flex items-center gap-2'>
+                <div className='flex items-center gap-2 mb-2'>
+
                   <DateRangePicker
                     label="Order Duration"
                     visibleMonths={1}
@@ -234,11 +237,10 @@ const FinanceTable = () => {
                   )}
                 </div>
 
-                <div className="py-1 flex-1">
-                  <Button variant="light" color="primary" onClick={() => { setColumnModalOpen(true) }} className="w-full">
-                    Choose Columns
-                  </Button>
-                </div>
+                {/* Choose Columns Button */}
+                <button className="relative z-[1] flex items-center justify-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700 w-full" onClick={() => { setColumnModalOpen(true); }}>
+                  Choose Columns <TbColumnInsertRight size={20} />
+                </button>
 
               </div>
 
@@ -251,7 +253,7 @@ const FinanceTable = () => {
       {/* Column Selection Modal */}
       <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
         <ModalContent>
-          <ModalHeader>Choose Columns</ModalHeader>
+          <ModalHeader className='bg-gray-200'>Choose Columns</ModalHeader>
           <ModalBody className="modal-body-scroll">
             <DragDropContext onDragEnd={handleOnDragEnd}>
               <Droppable droppableId="droppable">
@@ -292,13 +294,15 @@ const FinanceTable = () => {
               </Droppable>
             </DragDropContext>
           </ModalBody>
-          <ModalFooter>
-            <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
-              Deselect All
-            </Button>
-            <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
-              Select All
-            </Button>
+          <ModalFooter className='flex justify-between items-center'>
+            <div className='flex items-center gap-2'>
+              <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
+                Deselect All
+              </Button>
+              <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
+                Select All
+              </Button>
+            </div>
             <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
               Save
             </Button>

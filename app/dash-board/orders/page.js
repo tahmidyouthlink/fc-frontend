@@ -1,7 +1,7 @@
 "use client";
 import * as XLSX from 'xlsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Accordion, AccordionItem, Button, Checkbox, CheckboxGroup, DateRangePicker, Input } from "@nextui-org/react";
+import { Accordion, AccordionItem, Button, Checkbox, CheckboxGroup, DateRangePicker, Input, Textarea } from "@nextui-org/react";
 import emailjs from '@emailjs/browser';
 import Loading from '@/app/components/shared/Loading/Loading';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
@@ -26,9 +26,16 @@ import { useSearchParams } from 'next/navigation';
 import { today, getLocalTimeZone } from "@internationalized/date";
 import dynamic from 'next/dynamic';
 import useShippingZones from '@/app/hooks/useShippingZones';
+import Image from 'next/image';
+import { saveAs } from 'file-saver';
+import { HiDownload } from "react-icons/hi";
+import { CgArrowsExpandRight } from 'react-icons/cg';
+import ProductExpandedImageModalOrder from '@/app/components/product/ProductExpandedImageModalOrder';
+import { TbColumnInsertRight } from 'react-icons/tb';
+import { HiOutlineDownload } from "react-icons/hi";
 const PrintButton = dynamic(() => import("@/app/components/layout/PrintButton"), { ssr: false });
 
-const initialColumns = ['Order Number', 'Date & Time', 'Customer Name', 'Order Amount', 'Order Status', 'Action', 'Email', 'Phone Number', 'Alternative Phone Number', 'Shipping Method', 'Payment Status', 'Payment Method'];
+const initialColumns = ['Order Number', 'Date & Time', 'Customer Name', 'Order Amount', 'Order Status', 'Action', 'Email', 'Phone Number', 'Alt. Phone Number', 'Shipping Method', 'Payment Status', 'Payment Method'];
 
 const orderStatusTabs = [
   'New Orders',
@@ -41,7 +48,7 @@ const columnsConfig = {
   'New Orders': [...initialColumns],
   'Active Orders': [...initialColumns],
   'Completed Orders': [...initialColumns],
-  'Returns & Refunds': ['Return Number', 'Date & Time', 'Customer Name', 'Refund Amount', 'Status', 'Action', 'Email', 'Phone Number', 'Alternative Phone Number', 'Shipping Method', 'Payment Status', 'Payment Method'],
+  'Returns & Refunds': ['R. Order Number', 'Date & Time', 'Customer Name', 'Refund Amount', 'Status', 'Action', 'Email', 'Phone Number', 'Alt. Phone Number', 'Shipping Method', 'Payment Status', 'Payment Method'],
 };
 
 const OrdersPage = () => {
@@ -57,6 +64,7 @@ const OrdersPage = () => {
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   const [openDropdown, setOpenDropdown] = useState(false);
+  const [openDropdown2, setOpenDropdown2] = useState(false);
   const dropdownRef = useRef(null);
   const dropdownRefDownload = useRef(null);
   const [selectedTab, setSelectedTab] = useState(orderStatusTabs[0]);
@@ -72,9 +80,15 @@ const OrdersPage = () => {
   const [orderToUpdateOnHold, setOrderToUpdateOnHold] = useState({}); // selected order for update
   const [onHoldReason, setOnHoldReason] = useState("");
   const [isOnHoldModalOpen, setOnHoldModalOpen] = useState(false);
+  const [orderIdToUpdateDeclined, setOrderIdToUpdateDeclined] = useState(null); // Store order ID
+  const [orderToUpdateDeclined, setOrderToUpdateDeclined] = useState({}); // selected order for update
+  const [declinedReason, setDeclinedReason] = useState("");
+  const [isDeclinedModalOpen, setDeclinedModalOpen] = useState(false);
   const [isToggleOn, setIsToggleOn] = useState(true);
   const [shippingList, isShippingPending] = useShippingZones();
   const [selectedHandler, setSelectedHandler] = useState(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isImageExpanded, setIsImageExpanded] = useState(false);
 
   // Load saved state from localStorage or use defaults
   useEffect(() => {
@@ -111,6 +125,23 @@ const OrdersPage = () => {
       setSearchQuery(offer);
     }
   }, [promo, offer]);
+
+  // Click outside handler
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRefDownload.current && !dropdownRefDownload.current.contains(event.target)) {
+        setOpenDropdown(null);
+      }
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenDropdown2(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Handler for selecting a shipment handler
   const handleSelectHandler = (handler) => {
@@ -179,6 +210,10 @@ const OrdersPage = () => {
 
   const toggleDropdown = (dropdown) => {
     setOpenDropdown((prev) => (prev === dropdown ? null : dropdown)); // Toggle the clicked dropdown
+  };
+
+  const toggleDropdown2 = (dropdown) => {
+    setOpenDropdown2((prev) => (prev === dropdown ? null : dropdown)); // Toggle the clicked dropdown
   };
 
   // Check if filters are applied
@@ -319,17 +354,18 @@ const OrdersPage = () => {
 
     const order = paginatedOrders?.find(order => order._id === id);
 
-    const dataToSend = order?.productInformation.map(product => ({
-      productId: product.productId,
-      sku: product.sku,
-      size: product.size,
-      color: product.color
-    }));
-
     if (!order) {
       toast.error("Order not found");
       return;
-    }
+    };
+
+    const dataToSend = order?.productInformation.map(product => ({
+      productId: product.productId,
+      sku: product.sku,
+      onHandSku: product.sku,
+      size: product.size,
+      color: product.color
+    }));
 
     const actionMessages = {
       undefined: "Do you want to confirm this order?",
@@ -354,29 +390,6 @@ const OrdersPage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         if (actionType === undefined) {
-          // try {
-          //   const response = await axiosPublic.put("/decreaseSkuFromProduct", dataToSend);
-
-          //   // Check the results array from the response
-          //   const updateResults = response?.data?.results;
-
-          //   if (updateResults && Array.isArray(updateResults)) {
-          //     const successfulUpdates = updateResults.filter((result) => !result.error); // Filter out successful updates
-
-          //     if (successfulUpdates.length > 0) {
-          //       updateOrderStatus(order, id, actionType, isUndo); // Call your function only if there are successful updates
-          //     } else {
-          //       console.error("No successful updates occurred");
-          //     }
-          //   } else {
-          //     console.error("Unexpected response format:", response?.data);
-          //   }
-          // } catch (error) {
-          //   console.error("Error making API request:", error);
-          // }
-          updateOrderStatus(order, id, actionType, isUndo);
-        }
-        else if (actionType === "shipped") {
           try {
             const response = await axiosPublic.put("/decreaseSkuFromProduct", dataToSend);
 
@@ -387,10 +400,7 @@ const OrdersPage = () => {
               const successfulUpdates = updateResults.filter((result) => !result.error); // Filter out successful updates
 
               if (successfulUpdates.length > 0) {
-                // Open the modal for tracking number input only for 'shipped'
-                setOrderToUpdate(order);
-                setOrderIdToUpdate(id); // Set the order ID for modal
-                setTrackingModalOpen(true);  // Open the modal
+                updateOrderStatus(order, id, actionType, isUndo); // Call your function only if there are successful updates
               } else {
                 console.error("No successful updates occurred");
               }
@@ -401,11 +411,23 @@ const OrdersPage = () => {
             console.error("Error making API request:", error);
           }
         }
+        else if (actionType === "shipped") {
+          // Open the modal for tracking number input only for 'shipped'
+          setOrderToUpdate(order);
+          setOrderIdToUpdate(id); // Set the order ID for modal
+          setTrackingModalOpen(true);  // Open the modal
+        }
         else if (actionType === "onHold") {
           // Open the modal for on hold input only for 'onHold'
           setOrderToUpdateOnHold(order);
           setOrderIdToUpdateOnHold(id); // Set the order ID for modal
           setOnHoldModalOpen(true);  // Open the modal
+        }
+        else if (actionType === "declined") {
+          // Open the modal for on hold input only for 'onHold'
+          setOrderToUpdateDeclined(order);
+          setOrderIdToUpdateDeclined(id); // Set the order ID for modal
+          setDeclinedModalOpen(true);  // Open the modal
         }
         else {
           // For all other statuses, update order directly
@@ -417,6 +439,15 @@ const OrdersPage = () => {
 
   // Function to update order status
   const updateOrderStatus = async (order, id, actionType, isUndo) => {
+
+    const dataToSend = order?.productInformation.map(product => ({
+      productId: product.productId,
+      sku: product.sku,
+      onHandSku: product.sku,
+      size: product.size,
+      color: product.color
+    }));
+
     let updateStatus;
 
     if (isUndo) {
@@ -450,7 +481,7 @@ const OrdersPage = () => {
           break;
       }
       localStorage.setItem(`undoVisible_${id}`, true);
-    }
+    };
 
     const data = {
       orderStatus: updateStatus,
@@ -469,7 +500,9 @@ const OrdersPage = () => {
         }
         : {}), // Add selectedHandler details if provided for shipped
       ...(isUndo && { isUndo: true }),
-      ...(actionType === "onHold" && onHoldReason ? { onHoldReason } : {})
+      ...(actionType === "onHold" && onHoldReason ? { onHoldReason } : {}),
+      ...(actionType === "declined" && declinedReason ? { declinedReason } : {}),
+      dataToSend
     };
 
     try {
@@ -510,6 +543,60 @@ const OrdersPage = () => {
             position: "bottom-right",
             duration: 5000
           })
+        }
+        else if (actionType === "shipped") {
+          try {
+            const response = await axiosPublic.put("/decreaseOnHandSkuFromProduct", dataToSend);
+
+            // Check the results array from the response
+            const updateResults = response?.data?.results;
+
+            if (updateResults && Array.isArray(updateResults)) {
+              const successfulUpdates = updateResults.filter((result) => !result.error); // Filter out successful updates
+
+              if (successfulUpdates.length > 0) {
+                toast.custom((t) => (
+                  <div
+                    className={`${t.visible ? 'animate-enter' : 'animate-leave'
+                      } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+                  >
+                    <div className="pl-6">
+                      <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+                    </div>
+                    <div className="flex-1 w-0 p-4">
+                      <div className="flex items-start">
+                        <div className="ml-3 flex-1">
+                          <p className="text-base font-bold text-gray-900">
+                            Order Updated!
+                          </p>
+                          <p className="mt-1 text-sm text-gray-500">
+                            Order has been shipped
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex border-l border-gray-200">
+                      <button
+                        onClick={() => toast.dismiss(t.id)}
+                        className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+                      >
+                        <RxCross2 />
+                      </button>
+                    </div>
+                  </div>
+                ), {
+                  position: "bottom-right",
+                  duration: 5000
+                })
+              } else {
+                console.error("No successful updates occurred");
+              }
+            } else {
+              console.error("Unexpected response format:", response?.data);
+            }
+          } catch (error) {
+            console.error("Error making API request:", error);
+          }
         }
         else {
           sendOrderEmail(order, actionType); // Send notification email
@@ -691,8 +778,8 @@ const OrdersPage = () => {
             case 'Order Number':
               data["Order Number"] = row?.orderNumber;
               break;
-            case 'Return Number':
-              data['Return Number'] = row?.orderNumber;
+            case 'R. Order Number':
+              data['R. Order Number'] = row?.orderNumber;
               break;
             case 'Date & Time':
               data['Date & Time'] = row?.dateTime;
@@ -718,8 +805,8 @@ const OrdersPage = () => {
             case 'Phone Number':
               data['Phone Number'] = row?.customerInfo?.phoneNumber;
               break;
-            case 'Alternative Phone Number':
-              data['Alternative Phone Number'] = row?.customerInfo?.phoneNumber2 || "--";
+            case 'Alt. Phone Number':
+              data['Alt. Phone Number'] = row?.customerInfo?.phoneNumber2 || "--";
               break;
             case 'Shipping Method':
               data['Shipping Method'] = row?.deliveryInfo?.deliveryMethod;
@@ -779,8 +866,8 @@ const OrdersPage = () => {
             case "Order Number":
               rowData["Order Number"] = order?.orderNumber;
               break;
-            case "Return Number":
-              rowData["Return Number"] = order?.orderNumber;
+            case "R. Order Number":
+              rowData["R. Order Number"] = order?.orderNumber;
               break;
             case "Date & Time":
               rowData["Date & Time"] = order?.dateTime;
@@ -806,8 +893,8 @@ const OrdersPage = () => {
             case "Phone Number":
               rowData["Phone Number"] = order?.customerInfo?.phoneNumber;
               break;
-            case "Alternative Phone Number":
-              rowData["Alternative Phone Number"] = order?.customerInfo?.phoneNumber2 || "--";
+            case "Alt. Phone Number":
+              rowData["Alt. Phone Number"] = order?.customerInfo?.phoneNumber2 || "--";
               break;
             case "Shipping Method":
               rowData["Shipping Method"] = order?.deliveryInfo?.deliveryMethod;
@@ -836,7 +923,7 @@ const OrdersPage = () => {
       headStyles: { halign: 'center', valign: 'middle' },           // Center-align headers
       theme: "striped",  // Optional: customize the look of the table
       columnStyles: {
-        "Alternative Phone Number": { halign: 'center' }, // Center-align for "--" placeholder
+        "Alt. Phone Number": { halign: 'center' }, // Center-align for "--" placeholder
       }
     });
 
@@ -874,8 +961,8 @@ const OrdersPage = () => {
             case 'Order Number':
               data["Order Number"] = row?.orderNumber || "";  // Include empty cells
               break;
-            case 'Return Number':
-              data["Return Number"] = row?.orderNumber || "";  // Include empty cells
+            case 'R. Order Number':
+              data["R. Order Number"] = row?.orderNumber || "";  // Include empty cells
               break;
             case 'Date & Time':
               data["Date & Time"] = row?.dateTime || "";  // Include empty cells
@@ -901,8 +988,8 @@ const OrdersPage = () => {
             case 'Phone Number':
               data["Phone Number"] = row?.customerInfo?.phoneNumber || "";  // Include empty cells
               break;
-            case 'Alternative Phone Number':
-              data["Alternative Phone Number"] = row?.customerInfo?.phoneNumber2 || "";  // Include empty cells
+            case 'Alt. Phone Number':
+              data["Alt. Phone Number"] = row?.customerInfo?.phoneNumber2 || "";  // Include empty cells
               break;
             case 'Shipping Method':
               data["Shipping Method"] = row?.deliveryInfo?.deliveryMethod || "";  // Include empty cells
@@ -953,6 +1040,16 @@ const OrdersPage = () => {
   //   return false;
   // };
 
+  const handleDownload = (imgUrl) => {
+    if (!imgUrl) return;
+
+    // Extract the image name from the URL
+    const fileName = imgUrl.split("/").pop().split("?")[0]; // Removes any query parameters
+
+    // Trigger the download with the extracted filename
+    saveAs(imgUrl, fileName);
+  };
+
   const matchingShipmentHandlers = useMemo(() => {
     if (!shippingList || !orderToUpdate?.deliveryInfo?.city) return [];
 
@@ -997,7 +1094,7 @@ const OrdersPage = () => {
         <div className='flex items-center justify-between py-2 md:py-5 gap-2'>
 
           <div className='w-full'>
-            <h3 className='text-center md:text-start font-semibold text-xl lg:text-2xl'>Order Management</h3>
+            <h3 className='text-center md:text-start font-semibold text-xl lg:text-2xl'>ORDER MANAGEMENT</h3>
           </div>
 
           {/* Search Product Item */}
@@ -1032,8 +1129,8 @@ const OrdersPage = () => {
           <div className='flex w-full items-center max-w-screen-2xl px-3 mx-auto justify-center md:justify-end gap-3 md:gap-6'>
 
             <div ref={dropdownRefDownload} className="relative inline-block text-left z-10">
-              <Button onClick={() => toggleDropdown('download')} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
-                Download Data
+              <button onClick={() => toggleDropdown('download')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[14px] md:px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[10px] md:text-[14px] text-neutral-700">
+                EXPORT AS
                 <svg
                   className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown === "download" ? 'rotate-180' : ''}`}
                   xmlns="http://www.w3.org/2000/svg"
@@ -1043,7 +1140,7 @@ const OrdersPage = () => {
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                 </svg>
-              </Button>
+              </button>
 
               {openDropdown === 'download' && (
                 <div className="absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
@@ -1052,68 +1149,44 @@ const OrdersPage = () => {
                     {/* Button to export to CSV */}
                     <button
                       onClick={exportToCSV}
-                      className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
-md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
-                      <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
-md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
-                        Export CSV
+                      className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#d4ffce] bg-[#d4ffce] overflow-hidden transition-all hover:bg-[#bdf6b4] active:border-[#d4ffce] group rounded-lg
+                      md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+                      <span className="relative translate-x-[26px] text-neutral-700 font-semibold transition-transform duration-300 group-hover:text-transparent text-xs
+                      md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+                        EXPORT CSV
                       </span>
-                      <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
-md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 35 35"
-                          className="w-[20px] fill-white"
-                        >
-                          <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
-                          <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
-                          <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
-                        </svg>
+                      <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#bdf6b4] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#d4ffce]
+                      md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+                        <HiOutlineDownload size={20} className='text-neutral-700' />
                       </span>
                     </button>
 
                     {/* Button to export to XLSX */}
                     <button
                       onClick={exportToXLS}
-                      className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
-md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
-                      <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
-md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
-                        Export XLSX
+                      className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#d4ffce] bg-[#d4ffce] overflow-hidden transition-all hover:bg-[#bdf6b4] active:border-[#d4ffce] group rounded-lg
+                      md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+                      <span className="relative translate-x-[26px] text-neutral-700 font-semibold transition-transform duration-300 group-hover:text-transparent text-xs
+                      md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+                        EXPORT XLSX
                       </span>
-                      <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
-md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 35 35"
-                          className="w-[20px] fill-white"
-                        >
-                          <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
-                          <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
-                          <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
-                        </svg>
+                      <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#bdf6b4] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#d4ffce]
+                      md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+                        <HiOutlineDownload size={20} className='text-neutral-700' />
                       </span>
                     </button>
 
                     <button
                       onClick={exportToPDF}
-                      className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
-md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
-                      <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
-md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
-                        Export PDF
+                      className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#d4ffce] bg-[#d4ffce] overflow-hidden transition-all hover:bg-[#bdf6b4] active:border-[#d4ffce] group rounded-lg
+                      md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+                      <span className="relative translate-x-[26px] text-neutral-700 font-semibold transition-transform duration-300 group-hover:text-transparent text-xs
+                      md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+                        EXPORT PDF
                       </span>
-                      <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
-md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 35 35"
-                          className="w-[20px] fill-white"
-                        >
-                          <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
-                          <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
-                          <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
-                        </svg>
+                      <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#bdf6b4] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#d4ffce]
+                      md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+                        <HiOutlineDownload size={20} className='text-neutral-700' />
                       </span>
                     </button>
 
@@ -1123,10 +1196,11 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
             </div>
 
             <div ref={dropdownRef} className="relative inline-block text-left z-10">
-              <Button onClick={() => toggleDropdown('other')} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
-                Customize
+
+              <button onClick={() => toggleDropdown2('other')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[10px] md:text-[14px] text-neutral-700">
+                CUSTOMIZE
                 <svg
-                  className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown === "other" ? 'rotate-180' : ''}`}
+                  className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown2 === "other" ? 'rotate-180' : ''}`}
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -1134,18 +1208,14 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                 </svg>
-              </Button>
+              </button>
 
-              {openDropdown === 'other' && (
+              {openDropdown2 === 'other' && (
                 <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 
-                  {/* Choose Columns Button */}
-                  <div className="py-1">
-                    <Button variant="light" color="primary" onClick={() => { setColumnModalOpen(true); setOpenDropdown(false) }} className="w-full">
-                      Choose Columns
-                    </Button>
+                  <div className="p-1">
 
-                    <div className='flex items-center gap-2'>
+                    <div className='flex items-center gap-2 mb-2'>
                       <DateRangePicker
                         label="Order Duration"
                         visibleMonths={1}
@@ -1161,9 +1231,15 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                       )}
                     </div>
 
+                    {/* Choose Columns Button */}
+                    <button className="relative z-[1] flex items-center justify-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700 w-full" onClick={() => { setColumnModalOpen(true); setOpenDropdown(false) }}>
+                      Choose Columns <TbColumnInsertRight size={20} />
+                    </button>
+
                   </div>
                 </div>
               )}
+
             </div>
 
           </div>
@@ -1172,7 +1248,7 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
         {/* Column Selection Modal */}
         <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
           <ModalContent>
-            <ModalHeader>Choose Columns</ModalHeader>
+            <ModalHeader className='bg-gray-200'>Choose Columns</ModalHeader>
             <ModalBody className="modal-body-scroll">
               <DragDropContext onDragEnd={handleOnDragEnd}>
                 <Droppable droppableId="droppable">
@@ -1213,14 +1289,16 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                 </Droppable>
               </DragDropContext>
             </ModalBody>
-            <ModalFooter>
-              <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
-                Select All
-              </Button>
-              <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
-                Deselect All
-              </Button>
-              <Button variant="solid" color="primary" size="sm" onClick={handleSave}>
+            <ModalFooter className='flex justify-between items-center'>
+              <div className='flex items-center gap-2'>
+                <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
+                  Deselect All
+                </Button>
+                <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
+                  Select All
+                </Button>
+              </div>
+              <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
                 Save
               </Button>
             </ModalFooter>
@@ -1257,7 +1335,7 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                                 {order?.orderNumber}
                               </td>
                             )}
-                            {column === 'Return Number' && (
+                            {column === 'R. Order Number' && (
                               <td key="returnNumber" className="text-xs p-3 font-mono cursor-pointer text-blue-600 hover:text-blue-800" onClick={() => handleOrderClick(order)}>
                                 {order?.orderNumber}
                               </td>
@@ -1272,7 +1350,7 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                               <td key="orderAmount" className="text-xs p-3 text-gray-700 text-right">৳ {order?.total?.toFixed(2)}</td>
                             )}
                             {column === 'Refund Amount' && (
-                              <td key="refundAmount" className="text-xs p-3 text-gray-700 text-right">৳ {order?.total?.toFixed(2)}</td>
+                              <td key="refundAmount" className="text-xs p-3 text-gray-700 text-right">৳ {order?.returnInfo?.refundAmount?.toFixed(2)}</td>
                             )}
                             {column === 'Order Status' && (
                               <td key="orderStatus" className="text-xs p-3 text-yellow-600 text-center">{order?.orderStatus}</td>
@@ -1326,10 +1404,10 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                                   {order.orderStatus === 'Return Requested' && (
                                     <div className="flex items-center gap-2">
                                       <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'approved')} size="sm" color="warning" variant="flat">
-                                        Approved
+                                        Approve
                                       </Button>
                                       <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'declined')} size="sm" color="success" variant="flat">
-                                        Declined
+                                        Decline
                                       </Button>
                                     </div>
                                   )}
@@ -1394,7 +1472,7 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                             {column === 'Phone Number' && (
                               <td key="phoneNumber" className="text-xs p-3 text-gray-700 text-center">{order?.customerInfo?.phoneNumber}</td>
                             )}
-                            {column === 'Alternative Phone Number' && (
+                            {column === 'Alt. Phone Number' && (
                               <td key="altPhoneNumber" className="text-xs p-3 text-gray-700 text-center">{order?.customerInfo?.phoneNumber2 === "" ? '--' : order?.customerInfo?.phoneNumber2}</td>
                             )}
                             {column === 'Shipping Method' && (
@@ -1430,19 +1508,19 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                   <AccordionItem
                     key="1"
                     aria-label="Order Information"
-                    title="Order Information"
+                    title={<strong>Order Information</strong>}
                   >
                     <div className='flex justify-between mb-3'>
                       <div className='flex flex-col gap-2.5 w-full'>
                         <p>Order Id - <strong>#{selectedOrder?.orderNumber}</strong></p>
                         <p className='text-xs md:text-base'>Payment Method: {selectedOrder?.paymentInfo?.paymentMethod}</p>
-                        {selectedOrder?.deliveryInfo?.noteToSeller && <p className='text-xs md:text-base'>Customer Note: <strong>{selectedOrder?.deliveryInfo?.noteToSeller}</strong></p>}
-                        <p className='text-xs md:text-base'>Transaction Id: {selectedOrder?.paymentInfo?.transactionId}</p>
+                        <p className='text-xs md:text-base'>Trans. Id: {selectedOrder?.paymentInfo?.transactionId}</p>
                       </div>
                       <div className='flex flex-col gap-2.5 w-full'>
                         <p>Customer Id - <strong>{selectedOrder?.customerInfo?.customerId}</strong></p>
                         <p>Customer Name - <strong>{selectedOrder?.customerInfo?.customerName}</strong></p>
                         <p className='text-xs md:text-base'>Address: {selectedOrder?.deliveryInfo?.address1} {selectedOrder?.deliveryInfo?.address2}, {selectedOrder?.deliveryInfo?.city}, {selectedOrder?.deliveryInfo?.postalCode}</p>
+                        {selectedOrder?.deliveryInfo?.noteToSeller && <p className='text-xs md:text-base'>Customer Note: <strong>{selectedOrder?.deliveryInfo?.noteToSeller}</strong></p>}
                       </div>
                     </div>
                   </AccordionItem>
@@ -1450,9 +1528,9 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                   <AccordionItem
                     key="2"
                     aria-label="Shipment Information"
-                    title="Shipment Information"
+                    title={<strong>Shipment Information</strong>}
                   >
-                    <div className='mb-3 flex flex-col gap-2 pr-10'>
+                    <div className='mb-3 flex flex-col gap-2'>
                       <div className='flex justify-between items-center'>
                         <p className='text-xs md:text-base'>Shipment Handler: {selectedOrder?.shipmentInfo?.selectedShipmentHandlerName === undefined ? '--' : selectedOrder?.shipmentInfo?.selectedShipmentHandlerName}</p>
                         <p className='text-xs md:text-base'>Tracking Number: {selectedOrder?.shipmentInfo?.trackingNumber ? selectedOrder?.shipmentInfo?.trackingNumber : "--"}</p>
@@ -1464,10 +1542,10 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                   <AccordionItem
                     key="3"
                     aria-label="Product Information"
-                    title="Product Information"
+                    title={<strong>Product Information</strong>}
                   >
                     {/* Display product and promo/offer information */}
-                    <div className='flex justify-between gap-6 pr-6'>
+                    <div className='flex justify-between gap-6'>
                       <div>
                         {selectedOrder.productInformation && selectedOrder.productInformation.length > 0 && (
                           <>
@@ -1527,13 +1605,120 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
 
                   {selectedOrder?.returnInfo && <AccordionItem key="4"
                     aria-label="Return Information"
-                    title="Return Information">
+                    title={<strong>Return Information</strong>}>
+
+                    <div className='flex flex-col gap-4'>
+
+                      <div>
+                        {["Request Accepted", "Return Initiated", "Refunded"].includes(selectedOrder?.orderStatus) && (
+                          <p className="text-green-500 text-lg font-bold">Approved</p>
+                        )}
+
+                        {selectedOrder?.declinedReason && selectedOrder?.orderStatus === "Request Declined" &&
+                          (
+                            <div>
+                              <p className="text-red-500 text-lg font-bold">Declined</p>
+                              <p className="pb-4">
+                                <strong>Declined Reason:</strong> {selectedOrder?.declinedReason}
+                              </p>
+                            </div>
+                          )}
+                        <p><strong>Return Date & Time :</strong> {selectedOrder?.returnInfo?.dateTime}</p>
+                        <p><strong>Return Reason :</strong> {selectedOrder?.returnInfo?.reason}</p>
+                        {selectedOrder?.returnInfo?.description && <p><strong>Description :</strong> <i>{selectedOrder?.returnInfo?.description}</i></p>}
+                      </div>
+
+                      <div>
+                        <p className='font-bold text-lg'>Returned Product Details</p>
+                        {selectedOrder?.returnInfo?.products?.map((product, index) => (
+                          <div key={index} className="mb-4">
+                            <p><strong>Product : </strong> {product?.productTitle}</p>
+                            <p><strong>Product ID : </strong> {product?.productId}</p>
+                            <p><strong>Size:</strong>  {product?.size}</p>
+                            <p className='flex items-center gap-2'><strong>Color:</strong>
+                              {product?.color?.label}
+                              <span
+                                style={{
+                                  display: 'inline-block',
+                                  width: '20px',
+                                  height: '20px',
+                                  backgroundColor: product.color?.color || '#fff',
+                                  marginRight: '8px',
+                                  borderRadius: '4px'
+                                }}
+                              />
+                            </p>
+                            <p><strong>Unit Price:</strong> ৳ {product?.finalUnitPrice}</p>
+                            <p><strong>SKU:</strong> {product?.sku}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                    </div>
 
                   </AccordionItem>}
 
                   {selectedOrder?.returnInfo && <AccordionItem key="5"
                     aria-label="Attachments"
-                    title="Attachments">
+                    title={<strong>Attachments</strong>}>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {selectedOrder?.returnInfo?.imgUrls?.map((imgUrl, index) => (
+                        <div key={index} className="relative group h-24 w-full">
+                          {/* Display the image */}
+                          <Image
+                            src={imgUrl}
+                            alt={`Product Image ${index + 1}`}
+                            className="w-full h-full object-cover rounded-lg shadow-md"
+                            height={2000}
+                            width={2000}
+                          />
+
+                          {/* Button Wrapper (Centers Both Buttons) */}
+                          <div className="absolute inset-0 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition">
+                            {/* Expand Icon */}
+                            <button
+                              onClick={() => {
+                                setActiveImageIndex(index);
+                                setIsImageExpanded(true);
+                              }}
+                              className="text-white bg-black bg-opacity-50 p-2 rounded-full"
+                            >
+                              <CgArrowsExpandRight size={24} />
+                            </button>
+
+                            {/* Download Icon */}
+                            <button
+                              onClick={() => handleDownload(imgUrl)}
+                              className="text-white bg-black bg-opacity-50 p-2 rounded-full"
+                            >
+                              <HiDownload size={24} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* Modal */}
+                      {isImageExpanded && (
+                        <ProductExpandedImageModalOrder
+                          productTitle={
+                            selectedOrder?.returnInfo?.products?.[activeImageIndex]?.productTitle
+                          }
+                          selectedColorLabel={
+                            selectedOrder?.returnInfo?.products?.[activeImageIndex]?.color?.label
+                          }
+                          expandedImgUrl={
+                            selectedOrder?.returnInfo?.imgUrls?.[activeImageIndex]
+                          }
+                          totalImages={selectedOrder?.returnInfo?.imgUrls?.length}
+                          activeImageIndex={activeImageIndex}
+                          setActiveImageIndex={setActiveImageIndex}
+                          isImageExpanded={isImageExpanded}
+                          setIsImageExpanded={setIsImageExpanded}
+                        />
+                      )}
+                    </div>
+
 
                   </AccordionItem >}
 
@@ -1542,6 +1727,7 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
               </ModalBody>
 
               <ModalFooter className={`flex items-center ${selectedOrder?.lastStatusChange ? "justify-between" : "justify-end"} `}>
+
                 {
                   selectedOrder?.lastStatusChange ? (
                     <i>
@@ -1562,7 +1748,9 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                     ""
                   )
                 }
-                <PrintButton selectedOrder={selectedOrder} />
+
+                {!isImageExpanded && <PrintButton selectedOrder={selectedOrder} />}
+
               </ModalFooter>
 
             </ModalContent>
@@ -1570,66 +1758,73 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
         )}
 
         {/* Modal of tracking number */}
-        <Modal size='lg' isOpen={isTrackingModalOpen} onOpenChange={() => setTrackingModalOpen(false)}>
-          <ModalContent className='px-2'>
-            <ModalHeader className="flex flex-col gap-1">Select Shipment Handler</ModalHeader>
-            <ModalBody>
-              <div className='flex flex-wrap items-center justify-center gap-2'>
-                {matchingShipmentHandlers?.map((handler, index) => (
-                  <div
-                    key={index}
-                    className={`flex items-center gap-2 border-2 rounded-lg font-semibold px-6 py-2 cursor-pointer ${selectedHandler?.shipmentHandlerName === handler?.shipmentHandlerName ? 'border-[#ffddc2] bg-[#ffddc2]' : 'bg-white'
-                      }`}
-                    onClick={() => handleSelectHandler(handler)}
-                  >
-                    {handler?.shipmentHandlerName}
-                  </div>
-                ))}
-              </div>
+        {matchingShipmentHandlers?.length > 0 && (
+          <Modal size='lg' isOpen={isTrackingModalOpen} onOpenChange={() => setTrackingModalOpen(false)}>
+            <ModalContent className='px-2'>
+              <ModalHeader className="flex flex-col gap-1">Select Shipment Handler</ModalHeader>
+              <ModalBody>
+                <div className='flex flex-wrap items-center justify-center gap-2'>
+                  {matchingShipmentHandlers?.map((handler, index) => (
+                    <div
+                      key={index}
+                      className={`flex items-center gap-2 border-2 rounded-lg font-semibold px-6 py-2 cursor-pointer ${selectedHandler?.shipmentHandlerName === handler?.shipmentHandlerName ? 'border-[#ffddc2] bg-[#ffddc2]' : 'bg-white'
+                        }`}
+                      onClick={() => handleSelectHandler(handler)}
+                    >
+                      {handler?.shipmentHandlerName}
+                    </div>
+                  ))}
+                </div>
 
-              <div className='flex justify-between items-center gap-2'>
-                <Input
-                  clearable
-                  bordered
-                  fullWidth
-                  size="lg"
-                  label="Tracking Number *"
-                  placeholder="Enter tracking number"
-                  value={trackingNumber}
-                  onChange={(e) => setTrackingNumber(e.target.value.toUpperCase())}
-                />
-              </div>
+                <div className='flex justify-between items-center gap-2'>
+                  <Input
+                    clearable
+                    bordered
+                    fullWidth
+                    size="lg"
+                    label="Tracking Number *"
+                    placeholder="Enter tracking number"
+                    value={trackingNumber}
+                    onChange={(e) => setTrackingNumber(e.target.value.toUpperCase())}
+                  />
+                </div>
 
-            </ModalBody>
-            <ModalFooter>
-              <Button
-                color="primary"
-                onPress={async () => {
-                  // Check if handler is selected, regardless of toggle state
-                  if (!selectedHandler) {
-                    toast.error("Please select a shipment handler.");
-                    return; // Stop execution if no handler is selected
-                  }
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  color="primary"
+                  onPress={async () => {
+                    // Check if handler is selected, regardless of toggle state
+                    if (!selectedHandler) {
+                      toast.error("Please select a shipment handler.");
+                      return; // Stop execution if no handler is selected
+                    }
 
-                  // When toggle is ON, ensure tracking number is entered
-                  if (isToggleOn && !trackingNumber) {
-                    toast.error("Please enter a tracking number.");
-                    return; // Stop execution if no tracking number is provided
-                  }
+                    // When toggle is ON, ensure tracking number is entered
+                    if (isToggleOn && !trackingNumber) {
+                      toast.error("Please enter a tracking number.");
+                      return; // Stop execution if no tracking number is provided
+                    }
 
-                  // Update order status with tracking number and selected handler
-                  await updateOrderStatus(orderToUpdate, orderIdToUpdate, "shipped", false, trackingNumber, selectedHandler);
-                  setTrackingModalOpen(false); // Close modal after submission
-                  setTrackingNumber(''); // Clear input field
-                  setSelectedHandler(null); // Clear the selected handler
-                  setIsToggleOn(true); // Reset toggle to true
-                }}
-              >
-                Confirm
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+                    // Update order status with tracking number and selected handler
+                    try {
+                      await updateOrderStatus(orderToUpdate, orderIdToUpdate, "shipped", false, trackingNumber, selectedHandler);
+                      setTrackingModalOpen(false); // Close modal after submission
+                      setTrackingNumber(''); // Clear input field
+                      setSelectedHandler(null); // Clear the selected handler
+                      setIsToggleOn(true); // Reset toggle to true
+                    } catch (error) {
+                      console.error("Failed to updated order status:", error)
+                      toast.error("Something went wrong while updating the order status.")
+                    }
+                  }}
+                >
+                  Confirm
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+        )}
 
         {/* Modal of on hold */}
         <Modal size='lg' isOpen={isOnHoldModalOpen} onOpenChange={() => setOnHoldModalOpen(false)}>
@@ -1675,6 +1870,50 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
           </ModalContent>
         </Modal>
 
+        {/* Modal of Declined reason */}
+        <Modal size='lg' isOpen={isDeclinedModalOpen} onOpenChange={() => setDeclinedModalOpen(false)}>
+          <ModalContent>
+            <ModalHeader className="flex flex-col gap-1 bg-gray-200 px-8">Provide a Reason for Declining the Order</ModalHeader>
+            <ModalBody>
+
+              <div className='flex justify-between items-center gap-2'>
+                <Textarea
+                  clearable
+                  bordered
+                  fullWidth
+                  size="lg"
+                  label="Declined Reason *"
+                  placeholder="Enter declined reason"
+                  value={declinedReason}
+                  onChange={(e) => setDeclinedReason(e.target.value)}
+                />
+              </div>
+
+            </ModalBody>
+            <ModalFooter className='border'>
+              <Button
+                color="primary"
+                onPress={async () => {
+
+                  // When toggle is ON, ensure tracking number is entered
+                  if (!declinedReason) {
+                    toast.error("Please enter declined reason.");
+                    return; // Stop execution if no tracking number is provided
+                  }
+
+                  // Update order status with tracking number and selected handler
+                  await updateOrderStatus(orderToUpdateDeclined, orderIdToUpdateDeclined, "declined", false, declinedReason);
+                  setDeclinedModalOpen(false); // Close modal after submission
+                  setDeclinedReason(''); // Clear input field
+                  setIsToggleOn(true); // Reset toggle to true
+                }}
+              >
+                Confirm
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
         {/* Pagination Button */}
         <div className="flex flex-col mt-2 md:flex-row gap-4 justify-center items-center relative">
           <CustomPagination
@@ -1698,6 +1937,7 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
             </svg>
           </div>
         </div>
+
       </div>
     </div>
 

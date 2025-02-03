@@ -31,7 +31,7 @@ const Progressbar = ({ accepted, rejected, total, width = 'w-full' }) => {
       )}
 
       <div
-        className="bg-[#D2016E] h-full rounded-full"
+        className="bg-[#bdf6b4] h-full rounded-full"
         style={{ width: `${acceptedPercentage}%` }}
       />
     </div>
