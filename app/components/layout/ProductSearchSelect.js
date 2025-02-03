@@ -8,9 +8,10 @@ const ProductSearchSelect = ({ productList, onSelectionChange }) => {
   const dropdownRef = useRef(null);
 
   // Filter products based on search input and remove already selected products
-  const filteredProducts = productList.filter((product) =>
-    product.productId.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    !selectedProducts.includes(product.productId) // Exclude already selected products
+  const filteredProducts = productList?.filter((product) =>
+    (product?.productId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product?.productTitle.toLowerCase().includes(searchTerm.toLowerCase())) &&
+    !selectedProducts?.some((p) => p === product?.productId) // Exclude already selected products
   );
 
   // Handle adding/removing product selection
@@ -63,7 +64,7 @@ const ProductSearchSelect = ({ productList, onSelectionChange }) => {
         onChange={(e) => setSearchTerm(e.target.value)}
         onClick={handleInputClick} // Toggle dropdown on input click
         placeholder="Search & Select by Product ID's"
-        className="w-full p-2 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md mb-2"
+        className="w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mb-2"
       />
 
       {/* Dropdown list for search results */}
@@ -73,18 +74,21 @@ const ProductSearchSelect = ({ productList, onSelectionChange }) => {
             filteredProducts.map((product) => (
               <div
                 key={product._id}
-                className={`flex items-center justify-between p-2 cursor-pointer hover:bg-gray-100 ${selectedProducts.includes(product.productId) ? 'bg-gray-200' : ''
+                className={`flex items-center border rounded-lg justify-between p-1 cursor-pointer hover:bg-gray-100 ${selectedProducts.includes(product.productId) ? 'bg-gray-200' : ''
                   }`}
                 onClick={() => toggleProductSelection(product.productId)}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <Image
-                    width={400} height={400}
-                    src={product.imageUrls[0]}
-                    alt={product.productId}
-                    className="h-8 w-8 object-contain rounded"
+                    width={4000} height={4000}
+                    src={product?.thumbnailImageUrl}
+                    alt={product?.productId}
+                    className="h-12 w-12 object-contain rounded"
                   />
-                  <p>{product.productId}</p>
+                  <div className='flex flex-col'>
+                    <span className="ml-2 font-bold">{product?.productId}</span>
+                    <span className="ml-2 text-sm">{product?.productTitle}</span>
+                  </div>
                 </div>
               </div>
             ))

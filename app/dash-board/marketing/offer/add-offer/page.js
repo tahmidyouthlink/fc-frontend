@@ -260,15 +260,15 @@ const AddOffer = () => {
             <div className='grid grid-cols-1 lg:col-span-7 gap-8 mt-3 py-3 h-fit'>
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
                 <div>
-                  <label htmlFor='offerTitle' className='flex justify-start font-medium text-[#D2016E] pb-2'>Offer Title *</label>
-                  <input id='offerTitle' placeholder='Enter Offer Title'  {...register("offerTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="text" />
+                  <label htmlFor='offerTitle' className='flex justify-start font-medium text-[#9F5216] pb-2'>Offer Title *</label>
+                  <input id='offerTitle' placeholder='Enter Offer Title'  {...register("offerTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="text" />
                   {errors.offerTitle?.type === "required" && (
                     <p className="text-red-600 text-left">Offer Title is required</p>
                   )}
                 </div>
                 <div>
-                  <label htmlFor='badgeTitle' className='flex justify-start font-medium text-[#D2016E] pb-2'>Badge Title *</label>
-                  <input id='badgeTitle' placeholder='Enter Badge Title'  {...register("badgeTitle", { required: true, maxLength: 12 })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" maxLength="12" type="text" />
+                  <label htmlFor='badgeTitle' className='flex justify-start font-medium text-[#9F5216] pb-2'>Badge Title *</label>
+                  <input id='badgeTitle' placeholder='Enter Badge Title'  {...register("badgeTitle", { required: true, maxLength: 12 })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" maxLength="12" type="text" />
                   {errors.badgeTitle?.type === "required" && (
                     <p className="text-red-600 text-left">Badge Title is required</p>
                   )}
@@ -280,14 +280,14 @@ const AddOffer = () => {
                     selectedKey={offerDiscountType}
                     onSelectionChange={handleTabChange}
                   >
-                    <Tab className='text-[#D2016E]' key="Percentage" title="Percentage">Percentage (%) *</Tab>
-                    <Tab className='text-[#D2016E]' key="Amount" title="Amount">Amount (Taka) *</Tab>
+                    <Tab className='text-[#9F5216]' key="Percentage" title="Percentage">Percentage (%) *</Tab>
+                    <Tab className='text-[#9F5216]' key="Amount" title="Amount">Amount (Taka) *</Tab>
                   </Tabs>
 
                   <input
                     type="number"
                     {...register('offerDiscountValue', { required: true })}
-                    className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000'
+                    className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
                     placeholder={`Enter ${offerDiscountType} Discount`} // Correct placeholder
                   />
                   {errors.offerDiscountValue?.type === "required" && (
@@ -300,17 +300,17 @@ const AddOffer = () => {
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
 
                 <div>
-                  <label htmlFor='minAmount' className='flex justify-start font-medium text-[#D2016E] pb-2'>Minimum Order Amount *</label>
-                  <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="number" />
+                  <label htmlFor='minAmount' className='flex justify-start font-medium text-[#9F5216] pb-2'>Minimum Order Amount *</label>
+                  <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
                 </div>
 
                 {offerDiscountType === "Percentage" && <div>
-                  <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#D2016E] pb-2'>Maximum Capped Amount *</label>
-                  <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="number" />
+                  <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#9F5216] pb-2'>Maximum Capped Amount *</label>
+                  <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
                 </div>}
 
                 <div>
-                  <label htmlFor='expiryDate' className='flex justify-start font-medium text-[#D2016E] pb-2'>Offer Expire On *</label>
+                  <label htmlFor='expiryDate' className='flex justify-start font-medium text-[#9F5216] pb-2'>Offer Expire On *</label>
                   <DatePicker
                     id='expiryDate'
                     placeholder="Select date"
@@ -323,7 +323,7 @@ const AddOffer = () => {
                         setValue('expiryDate', date); // If DatePicker returns something else, handle it here
                       }
                     }}
-                    className="w-full outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md"
+                    className="w-full outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                   />
 
                   {dateError && (
@@ -341,7 +341,7 @@ const AddOffer = () => {
                 >
                   <Tab key="Products" title="Products">
                     <div>
-                      <label htmlFor='Product Title' className='flex justify-start font-medium text-[#D2016E] pb-2'>Product Title *</label>
+                      <label htmlFor='Product Selection' className='flex justify-start font-medium text-[#9F5216] pb-2'>Product Selection *</label>
                       <ProductSearchSelect
                         productList={productList}
                         onSelectionChange={handleProductSelectionChange}
@@ -351,7 +351,7 @@ const AddOffer = () => {
                   </Tab>
                   <Tab key="Categories" title="Categories">
                     <div>
-                      <label htmlFor='Category' className='flex justify-start font-medium text-[#D2016E] pb-2'>Category Selection *</label>
+                      <label htmlFor='Category' className='flex justify-start font-medium text-[#9F5216] pb-2'>Category Selection *</label>
                       <CategorySearchSelect
                         categoryList={categoryList}
                         onSelectionChange={handleCategorySelectionChange}
@@ -365,7 +365,7 @@ const AddOffer = () => {
 
               <div className='flex flex-col gap-6 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                 <div className='flex w-full flex-col gap-2'>
-                  <label htmlFor='offerDescription' className='flex justify-start font-medium text-[#D2016E]'>Offer Description</label>
+                  <label htmlFor='offerDescription' className='flex justify-start font-medium text-[#9F5216]'>Offer Description</label>
                   <Controller
                     name="offerDescription"
                     defaultValue=""
@@ -427,8 +427,8 @@ const AddOffer = () => {
 
           <div className='flex justify-end items-center mt-3'>
 
-            <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#D2016E] hover:bg-[#d2016dca]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
-              {isSubmitting ? 'Submitting...' : 'Submit'}
+            <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700 mt-4 mb-8`}>
+              {isSubmitting ? 'Submitting...' : 'Submit'} <MdOutlineFileUpload size={20} />
             </button>
 
           </div>

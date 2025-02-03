@@ -16,6 +16,7 @@ import { MdOutlineFileUpload } from 'react-icons/md';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
 import ProductSearchSelectId from '@/app/components/layout/ProductSearchSelectId';
 import CategorySearchSelectId from '@/app/components/layout/CategorySearchSelectId';
+import { FiSave } from 'react-icons/fi';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
@@ -302,15 +303,15 @@ const EditOffer = () => {
             <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 mt-3 py-3 h-fit'>
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
                 <div>
-                  <label htmlFor='offerTitle' className='flex justify-start font-medium text-[#D2016E]'>Offer Title *</label>
-                  <input id='offerTitle' {...register("offerTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="text" />
+                  <label htmlFor='offerTitle' className='flex justify-start font-medium text-[#9F5216]'>Offer Title *</label>
+                  <input id='offerTitle' {...register("offerTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="text" />
                   {errors.offerTitle?.type === "required" && (
                     <p className="text-red-600 text-left">Offer Title is required</p>
                   )}
                 </div>
                 <div>
-                  <label htmlFor='badgeTitle' className='flex justify-start font-medium text-[#D2016E] pb-2'>Badge Title *</label>
-                  <input id='badgeTitle' placeholder='Enter Badge Title'  {...register("badgeTitle", { required: true, maxLength: 12 })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" maxLength="12" type="text" />
+                  <label htmlFor='badgeTitle' className='flex justify-start font-medium text-[#9F5216] pb-2'>Badge Title *</label>
+                  <input id='badgeTitle' placeholder='Enter Badge Title'  {...register("badgeTitle", { required: true, maxLength: 12 })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" maxLength="12" type="text" />
                   {errors.badgeTitle?.type === "required" && (
                     <p className="text-red-600 text-left">Badge Title is required</p>
                   )}
@@ -329,7 +330,7 @@ const EditOffer = () => {
                   <input
                     type="number"
                     {...register('offerDiscountValue', { required: true })}
-                    className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000'
+                    className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
                     placeholder={`Enter ${offerDiscountType} Discount`} // Correct placeholder
                   />
                   {errors.offerDiscountValue?.type === "required" && (
@@ -342,17 +343,17 @@ const EditOffer = () => {
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
 
                 <div>
-                  <label htmlFor='minAmount' className='flex justify-start font-medium text-[#D2016E]'>Minimum Order Amount *</label>
-                  <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="number" />
+                  <label htmlFor='minAmount' className='flex justify-start font-medium text-[#9F5216]'>Minimum Order Amount *</label>
+                  <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
                 </div>
 
                 {offerDiscountType === "Percentage" && <div>
-                  <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#D2016E]'>Maximum Capped Amount *</label>
-                  <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="number" />
+                  <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#9F5216]'>Maximum Capped Amount *</label>
+                  <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
                 </div>}
 
                 <div className="space-y-2">
-                  <label htmlFor='expiryDate' className='block text-[#D2016E] font-medium text-sm'>
+                  <label htmlFor='expiryDate' className='block text-[#9F5216] font-medium text-sm'>
                     Expiry Date <span className="text-red-600">*</span>
                   </label>
                   <input
@@ -361,7 +362,7 @@ const EditOffer = () => {
                     {...register("expiryDate", { required: true })}
                     value={expiryDate}
                     onChange={(e) => setExpiryDate(e.target.value)} // Update state with the input value
-                    className="w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000"
+                    className="w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000"
                   />
                   {dateError && (
                     <p className="text-red-600 text-sm mt-1">Expiry Date is required</p>
@@ -381,7 +382,7 @@ const EditOffer = () => {
                 >
                   <Tab key="Products" title="Products">
                     <div>
-                      <label htmlFor='Product Title' className='flex justify-start font-medium text-[#D2016E] pb-2'>Product Title *</label>
+                      <label htmlFor='Product Selection' className='flex justify-start font-medium text-[#9F5216] pb-2'>Product Selection *</label>
                       {productList && (
                         <ProductSearchSelectId
                           productList={productList}
@@ -394,7 +395,7 @@ const EditOffer = () => {
                   </Tab>
                   <Tab key="Categories" title="Categories">
                     <div>
-                      <label htmlFor='Category' className='flex justify-start font-medium text-[#D2016E] pb-2'>Category Selection *</label>
+                      <label htmlFor='Category' className='flex justify-start font-medium text-[#9F5216] pb-2'>Category Selection *</label>
                       {categoryList && (
                         <CategorySearchSelectId
                           categoryList={categoryList}
@@ -411,7 +412,7 @@ const EditOffer = () => {
 
               <div className='flex flex-col gap-6 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
                 <div className='flex w-full flex-col gap-2'>
-                  <label htmlFor='offerDescription' className='flex justify-start font-medium text-[#D2016E] pb-2'>Offer Description</label>
+                  <label htmlFor='offerDescription' className='flex justify-start font-medium text-[#9F5216] pb-2'>Offer Description</label>
                   <Controller
                     control={control}
                     name="offerDescription"
@@ -473,9 +474,14 @@ const EditOffer = () => {
 
           <div className='flex justify-end items-center'>
 
-            <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#D2016E] hover:bg-[#d2016dca]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
-              {isSubmitting ? 'Submitting...' : 'Update offer'}
+            <button
+              type='submit'
+              disabled={isSubmitting}
+              className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}
+            >
+              {isSubmitting ? 'Saving...' : 'Save Changes'} <FiSave size={20} />
             </button>
+
           </div>
         </form>
       </div>

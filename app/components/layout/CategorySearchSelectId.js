@@ -59,7 +59,7 @@ const CategorySearchSelectId = ({ categoryList, value = [], onSelectionChange })
         onChange={(e) => setSearchTerm(e.target.value)}
         onClick={handleInputClick} // Toggle dropdown on input click
         placeholder="Search & Select Categories"
-        className="w-full p-2 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-300 rounded-md mb-2"
+        className="w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-300 rounded-md mb-2"
       />
 
       {/* Dropdown list for search results */}
@@ -69,7 +69,7 @@ const CategorySearchSelectId = ({ categoryList, value = [], onSelectionChange })
             filteredCategories.map((category) => (
               <div
                 key={category._id}
-                className={`flex items-center p-2 cursor-pointer hover:bg-gray-100 ${selectedCategories.includes(category.label) ? 'bg-gray-200' : ''
+                className={`flex items-center p-2 rounded-lg border cursor-pointer hover:bg-gray-100 ${selectedCategories.includes(category.label) ? 'bg-gray-200' : ''
                   }`}
                 onClick={() => toggleCategorySelection(category.label)}
               >
