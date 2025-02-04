@@ -291,7 +291,7 @@ const Transfers = () => {
 
         <div className='flex flex-wrap md:flex-nowrap items-center justify-between py-2 md:py-5 gap-2 w-full'>
 
-          <h3 className='text-center md:text-start font-semibold text-xl lg:text-2xl'>TRANSFERS</h3>
+          <h3 className='text-center md:text-start font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>TRANSFERS</h3>
 
           <button onClick={handleGoToTransferPage} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700">
             <FaPlus size={15} className='text-neutral-700' /> ADD

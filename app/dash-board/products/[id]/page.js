@@ -1035,27 +1035,27 @@ const EditProductPage = () => {
         <div className="flex items-center gap-3 w-full">
 
           <button className={`relative py-1 transition-all duration-300
-            ${activeTab === 'product' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
-            after:absolute after:left-0 after:right-0 hover:text-green-600 after:bottom-0 
-            after:h-[2px] after:bg-green-600 after:transition-all after:duration-300
+            ${activeTab === 'product' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
+            after:absolute after:left-0 after:right-0 hover:text-neutral-800 after:bottom-0 
+            after:h-[2px] after:bg-neutral-800 after:transition-all after:duration-300
             ${activeTab === 'product' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}`}
             onClick={() => setActiveTab('product')}>
             Product
           </button>
 
           <button className={`relative py-1 transition-all duration-300
-          ${activeTab === 'inventory' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
+          ${activeTab === 'inventory' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
           after:absolute after:left-0 after:right-0 after:bottom-0 
-          after:h-[2px] after:bg-green-600 hover:text-green-600 after:transition-all after:duration-300
+          after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300
           ${activeTab === 'inventory' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
             onClick={() => setActiveTab('inventory')}>
             Inventory
           </button>
 
           <button className={`relative py-1 transition-all duration-300
-          ${activeTab === 'shipping' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
+          ${activeTab === 'shipping' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
           after:absolute after:left-0 after:right-0 after:bottom-0 
-          after:h-[2px] after:bg-green-600 hover:text-green-600 after:transition-all after:duration-300
+          after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300
           ${activeTab === 'shipping' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
             onClick={() => setActiveTab('shipping')}>
             Shipping

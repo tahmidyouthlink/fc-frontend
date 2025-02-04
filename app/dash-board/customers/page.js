@@ -16,6 +16,7 @@ import arrivals2 from "../../../public/card-images/arrivals2.svg";
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import dynamic from 'next/dynamic';
 import { TbColumnInsertRight } from 'react-icons/tb';
+import { RxCross1 } from "react-icons/rx";
 const CustomerPrintButton = dynamic(() => import("@/app/components/layout/CustomerPrintButton"), { ssr: false });
 
 const initialColumns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alternative Phone Number', 'NewsLetter', 'Hometown', 'Status'];
@@ -261,14 +262,15 @@ const Customers = () => {
 
       <div className='max-w-screen-2xl px-6 2xl:px-0 mx-auto'>
 
-        <div className='flex flex-wrap lg:flex-nowrap items-center gap-2 lg:gap-0 justify-center md:justify-between py-2 md:py-5'>
-          <h3 className='w-full lg:w-1/2 font-semibold text-lg xl:text-2xl'>Customer Management</h3>
+        <div className='flex flex-wrap lg:flex-nowrap gap-2 lg:gap-0 justify-center md:justify-between py-2 md:py-5'>
+          <h3 className='w-full font-semibold text-lg md:text-xl lg:text-2xl xl:text-3xl text-neutral-700'>CUSTOMER MANAGEMENT</h3>
 
-          <div className='flex items-center justify-center gap-2 w-full'>
+          <div className='flex flex-wrap xl:flex-nowrap items-center justify-center gap-2 w-full'>
             <div className='w-full'>
+
               {/* Search Product Item */}
-              <li className="flex items-center relative group w-full">
-                <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
+              <li className="flex items-center relative group w-full cursor-pointer">
+                <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon cursor-pointer" aria-hidden="true" viewBox="0 0 24 24">
                   <g>
                     <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
                   </g>
@@ -278,13 +280,13 @@ const Customers = () => {
                   placeholder="Search By Customer Details..."
                   value={searchQuery}
                   onChange={handleSearch}
-                  className="w-full h-[40px] md:h-11 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-white text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
+                  className="w-full h-[40px] md:h-11 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-white text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base cursor-pointer"
                 />
               </li>
             </div>
 
             <div className='flex items-center max-w-screen-2xl mx-auto justify-center md:justify-end md:gap-6 w-full'>
-              <button className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700" onClick={() => { setColumnModalOpen(true) }}>
+              <button className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[12px] xl:text-[14px] text-neutral-700" onClick={() => { setColumnModalOpen(true) }}>
                 Choose Columns <TbColumnInsertRight size={20} />
               </button>
 

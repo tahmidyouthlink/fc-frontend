@@ -685,7 +685,7 @@ const EditPurchaseOrderPage = () => {
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
         <div className='flex flex-wrap md:flex-nowrap items-center justify-between w-full'>
-          <h3 className='w-full font-semibold text-base md:text-xl lg:text-2xl'>#{purchaseOrderNumber} <span
+          <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>#{purchaseOrderNumber} <span
             className={`px-3 py-1 rounded-full font-semibold
       ${purchaseOrderStatus === "pending" ? "bg-yellow-100 text-yellow-600"
                 : purchaseOrderStatus === "ordered" ? "bg-blue-100 text-blue-600"
