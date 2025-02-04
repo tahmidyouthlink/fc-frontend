@@ -86,14 +86,14 @@ const Seasons = () => {
     <div className='bg-gray-50 min-h-screen'>
 
       <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between max-w-screen-2xl mx-auto px-6 py-6'>
-        <h1 className='font-semibold text-center md:text-xl lg:text-2xl'>SEASON MANAGEMENT</h1>
+        <h1 className='font-semibold text-center text-lg md:text-xl lg:text-3xl text-neutral-700'>SEASON MANAGEMENT</h1>
 
         <button onClick={() => router.push('/dash-board/seasons/add-season')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
           <FaPlus size={15} className='text-neutral-700' /> Add
         </button>
       </div>
 
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 max-w-screen-2xl mx-auto px-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 max-w-screen-2xl mx-auto px-6">
         {seasonList?.map((season, index) => {
 
           return (

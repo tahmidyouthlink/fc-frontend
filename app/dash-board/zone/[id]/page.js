@@ -277,7 +277,7 @@ export default function EditShippingZone() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onFocus={handleInputFocus}
                 onBlur={() => setTimeout(() => setShowCitySuggestions(false), 200)} // Delay to allow selection
-                className="p-2 border border-gray-300 rounded w-full flex-1"
+                className="p-2 border border-gray-300 w-full flex-1 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
               />
 
               {/* Select All Button */}

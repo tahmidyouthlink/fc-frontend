@@ -82,7 +82,7 @@ const AddLocation = () => {
 
       <div className='max-w-screen-lg mx-auto pt-3 md:pt-6'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-base md:text-xl lg:text-2xl'>Location Configuration</h3>
+          <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>Location Configuration</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/locations"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>

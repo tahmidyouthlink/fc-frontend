@@ -118,16 +118,16 @@ const ExistingZones = () => {
     <div className='px-5 2xl:px-16'>
 
       <div className='py-4 w-full flex justify-between'>
-        <h3 className='text-start font-medium md:font-semibold text-[14px] md:text-2xl lg:text-3xl w-full'>SHIPPING MANAGEMENT</h3>
+        <h3 className='text-start font-medium md:font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700 w-full'>SHIPPING MANAGEMENT</h3>
         <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/zone"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
       </div>
 
       <div className='flex flex-wrap items-center gap-3 bg-white pt-2'>
         <button
           className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'inside dhaka' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
-        after:absolute after:left-0 after:right-0 hover:text-green-600 after:bottom-0 
-        after:h-[2px] after:bg-green-600 after:transition-all after:duration-300
+        ${activeTab === 'inside dhaka' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
+        after:absolute after:left-0 after:right-0 hover:text-neutral-800 after:bottom-0 
+        after:h-[2px] after:bg-neutral-800 after:transition-all after:duration-300
         ${activeTab === 'inside dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
       `}
           onClick={() => setActiveTab('inside dhaka')}
@@ -137,9 +137,9 @@ const ExistingZones = () => {
 
         <button
           className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'dhaka suburbs' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
-        after:absolute after:left-0 after:right-0 hover:text-green-600 after:bottom-0 
-        after:h-[2px] after:bg-green-600 after:transition-all after:duration-300
+        ${activeTab === 'dhaka suburbs' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
+        after:absolute after:left-0 after:right-0 hover:text-neutral-800 after:bottom-0 
+        after:h-[2px] after:bg-neutral-800 after:transition-all after:duration-300
         ${activeTab === 'dhaka suburbs' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
       `}
           onClick={() => setActiveTab('dhaka suburbs')}
@@ -149,9 +149,9 @@ const ExistingZones = () => {
 
         <button
           className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'outside dhaka' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
-        after:absolute after:left-0 after:right-0 hover:text-green-600 after:bottom-0 
-        after:h-[2px] after:bg-green-600 after:transition-all after:duration-300
+        ${activeTab === 'outside dhaka' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
+        after:absolute after:left-0 after:right-0 hover:text-neutral-800 after:bottom-0 
+        after:h-[2px] after:bg-neutral-800 after:transition-all after:duration-300
         ${activeTab === 'outside dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
       `}
           onClick={() => setActiveTab('outside dhaka')}

@@ -9,9 +9,10 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import { AiOutlineEdit } from 'react-icons/ai';
 import { FaPlusCircle } from 'react-icons/fa';
 import { FaArrowLeft } from 'react-icons/fa6';
-import { MdCheckBox, MdCheckBoxOutlineBlank, MdOutlineFileUpload, MdOutlineModeEdit } from 'react-icons/md';
+import { MdCheckBox, MdCheckBoxOutlineBlank, MdOutlineFileUpload } from 'react-icons/md';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
@@ -268,7 +269,7 @@ const AddShippingZone = () => {
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6 px-6'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Shipping Configuration</h3>
+          <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>Shipping Configuration</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/zone"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
@@ -302,7 +303,7 @@ const AddShippingZone = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onFocus={handleInputFocus}
                 onBlur={() => setTimeout(() => setShowCitySuggestions(false), 200)} // Delay to allow selection
-                className="p-2 border border-gray-300 rounded w-full flex-1"
+                className="p-2 border border-gray-300 w-full flex-1 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
               />
 
               {/* Select All Button */}
@@ -403,7 +404,7 @@ const AddShippingZone = () => {
 
                     <div className="group relative">
                       <button>
-                        <MdOutlineModeEdit
+                        <AiOutlineEdit
                           onClick={(e) => handleEditShipmentHandler(e, shipmentHandler._id)}
                           size={22}
                           className="text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200"

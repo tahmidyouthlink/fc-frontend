@@ -17,8 +17,7 @@ const EditLocation = () => {
   const router = useRouter();
   const [isSelected, setIsSelected] = useState(false);
 
-  const {
-    register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm();
+  const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm();
 
   useEffect(() => {
     const fetchLocationDetails = async () => {
@@ -106,7 +105,7 @@ const EditLocation = () => {
 
       <div className='max-w-screen-lg mx-auto pt-3 md:pt-6'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-base md:text-xl lg:text-2xl'>Location Configuration</h3>
+          <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>Edit Location Details</h3>
           <Link
             className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full'
             href={`/dash-board/locations`}>

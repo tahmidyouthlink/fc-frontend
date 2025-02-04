@@ -93,9 +93,9 @@ const EditProduct = () => {
 
           <button
             className={`relative py-1 transition-all duration-300
-${activeTab === 'category' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
-after:absolute after:left-0 after:right-0 hover:text-green-600 after:bottom-0 
-after:h-[2px] after:bg-green-600 after:transition-all after:duration-300
+${activeTab === 'category' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
+after:absolute after:left-0 after:right-0 hover:text-neutral-800 after:bottom-0 
+after:h-[2px] after:bg-neutral-800 after:transition-all after:duration-300
 ${activeTab === 'category' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
 `}
             onClick={() => setActiveTab('category')}
@@ -105,9 +105,9 @@ ${activeTab === 'category' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w
 
           <button
             className={`relative py-1 transition-all duration-300
-${activeTab === 'collection' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
+${activeTab === 'collection' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
 after:absolute after:left-0 after:right-0 after:bottom-0 
-after:h-[2px] after:bg-green-600 hover:text-green-600 after:transition-all after:duration-300
+after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300
 ${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
 `}
             onClick={() => setActiveTab('collection')}
@@ -120,7 +120,7 @@ ${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
       </div>
 
       {activeTab === "category" && <div>
-        <h3 className='w-full font-semibold text-xl lg:text-2xl max-w-screen-2xl mx-auto px-6 pb-6'>Look at Our Categories</h3>
+        <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700 max-w-screen-2xl mx-auto px-6 pb-6'>Look at Our Categories</h3>
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 max-w-screen-2xl mx-auto px-6">
           {categoryList?.map((category, index) => {
             // Filter products that match the current category
@@ -159,7 +159,7 @@ ${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
       </div>}
 
       {activeTab === "collection" && <div>
-        <h3 className='w-full font-semibold text-xl lg:text-2xl max-w-screen-2xl mx-auto px-6 pb-6'>Look at Our Seasonal Collection</h3>
+        <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700 max-w-screen-2xl mx-auto px-6 pb-6'>Look at Our Seasonal Collection</h3>
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 max-w-screen-2xl mx-auto px-6">
           {seasonList?.map((season, index) => {
             // Filter products that match the current season
@@ -172,7 +172,7 @@ ${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
 
                 {/* Image */}
                 <Image
-                  className="object-cover rounded-lg px-4"
+                  className="object-cover rounded-lg px-1.5"
                   src={season?.imageUrl}
                   alt="season-image"
                   layout="fill"

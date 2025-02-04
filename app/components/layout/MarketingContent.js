@@ -29,9 +29,9 @@ const MarketingContent = () => {
 
         <button
           className={`relative text-sm py-1 transition-all duration-300
-${activeTab === 'marketing banner' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
-after:absolute after:left-0 after:right-0 hover:text-green-600 after:bottom-0 
-after:h-[2px] after:bg-green-600 after:transition-all after:duration-300
+${activeTab === 'marketing banner' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
+after:absolute after:left-0 after:right-0 hover:text-neutral-800 after:bottom-0 
+after:h-[2px] after:bg-neutral-800 after:transition-all after:duration-300
 ${activeTab === 'marketing banner' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
 `}
           onClick={() => setActiveTab('marketing banner')}
@@ -41,9 +41,9 @@ ${activeTab === 'marketing banner' ? 'after:w-full font-bold' : 'after:w-0 hover
 
         <button
           className={`relative text-sm py-1 transition-all duration-300
-${activeTab === 'login/register slides' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
+${activeTab === 'login/register slides' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
 after:absolute after:left-0 after:right-0 after:bottom-0 
-after:h-[2px] after:bg-green-600 hover:text-green-600 after:transition-all after:duration-300
+after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300
 ${activeTab === 'login/register slides' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
 `}
           onClick={() => setActiveTab('login/register slides')}

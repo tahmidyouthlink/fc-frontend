@@ -36,15 +36,15 @@ const Marketing = () => {
     <div className='px-6 md:px-10'>
 
       <div className="bg-white sticky top-0 z-10">
-        <h1 className="font-bold text-lg lg:text-xl 2xl:text-2xl py-1 2xl:py-3 bg-white">MARKETING</h1>
+        <h1 className="font-bold text-lg md:text-xl lg:text-3xl text-neutral-700 py-1 2xl:py-3 bg-white">MARKETING</h1>
 
         <div className="flex flex-wrap items-center gap-3 bg-white">
 
           <button
             className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'view performance' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
-        after:absolute after:left-0 after:right-0 hover:text-green-600 after:bottom-0 
-        after:h-[2px] after:bg-green-600 after:transition-all after:duration-300
+        ${activeTab === 'view performance' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
+        after:absolute after:left-0 after:right-0 hover:text-neutral-800 after:bottom-0 
+        after:h-[2px] after:bg-neutral-800 after:transition-all after:duration-300
         ${activeTab === 'view performance' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
       `}
             onClick={() => setActiveTab('view performance')}
@@ -54,9 +54,9 @@ const Marketing = () => {
 
           <button
             className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'create promotions' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
+        ${activeTab === 'create promotions' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
         after:absolute after:left-0 after:right-0 after:bottom-0 
-        after:h-[2px] after:bg-green-600 hover:text-green-600 after:transition-all after:duration-300
+        after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300
         ${activeTab === 'create promotions' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
       `}
             onClick={() => setActiveTab('create promotions')}
@@ -66,9 +66,9 @@ const Marketing = () => {
 
           <button
             className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'marketing content' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
+        ${activeTab === 'marketing content' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
         after:absolute after:left-0 after:right-0 after:bottom-0 
-        after:h-[2px] after:bg-green-600 hover:text-green-600 after:transition-all after:duration-300
+        after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300
         ${activeTab === 'marketing content' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
       `}
             onClick={() => setActiveTab('marketing content')}
@@ -78,9 +78,9 @@ const Marketing = () => {
 
           <button
             className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'homepage content' ? 'text-green-600 font-semibold' : 'text-neutral-400 font-medium'}
-        after:absolute after:left-0 after:right-0 hover:text-green-600 after:bottom-0 
-        after:h-[2px] after:bg-green-600 after:transition-all after:duration-300
+        ${activeTab === 'homepage content' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
+        after:absolute after:left-0 after:right-0 hover:text-neutral-800 after:bottom-0 
+        after:h-[2px] after:bg-neutral-800 after:transition-all after:duration-300
         ${activeTab === 'homepage content' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
       `}
             onClick={() => setActiveTab('homepage content')}

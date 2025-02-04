@@ -82,7 +82,7 @@ const VendorsPage = () => {
   return (
     <div>
       <div className='flex justify-between items-center px-6 lg:px-16 py-3'>
-        <h1 className='py-2 md:py-3 font-semibold text-center md:text-xl lg:text-2xl sticky top-0 z-[10] bg-white'>VENDOR MANAGEMENT</h1>
+        <h1 className='py-2 md:py-3 font-semibold text-center text-lg md:text-xl lg:text-3xl text-neutral-700 sticky top-0 z-[10] bg-white'>VENDOR MANAGEMENT</h1>
         <button className="relative z-[1] rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
           <Link className='flex items-center gap-x-3' href={"/dash-board/vendors/add-vendor"}><FaPlus size={15} className='text-neutral-700' /> ADD</Link>
         </button>

@@ -1094,7 +1094,7 @@ const OrdersPage = () => {
         <div className='flex items-center justify-between py-2 md:py-5 gap-2'>
 
           <div className='w-full'>
-            <h3 className='text-center md:text-start font-semibold text-xl lg:text-2xl'>ORDER MANAGEMENT</h3>
+            <h3 className='text-center md:text-start font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>ORDER MANAGEMENT</h3>
           </div>
 
           {/* Search Product Item */}

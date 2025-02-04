@@ -773,7 +773,7 @@ const FirstStepOfAddProduct = () => {
 
       <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>PRODUCT CONFIGURATION</h3>
+          <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>PRODUCT CONFIGURATION</h3>
           <Link
             className="flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
             href="/dash-board/products"
