@@ -367,6 +367,13 @@ const OrdersPage = () => {
       color: product.color
     }));
 
+    const returnDataToSend = order?.returnInfo?.products?.map(product => ({
+      productId: product.productId,
+      sku: product.sku,
+      size: product.size,
+      color: product.color
+    }));
+
     const actionMessages = {
       undefined: "Do you want to confirm this order?",
       shipped: "Do you want to ship this order?",
@@ -429,6 +436,28 @@ const OrdersPage = () => {
           setOrderIdToUpdateDeclined(id); // Set the order ID for modal
           setDeclinedModalOpen(true);  // Open the modal
         }
+        else if (actionType === "refunded") {
+          try {
+            const response = await axiosPublic.put("/addReturnSkuToProduct", returnDataToSend);
+
+            // Check the results array from the response
+            const updateResults = response?.data?.results;
+
+            if (updateResults && Array.isArray(updateResults)) {
+              const successfulUpdates = updateResults.filter((result) => !result.error); // Filter out successful updates
+
+              if (successfulUpdates.length > 0) {
+                updateOrderStatus(order, id, actionType, isUndo); // Call your function only if there are successful updates
+              } else {
+                console.error("No successful updates occurred");
+              }
+            } else {
+              console.error("Unexpected response format:", response?.data);
+            }
+          } catch (error) {
+            console.error("Error making API request:", error);
+          }
+        }
         else {
           // For all other statuses, update order directly
           updateOrderStatus(order, id, actionType, isUndo); // Keep the existing logic for non-shipped actions
@@ -444,6 +473,13 @@ const OrdersPage = () => {
       productId: product.productId,
       sku: product.sku,
       onHandSku: product.sku,
+      size: product.size,
+      color: product.color
+    }));
+
+    const returnDataToSend = order?.returnInfo?.products?.map(product => ({
+      productId: product.productId,
+      sku: product.sku,
       size: product.size,
       color: product.color
     }));
@@ -502,7 +538,8 @@ const OrdersPage = () => {
       ...(isUndo && { isUndo: true }),
       ...(actionType === "onHold" && onHoldReason ? { onHoldReason } : {}),
       ...(actionType === "declined" && declinedReason ? { declinedReason } : {}),
-      dataToSend
+      dataToSend,
+      returnDataToSend
     };
 
     try {
@@ -1403,10 +1440,10 @@ const OrdersPage = () => {
 
                                   {order.orderStatus === 'Return Requested' && (
                                     <div className="flex items-center gap-2">
-                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'approved')} size="sm" color="warning" variant="flat">
+                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'approved')} color='success' size="sm" variant="flat">
                                         Approve
                                       </Button>
-                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'declined')} size="sm" color="success" variant="flat">
+                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'declined')} size="sm" color="danger" variant="flat">
                                         Decline
                                       </Button>
                                     </div>
@@ -1414,7 +1451,7 @@ const OrdersPage = () => {
 
                                   {order.orderStatus === 'Request Accepted' && (
                                     <div className="flex items-center gap-2">
-                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'returned')} size="sm" color="warning" variant="flat">
+                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'returned')} size="sm" color="secondary" variant="flat">
                                         Return
                                       </Button>
                                     </div>
@@ -1611,7 +1648,7 @@ const OrdersPage = () => {
 
                       <div>
                         {["Request Accepted", "Return Initiated", "Refunded"].includes(selectedOrder?.orderStatus) && (
-                          <p className="text-green-500 text-lg font-bold">Approved</p>
+                          <p className="text-green-500 text-lg font-bold pb-2.5">Approved</p>
                         )}
 
                         {selectedOrder?.declinedReason && selectedOrder?.orderStatus === "Request Declined" &&
@@ -1619,7 +1656,7 @@ const OrdersPage = () => {
                             <div>
                               <p className="text-red-500 text-lg font-bold">Declined</p>
                               <p className="pb-4">
-                                <strong>Declined Reason:</strong> {selectedOrder?.declinedReason}
+                                <strong>Declined Reason:</strong> <i>{selectedOrder?.declinedReason}</i>
                               </p>
                             </div>
                           )}
@@ -1876,13 +1913,13 @@ const OrdersPage = () => {
             <ModalHeader className="flex flex-col gap-1 bg-gray-200 px-8">Provide a Reason for Declining the Order</ModalHeader>
             <ModalBody>
 
-              <div className='flex justify-between items-center gap-2'>
+              <div className='flex justify-between items-center gap-2 my-2'>
                 <Textarea
                   clearable
-                  bordered
+                  disableAnimation
+                  variant="underlined"
                   fullWidth
                   size="lg"
-                  label="Declined Reason *"
                   placeholder="Enter declined reason"
                   value={declinedReason}
                   onChange={(e) => setDeclinedReason(e.target.value)}
@@ -1890,9 +1927,10 @@ const OrdersPage = () => {
               </div>
 
             </ModalBody>
-            <ModalFooter className='border'>
+            <ModalFooter>
               <Button
                 color="primary"
+                size='sm'
                 onPress={async () => {
 
                   // When toggle is ON, ensure tracking number is entered

@@ -251,7 +251,7 @@ const PDFDocument = ({ order }) => {
 
   return (
     <Document>
-      <Page style={styles.page} orientation='landscape'>
+      <Page style={styles.page}>
         {/* Sidebar Image */}
         <View style={styles.sidebar}>
           <Image src={sidebarImageBase64} style={{ width: '100%', height: '100%' }} alt="pdf-image" />

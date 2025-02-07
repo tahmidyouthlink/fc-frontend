@@ -161,13 +161,13 @@ const EditPurchaseOrderPage = () => {
 
     const skuByProduct = [];
 
-    productList.forEach((product) => {
+    productList?.forEach((product) => {
       const skuEntries = [];
 
-      product.productVariants.forEach((variant) => {
+      product?.productVariants?.forEach((variant) => {
         const size = variant?.size;
-        const colorCode = variant.color?.color; // Hex code for the color
-        const colorName = variant.color?.value; // Name of the color
+        const colorCode = variant?.color?.color; // Hex code for the color
+        const colorName = variant?.color?.value; // Name of the color
         const sku = variant?.sku || 0;
 
         // Find an existing entry for this size and color
@@ -196,7 +196,7 @@ const EditPurchaseOrderPage = () => {
       // );
       // const imageUrl = variantWithLocation?.imageUrls?.[0] || null;
 
-      skuByProduct.push({
+      skuByProduct?.push({
         productTitle: product?.productTitle,
         skuBySizeAndColor: skuEntries,
         imageUrl: product?.thumbnailImageUrl,
@@ -209,7 +209,7 @@ const EditPurchaseOrderPage = () => {
   // Function to toggle selection for a specific product size
   const toggleProductSizeColorSelection = (product, size, colorCode, colorName) => {
     setSelectedProducts((prevSelectedProducts) => {
-      const isSelected = prevSelectedProducts.some(
+      const isSelected = prevSelectedProducts?.some(
         (item) =>
           item?.productTitle === product?.productTitle &&
           item?.size === size &&
@@ -230,7 +230,7 @@ const EditPurchaseOrderPage = () => {
               )
           )
         );
-        return prevSelectedProducts.filter(
+        return prevSelectedProducts?.filter(
           (item) =>
             !(
               item?.productTitle === product?.productTitle &&
@@ -272,8 +272,8 @@ const EditPurchaseOrderPage = () => {
   // Function to toggle selection for all sizes of a product
   const toggleAllSizesAndColorsForProduct = (product) => {
     setSelectedProducts((prevSelectedProducts) => {
-      const allSelected = product?.skuBySizeAndColor.every((entry) =>
-        prevSelectedProducts.some(
+      const allSelected = product?.skuBySizeAndColor?.every((entry) =>
+        prevSelectedProducts?.some(
           (item) =>
             item?.productTitle === product?.productTitle &&
             item?.size === entry?.size &&
@@ -285,12 +285,12 @@ const EditPurchaseOrderPage = () => {
       if (allSelected) {
         // Deselect all sizes and colors for this product
         setPurchaseOrderVariants((prevVariants) =>
-          prevVariants.filter((variant) => variant.productTitle !== product.productTitle)
+          prevVariants?.filter((variant) => variant?.productTitle !== product?.productTitle)
         );
-        return prevSelectedProducts.filter((item) => item.productTitle !== product.productTitle);
+        return prevSelectedProducts?.filter((item) => item?.productTitle !== product?.productTitle);
       } else {
         // Select all sizes and colors for this product
-        const newSelections = product.skuBySizeAndColor.map((entry) => ({
+        const newSelections = product?.skuBySizeAndColor?.map((entry) => ({
           productTitle: product?.productTitle,
           imageUrl: product?.imageUrl,
           size: entry?.size,
@@ -299,8 +299,8 @@ const EditPurchaseOrderPage = () => {
         }));
 
         setPurchaseOrderVariants((prevVariants) => [
-          ...prevVariants.filter((variant) => variant.productTitle !== product.productTitle),
-          ...product.skuBySizeAndColor.map((entry) => ({
+          ...prevVariants?.filter((variant) => variant.productTitle !== product.productTitle),
+          ...product?.skuBySizeAndColor?.map((entry) => ({
             productTitle: product?.productTitle,
             size: entry?.size,
             color: {
@@ -314,7 +314,7 @@ const EditPurchaseOrderPage = () => {
         ]);
 
         return [
-          ...prevSelectedProducts.filter((item) => item.productTitle !== product.productTitle),
+          ...prevSelectedProducts?.filter((item) => item?.productTitle !== product?.productTitle),
           ...newSelections,
         ];
       }
@@ -325,7 +325,7 @@ const EditPurchaseOrderPage = () => {
   const removeSelectedProduct = (product, size, color) => {
 
     setSelectedProducts((prevSelectedProducts) => {
-      const updatedSelectedProducts = prevSelectedProducts.filter(
+      const updatedSelectedProducts = prevSelectedProducts?.filter(
         (item) => !(
           item?.productTitle === product?.productTitle &&
           item?.size === size &&
@@ -356,12 +356,12 @@ const EditPurchaseOrderPage = () => {
       const titleMatches = product?.productTitle?.toLowerCase().includes(searchQuery.toLowerCase());
 
       // Check if sizes, colors, locationSku, or totalSku match the search query
-      const sizeOrColorMatches = product.skuBySizeAndColor.some(entry => {
+      const sizeOrColorMatches = product?.skuBySizeAndColor?.some(entry => {
         // Check if entry.size matches the search query
-        const sizeMatches = entry.size.toString().toLowerCase().includes(searchQuery.toLowerCase());
+        const sizeMatches = entry?.size?.toString().toLowerCase().includes(searchQuery.toLowerCase());
 
         // Assuming entry.color is an object with a 'name' property
-        const colorNameMatches = entry.color && typeof entry.color.name === 'string' && entry.color.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const colorNameMatches = entry?.color && typeof entry.color.name === 'string' && entry.color.name.toLowerCase().includes(searchQuery.toLowerCase());
 
         return sizeMatches || colorNameMatches;
       });

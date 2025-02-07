@@ -10,7 +10,6 @@ import Loading from '@/app/components/shared/Loading/Loading';
 import LocationDropdown from '@/app/components/layout/LocationDropdown';
 import Image from 'next/image';
 import CustomPagination from '@/app/components/layout/CustomPagination';
-import { Button } from '@nextui-org/react';
 import useOrders from '@/app/hooks/useOrders';
 import useLocations from '@/app/hooks/useLocations';
 import { HiOutlineDownload } from 'react-icons/hi';
@@ -45,6 +44,7 @@ const InventoryPage = () => {
           color: variant?.color.label, // Display color label
           colorCode: variant?.color.color, // Display color code for visualization
           sku: variant?.sku,
+          returnSku: variant?.returnSku || 0,
           onHandSku: variant?.onHandSku,
           imageUrl: variant?.imageUrls[0], // Assuming we want the first image
           productId: product?.productId,
@@ -83,19 +83,19 @@ const InventoryPage = () => {
     const isNumberQuery = !isNaN(query) && query.trim() !== '';
 
     // Check if any product detail contains the search query
-    const productTitle = (product.productTitle || '').toLowerCase();
-    const productId = (product.productId || '').toLowerCase();
-    const size = (product.size !== undefined && product.size !== null) ? product.size.toString().toLowerCase() : ''; // Convert size to string
-    const color = (product.color || '').toLowerCase();
-    const sku = (product.sku || '').toString();
-    const onHandSku = (product.onHandSku || '').toString();
+    const productTitle = (product?.productTitle || '').toLowerCase();
+    const productId = (product?.productId || '').toLowerCase();
+    const size = (product?.size !== undefined && product?.size !== null) ? product?.size?.toString().toLowerCase() : ''; // Convert size to string
+    const color = (product?.color || '').toLowerCase();
+    const sku = (product?.sku || '').toString();
+    const onHandSku = (product?.onHandSku || '').toString();
 
     // Check for matches
     return (
-      productTitle.includes(query) ||
-      productId.includes(query) ||
-      size.includes(query) ||
-      color.includes(query) ||
+      productTitle?.includes(query) ||
+      productId?.includes(query) ||
+      size?.includes(query) ||
+      color?.includes(query) ||
       (isNumberQuery && sku === query) || // Numeric comparison for SKU 
       (isNumberQuery && onHandSku === query) // Numeric comparison for SKU
     );
@@ -426,13 +426,14 @@ const InventoryPage = () => {
                 <th key="onProcess" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">On Process</th>
                 <th key="available" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">SKU Available</th>
                 <th key="onHand" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">SKU On Hand</th>
+                <th key="returnSku" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">Return SKU</th>
               </tr>
             </thead>
 
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedProducts?.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="text-center p-4 text-gray-500 py-80">
+                  <td colSpan="6" className="text-center p-4 text-gray-500 py-80">
                     <h1 className="text-xl font-semibold text-neutral-800">No Products Available!</h1>
                     <div>
                       {locationNameForMessage === "" ? (
@@ -497,13 +498,14 @@ const InventoryPage = () => {
                         <div className="flex flex-col items-start justify-start gap-1">
                           <p className="font-bold text-blue-700 text-start">{product?.productTitle}</p>
                           <p className="font-medium">{product?.size}</p>
-                          <span className="flex items-center gap-2">{product.color}</span>
+                          <span className="flex items-center gap-2">{product?.color}</span>
                         </div>
                       </td>
                       <td key="pending" className="text-center"> {isMatchingLocation ? onPending : 0}</td>
                       <td key="onProcess" className="text-center"> {isMatchingLocation ? onProcess : 0}</td>
                       <td key="available" className="text-center"> {product?.sku}</td>
                       <td key="onHand" className="text-center">{product?.onHandSku}</td>
+                      <td key="returnSku" className="text-center">{product?.returnSku ? product?.returnSku : 0}</td>
                     </tr>
                   );
                 })

@@ -101,18 +101,18 @@ const CategoriesOverview = () => {
       setSelectedFeaturedCategories(prev => prev.filter(label => label !== categoryLabel));
     } else {
       // Only allow selecting up to 4 categories
-      if (selectedFeaturedCategories.length < 4) {
+      if (selectedFeaturedCategories.length < 5) {
         setSelectedFeaturedCategories(prev => [...prev, categoryLabel]);
       } else {
-        toast.error("You can only select up to 4 categories.");
+        toast.error("You can only select up to 5 categories.");
       }
     }
   };
 
   const handleFeaturedCategorySave = async () => {
 
-    if (selectedFeaturedCategories.length !== 4) {
-      toast.error("You must select exactly 4 featured categories.");
+    if (selectedFeaturedCategories.length !== 5) {
+      toast.error("You must select exactly 5 featured categories.");
       return;
     };
 
@@ -206,7 +206,7 @@ const CategoriesOverview = () => {
       <Modal className='mx-4 lg:mx-0' isOpen={isOpen} onOpenChange={onClose} size='xl'>
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1 bg-gray-200 px-8">
-            Select Featured Categories (Only 4 can be selected)
+            Select Featured Categories (Only 5 can be selected)
           </ModalHeader>
           <ModalBody className="modal-body-scroll">
             <div className="grid grid-cols-2 gap-4">

@@ -12,7 +12,7 @@ import { CustomCheckbox2 } from '@/app/components/layout/CustomCheckBox2';
 import { useRouter } from 'next/navigation';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6';
 import Image from 'next/image';
-import { RxCheck, RxCross2 } from 'react-icons/rx';
+import { RxCheck, RxCross1, RxCross2 } from 'react-icons/rx';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useCategories from '@/app/hooks/useCategories';
@@ -115,16 +115,55 @@ const FirstStepOfAddProduct = () => {
   // Handle adding/removing category selection
   const toggleSeasonSelection = (seasonName) => {
     let updatedSelectedSeasons;
+
     if (selectedSeasons.includes(seasonName)) {
-      // Remove category from selection
+      // Remove season from selection
       updatedSelectedSeasons = selectedSeasons.filter((season) => season !== seasonName);
     } else {
-      // Add category to selection
+      // Restrict selection to a maximum of 2 seasons
+      if (selectedSeasons.length >= 2) {
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="ml-6 p-1.5 rounded-full bg-red-500">
+              <RxCross1 className="h-4 w-4 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    You can select up to 2 seasons only.
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    You have reached the maximum limit of 2 seasons. Please remove one to add another.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        });
+        return;
+      }
+
       updatedSelectedSeasons = [...selectedSeasons, seasonName];
+      setSeasonError(""); // Clear error if valid selection
     }
 
     setSelectedSeasons(updatedSelectedSeasons);
-    handleSeasonSelectionChange(updatedSelectedSeasons); // Pass selected categories to parent component
+    handleSeasonSelectionChange(updatedSelectedSeasons); // Pass selected seasons to parent component
   };
 
   // Handle removing category directly from selected list
@@ -158,7 +197,39 @@ const FirstStepOfAddProduct = () => {
       if (updatedSelectedProducts.length < 4) {
         updatedSelectedProducts.push({ productId, productTitle, id, imageUrl });
       } else {
-        toast.error("You can select up to 4 products only."); // Optional: Show a warning message
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="ml-6 p-1.5 rounded-full bg-red-500">
+              <RxCross1 className="h-4 w-4 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    You can select up to 4 products only.
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    You have reached the maximum limit of 4 products. Please remove one to add another.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        })
       }
     }
 
@@ -519,7 +590,8 @@ const FirstStepOfAddProduct = () => {
     // Calculate the next product number, skipping deleted product numbers
     const nextProductNumber = String(highestNumber + 1).padStart(3, '0'); // 3-digit number with leading zeros
 
-    const categoryCode = category.slice(0, 2).toUpperCase(); // First 2 letters of the category
+    // Remove special characters from category and get the first 2 valid letters
+    const categoryCode = category.replace(/[^a-zA-Z]/g, "").slice(0, 2).toUpperCase();
 
     const productID = `${prefix}${yearCode}${categoryCode}${nextProductNumber}`;
     return productID;
@@ -690,6 +762,8 @@ const FirstStepOfAddProduct = () => {
       sizeGuideImageUrl: selectedImageUrl,
       status: "draft",
       restOfOutfit: selectedProductIds,
+      materialCare,
+      sizeFit
     };
 
     try {

@@ -347,16 +347,16 @@ const SecondStepOfAddProduct = () => {
     const storedSizeGuideImageUrl = localStorage.getItem('sizeGuideImageUrl');
 
     // Filter only active locations
-    const activeLocations = locationList.filter(location => location.status === true);
+    const activeLocations = locationList?.filter(location => location.status === true);
 
-    const formattedData = productVariants.map((variant, index) => {
+    const formattedData = productVariants?.map((variant, index) => {
       return activeLocations?.map(location => ({
         ...variant,
         sku: location.isPrimaryLocation
           ? parseFloat(formData[`sku-${index}`]) || 0 // SKU for primary location
           : 0, // Set SKU to 0 for others
         onHandSku: location.isPrimaryLocation
-          ? parseFloat(data[`sku-${index}`]) || 0 // SKU for primary location
+          ? parseFloat(formData[`sku-${index}`]) || 0 // SKU for primary location
           : 0, // Set SKU to 0 for others
         location: location.locationName,
       }));
@@ -367,11 +367,11 @@ const SecondStepOfAddProduct = () => {
 
     // Check if any variant is missing an image URL
     const invalidVariants = productVariants?.filter(
-      (variant) => variant.imageUrls.length < 4
+      (variant) => variant.imageUrls.length < 3
     );
 
     if (invalidVariants?.length > 0) {
-      toast.error("Each variant must have at least 4 images.");
+      toast.error("Each variant must have at least 3 images.");
       return;
     }
 
