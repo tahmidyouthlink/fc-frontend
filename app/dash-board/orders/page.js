@@ -1,7 +1,7 @@
 "use client";
 import * as XLSX from 'xlsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Accordion, AccordionItem, Button, Checkbox, CheckboxGroup, DateRangePicker, Input, Textarea } from "@nextui-org/react";
+import { Accordion, AccordionItem, Button, Checkbox, CheckboxGroup, DateRangePicker, Input, Select, SelectItem, Textarea } from "@nextui-org/react";
 import emailjs from '@emailjs/browser';
 import Loading from '@/app/components/shared/Loading/Loading';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
@@ -33,6 +33,7 @@ import { CgArrowsExpandRight } from 'react-icons/cg';
 import ProductExpandedImageModalOrder from '@/app/components/product/ProductExpandedImageModalOrder';
 import { TbColumnInsertRight } from 'react-icons/tb';
 import { HiOutlineDownload } from "react-icons/hi";
+import PaginationSelect from '@/app/components/layout/PaginationSelect';
 const PrintButton = dynamic(() => import("@/app/components/layout/PrintButton"), { ssr: false });
 
 const initialColumns = ['Order Number', 'Date & Time', 'Customer Name', 'Order Amount', 'Order Status', 'Action', 'Email', 'Phone Number', 'Alt. Phone Number', 'Shipping Method', 'Payment Status', 'Payment Method'];
@@ -219,8 +220,8 @@ const OrdersPage = () => {
   // Check if filters are applied
   const isFilterActive = searchQuery || (selectedDateRange?.start && selectedDateRange?.end);
 
-  const handleItemsPerPageChange = (e) => {
-    setItemsPerPage(parseInt(e.target.value));
+  const handleItemsPerPageChange = (newValue) => {
+    setItemsPerPage(newValue);
     setPage(0); // Reset to first page when changing items per page
   };
 
@@ -1959,21 +1960,11 @@ const OrdersPage = () => {
             currentPage={page}
             onPageChange={setPage}
           />
-          <div className="relative inline-block">
-            <select
-              id="itemsPerPage"
-              value={itemsPerPage}
-              onChange={handleItemsPerPageChange}
-              className="cursor-pointer px-3 py-2 rounded-lg text-sm md:text-base text-gray-800 bg-white shadow-lg border border-gray-300 focus:outline-none hover:bg-gradient-to-tr hover:from-pink-400 hover:to-yellow-400 hover:text-white transition-colors duration-300 appearance-none w-16 md:w-20 lg:w-24"
-            >
-              <option className='bg-white text-black' value={25}>25</option>
-              <option className='bg-white text-black' value={50}>50</option>
-              <option className='bg-white text-black' value={100}>100</option>
-            </select>
-            <svg className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
+          <PaginationSelect
+            options={[25, 50, 100]} // ✅ Pass available options
+            value={itemsPerPage} // ✅ Selected value
+            onChange={handleItemsPerPageChange} // ✅ Handle value change
+          />
         </div>
 
       </div>

@@ -13,6 +13,8 @@ import CustomPagination from '@/app/components/layout/CustomPagination';
 import useOrders from '@/app/hooks/useOrders';
 import useLocations from '@/app/hooks/useLocations';
 import { HiOutlineDownload } from 'react-icons/hi';
+import { Select, SelectItem } from '@nextui-org/react';
+import PaginationSelect from '@/app/components/layout/PaginationSelect';
 
 const InventoryPage = () => {
 
@@ -101,8 +103,8 @@ const InventoryPage = () => {
     );
   });
 
-  const handleItemsPerPageChange = (e) => {
-    setItemsPerPage(parseInt(e.target.value));
+  const handleItemsPerPageChange = (newValue) => {
+    setItemsPerPage(newValue);
     setPage(0); // Reset to first page when changing items per page
   };
 
@@ -522,21 +524,12 @@ const InventoryPage = () => {
           currentPage={page}
           onPageChange={setPage}
         />
-        <div className="relative inline-block">
-          <select
-            id="itemsPerPage"
-            value={itemsPerPage}
-            onChange={handleItemsPerPageChange}
-            className="cursor-pointer px-3 py-2 rounded-lg text-sm md:text-base text-gray-800 bg-white shadow-lg border border-gray-300 focus:outline-none hover:bg-gradient-to-tr hover:from-pink-400 hover:to-yellow-400 hover:text-white transition-colors duration-300 appearance-none w-16 md:w-20 lg:w-24"
-          >
-            <option className='bg-white text-black' value={25}>25</option>
-            <option className='bg-white text-black' value={50}>50</option>
-            <option className='bg-white text-black' value={100}>100</option>
-          </select>
-          <svg className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-          </svg>
-        </div>
+        <PaginationSelect
+          options={[25, 50, 100]} // ✅ Pass available options
+          value={itemsPerPage} // ✅ Selected value
+          onChange={handleItemsPerPageChange} // ✅ Handle value change
+        />
+
       </div>
 
     </div>
