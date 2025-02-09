@@ -13,14 +13,15 @@ const PaginationSelect = ({ options, value, onChange }) => {
       }}
       classNames={{
         mainWrapper: [
-          `z-[1] text-neutral-700 [&>button]:px-4 [&>button]:duration-300 
-          hover:[&>button]:bg-[#F4D3BA] [&>button]:bg-[#fbcfb0] font-semibold`
+          `z-[1] text-neutral-700 [&>button]:duration-300 
+          hover:[&>button]:bg-[#F4D3BA] [&>button]:bg-[#fbcfb0] font-semibold !h-10 !min-h-10 
+      [&>button]:!h-10 [&>button]:!min-h-10 [&>button]:!py-0`
         ],
         label: [
           "text-neutral-700 static mr-4 group-data-[filled=true]:scale-100 group-data-[filled=true]:-translate-y-0",
         ],
         innerWrapper: ["hidden"],
-        popoverContent: ["min-w-60 w-fit"],
+        popoverContent: ["min-w-20 w-fit"],
       }}
       label={value} // ✅ Shows selected value dynamically
     >

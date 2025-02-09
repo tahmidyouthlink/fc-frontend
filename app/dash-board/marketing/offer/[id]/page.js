@@ -1,22 +1,22 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
-import { Select, SelectItem, Tab, Tabs } from '@nextui-org/react';
+import { Tab, Tabs } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
-import { RxCheck, RxCross2 } from 'react-icons/rx';
+import { RxCheck, RxCross1, RxCross2 } from 'react-icons/rx';
 import dynamic from 'next/dynamic';
 import useCategories from '@/app/hooks/useCategories';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
-import ProductSearchSelectId from '@/app/components/layout/ProductSearchSelectId';
-import CategorySearchSelectId from '@/app/components/layout/CategorySearchSelectId';
 import { FiSave } from 'react-icons/fi';
+import useOffers from '@/app/hooks/useOffers';
+import ProductSearchSelect from '@/app/components/layout/ProductSearchSelect';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
@@ -43,6 +43,24 @@ const EditOffer = () => {
   const [productList, isProductPending] = useProductsInformation();
   const [productIdError, setProductIdError] = useState(false);
   const [selectedTab, setSelectedTab] = useState('Products');
+  const [offerList, isOfferPending] = useOffers();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownRef]);
 
   const handleTabChangeForCategoryOrProduct = (key) => {
     setSelectedTab(key);
@@ -157,14 +175,235 @@ const EditOffer = () => {
     document.getElementById('imageUpload').value = ''; // Clear the file input
   };
 
-  const handleCategorySelectionChange = (selectedCats) => {
-    setSelectedCategories(selectedCats);
-    setCategoryError(selectedCats.length === 0);
+  // Handle category selection
+  const handleCategorySelectionChange = async (categoryLabel) => {
+    setSelectedCategories((prevCategories) => {
+      let updatedSelectedCategories;
+
+      if (prevCategories?.includes(categoryLabel)) {
+        updatedSelectedCategories = prevCategories?.filter((category) => category !== categoryLabel);
+      } else {
+        updatedSelectedCategories = [...prevCategories, categoryLabel];
+      }
+
+      // Get the currently edited offer's ID
+      const currentOfferId = id;
+
+      // Get all products in other offers (excluding the current offer)
+      const productsInOtherOffers = offerList
+        ?.filter((offer) => offer?._id !== currentOfferId) // Ignore the current offer
+        ?.flatMap((offer) => offer?.selectedProductIds);
+
+      // Check if any of the new categories are in another offer (excluding the current offer)
+      const categoryConflict = updatedSelectedCategories?.some((category) =>
+        offerList?.some((offer) =>
+          offer._id !== currentOfferId && offer?.selectedCategories?.includes(category)
+        )
+      );
+
+      // Check if products under the selected category are already in another offer
+      const hasProductConflict = updatedSelectedCategories?.some((category) => {
+        const categoryProducts = productList
+          ?.filter((product) => product?.category === category)
+          ?.map((product) => product?.productId);
+
+        return categoryProducts?.some((prodId) => productsInOtherOffers?.includes(prodId));
+      });
+
+      // Step 4: Handle conflicts (either category conflict or product conflict)
+      if (categoryConflict) {
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="ml-6 p-1.5 rounded-full bg-red-500">
+              <RxCross1 className="h-4 w-4 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    {`${categoryLabel} are already in another offer.`}
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Please choose a different category or remove it from the other offer.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        })
+        return prevCategories; // Don't update the selected categories if there's a category conflict
+      };
+
+      if (hasProductConflict) {
+        toast.custom((t) => (
+          <div
+            className={`${t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+          >
+            <div className="ml-6 p-1.5 rounded-full bg-red-500">
+              <RxCross1 className="h-4 w-4 text-white rounded-full" />
+            </div>
+            <div className="flex-1 w-0 p-4">
+              <div className="flex items-start">
+                <div className="ml-3 flex-1">
+                  <p className="text-base font-bold text-gray-900">
+                    {`Products in ${categoryLabel} are already in another offer`}
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Choose a different category or remove its products from the other offer.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex border-l border-gray-200">
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+              >
+                <RxCross2 />
+              </button>
+            </div>
+          </div>
+        ), {
+          position: "bottom-right",
+          duration: 5000
+        })
+        return prevCategories; // Don't update the selected categories if there's a product conflict
+      };
+
+      return updatedSelectedCategories; // Update state correctly
+    });
   };
 
-  const handleProductSelectionChange = (selectedIds) => {
-    setSelectedProductIds(selectedIds);
-    setProductIdError(selectedIds.length === 0);
+  // Filter categories based on search input and remove already selected categories
+  const filteredCategories = categoryList?.filter((category) =>
+    category?.label?.toLowerCase()?.includes(searchTerm.toLowerCase()) &&
+    !selectedCategories?.includes(category.label) // Exclude already selected categories
+  );
+
+  // Handle removing category directly from selected list
+  const removeCategory = (categoryLabel) => {
+    const updatedSelectedCategories = selectedCategories?.filter((label) => label !== categoryLabel);
+    setSelectedCategories(updatedSelectedCategories);
+  };
+
+  const handleProductSelectionChange = async (selectedIds) => {
+    if (selectedIds.length === 0) {
+      setProductIdError(true);
+      setSelectedProductIds([]);
+      return false;
+    }
+
+    setProductIdError(false);
+
+    // Get categories of the selected products
+    const selectedProductsCategories = selectedIds.map(
+      (prodId) => productList.find((p) => p.productId === prodId)?.category
+    );
+
+    // Ignore the current offer when checking for conflicts
+    const otherOffers = offerList.filter(offer => offer._id !== id);
+
+    // Check if any selected product is already in another offer
+    const hasConflict = selectedIds.some((prodId) =>
+      otherOffers.some((offer) => offer.selectedProductIds.includes(prodId))
+    );
+
+    // Check if any selected product's category is already in another offer
+    const categoryConflict = selectedProductsCategories.some((category) =>
+      otherOffers.some((offer) => offer.selectedCategories.includes(category))
+    );
+
+    if (hasConflict) {
+      toast.custom((t) => (
+        <div
+          className={`${t.visible ? 'animate-enter' : 'animate-leave'
+            } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+        >
+          <div className="ml-6 p-1.5 rounded-full bg-red-500">
+            <RxCross1 className="h-4 w-4 text-white rounded-full" />
+          </div>
+          <div className="flex-1 w-0 p-4">
+            <div className="flex items-start">
+              <div className="ml-3 flex-1">
+                <p className="text-base font-bold text-gray-900">
+                  Your selected product is already part of another offer.
+                </p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Please choose a different product or remove it from the other offer.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex border-l border-gray-200">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+            >
+              <RxCross2 />
+            </button>
+          </div>
+        </div>
+      ), {
+        position: "bottom-right",
+        duration: 5000
+      })
+      return false;
+    }
+
+    if (categoryConflict) {
+      toast.custom((t) => (
+        <div
+          className={`${t.visible ? 'animate-enter' : 'animate-leave'
+            } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+        >
+          <div className="ml-6 p-1.5 rounded-full bg-red-500">
+            <RxCross1 className="h-4 w-4 text-white rounded-full" />
+          </div>
+          <div className="flex-1 w-0 p-4">
+            <div className="flex items-start">
+              <div className="ml-3 flex-1">
+                <p className="text-base font-bold text-gray-900">
+                  Your selected product is already part of another category.
+                </p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Please choose a different product or remove that category from the other offer.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex border-l border-gray-200">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+            >
+              <RxCross2 />
+            </button>
+          </div>
+        </div>
+      ), {
+        position: "bottom-right",
+        duration: 5000
+      })
+      return false;
+    }
+
+    setSelectedProductIds([...selectedIds]);
+    return true;
   };
 
   const onSubmit = async (data) => {
@@ -281,9 +520,9 @@ const EditOffer = () => {
     }
   };
 
-  if (isLoading || isCategoryPending || isProductPending) {
+  if (isLoading || isCategoryPending || isProductPending || isOfferPending) {
     return <Loading />;
-  }
+  };
 
   return (
     <div className='bg-gray-50 min-h-screen'>
@@ -384,10 +623,11 @@ const EditOffer = () => {
                     <div>
                       <label htmlFor='Product Selection' className='flex justify-start font-medium text-[#9F5216] pb-2'>Product Selection *</label>
                       {productList && (
-                        <ProductSearchSelectId
+                        <ProductSearchSelect
                           productList={productList}
-                          value={selectedProductIds}
                           onSelectionChange={handleProductSelectionChange}
+                          selectedProductIds={selectedProductIds}
+                          setSelectedProductIds={setSelectedProductIds}
                         />
                       )}
                       {productIdError && <p className="text-red-600 text-left">Select at least one product ID</p>}
@@ -397,11 +637,69 @@ const EditOffer = () => {
                     <div>
                       <label htmlFor='Category' className='flex justify-start font-medium text-[#9F5216] pb-2'>Category Selection *</label>
                       {categoryList && (
-                        <CategorySearchSelectId
-                          categoryList={categoryList}
-                          value={selectedCategories} // Persist selected categories
-                          onSelectionChange={handleCategorySelectionChange}
-                        />
+                        <div>
+                          <div className="w-full max-w-md mx-auto" ref={dropdownRef}>
+                            {/* Search Box */}
+                            <input
+                              type="text"
+                              value={searchTerm}
+                              onChange={(e) => setSearchTerm(e?.target?.value)}
+                              onClick={() => setIsDropdownOpen(true)} // Toggle dropdown on input click
+                              placeholder="Search & Select by Categories"
+                              className="w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mb-2"
+                            />
+
+                            {/* Dropdown list for search results */}
+                            {isDropdownOpen && (
+                              <div className="border rounded p-2 max-h-64 overflow-y-auto">
+                                {filteredCategories?.length > 0 ? (
+                                  filteredCategories?.map((category) => (
+                                    <div
+                                      key={category?._id}
+                                      className={`flex items-center p-2 rounded-lg border cursor-pointer hover:bg-gray-100 ${selectedCategories?.includes(category?.label) ? 'bg-gray-200' : ''}`}
+                                      onClick={() => handleCategorySelectionChange(category?.label)}
+                                    >
+                                      <Image
+                                        width={400}
+                                        height={400}
+                                        src={category?.imageUrl}
+                                        alt={category?.label}
+                                        className="h-8 w-8 object-cover rounded"
+                                      />
+                                      <span className="ml-2">{category?.label}</span>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <p className="text-gray-500">No categories found</p>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Selected categories display */}
+                            {selectedCategories?.length > 0 && (
+                              <div className="border p-2 rounded mt-2">
+                                <h4 className="text-sm font-semibold mb-2">Selected Categories:</h4>
+                                <ul className="space-y-2">
+                                  {selectedCategories?.map((label) => (
+                                    <li
+                                      key={label}
+                                      className="flex justify-between items-center bg-gray-100 p-2 rounded"
+                                    >
+                                      <span>{label}</span>
+                                      <button
+                                        type='button'
+                                        onClick={() => removeCategory(label)}
+                                        className="text-red-500 text-sm"
+                                      >
+                                        Remove
+                                      </button>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       )}
                       {categoryError && <p className="text-red-600 text-left">Select at least one category</p>}
                     </div>

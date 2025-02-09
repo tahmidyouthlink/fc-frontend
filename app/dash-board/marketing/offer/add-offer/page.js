@@ -2,19 +2,19 @@
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { DatePicker, Tab, Tabs } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
 import dynamic from 'next/dynamic';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import Image from 'next/image';
-import { RxCheck, RxCross2 } from 'react-icons/rx';
+import { RxCheck, RxCross1, RxCross2 } from 'react-icons/rx';
 import useCategories from '@/app/hooks/useCategories';
 import Loading from '@/app/components/shared/Loading/Loading';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
 import ProductSearchSelect from '@/app/components/layout/ProductSearchSelect';
-import CategorySearchSelect from '@/app/components/layout/CategorySearchSelect';
+import useOffers from '@/app/hooks/useOffers';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
@@ -35,8 +35,26 @@ const AddOffer = () => {
   const [categoryError, setCategoryError] = useState(false);
   const [selectedProductIds, setSelectedProductIds] = useState([]);
   const [productList, isProductPending] = useProductsInformation();
+  const [offerList, isOfferPending] = useOffers();
   const [productIdError, setProductIdError] = useState(false);
   const [selectedTab, setSelectedTab] = useState('Products');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownRef]);
 
   const handleTabChangeForCategoryOrProduct = (key) => {
     setSelectedTab(key);
@@ -101,22 +119,228 @@ const AddOffer = () => {
     return null;
   };
 
-  const handleCategorySelectionChange = async (selectedCats) => {
-    setSelectedCategories(selectedCats);
-    if (selectedCats.length === 0) {
-      setCategoryError(true);
-      return;
-    }
-    setCategoryError(false);
-  };
-
   const handleProductSelectionChange = async (selectedIds) => {
-    setSelectedProductIds(selectedIds);
     if (selectedIds.length === 0) {
       setProductIdError(true);
-      return;
+      setSelectedProductIds([]); // ✅ Ensure state is reset properly
+      return false;
     }
+
     setProductIdError(false);
+
+    // Get categories of the selected products
+    const selectedProductsCategories = selectedIds?.map(
+      (prodId) => productList?.find((p) => p?.productId === prodId)?.category
+    );
+
+    // Check if any selected product is already in another offer
+    const hasConflict = selectedIds?.some((prodId) =>
+      offerList?.some((offer) =>
+        offer?.selectedProductIds?.includes(prodId)
+      )
+    );
+
+    // Check if any selected product's category is already in another offer
+    const categoryConflict = selectedProductsCategories?.some((category) =>
+      offerList?.some((offer) =>
+        offer?.selectedCategories.includes(category)
+      )
+    );
+
+    if (hasConflict) {
+      toast.custom((t) => (
+        <div
+          className={`${t.visible ? 'animate-enter' : 'animate-leave'
+            } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+        >
+          <div className="ml-6 p-1.5 rounded-full bg-red-500">
+            <RxCross1 className="h-4 w-4 text-white rounded-full" />
+          </div>
+          <div className="flex-1 w-0 p-4">
+            <div className="flex items-start">
+              <div className="ml-3 flex-1">
+                <p className="text-base font-bold text-gray-900">
+                  Your selected product is already part of another offer.
+                </p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Please choose a different product or remove it from the other offer.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex border-l border-gray-200">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+            >
+              <RxCross2 />
+            </button>
+          </div>
+        </div>
+      ), {
+        position: "bottom-right",
+        duration: 5000
+      })
+      return false;
+    }
+
+    if (categoryConflict) {
+      toast.custom((t) => (
+        <div
+          className={`${t.visible ? 'animate-enter' : 'animate-leave'
+            } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+        >
+          <div className="ml-6 p-1.5 rounded-full bg-red-500">
+            <RxCross1 className="h-4 w-4 text-white rounded-full" />
+          </div>
+          <div className="flex-1 w-0 p-4">
+            <div className="flex items-start">
+              <div className="ml-3 flex-1">
+                <p className="text-base font-bold text-gray-900">
+                  Your selected product is already part of another category.
+                </p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Please choose a different product or remove that category from the other offer.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex border-l border-gray-200">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+            >
+              <RxCross2 />
+            </button>
+          </div>
+        </div>
+      ), {
+        position: "bottom-right",
+        duration: 5000
+      })
+      return false;
+    }
+
+    // ✅ Ensure state updates correctly
+    setSelectedProductIds([...selectedIds]);
+    return true;
+  };
+
+  // Handle category selection
+  const handleCategorySelectionChange = async (categoryLabel) => {
+    let updatedSelectedCategories;
+
+    // If the category is already selected, remove it
+    if (selectedCategories?.includes(categoryLabel)) {
+      updatedSelectedCategories = selectedCategories?.filter((category) => category !== categoryLabel);
+    } else {
+      updatedSelectedCategories = [...selectedCategories, categoryLabel];
+    }
+
+    // Step 1: Get the list of product IDs already part of any offers
+    const productsInOffers = offerList?.flatMap((offer) => offer?.selectedProductIds);
+
+    // Step 2: Check if the selected categories are already part of an offer
+    const categoryConflict = updatedSelectedCategories?.some((category) =>
+      offerList?.some((offer) => offer?.selectedCategories?.includes(category)) // Check if category is already in offer
+    );
+
+    // Step 3: Check if any of the selected categories' products are already part of an offer
+    const hasProductConflict = updatedSelectedCategories?.some((category) => {
+      const categoryProducts = productList?.filter((product) => product?.category === category)?.map((product) => product?.productId);
+      return categoryProducts?.some((prodId) => productsInOffers?.includes(prodId)); // If any of these products are already in the offer
+    });
+
+    // Step 4: Handle conflicts (either category conflict or product conflict)
+    if (categoryConflict) {
+      toast.custom((t) => (
+        <div
+          className={`${t.visible ? 'animate-enter' : 'animate-leave'
+            } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+        >
+          <div className="ml-6 p-1.5 rounded-full bg-red-500">
+            <RxCross1 className="h-4 w-4 text-white rounded-full" />
+          </div>
+          <div className="flex-1 w-0 p-4">
+            <div className="flex items-start">
+              <div className="ml-3 flex-1">
+                <p className="text-base font-bold text-gray-900">
+                  {`${categoryLabel} are already in another offer.`}
+                </p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Please choose a different category or remove it from the other offer.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex border-l border-gray-200">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+            >
+              <RxCross2 />
+            </button>
+          </div>
+        </div>
+      ), {
+        position: "bottom-right",
+        duration: 5000
+      })
+      return; // Don't update the selected categories if there's a category conflict
+    };
+
+    if (hasProductConflict) {
+      toast.custom((t) => (
+        <div
+          className={`${t.visible ? 'animate-enter' : 'animate-leave'
+            } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+        >
+          <div className="ml-6 p-1.5 rounded-full bg-red-500">
+            <RxCross1 className="h-4 w-4 text-white rounded-full" />
+          </div>
+          <div className="flex-1 w-0 p-4">
+            <div className="flex items-start">
+              <div className="ml-3 flex-1">
+                <p className="text-base font-bold text-gray-900">
+                  {`Products in ${categoryLabel} are already in another offer`}
+                </p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Choose a different category or remove its products from the other offer.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex border-l border-gray-200">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+            >
+              <RxCross2 />
+            </button>
+          </div>
+        </div>
+      ), {
+        position: "bottom-right",
+        duration: 5000
+      })
+      return; // Don't update the selected categories if there's a product conflict
+    };
+
+    // Update selected categories only if no conflicts
+    setCategoryError(false);
+    setSelectedCategories(updatedSelectedCategories);
+  };
+
+  // Filter categories based on search input and remove already selected categories
+  const filteredCategories = categoryList?.filter((category) =>
+    category?.label?.toLowerCase()?.includes(searchTerm.toLowerCase()) &&
+    !selectedCategories?.includes(category.label) // Exclude already selected categories
+  );
+
+  // Handle removing category directly from selected list
+  const removeCategory = (categoryLabel) => {
+    const updatedSelectedCategories = selectedCategories?.filter((label) => label !== categoryLabel);
+    setSelectedCategories(updatedSelectedCategories);
   };
 
   const handleGoBack = async () => {
@@ -239,7 +463,7 @@ const AddOffer = () => {
     }
   };
 
-  if (isCategoryPending || isProductPending) {
+  if (isCategoryPending || isProductPending || isOfferPending) {
     return <Loading />
   };
 
@@ -345,6 +569,8 @@ const AddOffer = () => {
                       <ProductSearchSelect
                         productList={productList}
                         onSelectionChange={handleProductSelectionChange}
+                        selectedProductIds={selectedProductIds}
+                        setSelectedProductIds={setSelectedProductIds}
                       />
                       {productIdError && <p className="text-red-600 text-left">Select at least one product ID</p>}
                     </div>
@@ -352,10 +578,67 @@ const AddOffer = () => {
                   <Tab key="Categories" title="Categories">
                     <div>
                       <label htmlFor='Category' className='flex justify-start font-medium text-[#9F5216] pb-2'>Category Selection *</label>
-                      <CategorySearchSelect
-                        categoryList={categoryList}
-                        onSelectionChange={handleCategorySelectionChange}
-                      />
+                      <div className="w-full max-w-md mx-auto" ref={dropdownRef}>
+                        {/* Search Box */}
+                        <input
+                          type="text"
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e?.target?.value)}
+                          onClick={() => setIsDropdownOpen(true)} // Toggle dropdown on input click
+                          placeholder="Search & Select by Categories"
+                          className="w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mb-2"
+                        />
+
+                        {/* Dropdown list for search results */}
+                        {isDropdownOpen && (
+                          <div className="border rounded p-2 max-h-64 overflow-y-auto">
+                            {filteredCategories?.length > 0 ? (
+                              filteredCategories?.map((category) => (
+                                <div
+                                  key={category?._id}
+                                  className={`flex items-center p-2 rounded-lg border cursor-pointer hover:bg-gray-100 ${selectedCategories?.includes(category?.label) ? 'bg-gray-200' : ''}`}
+                                  onClick={() => handleCategorySelectionChange(category?.label)}
+                                >
+                                  <Image
+                                    width={400}
+                                    height={400}
+                                    src={category?.imageUrl}
+                                    alt={category?.label}
+                                    className="h-8 w-8 object-cover rounded"
+                                  />
+                                  <span className="ml-2">{category?.label}</span>
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-gray-500">No categories found</p>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Selected categories display */}
+                        {selectedCategories?.length > 0 && (
+                          <div className="border p-2 rounded mt-2">
+                            <h4 className="text-sm font-semibold mb-2">Selected Categories:</h4>
+                            <ul className="space-y-2">
+                              {selectedCategories?.map((label) => (
+                                <li
+                                  key={label}
+                                  className="flex justify-between items-center bg-gray-100 p-2 rounded"
+                                >
+                                  <span>{label}</span>
+                                  <button
+                                    type='button'
+                                    onClick={() => removeCategory(label)}
+                                    className="text-red-500 text-sm"
+                                  >
+                                    Remove
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
                       {categoryError && <p className="text-red-600 text-left">Select at least one category</p>}
                     </div>
                   </Tab>

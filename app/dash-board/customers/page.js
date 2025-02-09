@@ -17,6 +17,7 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import dynamic from 'next/dynamic';
 import { TbColumnInsertRight } from 'react-icons/tb';
 import { RxCross1 } from "react-icons/rx";
+import PaginationSelect from '@/app/components/layout/PaginationSelect';
 const CustomerPrintButton = dynamic(() => import("@/app/components/layout/CustomerPrintButton"), { ssr: false });
 
 const initialColumns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alternative Phone Number', 'NewsLetter', 'Hometown', 'Status'];
@@ -99,12 +100,9 @@ const Customers = () => {
     }
   });
 
-  const handleItemsPerPageChange = (e) => {
-    // Extracting only the value from the event
-    const value = Number(e.target.value);
-    setItemsPerPage(value); // Set the number of items per page
-    setPage(0); // Reset to the first page
-    refetch(); // Refetch the data with updated items per page
+  const handleItemsPerPageChange = (newValue) => {
+    setItemsPerPage(newValue);
+    setPage(0); // Reset to first page when changing items per page
   };
 
   const handleViewClick = async (orderId) => {
@@ -547,21 +545,11 @@ const Customers = () => {
             currentPage={page}
             onPageChange={setPage}
           />
-          <div className="relative inline-block">
-            <select
-              id="itemsPerPage"
-              value={itemsPerPage}
-              onChange={handleItemsPerPageChange}
-              className="cursor-pointer px-3 py-2 rounded-lg text-sm md:text-base text-gray-800 bg-white shadow-lg border border-gray-300 focus:outline-none hover:bg-gradient-to-tr hover:from-pink-400 hover:to-yellow-400 hover:text-white transition-colors duration-300 appearance-none w-16 md:w-20 lg:w-24"
-            >
-              <option className='bg-white text-black' value={25}>25</option>
-              <option className='bg-white text-black' value={50}>50</option>
-              <option className='bg-white text-black' value={100}>100</option>
-            </select>
-            <svg className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
+          <PaginationSelect
+            options={[25, 50, 100]} // ✅ Pass available options
+            value={itemsPerPage} // ✅ Selected value
+            onChange={handleItemsPerPageChange} // ✅ Handle value change
+          />
         </div>
 
       </div >

@@ -1127,7 +1127,7 @@ const OrdersPage = () => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl px-0 md:px-6 2xl:px-0 mx-auto'>
+      <div className='max-w-screen-2xl px-0 md:px-6 2xl:px-3 mx-auto'>
 
         <div className='flex items-center justify-between py-2 md:py-5 gap-2'>
 
