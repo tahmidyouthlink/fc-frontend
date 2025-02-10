@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { HiArrowNarrowLeft } from "react-icons/hi";
-// import { useAuth } from "@/app/contexts/auth";
+import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
 import useOrders from "@/app/hooks/useOrders";
 import TransitionLink from "@/app/components/ui/TransitionLink";
@@ -17,13 +17,14 @@ import OrderInvoiceButton from "@/app/components/order/details/OrderInvoiceButto
 
 export default function ProductDetails({ params }) {
   const router = useRouter();
-  // const { user } = useAuth();
+  const { user } = useAuth();
   const { setIsPageLoading } = useLoading();
   const [orderList, isOrderListLoading, orderRefetch] = useOrders();
 
   const order = orderList?.find(
-    (order) => order?.orderNumber === params.id.toUpperCase(),
-    // && order?.customerInfo?.email === user?.email,
+    (order) =>
+      order?.orderNumber === params.id.toUpperCase() &&
+      order?.customerInfo?.email === user?.email,
   );
 
   useEffect(() => {
