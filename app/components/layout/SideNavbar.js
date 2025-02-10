@@ -7,7 +7,7 @@ import { MdOutlineSettings, MdPayment, MdOutlineLocationOn, MdOutlineInventory2,
 import { RiContractLine } from "react-icons/ri";
 import { TbBrandGoogleAnalytics, TbMessageCircleQuestion, TbClipboardList, TbBuildingBank } from "react-icons/tb";
 import Image from "next/image";
-import logoWhiteImage from "../../../public/logos/fc-logo.png";
+import logoWhiteImage from "../../../public/logos/logo.png";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
@@ -132,11 +132,10 @@ const SideNavbar = ({ onClose }) => {
         <Link href="/" legacyBehavior>
           <a className="flex items-center gap-2">
             <Image
-              className="h-[14px] md:h-6 w-auto"
+              className="h-9 md:h-10 w-auto"
               src={logoWhiteImage}
               alt="Fashion Commerce logo"
             />
-            <h1 className="text-xs md:text-lg">Fashion Commerce</h1>
           </a>
         </Link>
       </div>

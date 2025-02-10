@@ -1366,8 +1366,8 @@ const EditProductPage = () => {
                         selectedKey={discountType}
                         onSelectionChange={handleTabChange}
                       >
-                        <Tab key="Percentage" title="Percentage">Discount (%)</Tab>
-                        <Tab key="Flat" title="Flat">Flat Discount (taka)</Tab>
+                        <Tab className='text-[#9F5216]' key="Percentage" title="Percentage">Discount (%)</Tab>
+                        <Tab className='text-[#9F5216]' key="Flat" title="Flat">Flat Discount (taka)</Tab>
                       </Tabs>
 
                       <input
