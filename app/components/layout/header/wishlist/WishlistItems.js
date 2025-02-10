@@ -1,0 +1,129 @@
+import Image from "next/image";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
+import { CgTrash } from "react-icons/cg";
+import { useAuth } from "@/app/contexts/auth";
+import { useLoading } from "@/app/contexts/loading";
+import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import useOffers from "@/app/hooks/useOffers";
+import { calculateFinalPrice } from "@/app/utils/orderCalculations";
+import TransitionLink from "@/app/components/ui/TransitionLink";
+
+export default function WishlistItems({
+  wishlistItems,
+  productList,
+  setIsWishlistDrawerOpen,
+}) {
+  const axiosPublic = useAxiosPublic();
+  const { user, userData, setUserData } = useAuth();
+  const { setIsPageLoading } = useLoading();
+  const [specialOffers, isSpecialOffersLoading, specialOffersRefetch] =
+    useOffers();
+
+  useEffect(() => {
+    setIsPageLoading(isSpecialOffersLoading || !specialOffers?.length);
+
+    return () => setIsPageLoading(false);
+  }, [isSpecialOffersLoading, specialOffers]);
+
+  const removeWishlistItem = async (wishlistItemId) => {
+    setIsPageLoading(true);
+
+    const updatedWishlist = wishlistItems.filter(
+      (item) => item._id !== wishlistItemId,
+    );
+
+    // Save item in local wishlist
+    localStorage.setItem("wishlistItems", JSON.stringify(updatedWishlist));
+
+    // Save item in server wishlist, if user is logged in
+    if (!!user) {
+      const updatedUserData = {
+        ...userData,
+        wishlistItems: updatedWishlist,
+      };
+
+      try {
+        const response = await axiosPublic.put(
+          `/updateUserInformation/${userData?._id}`,
+          updatedUserData,
+        );
+
+        if (!!response?.data?.modifiedCount) setUserData(updatedUserData);
+      } catch (error) {
+        toast.error("Failed to update wishlist on server."); // If server error occurs
+      }
+    }
+
+    window.dispatchEvent(new Event("storageWishlist"));
+    setIsPageLoading(false);
+  };
+
+  return (
+    <ul className="mb-4 space-y-2.5">
+      {wishlistItems.map((wishlistItemInfo) => {
+        const wishlistItem = productList?.find(
+          (product) => product._id === wishlistItemInfo._id,
+        );
+
+        return (
+          <li
+            key={"wishlist-item-" + wishlistItemInfo?._id}
+            className="flex w-full items-stretch justify-between gap-x-2.5 rounded-lg bg-white p-2.5 shadow-[2px_2px_10px_0_rgba(0,0,0,0.025)]"
+          >
+            {/* Wishlist Item Image (with link to product page) */}
+            <TransitionLink
+              href={`/product/${wishlistItem?.productTitle?.split(" ")?.join("-")?.toLowerCase()}`}
+              className="relative min-h-full overflow-hidden rounded-md bg-[#F0F0F0] max-sm:w-16 sm:aspect-[1.1/1] sm:h-14"
+              hasDrawer={true}
+              setIsDrawerOpen={setIsWishlistDrawerOpen}
+            >
+              {!!wishlistItem?.productVariants[0]?.imageUrls[0] && (
+                <Image
+                  className="h-full w-full object-contain"
+                  src={wishlistItem?.productVariants[0]?.imageUrls[0]}
+                  alt={wishlistItem?.productTitle}
+                  fill
+                  sizes="15vh"
+                />
+              )}
+            </TransitionLink>
+            <div className="flex min-h-full grow flex-col justify-between text-neutral-400">
+              {/* Wishlist Item Title (with link to product page) */}
+              <div className="flex justify-between gap-x-5">
+                <TransitionLink
+                  href={`/product/${wishlistItem?.productTitle?.split(" ")?.join("-")?.toLowerCase()}`}
+                  className="block underline-offset-1 hover:underline"
+                  hasDrawer={true}
+                  setIsDrawerOpen={setIsWishlistDrawerOpen}
+                >
+                  <h4 className="text-neutral-600">
+                    {wishlistItem?.productTitle}
+                  </h4>
+                </TransitionLink>
+                {/* Wishlist Item Price */}
+                <span className="shrink-0 text-neutral-600">
+                  ৳{" "}
+                  {calculateFinalPrice(
+                    wishlistItem,
+                    specialOffers,
+                  ).toLocaleString()}
+                </span>
+              </div>
+              <div className="flex grow items-end justify-between">
+                {/* Wishlist Item Remove Button */}
+                <button
+                  className="mt-auto flex w-fit cursor-pointer items-center justify-between gap-x-1 font-semibold transition-[color] duration-300 ease-in-out hover:text-red-500"
+                  onClick={() => removeWishlistItem(wishlistItem?._id)}
+                >
+                  <CgTrash className="text-sm" />
+                  <p className="text-xs">Remove</p>
+                </button>
+              </div>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}

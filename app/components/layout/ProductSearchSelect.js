@@ -1,16 +1,17 @@
-import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 
 const ProductSearchSelect = ({ productList, onSelectionChange }) => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   // Filter products based on search input and remove already selected products
-  const filteredProducts = productList.filter((product) =>
-    product.productId.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    !selectedProducts.includes(product.productId) // Exclude already selected products
+  const filteredProducts = productList?.filter(
+    (product) =>
+      product.productId.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      !selectedProducts.includes(product.productId), // Exclude already selected products
   );
 
   // Handle adding/removing product selection
@@ -18,7 +19,9 @@ const ProductSearchSelect = ({ productList, onSelectionChange }) => {
     let updatedSelectedProducts;
     if (selectedProducts.includes(productId)) {
       // Remove product from selection
-      updatedSelectedProducts = selectedProducts.filter((id) => id !== productId);
+      updatedSelectedProducts = selectedProducts.filter(
+        (id) => id !== productId,
+      );
     } else {
       // Add product to selection
       updatedSelectedProducts = [...selectedProducts, productId];
@@ -30,7 +33,9 @@ const ProductSearchSelect = ({ productList, onSelectionChange }) => {
 
   // Handle removing product directly from selected list
   const removeProduct = (productId) => {
-    const updatedSelectedProducts = selectedProducts.filter((id) => id !== productId);
+    const updatedSelectedProducts = selectedProducts.filter(
+      (id) => id !== productId,
+    );
     setSelectedProducts(updatedSelectedProducts);
     onSelectionChange(updatedSelectedProducts); // Pass selected products to parent component
   };
@@ -48,14 +53,14 @@ const ProductSearchSelect = ({ productList, onSelectionChange }) => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [dropdownRef]);
 
   return (
-    <div className="w-full max-w-md mx-auto" ref={dropdownRef}>
+    <div className="mx-auto w-full max-w-md" ref={dropdownRef}>
       {/* Search Box */}
       <input
         type="text"
@@ -63,26 +68,30 @@ const ProductSearchSelect = ({ productList, onSelectionChange }) => {
         onChange={(e) => setSearchTerm(e.target.value)}
         onClick={handleInputClick} // Toggle dropdown on input click
         placeholder="Search & Select by Product ID's"
-        className="w-full p-2 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md mb-2"
+        className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#D2016E]"
       />
 
       {/* Dropdown list for search results */}
       {isDropdownOpen && (
-        <div className="border rounded p-2 max-h-64 overflow-y-auto">
+        <div className="max-h-64 overflow-y-auto rounded border p-2">
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
               <div
                 key={product._id}
-                className={`flex items-center justify-between p-2 cursor-pointer hover:bg-gray-100 ${selectedProducts.includes(product.productId) ? 'bg-gray-200' : ''
-                  }`}
+                className={`flex cursor-pointer items-center justify-between p-2 hover:bg-gray-100 ${
+                  selectedProducts.includes(product.productId)
+                    ? "bg-gray-200"
+                    : ""
+                }`}
                 onClick={() => toggleProductSelection(product.productId)}
               >
                 <div className="flex items-center gap-2">
                   <Image
-                    width={400} height={400}
+                    width={400}
+                    height={400}
                     src={product.imageUrls[0]}
                     alt={product.productId}
-                    className="h-8 w-8 object-contain rounded"
+                    className="h-8 w-8 rounded object-contain"
                   />
                   <p>{product.productId}</p>
                 </div>
@@ -96,18 +105,18 @@ const ProductSearchSelect = ({ productList, onSelectionChange }) => {
 
       {/* Selected products display */}
       {selectedProducts.length > 0 && (
-        <div className="border p-2 rounded mt-2">
-          <h4 className="text-sm font-semibold mb-2">Selected Products:</h4>
+        <div className="mt-2 rounded border p-2">
+          <h4 className="mb-2 text-sm font-semibold">Selected Products:</h4>
           <ul className="space-y-2">
             {selectedProducts.map((id) => (
               <li
                 key={id}
-                className="flex justify-between items-center bg-gray-100 p-2 rounded"
+                className="flex items-center justify-between rounded bg-gray-100 p-2"
               >
                 <span>{id}</span>
                 <button
                   onClick={() => removeProduct(id)}
-                  className="text-red-500 text-sm"
+                  className="text-sm text-red-500"
                 >
                   Remove
                 </button>

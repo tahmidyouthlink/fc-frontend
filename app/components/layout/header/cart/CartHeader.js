@@ -1,0 +1,62 @@
+import { CgClose, CgTrash } from "react-icons/cg";
+import { useAuth } from "@/app/contexts/auth";
+import { useLoading } from "@/app/contexts/loading";
+import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+
+export default function CartHeader({ totalItems, setIsCartDrawerOpen }) {
+  const { user, userData, setUserData } = useAuth();
+  const { setIsPageLoading } = useLoading();
+
+  const removeAllItems = async () => {
+    setIsPageLoading(true);
+
+    // Remove all items from local cart
+    localStorage.removeItem("cartItems");
+
+    // Remove all cart items from server cart, if user is logged in
+    if (!!user) {
+      const updatedUserData = {
+        ...userData,
+        cartItems: [],
+      };
+
+      try {
+        const response = await useAxiosPublic().put(
+          `/updateUserInformation/${userData?._id}`,
+          updatedUserData,
+        );
+
+        if (!!response?.data?.modifiedCount || !!response?.data?.matchedCount) {
+          setUserData(updatedUserData);
+        }
+      } catch (error) {
+        toast.error("Failed to remove all items from cart."); // If server error occurs
+      }
+    }
+
+    setIsPageLoading(false);
+    window.dispatchEvent(new Event("storageCart"));
+  };
+
+  return (
+    <>
+      <div className="flex items-center justify-between">
+        <h3 className="text-base font-semibold md:text-lg">
+          Shopping Cart ({totalItems})
+        </h3>
+        <CgClose
+          className="cursor-pointer"
+          size={24}
+          onClick={() => setIsCartDrawerOpen(false)}
+        />
+      </div>
+      <div
+        className={`mb-3 mt-7 flex w-fit cursor-pointer items-center justify-between gap-x-1.5 text-xs font-semibold text-red-500 md:text-sm ${!totalItems ? "hidden" : ""}`}
+        onClick={() => removeAllItems()}
+      >
+        <CgTrash size={15} />
+        Remove All
+      </div>
+    </>
+  );
+}

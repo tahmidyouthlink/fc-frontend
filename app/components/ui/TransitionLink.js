@@ -7,8 +7,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 export default function TransitionLink({
   children,
   href,
-  hasModal,
-  setIsModalOpen,
+  hasDrawer,
+  setIsDrawerOpen,
   ...props
 }) {
   const router = useRouter();
@@ -25,7 +25,7 @@ export default function TransitionLink({
         : !href.includes(searchParams.get("filterBy")?.split(" ")?.join("+"))
     ) {
       setIsPageLoading(true);
-      if (hasModal) setIsModalOpen(false);
+      if (hasDrawer) setIsDrawerOpen(false);
       router.push(href);
     }
   };

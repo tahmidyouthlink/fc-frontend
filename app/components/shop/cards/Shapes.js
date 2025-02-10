@@ -1,28 +1,8 @@
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import circleWithStarShape from "@/public/shapes/circle-with-star.svg";
 import curvedDottedLineShape from "@/public/shapes/curved-dotted-line-large.svg";
 
-export default function Shapes({ rows }) {
-  const [cardHeight, setCardHeight] = useState(null);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 640) {
-        setCardHeight(250);
-      } else if (window.innerWidth < 1024) {
-        setCardHeight(300);
-      } else {
-        setCardHeight(194);
-      }
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
+export default function Shapes({ cardHeight, rows }) {
   if (!!cardHeight)
     return [...Array(rows)].map((_, index) => (
       <div className="absolute inset-0" key={"shop-shapes-" + (index + 1)}>

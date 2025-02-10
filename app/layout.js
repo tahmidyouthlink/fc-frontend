@@ -1,9 +1,10 @@
 import { Oxygen } from "next/font/google";
-import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { NextUIProvider } from "@nextui-org/react";
 import ReactTanstackProvider from "./utils/Provider/ReactTanstackProvider";
 import { LoadingProvider } from "./contexts/loading";
+import { AuthProvider } from "./contexts/auth";
+import "./globals.css";
 
 const oxygen = Oxygen({ subsets: ["latin"], weight: ["300", "400", "700"] });
 
@@ -22,7 +23,9 @@ export default function RootLayout({ children }) {
       <body className={oxygen.className}>
         <ReactTanstackProvider>
           <NextUIProvider>
-            <LoadingProvider>{children}</LoadingProvider>
+            <AuthProvider>
+              <LoadingProvider>{children}</LoadingProvider>
+            </AuthProvider>
           </NextUIProvider>
           <Toaster />
         </ReactTanstackProvider>

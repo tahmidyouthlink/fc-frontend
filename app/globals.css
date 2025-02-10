@@ -27,6 +27,65 @@
       transform: translateX(-100%);
     }
   }
+
+  @keyframes scroll {
+    0%,
+    40% {
+      transform: translateY(0);
+    }
+    50%,
+    90% {
+      transform: translateY(-2.5rem);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(1turn);
+    }
+  }
+
+  @keyframes worm-length {
+    0% {
+      stroke-dasharray: 28.63 162.25;
+    }
+    25% {
+      stroke-dasharray: 0.1 190.88;
+    }
+    50% {
+      stroke-dasharray: 28.63 162.25;
+    }
+    75% {
+      stroke-dasharray: 0.1 190.88;
+    }
+    100% {
+      stroke-dasharray: 28.63 162.25;
+    }
+  }
+
+  @keyframes worm-move {
+    0% {
+      stroke-dashoffset: 0;
+    }
+    25% {
+      stroke-dashoffset: -38.18;
+    }
+    50% {
+      stroke-dashoffset: -76.36;
+    }
+    75% {
+      stroke-dashoffset: -114.54;
+    }
+    100% {
+      stroke-dashoffset: -152.72;
+    }
+  }
 }
 
 @layer utilities {
@@ -51,14 +110,12 @@
   }
 
   /* For mobile nav links and their icons */
-  nav.mobile div:first-child :is(a:not(:has(img)), li:not(:has(a))) {
+  nav.mobile :is(a:not(:has(img)), li:not(:has(a))) {
     @apply flex items-center gap-x-2.5 rounded-md p-2.5 transition-all duration-100 ease-in-out [&>svg]:h-4 [&>svg]:w-auto;
   }
 
   /* For on hover and active mobile nav links */
-  nav.mobile
-    div:first-child
-    :is(.active, a:not(:has(img)):hover, li:not(:has(a)):hover) {
+  nav.mobile :is(.active, a:not(:has(img)):hover, li:not(:has(a)):hover) {
     @apply bg-green-100 text-green-600;
   }
 
@@ -83,7 +140,15 @@
   }
 
   .payment-methods input::before {
-    @apply absolute inset-0 h-full w-full cursor-pointer rounded-lg border-2 border-neutral-200 bg-white/20 bg-contain bg-center bg-no-repeat bg-origin-content px-5 backdrop-blur-2xl transition-[border,background-color] duration-300 ease-in-out content-[''] checked:border-neutral-400 checked:bg-[#e8ffe4] hover:border-neutral-400 hover:bg-white/75;
+    @apply absolute inset-0 h-full w-full rounded-lg border-2 bg-white/20 bg-contain bg-center bg-no-repeat bg-origin-content px-5 backdrop-blur-2xl transition-[border,background-color] duration-300 ease-in-out content-[''];
+  }
+
+  .payment-methods input:not(:disabled)::before {
+    @apply cursor-pointer border-neutral-200 checked:border-neutral-400 checked:bg-[#e8ffe4] hover:border-neutral-400 hover:bg-white/75;
+  }
+
+  .payment-methods input:disabled::before {
+    @apply cursor-not-allowed border-transparent opacity-45 brightness-75;
   }
 
   .select-with-search [data-slot="input-wrapper"],
@@ -130,8 +195,24 @@
     @apply -mt-1 !h-[22px] [&_label]:top-[calc(50%+8px)];
   }
 
+  .user-into-form-buttons {
+    @apply flex gap-2.5 [&_svg]:text-base;
+  }
+
+  .user-into-form-buttons button {
+    @apply flex items-center gap-1.5 rounded-md p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4;
+  }
+
   .user-sidebar li a {
     @apply flex w-full cursor-pointer items-center gap-2 rounded-md py-2 transition-[background-color] duration-300 ease-in-out hover:bg-green-100 hover:text-green-600 max-sm:px-3 sm:px-2.5 sm:py-2 lg:px-3 lg:py-2.5 [&>svg]:text-base;
+  }
+
+  .custom-desktop-scrollbar {
+    @apply xl:[&::-webkit-scrollbar-thumb:hover]:bg-neutral-600 xl:[&::-webkit-scrollbar-thumb]:rounded-full xl:[&::-webkit-scrollbar-thumb]:bg-neutral-300 xl:[&::-webkit-scrollbar-track]:rounded-full xl:[&::-webkit-scrollbar-track]:bg-neutral-100 xl:[&::-webkit-scrollbar]:w-[9px] xl:[&::-webkit-scrollbar]:rounded-full xl:[&::-webkit-scrollbar]:bg-neutral-100;
+  }
+
+  .animate-blob {
+    @apply pointer-events-none;
   }
 }
 

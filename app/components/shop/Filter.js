@@ -11,8 +11,8 @@ import {
 import { HiOutlineLightningBolt } from "react-icons/hi";
 import { HiChevronDown } from "react-icons/hi2";
 import { LuBadge } from "react-icons/lu";
-import { MdOutlineNewReleases } from "react-icons/md";
-import { TbRosetteDiscount } from "react-icons/tb";
+import { TbGift, TbRosetteDiscount } from "react-icons/tb";
+import { TiStarOutline } from "react-icons/ti";
 
 export default function Filter({
   isFilterButtonClicked,
@@ -20,20 +20,10 @@ export default function Filter({
   filteredProducts,
   selectedFilterOptions,
   setSelectedFilterOptions,
+  isNoFilterOptionSelected,
   calculateFinalPrice,
+  specialOffers,
 }) {
-  // console.log(
-  //   "chk price regular",
-  //   filteredProducts?.map((product) => product.regularPrice),
-  // );
-
-  // console.log("chkchk", filteredProducts?.length);
-
-  // console.log(
-  //   "chk price final",
-  //   filteredProducts?.map((product) => calculateFinalPrice(product)),
-  // );
-
   const filterOptions = [
     {
       label: "Sort by",
@@ -55,7 +45,8 @@ export default function Filter({
       options: [
         "Popular",
         "New Arrivals",
-        // "In Stock",
+        "In Stock",
+        "Special Offers",
         "On Sale",
         "Clear",
       ],
@@ -86,7 +77,6 @@ export default function Filter({
       selectionMode: "multiple",
       type: "select",
       options: [
-        // ...new Set(filteredProducts?.flatMap((product) => product.availableColors)),
         ...[
           ...new Set(
             filteredProducts
@@ -97,16 +87,6 @@ export default function Filter({
         "Clear",
       ],
     },
-    // {
-    //   label: "Materials",
-    //   arrayKey: "materials",
-    //   selectionMode: "multiple",
-    //   type: "select",
-    //   options: [
-    //     ...new Set(filteredProducts?.flatMap((product) => product.materials)),
-    //     "Clear",
-    //   ],
-    // },
     {
       label: "Price",
       arrayKey: "price",
@@ -118,30 +98,20 @@ export default function Filter({
             ? 0
             : Math.min(
                 ...filteredProducts?.map((product) =>
-                  calculateFinalPrice(product),
+                  calculateFinalPrice(product, specialOffers),
                 ),
               ),
           max: !filteredProducts
             ? 0
             : Math.max(
                 ...filteredProducts?.map((product) =>
-                  calculateFinalPrice(product),
+                  calculateFinalPrice(product, specialOffers),
                 ),
               ),
         },
       ],
     },
   ];
-
-  const isNoFilterOptionSelected = () => {
-    return Object.values(selectedFilterOptions).every((value) => {
-      if (Array.isArray(value)) {
-        return value.length === 0;
-      } else {
-        return !value.min || !value.max;
-      }
-    });
-  };
 
   return (
     <section
@@ -155,7 +125,7 @@ export default function Filter({
         {filterOptions.map((filterOption, filterOptionIndex) =>
           filterOption.type === "select" ? (
             <Select
-              key={filterOptionIndex}
+              key={"filter-option-" + filterOption.label + filterOptionIndex}
               className={`w-fit ${selectedFilterOptions[filterOption.arrayKey].length ? "order-first" : "order-last"}`}
               label={
                 <>
@@ -209,6 +179,11 @@ export default function Filter({
                       ? option.label
                       : option
                   }
+                  textValue={
+                    filterOption.label === "Colors" && option !== "Clear"
+                      ? option.label
+                      : option
+                  }
                   startContent={
                     filterOption.label === "Colors" &&
                     option !== "Clear" && (
@@ -233,7 +208,7 @@ export default function Filter({
           ) : (
             <Popover
               placement="bottom-start"
-              key={filterOptionIndex}
+              key={"filter-option-" + filterOption.label + filterOptionIndex}
               offset={5}
               containerPadding={40}
               onOpenChange={(isOpen) => {
@@ -281,8 +256,10 @@ export default function Filter({
                       selectedFilterOptions.price?.min >
                         selectedFilterOptions.price?.max
                     }
-                    value={selectedFilterOptions.price?.min}
-                    defaultValue={filterOption.options[0].min}
+                    value={
+                      selectedFilterOptions.price?.min ||
+                      filterOption.options[0].min
+                    }
                     onValueChange={(value) => {
                       setSelectedFilterOptions((prevOptions) => ({
                         ...prevOptions,
@@ -314,8 +291,10 @@ export default function Filter({
                       selectedFilterOptions.price?.max <
                         selectedFilterOptions.price?.min
                     }
-                    value={selectedFilterOptions.price?.max}
-                    defaultValue={filterOption.options[0].max}
+                    value={
+                      selectedFilterOptions.price?.max ||
+                      filterOption.options[0].max
+                    }
                     onValueChange={(value) => {
                       setSelectedFilterOptions((prevOptions) => ({
                         ...prevOptions,
@@ -333,16 +312,10 @@ export default function Filter({
                 <Slider
                   label="Price Range"
                   aria-label="Price Range"
-                  step={1}
+                  step={100}
                   minValue={filterOption.options[0].min}
                   maxValue={filterOption.options[0].max}
                   value={[
-                    selectedFilterOptions.price?.min ||
-                      filterOption.options[0].min,
-                    selectedFilterOptions.price?.max ||
-                      filterOption.options[0].max,
-                  ]}
-                  defaultValue={[
                     selectedFilterOptions.price?.min ||
                       filterOption.options[0].min,
                     selectedFilterOptions.price?.max ||
@@ -393,7 +366,7 @@ export default function Filter({
             </Popover>
           ),
         )}
-        {!isNoFilterOptionSelected() && (
+        {!isNoFilterOptionSelected && (
           <Button
             disableRipple
             className="z-[1] order-last h-12 w-auto min-w-fit !scale-100 rounded-lg bg-[#d4ffce] px-4 font-semibold text-neutral-700 !opacity-100 shadow-sm hover:bg-[#bdf6b4]"
@@ -404,7 +377,6 @@ export default function Filter({
                 category: new Set([]),
                 sizes: new Set([]),
                 colors: new Set([]),
-                // materials: new Set([]),
                 price: {
                   min: undefined,
                   max: undefined,
@@ -441,8 +413,26 @@ export default function Filter({
             }));
           }}
         >
-          <MdOutlineNewReleases className="h-9 w-6 object-contain" />
+          <div className="relative h-9 w-6">
+            <LuBadge className="h-full w-full object-contain" />
+            <TbGift className="absolute left-1/2 top-1/2 h-full w-[55%] -translate-x-1/2 -translate-y-1/2 object-contain" />
+          </div>
           <p>New Arrival</p>
+        </button>
+        <button
+          className="bg-[#a138b1] hover:bg-[#852c93]"
+          onClick={() => {
+            setSelectedFilterOptions((prevSelectedValues) => ({
+              ...prevSelectedValues,
+              filterBy: ["Special Offers"],
+            }));
+          }}
+        >
+          <div className="relative h-9 w-6">
+            <LuBadge className="h-full w-full object-contain" />
+            <TiStarOutline className="absolute left-1/2 top-1/2 h-full w-2/3 -translate-x-1/2 -translate-y-1/2 object-contain" />
+          </div>
+          <p>Special Offer</p>
         </button>
         <button
           className="bg-[#32aa54] hover:bg-[#2d7843]"

@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { getProductVariantSku } from "@/app/utils/productSkuCalculation";
+import getImageSetsBasedOnColors from "@/app/utils/getImageSetsBasedOnColors";
 import CartModalContents from "./CartModalContents";
 import CartModalButtons from "./CartModalButtons";
 
@@ -6,11 +8,10 @@ export default function AddToCartModal({
   isAddToCartModalOpen,
   setIsAddToCartModalOpen,
   product,
-  calculateFinalPrice,
-  getImageSetsBasedOnColors,
+  primaryLocation,
 }) {
   const [selectedOptions, setSelectedOptions] = useState(null);
-  const [selectedProductSKU, setSelectedProductSKU] = useState(null);
+  const [productVariantSku, setProductVariantSku] = useState(null);
 
   useEffect(() => {
     if (!!product)
@@ -22,22 +23,17 @@ export default function AddToCartModal({
   }, [product]);
 
   useEffect(() => {
-    setSelectedProductSKU(
+    setProductVariantSku(
       !product || !selectedOptions?.size
         ? null
-        : product.productVariants
-            ?.map(
-              (variant) =>
-                variant.color._id === selectedOptions.color._id &&
-                variant.size === selectedOptions.size &&
-                variant.sku,
-            )
-            .reduce((acc, sku) => acc + sku, 0),
+        : getProductVariantSku(
+            product?.productVariants,
+            primaryLocation,
+            selectedOptions.color._id,
+            selectedOptions.size,
+          ),
     );
   }, [product, selectedOptions]);
-
-  // console.log("chk selectedOptions", selectedOptions);
-  // console.log("chk product", product);
 
   useEffect(() => {
     document.body.style.overflow = isAddToCartModalOpen ? "hidden" : "unset";
@@ -64,24 +60,23 @@ export default function AddToCartModal({
       >
         <CartModalContents
           product={product}
+          productVariantSku={productVariantSku}
           imageSets={getImageSetsBasedOnColors(product?.productVariants)}
           setIsAddToCartModalOpen={setIsAddToCartModalOpen}
           selectedOptions={selectedOptions}
           setSelectedOptions={setSelectedOptions}
-          getImageSetsBasedOnColors={getImageSetsBasedOnColors}
-          calculateFinalPrice={calculateFinalPrice}
-          selectedProductSKU={selectedProductSKU}
         />
         <hr className="mb-5 mt-10 h-0.5 bg-neutral-100 md:my-5" />
         <CartModalButtons
-          product={product}
-          imageSets={getImageSetsBasedOnColors(product?.productVariants)}
+          productId={product?._id}
+          defaultColor={
+            product?.availableColors[Object.keys(product?.availableColors)[0]]
+          }
+          productVariantSku={productVariantSku}
           productPageLink={`/product/${product?.productTitle?.split(" ")?.join("-")?.toLowerCase()}`}
           selectedOptions={selectedOptions}
           setSelectedOptions={setSelectedOptions}
           setIsAddToCartModalOpen={setIsAddToCartModalOpen}
-          calculateFinalPrice={calculateFinalPrice}
-          selectedProductSKU={selectedProductSKU}
         />
       </div>
     </div>

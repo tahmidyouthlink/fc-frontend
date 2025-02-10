@@ -1,44 +1,114 @@
+import { useEffect, useRef, useState } from "react";
 import { LuBadge } from "react-icons/lu";
-import { HiOutlineLightningBolt } from "react-icons/hi";
-import { MdOutlineNewReleases } from "react-icons/md";
 import { TbRosetteDiscount } from "react-icons/tb";
+import { TiStarOutline } from "react-icons/ti";
 
 export default function ProductBadges({
-  isTrending,
-  isNewArrival,
+  hasSpecialOffer,
+  specialOffer,
   hasDiscount,
   discount,
 }) {
+  const [specialOfferTextWidth, setSpecialOfferTextWidth] = useState(0);
+  const [discountTextWidth, setDiscountTextWidth] = useState(0);
+  const canvasRef = useRef();
+
+  useEffect(() => {
+    if (hasSpecialOffer) {
+      if (!canvasRef.current) {
+        canvasRef.current = document.createElement("canvas");
+      }
+      const context = canvasRef.current.getContext("2d");
+      context.font = "12px 'Oxygen', sans-serif"; // Match the font styles
+
+      // Extract badge title and value text
+      const titleText = specialOffer.badgeTitle;
+      const valueText =
+        specialOffer.offerDiscountType === "Percentage"
+          ? `${specialOffer.offerDiscountValue}% OFF!`
+          : `৳ ${specialOffer.offerDiscountValue} OFF!`;
+
+      // Measure base widths
+      let computedTitleWidth = context.measureText(titleText).width;
+      let computedValueWidth = context.measureText(valueText).width;
+
+      // Count digits
+      const titleDigitCount = (titleText.match(/\d/g) || []).length;
+      const ValueDigitCount = (valueText.match(/\d/g) || []).length;
+
+      // Slightly increase widths based on number of digits
+      computedTitleWidth += titleDigitCount * 0.1;
+      computedValueWidth += ValueDigitCount * 0.1;
+
+      // Take the maximum width between title and value text
+      let measuredWidth = Math.max(computedTitleWidth, computedValueWidth);
+
+      setSpecialOfferTextWidth(measuredWidth);
+    }
+  }, [specialOffer, hasSpecialOffer]);
+
+  useEffect(() => {
+    if (hasDiscount) {
+      if (!canvasRef.current) {
+        canvasRef.current = document.createElement("canvas");
+      }
+      const context = canvasRef.current.getContext("2d");
+      context.font = "12px 'Oxygen', sans-serif"; // Match the font styles
+      let measuredWidth;
+
+      // Measure the width of the computed discount text
+      measuredWidth = context.measureText(discount.text + " OFF!").width;
+
+      // Adjust width for "Flat" type for extra spacing
+      if (discount.type === "Flat") {
+        measuredWidth += 3; // Add buffer for visual spacing
+      }
+
+      setDiscountTextWidth(measuredWidth);
+    }
+  }, [discount, hasDiscount]);
+
+  const baseWidth = 32; // Width for the icon
+  const padding = 7; // Additional padding
+  const expandedSpecialOfferWidth = baseWidth + specialOfferTextWidth + padding;
+  const expandedDiscountWidth = baseWidth + discountTextWidth + padding;
+
   return (
-    <div className="absolute left-3.5 top-3.5 z-[3] space-y-2">
-      {isTrending && (
-        <div className="relative h-9 w-9 overflow-hidden rounded-lg bg-[#cd4747] font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[background-color,width] hover:w-[calc(36px+58px+10px)]">
-          <div className="relative mx-1.5 h-9 w-6">
-            <LuBadge className="h-full w-full object-contain" />
-            <HiOutlineLightningBolt className="absolute left-1/2 top-1/2 h-full w-2/3 -translate-x-1/2 -translate-y-1/2 object-contain" />
-          </div>
-          <p className="absolute left-9 top-1/2 -translate-y-1/2 text-nowrap text-[13px]">
-            Trending!
-          </p>
-        </div>
-      )}
-      {isNewArrival && (
-        <div className="relative h-9 w-9 overflow-hidden rounded-lg bg-[#5c49d9] font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[background-color,width] hover:w-[calc(36px+31px+10px)]">
-          <MdOutlineNewReleases className="mx-1.5 h-9 w-6 object-contain" />
-          <p className="absolute left-9 top-1/2 -translate-y-1/2 text-nowrap text-[13px]">
-            New!
-          </p>
-        </div>
-      )}
-      {hasDiscount && (
+    <div className="absolute left-3 top-3 z-[3] space-y-2">
+      {hasSpecialOffer ? (
         <div
-          className={`relative h-9 w-9 overflow-hidden rounded-lg bg-[#32aa54] font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[background-color,width] ${discount.type === "Percentage" ? "hover:w-[calc(36px+56px+10px)]" : "hover:w-[calc(36px+68px+10px)]"}`}
+          className="relative w-8 overflow-hidden rounded-lg bg-[#a138b1] font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[width] duration-300 hover:w-[var(--expanded-width)] [&:hover>div:last-child]:animate-[scroll_2s_linear_infinite]"
+          style={{
+            "--expanded-width": `${expandedSpecialOfferWidth}px`,
+          }}
         >
-          <TbRosetteDiscount className="mx-1.5 h-9 w-6 object-contain" />
-          <p className="absolute left-9 top-1/2 -translate-y-1/2 text-nowrap text-[13px]">
-            {discount.text} OFF!
-          </p>
+          <div className="relative mx-1 h-8 w-6">
+            <LuBadge className="h-full w-full object-contain" />
+            <TiStarOutline className="absolute left-1/2 top-1/2 h-full w-2/3 -translate-x-1/2 -translate-y-1/2 object-contain" />
+          </div>
+          <div className="absolute left-8 top-2 flex flex-col gap-6 transition-transform duration-300 ease-in-out [&>p]:pointer-events-none [&>p]:text-nowrap [&>p]:text-xs">
+            <p>{specialOffer.badgeTitle}</p>
+            <p>
+              {specialOffer.offerDiscountType === "Percentage"
+                ? `${specialOffer.offerDiscountValue}% OFF!`
+                : `৳ ${specialOffer.offerDiscountValue} OFF!`}
+            </p>
+          </div>
         </div>
+      ) : (
+        hasDiscount && (
+          <div
+            className="relative h-8 w-8 overflow-hidden rounded-lg bg-[#32aa54] font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-all hover:w-[var(--expanded-width)]"
+            style={{
+              "--expanded-width": `${expandedDiscountWidth}px`,
+            }}
+          >
+            <TbRosetteDiscount className="mx-1 h-8 w-6 object-contain" />
+            <p className="absolute left-8 top-1/2 -translate-y-1/2 text-nowrap text-xs">
+              {discount.text} OFF!
+            </p>
+          </div>
+        )
       )}
     </div>
   );
