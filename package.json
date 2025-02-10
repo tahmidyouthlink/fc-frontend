@@ -21,7 +21,7 @@
     "date-fns": "^3.6.0",
     "file-saver": "^2.0.5",
     "firebase": "^11.1.0",
-    "framer-motion": "^11.3.2",
+    "framer-motion": "^12.4.1",
     "jsbarcode": "^3.11.6",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",

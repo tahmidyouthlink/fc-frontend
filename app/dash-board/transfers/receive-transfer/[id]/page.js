@@ -126,6 +126,8 @@ const ReceiveTransferOrder = () => {
               if (prodVariant.sku >= variant.accept) {
                 // Subtract accept value from SKU
                 prodVariant.sku -= variant.accept;
+                // Update onHandSku
+                prodVariant.onHandSku = (prodVariant.onHandSku || 0) - variant.accept;
                 modifiedProducts.add(product._id); // Track modified product
               }
             }
@@ -139,6 +141,8 @@ const ReceiveTransferOrder = () => {
 
               // Add accept value to SKU
               prodVariant.sku += variant.accept;
+              // Update onHandSku
+              prodVariant.onHandSku = (prodVariant.onHandSku || 0) + variant.accept;
               modifiedProducts.add(product._id); // Track modified product
             }
           });
@@ -156,6 +160,7 @@ const ReceiveTransferOrder = () => {
             const newVariant = {
               ...matchingVariant,
               sku: variant.accept,
+              onHandSku: variant.accept, // Initialize onHandSku
               location: destinationName, // New location
             };
 
@@ -262,7 +267,7 @@ const ReceiveTransferOrder = () => {
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
         <div className='flex items-center justify-between w-full'>
           <div className='flex flex-col w-full'>
-            <h3 className='w-full font-semibold text-base md:text-xl lg:text-2xl'>Receive items</h3>
+            <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>Receive items</h3>
             <span className='text-neutral-500 text-sm'>#{transferOrderNumber}</span>
           </div>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={`/dash-board/transfers/${id}`}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>

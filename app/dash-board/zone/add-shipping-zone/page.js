@@ -3,16 +3,16 @@ import { cities } from '@/app/components/layout/cities';
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
-import { Select, SelectItem } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import React, { useEffect, useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import { AiOutlineEdit } from 'react-icons/ai';
 import { FaPlusCircle } from 'react-icons/fa';
 import { FaArrowLeft } from 'react-icons/fa6';
-import { MdOutlineModeEdit } from 'react-icons/md';
+import { MdCheckBox, MdCheckBoxOutlineBlank, MdOutlineFileUpload } from 'react-icons/md';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
@@ -23,16 +23,54 @@ const AddShippingZone = () => {
   const router = useRouter();
   const [selectedShipmentHandler, setSelectedShipmentHandler] = useState(null);
   const [sizeError, setSizeError] = useState(false);
-  const [selectedCity, setSelectedCity] = useState([]);
-  const [cityError, setCityError] = useState(false);
   const [shipmentHandlerList, isShipmentHandlerPending, refetch] = useShipmentHandlers();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCities, setSelectedCities] = useState([]);
+  const [cityError, setCityError] = useState(false);
+  const [showCitySuggestions, setShowCitySuggestions] = useState(false);
+  const suggestionsRefCity = useRef(null);
 
-  const { register, handleSubmit, control, resetField, formState: { errors } } = useForm();
+  const { register, handleSubmit, resetField, formState: { errors } } = useForm();
 
-  const handleSelectedCityArray = (keys) => {
-    const selectedArray = [...keys];
-    setSelectedCity(selectedArray);
-    setCityError(selectedArray.length === 0);
+  // Filter cities based on the search term and exclude selected cities
+  const filteredCities = cities.filter(
+    (city) =>
+      city.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      !selectedCities.includes(city)
+  );
+
+  // Handle city selection
+  const handleCitySelect = (city) => {
+    if (!selectedCities.includes(city)) {
+      setSelectedCities([...selectedCities, city]);
+    }
+    setSearchTerm(""); // Clear input
+    setShowCitySuggestions(false); // Close suggestions
+    setCityError(false);
+  };
+
+  // Remove selected city
+  const handleCityRemove = (index) => {
+    const updatedCities = [...selectedCities];
+    updatedCities.splice(index, 1);
+    setSelectedCities(updatedCities);
+  };
+
+  // Select all cities
+  const handleSelectAll = () => {
+    setSelectedCities(cities);
+    setCityError(false);
+  };
+
+  // Unselect all cities
+  const handleUnselectAll = () => {
+    setSelectedCities([]);
+    setCityError(true);
+  };
+
+  // Handle input focus
+  const handleInputFocus = () => {
+    setShowCitySuggestions(true);
   };
 
   // Function to handle selection (only one allowed)
@@ -133,7 +171,7 @@ const AddShippingZone = () => {
       hasError = true;
     }
 
-    if (selectedCity.length === 0) {
+    if (selectedCities.length === 0) {
       setCityError(true);
       hasError = true;
     }
@@ -144,35 +182,26 @@ const AddShippingZone = () => {
       return;
     }
 
+    // Prepare shipping charges and times objects
     let shippingCharges = {};
+    let shippingDurations = {};
 
-    // Build the shipping charges object based on the delivery types
-    if (selectedShipmentHandler.deliveryType.length === 1) {
-      // Use the single input for the charge
-      shippingCharges[selectedShipmentHandler.deliveryType[0]] = data.shippingCharge;
-    } else {
-      // Handle multiple delivery types
+    // Handle single delivery type
+    if (selectedShipmentHandler?.deliveryType.length === 1) {
+      const deliveryType = selectedShipmentHandler.deliveryType[0];
+      shippingCharges[deliveryType] = data.shippingCharge;
+      shippingDurations[deliveryType] = data.shippingTime;
+    }
+
+    // Handle multiple delivery types (STANDARD and EXPRESS)
+    if (selectedShipmentHandler?.deliveryType.length === 2) {
       if (selectedShipmentHandler.deliveryType.includes('STANDARD')) {
         shippingCharges['STANDARD'] = data.shippingChargeStandard;
+        shippingDurations['STANDARD'] = data.shippingDaysStandard;
       }
       if (selectedShipmentHandler.deliveryType.includes('EXPRESS')) {
         shippingCharges['EXPRESS'] = data.shippingChargeExpress;
-      }
-    }
-
-    let shippingHours = {};
-
-    // Build the shipping charges object based on the delivery types
-    if (selectedShipmentHandler.deliveryType.length === 1) {
-      // Use the single input for the charge
-      shippingHours[selectedShipmentHandler.deliveryType[0]] = data.shippingHour;
-    } else {
-      // Handle multiple delivery types
-      if (selectedShipmentHandler.deliveryType.includes('STANDARD')) {
-        shippingHours['STANDARD'] = data.shippingHourStandard;
-      }
-      if (selectedShipmentHandler.deliveryType.includes('EXPRESS')) {
-        shippingHours['EXPRESS'] = data.shippingHourExpress;
+        shippingDurations['EXPRESS'] = data.shippingHourExpress;
       }
     }
 
@@ -180,8 +209,8 @@ const AddShippingZone = () => {
       shippingZone,
       selectedShipmentHandler,
       shippingCharges,
-      shippingHours,
-      selectedCity
+      shippingDurations,
+      selectedCity: selectedCities
     };
 
     try {
@@ -233,19 +262,20 @@ const AddShippingZone = () => {
 
   if (isShipmentHandlerPending) {
     return <Loading />
-  }
+  };
 
   return (
     <div className='bg-gray-50 min-h-screen'>
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6 px-6'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Shipping Configuration</h3>
+          <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>Shipping Configuration</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/zone"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
+
         <div className='max-w-screen-xl mx-auto p-6 flex flex-col gap-4'>
 
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
@@ -264,34 +294,82 @@ const AddShippingZone = () => {
             </div>
 
             {/* City Selection */}
-            <div>
-              <Controller
-                name="cities"
-                control={control}
-                defaultValue={selectedCity}
-                render={({ field }) => (
-                  <div>
-                    <Select
-                      label="Select Cities"
-                      selectionMode="multiple"
-                      searchable
-                      placeholder="Select cities"
-                      selectedKeys={new Set(selectedCity)}
-                      onSelectionChange={(keys) => {
-                        handleSelectedCityArray(keys);
-                        field.onChange([...keys]);
-                      }}
-                    >
-                      {cities.map((city) => (
-                        <SelectItem key={city.key}>
-                          {city.label}
-                        </SelectItem>
-                      ))}
-                    </Select>
-                    {cityError && <p className="text-red-600 text-left">Cities are required.</p>}
-                  </div>
-                )}
+            <div className='flex items-center justify-center gap-4'>
+
+              <input
+                type="text"
+                placeholder="Search or select a city"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={handleInputFocus}
+                onBlur={() => setTimeout(() => setShowCitySuggestions(false), 200)} // Delay to allow selection
+                className="p-2 border border-gray-300 w-full flex-1 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
               />
+
+              {/* Select All Button */}
+              {selectedCities?.length > 71 ? "" : <button
+                type="button"
+                onClick={handleSelectAll}
+                className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700"
+              >
+                <MdCheckBox size={18} /> Select All
+              </button>}
+
+              {/* Unselect All Button */}
+              {selectedCities?.length > 2 && <button
+                type="button"
+                onClick={handleUnselectAll}
+                className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700"
+              >
+                <MdCheckBoxOutlineBlank size={20} />  Unselect All
+              </button>}
+
+            </div>
+
+            {/* Suggestions Dropdown */}
+            {showCitySuggestions && (
+              <div>
+                {filteredCities?.length > 0 ?
+                  <ul
+                    ref={suggestionsRefCity}
+                    className="w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto z-[9999]"
+                  >
+                    {filteredCities.map((city, i) => (
+                      <li
+                        key={i}
+                        className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors duration-150"
+                        onClick={() => handleCitySelect(city)}
+                      >
+                        {city}
+                      </li>
+                    ))}
+                  </ul> : <p>No city matches your search.</p>
+                }
+              </div>
+            )}
+
+            {cityError && <p className='text-red-600 text-left'>City selection is required.</p>}
+
+            {/* Selected Cities */}
+            <div>
+              {selectedCities?.length > 0 && <h3 className="mt-2 mb-2 font-semibold">Selected Cities</h3>}
+              <div className='flex flex-wrap gap-3 mb-4'>
+                {selectedCities.map((city, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center bg-gray-100 border border-gray-300 rounded-full py-1 px-3 text-sm text-gray-700"
+                  >
+                    <span>{city}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCityRemove(index)}
+                      className="ml-2 text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-150"
+                    >
+                      <RxCross2 size={19} />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
 
           </div>
@@ -326,7 +404,7 @@ const AddShippingZone = () => {
 
                     <div className="group relative">
                       <button>
-                        <MdOutlineModeEdit
+                        <AiOutlineEdit
                           onClick={(e) => handleEditShipmentHandler(e, shipmentHandler._id)}
                           size={22}
                           className="text-blue-500 hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200"
@@ -380,22 +458,28 @@ const AddShippingZone = () => {
 
                 <div className='w-full'>
                   <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                    {selectedShipmentHandler?.deliveryType[0]} Shipping Hours
+                    {selectedShipmentHandler?.deliveryType[0]} Shipping {selectedShipmentHandler?.deliveryType[0] === "express" ? "Hours" : "Days"}
                   </label>
                   <input
-                    type="number"
-                    placeholder={`Enter Shipping hours for ${selectedShipmentHandler?.deliveryType[0]}`}
-                    {...register('shippingHour', { required: 'Shipping Hour is required' })}
+                    type="text"
+                    placeholder={`Enter Shipping ${selectedShipmentHandler?.deliveryType[0] === "express" ? "hours" : "days"} for ${selectedShipmentHandler?.deliveryType[0]}`}
+                    {...register('shippingTime', { required: `Shipping ${selectedShipmentHandler?.deliveryType[0] === "express" ? "Hour" : "Days"} is required` })}
                     className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                    onKeyDown={(e) => {
+                      const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', '-'];
+                      if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+                        e.preventDefault();
+                      }
+                    }}
                   />
-                  {errors.shippingHour && (
-                    <p className="text-red-600 text-left">{errors?.shippingHour?.message}</p>
+                  {errors.shippingTime && (
+                    <p className="text-red-600 text-left">{errors?.shippingTime?.message}</p>
                   )}
                 </div>
               </div>
             </div>}
-            {/* Shipping Charge Input */}
 
+            {/* Shipping Charge Input */}
             {selectedShipmentHandler?.deliveryType?.length === 2 && <div className="w-full mt-4">
               {/* Conditionally render shipping charge input fields based on deliveryType */}
 
@@ -419,16 +503,22 @@ const AddShippingZone = () => {
                   <div className='w-full'>
                     {/* Input for STANDARD shipping charge */}
                     <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                      STANDARD Hours
+                      STANDARD Days
                     </label>
                     <input
                       type="text"
-                      placeholder="Enter Shipping hour for STANDARD"
-                      {...register('shippingHourStandard', { required: 'STANDARD Shipping hour is required' })}
+                      placeholder="Enter Shipping days for STANDARD"
+                      {...register('shippingDaysStandard', { required: 'STANDARD Shipping days is required' })}
                       className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                      onKeyDown={(e) => {
+                        const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', '-'];
+                        if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                     />
-                    {errors.shippingHourStandard && (
-                      <p className="text-red-600 text-left">{errors?.shippingHourStandard?.message}</p>
+                    {errors.shippingDaysStandard && (
+                      <p className="text-red-600 text-left">{errors?.shippingDaysStandard?.message}</p>
                     )}
                   </div>
                 </div>
@@ -459,6 +549,12 @@ const AddShippingZone = () => {
                       placeholder="Add Shipping hour for EXPRESS"
                       {...register('shippingHourExpress', { required: 'EXPRESS Shipping hour is required' })}
                       className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                      onKeyDown={(e) => {
+                        const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', '-'];
+                        if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                     />
                     {errors.shippingHourExpress && (
                       <p className="text-red-600 text-left">{errors?.shippingHourExpress?.message}</p>
@@ -472,15 +568,12 @@ const AddShippingZone = () => {
 
           {/* Submit Button */}
           <div className='flex justify-end items-center'>
-            <button
-              type='submit'
-              disabled={isSubmitting}
-              className={`mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium ${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium`}
-            >
-              {isSubmitting ? 'Submitting...' : 'Submit'}
+            <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700 mt-4 mb-8`}>
+              {isSubmitting ? 'Submitting...' : 'Submit'} <MdOutlineFileUpload size={20} />
             </button>
           </div>
         </div>
+
       </form>
     </div>
   );

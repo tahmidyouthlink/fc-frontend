@@ -1,8 +1,8 @@
 "use client";
 
-import { useLoading } from "@/app/contexts/loading";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useLoading } from "@/app/contexts/loading";
 
 export default function TransitionLink({
   children,

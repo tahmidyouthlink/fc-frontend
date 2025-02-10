@@ -245,7 +245,7 @@ const EditTransferOrder = () => {
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
         <div className='flex flex-wrap md:flex-nowrap items-center justify-between w-full'>
-          <h3 className='w-full font-semibold text-base md:text-xl lg:text-2xl'>#{transferOrderNumber} <span
+          <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700l'>#{transferOrderNumber} <span
             className={`px-3 py-1 rounded-full
       ${transferOrderStatus === "pending" ? "bg-yellow-100 text-yellow-600"
                 : transferOrderStatus === "received" ? "bg-green-100 text-green-600"

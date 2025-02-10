@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import { Checkbox } from '@nextui-org/react';
+import { MdOutlineFileUpload } from 'react-icons/md';
 
 const AddLocation = () => {
   const axiosPublic = useAxiosPublic();
@@ -81,7 +82,7 @@ const AddLocation = () => {
 
       <div className='max-w-screen-lg mx-auto pt-3 md:pt-6'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-base md:text-xl lg:text-2xl'>Location Configuration</h3>
+          <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>Location Configuration</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/locations"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
@@ -188,12 +189,8 @@ const AddLocation = () => {
 
           {/* Submit Button */}
           <div className='flex justify-end items-center'>
-            <button
-              type='submit'
-              disabled={isSubmitting}
-              className={`mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium ${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium`}
-            >
-              {isSubmitting ? 'Submitting...' : 'Submit'}
+            <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}>
+              {isSubmitting ? 'Submitting...' : 'Submit'} <MdOutlineFileUpload size={20} />
             </button>
           </div>
         </div>

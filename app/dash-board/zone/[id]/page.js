@@ -2,7 +2,7 @@
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { Select, SelectItem } from '@nextui-org/react';
 import { useRouter, useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
@@ -12,6 +12,8 @@ import Image from 'next/image';
 import useShipmentHandlers from '@/app/hooks/useShipmentHandlers';
 import Loading from '@/app/components/shared/Loading/Loading';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
+import { MdCheckBox, MdCheckBoxOutlineBlank } from 'react-icons/md';
+import { FiSave } from 'react-icons/fi';
 
 export default function EditShippingZone() {
   const router = useRouter();
@@ -20,8 +22,11 @@ export default function EditShippingZone() {
   const [selectedShipmentHandler, setSelectedShipmentHandler] = useState(null);
   const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
   const [sizeError, setSizeError] = useState(false);
-  const [selectedCity, setSelectedCity] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCities, setSelectedCities] = useState([]);
   const [cityError, setCityError] = useState(false);
+  const [showCitySuggestions, setShowCitySuggestions] = useState(false);
+  const suggestionsRefCity = useRef(null);
 
   const {
     register, handleSubmit, setValue, control, formState: { errors, isSubmitting }
@@ -33,7 +38,7 @@ export default function EditShippingZone() {
         const { data } = await axiosPublic.get(`/getSingleShippingZone/${params.id}`);
 
         setValue('shippingZone', data?.shippingZone);
-        setSelectedCity(data?.selectedCity);
+        setSelectedCities(data?.selectedCity);
         setSelectedShipmentHandler(data?.selectedShipmentHandler);
 
         // Set shipping charges based on delivery types
@@ -55,23 +60,29 @@ export default function EditShippingZone() {
               }
             }
           }
+        }
+
+        // Set shipping durations based on delivery types
+        if (data?.shippingDurations) {
+          const deliveryTypes = data?.selectedShipmentHandler?.deliveryType;
 
           if (deliveryTypes) {
             if (deliveryTypes.length === 1) {
-              // Only one delivery type, set the single shipping charge
+              // Only one delivery type, set the single shipping duration
               const deliveryType = deliveryTypes[0];
-              setValue('shippingHour', data.shippingHours[deliveryType]);
+              setValue('shippingTime', data.shippingDurations[deliveryType]);
             } else if (deliveryTypes.length > 1) {
-              // Set values for both STANDARD and EXPRESS charges
-              if (data.shippingCharges.STANDARD) {
-                setValue('shippingHourStandard', data.shippingHours.STANDARD);
+              // Set values for both STANDARD and EXPRESS durations
+              if (data.shippingDurations.STANDARD) {
+                setValue('shippingDaysStandard', data.shippingDurations.STANDARD);
               }
-              if (data.shippingCharges.EXPRESS) {
-                setValue('shippingHourExpress', data.shippingHours.EXPRESS);
+              if (data.shippingDurations.EXPRESS) {
+                setValue('shippingHourExpress', data.shippingDurations.EXPRESS);
               }
             }
           }
         }
+
       } catch (error) {
         toast.error("Failed to load shipping zone details.");
       }
@@ -80,20 +91,54 @@ export default function EditShippingZone() {
     fetchShippingZone();
   }, [params.id, setValue, axiosPublic]);
 
-  const handleSelectedCityArray = (keys) => {
-    const selectedArray = [...keys];
-    setSelectedCity(selectedArray);
-    setCityError(selectedArray.length === 0);
+  // Filter cities based on the search term and exclude selected cities
+  const filteredCities = cities.filter((city) => city.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    !selectedCities.includes(city)
+  );
+
+  // Handle city selection
+  const handleCitySelect = (city) => {
+    if (!selectedCities.includes(city)) {
+      setSelectedCities([...selectedCities, city]);
+    }
+    setSearchTerm(""); // Clear input
+    setShowCitySuggestions(false); // Close suggestions
+    setCityError(false);
   };
 
-  const toggleLogoSelection = (shipmentHandler) => {
-    if (selectedShipmentHandler?._id === shipmentHandler._id) {
-      setSelectedShipmentHandler(null);
-    } else {
-      setSelectedShipmentHandler(shipmentHandler);
-      setSizeError(false); // Clear error when a handler is selected
-    }
+  // Remove selected city
+  const handleCityRemove = (index) => {
+    const updatedCities = [...selectedCities];
+    updatedCities.splice(index, 1);
+    setSelectedCities(updatedCities);
   };
+
+  // Select all cities
+  const handleSelectAll = () => {
+    setSelectedCities(cities);
+    setCityError(false);
+  };
+
+  // Unselect all cities
+  const handleUnselectAll = () => {
+    setSelectedCities([]);
+    setCityError(true);
+  };
+
+  // Handle input focus
+  const handleInputFocus = () => {
+    setShowCitySuggestions(true);
+  };
+
+  // if needed then apply edit option for logo selection
+  // const toggleLogoSelection = (shipmentHandler) => {
+  //   if (selectedShipmentHandler?._id === shipmentHandler._id) {
+  //     setSelectedShipmentHandler(null);
+  //   } else {
+  //     setSelectedShipmentHandler(shipmentHandler);
+  //     setSizeError(false); // Clear error when a handler is selected
+  //   }
+  // };
 
   const onSubmit = async (formData) => {
     let hasError = false;
@@ -102,34 +147,33 @@ export default function EditShippingZone() {
     if (!selectedShipmentHandler) {
       setSizeError(true);
       hasError = true;
+    };
+
+    if (selectedCities.length === 0) {
+      setCityError(true);
+      hasError = true;
     }
 
+    // Prepare shipping charges and times objects
     let shippingCharges = {};
+    let shippingDurations = {};
 
+    // Handle single delivery type
     if (selectedShipmentHandler?.deliveryType.length === 1) {
-      shippingCharges[selectedShipmentHandler.deliveryType[0]] = formData.shippingCharge;
-    } else {
-      if (selectedShipmentHandler?.deliveryType.includes('STANDARD')) {
-        shippingCharges['STANDARD'] = formData.shippingChargeStandard;
-      }
-      if (selectedShipmentHandler?.deliveryType.includes('EXPRESS')) {
-        shippingCharges['EXPRESS'] = formData.shippingChargeExpress;
-      }
+      const deliveryType = selectedShipmentHandler.deliveryType[0];
+      shippingCharges[deliveryType] = formData.shippingCharge;
+      shippingDurations[deliveryType] = formData.shippingTime;
     }
 
-    let shippingHours = {};
-
-    // Build the shipping charges object based on the delivery types
-    if (selectedShipmentHandler.deliveryType.length === 1) {
-      // Use the single input for the charge
-      shippingHours[selectedShipmentHandler.deliveryType[0]] = formData.shippingHour;
-    } else {
-      // Handle multiple delivery types
+    // Handle multiple delivery types (STANDARD and EXPRESS)
+    if (selectedShipmentHandler?.deliveryType.length === 2) {
       if (selectedShipmentHandler.deliveryType.includes('STANDARD')) {
-        shippingHours['STANDARD'] = formData.shippingHourStandard;
+        shippingCharges['STANDARD'] = formData.shippingChargeStandard;
+        shippingDurations['STANDARD'] = formData.shippingDaysStandard;
       }
       if (selectedShipmentHandler.deliveryType.includes('EXPRESS')) {
-        shippingHours['EXPRESS'] = formData.shippingHourExpress;
+        shippingCharges['EXPRESS'] = formData.shippingChargeExpress;
+        shippingDurations['EXPRESS'] = formData.shippingHourExpress;
       }
     }
 
@@ -140,8 +184,8 @@ export default function EditShippingZone() {
         shippingZone: formData.shippingZone,
         selectedShipmentHandler: selectedShipmentHandler,
         shippingCharges,
-        shippingHours,
-        selectedCity: selectedCity
+        shippingDurations,
+        selectedCity: selectedCities
       };
 
       const res = await axiosPublic.put(`/editShippingZone/${params.id}`, updatedShippingZone);
@@ -194,6 +238,7 @@ export default function EditShippingZone() {
 
   return (
     <div className='bg-gray-50 min-h-screen'>
+
       <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
         <div className='flex items-center justify-between'>
           <h3 className='w-full font-semibold text-xl lg:text-2xl'>Shipping Settings</h3>
@@ -212,6 +257,7 @@ export default function EditShippingZone() {
               <label className="flex justify-start font-medium text-[#9F5216] pb-2">Shipping Zone</label>
               <input
                 type="text"
+                disabled
                 placeholder="Add Shipping Zone"
                 {...register('shippingZone', { required: 'Shipping Zone is required' })}
                 className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
@@ -221,39 +267,83 @@ export default function EditShippingZone() {
               )}
             </div>
 
-            {/* Selected City */}
-            <div>
-              <Controller
-                name="cities"
-                control={control}
-                defaultValue={selectedCity}
-                render={({ field }) => (
-                  <div>
-                    <Select
-                      label="Select Cities"
-                      selectionMode="multiple"
-                      value={selectedCity}
-                      searchable
-                      placeholder="Select cities"
-                      selectedKeys={new Set(selectedCity)}
-                      onSelectionChange={(keys) => {
-                        handleSelectedCityArray(keys);
-                        field.onChange([...keys]);
-                      }}
-                    >
-                      {cities?.map((city) => (
-                        <SelectItem key={city.key}>
-                          {city.label}
-                        </SelectItem>
-                      ))}
-                    </Select>
-                    {/* Display error message if no cities are selected */}
-                    {cityError && (
-                      <p className="text-red-600 text-left mt-1 text-sm">At least one city must be selected.</p>
-                    )}
-                  </div>
-                )}
+            {/* City Selection */}
+            <div className='flex items-center justify-center gap-4'>
+
+              <input
+                type="text"
+                placeholder="Search or select a city"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={handleInputFocus}
+                onBlur={() => setTimeout(() => setShowCitySuggestions(false), 200)} // Delay to allow selection
+                className="p-2 border border-gray-300 w-full flex-1 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
               />
+
+              {/* Select All Button */}
+              {selectedCities?.length > 71 ? "" : <button
+                type="button"
+                onClick={handleSelectAll}
+                className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700"
+              >
+                <MdCheckBox size={18} /> Select All
+              </button>}
+
+              {/* Unselect All Button */}
+              {selectedCities?.length > 2 && <button
+                type="button"
+                onClick={handleUnselectAll}
+                className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700"
+              >
+                <MdCheckBoxOutlineBlank size={20} /> Unselect All
+              </button>}
+
+            </div>
+
+            {/* Suggestions Dropdown */}
+            {showCitySuggestions && (
+              <div>
+                {filteredCities?.length > 0 ?
+                  <ul
+                    ref={suggestionsRefCity}
+                    className="w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-64 overflow-y-auto z-[9999]"
+                  >
+                    {filteredCities.map((city, i) => (
+                      <li
+                        key={i}
+                        className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors duration-150"
+                        onClick={() => handleCitySelect(city)}
+                      >
+                        {city}
+                      </li>
+                    ))}
+                  </ul> : <p>No city matches your search.</p>
+                }
+              </div>
+            )}
+
+            {cityError && <p className='text-red-600 text-left'>City selection is required.</p>}
+
+            {/* Selected Cities */}
+            <div>
+              {selectedCities?.length > 0 && <h3 className="mt-2 mb-2 font-semibold">Selected Cities</h3>}
+              <div className='flex flex-wrap gap-3 mb-4'>
+                {selectedCities.map((city, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center bg-gray-100 border border-gray-300 rounded-full py-1 px-3 text-sm text-gray-700"
+                  >
+                    <span>{city}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCityRemove(index)}
+                      className="ml-2 text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-150"
+                    >
+                      <RxCross2 size={19} />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
 
           </div>
@@ -265,19 +355,18 @@ export default function EditShippingZone() {
             <div className="flex flex-wrap items-center justify-start gap-4">
               {shipmentHandlerList?.map((shipmentHandler) => (
                 <div
-                  key={shipmentHandler._id}  // Always use unique keys
-                  onClick={() => toggleLogoSelection(shipmentHandler)}
+                  key={shipmentHandler?._id}  // Always use unique keys
+                  // onClick={() => toggleLogoSelection(shipmentHandler)}
                   className={`cursor-pointer border-2 rounded-md p-2 ${selectedShipmentHandler?._id === shipmentHandler._id ? 'border-blue-500' : 'border-gray-300'}`}
                 >
                   {shipmentHandler?.imageUrl && <Image src={shipmentHandler?.imageUrl} alt="shipment" height={300} width={300} className="h-24 w-24 xl:h-32 xl:w-32 object-contain" />}
-                  <p className="text-center">{shipmentHandler.shipmentHandlerName}</p>
+                  <p className="text-center">{shipmentHandler?.shipmentHandlerName}</p>
                 </div>
               ))}
               {/* Display error message if no shipment handler is selected */}
               {sizeError && <p className='text-red-600 text-left mt-1'>Please select at least one shipment handler.</p>}
             </div>
 
-            {/* Shipping Charge Fields */}
             {selectedShipmentHandler?.deliveryType.length === 1 && <div className="w-full mt-4">
               {/* Conditionally render shipping charge input fields based on deliveryType */}
               <div className='flex flex-col md:flex-row gap-6 items-center justify-between w-full'>
@@ -287,6 +376,7 @@ export default function EditShippingZone() {
                   </label>
                   <input
                     type="number"
+                    disabled
                     placeholder={`Enter Shipping Charge for ${selectedShipmentHandler?.deliveryType[0]}`}
                     {...register('shippingCharge', { required: 'Shipping Charge is required' })}
                     className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
@@ -298,22 +388,23 @@ export default function EditShippingZone() {
 
                 <div className='w-full'>
                   <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                    {selectedShipmentHandler?.deliveryType[0]} Shipping Hours
+                    {selectedShipmentHandler?.deliveryType[0]} Shipping {selectedShipmentHandler?.deliveryType[0] === "express" ? "Hours" : "Days"}
                   </label>
                   <input
-                    type="number"
-                    placeholder={`Enter Shipping hours for ${selectedShipmentHandler?.deliveryType[0]}`}
-                    {...register('shippingHour', { required: 'Shipping Hour is required' })}
+                    type="text"
+                    disabled
+                    placeholder={`Enter Shipping ${selectedShipmentHandler?.deliveryType[0] === "express" ? "hours" : "days"} for ${selectedShipmentHandler?.deliveryType[0]}`}
+                    {...register('shippingTime', { required: `Shipping ${selectedShipmentHandler?.deliveryType[0] === "express" ? "Hour" : "Days"} is required` })}
                     className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                   />
-                  {errors.shippingHour && (
-                    <p className="text-red-600 text-left">{errors?.shippingHour?.message}</p>
+                  {errors.shippingTime && (
+                    <p className="text-red-600 text-left">{errors?.shippingTime?.message}</p>
                   )}
                 </div>
               </div>
             </div>}
-            {/* Shipping Charge Input */}
 
+            {/* Shipping Charge Input */}
             {selectedShipmentHandler?.deliveryType?.length === 2 && <div className="w-full mt-4">
               {/* Conditionally render shipping charge input fields based on deliveryType */}
 
@@ -326,6 +417,7 @@ export default function EditShippingZone() {
                     </label>
                     <input
                       type="number"
+                      disabled
                       placeholder="Enter Shipping Charge for STANDARD"
                       {...register('shippingChargeStandard', { required: 'STANDARD Shipping Charge is required' })}
                       className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
@@ -337,16 +429,17 @@ export default function EditShippingZone() {
                   <div className='w-full'>
                     {/* Input for STANDARD shipping charge */}
                     <label className="flex justify-start font-medium text-[#9F5216] pb-2">
-                      STANDARD Hours
+                      STANDARD Days
                     </label>
                     <input
                       type="text"
-                      placeholder="Enter Shipping hour for STANDARD"
-                      {...register('shippingHourStandard', { required: 'STANDARD Shipping hour is required' })}
+                      disabled
+                      placeholder="Enter Shipping days for STANDARD"
+                      {...register('shippingDaysStandard', { required: 'STANDARD Shipping days is required' })}
                       className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                     />
-                    {errors.shippingHourStandard && (
-                      <p className="text-red-600 text-left">{errors?.shippingHourStandard?.message}</p>
+                    {errors.shippingDaysStandard && (
+                      <p className="text-red-600 text-left">{errors?.shippingDaysStandard?.message}</p>
                     )}
                   </div>
                 </div>
@@ -359,6 +452,7 @@ export default function EditShippingZone() {
                     </label>
                     <input
                       type="number"
+                      disabled
                       placeholder="Add Shipping Charge for EXPRESS"
                       {...register('shippingChargeExpress', { required: 'EXPRESS Shipping Charge is required' })}
                       className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
@@ -374,6 +468,7 @@ export default function EditShippingZone() {
                     </label>
                     <input
                       type="text"
+                      disabled
                       placeholder="Add Shipping hour for EXPRESS"
                       {...register('shippingHourExpress', { required: 'EXPRESS Shipping hour is required' })}
                       className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
@@ -385,17 +480,21 @@ export default function EditShippingZone() {
                 </div>
               </div>
             </div>}
+
           </div>
+
+          {/* Submit Button */}
           <div className='flex justify-end items-center'>
 
             <button
               type='submit'
               disabled={isSubmitting}
-              className={`mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium ${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium`}
+              className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700 mt-4 mb-8`}
             >
-              {isSubmitting ? 'Submitting...' : 'Submit'}
+              {isSubmitting ? 'Saving...' : 'Save Changes'} <FiSave size={20} />
             </button>
           </div>
+
         </div>
       </form>
     </div>

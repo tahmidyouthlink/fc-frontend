@@ -6,6 +6,9 @@ import CustomPagination from './CustomPagination';
 import { Button, Checkbox, CheckboxGroup, DateRangePicker, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
 import { IoMdClose } from 'react-icons/io';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { getLocalTimeZone, today } from '@internationalized/date';
+import { TbColumnInsertRight } from 'react-icons/tb';
+import PaginationSelect from './PaginationSelect';
 
 const initialColumns = ["Date & Time", 'Order ID', 'Customer Name', 'Payment Method', 'Transaction ID', 'Payment Status'];
 
@@ -28,9 +31,16 @@ const FinanceTable = () => {
     const savedColumnsFinancesPage = JSON.parse(localStorage.getItem('selectedColumnsFinancesPage'));
     if (savedColumns) {
       setSelectedColumns(savedColumns);
+    } else {
+      // Set to default if no saved columns exist
+      setSelectedColumns(initialColumns);
     }
+
     if (savedColumnsFinancesPage) {
       setColumnOrder(savedColumnsFinancesPage);
+    } else {
+      // Set to default column order if no saved order exists
+      setColumnOrder(initialColumns);
     }
   }, []);
 
@@ -51,7 +61,6 @@ const FinanceTable = () => {
 
   const handleDeselectAll = () => {
     setSelectedColumns([]);
-    setColumnOrder([]);
   };
 
   const handleSave = () => {
@@ -70,8 +79,8 @@ const FinanceTable = () => {
     setColumnOrder(reorderedColumns); // Update the column order both in modal and table
   };
 
-  const handleItemsPerPageChange = (e) => {
-    setItemsPerPage(parseInt(e.target.value));
+  const handleItemsPerPageChange = (newValue) => {
+    setItemsPerPage(newValue);
     setPage(0); // Reset to first page when changing items per page
   };
 
@@ -104,6 +113,8 @@ const FinanceTable = () => {
   const endDate = selectedDateRange?.end ? new Date(selectedDateRange.end.year, selectedDateRange.end.month - 1, selectedDateRange.end.day) : null; // Adjust end date to include the entire end day
   const adjustedEndDate = endDate ? new Date(endDate.getTime() + 24 * 60 * 60 * 1000 - 1) : null; // Add 1 day and subtract 1 ms
 
+  const currentDate = today(getLocalTimeZone());
+
   const handleReset = () => {
     setSelectedDateRange(null); // Reset the selected date range
   };
@@ -119,15 +130,15 @@ const FinanceTable = () => {
       : true;
 
     // Payment status filtering
-    const isStatusMatch = selectedPaymentStatus === 'All' || order.paymentStatus === selectedPaymentStatus;
+    const isStatusMatch = selectedPaymentStatus === 'All' || order?.paymentInfo?.paymentStatus === selectedPaymentStatus;
 
     // Check if order details match the search query
     const orderMatch = (
       (order.orderNumber || '').toLowerCase().includes(query) ||
-      (order.customerName || '').toLowerCase().includes(query) || // Added customerName search
-      (order.paymentMethod || '').toLowerCase().includes(query) ||
-      (order.transactionId || '').toLowerCase().includes(query) ||
-      (order.paymentStatus || '').toLowerCase().includes(query)
+      (order.customerInfo.customerName || '').toLowerCase().includes(query) || // Added customerName search
+      (order.paymentInfo.paymentMethod || '').toLowerCase().includes(query) ||
+      (order.paymentInfo.transactionId || '').toLowerCase().includes(query) ||
+      (order.paymentInfo.paymentStatus || '').toLowerCase().includes(query)
     );
 
     // Check if query matches date in specific format
@@ -192,8 +203,8 @@ const FinanceTable = () => {
         </div>
 
         <div ref={dropdownRef} className="relative inline-block text-left z-50">
-          <Button onClick={() => toggleDropdown('other')} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
-            Customize
+          <button onClick={() => toggleDropdown('other')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[10px] md:text-[14px] text-neutral-700">
+            CUSTOMIZE
             <svg
               className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown === "other" ? 'rotate-180' : ''}`}
               xmlns="http://www.w3.org/2000/svg"
@@ -203,18 +214,21 @@ const FinanceTable = () => {
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
             </svg>
-          </Button>
+          </button>
 
           {openDropdown === 'other' && (
             <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+
               <div className='p-1'>
 
-                <div className='flex items-center gap-2'>
+                <div className='flex items-center gap-2 mb-2'>
+
                   <DateRangePicker
                     label="Order Duration"
                     visibleMonths={1}
                     onChange={(range) => setSelectedDateRange(range)} // Ensure range is an array
                     value={selectedDateRange} // Ensure this matches the expected format
+                    maxValue={currentDate}
                   />
 
                   {selectedDateRange && selectedDateRange.start && selectedDateRange.end && (
@@ -224,11 +238,10 @@ const FinanceTable = () => {
                   )}
                 </div>
 
-                <div className="py-1 flex-1">
-                  <Button variant="light" color="primary" onClick={() => { setColumnModalOpen(true) }} className="w-full">
-                    Choose Columns
-                  </Button>
-                </div>
+                {/* Choose Columns Button */}
+                <button className="relative z-[1] flex items-center justify-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700 w-full" onClick={() => { setColumnModalOpen(true); }}>
+                  Choose Columns <TbColumnInsertRight size={20} />
+                </button>
 
               </div>
 
@@ -241,7 +254,7 @@ const FinanceTable = () => {
       {/* Column Selection Modal */}
       <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
         <ModalContent>
-          <ModalHeader>Choose Columns</ModalHeader>
+          <ModalHeader className='bg-gray-200'>Choose Columns</ModalHeader>
           <ModalBody className="modal-body-scroll">
             <DragDropContext onDragEnd={handleOnDragEnd}>
               <Droppable droppableId="droppable">
@@ -282,13 +295,15 @@ const FinanceTable = () => {
               </Droppable>
             </DragDropContext>
           </ModalBody>
-          <ModalFooter>
-            <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
-              Deselect All
-            </Button>
-            <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
-              Select All
-            </Button>
+          <ModalFooter className='flex justify-between items-center'>
+            <div className='flex items-center gap-2'>
+              <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
+                Deselect All
+              </Button>
+              <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
+                Select All
+              </Button>
+            </div>
             <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
               Save
             </Button>
@@ -296,6 +311,7 @@ const FinanceTable = () => {
         </ModalContent>
       </Modal>
 
+      {/* TABLE */}
       <div className="max-w-screen-2xl mx-auto custom-scrollbar custom-max-discount overflow-x-auto mt-6 drop-shadow rounded-lg">
         <table className="w-full text-left border-collapse">
           <thead className="bg-white sticky top-0 z-[1] rounded-md">
@@ -309,7 +325,7 @@ const FinanceTable = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedOrders?.length === 0 ?
               <tr>
-                <td colSpan={selectedColumns.length} className="text-center p-4 text-gray-500 md:pt-40 pt-32 lg:pt-52 xl:pt-60 2xl:pt-72">
+                <td colSpan={selectedColumns.length} className="text-center p-4 text-gray-500 md:pt-40 pt-32 lg:pt-48 xl:pt-56 2xl:py-60">
                   No orders found matching your criteria. Please adjust your filters or check back later.
                 </td>
               </tr>
@@ -335,22 +351,22 @@ const FinanceTable = () => {
                               )}
                               {column === 'Customer Name' && (
                                 <td key="customerName" className="text-xs p-3 text-gray-700">
-                                  {order?.customerName}
+                                  {order?.customerInfo?.customerName}
                                 </td>
                               )}
                               {column === 'Payment Method' && (
                                 <td key="paymentMethod" className="text-xs p-3 text-gray-700">
-                                  {order?.paymentMethod}
+                                  {order?.paymentInfo?.paymentMethod}
                                 </td>
                               )}
                               {column === 'Transaction ID' && (
                                 <td key="transactionId" className="text-xs p-3 text-gray-700">
-                                  {order?.transactionId ? order.transactionId : '--'}
+                                  {order?.paymentInfo?.transactionId ? order?.paymentInfo?.transactionId : '--'}
                                 </td>
                               )}
                               {column === 'Payment Status' && (
                                 <td key="paymentStatus" className="text-xs p-3 text-gray-700">
-                                  {order?.paymentStatus}
+                                  {order?.paymentInfo?.paymentStatus}
                                 </td>
                               )}
                             </>
@@ -366,28 +382,21 @@ const FinanceTable = () => {
         </table>
 
       </div>
+
+      {/* Pagination Button */}
       <div className="flex flex-col md:flex-row gap-4 justify-center items-center py-3">
         <CustomPagination
           totalPages={totalPages}
           currentPage={page}
           onPageChange={setPage}
         />
-        <div className="relative inline-block">
-          <select
-            id="itemsPerPage"
-            value={itemsPerPage}
-            onChange={handleItemsPerPageChange}
-            className="cursor-pointer px-3 py-2 rounded-lg text-sm md:text-base text-gray-800 bg-white shadow-lg border border-gray-300 focus:outline-none hover:bg-gradient-to-tr hover:from-pink-400 hover:to-yellow-400 hover:text-white transition-colors duration-300 appearance-none w-16 md:w-20 lg:w-24"
-          >
-            <option className='bg-white text-black' value={25}>25</option>
-            <option className='bg-white text-black' value={50}>50</option>
-            <option className='bg-white text-black' value={100}>100</option>
-          </select>
-          <svg className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-          </svg>
-        </div>
+        <PaginationSelect
+          options={[25, 50, 100]} // ✅ Pass available options
+          value={itemsPerPage} // ✅ Selected value
+          onChange={handleItemsPerPageChange} // ✅ Handle value change
+        />
       </div>
+
     </div>
   );
 };

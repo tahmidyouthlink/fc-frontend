@@ -92,6 +92,49 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginVertical: 2,
   },
+  table: {
+    display: "table",
+    width: "100%",
+    marginTop: 10,
+    borderCollapse: "collapse", // For a clean layout
+    height: 250,
+    letterSpacing: 1,
+    fontWeight: 500,
+  },
+  tableHeader: {
+    display: "flex",
+    flexDirection: "row",
+    marginVertical: 4,
+    paddingVertical: 4,
+    width: "100%",
+    color: "#00B8AC",
+    fontSize: 12,
+    fontWeight: 400,
+    fontFamily: "Lilita One",
+  },
+  tableRaw: {
+    marginVertical: 10,
+    marginBottom: 10,
+  },
+  tableCellLeft: {
+    textAlign: "left", // Left-align for text-based cells
+    paddingHorizontal: 4,
+    flex: 1,
+  },
+  tableCellRight: {
+    textAlign: "right", // Right-align for numeric cells
+    paddingHorizontal: 4,
+    flex: 1,
+  },
+  tableCellCenter: {
+    textAlign: "center", // Center alignment for specific cells
+    paddingHorizontal: 4,
+    flex: 1,
+  },
+  border: {
+    borderBottom: "2px solid #000000", // Subtle border for header
+    marginBottom: 20,
+  },
   subTable: {
     display: "flex",
     justifyContent: "flex-end",
@@ -125,49 +168,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     textTransform: "uppercase",
     letterSpacing: 2,
-  },
-  table: {
-    display: "table",
-    width: "100%",
-    marginTop: 10,
-    borderCollapse: "collapse", // For a clean layout
-    height: 250,
-    letterSpacing: 1,
-    fontWeight: 500,
-  },
-  tableHeader: {
-    display: "flex",
-    flexDirection: "row",
-    marginVertical: 4,
-    paddingVertical: 4,
-    width: "100%",
-    color: "#00B8AC",
-    fontSize: 12,
-    fontWeight: 400,
-    fontFamily: "Lilita One",
-  },
-  tableRaw: {
-    marginVertical: 10,
-    marginBottom: 10,
-  },
-  border: {
-    borderBottom: "2px solid #000000", // Subtle border for header
-    marginBottom: 20,
-  },
-  tableCellLeft: {
-    textAlign: "left", // Left-align for text-based cells
-    paddingHorizontal: 4,
-    flex: 1,
-  },
-  tableCellRight: {
-    textAlign: "right", // Right-align for numeric cells
-    paddingHorizontal: 4,
-    flex: 1,
-  },
-  tableCellCenter: {
-    textAlign: "center", // Center alignment for specific cells
-    paddingHorizontal: 4,
-    flex: 1,
   },
   footerAlign: {
     display: "flex",
@@ -243,11 +243,6 @@ const PDFDocument = ({ order }) => {
     return null;
   }
 
-  // Check if any product has an offer
-  const hasOffers = order?.productInformation.some(
-    (product) => product.offerTitle,
-  );
-
   // Prepare the product rows without applying discount at this point
   const productRows = order?.productInformation.map((product) => {
     const productTotal = (
@@ -273,8 +268,6 @@ const PDFDocument = ({ order }) => {
         : null, // Store offer details without applying discount yet
     ];
   });
-
-  console.log(order);
 
   return (
     <Document>
@@ -315,16 +308,6 @@ const PDFDocument = ({ order }) => {
               >
                 {order?.customerInfo?.customerName}
               </Text>
-              <Text
-                style={{
-                  letterSpacing: 4,
-                  textTransform: "uppercase",
-                  width: "70%",
-                  marginBottom: 5,
-                }}
-              >
-                {`${order?.deliveryInfo?.address1}${order?.deliveryInfo?.address2 ? " " + order?.deliveryInfo?.address2 : " "} ${order?.deliveryInfo?.city} ${order?.deliveryInfo?.postalCode}`}
-              </Text>
               <Text style={{ letterSpacing: 4, textTransform: "uppercase" }}>
                 {order?.customerInfo?.phoneNumber}
               </Text>
@@ -336,6 +319,16 @@ const PDFDocument = ({ order }) => {
                     {order?.customerInfo?.phoneNumber2}
                   </Text>
                 )}
+              <Text
+                style={{
+                  letterSpacing: 4,
+                  textTransform: "uppercase",
+                  width: "70%",
+                  marginBottom: 5,
+                }}
+              >
+                {`${order?.deliveryInfo?.address1}${order?.deliveryInfo?.address2 ? " " + order?.deliveryInfo?.address2 : " "} ${order?.deliveryInfo?.city} ${order?.deliveryInfo?.postalCode}`}
+              </Text>
             </View>
             <View style={styles.orderInfo3}>
               <Text style={{ textAlign: "right", marginBottom: 3 }}>
@@ -355,23 +348,45 @@ const PDFDocument = ({ order }) => {
 
           <View style={styles.table}>
             <View style={styles.tableHeader}>
-              <Text style={styles.tableCellLeft}>TITLE</Text>
-              <Text style={styles.tableCellCenter}>VARIANT</Text>
-              <Text style={styles.tableCellCenter}>PRICE</Text>
-              <Text style={styles.tableCellCenter}>QTY</Text>
-              <Text style={styles.tableCellRight}>TOTAL</Text>
+              <Text style={[styles.tableCellLeft, { minWidth: "75px" }]}>
+                TITLE
+              </Text>
+              <Text style={[styles.tableCellCenter, { minWidth: "65px" }]}>
+                VARIANT
+              </Text>
+              <Text style={[styles.tableCellCenter]}>PRICE</Text>
+              <Text style={[styles.tableCellCenter]}>QTY</Text>
+              <Text style={[styles.tableCellRight]}>TOTAL</Text>
             </View>
 
             <View style={styles.tableRaw}>
               {productRows.map((product, index) => (
                 <View key={index} style={styles.row}>
-                  <Text style={styles.tableCellLeft}>{product[0]}</Text>
-                  <Text style={styles.tableCellCenter}>
+                  <Text
+                    style={[
+                      styles.tableCellLeft,
+                      { marginTop: 2, minWidth: "75px" },
+                    ]}
+                  >
+                    {product[0]}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.tableCellCenter,
+                      { marginTop: 2, minWidth: "65px" },
+                    ]}
+                  >
                     {product[1]} - {product[2]}
                   </Text>
-                  <Text style={styles.tableCellCenter}>{product[3]}</Text>
-                  <Text style={styles.tableCellCenter}>{product[4]}</Text>
-                  <Text style={styles.tableCellRight}>{product[5]}</Text>
+                  <Text style={[styles.tableCellCenter, { marginTop: 2 }]}>
+                    {product[3]}
+                  </Text>
+                  <Text style={[styles.tableCellCenter, { marginTop: 2 }]}>
+                    {product[4]}
+                  </Text>
+                  <Text style={[styles.tableCellRight, { marginTop: 2 }]}>
+                    {product[5]}
+                  </Text>
                 </View>
               ))}
             </View>
@@ -412,8 +427,8 @@ const PDFDocument = ({ order }) => {
                 {/* Discount Value */}
                 <Text style={{ fontWeight: 500 }}>
                   {order?.totalSpecialOfferDiscount > 0
-                    ? `-${order?.totalSpecialOfferDiscount}`
-                    : `-${order?.promoInfo?.appliedPromoDiscount}`}
+                    ? `-${Number(order?.totalSpecialOfferDiscount || 0).toFixed(2)}`
+                    : `-${Number(order?.promoInfo?.appliedPromoDiscount || 0).toFixed(2)}`}
                 </Text>
               </View>
             )}

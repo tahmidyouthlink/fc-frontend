@@ -18,15 +18,27 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 const ThirdStepOfAddProduct = () => {
 
   const axiosPublic = useAxiosPublic();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { handleSubmit } = useForm();
   const [shippingList, isShippingPending] = useShippingZones();
-  const [selectedShipmentHandler, setSelectedShipmentHandler] = useState([]);
-  const [selectAll, setSelectAll] = useState(false); // State for "select all"
-  const [sizeError, setSizeError] = useState(false);
   const [shipmentHandlerList, isShipmentHandlerPending] = useShipmentHandlers();
   const [showModal, setShowModal] = useState(false);
+  const [activeTab, setActiveTab] = useState('Inside Dhaka');
+  const [tabSelections, setTabSelections] = useState({});
+
+  const dhakaSuburbs = ["Savar", "Nabinagar", "Ashulia", "Keraniganj", "Tongi", "Gazipur", "Narayanganj"];
+
+  // Filtered shipping list for the active tab
+  const filteredShippingList = shippingList?.filter((zone) => {
+    if (activeTab === "Inside Dhaka") return zone?.selectedCity?.includes("Dhaka");
+    if (activeTab === "Dhaka Suburbs") return zone?.selectedCity?.some((city) => dhakaSuburbs?.includes(city));
+    if (activeTab === "Outside Dhaka") {
+      // Exclude zones in Dhaka and Dhaka Suburbs
+      return !zone?.selectedCity?.includes("Dhaka") &&
+        !zone?.selectedCity?.some((city) => dhakaSuburbs?.includes(city));
+    }
+    return false;
+  });
 
   useEffect(() => {
     // Check if the necessary data from the first two steps are available in localStorage
@@ -53,6 +65,33 @@ const ThirdStepOfAddProduct = () => {
     }
   }, [router]);
 
+  useEffect(() => {
+    const initializeTabSelections = () => {
+      const dhakaSuburb = ["Savar", "Nabinagar", "Ashulia", "Keraniganj", "Tongi"];
+
+      if (!tabSelections["Outside Dhaka"]) {
+        const filteredList = shippingList?.filter((zone) => {
+          return (
+            !zone?.selectedCity?.includes("Dhaka") &&
+            !zone?.selectedCity?.some((city) => dhakaSuburb?.includes(city))
+          );
+        });
+
+        setTabSelections((prev) => ({
+          ...prev,
+          ["Outside Dhaka"]: filteredList?.map((item) => ({ ...item, selected: true })) || [],
+        }));
+      }
+    };
+
+    if (shippingList?.length) {
+      initializeTabSelections();
+    }
+  }, [shippingList, tabSelections]);
+
+  // Unified selection list from all tabs
+  const selectedShipmentHandler = Object.values(tabSelections).flat();
+
   // Function to handle "Go Back" button click
   const handleGoBackClick = (e) => {
     e.preventDefault();  // Prevent immediate navigation
@@ -75,52 +114,63 @@ const ThirdStepOfAddProduct = () => {
     });
   };
 
-  // Toggle card selection
+  // Toggle selection for an individual item
   const toggleCardSelection = (shipping) => {
-    const isSelected = selectedShipmentHandler.some(
-      (handler) => handler.shippingZone === shipping.shippingZone
-    );
-
-    if (isSelected) {
-      const updatedSelection = selectedShipmentHandler.filter(
-        (handler) => handler.shippingZone !== shipping.shippingZone
+    setTabSelections((prev) => {
+      const currentTabSelections = prev[activeTab] || [];
+      const isSelected = currentTabSelections.some(
+        (item) => item.shippingZone === shipping.shippingZone
       );
-      setSelectedShipmentHandler(updatedSelection);
-    } else {
-      const updatedSelection = [...selectedShipmentHandler, shipping];
-      setSelectedShipmentHandler(updatedSelection);
-
-      if (sizeError) {
-        setSizeError(false);
-      }
-    }
+      const updatedTabSelections = isSelected
+        ? currentTabSelections.filter(
+          (item) => item.shippingZone !== shipping.shippingZone
+        )
+        : [...currentTabSelections, shipping];
+      return { ...prev, [activeTab]: updatedTabSelections };
+    });
   };
 
+  // Handle "Select All" for the active tab
   const toggleSelectAll = () => {
-    if (selectAll) {
-      setSelectedShipmentHandler([]); // Deselect all
-    } else {
-      setSelectedShipmentHandler(shippingList); // Select all
-      setSizeError(false);
+    setTabSelections((prev) => {
+      const currentTabSelections = prev[activeTab] || [];
+      const allSelected = currentTabSelections.length === filteredShippingList.length;
+      return {
+        ...prev,
+        [activeTab]: allSelected ? [] : [...filteredShippingList],
+      };
+    });
+  };
+
+  const validateSelections = () => {
+    const tabs = ["Inside Dhaka", "Dhaka Suburbs", "Outside Dhaka"];
+
+    // Loop through each tab to check if there are selections
+    for (const tab of tabs) {
+      // Check if tabSelections for the current tab exists and has items selected
+      if (!tabSelections[tab] || tabSelections[tab].length === 0) {
+        toast.error(`Select at least one item in the ${tab}`);
+        return false;
+      }
     }
-    setSelectAll(!selectAll); // Toggle selectAll state
+
+    return true;
+  };
+
+  // Handle tab changes
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
   };
 
   const onSubmit = async () => {
-    setIsSubmitting(true);
-
-    if (selectedShipmentHandler.length === 0) {
-      setSizeError(true);
-      setIsSubmitting(false);
-      return;
-    }
+    if (!validateSelections()) return;
 
     const storedFormattedDate = localStorage.getItem("formattedDate")
     const storedProductTitle = localStorage.getItem('productTitle');
     const storedProductWeight = localStorage.getItem('weight');
     const storedProductBatchCode = localStorage.getItem('batchCode');
     const storedRegularPrice = localStorage.getItem('regularPrice');
-    const storedUploadedImageUrls = JSON.parse(localStorage.getItem('uploadedImageUrls') || '[]');
+    const storedUploadedImageUrl = localStorage.getItem('uploadedImageUrl');
     const storedRestOfOutfit = JSON.parse(localStorage.getItem('restOfOutfit') || '[]');
     const storedDiscountType = localStorage.getItem('discountType');
     const storedDiscountValue = localStorage.getItem('discountValue');
@@ -146,7 +196,7 @@ const ThirdStepOfAddProduct = () => {
       weight: storedProductWeight,
       batchCode: storedProductBatchCode,
       regularPrice: storedRegularPrice,
-      imageUrls: storedUploadedImageUrls,
+      thumbnailImageUrl: storedUploadedImageUrl,
       discountType: storedDiscountType,
       discountValue: storedDiscountValue,
       productDetails: storedProductDetails,
@@ -165,7 +215,6 @@ const ThirdStepOfAddProduct = () => {
       shippingDetails: selectedShipmentHandler,
       productId: storedProductId,
       status: "active",
-      salesThisMonth: 0,
       sizeGuideImageUrl: storedSizeGuideImageUrl,
       restOfOutfit: storedRestOfOutfit,
     }
@@ -212,7 +261,7 @@ const ThirdStepOfAddProduct = () => {
         localStorage.removeItem('batchCode');
         localStorage.removeItem('weight');
         localStorage.removeItem('regularPrice');
-        JSON.parse(localStorage.removeItem('uploadedImageUrls') || '[]');
+        localStorage.removeItem('uploadedImageUrl');
         localStorage.removeItem('discountType');
         localStorage.removeItem('discountValue');
         localStorage.removeItem('productDetails');
@@ -236,7 +285,6 @@ const ThirdStepOfAddProduct = () => {
       }
     } catch (error) {
       console.error("Error response:", error.response || error.message);
-      setIsSubmitting(false);
       toast.error('Failed to add Product Details. Please try again!');
     }
   };
@@ -248,9 +296,9 @@ const ThirdStepOfAddProduct = () => {
   return (
     <div className='min-h-screen'>
 
-      <div className='max-w-screen-xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-white'>
+      <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-white'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Add Select Shipping Details</h3>
+          <h3 className='w-full font-semibold text-xl lg:text-2xl'>SELECT SHIPPING DETAILS</h3>
           <Link
             className="flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
             href="/dash-board/products"
@@ -262,20 +310,62 @@ const ThirdStepOfAddProduct = () => {
             Go Back
           </Link>
         </div>
+
+        <div className='flex flex-wrap items-center gap-3 bg-white mt-4'>
+
+          <button
+            className={`relative text-sm py-1 transition-all duration-300
+${activeTab === 'Inside Dhaka' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
+after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
+after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
+${activeTab === 'Inside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
+`}
+            onClick={() => handleTabChange("Inside Dhaka")}
+          >
+            Inside Dhaka
+          </button>
+
+          <button
+            className={`relative text-sm py-1 transition-all duration-300
+${activeTab === 'Dhaka Suburbs' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
+after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
+after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
+${activeTab === 'Dhaka Suburbs' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
+`}
+            onClick={() => handleTabChange("Dhaka Suburbs")}
+          >
+            Dhaka Suburbs
+          </button>
+
+          <button
+            className={`relative text-sm py-1 transition-all duration-300
+${activeTab === 'Outside Dhaka' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
+after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
+after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
+${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
+`}
+            onClick={() => handleTabChange("Outside Dhaka")}
+          >
+            Outside Dhaka
+          </button>
+
+        </div>
+
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto mt-6 min-h-[85vh] flex flex-col justify-between'>
+      <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-2xl mx-auto min-h-[85vh] flex flex-col justify-between'>
 
         <div className="overflow-x-auto">
           <table className="min-w-full table-auto">
+
             <thead>
               <tr>
                 <th className="px-2 py-1 md:px-4 md:py-2 border-b border-gray-300">
                   <Checkbox
-                    isSelected={selectAll}
+                    isSelected={filteredShippingList.length > 0 && (tabSelections[activeTab]?.length === filteredShippingList.length)}
                     onChange={toggleSelectAll}
                     color="success"
-                    size='lg'
+                    size="lg"
                   />
                 </th>
                 <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipping Zone</th>
@@ -284,17 +374,16 @@ const ThirdStepOfAddProduct = () => {
                 <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipping Hours</th>
               </tr>
             </thead>
+
             <tbody>
-              {shippingList?.map((shipping, index) => {
+              {filteredShippingList?.map((shipping, index) => {
                 const isSelected = selectedShipmentHandler.some(
                   (handler) => handler.shippingZone === shipping?.shippingZone
                 );
 
                 return (
-                  <tr
-                    key={index}
-                    className={`cursor-pointer transition-all duration-200 ${isSelected ? 'bg-gray-50' : 'bg-white'}`}
-                  >
+                  <tr key={index}
+                    className={`cursor-pointer transition-all duration-200 ${isSelected ? 'bg-gray-50' : 'bg-white'}`}>
                     {/* Checkbox for selecting a row */}
                     <td className="text-center">
                       <Checkbox
@@ -330,37 +419,35 @@ const ThirdStepOfAddProduct = () => {
                         ))}
                       </div>
                     </td>
+
                     <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{shipping?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
                       <div key={idx}>
                         {type}: ৳ {shipping?.shippingCharges[type]}
                       </div>
                     ))}</td>
+
                     <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{shipping?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
                       <div key={idx}>
-                        {type}: {shipping?.shippingHours[type]} Hours
+                        {type}: {shipping?.shippingDurations[type]} {type === "EXPRESS" ? "hours" : "days"}
                       </div>
                     ))}</td>
                   </tr>
                 );
               })}
             </tbody>
+
           </table>
         </div>
 
-        {/* Error message */}
-        {sizeError && (
-          <p className='text-red-600 text-left mt-4 max-w-screen-xl px-6'>Please select at least one shipping handler.</p>
-        )}
-
-        <div className='flex justify-between mt-6 px-6 2xl:px-0'>
-          <Link href='/dash-board/products/add-product-2' className='flex items-center gap-2 mt-4 mb-8 bg-[#9F5216] hover:bg-[#804010] text-white py-2 px-4 rounded-md cursor-pointer font-medium'>
+        <div className='flex justify-between px-6 2xl:px-0 py-6'>
+          <Link href='/dash-board/products/add-product-2' className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'>
             <FaArrowLeft /> Previous Step
           </Link>
 
           <div className='flex items-center gap-6'>
 
-            <button disabled={isSubmitting} type='submit' className={`bg-[#9F5216] hover:bg-[#804010] text-white py-2 px-4 flex items-center justify-center gap-2 rounded-md cursor-pointer font-medium ${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 rounded-md cursor-pointer font-medium`}>
-              {isSubmitting ? 'Publishing...' : 'Publish'} <MdOutlineFileUpload size={20} />
+            <button type='submit' className={`relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700`}>
+              Publish <MdOutlineFileUpload size={20} />
             </button>
           </div>
 

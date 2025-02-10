@@ -6,11 +6,12 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import Loading from '@/app/components/shared/Loading/Loading';
 import { RiDeleteBinLine } from 'react-icons/ri';
-import { MdOutlineModeEdit } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 import useSeasons from '@/app/hooks/useSeasons';
 import Image from 'next/image';
+import { FaPlus } from 'react-icons/fa6';
+import { AiOutlineEdit } from 'react-icons/ai';
 
 const Seasons = () => {
   const axiosPublic = useAxiosPublic();
@@ -85,20 +86,21 @@ const Seasons = () => {
     <div className='bg-gray-50 min-h-screen'>
 
       <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between max-w-screen-2xl mx-auto px-6 py-6'>
-        <h1 className='font-semibold text-center md:text-xl lg:text-2xl'>Season Management</h1>
-        <Button onClick={() => router.push('/dash-board/seasons/add-season')} className='bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium'>
-          New Season
-        </Button>
+        <h1 className='font-semibold text-center text-lg md:text-xl lg:text-3xl text-neutral-700'>SEASON MANAGEMENT</h1>
+
+        <button onClick={() => router.push('/dash-board/seasons/add-season')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
+          <FaPlus size={15} className='text-neutral-700' /> Add
+        </button>
       </div>
 
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 max-w-screen-2xl mx-auto px-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 max-w-screen-2xl mx-auto px-6">
         {seasonList?.map((season, index) => {
 
           return (
-            <div key={index} className="w-full h-48 2xl:h-60 relative group cursor-pointer hover:scale-105 transition-all duration-300 rounded-lg">
+            <div key={index} className="w-full h-48 2xl:h-60 relative group cursor-pointer hover:scale-105 transition-all duration-300 rounded-lg border">
               {/* Image */}
               <Image
-                className="object-cover rounded-lg"
+                className="object-cover rounded-lg px-4"
                 src={season?.imageUrl}
                 alt="season-image"
                 layout="fill"
@@ -115,9 +117,18 @@ const Seasons = () => {
               </div>
 
               {/* Product Count - Hidden initially, appears on hover with animation */}
-              <div className="absolute inset-0 flex items-center gap-3 justify-center bg-black bg-opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <Button color='primary' size='sm' onClick={() => handleGoToSeasonPage(season?._id)}>Edit <MdOutlineModeEdit size={16} /></Button>
-                <Button color='danger' size='sm' onClick={() => handleDelete(season?._id)}>Delete <RiDeleteBinLine size={16} /></Button>
+              <div className="absolute inset-0 flex items-center gap-3 justify-center bg-black bg-opacity-60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg">
+
+                {/* Edit Button */}
+                <button onClick={() => handleGoToSeasonPage(season?._id)}>
+                  <span className='flex items-center gap-1.5 rounded-md bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4'><AiOutlineEdit size={16} /> Edit </span>
+                </button>
+
+                {/* Delete Button */}
+                <button onClick={() => handleDelete(season?._id)}>
+                  <span className='flex items-center gap-1.5 rounded-md bg-red-50 p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-red-100 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs'> <RiDeleteBinLine size={16} />Delete </span>
+                </button>
+
               </div>
             </div>
           );

@@ -1,48 +1,56 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-const ProductSearchSelect = ({ productList, onSelectionChange }) => {
+const ProductSearchSelect = ({
+  productList,
+  onSelectionChange,
+  selectedProductIds,
+  setSelectedProductIds,
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedProducts, setSelectedProducts] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   // Filter products based on search input and remove already selected products
   const filteredProducts = productList?.filter(
     (product) =>
-      product.productId.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      !selectedProducts.includes(product.productId), // Exclude already selected products
+      product?.status === "active" &&
+      (product?.productId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product?.productTitle
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())) &&
+      !selectedProductIds.includes(product?.productId), // Exclude already selected products
   );
 
   // Handle adding/removing product selection
   const toggleProductSelection = (productId) => {
     let updatedSelectedProducts;
-    if (selectedProducts.includes(productId)) {
+    if (selectedProductIds.includes(productId)) {
       // Remove product from selection
-      updatedSelectedProducts = selectedProducts.filter(
+      updatedSelectedProducts = selectedProductIds.filter(
         (id) => id !== productId,
       );
     } else {
       // Add product to selection
-      updatedSelectedProducts = [...selectedProducts, productId];
+      updatedSelectedProducts = [...selectedProductIds, productId];
     }
 
-    setSelectedProducts(updatedSelectedProducts);
     onSelectionChange(updatedSelectedProducts); // Pass selected products to parent component
   };
 
   // Handle removing product directly from selected list
   const removeProduct = (productId) => {
-    const updatedSelectedProducts = selectedProducts.filter(
-      (id) => id !== productId,
-    );
-    setSelectedProducts(updatedSelectedProducts);
-    onSelectionChange(updatedSelectedProducts); // Pass selected products to parent component
-  };
+    setSelectedProductIds((prevSelected) => {
+      const updatedSelectedProducts = prevSelected.filter(
+        (id) => id !== productId,
+      );
+      return updatedSelectedProducts.length > 0
+        ? [...updatedSelectedProducts]
+        : [];
+    });
 
-  // Toggle dropdown visibility
-  const handleInputClick = () => {
-    setIsDropdownOpen(!isDropdownOpen);
+    // ✅ Ensure parent component updates as well
+    onSelectionChange(selectedProductIds.filter((id) => id !== productId));
   };
 
   // Close dropdown when clicking outside
@@ -66,9 +74,9 @@ const ProductSearchSelect = ({ productList, onSelectionChange }) => {
         type="text"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        onClick={handleInputClick} // Toggle dropdown on input click
+        onClick={() => setIsDropdownOpen(true)} // Toggle dropdown on input click
         placeholder="Search & Select by Product ID's"
-        className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#D2016E]"
+        className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#9F5216]"
       />
 
       {/* Dropdown list for search results */}
@@ -78,22 +86,27 @@ const ProductSearchSelect = ({ productList, onSelectionChange }) => {
             filteredProducts.map((product) => (
               <div
                 key={product._id}
-                className={`flex cursor-pointer items-center justify-between p-2 hover:bg-gray-100 ${
-                  selectedProducts.includes(product.productId)
+                className={`flex cursor-pointer items-center justify-between rounded-lg border p-1 hover:bg-gray-100 ${
+                  selectedProductIds.includes(product.productId)
                     ? "bg-gray-200"
                     : ""
                 }`}
                 onClick={() => toggleProductSelection(product.productId)}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <Image
-                    width={400}
-                    height={400}
-                    src={product.imageUrls[0]}
-                    alt={product.productId}
-                    className="h-8 w-8 rounded object-contain"
+                    width={4000}
+                    height={4000}
+                    src={product?.thumbnailImageUrl}
+                    alt={product?.productId}
+                    className="h-12 w-12 rounded object-contain"
                   />
-                  <p>{product.productId}</p>
+                  <div className="flex flex-col">
+                    <span className="ml-2 font-bold">{product?.productId}</span>
+                    <span className="ml-2 text-sm">
+                      {product?.productTitle}
+                    </span>
+                  </div>
                 </div>
               </div>
             ))
@@ -104,17 +117,18 @@ const ProductSearchSelect = ({ productList, onSelectionChange }) => {
       )}
 
       {/* Selected products display */}
-      {selectedProducts.length > 0 && (
+      {selectedProductIds.length > 0 && (
         <div className="mt-2 rounded border p-2">
           <h4 className="mb-2 text-sm font-semibold">Selected Products:</h4>
           <ul className="space-y-2">
-            {selectedProducts.map((id) => (
+            {selectedProductIds?.map((id) => (
               <li
                 key={id}
                 className="flex items-center justify-between rounded bg-gray-100 p-2"
               >
                 <span>{id}</span>
                 <button
+                  type="button"
                   onClick={() => removeProduct(id)}
                   className="text-sm text-red-500"
                 >

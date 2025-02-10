@@ -1,7 +1,7 @@
 "use client";
 import * as XLSX from 'xlsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Checkbox, CheckboxGroup, DateRangePicker, Input } from "@nextui-org/react";
+import { Accordion, AccordionItem, Button, Checkbox, CheckboxGroup, DateRangePicker, Input, Select, SelectItem, Textarea } from "@nextui-org/react";
 import emailjs from '@emailjs/browser';
 import Loading from '@/app/components/shared/Loading/Loading';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
@@ -25,16 +25,32 @@ import { parseISO, isBefore, subDays } from "date-fns";
 import { useSearchParams } from 'next/navigation';
 import { today, getLocalTimeZone } from "@internationalized/date";
 import dynamic from 'next/dynamic';
+import useShippingZones from '@/app/hooks/useShippingZones';
+import Image from 'next/image';
+import { saveAs } from 'file-saver';
+import { HiDownload } from "react-icons/hi";
+import { CgArrowsExpandRight } from 'react-icons/cg';
+import ProductExpandedImageModalOrder from '@/app/components/product/ProductExpandedImageModalOrder';
+import { TbColumnInsertRight } from 'react-icons/tb';
+import { HiOutlineDownload } from "react-icons/hi";
+import PaginationSelect from '@/app/components/layout/PaginationSelect';
 const PrintButton = dynamic(() => import("@/app/components/layout/PrintButton"), { ssr: false });
 
-const initialColumns = ['Order Number', 'Date & Time', 'Customer Name', 'Order Amount', 'Order Status', 'Action', 'Email', 'Phone Number', 'Alternative Phone Number', 'Shipping Zone', 'Shipping Method', 'Payment Status', 'Payment Method', 'Vendor'];
+const initialColumns = ['Order Number', 'Date & Time', 'Customer Name', 'Order Amount', 'Order Status', 'Action', 'Email', 'Phone Number', 'Alt. Phone Number', 'Shipping Method', 'Payment Status', 'Payment Method'];
 
 const orderStatusTabs = [
   'New Orders',
   'Active Orders',
   'Completed Orders',
-  'Canceled Orders',
+  'Returns & Refunds',
 ];
+
+const columnsConfig = {
+  'New Orders': [...initialColumns],
+  'Active Orders': [...initialColumns],
+  'Completed Orders': [...initialColumns],
+  'Returns & Refunds': ['R. Order Number', 'Date & Time', 'Customer Name', 'Refund Amount', 'Status', 'Action', 'Email', 'Phone Number', 'Alt. Phone Number', 'Shipping Method', 'Payment Status', 'Payment Method'],
+};
 
 const OrdersPage = () => {
   const isAdmin = true;
@@ -49,30 +65,52 @@ const OrdersPage = () => {
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   const [openDropdown, setOpenDropdown] = useState(false);
+  const [openDropdown2, setOpenDropdown2] = useState(false);
   const dropdownRef = useRef(null);
   const dropdownRefDownload = useRef(null);
-  const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
-  const [selectedColumns, setSelectedColumns] = useState([]);
-  const [columnOrder, setColumnOrder] = useState(initialColumns);
-  const [isColumnModalOpen, setColumnModalOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState(orderStatusTabs[0]);
+  const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
+  const [selectedColumns, setSelectedColumns] = useState(columnsConfig[selectedTab]);
+  const [columnOrder, setColumnOrder] = useState(columnsConfig[selectedTab]);
+  const [isColumnModalOpen, setColumnModalOpen] = useState(false);
   const [trackingNumber, setTrackingNumber] = useState("");
   const [orderIdToUpdate, setOrderIdToUpdate] = useState(null); // Store order ID
   const [orderToUpdate, setOrderToUpdate] = useState({}); // selected order for update
   const [isTrackingModalOpen, setTrackingModalOpen] = useState(false);
+  const [orderIdToUpdateOnHold, setOrderIdToUpdateOnHold] = useState(null); // Store order ID
+  const [orderToUpdateOnHold, setOrderToUpdateOnHold] = useState({}); // selected order for update
+  const [onHoldReason, setOnHoldReason] = useState("");
+  const [isOnHoldModalOpen, setOnHoldModalOpen] = useState(false);
+  const [orderIdToUpdateDeclined, setOrderIdToUpdateDeclined] = useState(null); // Store order ID
+  const [orderToUpdateDeclined, setOrderToUpdateDeclined] = useState({}); // selected order for update
+  const [declinedReason, setDeclinedReason] = useState("");
+  const [isDeclinedModalOpen, setDeclinedModalOpen] = useState(false);
   const [isToggleOn, setIsToggleOn] = useState(true);
+  const [shippingList, isShippingPending] = useShippingZones();
   const [selectedHandler, setSelectedHandler] = useState(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isImageExpanded, setIsImageExpanded] = useState(false);
 
+  // Load saved state from localStorage or use defaults
   useEffect(() => {
-    const savedColumns = JSON.parse(localStorage.getItem('selectedColumns'));
-    const savedOrder = JSON.parse(localStorage.getItem('columnOrder'));
-    if (savedColumns) {
-      setSelectedColumns(savedColumns);
+    const cleanTab = selectedTab.split(" (")[0]; // Clean the tab name
+    const savedSelectedColumns = JSON.parse(localStorage.getItem(`selectedColumns_${cleanTab}`));
+    const savedColumnOrder = JSON.parse(localStorage.getItem(`columnOrder_${cleanTab}`));
+    const allColumns = columnsConfig[cleanTab]; // Default columns for the tab
+
+    if (savedSelectedColumns && savedColumnOrder) {
+      // Ensure all columns are shown in the modal (unselected columns included)
+      const completeColumns = allColumns.map((col) =>
+        savedSelectedColumns.includes(col) ? col : col
+      );
+      setSelectedColumns(savedSelectedColumns);
+      setColumnOrder(savedColumnOrder.filter((col) => completeColumns.includes(col)));
+    } else {
+      // Fallback to default columns if nothing is saved
+      setSelectedColumns(allColumns);
+      setColumnOrder(allColumns);
     }
-    if (savedOrder) {
-      setColumnOrder(savedOrder);
-    }
-  }, []);
+  }, [selectedTab]);
 
   useEffect(() => {
     if (searchQuery) {
@@ -89,6 +127,23 @@ const OrdersPage = () => {
     }
   }, [promo, offer]);
 
+  // Click outside handler
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRefDownload.current && !dropdownRefDownload.current.contains(event.target)) {
+        setOpenDropdown(null);
+      }
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenDropdown2(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   // Handler for selecting a shipment handler
   const handleSelectHandler = (handler) => {
     setSelectedHandler(handler);
@@ -99,18 +154,18 @@ const OrdersPage = () => {
   };
 
   const handleSelectAll = () => {
-    setSelectedColumns(initialColumns);
-    setColumnOrder(initialColumns);
+    setSelectedColumns(columnsConfig[selectedTab]);
+    setColumnOrder(columnsConfig[selectedTab]);
   };
 
   const handleDeselectAll = () => {
     setSelectedColumns([]);
-    setColumnOrder([]);
   };
 
   const handleSave = () => {
-    localStorage.setItem('selectedColumns', JSON.stringify(selectedColumns));
-    localStorage.setItem('columnOrder', JSON.stringify(columnOrder));
+    const cleanTab = selectedTab.split(" (")[0]; // Clean the tab name
+    localStorage.setItem(`selectedColumns_${cleanTab}`, JSON.stringify(selectedColumns));
+    localStorage.setItem(`columnOrder_${cleanTab}`, JSON.stringify(columnOrder));
     setColumnModalOpen(false);
   };
 
@@ -121,7 +176,10 @@ const OrdersPage = () => {
     const [draggedColumn] = reorderedColumns.splice(result.source.index, 1);
     reorderedColumns.splice(result.destination.index, 0, draggedColumn);
 
-    setColumnOrder(reorderedColumns); // Update the column order both in modal and table
+    setColumnOrder(reorderedColumns);
+    setSelectedColumns((prevSelected) =>
+      reorderedColumns.filter((col) => prevSelected.includes(col))
+    );
   };
 
   // Convert dateTime string to Date object
@@ -155,19 +213,23 @@ const OrdersPage = () => {
     setOpenDropdown((prev) => (prev === dropdown ? null : dropdown)); // Toggle the clicked dropdown
   };
 
+  const toggleDropdown2 = (dropdown) => {
+    setOpenDropdown2((prev) => (prev === dropdown ? null : dropdown)); // Toggle the clicked dropdown
+  };
+
   // Check if filters are applied
   const isFilterActive = searchQuery || (selectedDateRange?.start && selectedDateRange?.end);
 
-  const handleItemsPerPageChange = (e) => {
-    setItemsPerPage(parseInt(e.target.value));
+  const handleItemsPerPageChange = (newValue) => {
+    setItemsPerPage(newValue);
     setPage(0); // Reset to first page when changing items per page
   };
 
   // Filter orders based on search query and date range
   const searchedOrders = orderList?.filter(order => {
+
     const query = searchQuery.toLowerCase();
     const isNumberQuery = !isNaN(query) && query.trim() !== '';
-    const queryParts = query.split(' ');
 
     // Date range filtering
     const orderDate = parseDate(order.dateTime);
@@ -176,15 +238,15 @@ const OrdersPage = () => {
       : true;
 
     // Check if any product detail contains the search query
-    const productMatch = order.productInformation?.some(product => {
-      const productTitle = (product.productTitle || '').toString().toLowerCase();
-      const productId = (product.productId || '').toString().toLowerCase();
-      const size = (typeof product.size === 'string' ? product.size : '').toLowerCase();
-      const color = (product.color?.label || '').toString().toLowerCase();
-      const batchCode = (product.batchCode || '').toString().toLowerCase();
-      const offerTitle = (product.offerTitle || '').toString().toLowerCase();
-      const offerDiscountValue = (product.offerDiscountValue || '').toString();
-      const sku = (product.sku || '').toString(); // SKU might be numeric, so keep it as a string
+    const productMatch = order?.productInformation?.some(product => {
+      const productTitle = (product?.productTitle || '').toString().toLowerCase();
+      const productId = (product?.productId || '').toString().toLowerCase();
+      const size = (typeof product?.size === 'string' ? product.size : '').toLowerCase();
+      const color = (product?.color?.label || '').toString().toLowerCase();
+      const batchCode = (product?.batchCode || '').toString().toLowerCase();
+      const offerTitle = (product?.offerInfo?.offerTitle || '').toString().toLowerCase();
+      const offerDiscountValue = (product?.offerInfo?.offerDiscountValue || '').toString();
+      const sku = (product?.sku || '').toString(); // SKU might be numeric, so keep it as a string
 
       return (
         productTitle.includes(query) ||
@@ -200,54 +262,64 @@ const OrdersPage = () => {
 
     // Check if order details match the search query
     const orderMatch = (
-      (order.orderNumber || '').toLowerCase().includes(query) ||
-      (order.dateTime || '').toLowerCase().includes(query) ||
-      (order.customerName || '').toLowerCase().includes(query) || // Added customerName search
-      (order.email || '').toLowerCase().includes(query) ||
-      (order.phoneNumber || '').toString().includes(query) ||
-      (order.phoneNumber2 || '').toString().includes(query) ||
-      (order.address1 || '').toLowerCase().includes(query) ||
-      (order.address2 || '').toLowerCase().includes(query) ||
-      (order.city || '').toLowerCase().includes(query) ||
-      (order.postalCode || '').toString().includes(query) ||
-      (order.orderStatus || '').toLowerCase().includes(query) ||
-      (order.totalAmount || '').toString().includes(query) ||
-      (order.paymentMethod || '').toLowerCase().includes(query) ||
-      (order.vendor || '').toLowerCase().includes(query) ||
-      (order.shippingZone || '').toLowerCase().includes(query) ||
-      (order.promoDiscountValue || '').toString().includes(query) ||
-      (order.offerDiscountValue || '').toString().includes(query) ||
-      (order.promoCode || '').toLowerCase().includes(query) ||
-      (order.offerTitle || '').toLowerCase().includes(query) ||
-      (order.transactionId || '').toLowerCase().includes(query) ||
-      (order.trackingNumber || '').toLowerCase().includes(query) ||
-      (order.shippingMethod || '').toLowerCase().includes(query) ||
-      (order.paymentStatus || '').toLowerCase().includes(query) ||
-      (order.customerId || '').toLowerCase().includes(query)
-    );
-
-    // Check if query parts match first and last names
-    const nameMatch = queryParts.length === 2 && (
-      (order.firstName || '').toLowerCase().includes(queryParts[0]) &&
-      (order.lastName || '').toLowerCase().includes(queryParts[1])
+      (order?.orderNumber || '').toLowerCase().includes(query) ||
+      (order?.dateTime || '').toLowerCase().includes(query) ||
+      (order?.customerInfo?.customerName || '').toLowerCase().includes(query) || // Added customerName search
+      (order?.customerInfo?.email || '').toLowerCase().includes(query) ||
+      (order?.customerInfo?.phoneNumber || '').toString().includes(query) ||
+      (order?.customerInfo?.phoneNumber2 || '').toString().includes(query) ||
+      (order?.deliveryInfo?.address1 || '').toLowerCase().includes(query) ||
+      (order?.deliveryInfo?.address2 || '').toLowerCase().includes(query) ||
+      (order?.deliveryInfo?.city || '').toLowerCase().includes(query) ||
+      (order?.deliveryInfo?.postalCode || '').toString().includes(query) ||
+      (order?.orderStatus || '').toLowerCase().includes(query) ||
+      (order?.total || '').toString().includes(query) ||
+      (order?.paymentInfo?.paymentMethod || '').toLowerCase().includes(query) ||
+      (order?.promoInfo?.promoDiscountValue || '').toString().includes(query) ||
+      (order?.promoInfo?.promoCode || '').toLowerCase().includes(query) ||
+      (order?.paymentInfo?.transactionId || '').toLowerCase().includes(query) ||
+      (order?.shipmentInfo?.trackingNumber || '').toLowerCase().includes(query) ||
+      (order?.shipmentInfo?.selectedShipmentHandlerName || '').toLowerCase().includes(query) ||
+      (order?.deliveryInfo?.deliveryMethod || '').toLowerCase().includes(query) ||
+      (order?.paymentInfo?.paymentStatus || '').toLowerCase().includes(query) ||
+      (order?.customerInfo?.customerId || '').toLowerCase().includes(query)
     );
 
     // Check if query matches date in specific format
-    const dateMatch = (order.dateTime || '').toLowerCase().includes(query);
+    const dateMatch = (order?.dateTime || '').toLowerCase().includes(query);
 
     // Check if promo or offer exists and the order is 'Paid'
     const isPromoOrOffer = promo || offer;
-    const isPaidOrder = order.paymentStatus === 'Paid';
+    const isPaidOrder = order?.paymentInfo?.paymentStatus === 'Paid';
 
     // Combine all filters
-    return isDateInRange && (productMatch || orderMatch || nameMatch || dateMatch) && (!isPromoOrOffer || isPaidOrder);
+    return isDateInRange && (productMatch || orderMatch || dateMatch) && (!isPromoOrOffer || isPaidOrder);
   });
+
+  // Function to calculate counts for each tab
+  const getOrderCounts = () => {
+    return {
+      'New Orders': orderList?.filter(order => order?.orderStatus === 'Pending').length || 0,
+      'Active Orders': orderList?.filter(order => ['Processing', 'Shipped', 'On Hold'].includes(order?.orderStatus)).length || 0,
+      'Completed Orders': orderList?.filter(order => order?.orderStatus === 'Delivered').length || 0,
+      'Returns & Refunds': orderList?.filter(order => ['Return Requested', 'Request Accepted', 'Request Declined', 'Return Initiated', 'Refunded'].includes(order?.orderStatus)).length || 0,
+    };
+  };
+
+  // Memoize counts to prevent unnecessary recalculations
+  const counts = useMemo(getOrderCounts, [orderList]);
+
+  // Append counts to tabs
+  const tabsWithCounts = useMemo(() => {
+    return orderStatusTabs?.map(tab => `${tab} (${counts[tab] || 0})`);
+  }, [counts]);
 
   // Function to get filtered orders based on the selected tab and sort by last status change
   const getFilteredOrders = () => {
+    const cleanTab = selectedTab.split(' (')[0];
     let filtered = [];
 
-    switch (selectedTab) {
+    switch (cleanTab) {
       case 'New Orders':
         filtered = orderList?.filter(order => order?.orderStatus === 'Pending');
         break;
@@ -257,8 +329,8 @@ const OrdersPage = () => {
       case 'Completed Orders':
         filtered = orderList?.filter(order => order?.orderStatus === 'Delivered');
         break;
-      case 'Canceled Orders':
-        filtered = orderList?.filter(order => ['Requested Return', 'Refunded'].includes(order?.orderStatus));
+      case 'Returns & Refunds':
+        filtered = orderList?.filter(order => ['Return Requested', 'Request Accepted', 'Request Declined', 'Return Initiated', 'Refunded'].includes(order?.orderStatus));
         break;
       default:
         filtered = orderList;
@@ -280,19 +352,37 @@ const OrdersPage = () => {
   const totalPages = Math.ceil(filteredOrders?.length / itemsPerPage);
 
   const handleActions = async (id, actionType, isUndo = false) => {
+
     const order = paginatedOrders?.find(order => order._id === id);
 
     if (!order) {
       toast.error("Order not found");
       return;
-    }
+    };
+
+    const dataToSend = order?.productInformation.map(product => ({
+      productId: product.productId,
+      sku: product.sku,
+      onHandSku: product.sku,
+      size: product.size,
+      color: product.color
+    }));
+
+    const returnDataToSend = order?.returnInfo?.products?.map(product => ({
+      productId: product.productId,
+      sku: product.sku,
+      size: product.size,
+      color: product.color
+    }));
 
     const actionMessages = {
       undefined: "Do you want to confirm this order?",
       shipped: "Do you want to ship this order?",
       onHold: "Do you want to put this order on hold?",
       delivered: "Do you want to mark this order as delivered?",
-      requestedReturn: "Do you want to approve a return request for this order?",
+      approved: "Do you want to mark this order as accepted?",
+      declined: "Do you want to mark this order as declined?",
+      returned: "Do you want to mark this order as returned?",
       refunded: "Do you want to refund this order?",
       "": "Do you want to revert this order?"
     };
@@ -307,12 +397,69 @@ const OrdersPage = () => {
       confirmButtonText: "Yes"
     }).then(async (result) => {
       if (result.isConfirmed) {
-        if (actionType === "shipped") {
+        if (actionType === undefined) {
+          try {
+            const response = await axiosPublic.put("/decreaseSkuFromProduct", dataToSend);
+
+            // Check the results array from the response
+            const updateResults = response?.data?.results;
+
+            if (updateResults && Array.isArray(updateResults)) {
+              const successfulUpdates = updateResults.filter((result) => !result.error); // Filter out successful updates
+
+              if (successfulUpdates.length > 0) {
+                updateOrderStatus(order, id, actionType, isUndo); // Call your function only if there are successful updates
+              } else {
+                console.error("No successful updates occurred");
+              }
+            } else {
+              console.error("Unexpected response format:", response?.data);
+            }
+          } catch (error) {
+            console.error("Error making API request:", error);
+          }
+        }
+        else if (actionType === "shipped") {
           // Open the modal for tracking number input only for 'shipped'
           setOrderToUpdate(order);
           setOrderIdToUpdate(id); // Set the order ID for modal
           setTrackingModalOpen(true);  // Open the modal
-        } else {
+        }
+        else if (actionType === "onHold") {
+          // Open the modal for on hold input only for 'onHold'
+          setOrderToUpdateOnHold(order);
+          setOrderIdToUpdateOnHold(id); // Set the order ID for modal
+          setOnHoldModalOpen(true);  // Open the modal
+        }
+        else if (actionType === "declined") {
+          // Open the modal for on hold input only for 'onHold'
+          setOrderToUpdateDeclined(order);
+          setOrderIdToUpdateDeclined(id); // Set the order ID for modal
+          setDeclinedModalOpen(true);  // Open the modal
+        }
+        else if (actionType === "refunded") {
+          try {
+            const response = await axiosPublic.put("/addReturnSkuToProduct", returnDataToSend);
+
+            // Check the results array from the response
+            const updateResults = response?.data?.results;
+
+            if (updateResults && Array.isArray(updateResults)) {
+              const successfulUpdates = updateResults.filter((result) => !result.error); // Filter out successful updates
+
+              if (successfulUpdates.length > 0) {
+                updateOrderStatus(order, id, actionType, isUndo); // Call your function only if there are successful updates
+              } else {
+                console.error("No successful updates occurred");
+              }
+            } else {
+              console.error("Unexpected response format:", response?.data);
+            }
+          } catch (error) {
+            console.error("Error making API request:", error);
+          }
+        }
+        else {
           // For all other statuses, update order directly
           updateOrderStatus(order, id, actionType, isUndo); // Keep the existing logic for non-shipped actions
         }
@@ -322,11 +469,27 @@ const OrdersPage = () => {
 
   // Function to update order status
   const updateOrderStatus = async (order, id, actionType, isUndo) => {
+
+    const dataToSend = order?.productInformation.map(product => ({
+      productId: product.productId,
+      sku: product.sku,
+      onHandSku: product.sku,
+      size: product.size,
+      color: product.color
+    }));
+
+    const returnDataToSend = order?.returnInfo?.products?.map(product => ({
+      productId: product.productId,
+      sku: product.sku,
+      size: product.size,
+      color: product.color
+    }));
+
     let updateStatus;
 
     if (isUndo) {
       updateStatus = order?.previousStatus; // Revert to previous status if undoing
-      localStorage.removeItem(`undoVisible_${id}`);
+      // localStorage.removeItem(`undoVisible_${id}`);
     } else {
       switch (actionType) {
         case 'shipped':
@@ -338,8 +501,14 @@ const OrdersPage = () => {
         case 'delivered':
           updateStatus = 'Delivered';
           break;
-        case 'requestedReturn':
-          updateStatus = 'Requested Return';
+        case 'approved':
+          updateStatus = 'Request Accepted';
+          break;
+        case 'declined':
+          updateStatus = 'Request Declined';
+          break;
+        case 'returned':
+          updateStatus = 'Return Initiated';
           break;
         case 'refunded':
           updateStatus = 'Refunded';
@@ -348,13 +517,30 @@ const OrdersPage = () => {
           updateStatus = 'Processing';
           break;
       }
-      localStorage.setItem(`undoVisible_${id}`, true);
-    }
+      // localStorage.setItem(`undoVisible_${id}`, true);
+    };
 
     const data = {
       orderStatus: updateStatus,
+      ...(actionType === "shipped" && {
+        shippedAt: new Date(), // Add shippedAt timestamp
+      }),
+      ...(actionType === "delivered" && {
+        deliveredAt: new Date(), // Add deliveredAt timestamp
+      }),
       ...(actionType === "shipped" && trackingNumber ? { trackingNumber } : {}), // Add tracking number if provided for shipped
-      ...(actionType === "shipped" && selectedHandler ? { selectedHandlerName: selectedHandler } : {}) // Add selectedHandler for shipped
+      ...(actionType === "shipped" && selectedHandler
+        ? {
+          selectedShipmentHandlerName: selectedHandler?.shipmentHandlerName,
+          trackingUrl: selectedHandler?.trackingUrl,
+          imageUrl: selectedHandler?.imageUrl,
+        }
+        : {}), // Add selectedHandler details if provided for shipped
+      ...(isUndo && { isUndo: true }),
+      ...(actionType === "onHold" && onHoldReason ? { onHoldReason } : {}),
+      ...(actionType === "declined" && declinedReason ? { declinedReason } : {}),
+      dataToSend,
+      returnDataToSend
     };
 
     try {
@@ -396,6 +582,60 @@ const OrdersPage = () => {
             duration: 5000
           })
         }
+        else if (actionType === "shipped") {
+          try {
+            const response = await axiosPublic.put("/decreaseOnHandSkuFromProduct", dataToSend);
+
+            // Check the results array from the response
+            const updateResults = response?.data?.results;
+
+            if (updateResults && Array.isArray(updateResults)) {
+              const successfulUpdates = updateResults.filter((result) => !result.error); // Filter out successful updates
+
+              if (successfulUpdates.length > 0) {
+                toast.custom((t) => (
+                  <div
+                    className={`${t.visible ? 'animate-enter' : 'animate-leave'
+                      } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+                  >
+                    <div className="pl-6">
+                      <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+                    </div>
+                    <div className="flex-1 w-0 p-4">
+                      <div className="flex items-start">
+                        <div className="ml-3 flex-1">
+                          <p className="text-base font-bold text-gray-900">
+                            Order Updated!
+                          </p>
+                          <p className="mt-1 text-sm text-gray-500">
+                            Order has been shipped
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex border-l border-gray-200">
+                      <button
+                        onClick={() => toast.dismiss(t.id)}
+                        className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+                      >
+                        <RxCross2 />
+                      </button>
+                    </div>
+                  </div>
+                ), {
+                  position: "bottom-right",
+                  duration: 5000
+                })
+              } else {
+                console.error("No successful updates occurred");
+              }
+            } else {
+              console.error("Unexpected response format:", response?.data);
+            }
+          } catch (error) {
+            console.error("Error making API request:", error);
+          }
+        }
         else {
           sendOrderEmail(order, actionType); // Send notification email
         }
@@ -409,15 +649,21 @@ const OrdersPage = () => {
   };
 
   // Adjust this logic to correctly determine the visibility of the Undo button
-  const isUndoAvailable = (order) => {
-    if (!isAdmin) return false;
-    const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
-    const lastChange = new Date(order.lastStatusChange);
-
-    // Check localStorage to see if the undo button should be visible
-    const isVisible = localStorage.getItem(`undoVisible_${order._id}`);
-    return lastChange >= sixHoursAgo && isVisible;
+  const checkUndoAvailability = (order) => {
+    if (!order.undoAvailableUntil || !isAdmin) return false;
+    return new Date(order.undoAvailableUntil) > new Date(); // Check if undo is still valid
   };
+
+  // Adjust this logic to correctly determine the visibility of the Undo button - local storage previous logic
+  // const isUndoAvailable = (order) => {
+  //   if (!isAdmin) return false;
+  //   const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
+  //   const lastChange = new Date(order.lastStatusChange);
+
+  //   // Check localStorage to see if the undo button should be visible
+  //   const isVisible = localStorage.getItem(`undoVisible_${order._id}`);
+  //   return lastChange >= sixHoursAgo && isVisible;
+  // };
 
   // sending mail to customer
   const sendOrderEmail = (order, actionType) => {
@@ -437,7 +683,15 @@ const OrdersPage = () => {
         message = "We have received your return request and will process it shortly. You will be contacted with further instructions on how to return your items.";
         successToastMessage = "Shipment is on hold.";
         break;
-      case 'requestedReturn':
+      case 'approved':
+        message = "We have received your return request and will process it shortly. You will be contacted with further instructions on how to return your items.";
+        successToastMessage = "Approved request has been initiated!";
+        break;
+      case 'declined':
+        message = "We have received your return request and will process it shortly. You will be contacted with further instructions on how to return your items.";
+        successToastMessage = "Declined request has been initiated!";
+        break;
+      case 'returned':
         message = "We have received your return request and will process it shortly. You will be contacted with further instructions on how to return your items.";
         successToastMessage = "Return request has been initiated!";
         break;
@@ -566,43 +820,46 @@ const OrdersPage = () => {
         if (selectedColumns.includes(col)) {
           switch (col) {
             case 'Order Number':
-              data.orderNumber = row.orderNumber;
+              data["Order Number"] = row?.orderNumber;
+              break;
+            case 'R. Order Number':
+              data['R. Order Number'] = row?.orderNumber;
               break;
             case 'Date & Time':
-              data.dateTime = row.dateTime;
+              data['Date & Time'] = row?.dateTime;
               break;
             case 'Customer Name':
-              data.customerName = row.customerName;
+              data['Customer Name'] = row?.customerInfo?.customerName;
               break;
             case 'Order Amount':
-              data.totalAmount = row.totalAmount;
+              data['Order Amount'] = row?.total;
+              break;
+            case 'Refund Amount':
+              data['Refund Amount'] = row?.total;
               break;
             case 'Order Status':
-              data.orderStatus = row.orderStatus;
+              data['Order Status'] = row?.orderStatus;
+              break;
+            case 'Status':
+              data['Status'] = row?.orderStatus;
               break;
             case 'Email':
-              data.email = row.email;
+              data['Email'] = row?.customerInfo?.email;
               break;
             case 'Phone Number':
-              data.phoneNumber = row.phoneNumber;
+              data['Phone Number'] = row?.customerInfo?.phoneNumber;
               break;
-            case 'Alternative Phone Number':
-              data.phoneNumber2 = row.phoneNumber2 || "--";
-              break;
-            case 'Shipping Zone':
-              data.shippingZone = row.shippingZone;
+            case 'Alt. Phone Number':
+              data['Alt. Phone Number'] = row?.customerInfo?.phoneNumber2 || "--";
               break;
             case 'Shipping Method':
-              data.shippingMethod = row.shippingMethod;
+              data['Shipping Method'] = row?.deliveryInfo?.deliveryMethod;
               break;
             case 'Payment Status':
-              data.paymentStatus = row.paymentStatus;
+              data['Payment Status'] = row?.paymentInfo?.paymentStatus;
               break;
             case 'Payment Method':
-              data.paymentMethod = row.paymentMethod;
-              break;
-            case 'Vendor':
-              data.vendor = row.vendor;
+              data['Payment Method'] = row?.paymentInfo?.paymentMethod;
               break;
             default:
               break;
@@ -651,43 +908,46 @@ const OrdersPage = () => {
         if (selectedColumns.includes(col)) {
           switch (col) {
             case "Order Number":
-              rowData["Order Number"] = order.orderNumber;
+              rowData["Order Number"] = order?.orderNumber;
+              break;
+            case "R. Order Number":
+              rowData["R. Order Number"] = order?.orderNumber;
               break;
             case "Date & Time":
-              rowData["Date & Time"] = order.dateTime;
+              rowData["Date & Time"] = order?.dateTime;
               break;
             case "Customer Name":
-              rowData["Customer Name"] = order.customerName;
+              rowData["Customer Name"] = order?.customerInfo?.customerName;
               break;
             case "Order Amount":
-              rowData["Order Amount"] = `${order.totalAmount.toFixed(2)}`;
+              rowData["Order Amount"] = `${order?.total?.toFixed(2)}`;
+              break;
+            case "Refund Amount":
+              rowData["Refund Amount"] = `${order?.total?.toFixed(2)}`;
               break;
             case "Order Status":
-              rowData["Order Status"] = order.orderStatus;
+              rowData["Order Status"] = order?.orderStatus;
+              break;
+            case "Status":
+              rowData["Status"] = order?.orderStatus;
               break;
             case "Email":
-              rowData["Email"] = order.email;
+              rowData["Email"] = order?.customerInfo?.email;
               break;
             case "Phone Number":
-              rowData["Phone Number"] = order.phoneNumber;
+              rowData["Phone Number"] = order?.customerInfo?.phoneNumber;
               break;
-            case "Alternative Phone Number":
-              rowData["Alternative Phone Number"] = order.phoneNumber2 || "--";
-              break;
-            case "Shipping Zone":
-              rowData["Shipping Zone"] = order.shippingZone;
+            case "Alt. Phone Number":
+              rowData["Alt. Phone Number"] = order?.customerInfo?.phoneNumber2 || "--";
               break;
             case "Shipping Method":
-              rowData["Shipping Method"] = order.shippingMethod;
+              rowData["Shipping Method"] = order?.deliveryInfo?.deliveryMethod;
               break;
             case "Payment Status":
-              rowData["Payment Status"] = order.paymentStatus;
+              rowData["Payment Status"] = order?.paymentInfo?.paymentStatus;
               break;
             case "Payment Method":
-              rowData["Payment Method"] = order.paymentMethod;
-              break;
-            case "Vendor":
-              rowData["Vendor"] = order.vendor;
+              rowData["Payment Method"] = order?.paymentInfo?.paymentMethod;
               break;
             default:
               break;
@@ -707,7 +967,7 @@ const OrdersPage = () => {
       headStyles: { halign: 'center', valign: 'middle' },           // Center-align headers
       theme: "striped",  // Optional: customize the look of the table
       columnStyles: {
-        "Alternative Phone Number": { halign: 'center' }, // Center-align for "--" placeholder
+        "Alt. Phone Number": { halign: 'center' }, // Center-align for "--" placeholder
       }
     });
 
@@ -743,43 +1003,46 @@ const OrdersPage = () => {
         if (selectedColumns.includes(col)) {
           switch (col) {
             case 'Order Number':
-              data["Order Number"] = row.orderNumber || "";  // Include empty cells
+              data["Order Number"] = row?.orderNumber || "";  // Include empty cells
+              break;
+            case 'R. Order Number':
+              data["R. Order Number"] = row?.orderNumber || "";  // Include empty cells
               break;
             case 'Date & Time':
-              data["Date & Time"] = row.dateTime || "";  // Include empty cells
+              data["Date & Time"] = row?.dateTime || "";  // Include empty cells
               break;
             case 'Customer Name':
-              data["Customer Name"] = row.customerName || "";  // Include empty cells
+              data["Customer Name"] = row?.customerInfo?.customerName || "";  // Include empty cells
               break;
             case 'Order Amount':
-              data["Order Amount"] = row.totalAmount || "";  // Include empty cells
+              data["Order Amount"] = row?.total || "";  // Include empty cells
+              break;
+            case 'Refund Amount':
+              data["Refund Amount"] = row?.total || "";  // Include empty cells
               break;
             case 'Order Status':
-              data["Order Status"] = row.orderStatus || "";  // Include empty cells
+              data["Order Status"] = row?.orderStatus || "";  // Include empty cells
+              break;
+            case 'Status':
+              data["Status"] = row?.orderStatus || "";  // Include empty cells
               break;
             case 'Email':
-              data["Email"] = row.email || "";  // Include empty cells
+              data["Email"] = row?.customerInfo?.email || "";  // Include empty cells
               break;
             case 'Phone Number':
-              data["Phone Number"] = row.phoneNumber || "";  // Include empty cells
+              data["Phone Number"] = row?.customerInfo?.phoneNumber || "";  // Include empty cells
               break;
-            case 'Alternative Phone Number':
-              data["Alternative Phone Number"] = row.phoneNumber2 || "";  // Include empty cells
-              break;
-            case 'Shipping Zone':
-              data["Shipping Zone"] = row.shippingZone || "";  // Include empty cells
+            case 'Alt. Phone Number':
+              data["Alt. Phone Number"] = row?.customerInfo?.phoneNumber2 || "";  // Include empty cells
               break;
             case 'Shipping Method':
-              data["Shipping Method"] = row.shippingMethod || "";  // Include empty cells
+              data["Shipping Method"] = row?.deliveryInfo?.deliveryMethod || "";  // Include empty cells
               break;
             case 'Payment Status':
-              data["Payment Status"] = row.paymentStatus || "";  // Include empty cells
+              data["Payment Status"] = row?.paymentInfo?.paymentStatus || "";  // Include empty cells
               break;
             case 'Payment Method':
-              data["Payment Method"] = row.paymentMethod || "";  // Include empty cells
-              break;
-            case 'Vendor':
-              data["Vendor"] = row.vendor || "";  // Include empty cells
+              data["Payment Method"] = row?.paymentInfo?.paymentMethod || "";  // Include empty cells
               break;
             default:
               break;
@@ -805,20 +1068,38 @@ const OrdersPage = () => {
     XLSX.writeFile(workbook, `${fileName}.xlsx`);
   };
 
-  const isSevenDaysOrMore = (lastStatusChange) => {
-    const today = new Date();
-    const sevenDaysAgo = subDays(today, 7);
-    return isBefore(parseISO(lastStatusChange), sevenDaysAgo);
+  // After delivered, only admin can change this within 7 days of order
+  // const isSevenDaysOrMore = (lastStatusChange) => {
+  //   const today = new Date();
+  //   const sevenDaysAgo = subDays(today, 7);
+  //   return isBefore(parseISO(lastStatusChange), sevenDaysAgo);
+  // };
+
+  // Disable the button based on admins or staffs
+  // const shouldDisableButton = (orderStatus, lastStatusChange, isAdmin) => {
+  //   if (!isAdmin) return false; // If admin, do not disable
+  //   if (['Delivered', 'Requested Return', 'Refunded'].includes(orderStatus)) {
+  //     return isSevenDaysOrMore(lastStatusChange); // Disable if last status change was 7 or more days ago
+  //   }
+  //   return false;
+  // };
+
+  const handleDownload = (imgUrl) => {
+    if (!imgUrl) return;
+
+    // Extract the image name from the URL
+    const fileName = imgUrl.split("/").pop().split("?")[0]; // Removes any query parameters
+
+    // Trigger the download with the extracted filename
+    saveAs(imgUrl, fileName);
   };
 
-  // Disable the button based on conditions
-  const shouldDisableButton = (orderStatus, lastStatusChange, isAdmin) => {
-    if (isAdmin) return false; // If admin, do not disable
-    if (['Delivered', 'Requested Return', 'Refunded'].includes(orderStatus)) {
-      return isSevenDaysOrMore(lastStatusChange); // Disable if last status change was 7 or more days ago
-    }
-    return false;
-  };
+  const matchingShipmentHandlers = useMemo(() => {
+    if (!shippingList || !orderToUpdate?.deliveryInfo?.city) return [];
+
+    return shippingList?.filter(zone => zone?.selectedCity?.includes(orderToUpdate?.deliveryInfo?.city))?.map(zone => zone?.selectedShipmentHandler).filter(Boolean) || []; // Ensure no null or undefined values
+
+  }, [shippingList, orderToUpdate?.deliveryInfo?.city]);
 
   useEffect(() => {
     if (paginatedOrders?.length === 0) {
@@ -826,9 +1107,9 @@ const OrdersPage = () => {
     }
   }, [paginatedOrders]);
 
-  if (isOrderListPending) {
+  if (isOrderListPending || isShippingPending) {
     return <Loading />;
-  }
+  };
 
   return (
     <div className='relative w-full min-h-screen bg-gray-100'>
@@ -852,12 +1133,12 @@ const OrdersPage = () => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl px-0 md:px-6 2xl:px-0 mx-auto'>
+      <div className='max-w-screen-2xl px-0 md:px-6 2xl:px-3 mx-auto'>
 
         <div className='flex items-center justify-between py-2 md:py-5 gap-2'>
 
           <div className='w-full'>
-            <h3 className='text-center md:text-start font-semibold text-xl lg:text-2xl'>Order Management</h3>
+            <h3 className='text-center md:text-start font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>ORDER MANAGEMENT</h3>
           </div>
 
           {/* Search Product Item */}
@@ -883,17 +1164,17 @@ const OrdersPage = () => {
         <div className='pb-3 px-6 md:px-0 pt-3 md:pt-0 flex flex-wrap lg:flex-nowrap gap-3 lg:gap-0 justify-center md:justify-between'>
           <div className='flex justify-center md:justify-start w-full'>
             <TabsOrder
-              tabs={orderStatusTabs}
-              selectedTab={selectedTab}
-              onTabChange={setSelectedTab} // This passes the function to change the tab
+              tabs={tabsWithCounts}
+              selectedTab={`${selectedTab} (${counts[selectedTab] || 0})`} // Pass the selected tab with the count
+              onTabChange={(tab) => setSelectedTab(tab.split(' (')[0])} // Extract the tab name without the count
             />
           </div>
 
           <div className='flex w-full items-center max-w-screen-2xl px-3 mx-auto justify-center md:justify-end gap-3 md:gap-6'>
 
             <div ref={dropdownRefDownload} className="relative inline-block text-left z-10">
-              <Button onClick={() => toggleDropdown('download')} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
-                Download Data
+              <button onClick={() => toggleDropdown('download')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[14px] md:px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[10px] md:text-[14px] text-neutral-700">
+                EXPORT AS
                 <svg
                   className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown === "download" ? 'rotate-180' : ''}`}
                   xmlns="http://www.w3.org/2000/svg"
@@ -903,7 +1184,7 @@ const OrdersPage = () => {
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                 </svg>
-              </Button>
+              </button>
 
               {openDropdown === 'download' && (
                 <div className="absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
@@ -912,68 +1193,44 @@ const OrdersPage = () => {
                     {/* Button to export to CSV */}
                     <button
                       onClick={exportToCSV}
-                      className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
-md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
-                      <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
-md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
-                        Export CSV
+                      className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#d4ffce] bg-[#d4ffce] overflow-hidden transition-all hover:bg-[#bdf6b4] active:border-[#d4ffce] group rounded-lg
+                      md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+                      <span className="relative translate-x-[26px] text-neutral-700 font-semibold transition-transform duration-300 group-hover:text-transparent text-xs
+                      md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+                        EXPORT CSV
                       </span>
-                      <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
-md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 35 35"
-                          className="w-[20px] fill-white"
-                        >
-                          <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
-                          <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
-                          <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
-                        </svg>
+                      <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#bdf6b4] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#d4ffce]
+                      md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+                        <HiOutlineDownload size={20} className='text-neutral-700' />
                       </span>
                     </button>
 
                     {/* Button to export to XLSX */}
                     <button
                       onClick={exportToXLS}
-                      className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
-md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
-                      <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
-md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
-                        Export XLSX
+                      className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#d4ffce] bg-[#d4ffce] overflow-hidden transition-all hover:bg-[#bdf6b4] active:border-[#d4ffce] group rounded-lg
+                      md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+                      <span className="relative translate-x-[26px] text-neutral-700 font-semibold transition-transform duration-300 group-hover:text-transparent text-xs
+                      md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+                        EXPORT XLSX
                       </span>
-                      <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
-md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 35 35"
-                          className="w-[20px] fill-white"
-                        >
-                          <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
-                          <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
-                          <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
-                        </svg>
+                      <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#bdf6b4] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#d4ffce]
+                      md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+                        <HiOutlineDownload size={20} className='text-neutral-700' />
                       </span>
                     </button>
 
                     <button
                       onClick={exportToPDF}
-                      className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
-md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
-                      <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
-md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
-                        Export PDF
+                      className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#d4ffce] bg-[#d4ffce] overflow-hidden transition-all hover:bg-[#bdf6b4] active:border-[#d4ffce] group rounded-lg
+                      md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+                      <span className="relative translate-x-[26px] text-neutral-700 font-semibold transition-transform duration-300 group-hover:text-transparent text-xs
+                      md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+                        EXPORT PDF
                       </span>
-                      <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
-md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 35 35"
-                          className="w-[20px] fill-white"
-                        >
-                          <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
-                          <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
-                          <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
-                        </svg>
+                      <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#bdf6b4] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#d4ffce]
+                      md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+                        <HiOutlineDownload size={20} className='text-neutral-700' />
                       </span>
                     </button>
 
@@ -983,10 +1240,11 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
             </div>
 
             <div ref={dropdownRef} className="relative inline-block text-left z-10">
-              <Button onClick={() => toggleDropdown('other')} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
-                Customize
+
+              <button onClick={() => toggleDropdown2('other')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[10px] md:text-[14px] text-neutral-700">
+                CUSTOMIZE
                 <svg
-                  className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown === "other" ? 'rotate-180' : ''}`}
+                  className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown2 === "other" ? 'rotate-180' : ''}`}
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -994,18 +1252,14 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                 </svg>
-              </Button>
+              </button>
 
-              {openDropdown === 'other' && (
+              {openDropdown2 === 'other' && (
                 <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 
-                  {/* Choose Columns Button */}
-                  <div className="py-1">
-                    <Button variant="light" color="primary" onClick={() => { setColumnModalOpen(true); setOpenDropdown(false) }} className="w-full">
-                      Choose Columns
-                    </Button>
+                  <div className="p-1">
 
-                    <div className='flex items-center gap-2'>
+                    <div className='flex items-center gap-2 mb-2'>
                       <DateRangePicker
                         label="Order Duration"
                         visibleMonths={1}
@@ -1021,9 +1275,15 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                       )}
                     </div>
 
+                    {/* Choose Columns Button */}
+                    <button className="relative z-[1] flex items-center justify-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700 w-full" onClick={() => { setColumnModalOpen(true); setOpenDropdown(false) }}>
+                      Choose Columns <TbColumnInsertRight size={20} />
+                    </button>
+
                   </div>
                 </div>
               )}
+
             </div>
 
           </div>
@@ -1032,7 +1292,7 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
         {/* Column Selection Modal */}
         <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
           <ModalContent>
-            <ModalHeader>Choose Columns</ModalHeader>
+            <ModalHeader className='bg-gray-200'>Choose Columns</ModalHeader>
             <ModalBody className="modal-body-scroll">
               <DragDropContext onDragEnd={handleOnDragEnd}>
                 <Droppable droppableId="droppable">
@@ -1073,14 +1333,16 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                 </Droppable>
               </DragDropContext>
             </ModalBody>
-            <ModalFooter>
-              <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
-                Select All
-              </Button>
-              <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
-                Deselect All
-              </Button>
-              <Button variant="solid" color="primary" size="sm" onClick={handleSave}>
+            <ModalFooter className='flex justify-between items-center'>
+              <div className='flex items-center gap-2'>
+                <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
+                  Deselect All
+                </Button>
+                <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
+                  Select All
+                </Button>
+              </div>
+              <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
                 Save
               </Button>
             </ModalFooter>
@@ -1117,31 +1379,45 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                                 {order?.orderNumber}
                               </td>
                             )}
+                            {column === 'R. Order Number' && (
+                              <td key="returnNumber" className="text-xs p-3 font-mono cursor-pointer text-blue-600 hover:text-blue-800" onClick={() => handleOrderClick(order)}>
+                                {order?.orderNumber}
+                              </td>
+                            )}
                             {column === 'Date & Time' && (
                               <td key="dateTime" className="text-xs p-3 text-gray-700 text-center">{order?.dateTime}</td>
                             )}
                             {column === 'Customer Name' && (
-                              <td key="customerName" className="text-xs p-3 text-gray-700 uppercase text-center">{order?.customerName}</td>
+                              <td key="customerName" className="text-xs p-3 text-gray-700 uppercase text-center">{order?.customerInfo?.customerName}</td>
                             )}
                             {column === 'Order Amount' && (
-                              <td key="orderAmount" className="text-xs p-3 text-gray-700 text-right">৳ {order?.totalAmount.toFixed(2)}</td>
+                              <td key="orderAmount" className="text-xs p-3 text-gray-700 text-right">৳ {order?.total?.toFixed(2)}</td>
+                            )}
+                            {column === 'Refund Amount' && (
+                              <td key="refundAmount" className="text-xs p-3 text-gray-700 text-right">৳ {order?.returnInfo?.refundAmount?.toFixed(2)}</td>
                             )}
                             {column === 'Order Status' && (
                               <td key="orderStatus" className="text-xs p-3 text-yellow-600 text-center">{order?.orderStatus}</td>
                             )}
+                            {column === 'Status' && (
+                              <td key="status" className="text-xs p-3 text-yellow-600 text-center">{order?.orderStatus}</td>
+                            )}
                             {column === 'Action' && (
                               <td className="p-3">
                                 <div className="flex gap-2 items-center">
+
                                   {order.orderStatus === 'Pending' && (
                                     <Button onClick={() => handleActions(order._id)} size="sm" className="text-xs w-20" color="primary" variant="flat">
                                       Confirm
                                     </Button>
                                   )}
+
                                   {order.orderStatus === 'Processing' && (
                                     <Button onClick={() => handleActions(order._id, 'shipped')} size="sm" className="text-xs w-20" color="secondary" variant="flat">
                                       Shipped
                                     </Button>
                                   )}
+
                                   {order.orderStatus === 'Shipped' && (
                                     <div className="flex items-center gap-2">
                                       <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'onHold')} size="sm" color="warning" variant="flat">
@@ -1152,6 +1428,7 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                                       </Button>
                                     </div>
                                   )}
+
                                   {order.orderStatus === 'On Hold' && (
                                     <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'delivered')} size="sm" color="success" variant="flat">
                                       Delivered
@@ -1161,30 +1438,57 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                                   {order.orderStatus === 'Delivered' && (
                                     <Button
                                       className="text-xs w-20"
-                                      onClick={() => handleActions(order._id, 'requestedReturn')}
                                       size="sm"
-                                      color="danger"
-                                      variant="flat"
-                                      isDisabled={shouldDisableButton(order.orderStatus, order.lastStatusChange, isAdmin)}
+                                      isDisabled
                                     >
-                                      Return
+                                      Completed
                                     </Button>
                                   )}
-                                  {order.orderStatus === 'Requested Return' && (
+
+                                  {order.orderStatus === 'Return Requested' && (
+                                    <div className="flex items-center gap-2">
+                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'approved')} color='success' size="sm" variant="flat">
+                                        Approve
+                                      </Button>
+                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'declined')} size="sm" color="danger" variant="flat">
+                                        Decline
+                                      </Button>
+                                    </div>
+                                  )}
+
+                                  {order.orderStatus === 'Request Accepted' && (
+                                    <div className="flex items-center gap-2">
+                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'returned')} size="sm" color="secondary" variant="flat">
+                                        Return
+                                      </Button>
+                                    </div>
+                                  )}
+
+                                  {order.orderStatus === 'Request Declined' && (
+                                    <div className="flex items-center gap-2">
+                                      <Button className="text-xs w-20"
+                                        isDisabled size="sm"
+                                        color="default">
+                                        Declined
+                                      </Button>
+                                    </div>
+                                  )}
+
+                                  {order.orderStatus === 'Return Initiated' && (
                                     <Button
                                       className="text-xs w-20"
-                                      onClick={() => handleActions(order._id, 'refunded')}
                                       size="sm"
-                                      color="danger"
-                                      variant="flat"
-                                      isDisabled={shouldDisableButton(order.orderStatus, order.lastStatusChange, isAdmin)}
+                                      color="warning"
+                                      variant='flat'
+                                      onClick={() => handleActions(order._id, 'refunded')}
                                     >
                                       Refund
                                     </Button>
                                   )}
+
                                   {order.orderStatus === 'Refunded' && (
                                     <Button
-                                      className="text-xs w-20 cursor-not-allowed"
+                                      className="text-xs w-20"
                                       size="sm"
                                       color="default"
                                       isDisabled
@@ -1194,7 +1498,7 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                                   )}
 
                                   {/* Undo button logic */}
-                                  {isAdmin && isUndoAvailable(order) && (
+                                  {isAdmin && checkUndoAvailability(order) && (
                                     <button
                                       onClick={() => handleActions(order._id, '', true)}
                                       className="text-red-600 hover:text-red-800 focus:ring-2 focus:ring-red-500 rounded p-1"
@@ -1202,32 +1506,27 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                                       <FaUndo />
                                     </button>
                                   )}
+
                                 </div>
                               </td>
                             )}
                             {column === 'Email' && (
-                              <td key="email" className="text-xs p-3 text-gray-700">{order?.email}</td>
+                              <td key="email" className="text-xs p-3 text-gray-700">{order?.customerInfo?.email}</td>
                             )}
                             {column === 'Phone Number' && (
-                              <td key="phoneNumber" className="text-xs p-3 text-gray-700 text-center">{order?.phoneNumber}</td>
+                              <td key="phoneNumber" className="text-xs p-3 text-gray-700 text-center">{order?.customerInfo?.phoneNumber}</td>
                             )}
-                            {column === 'Alternative Phone Number' && (
-                              <td key="altPhoneNumber" className="text-xs p-3 text-gray-700 text-center">{order?.phoneNumber2 === 0 ? '--' : order?.phoneNumber2}</td>
-                            )}
-                            {column === 'Shipping Zone' && (
-                              <td key="shippingZone" className="text-xs p-3 text-gray-700 text-center">{order?.shippingZone}</td>
+                            {column === 'Alt. Phone Number' && (
+                              <td key="altPhoneNumber" className="text-xs p-3 text-gray-700 text-center">{order?.customerInfo?.phoneNumber2 === "" ? '--' : order?.customerInfo?.phoneNumber2}</td>
                             )}
                             {column === 'Shipping Method' && (
-                              <td key="shippingMethod" className="text-xs p-3 text-gray-700 text-center">{order?.shippingMethod}</td>
+                              <td key="shippingMethod" className="text-xs p-3 text-gray-700 text-center">{order?.deliveryInfo?.deliveryMethod}</td>
                             )}
                             {column === 'Payment Status' && (
-                              <td key="paymentStatus" className="text-xs p-3 text-gray-700 text-center">{order?.paymentStatus}</td>
+                              <td key="paymentStatus" className="text-xs p-3 text-gray-700 text-center">{order?.paymentInfo?.paymentStatus}</td>
                             )}
                             {column === 'Payment Method' && (
-                              <td key="paymentMethod" className="text-xs p-3 text-gray-700 text-center">{order?.paymentMethod}</td>
-                            )}
-                            {column === 'Vendor' && (
-                              <td key="vendor" className="text-xs p-3 text-gray-700 text-center">{order?.vendor}</td>
+                              <td key="paymentMethod" className="text-xs p-3 text-gray-700 text-center">{order?.paymentInfo?.paymentMethod}</td>
                             )}
                           </>
                         )
@@ -1247,27 +1546,142 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                 <ModalHeader className="text-sm md:text-base"><Barcode selectedOrder={selectedOrder} /></ModalHeader>
               </div>
               <ModalBody className="modal-body-scroll">
-                <div className='flex items-center justify-between w-full pr-10'>
-                  <p>Order Id - <strong>#{selectedOrder?.orderNumber}</strong></p>
-                  <p>Customer Id - <strong>{selectedOrder?.customerId}</strong></p>
-                </div>
-                <p className='text-xs md:text-base'>Address: {selectedOrder?.address1} {selectedOrder?.address2}, {selectedOrder?.city}, {selectedOrder?.postalCode}</p>
-                <div className='flex items-center justify-between pr-10'>
-                  <p className='text-xs md:text-base'>Payment Method: {selectedOrder?.paymentMethod}</p>
-                  <p className='text-xs md:text-base'>Transaction Id: {selectedOrder?.transactionId}</p>
-                </div>
-                <div className='flex flex-wrap items-center justify-between pr-10'>
-                  <p className='text-xs md:text-base'>Shipment Handler: {selectedOrder?.selectedHandlerName === undefined ? '--' : selectedOrder?.selectedHandlerName}</p>
-                  <p className='text-xs md:text-base'>Tracking Number: {selectedOrder?.trackingNumber === "" ? '--' : selectedOrder?.trackingNumber}</p>
-                </div>
 
-                <h4 className="mt-4 text-lg font-semibold">Product Information</h4>
-                {/* Display product and promo/offer information */}
-                <div className='flex justify-between gap-6 pr-6'>
-                  <div>
-                    {selectedOrder.productInformation && selectedOrder.productInformation.length > 0 && (
-                      <>
-                        {selectedOrder.productInformation.map((product, index) => (
+                <Accordion defaultExpandedKeys={["1"]}>
+
+                  <AccordionItem
+                    key="1"
+                    aria-label="Order Information"
+                    title={<strong>Order Information</strong>}
+                  >
+                    <div className='flex justify-between mb-3'>
+                      <div className='flex flex-col gap-2.5 w-full'>
+                        <p>Order Id - <strong>#{selectedOrder?.orderNumber}</strong></p>
+                        <p className='text-xs md:text-base'>Payment Method: {selectedOrder?.paymentInfo?.paymentMethod}</p>
+                        <p className='text-xs md:text-base'>Trans. Id: {selectedOrder?.paymentInfo?.transactionId}</p>
+                      </div>
+                      <div className='flex flex-col gap-2.5 w-full'>
+                        <p>Customer Id - <strong>{selectedOrder?.customerInfo?.customerId}</strong></p>
+                        <p>Customer Name - <strong>{selectedOrder?.customerInfo?.customerName}</strong></p>
+                        <p className='text-xs md:text-base'>Address: {selectedOrder?.deliveryInfo?.address1} {selectedOrder?.deliveryInfo?.address2}, {selectedOrder?.deliveryInfo?.city}, {selectedOrder?.deliveryInfo?.postalCode}</p>
+                        {selectedOrder?.deliveryInfo?.noteToSeller && <p className='text-xs md:text-base'>Customer Note: <strong>{selectedOrder?.deliveryInfo?.noteToSeller}</strong></p>}
+                      </div>
+                    </div>
+                  </AccordionItem>
+
+                  <AccordionItem
+                    key="2"
+                    aria-label="Shipment Information"
+                    title={<strong>Shipment Information</strong>}
+                  >
+                    <div className='mb-3 flex flex-col gap-2'>
+                      <div className='flex justify-between items-center'>
+                        <p className='text-xs md:text-base'>Shipment Handler: {selectedOrder?.shipmentInfo?.selectedShipmentHandlerName === undefined ? '--' : selectedOrder?.shipmentInfo?.selectedShipmentHandlerName}</p>
+                        <p className='text-xs md:text-base'>Tracking Number: {selectedOrder?.shipmentInfo?.trackingNumber ? selectedOrder?.shipmentInfo?.trackingNumber : "--"}</p>
+                      </div>
+                      {selectedOrder?.onHoldReason && <p className='text-xs md:text-base'>On Hold reason: <strong>{selectedOrder?.onHoldReason}</strong></p>}
+                    </div>
+                  </AccordionItem>
+
+                  <AccordionItem
+                    key="3"
+                    aria-label="Product Information"
+                    title={<strong>Product Information</strong>}
+                  >
+                    {/* Display product and promo/offer information */}
+                    <div className='flex justify-between gap-6'>
+                      <div>
+                        {selectedOrder.productInformation && selectedOrder.productInformation.length > 0 && (
+                          <>
+                            {selectedOrder.productInformation.map((product, index) => (
+                              <div key={index} className="mb-4">
+                                <p><strong>Product : </strong> {product?.productTitle}</p>
+                                <p><strong>Product ID : </strong> {product?.productId}</p>
+                                <p><strong>Size:</strong>  {product?.size}</p>
+                                <p className='flex items-center gap-2'><strong>Color:</strong>
+                                  {product?.color?.label}
+                                  <span
+                                    style={{
+                                      display: 'inline-block',
+                                      width: '20px',
+                                      height: '20px',
+                                      backgroundColor: product.color?.color || '#fff',
+                                      marginRight: '8px',
+                                      borderRadius: '4px'
+                                    }}
+                                  />
+                                </p>
+                                <p><strong>Batch Code:</strong> {product?.batchCode}</p>
+                                <p><strong>Unit Price:</strong> ৳ {product?.discountInfo ? product?.discountInfo?.finalPriceAfterDiscount : product?.regularPrice}</p>
+                                {product.offerInfo && (
+                                  <p>
+                                    <strong>Offer Price:</strong> ৳{" "}
+                                    {(product?.regularPrice - (product?.offerInfo?.appliedOfferDiscount))}
+                                  </p>
+                                )}
+                                {/* Is Promo Price is needed to show on backend? */}
+                                {/* {product.promoInfo && (
+                                  <p>
+                                    <strong>Promo Price:</strong> ৳{" "}
+                                    -- Logic will be here --
+                                  </p>
+                                )} */}
+                                <p><strong>SKU:</strong> {product?.sku}</p>
+                                <p className='flex gap-0.5'><strong>Vendors:</strong>{product?.vendors?.length > 0 ? product?.vendors?.map((vendor, index) => (
+                                  <p key={index}>{vendor}</p>
+                                )) : "--"}</p>
+                              </div>
+                            ))}
+                          </>
+                        )}
+                      </div>
+                      <div className='flex flex-col items-center text-sm md:text-base w-60'>
+                        <p className='w-full'><strong>Sub Total:</strong>  ৳ {selectedOrder?.subtotal?.toFixed(2)}</p>
+                        <p className='w-full'>
+                          {selectedOrder?.totalSpecialOfferDiscount > 0 ? (
+                            <span> <strong>Offer Discount:</strong> ৳{selectedOrder?.totalSpecialOfferDiscount}</span>
+                          ) : selectedOrder?.promoInfo ? (
+                            <span> <strong>Promo Discount:</strong> ৳{selectedOrder?.promoInfo.appliedPromoDiscount}</span>
+                          ) : (
+                            <p>
+                              <strong> Promo/Offer applied: </strong><span>X</span>
+                            </p>
+                          )}
+                        </p>
+                        <p className='w-full'><strong>Shipping Charge:</strong>  ৳ {selectedOrder?.shippingCharge}</p>
+                        <p className='w-full'><strong>Total Amount:</strong>  ৳ {selectedOrder?.total?.toFixed(2)}</p>
+                      </div>
+                    </div>
+                  </AccordionItem>
+
+                  {selectedOrder?.returnInfo && <AccordionItem key="4"
+                    aria-label="Return Information"
+                    title={<strong>Return Information</strong>}>
+
+                    <div className='flex flex-col gap-4'>
+
+                      <div>
+                        {["Request Accepted", "Return Initiated", "Refunded"].includes(selectedOrder?.orderStatus) && (
+                          <p className="text-green-500 text-lg font-bold pb-2.5">Approved</p>
+                        )}
+
+                        {selectedOrder?.declinedReason && selectedOrder?.orderStatus === "Request Declined" &&
+                          (
+                            <div>
+                              <p className="text-red-500 text-lg font-bold">Declined</p>
+                              <p className="pb-4">
+                                <strong>Declined Reason:</strong> <i>{selectedOrder?.declinedReason}</i>
+                              </p>
+                            </div>
+                          )}
+                        <p><strong>Return Date & Time :</strong> {selectedOrder?.returnInfo?.dateTime}</p>
+                        <p><strong>Return Reason :</strong> {selectedOrder?.returnInfo?.reason}</p>
+                        {selectedOrder?.returnInfo?.description && <p><strong>Description :</strong> <i>{selectedOrder?.returnInfo?.description}</i></p>}
+                      </div>
+
+                      <div>
+                        <p className='font-bold text-lg'>Returned Product Details</p>
+                        {selectedOrder?.returnInfo?.products?.map((product, index) => (
                           <div key={index} className="mb-4">
                             <p><strong>Product : </strong> {product?.productTitle}</p>
                             <p><strong>Product ID : </strong> {product?.productId}</p>
@@ -1285,105 +1699,189 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                                 }}
                               />
                             </p>
-                            <p><strong>Batch Code:</strong> {product?.batchCode}</p>
-                            <p><strong>Unit Price:</strong> {product?.unitPrice}</p>
+                            <p><strong>Unit Price:</strong> ৳ {product?.finalUnitPrice}</p>
                             <p><strong>SKU:</strong> {product?.sku}</p>
                           </div>
                         ))}
-                      </>
-                    )}
-                  </div>
-                  <div className='flex flex-col items-center text-sm md:text-base w-60'>
-                    <p className='w-full'><strong>Total Amount:</strong>  ৳ {selectedOrder?.totalAmount.toFixed(2)}</p>
-                    <p className='w-full'>
-                      {selectedOrder?.promoCode || selectedOrder?.productInformation?.some((product) => product.offerTitle) ? (
-                        (() => {
-                          // Calculate promo discount only if it's greater than 0
-                          const promoDiscount =
-                            selectedOrder.promoDiscountType === 'Percentage'
-                              ? (selectedOrder.totalAmount * selectedOrder.promoDiscountValue) / 100
-                              : selectedOrder.promoDiscountValue;
+                      </div>
 
-                          // Extract offer discounts from productInformation and filter out 0-value offers
-                          const offerDetails = selectedOrder.productInformation
-                            .map((product) => {
-                              const offerDiscount =
-                                product.offerDiscountType === 'Percentage'
-                                  ? (product.unitPrice * product.offerDiscountValue) / 100
-                                  : product.offerDiscountValue;
+                    </div>
 
-                              return {
-                                offerTitle: product.offerTitle,
-                                offerDiscountType: product.offerDiscountType,
-                                offerDiscountValue: product.offerDiscountValue,
-                                offerDiscountAmount: offerDiscount,
-                              };
-                            })
-                            .filter((offer) => offer.offerDiscountAmount > 0); // Filter out 0-value offers
+                  </AccordionItem>}
 
-                          return (
-                            <div className='flex flex-col gap-2'>
-                              {/* Show promo discount if applied */}
-                              {selectedOrder.promoCode && promoDiscount > 0 ? (
-                                <div>
-                                  <strong>Promo applied:</strong> {selectedOrder.promoCode} ({selectedOrder.promoDiscountType === 'Percentage'
-                                    ? `${selectedOrder.promoDiscountValue.toFixed(2)}%`
-                                    : `৳ ${selectedOrder.promoDiscountValue.toFixed(2)}`})
-                                  <br />
-                                  <br />
-                                </div>
-                              ) : null}
+                  {selectedOrder?.returnInfo && <AccordionItem key="5"
+                    aria-label="Attachments"
+                    title={<strong>Attachments</strong>}>
 
-                              {/* Show multiple offers if they are applied */}
-                              {offerDetails.length > 0 ? (
-                                <div>
-                                  {offerDetails.map((offer, index) => (
-                                    <span key={index}>
-                                      <strong>Offer applied</strong> ({offer.offerTitle}):{' '}
-                                      {offer.offerDiscountType === 'Percentage'
-                                        ? `${offer.offerDiscountValue.toFixed(2)}%`
-                                        : `৳ ${offer.offerDiscountAmount.toFixed(2)}`}
-                                      <br />
-                                    </span>
-                                  ))}
-                                </div>
-                              ) : null}
-                            </div>
-                          );
-                        })()
-                      ) : (
-                        <div>
-                          <strong>Promo/Offer applied:</strong> X
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {selectedOrder?.returnInfo?.imgUrls?.map((imgUrl, index) => (
+                        <div key={index} className="relative group h-24 w-full">
+                          {/* Display the image */}
+                          <Image
+                            src={imgUrl}
+                            alt={`Product Image ${index + 1}`}
+                            className="w-full h-full object-cover rounded-lg shadow-md"
+                            height={2000}
+                            width={2000}
+                          />
+
+                          {/* Button Wrapper (Centers Both Buttons) */}
+                          <div className="absolute inset-0 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition">
+                            {/* Expand Icon */}
+                            <button
+                              onClick={() => {
+                                setActiveImageIndex(index);
+                                setIsImageExpanded(true);
+                              }}
+                              className="text-white bg-black bg-opacity-50 p-2 rounded-full"
+                            >
+                              <CgArrowsExpandRight size={24} />
+                            </button>
+
+                            {/* Download Icon */}
+                            <button
+                              onClick={() => handleDownload(imgUrl)}
+                              className="text-white bg-black bg-opacity-50 p-2 rounded-full"
+                            >
+                              <HiDownload size={24} />
+                            </button>
+                          </div>
                         </div>
+                      ))}
+
+                      {/* Modal */}
+                      {isImageExpanded && (
+                        <ProductExpandedImageModalOrder
+                          productTitle={
+                            selectedOrder?.returnInfo?.products?.[activeImageIndex]?.productTitle
+                          }
+                          selectedColorLabel={
+                            selectedOrder?.returnInfo?.products?.[activeImageIndex]?.color?.label
+                          }
+                          expandedImgUrl={
+                            selectedOrder?.returnInfo?.imgUrls?.[activeImageIndex]
+                          }
+                          totalImages={selectedOrder?.returnInfo?.imgUrls?.length}
+                          activeImageIndex={activeImageIndex}
+                          setActiveImageIndex={setActiveImageIndex}
+                          isImageExpanded={isImageExpanded}
+                          setIsImageExpanded={setIsImageExpanded}
+                        />
                       )}
-                    </p>
-                  </div>
-                </div>
+                    </div>
+
+
+                  </AccordionItem >}
+
+                </Accordion>
+
               </ModalBody>
-              <ModalFooter className='flex items-center justify-end'>
-                <PrintButton selectedOrder={selectedOrder} />
+
+              <ModalFooter className={`flex items-center ${selectedOrder?.lastStatusChange ? "justify-between" : "justify-end"} `}>
+
+                {
+                  selectedOrder?.lastStatusChange ? (
+                    <i>
+                      Last updated on{" "}
+                      {(() => {
+                        const rawDate = selectedOrder.lastStatusChange;
+                        const date = new Date(rawDate);
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const year = String(date.getFullYear()).slice(-2);
+                        const hours = String(date.getHours()).padStart(2, '0');
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
+                        return `${day}-${month}-${year} | ${hours}:${minutes}`;
+                      })()}
+                      {" "} by {" "}
+                    </i>
+                  ) : (
+                    ""
+                  )
+                }
+
+                {!isImageExpanded && <PrintButton selectedOrder={selectedOrder} />}
+
               </ModalFooter>
+
             </ModalContent>
           </Modal>
         )}
 
         {/* Modal of tracking number */}
-        <Modal size='lg' isOpen={isTrackingModalOpen} onOpenChange={() => setTrackingModalOpen(false)}>
+        {matchingShipmentHandlers?.length > 0 && (
+          <Modal size='lg' isOpen={isTrackingModalOpen} onOpenChange={() => setTrackingModalOpen(false)}>
+            <ModalContent className='px-2'>
+              <ModalHeader className="flex flex-col gap-1">Select Shipment Handler</ModalHeader>
+              <ModalBody>
+                <div className='flex flex-wrap items-center justify-center gap-2'>
+                  {matchingShipmentHandlers?.map((handler, index) => (
+                    <div
+                      key={index}
+                      className={`flex items-center gap-2 border-2 rounded-lg font-semibold px-6 py-2 cursor-pointer ${selectedHandler?.shipmentHandlerName === handler?.shipmentHandlerName ? 'border-[#ffddc2] bg-[#ffddc2]' : 'bg-white'
+                        }`}
+                      onClick={() => handleSelectHandler(handler)}
+                    >
+                      {handler?.shipmentHandlerName}
+                    </div>
+                  ))}
+                </div>
+
+                <div className='flex justify-between items-center gap-2'>
+                  <Input
+                    clearable
+                    bordered
+                    fullWidth
+                    size="lg"
+                    label="Tracking Number *"
+                    placeholder="Enter tracking number"
+                    value={trackingNumber}
+                    onChange={(e) => setTrackingNumber(e.target.value.toUpperCase())}
+                  />
+                </div>
+
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  color="primary"
+                  onPress={async () => {
+                    // Check if handler is selected, regardless of toggle state
+                    if (!selectedHandler) {
+                      toast.error("Please select a shipment handler.");
+                      return; // Stop execution if no handler is selected
+                    }
+
+                    // When toggle is ON, ensure tracking number is entered
+                    if (isToggleOn && !trackingNumber) {
+                      toast.error("Please enter a tracking number.");
+                      return; // Stop execution if no tracking number is provided
+                    }
+
+                    // Update order status with tracking number and selected handler
+                    try {
+                      await updateOrderStatus(orderToUpdate, orderIdToUpdate, "shipped", false, trackingNumber, selectedHandler);
+                      setTrackingModalOpen(false); // Close modal after submission
+                      setTrackingNumber(''); // Clear input field
+                      setSelectedHandler(null); // Clear the selected handler
+                      setIsToggleOn(true); // Reset toggle to true
+                    } catch (error) {
+                      console.error("Failed to updated order status:", error)
+                      toast.error("Something went wrong while updating the order status.")
+                    }
+                  }}
+                >
+                  Confirm
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+        )}
+
+        {/* Modal of on hold */}
+        <Modal size='lg' isOpen={isOnHoldModalOpen} onOpenChange={() => setOnHoldModalOpen(false)}>
           <ModalContent className='px-2'>
-            <ModalHeader className="flex flex-col gap-1">Select Shipment Handler</ModalHeader>
+            <ModalHeader className="flex flex-col gap-1">On Hold Reason</ModalHeader>
             <ModalBody>
-              <div className='flex flex-wrap items-center justify-center gap-2'>
-                {orderToUpdate?.shipmentHandlers?.map((handler, index) => (
-                  <div
-                    key={index}
-                    className={`flex items-center gap-2 border-2 rounded-lg font-semibold px-6 py-2 cursor-pointer ${selectedHandler === handler ? 'border-[#ffddc2] bg-[#ffddc2]' : 'bg-white'
-                      }`}
-                    onClick={() => handleSelectHandler(handler)}
-                  >
-                    {handler}
-                  </div>
-                ))}
-              </div>
 
               <div className='flex justify-between items-center gap-2'>
                 <Input
@@ -1391,10 +1889,10 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
                   bordered
                   fullWidth
                   size="lg"
-                  label="Tracking Number *"
-                  placeholder="Enter tracking number"
-                  value={trackingNumber}
-                  onChange={(e) => setTrackingNumber(e.target.value.toUpperCase())}
+                  label="On Hold Reason *"
+                  placeholder="Enter on hold reason"
+                  value={onHoldReason}
+                  onChange={(e) => setOnHoldReason(e.target.value)}
                 />
               </div>
 
@@ -1403,23 +1901,62 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
               <Button
                 color="primary"
                 onPress={async () => {
-                  // Check if handler is selected, regardless of toggle state
-                  if (!selectedHandler) {
-                    toast.error("Please select a shipment handler.");
-                    return; // Stop execution if no handler is selected
-                  }
 
                   // When toggle is ON, ensure tracking number is entered
-                  if (isToggleOn && !trackingNumber) {
-                    toast.error("Please enter a tracking number.");
+                  if (!onHoldReason) {
+                    toast.error("Please enter on hold reason.");
                     return; // Stop execution if no tracking number is provided
                   }
 
                   // Update order status with tracking number and selected handler
-                  await updateOrderStatus(orderToUpdate, orderIdToUpdate, "shipped", false, trackingNumber, selectedHandler);
-                  setTrackingModalOpen(false); // Close modal after submission
-                  setTrackingNumber(''); // Clear input field
-                  setSelectedHandler(null); // Clear the selected handler
+                  await updateOrderStatus(orderToUpdateOnHold, orderIdToUpdateOnHold, "onHold", false, onHoldReason);
+                  setOnHoldModalOpen(false); // Close modal after submission
+                  setOnHoldReason(''); // Clear input field
+                  setIsToggleOn(true); // Reset toggle to true
+                }}
+              >
+                Confirm
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
+        {/* Modal of Declined reason */}
+        <Modal size='lg' isOpen={isDeclinedModalOpen} onOpenChange={() => setDeclinedModalOpen(false)}>
+          <ModalContent>
+            <ModalHeader className="flex flex-col gap-1 bg-gray-200 px-8">Provide a Reason for Declining the Order</ModalHeader>
+            <ModalBody>
+
+              <div className='flex justify-between items-center gap-2 my-2'>
+                <Textarea
+                  clearable
+                  disableAnimation
+                  variant="underlined"
+                  fullWidth
+                  size="lg"
+                  placeholder="Enter declined reason"
+                  value={declinedReason}
+                  onChange={(e) => setDeclinedReason(e.target.value)}
+                />
+              </div>
+
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                color="primary"
+                size='sm'
+                onPress={async () => {
+
+                  // When toggle is ON, ensure tracking number is entered
+                  if (!declinedReason) {
+                    toast.error("Please enter declined reason.");
+                    return; // Stop execution if no tracking number is provided
+                  }
+
+                  // Update order status with tracking number and selected handler
+                  await updateOrderStatus(orderToUpdateDeclined, orderIdToUpdateDeclined, "declined", false, declinedReason);
+                  setDeclinedModalOpen(false); // Close modal after submission
+                  setDeclinedReason(''); // Clear input field
                   setIsToggleOn(true); // Reset toggle to true
                 }}
               >
@@ -1436,22 +1973,13 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
             currentPage={page}
             onPageChange={setPage}
           />
-          <div className="relative inline-block">
-            <select
-              id="itemsPerPage"
-              value={itemsPerPage}
-              onChange={handleItemsPerPageChange}
-              className="cursor-pointer px-3 py-2 rounded-lg text-sm md:text-base text-gray-800 bg-white shadow-lg border border-gray-300 focus:outline-none hover:bg-gradient-to-tr hover:from-pink-400 hover:to-yellow-400 hover:text-white transition-colors duration-300 appearance-none w-16 md:w-20 lg:w-24"
-            >
-              <option className='bg-white text-black' value={25}>25</option>
-              <option className='bg-white text-black' value={50}>50</option>
-              <option className='bg-white text-black' value={100}>100</option>
-            </select>
-            <svg className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
+          <PaginationSelect
+            options={[25, 50, 100]} // ✅ Pass available options
+            value={itemsPerPage} // ✅ Selected value
+            onChange={handleItemsPerPageChange} // ✅ Handle value change
+          />
         </div>
+
       </div>
     </div>
 

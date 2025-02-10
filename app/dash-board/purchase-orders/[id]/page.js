@@ -20,6 +20,7 @@ import { FaUndo } from 'react-icons/fa';
 import PendingModalProduct from '@/app/components/layout/PendingModalProduct';
 
 import dynamic from 'next/dynamic';
+import { RiDeleteBinLine } from 'react-icons/ri';
 const PurchaseOrderPDFButton = dynamic(() => import("@/app/components/layout/PurchaseOrderPDFButton"), { ssr: false });
 
 const EditPurchaseOrderPage = () => {
@@ -160,13 +161,13 @@ const EditPurchaseOrderPage = () => {
 
     const skuByProduct = [];
 
-    productList.forEach((product) => {
+    productList?.forEach((product) => {
       const skuEntries = [];
 
-      product.productVariants.forEach((variant) => {
+      product?.productVariants?.forEach((variant) => {
         const size = variant?.size;
-        const colorCode = variant.color?.color; // Hex code for the color
-        const colorName = variant.color?.value; // Name of the color
+        const colorCode = variant?.color?.color; // Hex code for the color
+        const colorName = variant?.color?.value; // Name of the color
         const sku = variant?.sku || 0;
 
         // Find an existing entry for this size and color
@@ -189,10 +190,16 @@ const EditPurchaseOrderPage = () => {
         }
       });
 
-      skuByProduct.push({
+      // Find the first image URL from a variant matching the selected location
+      // const variantWithLocation = product.productVariants.find(
+      //   (variant) => variant.location === selectedLocation
+      // );
+      // const imageUrl = variantWithLocation?.imageUrls?.[0] || null;
+
+      skuByProduct?.push({
         productTitle: product?.productTitle,
         skuBySizeAndColor: skuEntries,
-        imageUrl: product?.imageUrls[0],
+        imageUrl: product?.thumbnailImageUrl,
       });
     });
 
@@ -202,7 +209,7 @@ const EditPurchaseOrderPage = () => {
   // Function to toggle selection for a specific product size
   const toggleProductSizeColorSelection = (product, size, colorCode, colorName) => {
     setSelectedProducts((prevSelectedProducts) => {
-      const isSelected = prevSelectedProducts.some(
+      const isSelected = prevSelectedProducts?.some(
         (item) =>
           item?.productTitle === product?.productTitle &&
           item?.size === size &&
@@ -223,7 +230,7 @@ const EditPurchaseOrderPage = () => {
               )
           )
         );
-        return prevSelectedProducts.filter(
+        return prevSelectedProducts?.filter(
           (item) =>
             !(
               item?.productTitle === product?.productTitle &&
@@ -265,8 +272,8 @@ const EditPurchaseOrderPage = () => {
   // Function to toggle selection for all sizes of a product
   const toggleAllSizesAndColorsForProduct = (product) => {
     setSelectedProducts((prevSelectedProducts) => {
-      const allSelected = product?.skuBySizeAndColor.every((entry) =>
-        prevSelectedProducts.some(
+      const allSelected = product?.skuBySizeAndColor?.every((entry) =>
+        prevSelectedProducts?.some(
           (item) =>
             item?.productTitle === product?.productTitle &&
             item?.size === entry?.size &&
@@ -278,12 +285,12 @@ const EditPurchaseOrderPage = () => {
       if (allSelected) {
         // Deselect all sizes and colors for this product
         setPurchaseOrderVariants((prevVariants) =>
-          prevVariants.filter((variant) => variant.productTitle !== product.productTitle)
+          prevVariants?.filter((variant) => variant?.productTitle !== product?.productTitle)
         );
-        return prevSelectedProducts.filter((item) => item.productTitle !== product.productTitle);
+        return prevSelectedProducts?.filter((item) => item?.productTitle !== product?.productTitle);
       } else {
         // Select all sizes and colors for this product
-        const newSelections = product.skuBySizeAndColor.map((entry) => ({
+        const newSelections = product?.skuBySizeAndColor?.map((entry) => ({
           productTitle: product?.productTitle,
           imageUrl: product?.imageUrl,
           size: entry?.size,
@@ -292,8 +299,8 @@ const EditPurchaseOrderPage = () => {
         }));
 
         setPurchaseOrderVariants((prevVariants) => [
-          ...prevVariants.filter((variant) => variant.productTitle !== product.productTitle),
-          ...product.skuBySizeAndColor.map((entry) => ({
+          ...prevVariants?.filter((variant) => variant.productTitle !== product.productTitle),
+          ...product?.skuBySizeAndColor?.map((entry) => ({
             productTitle: product?.productTitle,
             size: entry?.size,
             color: {
@@ -307,7 +314,7 @@ const EditPurchaseOrderPage = () => {
         ]);
 
         return [
-          ...prevSelectedProducts.filter((item) => item.productTitle !== product.productTitle),
+          ...prevSelectedProducts?.filter((item) => item?.productTitle !== product?.productTitle),
           ...newSelections,
         ];
       }
@@ -318,7 +325,7 @@ const EditPurchaseOrderPage = () => {
   const removeSelectedProduct = (product, size, color) => {
 
     setSelectedProducts((prevSelectedProducts) => {
-      const updatedSelectedProducts = prevSelectedProducts.filter(
+      const updatedSelectedProducts = prevSelectedProducts?.filter(
         (item) => !(
           item?.productTitle === product?.productTitle &&
           item?.size === size &&
@@ -349,12 +356,12 @@ const EditPurchaseOrderPage = () => {
       const titleMatches = product?.productTitle?.toLowerCase().includes(searchQuery.toLowerCase());
 
       // Check if sizes, colors, locationSku, or totalSku match the search query
-      const sizeOrColorMatches = product.skuBySizeAndColor.some(entry => {
+      const sizeOrColorMatches = product?.skuBySizeAndColor?.some(entry => {
         // Check if entry.size matches the search query
-        const sizeMatches = entry.size.toString().toLowerCase().includes(searchQuery.toLowerCase());
+        const sizeMatches = entry?.size?.toString().toLowerCase().includes(searchQuery.toLowerCase());
 
         // Assuming entry.color is an object with a 'name' property
-        const colorNameMatches = entry.color && typeof entry.color.name === 'string' && entry.color.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const colorNameMatches = entry?.color && typeof entry.color.name === 'string' && entry.color.name.toLowerCase().includes(searchQuery.toLowerCase());
 
         return sizeMatches || colorNameMatches;
       });
@@ -678,7 +685,7 @@ const EditPurchaseOrderPage = () => {
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
         <div className='flex flex-wrap md:flex-nowrap items-center justify-between w-full'>
-          <h3 className='w-full font-semibold text-base md:text-xl lg:text-2xl'>#{purchaseOrderNumber} <span
+          <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>#{purchaseOrderNumber} <span
             className={`px-3 py-1 rounded-full font-semibold
       ${purchaseOrderStatus === "pending" ? "bg-yellow-100 text-yellow-600"
                 : purchaseOrderStatus === "ordered" ? "bg-blue-100 text-blue-600"
@@ -697,30 +704,17 @@ const EditPurchaseOrderPage = () => {
             <div className="flex gap-4 items-center">
               <PurchaseOrderPDFButton selectedVendor={selectedVendor} selectedLocation={selectedLocation} paymentTerms={paymentTerms} estimatedArrival={estimatedArrival} referenceNumber={referenceNumber} supplierNote={supplierNote} shipping={shipping} discount={discount} selectedProducts={selectedProducts} purchaseOrderVariants={purchaseOrderVariants} purchaseOrderNumber={purchaseOrderNumber} purchaseOrderStatus={purchaseOrderStatus} />
               {["ordered", "canceled"].includes(purchaseOrderStatus) && isAdmin === true && <button type='button' onClick={handleReverseStatusPending}
-                class="group relative inline-flex items-center justify-center w-[40px] h-[40px] bg-[#D2016E] text-white rounded-full shadow-lg transform scale-100 transition-transform duration-300"
+                class="group relative inline-flex items-center justify-center w-[40px] h-[40px] bg-[#d4ffce] hover:bg-[#bdf6b4] text-neutral-700 rounded-full shadow-lg transform scale-100 transition-transform duration-300"
               >
                 <FaUndo size={20} className="rotate-0 transition ease-out duration-300 scale-100 group-hover:-rotate-45 group-hover:scale-75" />
               </button>}
+
               <button onClick={() => handleDeletePurchaseOrder(id)}
                 class="group relative inline-flex items-center justify-center w-[40px] h-[40px] bg-[#D2016E] text-white rounded-full shadow-lg transform scale-100 transition-transform duration-300"
               >
-                <svg
-                  width="25px"
-                  height="25px"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="rotate-0 transition ease-out duration-300 scale-100 group-hover:-rotate-45 group-hover:scale-75"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    stroke-width="2"
-                    stroke-linejoin="round"
-                    stroke-linecap="round"
-                  ></path>
-                </svg>
+                <RiDeleteBinLine size={23} className="rotate-0 transition ease-out duration-300 scale-100 group-hover:-rotate-45 group-hover:scale-75" />
               </button>
+
             </div>
           </div>
         </div>

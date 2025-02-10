@@ -59,6 +59,16 @@ const CreateTransfer = () => {
 
       const lastMatchedItem = matchedItem[matchedItem.length - 1];
 
+      // Validate the entered quantity against originSku
+      const enteredQuantity = parseInt(value, 10); // Parse value to integer
+      const originSku = selectedProducts[index]?.originSku; // Get originSku for the product
+
+      if (enteredQuantity > originSku) {
+        toast.error(`Entered quantity for ${productTitle} (${colorName}) exceeds available stock ${originSku}`
+        );
+        return prevVariants; // Prevent updating state if validation fails
+      }
+
       // Set product title, size, and color properties
       if (!updatedVariants[index].productTitle) {
         updatedVariants[index].productTitle = productTitle;
@@ -152,7 +162,7 @@ const CreateTransfer = () => {
       // Push the completed SKU data for each product, including title and image
       skuByProduct.push({
         productTitle: product.productTitle,
-        imageUrl: product?.imageUrls[0],
+        imageUrl: product?.thumbnailImageUrl,
         skuBySizeAndColor: skuEntries,
       });
     });
@@ -489,7 +499,7 @@ const CreateTransfer = () => {
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
         <div className='flex items-center justify-between w-full'>
-          <h3 className='w-full font-semibold text-base md:text-xl lg:text-2xl'>Create transfer</h3>
+          <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>Create transfer</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/transfers"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
@@ -499,8 +509,8 @@ const CreateTransfer = () => {
         <div className='max-w-screen-xl mx-auto py-6 flex flex-col gap-4'>
 
           <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-            <OriginSelect register={register} errors={errors} selectedOrigin={selectedOrigin} setSelectedOrigin={setSelectedOrigin} />
-            <DestinationSelect register={register} errors={errors} selectedDestination={selectedDestination} setSelectedDestination={setSelectedDestination} />
+            <OriginSelect register={register} selectedDestination={selectedDestination} errors={errors} selectedOrigin={selectedOrigin} setSelectedOrigin={setSelectedOrigin} />
+            <DestinationSelect register={register} selectedOrigin={selectedOrigin} errors={errors} selectedDestination={selectedDestination} setSelectedDestination={setSelectedDestination} />
           </div>
 
           <div className='bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
@@ -779,6 +789,7 @@ const CreateTransfer = () => {
                                       p.originSku === entry.originSku // Include originSku in selection
                                   )}
                                   onValueChange={() => toggleProductSizeColorSelection(product, entry.size, entry.color?.code, entry.color?.name, entry?.originSku, entry?.destinationSku)}
+                                  isDisabled={entry.originSku === 0}
                                 />
                                 <span className="font-semibold ml-2">
                                   {entry.size}

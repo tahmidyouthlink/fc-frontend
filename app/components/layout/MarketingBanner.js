@@ -8,7 +8,6 @@ import toast from 'react-hot-toast';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Loading from '../shared/Loading/Loading';
-import { ImCross } from 'react-icons/im';
 
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
@@ -109,7 +108,7 @@ const MarketingBanner = () => {
 
   const onSubmit = async () => {
 
-    if (!image && !marketingBannerList?.length) {
+    if (!image) {
       setSizeError(true);
       return;
     }
@@ -268,7 +267,7 @@ const MarketingBanner = () => {
           </button>}
           <button
             type='submit'
-            className={`bg-[#D2016E] hover:bg-[#d2016dbd] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}
+            className={`bg-[#d4ffce] hover:bg-[#bdf6b4] text-neutral-700 py-2 px-4 text-sm rounded-lg cursor-pointer font-bold transition-[background-color] duration-300`}
           >
             Update
           </button>

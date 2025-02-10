@@ -8,7 +8,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import toast from 'react-hot-toast';
+import { AiOutlineEdit } from 'react-icons/ai';
 import { FaPlus } from "react-icons/fa6";
+import { RiDeleteBinLine } from 'react-icons/ri';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 
@@ -141,10 +143,10 @@ const LocationsPage = () => {
     <div>
 
       <div className='flex justify-between items-center px-6 lg:px-16 py-3'>
-        <h1 className='py-2 md:py-3 font-semibold text-center md:text-xl lg:text-2xl sticky top-0 z-[10] bg-white'>Location Management</h1>
-        <Button className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg font-medium" variant="light" color="primary">
-          <Link className='flex items-center gap-2' href={"/dash-board/locations/add-location"}> <FaPlus size={14} /> <span>Add Location</span></Link>
-        </Button>
+        <h1 className='py-2 md:py-3 font-semibold text-center text-lg md:text-xl lg:text-3xl text-neutral-700 sticky top-0 z-[10] bg-white'>LOCATION MANAGEMENT</h1>
+        <button className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
+          <Link className='flex items-center gap-2' href={"/dash-board/locations/add-location"}> <FaPlus size={14} /> <span>Add</span></Link>
+        </button>
       </div>
 
       <div className="max-w-screen-2xl mx-auto px-0 md:px-4 lg:px-6 custom-max-h overflow-x-auto modal-body-scroll">
@@ -182,22 +184,20 @@ const LocationsPage = () => {
 
                 <td className="p-3">
                   <div className="flex gap-2 items-center">
-                    <Button
-                      onClick={() => router.push(`/dash-board/locations/${location?._id}`)}
-                      size="sm"
-                      className="text-xs"
-                      color="primary"
-                      variant="flat">
-                      Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      className="text-xs"
-                      color="danger"
-                      variant="flat"
-                      onClick={() => handleDeleteLocation(location?._id)}>
-                      Delete
-                    </Button>
+
+                    <div className='flex justify-end items-center gap-2'>
+
+                      {/* Edit Button */}
+                      <button onClick={() => router.push(`/dash-board/locations/${location?._id}`)}>
+                        <span className='flex items-center gap-1.5 rounded-md bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4'><AiOutlineEdit size={16} /> Edit </span>
+                      </button>
+
+                      {/* Delete Button */}
+                      <button onClick={() => handleDeleteLocation(location?._id)}>
+                        <span className='flex items-center gap-1.5 rounded-md bg-red-50 p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-red-100 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs'> <RiDeleteBinLine size={16} />Delete </span>
+                      </button>
+
+                    </div>
                   </div>
                 </td>
 

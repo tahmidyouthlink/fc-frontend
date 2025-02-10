@@ -16,6 +16,8 @@ import Link from 'next/link';
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { IoMdClose } from 'react-icons/io';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { TbColumnInsertRight } from 'react-icons/tb';
+import PaginationSelect from '@/app/components/layout/PaginationSelect';
 
 const initialColumns = ['Product', 'Status', 'SKU', 'Season', 'Price', 'Discount (৳ / %)', 'Sizes', 'Colors', 'Vendor', 'Shipping Zones', 'Shipment Handlers'];
 
@@ -35,6 +37,8 @@ const ProductPage = () => {
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
+  const [isSkuModalOpen, setSkuModalOpen] = useState(false);
+  const [groupedByLocation, setGroupedByLocation] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTab, setSelectedTab] = useState(productStatusTab[0]);
   const dropdownRef = useRef(null);
@@ -46,12 +50,21 @@ const ProductPage = () => {
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedColumnsProductCategory'));
     const savedExistingProduct = JSON.parse(localStorage.getItem('selectedExistingProduct'));
+
     if (savedColumns) {
       setSelectedColumns(savedColumns);
+    } else {
+      // Set to default if no saved columns exist
+      setSelectedColumns(initialColumns);
     }
+
     if (savedExistingProduct) {
       setColumnOrder(savedExistingProduct);
+    } else {
+      // Set to default column order if no saved order exists
+      setColumnOrder(initialColumns);
     }
+
   }, []);
 
   const handleColumnChange = (selected) => {
@@ -65,7 +78,6 @@ const ProductPage = () => {
 
   const handleDeselectAll = () => {
     setSelectedColumns([]);
-    setColumnOrder([]);
   };
 
   const handleSave = () => {
@@ -156,6 +168,23 @@ const ProductPage = () => {
     return isDateInRange && matchesSearch;
   });
 
+  const getOrderCounts = () => {
+    return {
+      'All': productDetails?.filter(product => product?.status).length || 0,
+      'Active': productDetails?.filter(product => product?.status === 'active').length || 0,
+      'Draft': productDetails?.filter(product => product?.status === 'draft').length || 0,
+      'Archived': productDetails?.filter(product => product?.status === "archive").length || 0,
+    };
+  };
+
+  // Memoize counts to prevent unnecessary recalculations
+  const counts = useMemo(getOrderCounts, [productDetails]);
+
+  // Append counts to tabs
+  const tabsWithCounts = useMemo(() => {
+    return productStatusTab?.map(tab => `${tab} (${counts[tab] || 0})`);
+  }, [counts]);
+
   const getFilteredProducts = () => {
     switch (selectedTab) {
       case 'Active':
@@ -200,14 +229,36 @@ const ProductPage = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleItemsPerPageChange = (e) => {
-    setItemsPerPage(parseInt(e.target.value));
+  const handleItemsPerPageChange = (newValue) => {
+    setItemsPerPage(newValue);
     setPage(0); // Reset to first page when changing items per page
   };
 
   const handleGoToEditPage = (id) => {
     router.push(`/dash-board/products/${id}`);
-  }
+  };
+
+  const handlePassProduct = (product) => {
+
+    // Process the data to group by location
+    const groupedByLocation = product?.productVariants?.reduce((acc, variant) => {
+      const { location, color, size, sku } = variant;
+
+      if (!acc[location]) {
+        acc[location] = { colors: new Set(), sizes: new Set(), totalSku: 0 };
+      }
+
+      acc[location].colors.add(color.label);
+      acc[location].sizes.add(size);
+      acc[location].totalSku += sku;
+
+      return acc;
+    }, {});
+
+    // Store the processed data in a state to pass to the modal
+    setGroupedByLocation(groupedByLocation);
+    setSkuModalOpen(true); // Open the modal
+  };
 
   useEffect(() => {
     if (paginatedProducts?.length === 0) {
@@ -246,9 +297,9 @@ const ProductPage = () => {
       <div className='flex justify-between flex-wrap items-center gap-3 md:gap-0 max-w-screen-2xl mx-auto pb-3 px-6 2xl:px-0'>
 
         <TabsOrder
-          tabs={productStatusTab}
-          selectedTab={selectedTab}
-          onTabChange={setSelectedTab}
+          tabs={tabsWithCounts}
+          selectedTab={`${selectedTab} (${counts[selectedTab] || 0})`} // Pass the selected tab with the count
+          onTabChange={(tab) => setSelectedTab(tab.split(' (')[0])} // Extract the tab name without the count
         />
 
         <div className='min-w-[40%]'>
@@ -278,8 +329,9 @@ const ProductPage = () => {
         </div>
 
         <div ref={dropdownRef} className="relative inline-block text-left z-50">
-          <Button onClick={() => toggleDropdown('other')} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
-            Customize
+
+          <button onClick={() => toggleDropdown('other')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[10px] md:text-[14px] text-neutral-700">
+            CUSTOMIZE
             <svg
               className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown === "other" ? 'rotate-180' : ''}`}
               xmlns="http://www.w3.org/2000/svg"
@@ -289,15 +341,11 @@ const ProductPage = () => {
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
             </svg>
-          </Button>
+          </button>
 
           {openDropdown === 'other' && (
             <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="p-1 flex flex-col gap-2">
-
-                <Button color="danger" size='sm' onClick={() => { setColumnModalOpen(true) }}>
-                  Choose Columns
-                </Button>
 
                 <div className='flex items-center gap-2'>
                   <DateRangePicker
@@ -315,10 +363,16 @@ const ProductPage = () => {
                   )}
                 </div>
 
+                {/* Choose Columns Button */}
+                <button className="relative z-[1] flex items-center justify-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700 w-full" onClick={() => { setColumnModalOpen(true) }}>
+                  Choose Columns <TbColumnInsertRight size={20} />
+                </button>
+
               </div>
             </div>
           )}
         </div>
+
       </div>
 
       {isLoading ? (
@@ -327,8 +381,8 @@ const ProductPage = () => {
         </div>
       ) : (
         paginatedProducts?.length > 0 ? (
-          <div className='mx-6 2xl:mx-0 custom-max-h-orders'>
-            <div className="max-w-screen-2xl mx-auto custom-max-h-orders overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
+          <div className='mx-6 2xl:mx-0 custom-max-h-order'>
+            <div className="max-w-screen-2xl mx-auto custom-max-h-order overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
               <table className="w-full text-left border-collapse">
                 <thead className="sticky top-0 z-[1] w-full bg-white">
                   <tr className='w-full'>
@@ -350,7 +404,7 @@ const ProductPage = () => {
                               {column === 'Product' && (
                                 <td key="Product" onClick={() => handleGoToEditPage(product?._id)} className="text-xs p-3 cursor-pointer text-blue-600 hover:text-blue-800 flex flex-col lg:flex-row items-center gap-3">
                                   <div>
-                                    <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrls[0]} alt='productIMG' height={600} width={600} />
+                                    <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.thumbnailImageUrl} alt='productIMG' height={600} width={600} />
                                   </div>
                                   <div className='flex flex-col'>
                                     <p>{product?.productTitle}</p>
@@ -370,7 +424,7 @@ const ProductPage = () => {
                                 </td>
                               )}
                               {column === 'SKU' && (
-                                <td key="SKU" className="text-xs p-3 text-gray-700 text-center">{product?.productVariants?.length > 0
+                                <td key="SKU" onClick={() => { handlePassProduct(product), setSkuModalOpen(true) }} className="text-xs p-3 text-center text-blue-500 hover:underline hover:cursor-pointer">{product?.productVariants?.length > 0
                                   ? `${product.productVariants.reduce((acc, variant) => acc + variant.sku, 0)} ${product.productVariants.reduce((acc, variant) => acc + variant.sku, 0) === 1 ? 'Item' : 'Items'}`
                                   : 'No Items'}</td>
                               )}
@@ -406,7 +460,12 @@ const ProductPage = () => {
                                 <td key="Shipping Zones" className="text-xs p-3 text-gray-700 text-center">{product?.shippingDetails?.map(detail => detail.shippingZone).join(', ') || '--'}</td>
                               )}
                               {column === 'Shipment Handlers' && (
-                                <td key="Shipment Handlers" className="text-xs p-3 text-gray-700 text-center">{product?.shippingDetails?.map(detail => detail.selectedShipmentHandler.shipmentHandlerName).join(', ') || '--'}</td>
+                                <td key="Shipment Handlers" className="text-xs p-3 text-gray-700 text-center">
+                                  {product?.shippingDetails
+                                    ? Array.from(new Set(product.shippingDetails.map(detail => detail.selectedShipmentHandler.shipmentHandlerName)))
+                                      .join(', ')
+                                    : '--'}
+                                </td>
                               )}
                             </>
                           )
@@ -429,7 +488,7 @@ const ProductPage = () => {
       {/* Column Selection Modal */}
       <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
         <ModalContent>
-          <ModalHeader>Choose Columns</ModalHeader>
+          <ModalHeader className='bg-gray-200'>Choose Columns</ModalHeader>
           <ModalBody className="modal-body-scroll">
             <DragDropContext onDragEnd={handleOnDragEnd}>
               <Droppable droppableId="droppable">
@@ -470,16 +529,48 @@ const ProductPage = () => {
               </Droppable>
             </DragDropContext>
           </ModalBody>
-          <ModalFooter>
-            <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
-              Select All
-            </Button>
-            <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
-              Deselect All
-            </Button>
+          <ModalFooter className='flex justify-between items-center'>
+            <div className='flex items-center gap-2'>
+              <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
+                Deselect All
+              </Button>
+              <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
+                Select All
+              </Button>
+            </div>
             <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
               Save
             </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Modal of tracking number */}
+      <Modal size='2xl' isOpen={isSkuModalOpen} onOpenChange={() => setSkuModalOpen(false)}>
+        <ModalContent className='mx-4 lg:mx-0'>
+          <ModalHeader className="flex flex-col gap-1 bg-gray-200 px-8">
+            Details
+          </ModalHeader>
+          <ModalBody>
+            <div className='flex flex-wrap items-center justify-between gap-2'>
+              {Object?.entries(groupedByLocation)?.map(([location, details]) => (
+                <div key={location} className="border-l p-3">
+                  <h3 className="font-bold text-lg mb-2">Location: {location}</h3>
+                  <p className="text-gray-700">
+                    <strong>Colors:</strong> {details.colors.size}
+                  </p>
+                  <p className="text-gray-700">
+                    <strong>Sizes:</strong> {details.sizes.size}
+                  </p>
+                  <p className="text-gray-700">
+                    <strong>Total SKUs:</strong> {details.totalSku}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </ModalBody>
+          <ModalFooter className='border'>
+            <Button variant='light' color="danger" onClick={() => setSkuModalOpen(false)}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -491,21 +582,11 @@ const ProductPage = () => {
           currentPage={page}
           onPageChange={setPage}
         />
-        <div className="relative inline-block">
-          <select
-            id="itemsPerPage"
-            value={itemsPerPage}
-            onChange={handleItemsPerPageChange}
-            className="cursor-pointer px-3 py-2 rounded-lg text-sm md:text-base text-gray-800 bg-white shadow-lg border border-gray-300 focus:outline-none hover:bg-gradient-to-tr hover:from-pink-400 hover:to-yellow-400 hover:text-white transition-colors duration-300 appearance-none w-16 md:w-20 lg:w-24"
-          >
-            <option className='bg-white text-black' value={25}>25</option>
-            <option className='bg-white text-black' value={50}>50</option>
-            <option className='bg-white text-black' value={100}>100</option>
-          </select>
-          <svg className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-          </svg>
-        </div>
+        <PaginationSelect
+          options={[25, 50, 100]} // ✅ Pass available options
+          value={itemsPerPage} // ✅ Selected value
+          onChange={handleItemsPerPageChange} // ✅ Handle value change
+        />
       </div>
 
     </div>

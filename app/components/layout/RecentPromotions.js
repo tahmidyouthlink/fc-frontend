@@ -15,9 +15,11 @@ import Swal from 'sweetalert2';
 import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import * as XLSX from 'xlsx';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable'; // Also install this package
 import Papa from 'papaparse';
+import { TbColumnInsertRight } from 'react-icons/tb';
+import { HiOutlineDownload } from 'react-icons/hi';
+
+const initialColumns = ["Promo Code / Offer Title", "Type", "Discount Value", "Expiry Date", "Total Times Applied", "Total Discount Given", "Min Order Amount", "Max Capped Amount", "Actions", "Status"];
 
 const RecentPromotions = () => {
 
@@ -32,7 +34,6 @@ const RecentPromotions = () => {
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   // const [isExpanded, setIsExpanded] = useState(null); // To track which row is expanded
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
-  const initialColumns = ["Promo Code / Offer Title", "Type", "Discount Value", "Expiry Date", "Total Times Applied", "Total Discount Given", "Min Order Amount", "Max Capped Amount", "Actions", "Status"];
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
@@ -42,9 +43,16 @@ const RecentPromotions = () => {
     const savedMarketingColumns = JSON.parse(localStorage.getItem('selectedMarketingColumns'));
     if (savedColumns) {
       setSelectedColumns(savedColumns);
+    } else {
+      // Set to default if no saved columns exist
+      setSelectedColumns(initialColumns);
     }
+
     if (savedMarketingColumns) {
       setColumnOrder(savedMarketingColumns);
+    } else {
+      // Set to default column order if no saved order exists
+      setColumnOrder(initialColumns);
     }
   }, []);
 
@@ -59,7 +67,6 @@ const RecentPromotions = () => {
 
   const handleDeselectAll = () => {
     setSelectedColumns([]);
-    setColumnOrder([]);
   };
 
   const handleSave = () => {
@@ -127,43 +134,30 @@ const RecentPromotions = () => {
   }, [promoList, offerList]);
 
   const calculateTotalPromoApplied = (promoCode) => {
-    return orderList?.filter(order => order.promoCode === promoCode && order.paymentStatus === "Paid").length || 0;
+    return orderList?.filter(order => order?.promoInfo?.promoCode === promoCode && order?.paymentInfo?.paymentStatus === "Paid").length || 0;
   };
 
-  const calculateTotalAmountDiscounted = (promoCode) => {
+  const calculateTotalPromoAmountDiscounted = (promoCode) => {
+    // Use reduce and ensure acc always starts as a number
     const totalDiscount = orderList?.reduce((acc, order) => {
-      if (order.promoCode !== promoCode || order.paymentStatus !== "Paid") return acc; // Check for payment status
-
-      let offerDiscountTotal = 0;
-      order.productInformation.forEach(product => {
-        if (product.offerTitle && product.offerDiscountValue > 0) {
-          const productTotal = product.unitPrice * product.sku;
-          if (product.offerDiscountType === 'Percentage') {
-            offerDiscountTotal += (product.offerDiscountValue / 100) * productTotal;
-          } else if (product.offerDiscountType === 'Amount') {
-            offerDiscountTotal += product.offerDiscountValue;
-          }
-        }
-      });
-
-      const adjustedOrderTotal = order.totalAmount - offerDiscountTotal;
-      let promoDiscount = 0;
-      if (order.promoDiscountType === 'Percentage') {
-        promoDiscount = (order.promoDiscountValue / 100) * adjustedOrderTotal;
-      } else if (order.promoDiscountType === 'Amount') {
-        promoDiscount = order.promoDiscountValue;
+      // Check if the promoCode matches and payment is paid
+      if (order?.promoInfo?.promoCode !== promoCode || order?.paymentInfo?.paymentStatus !== "Paid") {
+        return acc;
       }
 
+      // Add appliedPromoDiscount if it exists, otherwise add 0
+      const promoDiscount = parseFloat(order?.promoInfo?.appliedPromoDiscount) || 0;
       return acc + promoDiscount;
-    }, 0) || 0;
+    }, 0) || 0; // Default to 0 if reduce returns undefined
 
-    return totalDiscount.toFixed(2);
+    // Ensure totalDiscount is a number before calling toFixed
+    return Number(totalDiscount).toFixed(2);
   };
 
   const calculateTotalOfferApplied = (offerTitle) => {
     return orderList?.reduce((count, order) => {
-      const offerCount = (order.paymentStatus === "Paid" && order.productInformation.filter(
-        product => product.offerTitle === offerTitle
+      const offerCount = (order?.paymentInfo?.paymentStatus === "Paid" && order?.productInformation.filter(
+        product => product?.offerInfo?.offerTitle === offerTitle
       ).length) || 0; // Check for payment status
       return count + offerCount;
     }, 0) || 0;
@@ -171,34 +165,30 @@ const RecentPromotions = () => {
 
   const calculateTotalOfferAmountDiscounted = (offerTitle) => {
     const totalDiscount = orderList?.reduce((acc, order) => {
-      if (order.paymentStatus !== "Paid") return acc; // Check for payment status
+      // Skip orders where payment status is not "Paid"
+      if (order.paymentInfo.paymentStatus !== "Paid") return acc;
 
+      // Calculate total applied offer discount for the given offer title
       const offerDiscountTotal = order.productInformation.reduce((prodAcc, product) => {
-        if (product.offerTitle !== offerTitle) return prodAcc;
+        // Skip products where the offer title does not match
+        if (product.offerInfo?.offerTitle !== offerTitle) return prodAcc;
 
-        const productSubtotal = product.unitPrice * product.sku;
-        let discount = 0;
-
-        if (product.offerDiscountType === 'Percentage') {
-          discount = (product.offerDiscountValue / 100) * productSubtotal;
-        } else if (product.offerDiscountType === 'Amount') {
-          discount = product.offerDiscountValue;
-        }
-
-        return prodAcc + discount;
+        // Add the applied offer discount
+        return prodAcc + (product.offerInfo.appliedOfferDiscount || 0);
       }, 0);
 
       return acc + offerDiscountTotal;
     }, 0) || 0;
 
-    return totalDiscount.toFixed(2);
+    // Ensure totalDiscount is a valid number and format it
+    return Number(totalDiscount).toFixed(2);
   };
 
   const getProductTitlesForPromo = (promoCode) => {
     const productTitles = [];
 
     orderList.forEach(order => {
-      if (order.promoCode === promoCode && order.paymentStatus === "Paid") { // Check for payment status
+      if (order?.promoInfo?.promoCode === promoCode && order.paymentInfo.paymentStatus === "Paid") { // Check for payment status
         order.productInformation.forEach(product => {
           productTitles.push(product.productTitle); // Adjust this to your actual product title field
         });
@@ -212,9 +202,9 @@ const RecentPromotions = () => {
     const productTitles = [];
 
     orderList.forEach(order => {
-      if (order.paymentStatus === "Paid") { // Check for payment status
+      if (order.paymentInfo.paymentStatus === "Paid") { // Check for payment status
         order.productInformation.forEach(product => {
-          if (product.offerTitle === offerTitle) {
+          if (product?.offerInfo?.offerTitle === offerTitle) {
             productTitles.push(product.productTitle); // Adjust this to your actual product title field
           }
         });
@@ -226,6 +216,7 @@ const RecentPromotions = () => {
 
   // Function to filter based on the search query and tab/dropdown selection
   const filterItems = (items) => {
+
     if (!searchQuery) return items;
     const query = searchQuery.toLowerCase();
 
@@ -233,7 +224,7 @@ const RecentPromotions = () => {
 
       // Get calculated totals for promo/offer
       const totalPromoApplied = item?.promoCode ? calculateTotalPromoApplied(item.promoCode) : 0;
-      const totalAmountDiscounted = item?.promoCode ? calculateTotalAmountDiscounted(item.promoCode) : '0.00';
+      const totalAmountDiscounted = item?.promoCode ? calculateTotalPromoAmountDiscounted(item.promoCode) : '0.00';
       const totalOfferApplied = item?.offerTitle ? calculateTotalOfferApplied(item.offerTitle) : 0;
       const totalOfferAmountDiscounted = item?.offerTitle ? calculateTotalOfferAmountDiscounted(item.offerTitle) : '0.00';
 
@@ -523,13 +514,13 @@ const RecentPromotions = () => {
             ? calculateTotalPromoApplied(item?.promoCode)
             : 0;
 
-          const totalAmountDiscounted = item?.promoCode
-            ? calculateTotalAmountDiscounted(item?.promoCode)
-            : '0.00';
-
           const totalOfferApplied = item?.offerTitle
             ? calculateTotalOfferApplied(item?.offerTitle)
             : 0;
+
+          const totalPromoAmountDiscounted = item?.promoCode
+            ? calculateTotalPromoAmountDiscounted(item?.promoCode)
+            : '0.00';
 
           const totalOfferAmountDiscounted = item?.offerTitle
             ? calculateTotalOfferAmountDiscounted(item?.offerTitle)
@@ -585,7 +576,7 @@ const RecentPromotions = () => {
                       {column === 'Total Discount Given' && (
                         <td key="totalDiscountGiven" className="text-xs p-3 text-gray-700 text-center">
                           {item?.promoCode
-                            ? `৳ ${totalAmountDiscounted}`
+                            ? `৳ ${totalPromoAmountDiscounted}`
                             : `৳ ${totalOfferAmountDiscounted}`}
                         </td>
                       )}
@@ -769,7 +760,7 @@ const RecentPromotions = () => {
               data['Total Times Applied'] = item.promoCode ? calculateTotalPromoApplied(item.promoCode) : calculateTotalOfferApplied(item.offerTitle);
               break;
             case 'Total Discount Given':
-              data['Total Discount Given'] = item.promoCode ? calculateTotalAmountDiscounted(item.promoCode) : calculateTotalOfferAmountDiscounted(item.offerTitle) || '0.00';
+              data['Total Discount Given'] = item.promoCode ? calculateTotalPromoAmountDiscounted(item.promoCode) : calculateTotalOfferAmountDiscounted(item.offerTitle) || '0.00';
               break;
             case 'Min Order Amount':
               data['Min Order Amount'] = item.minAmount || '0';
@@ -778,7 +769,8 @@ const RecentPromotions = () => {
               data['Max Capped Amount'] = item.maxAmount || '0';
               break;
             case 'Status':
-              data['Status'] = item.promoStatus ? 'Active' : 'Inactive';
+              const isActive = item.promoStatus || item.offerStatus;
+              data['Status'] = isActive ? 'Active' : 'Inactive';
               break;
             default:
               break;
@@ -835,7 +827,7 @@ const RecentPromotions = () => {
               rowData['Total Times Applied'] = item.promoCode ? calculateTotalPromoApplied(item.promoCode) : calculateTotalOfferApplied(item.offerTitle);
               break;
             case 'Total Discount Given':
-              rowData['Total Discount Given'] = item.promoCode ? calculateTotalAmountDiscounted(item.promoCode) : calculateTotalOfferAmountDiscounted(item.offerTitle) || '0.00';
+              rowData['Total Discount Given'] = item.promoCode ? calculateTotalPromoAmountDiscounted(item.promoCode) : calculateTotalOfferAmountDiscounted(item.offerTitle) || '0.00';
               break;
             case 'Min Order Amount':
               rowData['Min Order Amount'] = item.minAmount || '0';
@@ -844,7 +836,8 @@ const RecentPromotions = () => {
               rowData['Max Capped Amount'] = item.maxAmount || '0';
               break;
             case 'Status':
-              rowData['Status'] = item.promoStatus ? 'Active' : 'Inactive';
+              const isActive = item.promoStatus || item.offerStatus;
+              rowData['Status'] = isActive ? 'Active' : 'Inactive';
               break;
             default:
               break;
@@ -892,7 +885,7 @@ const RecentPromotions = () => {
               data['Total Times Applied'] = item.promoCode ? calculateTotalPromoApplied(item.promoCode) : calculateTotalOfferApplied(item.offerTitle) || "";
               break;
             case 'Total Discount Given':
-              data['Total Discount Given'] = item.promoCode ? calculateTotalAmountDiscounted(item.promoCode) : calculateTotalOfferAmountDiscounted(item.offerTitle) || "0.00";
+              data['Total Discount Given'] = item.promoCode ? calculateTotalPromoAmountDiscounted(item.promoCode) : calculateTotalOfferAmountDiscounted(item.offerTitle) || "0.00";
               break;
             case 'Min Order Amount':
               data['Min Order Amount'] = item.minAmount || "0";
@@ -901,7 +894,8 @@ const RecentPromotions = () => {
               data['Max Capped Amount'] = item.maxAmount || "0";
               break;
             case 'Status':
-              data['Status'] = item.promoStatus ? 'Active' : 'Inactive';
+              const isActive = item.promoStatus || item.offerStatus;
+              data['Status'] = isActive ? 'Active' : 'Inactive';
               break;
             default:
               break;
@@ -943,14 +937,15 @@ const RecentPromotions = () => {
         </div>
 
         <div className="py-1">
-          <Button variant="solid" color="danger" onClick={() => { setColumnModalOpen(true) }} className="w-[150px]">
-            Choose Columns
-          </Button>
+          <button className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700" onClick={() => { setColumnModalOpen(true) }}>
+            Choose Columns <TbColumnInsertRight size={20} />
+          </button>
         </div>
 
         <div ref={dropdownRef} className="relative inline-block text-left">
-          <Button onClick={toggleDropdown} className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
-            Download Data
+
+          <button onClick={toggleDropdown} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[14px] md:px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[10px] md:text-[14px] text-neutral-700">
+            EXPORT AS
             <svg
               className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${isOpenDropdown ? 'rotate-180' : ''}`}
               xmlns="http://www.w3.org/2000/svg"
@@ -960,86 +955,64 @@ const RecentPromotions = () => {
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
             </svg>
-          </Button>
+          </button>
 
           {isOpenDropdown && (
             <div className="absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="p-1">
 
-                <div className='flex flex-col gap-2 w-full'>
+                <div className="p-2 flex flex-col gap-2 w-full">
+
                   {/* Button to export to CSV */}
                   <button
                     onClick={exportToCSV}
-                    className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
-md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
-                    <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
-md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
-                      Export CSV
+                    className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#d4ffce] bg-[#d4ffce] overflow-hidden transition-all hover:bg-[#bdf6b4] active:border-[#d4ffce] group rounded-lg
+                    md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+                    <span className="relative translate-x-[26px] text-neutral-700 font-semibold transition-transform duration-300 group-hover:text-transparent text-xs
+                    md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+                      EXPORT CSV
                     </span>
-                    <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
-md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 35 35"
-                        className="w-[20px] fill-white"
-                      >
-                        <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
-                        <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
-                        <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
-                      </svg>
+                    <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#bdf6b4] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#d4ffce]
+                    md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+                      <HiOutlineDownload size={20} className='text-neutral-700' />
                     </span>
                   </button>
 
                   {/* Button to export to XLSX */}
                   <button
                     onClick={exportToXLS}
-                    className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
-md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
-                    <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
-md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
-                      Export XLSX
+                    className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#d4ffce] bg-[#d4ffce] overflow-hidden transition-all hover:bg-[#bdf6b4] active:border-[#d4ffce] group rounded-lg
+                    md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+                    <span className="relative translate-x-[26px] text-neutral-700 font-semibold transition-transform duration-300 group-hover:text-transparent text-xs
+                    md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+                      EXPORT XLSX
                     </span>
-                    <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
-md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 35 35"
-                        className="w-[20px] fill-white"
-                      >
-                        <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
-                        <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
-                        <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
-                      </svg>
+                    <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#bdf6b4] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#d4ffce]
+                    md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+                      <HiOutlineDownload size={20} className='text-neutral-700' />
                     </span>
                   </button>
 
-                  {/* Button to export to PDF */}
                   <button
                     onClick={exportToPDF}
-                    className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#9F5216] bg-[#9F5216] overflow-hidden transition-all hover:bg-[#803F11] active:border-[#70350E] group rounded-lg
-md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
-                    <span className="relative translate-x-[26px] text-white transition-transform duration-300 group-hover:text-transparent text-xs
-md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
-                      Export PDF
+                    className="mx-2 relative w-[150px] h-[40px] cursor-pointer text-xs flex items-center border border-[#d4ffce] bg-[#d4ffce] overflow-hidden transition-all hover:bg-[#bdf6b4] active:border-[#d4ffce] group rounded-lg
+                    md:w-[140px] md:h-[38px] lg:w-[150px] lg:h-[40px] sm:w-[130px] sm:h-[36px]">
+                    <span className="relative translate-x-[26px] text-neutral-700 font-semibold transition-transform duration-300 group-hover:text-transparent text-xs
+                    md:translate-x-[24px] lg:translate-x-[26px] sm:translate-x-[22px]">
+                      EXPORT PDF
                     </span>
-                    <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#803F11] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#70350E]
-md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 35 35"
-                        className="w-[20px] fill-white"
-                      >
-                        <path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path>
-                        <path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path>
-                        <path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path>
-                      </svg>
+                    <span className="absolute transform translate-x-[109px] h-full w-[39px] bg-[#bdf6b4] flex items-center justify-center transition-transform duration-300 group-hover:w-[148px] group-hover:translate-x-0 active:bg-[#d4ffce]
+                    md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
+                      <HiOutlineDownload size={20} className='text-neutral-700' />
                     </span>
                   </button>
+
                 </div>
 
               </div>
             </div>
           )}
+
         </div>
 
         {/* Search Product Item */}
@@ -1160,7 +1133,7 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
       {/* Column Selection Modal */}
       <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
         <ModalContent>
-          <ModalHeader>Choose Columns</ModalHeader>
+          <ModalHeader className='bg-gray-200'>Choose Columns</ModalHeader>
           <ModalBody className="modal-body-scroll">
             <DragDropContext onDragEnd={handleOnDragEnd}>
               <Droppable droppableId="droppable">
@@ -1201,14 +1174,16 @@ md:translate-x-[100px] lg:translate-x-[109px] sm:translate-x-[90px]">
               </Droppable>
             </DragDropContext>
           </ModalBody>
-          <ModalFooter>
-            <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
-              Select All
-            </Button>
-            <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
-              Deselect All
-            </Button>
-            <Button variant="solid" size='sm' color="primary" onClick={handleSave}>
+          <ModalFooter className='flex justify-between items-center'>
+            <div className='flex items-center gap-2'>
+              <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
+                Deselect All
+              </Button>
+              <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
+                Select All
+              </Button>
+            </div>
+            <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
               Save
             </Button>
           </ModalFooter>

@@ -351,7 +351,8 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 }
 
 /* Base styles for small screens (mobile) */
-.custom-max-h-orders {
+.custom-max-h-orders,
+.custom-max-h-order {
   min-height: calc(100vh - 300px);
   max-height: calc(100vh - 300px);
   overflow-y: auto;
@@ -359,7 +360,8 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 
 /* Medium screens (tablets) */
 @media (min-width: 768px) {
-  .custom-max-h-orders {
+  .custom-max-h-orders,
+  .custom-max-h-order {
     min-height: calc(100vh - 225px);
     max-height: calc(100vh - 225px);
     overflow-y: auto;
@@ -367,7 +369,8 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 }
 
 @media (min-width: 1024px) {
-  .custom-max-h-orders {
+  .custom-max-h-orders,
+  .custom-max-h-order {
     min-height: calc(100vh - 210px);
     max-height: calc(100vh - 210px);
     overflow-y: auto;
@@ -376,6 +379,14 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 
 @media (min-width: 1440px) {
   .custom-max-h-orders {
+    min-height: calc(100vh - 200px);
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+  }
+}
+
+@media (min-width: 1440px) {
+  .custom-max-h-order {
     min-height: calc(100vh - 190px);
     max-height: calc(100vh - 190px);
     overflow-y: auto;
@@ -541,4 +552,12 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 
 .input-suffix {
   right: 10px; /* Positioning for the percentage sign */
+}
+
+.hero-images > div:is(:first-child, :last-child) {
+  @apply relative mb-auto h-[calc(40%-8px)] w-[calc(50%-8px)] max-sm:order-last sm:h-[90%] sm:w-[25vw] xl:h-[94%] xl:w-[60vh] [&>img]:rounded-xl [&>img]:object-cover;
+}
+
+.hero-images > div:not(:is(:first-child, :last-child)) {
+  @apply relative mt-auto h-[calc(60%-8px)] w-full sm:h-[86%] sm:grow xl:h-[88%] [&>img]:rounded-xl [&>img]:object-cover [&>img]:object-bottom;
 }

@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
+import { FiSave } from 'react-icons/fi';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 
 const EditLocation = () => {
@@ -16,8 +17,7 @@ const EditLocation = () => {
   const router = useRouter();
   const [isSelected, setIsSelected] = useState(false);
 
-  const {
-    register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm();
+  const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm();
 
   useEffect(() => {
     const fetchLocationDetails = async () => {
@@ -105,7 +105,7 @@ const EditLocation = () => {
 
       <div className='max-w-screen-lg mx-auto pt-3 md:pt-6'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-base md:text-xl lg:text-2xl'>Location Configuration</h3>
+          <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>Edit Location Details</h3>
           <Link
             className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full'
             href={`/dash-board/locations`}>
@@ -222,9 +222,9 @@ const EditLocation = () => {
             <button
               type='submit'
               disabled={isSubmitting}
-              className={`mt-4 mb-8 bg-[#9F5216] hover:bg-[#9f5116c9] text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium ${isSubmitting ? 'bg-gray-400' : 'bg-[#9F5216] hover:bg-[#9f5116c9]'} text-white py-2 px-4 text-sm rounded-md cursor-pointer font-medium`}
+              className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}
             >
-              {isSubmitting ? 'Submitting...' : 'Submit'}
+              {isSubmitting ? 'Saving...' : 'Save Changes'} <FiSave size={18} />
             </button>
           </div>
         </div>

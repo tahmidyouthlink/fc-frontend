@@ -11,9 +11,7 @@ const CustomPagination = ({ totalPages, currentPage, onPageChange }) => {
         pageNumbers.push(
           <button
             key={i}
-            className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full text-sm md:text-base 
-                        ${i === currentPage + 1 ? "bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg" : "text-gray-800"} 
-                        hover:bg-gradient-to-tr hover:from-pink-400 hover:to-yellow-400 hover:text-white transition duration-300`}
+            className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-large drop-shadow text-sm md:text-base ${i === currentPage + 1 ? "bg-[#ffddc2] font-semibold text-neutral-700" : "text-gray-800"} hover:bg-[#fbcfb0] hover:text-neutral-800 transition duration-300`}
             onClick={() => onPageChange(i - 1)}
           >
             {i}
@@ -28,9 +26,7 @@ const CustomPagination = ({ totalPages, currentPage, onPageChange }) => {
         pageNumbers.push(
           <button
             key={1}
-            className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full text-sm md:text-base 
-                        ${currentPage === 0 ? "bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg" : "text-gray-800"} 
-                        hover:bg-gradient-to-tr hover:from-pink-400 hover:to-yellow-400 hover:text-white transition duration-300`}
+            className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-large drop-shadow text-sm md:text-base ${currentPage === 0 ? "bg-[#ffddc2] font-semibold text-neutral-700" : "text-gray-800"} hover:bg-[#fbcfb0] hover:text-neutral-800 transition duration-300`}
             onClick={() => onPageChange(0)}
           >
             1
@@ -41,7 +37,7 @@ const CustomPagination = ({ totalPages, currentPage, onPageChange }) => {
           pageNumbers.push(
             <button
               key="dots-start"
-              className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full text-sm md:text-base text-gray-800 disabled cursor-not-allowed"
+              className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-large drop-shadow text-sm md:text-base text-gray-800 disabled cursor-not-allowed"
               disabled
             >
               ...
@@ -54,9 +50,7 @@ const CustomPagination = ({ totalPages, currentPage, onPageChange }) => {
         pageNumbers.push(
           <button
             key={i}
-            className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full text-sm md:text-base 
-                        ${i === currentPage + 1 ? "bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg" : "text-gray-800"} 
-                        hover:bg-gradient-to-tr hover:from-pink-400 hover:to-yellow-400 hover:text-white transition duration-300`}
+            className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-large drop-shadow text-sm md:text-base ${i === currentPage + 1 ? "bg-[#ffddc2] font-semibold text-neutral-700" : "text-gray-800"} hover:bg-[#fbcfb0] hover:text-neutral-800 transition duration-300`}
             onClick={() => onPageChange(i - 1)}
           >
             {i}
@@ -69,7 +63,7 @@ const CustomPagination = ({ totalPages, currentPage, onPageChange }) => {
           pageNumbers.push(
             <button
               key="dots-end"
-              className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full text-sm md:text-base text-gray-800 disabled cursor-not-allowed"
+              className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-large drop-shadow text-sm md:text-base text-gray-800 disabled cursor-not-allowed"
               disabled
             >
               ...
@@ -80,9 +74,7 @@ const CustomPagination = ({ totalPages, currentPage, onPageChange }) => {
         pageNumbers.push(
           <button
             key={totalPages}
-            className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full text-sm md:text-base 
-                        ${currentPage === totalPages - 1 ? "bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg" : "text-gray-800"} 
-                        hover:bg-gradient-to-tr hover:from-pink-400 hover:to-yellow-400 hover:text-white transition duration-300`}
+            className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-large drop-shadow text-sm md:text-base ${currentPage === totalPages - 1 ? "bg-[#ffddc2] font-semibold text-neutral-700" : "text-gray-800"} hover:bg-[#fbcfb0] hover:text-neutral-800 transition duration-300`}
             onClick={() => onPageChange(totalPages - 1)}
           >
             {totalPages}
@@ -98,9 +90,8 @@ const CustomPagination = ({ totalPages, currentPage, onPageChange }) => {
     <div className="flex flex-wrap gap-2 md:gap-3 justify-center items-center">
       {/* Previous Button */}
       <button
-        className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-gray-50 shadow-md   
-                    ${currentPage === 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"} 
-                    transition duration-300`}
+        className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-large drop-shadow bg-gray-50 ${currentPage === 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"} 
+        transition duration-300`}
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 0}
       >
@@ -112,9 +103,7 @@ const CustomPagination = ({ totalPages, currentPage, onPageChange }) => {
 
       {/* Next Button */}
       <button
-        className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-gray-50 shadow-md  
-                    ${currentPage === totalPages - 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"} 
-                    transition duration-300`}
+        className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-large drop-shadow bg-gray-50 ${currentPage === totalPages - 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"} transition duration-300`}
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages - 1}
       >

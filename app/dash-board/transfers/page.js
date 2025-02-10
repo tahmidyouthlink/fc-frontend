@@ -12,6 +12,9 @@ import Progressbar from '@/app/components/layout/Progressbar';
 import { useRouter } from 'next/navigation';
 import { Button, Checkbox, CheckboxGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { TbColumnInsertRight } from 'react-icons/tb';
+import { FaPlus } from 'react-icons/fa6';
+import PaginationSelect from '@/app/components/layout/PaginationSelect';
 
 const transferStatusTabs = [
   'All',
@@ -37,12 +40,21 @@ const Transfers = () => {
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedColumnsTransferOrder'));
     const savedOrder = JSON.parse(localStorage.getItem('columnOrderTransferOrder'));
+
     if (savedColumns) {
       setSelectedColumns(savedColumns);
+    } else {
+      // Set to default if no saved columns exist
+      setSelectedColumns(initialColumns);
     }
+
     if (savedOrder) {
       setColumnOrder(savedOrder);
+    } else {
+      // Set to default column order if no saved order exists
+      setColumnOrder(initialColumns);
     }
+
   }, []);
 
   useEffect(() => {
@@ -62,7 +74,6 @@ const Transfers = () => {
 
   const handleDeselectAll = () => {
     setSelectedColumns([]);
-    setColumnOrder([]);
   };
 
   const handleSave = () => {
@@ -81,10 +92,28 @@ const Transfers = () => {
     setColumnOrder(reorderedColumns); // Update the column order both in modal and table
   };
 
-  const handleItemsPerPageChange = (e) => {
-    setItemsPerPage(parseInt(e.target.value));
+  const handleItemsPerPageChange = (newValue) => {
+    setItemsPerPage(newValue);
     setPage(0); // Reset to first page when changing items per page
   };
+
+  // Function to calculate counts for each tab
+  const getOrderCounts = () => {
+    return {
+      'Pending': transferOrderList?.filter(order => order?.status === 'pending').length || 0,
+      'Received': transferOrderList?.filter(order => order?.status === 'received').length || 0,
+      'Canceled': transferOrderList?.filter(order => order?.status === 'canceled').length || 0,
+      'All': transferOrderList?.filter(order => order?.status).length || 0,
+    };
+  };
+
+  // Memoize counts to prevent unnecessary recalculations
+  const counts = useMemo(getOrderCounts, [transferOrderList]);
+
+  // Append counts to tabs
+  const tabsWithCounts = useMemo(() => {
+    return transferStatusTabs?.map(tab => `${tab} (${counts[tab] || 0})`);
+  }, [counts]);
 
   const filterPurchaseOrders = (transferOrderList, searchQuery) => {
     const query = searchQuery.toLowerCase();
@@ -202,7 +231,7 @@ const Transfers = () => {
       {/* Column Selection Modal */}
       <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
         <ModalContent>
-          <ModalHeader>Choose Columns</ModalHeader>
+          <ModalHeader className='bg-gray-200'>Choose Columns</ModalHeader>
           <ModalBody className="modal-body-scroll">
             <DragDropContext onDragEnd={handleOnDragEnd}>
               <Droppable droppableId="droppable">
@@ -243,14 +272,16 @@ const Transfers = () => {
               </Droppable>
             </DragDropContext>
           </ModalBody>
-          <ModalFooter>
-            <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
-              Select All
-            </Button>
-            <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
-              Deselect All
-            </Button>
-            <Button variant="solid" color="primary" size="sm" onClick={handleSave}>
+          <ModalFooter className='flex justify-between items-center'>
+            <div className='flex items-center gap-2'>
+              <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
+                Deselect All
+              </Button>
+              <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
+                Select All
+              </Button>
+            </div>
+            <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
               Save
             </Button>
           </ModalFooter>
@@ -261,27 +292,27 @@ const Transfers = () => {
 
         <div className='flex flex-wrap md:flex-nowrap items-center justify-between py-2 md:py-5 gap-2 w-full'>
 
-          <h3 className='text-center md:text-start font-semibold text-xl lg:text-2xl'>Transfers</h3>
+          <h3 className='text-center md:text-start font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>TRANSFERS</h3>
 
-          <Button variant="solid" color="danger" onClick={handleGoToTransferPage}>
-            Create transfer
-          </Button>
+          <button onClick={handleGoToTransferPage} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700">
+            <FaPlus size={15} className='text-neutral-700' /> ADD
+          </button>
 
         </div>
 
         <div className='flex flex-wrap lg:flex-nowrap justify-between items-center gap-6 w-full'>
           <div className='flex-1'>
             <TabsOrder
-              tabs={transferStatusTabs}
-              selectedTab={selectedTab}
-              onTabChange={setSelectedTab} // This passes the function to change the tab
+              tabs={tabsWithCounts}
+              selectedTab={`${selectedTab} (${counts[selectedTab] || 0})`} // Pass the selected tab with the count
+              onTabChange={(tab) => setSelectedTab(tab.split(' (')[0])} // Extract the tab name without the count
             />
           </div>
 
           <div>
-            <Button variant="solid" color="danger" onClick={() => { setColumnModalOpen(true) }} className="w-full">
-              Choose Columns
-            </Button>
+            <button className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-semibold text-[14px] text-neutral-700" onClick={() => { setColumnModalOpen(true) }}>
+              Choose Columns <TbColumnInsertRight size={20} />
+            </button>
           </div>
 
           {/* Search Product Item */}
@@ -358,9 +389,9 @@ const Transfers = () => {
                                 <td key="Status" className="text-xs p-3 font-semibold text-center">
                                   <span
                                     className={`px-3 py-1 rounded-full
-              ${order?.status === "pending" ? "bg-yellow-100 text-yellow-600"
+              ${order?.status === "pending" ? "bg-red-100 text-red-600"
                                         : order?.status === "received" ? "bg-green-100 text-green-600"
-                                          : order?.status === "canceled" ? "bg-red-100 text-red-600"
+                                          : order?.status === "canceled" ? "bg-yellow-100 text-yellow-600"
                                             : "bg-gray-100 text-gray-600"}`}
                                   >
                                     {order?.status === "pending" ? "Pending"
@@ -407,21 +438,11 @@ const Transfers = () => {
             currentPage={page}
             onPageChange={setPage}
           />
-          <div className="relative inline-block">
-            <select
-              id="itemsPerPage"
-              value={itemsPerPage}
-              onChange={handleItemsPerPageChange}
-              className="cursor-pointer px-3 py-2 rounded-lg text-sm md:text-base text-gray-800 bg-white shadow-lg border border-gray-300 focus:outline-none hover:bg-gradient-to-tr hover:from-pink-400 hover:to-yellow-400 hover:text-white transition-colors duration-300 appearance-none w-16 md:w-20 lg:w-24"
-            >
-              <option className='bg-white text-black' value={25}>25</option>
-              <option className='bg-white text-black' value={50}>50</option>
-              <option className='bg-white text-black' value={100}>100</option>
-            </select>
-            <svg className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
+          <PaginationSelect
+            options={[25, 50, 100]} // ✅ Pass available options
+            value={itemsPerPage} // ✅ Selected value
+            onChange={handleItemsPerPageChange} // ✅ Handle value change
+          />
         </div>
 
       </div>
