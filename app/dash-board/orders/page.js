@@ -489,7 +489,7 @@ const OrdersPage = () => {
 
     if (isUndo) {
       updateStatus = order?.previousStatus; // Revert to previous status if undoing
-      localStorage.removeItem(`undoVisible_${id}`);
+      // localStorage.removeItem(`undoVisible_${id}`);
     } else {
       switch (actionType) {
         case 'shipped':
@@ -517,7 +517,7 @@ const OrdersPage = () => {
           updateStatus = 'Processing';
           break;
       }
-      localStorage.setItem(`undoVisible_${id}`, true);
+      // localStorage.setItem(`undoVisible_${id}`, true);
     };
 
     const data = {
@@ -649,15 +649,21 @@ const OrdersPage = () => {
   };
 
   // Adjust this logic to correctly determine the visibility of the Undo button
-  const isUndoAvailable = (order) => {
-    if (!isAdmin) return false;
-    const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
-    const lastChange = new Date(order.lastStatusChange);
-
-    // Check localStorage to see if the undo button should be visible
-    const isVisible = localStorage.getItem(`undoVisible_${order._id}`);
-    return lastChange >= sixHoursAgo && isVisible;
+  const checkUndoAvailability = (order) => {
+    if (!order.undoAvailableUntil || !isAdmin) return false;
+    return new Date(order.undoAvailableUntil) > new Date(); // Check if undo is still valid
   };
+
+  // Adjust this logic to correctly determine the visibility of the Undo button - local storage previous logic
+  // const isUndoAvailable = (order) => {
+  //   if (!isAdmin) return false;
+  //   const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
+  //   const lastChange = new Date(order.lastStatusChange);
+
+  //   // Check localStorage to see if the undo button should be visible
+  //   const isVisible = localStorage.getItem(`undoVisible_${order._id}`);
+  //   return lastChange >= sixHoursAgo && isVisible;
+  // };
 
   // sending mail to customer
   const sendOrderEmail = (order, actionType) => {
@@ -1492,7 +1498,7 @@ const OrdersPage = () => {
                                   )}
 
                                   {/* Undo button logic */}
-                                  {isAdmin && isUndoAvailable(order) && (
+                                  {isAdmin && checkUndoAvailability(order) && (
                                     <button
                                       onClick={() => handleActions(order._id, '', true)}
                                       className="text-red-600 hover:text-red-800 focus:ring-2 focus:ring-red-500 rounded p-1"
@@ -1610,9 +1616,16 @@ const OrdersPage = () => {
                                 {product.offerInfo && (
                                   <p>
                                     <strong>Offer Price:</strong> ৳{" "}
-                                    {(product?.regularPrice - (product?.regularPrice * product?.offerInfo?.offerDiscountValue / 100))}
+                                    {(product?.regularPrice - (product?.offerInfo?.appliedOfferDiscount))}
                                   </p>
                                 )}
+                                {/* Is Promo Price is needed to show on backend? */}
+                                {/* {product.promoInfo && (
+                                  <p>
+                                    <strong>Promo Price:</strong> ৳{" "}
+                                    -- Logic will be here --
+                                  </p>
+                                )} */}
                                 <p><strong>SKU:</strong> {product?.sku}</p>
                                 <p className='flex gap-0.5'><strong>Vendors:</strong>{product?.vendors?.length > 0 ? product?.vendors?.map((vendor, index) => (
                                   <p key={index}>{vendor}</p>

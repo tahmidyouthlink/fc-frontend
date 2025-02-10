@@ -151,6 +151,7 @@ const InventoryPage = () => {
         onProcess: onProcess,
         available: product.sku,
         onHand: product.onHandSku,
+        returnSku: product.returnSku,
       };
     });
 
@@ -181,6 +182,7 @@ const InventoryPage = () => {
       { header: "On Process", dataKey: "onProcess" },
       { header: "Available", dataKey: "available" },
       { header: "On Hand", dataKey: "onHand" },
+      { header: "Return SKU", dataKey: "returnSku" },
     ];
 
     const rows = paginatedProducts.map(product => {
@@ -214,6 +216,7 @@ const InventoryPage = () => {
         onProcess: onProcess,
         available: product.sku,
         onHand: product.onHandSku,
+        returnSku: product.returnSku,
       };
     });
 
@@ -262,6 +265,7 @@ const InventoryPage = () => {
         onProcess: onProcess,
         available: product.sku,
         onHand: product.onHandSku,
+        returnSku: product.returnSku,
       };
     });
 
