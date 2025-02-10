@@ -20,6 +20,7 @@ export default function DeliveryAddress({
 }) {
   const { user } = useAuth();
   const { setIsPageLoading } = useLoading();
+  const axiosPublic = useAxiosPublic();
   const [isEditingForm, setIsEditingForm] = useState(false);
   const {
     register,
@@ -60,7 +61,19 @@ export default function DeliveryAddress({
         postalCode: address?.postalCode,
       });
     }
-  }, [type, userData, isEditingForm, isAddingNewAddress]);
+  }, [
+    type,
+    userData,
+    isEditingForm,
+    isAddingNewAddress,
+    reset,
+    address?.nickname,
+    address?.isPrimary,
+    address?.address1,
+    address?.address2,
+    address?.city,
+    address?.postalCode,
+  ]);
 
   useEffect(() => {
     if (!(type === "update" && !isEditingForm)) {
@@ -148,7 +161,7 @@ export default function DeliveryAddress({
     setUserData(updatedUserData);
 
     try {
-      const response = await useAxiosPublic().put(
+      const response = await axiosPublic.put(
         `/updateUserInformation/${userData?._id}`,
         updatedUserData,
       );
@@ -198,7 +211,7 @@ export default function DeliveryAddress({
     setUserData(updatedUserData);
 
     try {
-      const response = await useAxiosPublic().put(
+      const response = await axiosPublic.put(
         `/updateUserInformation/${userData?._id}`,
         updatedUserData,
       );
@@ -246,7 +259,7 @@ export default function DeliveryAddress({
     );
 
     try {
-      const response = await useAxiosPublic().put(
+      const response = await axiosPublic.put(
         `/updateUserInformation/${userData?._id}`,
         updatedUserData,
       );

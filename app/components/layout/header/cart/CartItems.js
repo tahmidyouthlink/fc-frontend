@@ -21,6 +21,7 @@ export default function CartItems({
   setIsCartDrawerOpen,
 }) {
   const { user, userData, setUserData } = useAuth();
+  const axiosPublic = useAxiosPublic();
 
   const handleCartUpdate = async (updatedCart) => {
     setIsPageLoading(true);
@@ -35,7 +36,7 @@ export default function CartItems({
       };
 
       try {
-        const response = await useAxiosPublic().put(
+        const response = await axiosPublic.put(
           `/updateUserInformation/${userData?._id}`,
           updatedUserData,
         );

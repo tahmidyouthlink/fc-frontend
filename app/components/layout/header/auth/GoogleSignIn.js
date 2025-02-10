@@ -28,7 +28,7 @@ export default function GoogleSignIn({
     setIsPageLoading(isCustomerListLoading || !customerList?.length);
 
     return () => setIsPageLoading(false);
-  }, [isCustomerListLoading, customerList]);
+  }, [isCustomerListLoading, customerList, setIsPageLoading]);
 
   const handleGoogleSignIn = async () => {
     setIsPageLoading(true);

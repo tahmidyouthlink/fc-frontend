@@ -33,6 +33,7 @@ export default function ReturnOrderModal({
   errors,
 }) {
   const { setIsPageLoading } = useLoading();
+  const axiosPublic = useAxiosPublic();
   const selectedReason = Object.values(watch("reason") || {})[0];
   const selectedIssue = Object.values(watch("issue") || {})[0];
   const returnItems = watch("items");
@@ -129,7 +130,7 @@ export default function ReturnOrderModal({
     };
 
     try {
-      const response = await useAxiosPublic().patch(
+      const response = await axiosPublic.patch(
         `/changeOrderStatus/${activeReturnOrder._id}`,
         updatedActiveReturnOrder,
       );
@@ -172,7 +173,7 @@ export default function ReturnOrderModal({
     else toast.error("Please fill up the form properly.");
   };
 
-  useEffect(() => setValue("issue", ""), [selectedReason]);
+  useEffect(() => setValue("issue", ""), [selectedReason, setValue]);
 
   useEffect(() => {
     if (!isReturnModalOpen) {
@@ -180,7 +181,7 @@ export default function ReturnOrderModal({
       setImgFiles([]);
       setReturnImgUrls([]);
     }
-  }, [isReturnModalOpen]);
+  }, [isReturnModalOpen, reset]);
 
   return (
     <Modal

@@ -71,6 +71,7 @@ export default function Home() {
     locationList,
     isHeroImgsLoading,
     heroImgs,
+    setIsPageLoading,
   ]);
 
   return (

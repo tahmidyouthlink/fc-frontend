@@ -28,6 +28,7 @@ export default function CheckoutCartItems({
 }) {
   const { user, userData, setUserData } = useAuth();
   const { setIsPageLoading } = useLoading();
+  const axiosPublic = useAxiosPublic();
   const cartSubtotal = calculateSubtotal(productList, cartItems, specialOffers);
 
   const handleCartUpdate = async (updatedCart) => {
@@ -43,7 +44,7 @@ export default function CheckoutCartItems({
       };
 
       try {
-        const response = await useAxiosPublic().put(
+        const response = await axiosPublic.put(
           `/updateUserInformation/${userData?._id}`,
           updatedUserData,
         );

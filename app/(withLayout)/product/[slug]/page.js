@@ -38,7 +38,7 @@ export default function Product({ params: { slug } }) {
       (!product || product.status !== "active")
     )
       router.push("/shop");
-  }, [product, productList, router]);
+  }, [isProductListLoading, product, productList, router]);
 
   // Load recently viewed products
   useEffect(() => {
@@ -114,6 +114,7 @@ export default function Product({ params: { slug } }) {
     specialOffers,
     isLocationListLoading,
     locationList,
+    setIsPageLoading,
   ]);
 
   return (

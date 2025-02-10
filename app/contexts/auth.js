@@ -20,20 +20,21 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isUserLoading, setIsUserLoading] = useState(true);
+  const axiosPublic = useAxiosPublic();
 
   // Listen for changes to the user's authentication state
   // When the token changes, update the states and token cookie accordingly
   useEffect(() => {
     const updateUserData = async (userEmail) => {
       try {
-        const { data } = await useAxiosPublic().get("/allCustomerDetails");
+        const { data } = await axiosPublic.get("/allCustomerDetails");
         const doesUserHaveAccount = data.some(
           (userData) => userData.email === userEmail,
         );
 
         if (!doesUserHaveAccount) return setUserData(null);
 
-        const res = await useAxiosPublic().get(
+        const res = await axiosPublic.get(
           `/customerDetailsViaEmail/${userEmail}`,
         );
 
@@ -65,7 +66,7 @@ export const AuthProvider = ({ children }) => {
           cartItems: updatedCartItems,
         };
 
-        const response = await useAxiosPublic().put(
+        const response = await axiosPublic.put(
           `/updateUserInformation/${currentUserData?._id}`,
           updatedUserData,
         );
@@ -96,7 +97,7 @@ export const AuthProvider = ({ children }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [axiosPublic, userData]);
 
   // Provide the user state and loading state to child components through context
   return (

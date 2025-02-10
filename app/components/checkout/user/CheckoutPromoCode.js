@@ -17,7 +17,7 @@ export default function CheckoutPromoCode({
     setIsPageLoading(isPromosPending || !promos?.length);
 
     return () => setIsPageLoading(false);
-  }, [promos, isPromosPending]);
+  }, [promos, isPromosPending, setIsPageLoading]);
 
   useEffect(() => {
     const updatedPromoMessage = !userPromoCode
@@ -30,7 +30,7 @@ export default function CheckoutPromoCode({
           : "Promo code applied.";
 
     setPromoMessage(updatedPromoMessage);
-  }, [userPromoCode, cartItems]);
+  }, [userPromoCode, cartItems, cartSubtotal]);
 
   const handlePromoCodeValidation = () => {
     const enteredPromoCode = document.querySelector("#promo-code").value;

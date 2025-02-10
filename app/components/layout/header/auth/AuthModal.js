@@ -57,7 +57,7 @@ export default function AuthModal({
               ) : (
                 /* Register page link if user doesn't have an account */
                 <p className="mt-2 text-xs md:text-sm">
-                  Don't have an account?{" "}
+                  Don`&apos;`t have an account?{" "}
                   <button
                     type="button"
                     className="font-semibold text-[#57944e] transition-[color] duration-300 ease-in-out hover:text-[#6cb461]"

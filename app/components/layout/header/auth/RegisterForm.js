@@ -33,7 +33,7 @@ export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
     setIsPageLoading(isCustomerListLoading || !customerList?.length);
 
     return () => setIsPageLoading(false);
-  }, [isCustomerListLoading, customerList]);
+  }, [isCustomerListLoading, customerList, setIsPageLoading]);
 
   const {
     register: registerForRegister,
@@ -168,7 +168,7 @@ export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
     };
 
     getSubscribedEmails();
-  }, []);
+  }, [axiosPublic]);
 
   return (
     <form

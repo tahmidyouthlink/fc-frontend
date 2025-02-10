@@ -55,6 +55,7 @@ export default function ProductCard({
     specialOffers,
     isLocationListLoading,
     locationList,
+    setIsPageLoading,
   ]);
 
   return (

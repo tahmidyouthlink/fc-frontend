@@ -33,7 +33,7 @@ export default function AddToCartModal({
             selectedOptions.size,
           ),
     );
-  }, [product, selectedOptions]);
+  }, [primaryLocation, product, selectedOptions]);
 
   useEffect(() => {
     document.body.style.overflow = isAddToCartModalOpen ? "hidden" : "unset";

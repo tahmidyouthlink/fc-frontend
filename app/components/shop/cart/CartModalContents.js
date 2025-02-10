@@ -33,7 +33,7 @@ export default function CartModalContents({
     setIsPageLoading(isSpecialOffersLoading || !specialOffers?.length);
 
     return () => setIsPageLoading(false);
-  }, [isSpecialOffersLoading, specialOffers]);
+  }, [isSpecialOffersLoading, setIsPageLoading, specialOffers]);
 
   return (
     <div className="relative h-fit md:flex md:gap-x-10">

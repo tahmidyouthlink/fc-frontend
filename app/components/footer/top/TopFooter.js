@@ -81,13 +81,13 @@ export default function TopFooter() {
 
       checkIfSubscribed();
     }
-  }, [userData]);
+  }, [axiosPublic, setValue, userData]);
 
   useEffect(() => {
     setIsPageLoading(isMarketingBannerListLoading || !footerBanner);
 
     return () => setIsPageLoading(false);
-  }, [isMarketingBannerListLoading, footerBanner]);
+  }, [isMarketingBannerListLoading, footerBanner, setIsPageLoading]);
 
   if (!pathname.includes("checkout"))
     return (

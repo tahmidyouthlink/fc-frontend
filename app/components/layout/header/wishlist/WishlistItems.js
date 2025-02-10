@@ -24,7 +24,7 @@ export default function WishlistItems({
     setIsPageLoading(isSpecialOffersLoading || !specialOffers?.length);
 
     return () => setIsPageLoading(false);
-  }, [isSpecialOffersLoading, specialOffers]);
+  }, [isSpecialOffersLoading, setIsPageLoading, specialOffers]);
 
   const removeWishlistItem = async (wishlistItemId) => {
     setIsPageLoading(true);

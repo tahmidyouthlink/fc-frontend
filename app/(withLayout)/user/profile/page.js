@@ -10,7 +10,7 @@ export default function Profile() {
   const { userData, setUserData } = useAuth();
   const { setIsPageLoading } = useLoading();
 
-  useEffect(() => setIsPageLoading(!userData), [userData]);
+  useEffect(() => setIsPageLoading(!userData), [setIsPageLoading, userData]);
 
   return (
     <div className="user-info min-h-full grow space-y-4 rounded-xl border-2 border-neutral-50/20 bg-white/40 p-3.5 shadow-[0_0_20px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl lg:p-5 [&_input]:text-sm [&_label]:text-sm [&_label]:text-neutral-500">

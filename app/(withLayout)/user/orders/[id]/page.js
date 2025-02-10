@@ -31,11 +31,11 @@ export default function ProductDetails({ params }) {
     setIsPageLoading(isOrderListLoading || !orderList?.length);
 
     return () => setIsPageLoading(false);
-  }, [isOrderListLoading, orderList]);
+  }, [isOrderListLoading, orderList, setIsPageLoading]);
 
   useEffect(() => {
     if (!!orderList?.length && !order) router.push("/user/orders");
-  }, [orderList, order]);
+  }, [orderList, order, router]);
 
   return (
     <section className="grow auto-rows-max rounded-xl bg-white p-3.5 shadow-[2px_2px_20px_0_rgba(0,0,0,0.075)] xl:p-5">

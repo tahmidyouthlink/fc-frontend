@@ -65,7 +65,7 @@ export default function CheckoutDiscountTooptip({
                 </p>
                 {isEligibleForSpecialOffer && (
                   <p className="text-[13px] font-semibold text-[#57944e]">
-                    Kudos! You've saved ৳ {savedAmount?.toLocaleString()}
+                    Kudos! You`&apos;`ve saved ৳ {savedAmount?.toLocaleString()}
                   </p>
                 )}
               </div>

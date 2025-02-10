@@ -39,7 +39,7 @@ export default function ProductContents({
         size: undefined,
         quantity: 1,
       });
-  }, [product]);
+  }, [product, setSelectedOptions]);
 
   return (
     <div className="px-5 sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0">

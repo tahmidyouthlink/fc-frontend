@@ -37,6 +37,7 @@ export default function CartDrawer({
     specialOffers,
     isLocationListLoading,
     locationList,
+    setIsPageLoading,
   ]);
 
   return (

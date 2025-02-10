@@ -45,6 +45,7 @@ import CheckoutConfirmation from "@/app/components/checkout/CheckoutConfirmation
 export default function Checkout() {
   const { user, userData, setUserData } = useAuth();
   const { setIsPageLoading } = useLoading();
+  const axiosPublic = useAxiosPublic();
   const [productList, isProductListLoading, productRefetch] =
     useProductsInformation();
   const [orderList, isOrderListLoading, orderRefetch] = useOrders();
@@ -256,7 +257,7 @@ export default function Checkout() {
       };
 
       try {
-        const response = await useAxiosPublic().post("/addOrder", newOrderData);
+        const response = await axiosPublic.post("/addOrder", newOrderData);
 
         if (response?.data?.insertedId) {
           setOrderDetails({
@@ -354,7 +355,7 @@ export default function Checkout() {
       setUserData(updatedUserData);
 
       try {
-        await useAxiosPublic().put(
+        await axiosPublic.put(
           `/updateUserInformation/${userData?._id}`,
           updatedUserData,
         );
@@ -389,7 +390,7 @@ export default function Checkout() {
 
   useEffect(() => {
     setValue("deliveryType", "");
-  }, [selectedCity]);
+  }, [selectedCity, setValue]);
 
   useEffect(() => {
     reset({
@@ -436,7 +437,7 @@ export default function Checkout() {
     setIsSaveAddressCheckboxSelected(
       !!userData?.userInfo?.savedDeliveryAddress?.city,
     );
-  }, [userData]);
+  }, [getValues, reset, userData]);
 
   useEffect(() => {
     const autocompleteElements = document.querySelectorAll(
@@ -478,6 +479,7 @@ export default function Checkout() {
     specialOffers,
     isLocationListLoading,
     locationList,
+    setIsPageLoading,
   ]);
 
   useEffect(() => {

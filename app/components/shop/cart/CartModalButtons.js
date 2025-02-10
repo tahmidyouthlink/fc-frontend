@@ -21,6 +21,7 @@ export default function CartModalButtons({
 }) {
   const { user, userData, setUserData } = useAuth();
   const { setIsPageLoading } = useLoading();
+  const axiosPublic = useAxiosPublic();
 
   const isExistingItem = (item) =>
     item._id === productId &&
@@ -72,7 +73,7 @@ export default function CartModalButtons({
       };
 
       try {
-        const response = await useAxiosPublic().put(
+        const response = await axiosPublic.put(
           `/updateUserInformation/${userData?._id}`,
           updatedUserData,
         );

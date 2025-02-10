@@ -19,7 +19,7 @@ export default function Header() {
     );
 
     return () => setIsPageLoading(false);
-  }, [isUserLoading, isProductListLoading, productList]);
+  }, [isUserLoading, isProductListLoading, productList, setIsPageLoading]);
 
   return (
     <header

@@ -166,6 +166,7 @@ export default function Shop() {
     selectedFilterOptions,
     keyword,
     searchParams,
+    primaryLocation,
   ]);
 
   useEffect(() => {
@@ -187,6 +188,7 @@ export default function Shop() {
     isLocationListLoading,
     locationList,
     searchParams,
+    setIsPageLoading,
   ]);
 
   if (!(isProductListLoading || !productList?.length))

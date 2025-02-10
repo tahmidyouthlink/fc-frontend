@@ -6,6 +6,7 @@ import useAxiosPublic from "@/app/hooks/useAxiosPublic";
 export default function CartHeader({ totalItems, setIsCartDrawerOpen }) {
   const { user, userData, setUserData } = useAuth();
   const { setIsPageLoading } = useLoading();
+  const axiosPublic = useAxiosPublic();
 
   const removeAllItems = async () => {
     setIsPageLoading(true);
@@ -21,7 +22,7 @@ export default function CartHeader({ totalItems, setIsCartDrawerOpen }) {
       };
 
       try {
-        const response = await useAxiosPublic().put(
+        const response = await axiosPublic.put(
           `/updateUserInformation/${userData?._id}`,
           updatedUserData,
         );

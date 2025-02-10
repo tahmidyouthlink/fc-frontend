@@ -20,7 +20,7 @@ export default function Orders() {
     setIsPageLoading(isOrderListLoading || !orderList?.length);
 
     return () => setIsPageLoading(false);
-  }, [isOrderListLoading, orderList]);
+  }, [isOrderListLoading, orderList, setIsPageLoading]);
 
   return (
     <>

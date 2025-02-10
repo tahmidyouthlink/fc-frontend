@@ -76,7 +76,7 @@ export default function CheckoutItemsInfo({
     setIsPageLoading(isShippingZonesLoading || !shippingZones?.length);
 
     return () => setIsPageLoading(false);
-  }, [isShippingZonesLoading, shippingZones]);
+  }, [isShippingZonesLoading, setIsPageLoading, shippingZones]);
 
   return (
     <div className="space-y-2.5 [&>div>*]:z-[1] [&>div>span]:text-right [&>div]:flex [&>div]:justify-between">

@@ -11,6 +11,7 @@ import { cities } from "@/app/data/cities";
 
 export default function PersonalInfo({ userData, setUserData, personalInfo }) {
   const { setIsPageLoading } = useLoading();
+  const axiosPublic = useAxiosPublic();
   const [isEditingForm, setIsEditingForm] = useState(false);
   const {
     register,
@@ -39,7 +40,17 @@ export default function PersonalInfo({ userData, setUserData, personalInfo }) {
       hometown: personalInfo?.hometown || (isEditingForm ? "" : "--"),
       dob: personalInfo?.dob ? parseDate(personalInfo.dob) : null,
     });
-  }, [userData, isEditingForm]);
+  }, [
+    userData,
+    isEditingForm,
+    reset,
+    personalInfo?.customerName,
+    personalInfo?.email,
+    personalInfo?.phoneNumber,
+    personalInfo?.phoneNumber2,
+    personalInfo?.hometown,
+    personalInfo.dob,
+  ]);
 
   const onSubmit = async (data) => {
     setIsPageLoading(true);
@@ -78,7 +89,7 @@ export default function PersonalInfo({ userData, setUserData, personalInfo }) {
     setUserData(updatedUserData);
 
     try {
-      const response = await useAxiosPublic().put(
+      const response = await axiosPublic.put(
         `/updateUserInformation/${userData?._id}`,
         updatedUserData,
       );

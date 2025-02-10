@@ -60,7 +60,7 @@ export default function CheckoutRegister({
     setIsPageLoading(isCustomerListLoading || !customerList?.length);
 
     return () => setIsPageLoading(false);
-  }, [isCustomerListLoading, customerList]);
+  }, [isCustomerListLoading, customerList, setIsPageLoading]);
 
   const onSubmitForRegister = async (data) => {
     if (!isPoliciesCheckboxSelected)
@@ -160,7 +160,7 @@ export default function CheckoutRegister({
     };
 
     getSubscribedEmails();
-  }, []);
+  }, [axiosPublic]);
 
   return (
     <Modal

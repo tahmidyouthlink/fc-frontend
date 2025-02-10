@@ -37,7 +37,7 @@ export default function ContactForm() {
       topic: getValues("topic") || "",
       message: getValues("message") || "",
     });
-  }, [userData]);
+  }, [getValues, reset, userData]);
 
   const onSubmit = async (data) => {
     console.log("rhf contact form data", data);
