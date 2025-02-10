@@ -12,11 +12,9 @@ export default function Orders() {
   const { setIsPageLoading } = useLoading();
   const [orderList, isOrderListLoading, orderRefetch] = useOrders();
 
-  // const userOrders = orderList?.filter(
-  //   (order) => order?.customerInfo?.email === user?.email,
-  // );
-
-  const userOrders = orderList;
+  const userOrders = orderList?.filter(
+    (order) => order?.customerInfo?.email === user?.email,
+  );
 
   useEffect(() => {
     setIsPageLoading(isOrderListLoading || !orderList?.length);
