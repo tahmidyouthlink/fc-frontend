@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Header from "../components/layout/header/Header";
 import LoaderFrontend from "../components/shared/LoaderFrontend";
 import ScrollTopButton from "../components/ui/ScrollTopButton";
@@ -12,13 +13,15 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <div className="flex min-h-dvh flex-col [&>main]:grow">
-      <Header />
-      <LoaderFrontend />
-      <ScrollTopButton />
-      <ChatButton />
-      {children}
-      <Footer />
-    </div>
+    <Suspense fallback={<LoaderFrontend />}>
+      <div className="flex min-h-dvh flex-col [&>main]:grow">
+        <Header />
+        <LoaderFrontend />
+        <ScrollTopButton />
+        <ChatButton />
+        {children}
+        <Footer />
+      </div>
+    </Suspense>
   );
 }
