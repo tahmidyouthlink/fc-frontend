@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { CgMenuLeft } from "react-icons/cg";
-import logoWhiteImage from "@/public/logos/fc-logo.png";
+import logoWhiteImage from "@/public/logos/logo.png";
 import SideNavbar from "./SideNavbar";
 import Link from "next/link";
 import Image from "next/image";
@@ -50,11 +50,10 @@ const DashboardNavbar = () => {
           <Link href="/" legacyBehavior>
             <a className="flex items-center gap-2">
               <Image
-                className="h-[14px] md:h-6 w-auto"
+                className="h-9 md:h-10 w-auto"
                 src={logoWhiteImage}
                 alt="F-Commerce logo"
               />
-              <h1 className="text-xs md:text-lg">F-Commerce</h1>
             </a>
           </Link>
         </div>
