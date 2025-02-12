@@ -187,7 +187,7 @@ const SideNavbar = ({ onClose }) => {
                           className={`font-semibold text-neutral-600
                   ${pathname === item?.path ||
                               (item?.path !== "/dash-board" && pathname.startsWith(item?.path))
-                              ? "text-[#00B795]"
+                              ? "!text-[#00B795]"
                               : "text-black group-hover:text-[#00B795]"
                             }`}
                         >
@@ -252,7 +252,7 @@ const SideNavbar = ({ onClose }) => {
                                     onClick={onClose}
                                   >
                                     <h2 className="p-1 text-base xl:text-lg 2xl:text-xl rounded-xl">{subLink.icon}</h2>
-                                    <h2 className={`font-semibold text-neutral-600 group-hover:text-[#00B795] ${pathname === subLink.link ? "text-[#00B795]" : ""}`}>
+                                    <h2 className={`font-semibold text-neutral-600 group-hover:text-[#00B795] ${pathname === subLink.link ? "!text-[#00B795]" : ""}`}>
                                       {subLink.label}
                                     </h2>
                                   </a>
@@ -267,7 +267,7 @@ const SideNavbar = ({ onClose }) => {
                           <a
                             className={`flex items-center gap-2 w-full hover:bg-[#E5F7F4] group px-4 py-3 ${pathname === linkItem.link ? "text-[#00B795] bg-[#E5F7F4] border-l-5 border-[#00B795]" : "hover:text-[#00B795]"}`} onClick={onClose}>
                             <h2 className="p-1 text-base xl:text-lg 2xl:text-xl rounded-xl">{linkItem.icon}</h2>
-                            <h2 className={`font-semibold text-neutral-600 group-hover:text-[#00B795] ${pathname === linkItem.link ? "text-[#00B795]" : ""}`}>{linkItem.label}</h2>
+                            <h2 className={`font-semibold text-neutral-600 group-hover:text-[#00B795] ${pathname === linkItem.link ? "!text-[#00B795]" : ""}`}>{linkItem.label}</h2>
                           </a>
                         </Link>
                       )
