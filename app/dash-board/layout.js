@@ -5,12 +5,13 @@ import DashboardNavbar from "../components/layout/DashboardNavbar";
 const Layout = ({ children }) => {
   return (
     <>
-      {/* for large devices */}
-      <div className="inset-y-0 flex-col hidden md:flex">
+      {/* Only render sidebar on large devices */}
+      <div className="inset-y-0 flex-col hidden lg:flex">
         <SideNavbar />
       </div>
-      {/* for all devices */}
-      <div className="relative ml-0 md:ml-[220px] lg:ml-[250px] xl:ml-[280px] 2xl:ml-[300px]">
+
+      {/* Main content */}
+      <div className="relative ml-0 lg:ml-[262px]">
         <DashboardNavbar />
         {children}
       </div>

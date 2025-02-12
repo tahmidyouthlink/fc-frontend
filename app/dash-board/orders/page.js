@@ -1616,7 +1616,7 @@ const OrdersPage = () => {
                                 {product.offerInfo && (
                                   <p>
                                     <strong>Offer Price:</strong> ৳{" "}
-                                    {(product?.regularPrice - (product?.offerInfo?.appliedOfferDiscount / product?.sku))}
+                                    {(product?.regularPrice - (product?.offerInfo?.appliedOfferDiscount / product?.sku)).toFixed(2)}
                                   </p>
                                 )}
                                 {/* Is Promo Price is needed to show on backend? */}
