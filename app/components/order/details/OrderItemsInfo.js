@@ -1,4 +1,6 @@
+import { useState } from "react";
 import DiscountTooptip from "../../ui/DiscountTooltip";
+import DiscountModal from "../../ui/DiscountModal";
 
 export default function OrderItemsInfo({
   totalSpecialOfferDiscount,
@@ -7,6 +9,8 @@ export default function OrderItemsInfo({
   shippingCharge,
   total,
 }) {
+  const [isPromoModalOpen, setIsPromoModalOpen] = useState(false);
+
   return (
     <div className="space-y-2">
       <div className="flex justify-between">
@@ -23,7 +27,29 @@ export default function OrderItemsInfo({
       )}
       {!!promoInfo && (
         <div className="flex justify-between">
-          <h5 className="text-neutral-400">
+          <h5
+            className="text-neutral-400 xl:hidden"
+            onClick={() => setIsPromoModalOpen(true)}
+          >
+            Promo (
+            <span className="cursor-default text-[#57944e] underline underline-offset-2">
+              {promoInfo?.promoCode}
+            </span>
+            )
+          </h5>
+          <DiscountModal
+            isDiscountModalOpen={isPromoModalOpen}
+            setIsDiscountModalOpen={setIsPromoModalOpen}
+            discountTitle={promoInfo?.promoCode}
+            discountAmount={
+              promoInfo?.promoDiscountType === "Percentage"
+                ? promoInfo?.promoDiscountValue + "%"
+                : "৳ " + promoInfo?.promoDiscountValue
+            }
+            isEligibleForDiscount={true}
+            savedAmount={promoInfo?.appliedPromoDiscount}
+          />
+          <h5 className="text-neutral-400 max-xl:hidden">
             Promo (
             <DiscountTooptip
               discountTitle={promoInfo?.promoCode}

@@ -1,14 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLoading } from "@/app/contexts/loading";
 import {
   calculatePromoDiscount,
   calculateShippingCharge,
   calculateSubtotal,
   calculateTotalSpecialOfferDiscount,
-  getProductSpecialOffer,
 } from "@/app/utils/orderCalculations";
 import useShippingZones from "@/app/hooks/useShippingZones";
 import DiscountTooptip from "../../ui/DiscountTooltip";
+import DiscountModal from "../../ui/DiscountModal";
 
 export default function CheckoutItemsInfo({
   productList,
@@ -22,6 +22,7 @@ export default function CheckoutItemsInfo({
   const { setIsPageLoading } = useLoading();
   const [shippingZones, isShippingZonesLoading, shippingZonesRefetch] =
     useShippingZones();
+  const [isPromoModalOpen, setIsPromoModalOpen] = useState(false);
   const subtotal = calculateSubtotal(productList, cartItems, specialOffers);
   const totalSpecialOfferDiscount = calculateTotalSpecialOfferDiscount(
     productList,
@@ -47,31 +48,6 @@ export default function CheckoutItemsInfo({
       ? 0
       : shippingCharge);
 
-  const allSpecialOfferValues = [
-    ...new Set(
-      cartItems.map((cartItem) => {
-        const product = productList?.find(
-          (product) => product._id === cartItem?._id,
-        );
-        const specialOffer = getProductSpecialOffer(
-          product,
-          specialOffers,
-          subtotal,
-        );
-
-        if (specialOffer) {
-          if (specialOffer.offerDiscountType === "Percentage") {
-            return specialOffer.offerDiscountValue + "%";
-          } else {
-            return "৳ " + specialOffer.offerDiscountValue;
-          }
-        }
-      }),
-    ),
-  ]
-    ?.filter((value) => !!value)
-    ?.join(", ");
-
   useEffect(() => {
     setIsPageLoading(isShippingZonesLoading || !shippingZones?.length);
 
@@ -86,17 +62,35 @@ export default function CheckoutItemsInfo({
       </div>
       {!!totalSpecialOfferDiscount && (
         <div>
-          <h5 className="text-neutral-500">
-            Special Offer
-            {/* {allSpecialOfferValues.includes(",") ? "s" : ""} */}
-            {/* {" "}({allSpecialOfferValues}) */}
-          </h5>
+          <h5 className="text-neutral-500">Special Offer</h5>
           <span className="text-red-600">{`- ৳ ${totalSpecialOfferDiscount.toLocaleString()}`}</span>
         </div>
       )}
       {isPromoCodeValid && (
         <div>
-          <h5 className="text-neutral-500">
+          <h5 className="text-neutral-500 xl:hidden">
+            Promo (
+            <span
+              className="cursor-default text-[#57944e] underline underline-offset-2"
+              onClick={() => setIsPromoModalOpen(true)}
+            >
+              {userPromoCode?.promoCode}
+            </span>
+            )
+          </h5>
+          <DiscountModal
+            isDiscountModalOpen={isPromoModalOpen}
+            setIsDiscountModalOpen={setIsPromoModalOpen}
+            discountTitle={userPromoCode?.promoCode}
+            discountAmount={
+              userPromoCode?.promoDiscountType === "Percentage"
+                ? userPromoCode?.promoDiscountValue + "%"
+                : "৳ " + userPromoCode?.promoDiscountValue
+            }
+            discountMinAmount={userPromoCode?.minAmount}
+            discountMaxAmount={userPromoCode?.maxAmount}
+          />
+          <h5 className="text-neutral-500 max-xl:hidden">
             Promo (
             <DiscountTooptip
               discountTitle={userPromoCode?.promoCode}

@@ -1,9 +1,14 @@
+import { useState } from "react";
 import Image from "next/image";
 import { FaCircleCheck } from "react-icons/fa6";
 import TransitionLink from "@/app/components/ui/TransitionLink";
+import DiscountModal from "../../ui/DiscountModal";
 import DiscountTooptip from "../../ui/DiscountTooltip";
 
 export default function OrderItems({ orderItems }) {
+  const [isSpecialOfferModalOpen, setIsSpecialOfferModalOpen] = useState(false);
+  const [activeModalItem, setActiveModalItem] = useState(null);
+
   const calculateTotalItems = () => {
     return orderItems?.reduce(
       (accumulator, item) => Number(item?.sku) + accumulator,
@@ -87,19 +92,14 @@ export default function OrderItems({ orderItems }) {
                       </div>
                       {/* Special Offer Text (if applicable) */}
                       {!!item?.offerInfo && (
-                        <DiscountTooptip
-                          discountTitle={item?.offerInfo?.offerTitle}
-                          discountAmount={
-                            item?.offerInfo?.offerDiscountType === "Percentage"
-                              ? item?.offerInfo?.offerDiscountValue + "%"
-                              : "৳ " + item?.offerInfo?.offerDiscountValue
-                          }
-                          isEligibleForSpecialOffer={true}
-                          savedAmount={Number(
-                            item?.offerInfo?.appliedOfferDiscount,
-                          )}
-                        >
-                          <span className="mt-1 flex cursor-default items-center gap-x-1 text-xs text-[#57944e] underline-offset-2 hover:underline">
+                        <>
+                          <span
+                            className="mt-1 flex cursor-default items-center gap-x-1 text-xs text-[#57944e] underline-offset-2 hover:underline xl:hidden"
+                            onClick={() => {
+                              setActiveModalItem(item);
+                              setIsSpecialOfferModalOpen(true);
+                            }}
+                          >
                             <span>
                               Special Offer (
                               {item?.offerInfo?.offerDiscountType ===
@@ -112,7 +112,34 @@ export default function OrderItems({ orderItems }) {
                               <FaCircleCheck className="size-4" />
                             </span>
                           </span>
-                        </DiscountTooptip>
+                          <DiscountTooptip
+                            discountTitle={item?.offerInfo?.offerTitle}
+                            discountAmount={
+                              item?.offerInfo?.offerDiscountType ===
+                              "Percentage"
+                                ? item?.offerInfo?.offerDiscountValue + "%"
+                                : "৳ " + item?.offerInfo?.offerDiscountValue
+                            }
+                            isEligibleForSpecialOffer={true}
+                            savedAmount={Number(
+                              item?.offerInfo?.appliedOfferDiscount,
+                            )}
+                          >
+                            <span className="mt-1 hidden cursor-default items-center gap-x-1 text-xs text-[#57944e] underline-offset-2 hover:underline xl:flex">
+                              <span>
+                                Special Offer (
+                                {item?.offerInfo?.offerDiscountType ===
+                                "Percentage"
+                                  ? item?.offerInfo?.offerDiscountValue + "%"
+                                  : "৳ " + item?.offerInfo?.offerDiscountValue}
+                                )
+                              </span>
+                              <span>
+                                <FaCircleCheck className="size-4" />
+                              </span>
+                            </span>
+                          </DiscountTooptip>
+                        </>
                       )}
                     </div>
                     <div className="space-y-1">
@@ -136,6 +163,18 @@ export default function OrderItems({ orderItems }) {
           );
         })}
       </ul>
+      <DiscountModal
+        isDiscountModalOpen={isSpecialOfferModalOpen}
+        setIsDiscountModalOpen={setIsSpecialOfferModalOpen}
+        discountTitle={activeModalItem?.offerInfo?.offerTitle}
+        isEligibleForDiscount={true}
+        discountAmount={
+          activeModalItem?.offerInfo?.offerDiscountType === "Percentage"
+            ? activeModalItem?.offerInfo?.offerDiscountValue + "%"
+            : "৳ " + activeModalItem?.offerInfo?.offerDiscountValue
+        }
+        savedAmount={Number(activeModalItem?.offerInfo?.appliedOfferDiscount)}
+      />
     </div>
   );
 }
