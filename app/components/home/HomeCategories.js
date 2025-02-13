@@ -64,7 +64,7 @@ export default function HomeCategories({ featuredCategories }) {
                       backgroundImage: `url(${featuredCategory?.imageUrl})`,
                     }}
                   />
-                  <p className="pointer-events-none z-[2]">
+                  <p className="pointer-events-none z-[2] p-1 text-center">
                     {featuredCategory?.label}
                   </p>
                 </TransitionLink>
