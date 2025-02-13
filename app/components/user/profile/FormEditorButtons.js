@@ -56,7 +56,7 @@ export default function FormEditorButtons({
               onClick={() => handlePrimarySelection()}
             >
               <RiStarLine />
-              <p className="whitespace-nowrap">Set as Primary</p>
+              <p className="whitespace-nowrap">Make Primary</p>
             </button>
           )}
           <button

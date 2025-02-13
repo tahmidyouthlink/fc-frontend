@@ -196,11 +196,11 @@
   }
 
   .user-into-form-buttons {
-    @apply flex gap-2.5 [&_svg]:text-base;
+    @apply flex gap-1.5 lg:gap-2.5 [&_svg]:text-base;
   }
 
   .user-into-form-buttons button {
-    @apply flex items-center gap-1.5 rounded-md p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4;
+    @apply flex items-center gap-1.5 rounded-md p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-lg:[&_p]:hidden max-lg:[&_svg]:size-4;
   }
 
   .user-sidebar li a {
