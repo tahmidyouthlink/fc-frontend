@@ -11,6 +11,9 @@ import { AiOutlineEdit } from "react-icons/ai";
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 import { FaPlus, FaStar } from "react-icons/fa6";
+import arrowSvgImage from "/public/card-images/arrow.svg";
+import arrivals1 from "/public/card-images/arrivals1.svg";
+import arrivals2 from "/public/card-images/arrivals2.svg";
 
 const CategoriesOverview = () => {
   const axiosPublic = useAxiosPublic();
@@ -147,7 +150,26 @@ const CategoriesOverview = () => {
   }
 
   return (
-    <div className='bg-gray-50 min-h-screen'>
+    <div className='bg-gray-50 min-h-screen relative'>
+
+      <div
+        style={{
+          backgroundImage: `url(${arrivals1.src})`,
+        }}
+        className='absolute inset-0 z-0 hidden md:block bg-no-repeat left-[45%] lg:left-[60%] -top-[138px]'
+      />
+      <div
+        style={{
+          backgroundImage: `url(${arrivals2.src})`,
+        }}
+        className='absolute inset-0 z-0 bg-contain bg-center xl:-top-28 w-full bg-no-repeat'
+      />
+      <div
+        style={{
+          backgroundImage: `url(${arrowSvgImage.src})`,
+        }}
+        className='absolute inset-0 z-0 top-2 md:top-4 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[30%] 2xl:left-[40%] bg-no-repeat'
+      />
 
       <div className='sticky top-0 z-10 bg-gray-50 flex items-center flex-wrap gap-4 justify-between max-w-screen-2xl mx-auto px-6 pt-6'>
         <h1 className='font-semibold text-center text-[16px] lg:text-3xl text-neutral-700'>CATEGORY MANAGEMENT</h1>
@@ -159,9 +181,9 @@ const CategoriesOverview = () => {
         </button>
       </div>
 
-      <div className='max-w-screen-2xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 px-6'>
+      <div className='max-w-screen-2xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 px-6 relative'>
         {categoryList?.map(category => (
-          <div key={category?._id} className='category-item border p-4 rounded-md'>
+          <div key={category?._id} className='category-item border p-4 rounded-md bg-white'>
             <div className='flex justify-between items-center'>
               <h4 className='font-bold text-lg'>{category?.label}</h4>
               <div className='flex justify-end items-center gap-2'>

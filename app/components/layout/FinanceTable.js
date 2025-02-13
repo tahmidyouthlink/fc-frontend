@@ -166,7 +166,7 @@ const FinanceTable = () => {
   }
 
   return (
-    <div>
+    <div className='relative'>
 
       <div className='flex flex-col lg:flex-row items-center justify-evenly gap-6 max-w-screen-2xl mx-auto'>
 

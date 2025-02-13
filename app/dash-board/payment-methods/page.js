@@ -1,5 +1,8 @@
 "use client";
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
+import arrowSvgImage from "/public/card-images/arrow.svg";
+import arrivals1 from "/public/card-images/arrivals1.svg";
+import arrivals2 from "/public/card-images/arrivals2.svg";
 import React from 'react';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
@@ -140,11 +143,34 @@ const PaymentMethods = () => {
   }
 
   return (
-    <div className='bg-gray-50 min-h-screen px-6 lg:px-0'>
-      <div className='max-w-screen-2xl mx-auto flex items-center pt-3 md:pt-6'>
+    <div className='bg-gray-50 min-h-screen px-6 relative'>
+
+      <div
+        style={{
+          backgroundImage: `url(${arrivals1.src})`,
+        }}
+        className='absolute inset-0 z-0 hidden md:block bg-no-repeat left-[45%] lg:left-[60%] -top-[138px]'
+      />
+
+      <div
+        style={{
+          backgroundImage: `url(${arrivals2.src})`,
+        }}
+        className='absolute inset-0 z-0 bg-contain bg-center xl:-top-28 w-full bg-no-repeat'
+      />
+
+      <div
+        style={{
+          backgroundImage: `url(${arrowSvgImage.src})`,
+        }}
+        className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
+      />
+
+      <div className='max-w-screen-2xl mx-auto flex items-center pt-3 md:pt-6 relative'>
         <h3 className='w-full font-semibold text-xl lg:text-2xl'>PAYMENT MANAGEMENT</h3>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-center gap-6 max-w-screen-2xl mx-auto my-6">
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-center gap-6 max-w-screen-2xl mx-auto my-6 relative">
         {
           paymentMethodList?.map((payment, index) => (
             <div key={index} className="flex-1 overflow-hidden rounded-lg shadow transition hover:shadow-lg flex flex-col bg-white">
@@ -224,6 +250,7 @@ const PaymentMethods = () => {
           </Link>
         </div>
       </div>
+
     </div>
   );
 };

@@ -13,7 +13,6 @@ import CustomPagination from '@/app/components/layout/CustomPagination';
 import useOrders from '@/app/hooks/useOrders';
 import useLocations from '@/app/hooks/useLocations';
 import { HiOutlineDownload } from 'react-icons/hi';
-import { Select, SelectItem } from '@nextui-org/react';
 import PaginationSelect from '@/app/components/layout/PaginationSelect';
 
 const InventoryPage = () => {
@@ -299,7 +298,7 @@ const InventoryPage = () => {
   };
 
   return (
-    <div className='relative w-full min-h-screen bg-gray-100'>
+    <div className='relative w-full min-h-screen bg-gray-50'>
 
       <div
         style={{
@@ -317,7 +316,7 @@ const InventoryPage = () => {
         style={{
           backgroundImage: `url(${arrowSvgImage.src})`,
         }}
-        className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
+        className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[24%] xl:left-[19%] 2xl:left-[34%] bg-no-repeat'
       />
 
       <div className='max-w-screen-2xl px-6 2xl:px-0 mx-auto'>
