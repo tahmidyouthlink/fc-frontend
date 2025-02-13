@@ -26,14 +26,11 @@ const DashboardNavbar = () => {
 
   useEffect(() => {
     if (isToggle) {
-      // Disable scrolling on the body when sidebar is open
       document.body.style.overflow = "hidden";
     } else {
-      // Re-enable scrolling when sidebar is closed
       document.body.style.overflow = "";
     }
 
-    // Clean up when component unmounts
     return () => {
       document.body.style.overflow = "";
     };
@@ -41,31 +38,33 @@ const DashboardNavbar = () => {
 
   return (
     <div>
-      {/* Sidebar - hide from medium devices */}
+      {/* Top Navbar */}
       <div className="flex items-center justify-between px-4">
-        <button className="md:hidden duration-300 p-2" onClick={() => setIsToggle(!isToggle)}>
-          {isToggle ? null : <CgMenuLeft size={20} />}
+        <button className="lg:hidden duration-300 p-2" onClick={() => setIsToggle(!isToggle)}>
+          {!isToggle && <CgMenuLeft size={20} />}
         </button>
-        <div className="w-full flex justify-center md:hidden">
+        <div className="w-full flex justify-center lg:hidden">
           <Link href="/" legacyBehavior>
-            <a className="flex items-center gap-2">
-              <Image
-                className="h-9 md:h-10 w-auto"
-                src={logoWhiteImage}
-                alt="F-Commerce logo"
-              />
+            <a className="flex items-center gap-2 py-3">
+              <Image className="h-7 lg:h-10 w-auto" src={logoWhiteImage} alt="F-Commerce logo" />
             </a>
           </Link>
         </div>
-        {/* Overlay */}
-        {isToggle && (
-          <div className="fixed inset-0 z-40 bg-white opacity-100 md:hidden" onClick={handleClose}></div>
-        )}
       </div>
-      <div
-        className={`fixed inset-y-0 left-0 z-50 transition-all duration-500 ${isToggle ? "block" : "hidden"} flex-col w-full h-full md:hidden bg-gradient-to-t from-[#9f511655] to-[#9f511616]`}>
-        <SideNavbar onClose={handleClose} />
-      </div>
+
+      {/* Sidebar - only visible when toggled on small screens */}
+      {isToggle && (
+        <>
+          {/* Overlay */}
+          <div className="fixed inset-0 z-40 bg-black opacity-30 lg:hidden" onClick={handleClose}></div>
+
+          {/* Sidebar */}
+          <div className="fixed inset-y-0 left-0 z-50 w-64 h-full bg-white shadow-lg transition-transform transform lg:hidden"
+            style={{ transform: isToggle ? "translateX(0)" : "translateX(-100%)" }}>
+            <SideNavbar onClose={handleClose} />
+          </div>
+        </>
+      )}
     </div>
   );
 };
