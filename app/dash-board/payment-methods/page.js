@@ -140,7 +140,7 @@ const PaymentMethods = () => {
   }
 
   return (
-    <div className='bg-gray-50 min-h-screen'>
+    <div className='bg-gray-50 min-h-screen px-6 lg:px-0'>
       <div className='max-w-screen-2xl mx-auto flex items-center pt-3 md:pt-6'>
         <h3 className='w-full font-semibold text-xl lg:text-2xl'>PAYMENT MANAGEMENT</h3>
       </div>

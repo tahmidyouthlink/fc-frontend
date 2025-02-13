@@ -294,9 +294,9 @@ const ThirdStepOfAddProduct = () => {
   }
 
   return (
-    <div className='min-h-screen'>
+    <div className='min-h-screen bg-gray-50'>
 
-      <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-white'>
+      <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
         <div className='flex items-center justify-between'>
           <h3 className='w-full font-semibold text-xl lg:text-2xl'>SELECT SHIPPING DETAILS</h3>
           <Link
@@ -311,7 +311,7 @@ const ThirdStepOfAddProduct = () => {
           </Link>
         </div>
 
-        <div className='flex flex-wrap items-center gap-3 bg-white mt-4'>
+        <div className='flex flex-wrap items-center gap-3 bg-gray-50 mt-4'>
 
           <button
             className={`relative text-sm py-1 transition-all duration-300
@@ -383,7 +383,7 @@ ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:af
 
                 return (
                   <tr key={index}
-                    className={`cursor-pointer transition-all duration-200 ${isSelected ? 'bg-gray-50' : 'bg-white'}`}>
+                    className={`cursor-pointer transition-all duration-200 ${isSelected ? 'bg-white' : 'bg-gray-50'}`}>
                     {/* Checkbox for selecting a row */}
                     <td className="text-center">
                       <Checkbox

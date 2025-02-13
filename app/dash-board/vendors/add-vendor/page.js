@@ -75,7 +75,7 @@ const AddVendor = () => {
   return (
     <div className='bg-gray-50 min-h-screen px-6'>
 
-      <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
+      <div className='max-w-screen-xl mx-auto pt-3 md:pt-6 px-6'>
         <div className='flex items-center justify-between'>
           <h3 className='w-full font-semibold text-xl lg:text-2xl'>Vendor Configuration</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/vendors"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
@@ -84,7 +84,7 @@ const AddVendor = () => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
 
-        <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
+        <div className='max-w-screen-xl mx-auto p-6 flex flex-col gap-4'>
 
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
             {/* Vendor name Input */}

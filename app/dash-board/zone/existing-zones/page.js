@@ -115,14 +115,14 @@ const ExistingZones = () => {
   }
 
   return (
-    <div className='px-5 2xl:px-16'>
+    <div className='px-5 bg-gray-50 min-h-screen'>
 
-      <div className='py-4 w-full flex justify-between'>
+      <div className='py-4 w-full flex justify-between max-w-screen-2xl mx-auto'>
         <h3 className='text-start font-medium md:font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700 w-full'>SHIPPING MANAGEMENT</h3>
         <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/zone"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
       </div>
 
-      <div className='flex flex-wrap items-center gap-3 bg-white pt-2'>
+      <div className='flex flex-wrap items-center gap-3 bg-gray-50 pt-2 max-w-screen-2xl mx-auto'>
         <button
           className={`relative text-sm py-1 transition-all duration-300
         ${activeTab === 'inside dhaka' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
@@ -160,7 +160,7 @@ const ExistingZones = () => {
         </button>
       </div>
 
-      <div className="pt-2">
+      <div className="pt-2 max-w-screen-2xl mx-auto">
 
         <p className="pt-1 pb-4 text-neutral-800 font-semibold">
           {activeTab === "inside dhaka"
@@ -170,9 +170,9 @@ const ExistingZones = () => {
               : "Nationwide Areas Only without Dhaka"}
         </p>
 
-        <div className="custom-max-h overflow-x-auto modal-body-scroll mt-3">
+        <div className="custom-max-h overflow-x-auto modal-body-scroll mt-3 drop-shadow rounded-lg">
           <table className="w-full text-left border-collapse">
-            <thead className="bg-gray-100 sticky top-0 z-[1] shadow-md">
+            <thead className="sticky top-0 z-[1] bg-white">
               <tr>
                 <th className="text-sm md:text-base p-2 xl:p-3 text-gray-700 border-b border-gray-300">
                   Shipping Zone

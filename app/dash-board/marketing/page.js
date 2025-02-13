@@ -33,12 +33,12 @@ const Marketing = () => {
   }, [activeTab]);
 
   return (
-    <div className='px-6 md:px-10'>
+    <div className='px-6 md:px-10 bg-gray-50 min-h-screen'>
 
-      <div className="bg-white sticky top-0 z-10">
-        <h1 className="font-bold text-lg md:text-xl lg:text-3xl text-neutral-700 py-1 2xl:py-3 bg-white">MARKETING</h1>
+      <div className="bg-gray-50 sticky top-0 z-10">
+        <h1 className="font-bold text-lg md:text-xl lg:text-3xl text-neutral-700 py-1 2xl:py-3 bg-gray-50">MARKETING</h1>
 
-        <div className="flex flex-wrap items-center gap-3 bg-white">
+        <div className="flex flex-wrap items-center gap-3 bg-gray-50">
 
           <button
             className={`relative text-sm py-1 transition-all duration-300

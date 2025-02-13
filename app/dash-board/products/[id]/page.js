@@ -1903,7 +1903,7 @@ ${activeTab2 === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:a
 
                     return (
                       <tr key={index}
-                        className={`cursor-pointer transition-all duration-200 ${isSelected ? 'bg-gray-50' : 'bg-white'}`}>
+                        className={`cursor-pointer transition-all duration-200 ${isSelected ? 'bg-white' : 'bg-gray-50'}`}>
                         {/* Checkbox for selecting a row */}
                         <td className="text-center">
                           <Checkbox

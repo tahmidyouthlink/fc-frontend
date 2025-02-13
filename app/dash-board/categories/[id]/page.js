@@ -430,7 +430,7 @@ export default function EditCategory() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} className='bg-gray-50'>
 
       <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
         <div className='flex items-center justify-between'>

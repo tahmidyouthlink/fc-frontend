@@ -80,17 +80,17 @@ const VendorsPage = () => {
   }
 
   return (
-    <div>
-      <div className='flex justify-between items-center px-6 lg:px-16 py-3'>
-        <h1 className='py-2 md:py-3 font-semibold text-center text-lg md:text-xl lg:text-3xl text-neutral-700 sticky top-0 z-[10] bg-white'>VENDOR MANAGEMENT</h1>
+    <div className='bg-gray-50 min-h-screen'>
+      <div className='flex justify-between items-center px-6 max-w-screen-2xl mx-auto py-3'>
+        <h1 className='py-2 md:py-3 font-semibold text-center text-lg md:text-xl lg:text-3xl text-neutral-700 sticky top-0 z-[10] bg-gray-50'>VENDOR MANAGEMENT</h1>
         <button className="relative z-[1] rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
           <Link className='flex items-center gap-x-3' href={"/dash-board/vendors/add-vendor"}><FaPlus size={15} className='text-neutral-700' /> ADD</Link>
         </button>
       </div>
 
-      <div className="max-w-screen-2xl mx-auto px-0 md:px-4 lg:px-6 custom-max-h overflow-x-auto modal-body-scroll">
+      <div className="px-6 max-w-screen-2xl mx-auto custom-max-h-orders overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
         <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-100 sticky top-0 z-[1] shadow-md">
+          <thead className="sticky top-0 z-[1] bg-white">
             <tr>
               <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Vendor Name</th>
               <th className="text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">Contact Person Name</th>

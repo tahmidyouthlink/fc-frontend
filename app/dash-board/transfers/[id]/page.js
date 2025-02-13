@@ -241,7 +241,7 @@ const EditTransferOrder = () => {
   };
 
   return (
-    <div className='bg-gray-100 min-h-screen px-6'>
+    <div className='bg-gray-50 min-h-screen px-6'>
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
         <div className='flex flex-wrap md:flex-nowrap items-center justify-between w-full'>

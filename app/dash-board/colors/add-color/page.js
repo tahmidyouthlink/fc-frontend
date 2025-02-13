@@ -82,16 +82,16 @@ const AddColor = () => {
   };
 
   return (
-    <div className='relative max-w-screen-lg mx-auto px-6'>
+    <div className='relative px-6 bg-gray-50 min-h-screen'>
 
-      <div className='max-w-screen-lg mx-auto pt-3 md:pt-6'>
+      <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
         <div className='flex items-center justify-between'>
           <h3 className='w-full font-semibold text-xl lg:text-2xl'>CREATE NEW COLORS</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/colors"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto'>
         <div className="mt-8 w-full bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg">
           <label className="flex justify-start font-medium text-[#9F5216] pb-2">Select Color</label>
           {colorFields.map((item, index) => (
