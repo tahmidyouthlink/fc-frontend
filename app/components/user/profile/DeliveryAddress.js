@@ -61,19 +61,7 @@ export default function DeliveryAddress({
         postalCode: address?.postalCode,
       });
     }
-  }, [
-    type,
-    userData,
-    isEditingForm,
-    isAddingNewAddress,
-    reset,
-    address?.nickname,
-    address?.isPrimary,
-    address?.address1,
-    address?.address2,
-    address?.city,
-    address?.postalCode,
-  ]);
+  }, [type, userData, isEditingForm, isAddingNewAddress, reset, address]);
 
   useEffect(() => {
     if (!(type === "update" && !isEditingForm)) {

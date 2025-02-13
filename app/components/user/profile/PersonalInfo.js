@@ -40,17 +40,7 @@ export default function PersonalInfo({ userData, setUserData, personalInfo }) {
       hometown: personalInfo?.hometown || (isEditingForm ? "" : "--"),
       dob: personalInfo?.dob ? parseDate(personalInfo.dob) : null,
     });
-  }, [
-    userData,
-    isEditingForm,
-    reset,
-    personalInfo?.customerName,
-    personalInfo?.email,
-    personalInfo?.phoneNumber,
-    personalInfo?.phoneNumber2,
-    personalInfo?.hometown,
-    personalInfo.dob,
-  ]);
+  }, [userData, isEditingForm, reset, personalInfo]);
 
   const onSubmit = async (data) => {
     setIsPageLoading(true);
