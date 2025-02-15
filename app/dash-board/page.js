@@ -5,7 +5,7 @@ import arrivals2 from "/public/card-images/arrivals2.svg";
 
 const DashboardMainPage = () => {
   return (
-    <div className='bg-gray-50 min-h-screen'>
+    <div className='bg-gray-50 min-h-screen relative'>
 
       <div
         style={{
