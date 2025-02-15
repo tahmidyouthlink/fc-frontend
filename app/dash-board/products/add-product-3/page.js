@@ -14,6 +14,9 @@ import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
+import arrowSvgImage from "/public/card-images/arrow.svg";
+import arrivals1 from "/public/card-images/arrivals1.svg";
+import arrivals2 from "/public/card-images/arrivals2.svg";
 
 const ThirdStepOfAddProduct = () => {
 
@@ -291,10 +294,31 @@ const ThirdStepOfAddProduct = () => {
 
   if (isShippingPending || isShipmentHandlerPending) {
     return <Loading />
-  }
+  };
 
   return (
-    <div className='min-h-screen bg-gray-50'>
+    <div className='min-h-screen bg-gray-50 relative'>
+
+      <div
+        style={{
+          backgroundImage: `url(${arrivals1.src})`,
+        }}
+        className='absolute inset-0 z-0 hidden md:block bg-no-repeat xl:left-[15%] 2xl:left-[30%] bg-[length:1600px_900px] -top-[90px]'
+      />
+
+      <div
+        style={{
+          backgroundImage: `url(${arrivals2.src})`,
+        }}
+        className='absolute inset-0 z-0 bg-contain bg-center xl:-top-28 w-full bg-no-repeat'
+      />
+
+      <div
+        style={{
+          backgroundImage: `url(${arrowSvgImage.src})`,
+        }}
+        className='absolute inset-0 z-0 top-8 xl:top-12 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[40%] 2xl:left-[41%] bg-no-repeat'
+      />
 
       <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
         <div className='flex items-center justify-between'>
@@ -353,18 +377,18 @@ ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:af
 
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-2xl mx-auto min-h-[85vh] flex flex-col justify-between'>
+      <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-2xl mx-auto min-h-[85vh] flex flex-col justify-between relative'>
 
         <div className="overflow-x-auto">
-          <table className="min-w-full table-auto">
+          <table className="min-w-full table-auto bg-white">
 
             <thead>
-              <tr>
+              <tr className='rounded-lg bg-gray-50'>
                 <th className="px-2 py-1 md:px-4 md:py-2 border-b border-gray-300">
                   <Checkbox
                     isSelected={filteredShippingList.length > 0 && (tabSelections[activeTab]?.length === filteredShippingList.length)}
                     onChange={toggleSelectAll}
-                    color="success"
+                    color="warning"
                     size="lg"
                   />
                 </th>
@@ -389,7 +413,7 @@ ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:af
                       <Checkbox
                         isSelected={isSelected}
                         onChange={() => toggleCardSelection(shipping)}
-                        color="success"
+                        color="warning"
                         size='lg'
                       />
                     </td>

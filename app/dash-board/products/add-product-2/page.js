@@ -14,6 +14,9 @@ import Loading from '@/app/components/shared/Loading/Loading';
 import ExitConfirmationModal from '@/app/components/layout/ExitConfirmationModal';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { LuImagePlus } from "react-icons/lu";
+import arrowSvgImage from "/public/card-images/arrow.svg";
+import arrivals1 from "/public/card-images/arrivals1.svg";
+import arrivals2 from "/public/card-images/arrivals2.svg";
 
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
@@ -482,7 +485,28 @@ const SecondStepOfAddProduct = () => {
   }
 
   return (
-    <div className='bg-gray-50 min-h-screen px-6'>
+    <div className='bg-gray-50 min-h-screen px-6 relative'>
+
+      <div
+        style={{
+          backgroundImage: `url(${arrivals1.src})`,
+        }}
+        className='absolute inset-0 z-0 hidden md:block bg-no-repeat xl:left-[15%] 2xl:left-[30%] bg-[length:1600px_900px] -top-[90px]'
+      />
+
+      <div
+        style={{
+          backgroundImage: `url(${arrivals2.src})`,
+        }}
+        className='absolute inset-0 z-0 bg-contain bg-center xl:-top-28 w-full bg-no-repeat'
+      />
+
+      <div
+        style={{
+          backgroundImage: `url(${arrowSvgImage.src})`,
+        }}
+        className='absolute inset-0 z-0 top-8 xl:top-12 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[40%] 2xl:left-[41%] bg-no-repeat'
+      />
 
       <div className='max-w-screen-2xl mx-auto py-3 md:py-4 sticky top-0 z-10 bg-gray-50'>
         <div className='flex flex-wrap lg:flex-nowrap items-center justify-between'>
@@ -501,7 +525,7 @@ const SecondStepOfAddProduct = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className='min-h-[91vh] flex flex-col justify-between max-w-screen-2xl mx-auto'>
+      <form onSubmit={handleSubmit(onSubmit)} className='min-h-[91vh] flex flex-col justify-between max-w-screen-2xl mx-auto relative'>
         <div>
           <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 pt-3 pb-12'>
             {productVariants?.map((variant, index) => (
