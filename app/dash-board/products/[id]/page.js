@@ -33,6 +33,10 @@ import { RxUpdate } from "react-icons/rx";
 import useSeasons from '@/app/hooks/useSeasons';
 import useLocations from '@/app/hooks/useLocations';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
+import { HiCheckCircle } from 'react-icons/hi2';
+import arrowSvgImage from "/public/card-images/arrow.svg";
+import arrivals1 from "/public/card-images/arrivals1.svg";
+import arrivals2 from "/public/card-images/arrivals2.svg";
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
@@ -106,17 +110,17 @@ const EditProductPage = () => {
   const [image, setImage] = useState(null);
 
   // Filter categories based on search input and remove already selected categories
-  const filteredSeasons = seasonList?.filter((season) =>
-    season.seasonName.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    !selectedSeasons.includes(season.seasonName) // Exclude already selected categories
-  );
+  const filteredSeasons = seasonList
+    ?.filter((season) =>
+      season.seasonName.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => a.seasonName.localeCompare(b.seasonName)); // Sorting A → Z
 
   // Filter products based on search input and remove already selected products
   const filteredProducts = productList?.filter((product) =>
-    (product.productId.toLowerCase().includes(searchTermForCompleteOutfit.toLowerCase()) ||
-      product.productTitle.toLowerCase().includes(searchTermForCompleteOutfit.toLowerCase())) &&
-    !selectedProductIds.some((p) => p.productId === product.productId) // Exclude already selected products
-  );
+  (product.productId.toLowerCase().includes(searchTermForCompleteOutfit.toLowerCase()) ||
+    product.productTitle.toLowerCase().includes(searchTermForCompleteOutfit.toLowerCase())))
+    .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate)); // Sorting latest → oldest;
 
   // Handle adding/removing category selection
   const toggleSeasonSelection = (seasonName) => {
@@ -170,13 +174,6 @@ const EditProductPage = () => {
 
     setSelectedSeasons(updatedSelectedSeasons);
     handleSeasonSelectionChange(updatedSelectedSeasons); // Pass selected seasons to parent component
-  };
-
-  // Handle removing category directly from selected list
-  const removeSeason = (seasonName) => {
-    const updatedSelectedSeasons = selectedSeasons.filter((label) => label !== seasonName);
-    setSelectedSeasons(updatedSelectedSeasons);
-    handleSeasonSelectionChange(updatedSelectedSeasons); // Pass selected categories to parent component
   };
 
   const handleSeasonSelectionChange = async (selectedSea) => {
@@ -243,20 +240,8 @@ const EditProductPage = () => {
     handleProductSelectionChange(updatedSelectedProducts);
   };
 
-  // Handle removing category directly from selected list
-  const removeProduct = (productId) => {
-    const updatedSelectedProducts = selectedProductIds.filter((p) => p.productId !== productId);
-    setSelectedProductIds(updatedSelectedProducts);
-    handleProductSelectionChange(updatedSelectedProducts); // Pass updated list to parent component
-  };
-
   const handleProductSelectionChange = (selectedProducts) => {
     setSelectedProductIds(selectedProducts); // Update the state with selected products
-  };
-
-  // Toggle dropdown visibility
-  const handleInputClick = () => {
-    setIsDropdownOpen(!isDropdownOpen);
   };
 
   // Close dropdown when clicking outside
@@ -285,10 +270,6 @@ const EditProductPage = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [dropdownRefForCompleteOutfit]);
-
-  const handleInputClickForCompleteOutfit = () => {
-    setIsDropdownOpenForCompleteOutfit(!isDropdownOpenForCompleteOutfit);
-  };
 
   // Filtered shipping list for the active tab
   const filteredShippingList = shippingList?.filter((zone) => {
@@ -1077,13 +1058,34 @@ const EditProductPage = () => {
 
   if (isCategoryPending || isSizeRangePending || isSubCategoryPending || isTagPending || isVendorPending || isColorPending || isShippingPending || isShipmentHandlerPending || isSeasonPending || isLocationPending || isProductPending) {
     return <Loading />
-  }
+  };
 
   return (
-    <div className='bg-gray-50 min-h-screen'>
+    <div className='bg-gray-50 min-h-screen relative'>
 
-      <div className='max-w-screen-2xl mx-auto sticky top-0 px-6 py-2 md:px-6 md:py-6 z-10 bg-gray-50 flex justify-between gap-4'>
-        <div className="flex items-center gap-3 w-full">
+      <div
+        style={{
+          backgroundImage: `url(${arrivals1.src})`,
+        }}
+        className='absolute inset-0 z-0 hidden md:block bg-no-repeat xl:left-[15%] 2xl:left-[30%] bg-[length:1600px_900px]'
+      />
+
+      <div
+        style={{
+          backgroundImage: `url(${arrivals2.src})`,
+        }}
+        className='absolute inset-0 z-0 bg-contain bg-center xl:-top-28 w-full bg-no-repeat'
+      />
+
+      <div
+        style={{
+          backgroundImage: `url(${arrowSvgImage.src})`,
+        }}
+        className='absolute inset-0 z-0 top-32 xl:top-16 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[40%] 2xl:left-[45%] bg-no-repeat'
+      />
+
+      <div className='max-w-screen-2xl mx-auto sticky top-0 px-6 py-2 md:px-6 md:py-6 z-10 bg-gray-50 flex justify-between flex-wrap gap-4'>
+        <div className="flex-1 flex items-center gap-3 w-full">
 
           <button className={`relative py-1 transition-all duration-300
             ${activeTab === 'product' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
@@ -1116,7 +1118,7 @@ const EditProductPage = () => {
 
         {decodedSeasonName ? (
           <Link
-            className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full'
+            className='flex items-center gap-2 text-[10px] md:text-base justify-end'
             href={`/dash-board/products/existing-products/seasons/${decodedSeasonName}`}>
             <span className='border border-black rounded-full p-1 md:p-2'>
               <FaArrowLeft />
@@ -1125,7 +1127,7 @@ const EditProductPage = () => {
           </Link>
         ) : (
           <Link
-            className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full'
+            className='flex items-center gap-2 text-[10px] md:text-base justify-end'
             href={`/dash-board/products/existing-products/${selectedCategory}`}>
             <span className='border border-black rounded-full p-1 md:p-2'>
               <FaArrowLeft />
@@ -1137,7 +1139,7 @@ const EditProductPage = () => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
 
-        {activeTab === "product" && <div>
+        {activeTab === "product" && <div className='relative'>
           <div className='max-w-screen-2xl px-6 mx-auto pb-3'>
             <h3 className='w-full font-semibold text-xl lg:text-2xl xl:text-3xl text-neutral-700'>UPDATE PRODUCT DETAILS</h3>
           </div>
@@ -1457,59 +1459,41 @@ const EditProductPage = () => {
 
                       <input
                         type="text"
-                        value={searchTerm}
+                        value={isDropdownOpen ? searchTerm : selectedSeasons.join(", ")} // Show selected IDs when closed
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        onClick={handleInputClick} // Toggle dropdown on input click
+                        onClick={() => setIsDropdownOpen(true)} // dropdown on input click
                         placeholder="Search & Select by Seasonal Collection"
-                        className="w-full p-2 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md mb-2"
+                        className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#9F5216] overflow-hidden text-ellipsis whitespace-nowrap"
                       />
 
                       {/* Dropdown list for search results */}
                       {isDropdownOpen && (
-                        <div className="rounded max-h-64 overflow-y-auto">
+                        <div className="border flex flex-col gap-1.5 p-2 max-h-64 overflow-y-auto rounded-lg">
                           {filteredSeasons?.length > 0 ? (
                             filteredSeasons?.map((season) => (
                               <div
                                 key={season._id}
-                                className={`flex items-center p-2 cursor-pointer rounded-lg hover:bg-gray-100 border ${selectedSeasons.includes(season.seasonName) ? 'bg-gray-200' : ''}`}
+                                className={`flex cursor-pointer items-center justify-between rounded-lg border p-1 transition-[border-color,background-color] duration-300 ease-in-out hover:border-[#d7ecd2] hover:bg-[#fafff9] ${selectedSeasons?.includes(season.seasonName) ? 'border-[#d7ecd2] bg-[#fafff9]' : 'border-neutral-100'}`}
                                 onClick={() => toggleSeasonSelection(season.seasonName)}
                               >
-                                <Image
-                                  width={400}
-                                  height={400}
-                                  src={season.imageUrl}
-                                  alt="season-imageUrl"
-                                  className="h-8 w-8 object-cover rounded"
+                                <div className='flex items-center gap-1'>
+                                  <Image
+                                    width={4000}
+                                    height={4000}
+                                    src={season?.imageUrl}
+                                    alt="season-imageUrl"
+                                    className="h-8 w-8 object-cover rounded"
+                                  />
+                                  <span className="ml-2">{season?.seasonName}</span>
+                                </div>
+                                <HiCheckCircle
+                                  className={`pointer-events-none size-7 text-[#60d251] transition-opacity duration-300 ease-in-out ${selectedSeasons?.includes(season?.seasonName) ? "opacity-100" : "opacity-0"}`}
                                 />
-                                <span className="ml-2">{season.seasonName}</span>
                               </div>
                             ))
                           ) : (
                             <p className="text-gray-500">No collection found</p>
                           )}
-                        </div>
-                      )}
-
-                      {/* Selected categories display */}
-                      {selectedSeasons?.length > 0 && (
-                        <div className="border p-2 rounded mt-2">
-                          <h4 className="text-sm font-semibold mb-2">Selected Collection:</h4>
-                          <ul className="space-y-2">
-                            {selectedSeasons?.map((season, index) => (
-                              <li
-                                key={index}
-                                className="flex justify-between items-center bg-gray-100 p-2 rounded"
-                              >
-                                <span className='font-semibold'>{season}</span>
-                                <button type='button'
-                                  onClick={() => removeSeason(season)}
-                                  className="text-red-500 text-sm"
-                                >
-                                  Remove
-                                </button>
-                              </li>
-                            ))}
-                          </ul>
                         </div>
                       )}
 
@@ -1523,75 +1507,44 @@ const EditProductPage = () => {
 
                       <input
                         type="text"
-                        value={searchTermForCompleteOutfit}
+                        value={isDropdownOpenForCompleteOutfit ? searchTermForCompleteOutfit : selectedProductIds.map(product => product.productId).join(", ")} // Show selected IDs when closed
                         onChange={(e) => setSearchTermForCompleteOutfit(e.target.value)}
-                        onClick={handleInputClickForCompleteOutfit} // Toggle dropdown on input click
+                        onClick={() => setIsDropdownOpenForCompleteOutfit(true)} // Toggle dropdown on input click
                         placeholder="Search & Select by Seasonal Collection"
-                        className="w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mb-2"
+                        className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#9F5216] overflow-hidden text-ellipsis whitespace-nowrap"
                       />
 
                       {/* Dropdown list for search results */}
                       {isDropdownOpenForCompleteOutfit && (
-                        <div className="rounded max-h-64 overflow-y-auto">
+                        <div className="border flex flex-col gap-1.5 p-2 max-h-64 overflow-y-auto rounded-lg">
                           {filteredProducts?.length > 0 ? (
                             filteredProducts?.map((product) => (
                               <div
                                 key={product._id}
-                                className={`flex items-center p-1.5 cursor-pointer rounded-lg hover:bg-gray-100 border ${selectedProductIds.includes(product.productTitle) || selectedProductIds.includes(product.productId) ? 'bg-gray-200' : ''}`}
+                                className={`flex cursor-pointer items-center justify-between rounded-lg border p-1 transition-[border-color,background-color] duration-300 ease-in-out hover:border-[#d7ecd2] hover:bg-[#fafff9] ${selectedProductIds?.map(product => product?.productId)?.includes(product?.productId) ? 'border-[#d7ecd2] bg-[#fafff9]' : 'border-neutral-100'}`}
                                 onClick={() => toggleProductSelection(product?.productId, product?.productTitle, product?._id, product?.thumbnailImageUrl)}
                               >
-                                <Image
-                                  width={400}
-                                  height={400}
-                                  src={product.thumbnailImageUrl}
-                                  alt="season-imageUrl"
-                                  className="h-8 w-8 object-cover rounded"
-                                />
-                                <div className='flex flex-col'>
-                                  <span className="ml-2 font-bold">{product.productId}</span>
-                                  <span className="ml-2 text-sm">{product.productTitle}</span>
+                                <div className='flex items-center gap-1'>
+                                  <Image
+                                    width={4000}
+                                    height={4000}
+                                    src={product?.thumbnailImageUrl}
+                                    alt="season-imageUrl"
+                                    className="h-8 w-8 object-cover rounded"
+                                  />
+                                  <div className='flex flex-col'>
+                                    <span className="ml-2 font-bold">{product?.productId}</span>
+                                    <span className="ml-2 text-sm">{product?.productTitle}</span>
+                                  </div>
                                 </div>
+                                <HiCheckCircle
+                                  className={`pointer-events-none size-7 text-[#60d251] transition-opacity duration-300 ease-in-out ${selectedProductIds?.map(product => product?.productId)?.includes(product?.productId) ? "opacity-100" : "opacity-0"}`}
+                                />
                               </div>
                             ))
                           ) : (
                             <p className="text-gray-500">No product found</p>
                           )}
-                        </div>
-                      )}
-
-                      {/* Selected categories display */}
-                      {selectedProductIds?.length > 0 && (
-                        <div className="border p-2 rounded mt-2">
-                          <h4 className="text-sm font-semibold mb-2">Selected Products:</h4>
-                          <ul className="space-y-2">
-                            {selectedProductIds?.map((product, index) => (
-                              <li
-                                key={index}
-                                className="flex justify-between items-center bg-gray-100 p-2 rounded"
-                              >
-                                <div className='flex items-center gap-1'>
-                                  <Image
-                                    width={400}
-                                    height={400}
-                                    src={product.imageUrl}
-                                    alt="season-imageUrl"
-                                    className="h-8 w-8 object-cover rounded"
-                                  />
-                                  <div className='flex flex-col'>
-                                    <span className="ml-2 font-bold">{product.productId}</span>
-                                    <span className="ml-2 text-sm">{product.productTitle}</span>
-                                  </div>
-                                </div>
-                                <button
-                                  onClick={() => removeProduct(product?.productId)}
-                                  className="text-red-500 text-sm"
-                                  type='button'
-                                >
-                                  Remove
-                                </button>
-                              </li>
-                            ))}
-                          </ul>
                         </div>
                       )}
 
@@ -1657,7 +1610,7 @@ const EditProductPage = () => {
           </div>
         </div>}
 
-        {activeTab === "inventory" && <div>
+        {activeTab === "inventory" && <div className='relative'>
           <div className='2xl:max-w-screen-2xl 2xl:mx-auto'>
             <div className='flex flex-wrap items-center justify-between px-6 gap-4 text-neutral-700'>
               <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl'>UPDATE INVENTORY VARIANTS</h3>
@@ -1829,7 +1782,7 @@ const EditProductPage = () => {
           </div>
         </div>}
 
-        {activeTab === "shipping" && <div className='2xl:max-w-screen-2xl 2xl:mx-auto'>
+        {activeTab === "shipping" && <div className='2xl:max-w-screen-2xl 2xl:mx-auto relative'>
 
           <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl px-6 pb-6 text-neutral-700'>UPDATE SHIPPING DETAILS</h3>
 
@@ -1876,15 +1829,15 @@ ${activeTab2 === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:a
 
           <div className='px-6'>
             <div className="overflow-x-auto">
-              <table className="min-w-full table-auto">
+              <table className="min-w-full table-auto bg-white">
 
                 <thead>
-                  <tr>
+                  <tr className={`rounded-lg bg-gray-50`}>
                     <th className="px-2 py-1 md:px-4 md:py-2 border-b border-gray-300">
                       <Checkbox
                         isSelected={filteredShippingList?.length > 0 && (tabSelections[activeTab2]?.length === filteredShippingList.length)}
                         onChange={toggleSelectAll}
-                        color="success"
+                        color="warning"
                         size="lg"
                       />
                     </th>
@@ -1903,13 +1856,13 @@ ${activeTab2 === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:a
 
                     return (
                       <tr key={index}
-                        className={`cursor-pointer transition-all duration-200 ${isSelected ? 'bg-gray-50' : 'bg-white'}`}>
+                        className={`cursor-pointer transition-all duration-200 ${isSelected ? 'bg-white' : 'bg-gray-50'}`}>
                         {/* Checkbox for selecting a row */}
                         <td className="text-center">
                           <Checkbox
                             isSelected={isSelected}
                             onChange={() => toggleCardSelection(shipping)}
-                            color="success"
+                            color="warning"
                             size='lg'
                           />
                         </td>

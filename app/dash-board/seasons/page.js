@@ -1,7 +1,6 @@
 "use client";
 import React from 'react';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
-import { Button } from '@nextui-org/react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import Loading from '@/app/components/shared/Loading/Loading';
@@ -12,6 +11,9 @@ import useSeasons from '@/app/hooks/useSeasons';
 import Image from 'next/image';
 import { FaPlus } from 'react-icons/fa6';
 import { AiOutlineEdit } from 'react-icons/ai';
+import arrowSvgImage from "/public/card-images/arrow.svg";
+import arrivals1 from "/public/card-images/arrivals1.svg";
+import arrivals2 from "/public/card-images/arrivals2.svg";
 
 const Seasons = () => {
   const axiosPublic = useAxiosPublic();
@@ -83,7 +85,28 @@ const Seasons = () => {
   }
 
   return (
-    <div className='bg-gray-50 min-h-screen'>
+    <div className='bg-gray-50 min-h-screen relative'>
+
+      <div
+        style={{
+          backgroundImage: `url(${arrivals1.src})`,
+        }}
+        className='absolute inset-0 z-0 hidden md:block bg-no-repeat left-[45%] lg:left-[60%] -top-[50px]'
+      />
+
+      <div
+        style={{
+          backgroundImage: `url(${arrivals2.src})`,
+        }}
+        className='absolute inset-0 z-0 bg-contain bg-center xl:-top-28 w-full bg-no-repeat'
+      />
+
+      <div
+        style={{
+          backgroundImage: `url(${arrowSvgImage.src})`,
+        }}
+        className='absolute inset-0 z-0 top-2 md:top-12 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[30%] 2xl:left-[40%] bg-no-repeat'
+      />
 
       <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between max-w-screen-2xl mx-auto px-6 py-6'>
         <h1 className='font-semibold text-center text-lg md:text-xl lg:text-3xl text-neutral-700'>SEASON MANAGEMENT</h1>
@@ -93,7 +116,7 @@ const Seasons = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 max-w-screen-2xl mx-auto px-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 max-w-screen-2xl mx-auto px-6 relative">
         {seasonList?.map((season, index) => {
 
           return (

@@ -217,7 +217,7 @@ const PurchaseOrders = () => {
   }
 
   return (
-    <div className='relative w-full min-h-screen bg-[#FAFAFA] px-6'>
+    <div className='relative w-full min-h-screen bg-gray-50 px-6'>
 
       <div
         style={{
@@ -235,7 +235,7 @@ const PurchaseOrders = () => {
         style={{
           backgroundImage: `url(${arrowSvgImage.src})`,
         }}
-        className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
+        className='absolute inset-0 z-0 top-2 md:top-0 xl:top-10 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] xl:left-[29%] 2xl:left-[32%] bg-no-repeat'
       />
 
       {/* Column Selection Modal */}
@@ -337,7 +337,7 @@ const PurchaseOrders = () => {
                 placeholder="Search purchase order details..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-white text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
+                className="w-full text-sm h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-white transition-[border-color,background-color] font-semibold text-neutral-600 duration-300 ease-in-out focus:outline-none focus:border-[#F4D3BA] hover:shadow-none focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base shadow placeholder:text-neutral-400"
               />
             </li>
           </div>

@@ -17,6 +17,7 @@ import useProductsInformation from '@/app/hooks/useProductsInformation';
 import { FiSave } from 'react-icons/fi';
 import useOffers from '@/app/hooks/useOffers';
 import ProductSearchSelect from '@/app/components/layout/ProductSearchSelect';
+import { HiCheckCircle } from 'react-icons/hi2';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
@@ -291,15 +292,8 @@ const EditOffer = () => {
 
   // Filter categories based on search input and remove already selected categories
   const filteredCategories = categoryList?.filter((category) =>
-    category?.label?.toLowerCase()?.includes(searchTerm.toLowerCase()) &&
-    !selectedCategories?.includes(category.label) // Exclude already selected categories
-  );
-
-  // Handle removing category directly from selected list
-  const removeCategory = (categoryLabel) => {
-    const updatedSelectedCategories = selectedCategories?.filter((label) => label !== categoryLabel);
-    setSelectedCategories(updatedSelectedCategories);
-  };
+    category?.label?.toLowerCase()?.includes(searchTerm.toLowerCase()))
+    .sort((a, b) => a.label.localeCompare(b.label)); // Sorting A → Z
 
   const handleProductSelectionChange = async (selectedIds) => {
     if (selectedIds.length === 0) {
@@ -539,7 +533,7 @@ const EditOffer = () => {
         <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto pt-1 pb-6 flex flex-col gap-6'>
 
           <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
-            <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 mt-3 py-3 h-fit'>
+            <div className='grid grid-cols-1 lg:col-span-5 gap-8 mt-3 py-3 h-fit'>
               <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
                 <div>
                   <label htmlFor='offerTitle' className='flex justify-start font-medium text-[#9F5216]'>Offer Title *</label>
@@ -610,7 +604,7 @@ const EditOffer = () => {
               </div>
             </div>
 
-            <div className='grid grid-cols-1 lg:col-span-5 xl:col-span-5 gap-8 mt-3 py-3'>
+            <div className='grid grid-cols-1 lg:col-span-7 gap-8 mt-3 py-3'>
 
               <div className='flex flex-col bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
@@ -630,7 +624,7 @@ const EditOffer = () => {
                           setSelectedProductIds={setSelectedProductIds}
                         />
                       )}
-                      {productIdError && <p className="text-red-600 text-left">Select at least one product ID</p>}
+                      {productIdError && <p className="text-red-600 text-left">Please select at least one product ID</p>}
                     </div>
                   </Tab>
                   <Tab key="Categories" title="Categories">
@@ -638,35 +632,41 @@ const EditOffer = () => {
                       <label htmlFor='Category' className='flex justify-start font-medium text-[#9F5216] pb-2'>Category Selection *</label>
                       {categoryList && (
                         <div>
-                          <div className="w-full max-w-md mx-auto" ref={dropdownRef}>
+                          <div className="w-full mx-auto" ref={dropdownRef}>
+
                             {/* Search Box */}
                             <input
                               type="text"
-                              value={searchTerm}
+                              value={isDropdownOpen ? searchTerm : selectedCategories.join(", ")} // Show selected IDs when closed
                               onChange={(e) => setSearchTerm(e?.target?.value)}
                               onClick={() => setIsDropdownOpen(true)} // Toggle dropdown on input click
                               placeholder="Search & Select by Categories"
-                              className="w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mb-2"
+                              className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#9F5216] overflow-hidden text-ellipsis whitespace-nowrap"
                             />
 
                             {/* Dropdown list for search results */}
                             {isDropdownOpen && (
-                              <div className="border rounded p-2 max-h-64 overflow-y-auto">
+                              <div className="border flex flex-col gap-1.5 p-2 max-h-64 overflow-y-auto rounded-lg">
                                 {filteredCategories?.length > 0 ? (
                                   filteredCategories?.map((category) => (
                                     <div
                                       key={category?._id}
-                                      className={`flex items-center p-2 rounded-lg border cursor-pointer hover:bg-gray-100 ${selectedCategories?.includes(category?.label) ? 'bg-gray-200' : ''}`}
+                                      className={`flex cursor-pointer items-center justify-between rounded-lg border p-1 transition-[border-color,background-color] duration-300 ease-in-out hover:border-[#d7ecd2] hover:bg-[#fafff9] ${selectedCategories?.includes(category?.label) ? 'border-[#d7ecd2] bg-[#fafff9]' : 'border-neutral-100'}`}
                                       onClick={() => handleCategorySelectionChange(category?.label)}
                                     >
-                                      <Image
-                                        width={400}
-                                        height={400}
-                                        src={category?.imageUrl}
-                                        alt={category?.label}
-                                        className="h-8 w-8 object-cover rounded"
+                                      <div className='flex items-center gap-1'>
+                                        <Image
+                                          width={4000}
+                                          height={4000}
+                                          src={category?.imageUrl}
+                                          alt={category?.label}
+                                          className="h-12 w-12 object-cover rounded"
+                                        />
+                                        <span className="ml-2 font-medium">{category?.label}</span>
+                                      </div>
+                                      <HiCheckCircle
+                                        className={`pointer-events-none size-7 text-[#60d251] transition-opacity duration-300 ease-in-out ${selectedCategories?.includes(category?.label) ? "opacity-100" : "opacity-0"}`}
                                       />
-                                      <span className="ml-2">{category?.label}</span>
                                     </div>
                                   ))
                                 ) : (
@@ -676,28 +676,25 @@ const EditOffer = () => {
                             )}
 
                             {/* Selected categories display */}
-                            {selectedCategories?.length > 0 && (
-                              <div className="border p-2 rounded mt-2">
-                                <h4 className="text-sm font-semibold mb-2">Selected Categories:</h4>
-                                <ul className="space-y-2">
-                                  {selectedCategories?.map((label) => (
-                                    <li
-                                      key={label}
-                                      className="flex justify-between items-center bg-gray-100 p-2 rounded"
-                                    >
+                            {/* {selectedCategories.length > 0 && (
+                              <div className="mt-2 rounded-lg border p-2">
+                                <h4 className="mb-2 text-sm font-semibold">Selected Categories:</h4>
+                                <div className="flex flex-wrap gap-2">
+                                  {selectedCategories?.map((label, index) => (
+                                    <div key={index} className="flex items-center bg-gray-100 border border-gray-300 rounded-full py-1 px-3 text-sm text-gray-700">
                                       <span>{label}</span>
                                       <button
-                                        type='button'
+                                        type="button"
                                         onClick={() => removeCategory(label)}
-                                        className="text-red-500 text-sm"
+                                        className="ml-2 text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-150"
                                       >
-                                        Remove
+                                        <RxCross2 size={19} />
                                       </button>
-                                    </li>
+                                    </div>
                                   ))}
-                                </ul>
+                                </div>
                               </div>
-                            )}
+                            )} */}
                           </div>
                         </div>
                       )}

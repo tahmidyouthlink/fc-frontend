@@ -3,17 +3,42 @@ import FinancePerformance from '@/app/components/layout/FinancePerformance';
 import FinanceTable from '@/app/components/layout/FinanceTable';
 import RefundedPayments from '@/app/components/layout/RefundedPayments';
 import React, { useState } from 'react';
+import arrowSvgImage from "/public/card-images/arrow.svg";
+import arrivals1 from "/public/card-images/arrivals1.svg";
+import arrivals2 from "/public/card-images/arrivals2.svg";
 
 const Finances = () => {
 
   const [activeTab, setActiveTab] = useState('completed');
 
   return (
-    <div className='px-6 md:px-10'>
-      <div className="bg-white sticky top-0 z-10">
-        <h1 className="font-bold text-lg md:text-xl lg:text-3xl text-neutral-700 py-1 2xl:py-3 bg-white">FINANCES</h1>
+    <div className='px-6 md:px-10 bg-gray-50 relative min-h-screen'>
 
-        <div className="flex items-center gap-3 bg-white">
+      <div
+        style={{
+          backgroundImage: `url(${arrivals1.src})`,
+        }}
+        className='absolute inset-0 z-0 hidden md:block bg-no-repeat left-[45%] lg:left-[60%] -top-[70px]'
+      />
+
+      <div
+        style={{
+          backgroundImage: `url(${arrivals2.src})`,
+        }}
+        className='absolute inset-0 z-0 bg-contain bg-center top-96 xl:top-28 w-full bg-no-repeat'
+      />
+
+      <div
+        style={{
+          backgroundImage: `url(${arrowSvgImage.src})`,
+        }}
+        className='absolute inset-0 z-0 top-36 md:top-36 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[20%] lg:bg-[length:200px_100px] md:left-[0%] xl:left-[10%] 2xl:left-[25%] bg-no-repeat'
+      />
+
+      <div className="bg-gray-50 sticky top-0 z-10">
+        <h1 className="font-bold text-lg md:text-xl lg:text-3xl text-neutral-700 py-1 2xl:py-3 bg-gray-50">FINANCES</h1>
+
+        <div className="flex items-center gap-3 bg-gray-50">
 
           <button
             className={`relative text-sm py-1 transition-all duration-300
@@ -59,6 +84,7 @@ const Finances = () => {
         <p className='pt-1 pb-6 text-neutral-400 text-sm font-medium'>Please use the following table to view your transactions.</p>
         <FinanceTable />
       </div>
+
     </div >
   );
 };

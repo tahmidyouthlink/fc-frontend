@@ -28,6 +28,10 @@ import useProductsInformation from '@/app/hooks/useProductsInformation';
 import { FiSave } from "react-icons/fi";
 import useSeasons from '@/app/hooks/useSeasons';
 import ExitConfirmationModal from '@/app/components/layout/ExitConfirmationModal';
+import { HiCheckCircle } from 'react-icons/hi2';
+import arrowSvgImage from "/public/card-images/arrow.svg";
+import arrivals1 from "/public/card-images/arrivals1.svg";
+import arrivals2 from "/public/card-images/arrivals2.svg";
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
@@ -100,17 +104,17 @@ const FirstStepOfAddProduct = () => {
   };
 
   // Filter categories based on search input and remove already selected categories
-  const filteredSeasons = seasonList?.filter((season) =>
-    season.seasonName.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    !selectedSeasons.includes(season.seasonName) // Exclude already selected categories
-  );
+  const filteredSeasons = seasonList
+    ?.filter((season) =>
+      season.seasonName.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => a.seasonName.localeCompare(b.seasonName)); // Sorting A → Z
 
   // Filter products based on search input and remove already selected products
   const filteredProducts = productList?.filter((product) =>
-    (product.productId.toLowerCase().includes(searchTermForCompleteOutfit.toLowerCase()) ||
-      product.productTitle.toLowerCase().includes(searchTermForCompleteOutfit.toLowerCase())) &&
-    !selectedProductIds.some((p) => p.productId === product.productId) // Exclude already selected products
-  );
+  (product.productId.toLowerCase().includes(searchTermForCompleteOutfit.toLowerCase()) ||
+    product.productTitle.toLowerCase().includes(searchTermForCompleteOutfit.toLowerCase())))
+    .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate)); // Sorting latest → oldest;
 
   // Handle adding/removing category selection
   const toggleSeasonSelection = (seasonName) => {
@@ -164,13 +168,6 @@ const FirstStepOfAddProduct = () => {
 
     setSelectedSeasons(updatedSelectedSeasons);
     handleSeasonSelectionChange(updatedSelectedSeasons); // Pass selected seasons to parent component
-  };
-
-  // Handle removing category directly from selected list
-  const removeSeason = (seasonName) => {
-    const updatedSelectedSeasons = selectedSeasons.filter((label) => label !== seasonName);
-    setSelectedSeasons(updatedSelectedSeasons);
-    handleSeasonSelectionChange(updatedSelectedSeasons); // Pass selected categories to parent component
   };
 
   const handleSeasonSelectionChange = async (selectedSea) => {
@@ -237,20 +234,8 @@ const FirstStepOfAddProduct = () => {
     handleProductSelectionChange(updatedSelectedProducts);
   };
 
-  // Handle removing category directly from selected list
-  const removeProduct = (productId) => {
-    const updatedSelectedProducts = selectedProductIds.filter((p) => p.productId !== productId);
-    setSelectedProductIds(updatedSelectedProducts);
-    handleProductSelectionChange(updatedSelectedProducts); // Pass updated list to parent component
-  };
-
   const handleProductSelectionChange = (selectedProducts) => {
     setSelectedProductIds(selectedProducts); // Update the state with selected products
-  };
-
-  // Toggle dropdown visibility
-  const handleInputClick = () => {
-    setIsDropdownOpen(!isDropdownOpen);
   };
 
   // Close dropdown when clicking outside
@@ -279,10 +264,6 @@ const FirstStepOfAddProduct = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [dropdownRefForCompleteOutfit]);
-
-  const handleInputClickForCompleteOutfit = () => {
-    setIsDropdownOpenForCompleteOutfit(!isDropdownOpenForCompleteOutfit);
-  };
 
   const handleCategoryChange = (value) => {
     localStorage.setItem('category', value); // Save the selected category to local storage
@@ -843,25 +824,47 @@ const FirstStepOfAddProduct = () => {
   };
 
   return (
-    <div className='bg-gray-50 min-h-screen'>
+    <div className='bg-gray-50 min-h-screen relative'>
+
+      <div
+        style={{
+          backgroundImage: `url(${arrivals1.src})`,
+        }}
+        className='absolute inset-0 z-0 hidden md:block bg-no-repeat xl:left-[15%] 2xl:left-[30%] bg-[length:1600px_900px]'
+      />
+
+      <div
+        style={{
+          backgroundImage: `url(${arrivals2.src})`,
+        }}
+        className='absolute inset-0 z-0 bg-contain bg-center xl:-top-28 w-full bg-no-repeat'
+      />
+
+      <div
+        style={{
+          backgroundImage: `url(${arrowSvgImage.src})`,
+        }}
+        className='absolute inset-0 z-0 top-16 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[50%] bg-no-repeat'
+      />
 
       <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
         <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>PRODUCT CONFIGURATION</h3>
-          <Link
-            className="flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
+          <h3 className='flex-1 font-semibold text-[13px] md:text-xl lg:text-3xl text-neutral-700'>PRODUCT CONFIGURATION</h3>
+
+          <Link // Trigger the modal on click
+            className="flex items-center gap-2 text-[10px] md:text-base justify-end"
             href="/dash-board/products"
-            onClick={handleGoBackClick}  // Trigger the modal on click
-          >
+            onClick={handleGoBackClick}>
             <span className="border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2">
               <FaArrowLeft />
             </span>
             Go Back
           </Link>
+
         </div>
       </div>
 
-      <form className='2xl:max-w-screen-2xl 2xl:mx-auto' onSubmit={handleSubmit(onSubmit)}>
+      <form className='2xl:max-w-screen-2xl 2xl:mx-auto relative' onSubmit={handleSubmit(onSubmit)}>
 
         <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
 
@@ -1221,59 +1224,41 @@ const FirstStepOfAddProduct = () => {
 
                   <input
                     type="text"
-                    value={searchTerm}
+                    value={isDropdownOpen ? searchTerm : selectedSeasons.join(", ")} // Show selected IDs when closed
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    onClick={handleInputClick} // Toggle dropdown on input click
+                    onClick={() => setIsDropdownOpen(true)} // dropdown on input click
                     placeholder="Search & Select by Seasonal Collection"
-                    className="w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mb-2"
+                    className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#9F5216] overflow-hidden text-ellipsis whitespace-nowrap"
                   />
 
                   {/* Dropdown list for search results */}
                   {isDropdownOpen && (
-                    <div className="rounded max-h-64 overflow-y-auto">
+                    <div className="border flex flex-col gap-1.5 p-2 max-h-64 overflow-y-auto rounded-lg">
                       {filteredSeasons?.length > 0 ? (
                         filteredSeasons?.map((season) => (
                           <div
-                            key={season._id}
-                            className={`flex items-center p-2 cursor-pointer rounded-lg hover:bg-gray-100 border ${selectedSeasons.includes(season.seasonName) ? 'bg-gray-200' : ''}`}
-                            onClick={() => toggleSeasonSelection(season.seasonName)}
+                            key={season?._id}
+                            className={`flex cursor-pointer items-center justify-between rounded-lg border p-1 transition-[border-color,background-color] duration-300 ease-in-out hover:border-[#d7ecd2] hover:bg-[#fafff9] ${selectedSeasons?.includes(season?.seasonName) ? 'border-[#d7ecd2] bg-[#fafff9]' : 'border-neutral-100'}`}
+                            onClick={() => toggleSeasonSelection(season?.seasonName)}
                           >
-                            <Image
-                              width={400}
-                              height={400}
-                              src={season.imageUrl}
-                              alt="season-imageUrl"
-                              className="h-8 w-8 object-cover rounded"
+                            <div className='flex items-center gap-1'>
+                              <Image
+                                width={4000}
+                                height={4000}
+                                src={season?.imageUrl}
+                                alt="season-imageUrl"
+                                className="h-8 w-8 object-cover rounded"
+                              />
+                              <span className="ml-2">{season?.seasonName}</span>
+                            </div>
+                            <HiCheckCircle
+                              className={`pointer-events-none size-7 text-[#60d251] transition-opacity duration-300 ease-in-out ${selectedSeasons?.includes(season?.seasonName) ? "opacity-100" : "opacity-0"}`}
                             />
-                            <span className="ml-2">{season.seasonName}</span>
                           </div>
                         ))
                       ) : (
                         <p className="text-gray-500">No collection found</p>
                       )}
-                    </div>
-                  )}
-
-                  {/* Selected categories display */}
-                  {selectedSeasons?.length > 0 && (
-                    <div className="border p-2 rounded mt-2">
-                      <h4 className="text-sm font-semibold mb-2">Selected Collection:</h4>
-                      <ul className="space-y-2">
-                        {selectedSeasons?.map((season, index) => (
-                          <li
-                            key={index}
-                            className="flex justify-between items-center bg-gray-100 p-2 rounded"
-                          >
-                            <span className='font-semibold'>{season}</span>
-                            <button
-                              onClick={() => removeSeason(season)}
-                              className="text-red-500 text-sm"
-                            >
-                              Remove
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
                     </div>
                   )}
 
@@ -1288,75 +1273,43 @@ const FirstStepOfAddProduct = () => {
 
                   <input
                     type="text"
-                    value={searchTermForCompleteOutfit}
+                    value={isDropdownOpenForCompleteOutfit ? searchTermForCompleteOutfit : selectedProductIds.map(product => product.productId).join(", ")} // Show selected IDs when closed
                     onChange={(e) => setSearchTermForCompleteOutfit(e.target.value)}
-                    onClick={handleInputClickForCompleteOutfit} // Toggle dropdown on input click
+                    onClick={() => setIsDropdownOpenForCompleteOutfit(true)} // Toggle dropdown on input click
                     placeholder="Search & Select by Seasonal Collection"
-                    className="w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mb-2"
+                    className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#9F5216] overflow-hidden text-ellipsis whitespace-nowrap"
                   />
 
                   {/* Dropdown list for search results */}
                   {isDropdownOpenForCompleteOutfit && (
-                    <div className="rounded max-h-64 overflow-y-auto">
+                    <div className="border flex flex-col gap-1.5 p-2 max-h-64 overflow-y-auto rounded-lg">
                       {filteredProducts?.length > 0 ? (
                         filteredProducts?.map((product) => (
                           <div
-                            key={product._id}
-                            className={`flex items-center p-1.5 cursor-pointer rounded-lg hover:bg-gray-100 border ${selectedProductIds.includes(product.productTitle) || selectedProductIds.includes(product.productId) ? 'bg-gray-200' : ''}`}
-                            onClick={() => toggleProductSelection(product?.productId, product?.productTitle, product?._id, product?.thumbnailImageUrl)}
-                          >
-                            <Image
-                              width={400}
-                              height={400}
-                              src={product.thumbnailImageUrl}
-                              alt="season-imageUrl"
-                              className="h-8 w-8 object-cover rounded"
-                            />
-                            <div className='flex flex-col'>
-                              <span className="ml-2 font-bold">{product.productId}</span>
-                              <span className="ml-2 text-sm">{product.productTitle}</span>
+                            key={product?._id}
+                            className={`flex cursor-pointer items-center justify-between rounded-lg border p-1 transition-[border-color,background-color] duration-300 ease-in-out hover:border-[#d7ecd2] hover:bg-[#fafff9] ${selectedProductIds?.map(product => product?.productId)?.includes(product?.productId) ? 'border-[#d7ecd2] bg-[#fafff9]' : 'border-neutral-100'}`}
+                            onClick={() => toggleProductSelection(product?.productId, product?.productTitle, product?._id, product?.thumbnailImageUrl)}>
+                            <div className='flex items-center gap-1'>
+                              <Image
+                                width={4000}
+                                height={4000}
+                                src={product?.thumbnailImageUrl}
+                                alt="season-imageUrl"
+                                className="h-8 w-8 object-cover rounded"
+                              />
+                              <div className='flex flex-col'>
+                                <span className="ml-2 font-bold">{product?.productId}</span>
+                                <span className="ml-2 text-sm">{product?.productTitle}</span>
+                              </div>
                             </div>
+                            <HiCheckCircle
+                              className={`pointer-events-none size-7 text-[#60d251] transition-opacity duration-300 ease-in-out ${selectedProductIds?.map(product => product?.productId)?.includes(product?.productId) ? "opacity-100" : "opacity-0"}`}
+                            />
                           </div>
                         ))
                       ) : (
                         <p className="text-gray-500">No product found</p>
                       )}
-                    </div>
-                  )}
-
-                  {/* Selected categories display */}
-                  {selectedProductIds?.length > 0 && (
-                    <div className="border p-2 rounded mt-2">
-                      <h4 className="text-sm font-semibold mb-2">Selected Products:</h4>
-                      <ul className="space-y-2">
-                        {selectedProductIds?.map((product, index) => (
-                          <li
-                            key={index}
-                            className="flex justify-between items-center bg-gray-100 p-2 rounded"
-                          >
-                            <div className='flex items-center gap-1'>
-                              <Image
-                                width={400}
-                                height={400}
-                                src={product.imageUrl}
-                                alt="season-imageUrl"
-                                className="h-8 w-8 object-cover rounded"
-                              />
-                              <div className='flex flex-col'>
-                                <span className="ml-2 font-bold">{product.productId}</span>
-                                <span className="ml-2 text-sm">{product.productTitle}</span>
-                              </div>
-                            </div>
-                            <button
-                              onClick={() => removeProduct(product?.productId)}
-                              className="text-red-500 text-sm"
-                              type='button'
-                            >
-                              Remove
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
                     </div>
                   )}
 

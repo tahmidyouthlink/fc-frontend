@@ -101,9 +101,9 @@ const EditLocation = () => {
   };
 
   return (
-    <div>
+    <div className='bg-gray-50 min-h-screen'>
 
-      <div className='max-w-screen-lg mx-auto pt-3 md:pt-6'>
+      <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
         <div className='flex items-center justify-between'>
           <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>Edit Location Details</h3>
           <Link
@@ -119,7 +119,7 @@ const EditLocation = () => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
 
-        <div className='max-w-screen-lg mx-auto py-6 flex flex-col gap-4'>
+        <div className='max-w-screen-xl mx-auto py-6 flex flex-col gap-4'>
 
           <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
             {/* Location name Input */}

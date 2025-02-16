@@ -25,7 +25,7 @@ const MarketingContent = () => {
 
   return (
     <div>
-      <div className="flex flex-wrap items-center gap-3 bg-white">
+      <div className="flex flex-wrap items-center gap-3 bg-gray-50">
 
         <button
           className={`relative text-sm py-1 transition-all duration-300

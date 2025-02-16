@@ -40,10 +40,10 @@ const DashboardNavbar = () => {
     <div>
       {/* Top Navbar */}
       <div className="flex items-center justify-between px-4">
-        <button className="lg:hidden duration-300 p-2" onClick={() => setIsToggle(!isToggle)}>
+        <button className="xl:hidden duration-300 p-2" onClick={() => setIsToggle(!isToggle)}>
           {!isToggle && <CgMenuLeft size={20} />}
         </button>
-        <div className="w-full flex justify-center lg:hidden">
+        <div className="w-full flex justify-center xl:hidden">
           <Link href="/" legacyBehavior>
             <a className="flex items-center gap-2 py-3">
               <Image className="h-7 lg:h-10 w-auto" src={logoWhiteImage} alt="F-Commerce logo" />
@@ -56,10 +56,10 @@ const DashboardNavbar = () => {
       {isToggle && (
         <>
           {/* Overlay */}
-          <div className="fixed inset-0 z-40 bg-black opacity-30 lg:hidden" onClick={handleClose}></div>
+          <div className="fixed inset-0 z-40 bg-black opacity-30 xl:hidden" onClick={handleClose}></div>
 
           {/* Sidebar */}
-          <div className="fixed inset-y-0 left-0 z-50 w-64 h-full bg-white shadow-lg transition-transform transform lg:hidden"
+          <div className="fixed inset-y-0 left-0 z-50 w-64 h-full bg-white shadow-lg transition-transform transform xl:hidden"
             style={{ transform: isToggle ? "translateX(0)" : "translateX(-100%)" }}>
             <SideNavbar onClose={handleClose} />
           </div>

@@ -6,12 +6,12 @@ const Layout = ({ children }) => {
   return (
     <>
       {/* Only render sidebar on large devices */}
-      <div className="inset-y-0 flex-col hidden lg:flex">
+      <div className="inset-y-0 flex-col hidden xl:flex">
         <SideNavbar />
       </div>
 
       {/* Main content */}
-      <div className="relative ml-0 lg:ml-[262px]">
+      <div className="relative ml-0 xl:ml-[262px]">
         <DashboardNavbar />
         {children}
       </div>

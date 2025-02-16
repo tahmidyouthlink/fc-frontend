@@ -45,7 +45,7 @@ const SideNavbar = ({ onClose }) => {
 
   const allList = [
     {
-      name: "Home",
+      name: "Dashboard",
       icon: <RxDashboard />,
       path: "/dash-board",
     },
@@ -230,7 +230,7 @@ const SideNavbar = ({ onClose }) => {
                             onClick={() => handleSubItemClick(linkItem?.name)}
                             className="flex items-center gap-6 w-full hover:bg-[#E5F7F4] cursor-pointer px-4 py-3 justify-between group"
                           >
-                            <div className="flex items-center justify-between gap-2">
+                            <div className="flex pl-2 items-center justify-between gap-2">
                               <h2 className="p-1 text-base xl:text-lg 2xl:text-xl rounded-xl group-hover:text-[#00B795]">{linkItem?.icon}</h2>
                               <h2 className={`font-semibold text-neutral-600 group-hover:text-[#00B795]`}>{linkItem?.name}</h2>
                             </div>
@@ -248,7 +248,7 @@ const SideNavbar = ({ onClose }) => {
                               {linkItem?.links?.map((subLink, subIndex) => (
                                 <Link href={subLink.link} key={subIndex} legacyBehavior>
                                   <a
-                                    className={`flex items-center gap-2 w-full hover:bg-[#E5F7F4] px-4 py-3 group ${pathname === subLink.link ? "text-[#00B795] bg-[#E5F7F4] border-l-5 border-[#00B795]" : "hover:text-[#00B795]"}`}
+                                    className={`flex items-center gap-2 w-full hover:bg-[#E5F7F4] pl-8 py-3 group ${pathname === subLink.link ? "text-[#00B795] bg-[#E5F7F4] border-l-5 border-[#00B795]" : "hover:text-[#00B795]"}`}
                                     onClick={onClose}
                                   >
                                     <h2 className="p-1 text-base xl:text-lg 2xl:text-xl rounded-xl">{subLink.icon}</h2>
@@ -265,7 +265,7 @@ const SideNavbar = ({ onClose }) => {
                         // Render regular links in Product Hub or Settings
                         <Link href={linkItem.link} key={linkIndex} legacyBehavior>
                           <a
-                            className={`flex items-center gap-2 w-full hover:bg-[#E5F7F4] group px-4 py-3 ${pathname === linkItem.link ? "text-[#00B795] bg-[#E5F7F4] border-l-5 border-[#00B795]" : "hover:text-[#00B795]"}`} onClick={onClose}>
+                            className={`flex pl-6 items-center gap-2 w-full hover:bg-[#E5F7F4] group py-3 ${pathname === linkItem.link ? "text-[#00B795] bg-[#E5F7F4] border-l-5 border-[#00B795]" : "hover:text-[#00B795]"}`} onClick={onClose}>
                             <h2 className="p-1 text-base xl:text-lg 2xl:text-xl rounded-xl">{linkItem.icon}</h2>
                             <h2 className={`font-semibold text-neutral-600 group-hover:text-[#00B795] ${pathname === linkItem.link ? "!text-[#00B795]" : ""}`}>{linkItem.label}</h2>
                           </a>

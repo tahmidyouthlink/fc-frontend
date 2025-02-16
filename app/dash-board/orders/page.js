@@ -17,9 +17,9 @@ import CustomPagination from '@/app/components/layout/CustomPagination';
 import TabsOrder from '@/app/components/layout/TabsOrder';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
-import arrowSvgImage from "../../../public/card-images/arrow.svg";
-import arrivals1 from "../../../public/card-images/arrivals1.svg";
-import arrivals2 from "../../../public/card-images/arrivals2.svg";
+import arrowSvgImage from "/public/card-images/arrow.svg";
+import arrivals1 from "/public/card-images/arrivals1.svg";
+import arrivals2 from "/public/card-images/arrivals2.svg";
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { parseISO, isBefore, subDays } from "date-fns";
 import { useSearchParams } from 'next/navigation';
@@ -1112,7 +1112,7 @@ const OrdersPage = () => {
   };
 
   return (
-    <div className='relative w-full min-h-screen bg-gray-100'>
+    <div className='relative w-full min-h-screen bg-gray-50'>
 
       <div
         style={{
@@ -1133,7 +1133,7 @@ const OrdersPage = () => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl px-0 md:px-6 2xl:px-3 mx-auto'>
+      <div className='max-w-screen-2xl px-3 md:px-6 2xl:px-3 mx-auto'>
 
         <div className='flex items-center justify-between py-2 md:py-5 gap-2'>
 
@@ -1154,7 +1154,7 @@ const OrdersPage = () => {
                 placeholder="Search By Order Details..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-white text-[#0d0c22] transition duration-300 ease-in-out focus:outline-none focus:border-[#9F5216]/30 focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base"
+                className="w-full text-sm h-[35px] md:h-10 px-4 pl-[2.5rem] md:border-2 border-transparent rounded-lg outline-none bg-white transition-[border-color,background-color] font-semibold text-neutral-600 duration-300 ease-in-out focus:outline-none focus:border-[#F4D3BA] hover:shadow-none focus:bg-white focus:shadow-[0_0_0_4px_rgb(234,76,137/10%)] hover:outline-none hover:border-[#9F5216]/30 hover:bg-white hover:shadow-[#9F5216]/30 text-[12px] md:text-base shadow placeholder:text-neutral-400"
               />
             </li>
           </div>
