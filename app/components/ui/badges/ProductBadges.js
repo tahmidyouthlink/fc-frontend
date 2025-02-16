@@ -77,7 +77,7 @@ export default function ProductBadges({
     <div className="absolute left-3 top-3 z-[3] space-y-2">
       {hasSpecialOffer ? (
         <div
-          className="relative w-8 overflow-hidden rounded-lg bg-[#a138b1] font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[width] duration-300 hover:w-[var(--expanded-width)] [&:hover>div:last-child]:animate-[scroll_2s_linear_infinite]"
+          className="relative w-8 overflow-hidden rounded-lg bg-[#a138b1] font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[width] duration-300 hover:w-[var(--expanded-width)] [&:hover>div:last-child]:animate-[scroll_3s_linear_infinite]"
           style={{
             "--expanded-width": `${expandedSpecialOfferWidth}px`,
           }}
