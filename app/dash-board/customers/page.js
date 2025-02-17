@@ -16,11 +16,10 @@ import arrivals2 from "../../../public/card-images/arrivals2.svg";
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import dynamic from 'next/dynamic';
 import { TbColumnInsertRight } from 'react-icons/tb';
-import { RxCross1 } from "react-icons/rx";
 import PaginationSelect from '@/app/components/layout/PaginationSelect';
 const CustomerPrintButton = dynamic(() => import("@/app/components/layout/CustomerPrintButton"), { ssr: false });
 
-const initialColumns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alternative Phone Number', 'NewsLetter', 'Hometown', 'Status'];
+const initialColumns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alt. Phone Number', 'NewsLetter', 'Hometown', 'Status'];
 
 const Customers = () => {
 
@@ -245,12 +244,14 @@ const Customers = () => {
         }}
         className='absolute inset-0 z-0 hidden md:block bg-no-repeat left-[45%] lg:left-[60%] -top-[138px]'
       />
+
       <div
         style={{
           backgroundImage: `url(${arrivals2.src})`,
         }}
         className='absolute inset-0 z-0 bg-contain bg-center xl:-top-28 w-full bg-no-repeat'
       />
+
       <div
         style={{
           backgroundImage: `url(${arrowSvgImage.src})`,
@@ -431,7 +432,7 @@ const Customers = () => {
                                   {customer?.shippingMethods}
                                 </td>
                               )}
-                              {column === 'Alternative Phone Number' && (
+                              {column === 'Alt. Phone Number' && (
                                 <td key="altPhoneNumber" className="text-xs p-3 text-gray-700 text-center">
                                   {customer?.alternativePhoneNumber}
                                 </td>
@@ -521,7 +522,7 @@ const Customers = () => {
               </ModalHeader>
               <ModalBody className="modal-body-scroll mt-4 mb-2 mx-2">
                 <p className='text-xs md:text-sm'><span className='text-neutral-950 font-semibold'>Preferred Payment Methods:</span> <span className='text-neutral-800'>{selectedCustomerInfo?.paymentMethods}</span></p>
-                <p className='text-xs md:text-sm'><span className='text-neutral-950 font-semibold'>Alternative Phone Number:</span> <span className='text-neutral-800'>{selectedCustomerInfo?.alternativePhoneNumber}</span></p>
+                <p className='text-xs md:text-sm'><span className='text-neutral-950 font-semibold'>Alt. Phone Number:</span> <span className='text-neutral-800'>{selectedCustomerInfo?.alternativePhoneNumber}</span></p>
                 <p className='text-xs md:text-sm'><span className='text-neutral-950 font-semibold'>Shipping Methods :</span> <span className='text-neutral-800'>{selectedCustomerInfo?.shippingMethods}</span></p>
                 <p className='text-xs md:text-sm'><span className='text-neutral-950 font-semibold'>Date of Birth :</span> <span className='text-neutral-800'>{selectedCustomerInfo?.dob}</span></p>
                 <p className='text-xs md:text-sm'><span className='text-neutral-950 font-semibold'>Addresses:</span> <span className='text-neutral-800'>{selectedCustomerInfo?.streetAddress}</span></p>
