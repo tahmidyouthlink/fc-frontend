@@ -206,6 +206,8 @@ const PromotionPerformanceChart = () => {
 
       const startDateObj = new Date(filterStartDate);
       const endDateObj = new Date(filterEndDate);
+
+      startDateObj.setHours(0, 0, 0, 0);
       endDateObj.setHours(23, 59, 59, 999); // Set to end of the day
 
       filteredOrders = orderList?.filter((order) => {
@@ -335,22 +337,33 @@ const PromotionPerformanceChart = () => {
   const currentDate = today(getLocalTimeZone());
 
   const maxDiscountedAmount = useMemo(() => {
-    return Math.floor(Math.max(...hourlyPromotionData.map(data => data.discountedAmount), 0));
+    return Math.floor(Math.max(...hourlyPromotionData?.map(data => data?.discountedAmount), 0));
   }, [hourlyPromotionData]);
 
   const maxDiscountedAmountDay = useMemo(() => {
-    return Math.floor(Math.max(...dailyData.map(data => data.discountedAmount), 0));
+    return Math.floor(Math.max(...dailyData?.map(data => data?.discountedAmount), 0));
   }, [dailyData]);
+
+  const maxDiscountedOrder = useMemo(() => {
+    return Math.floor(Math.max(...hourlyPromotionData?.map(data => data?.discountedOrders), 0));
+  }, [hourlyPromotionData])
+
+  const maxDiscountedOrderDay = useMemo(() => {
+    return Math.floor(Math.max(...dailyData?.map(data => data?.discountedOrders), 0));
+  }, [dailyData])
 
   const yAxisDomain = [0, maxDiscountedAmount * 1.2];
   const yAxisDomainDay = [0, maxDiscountedAmountDay * 1.2];
+  const yAxisDomainOrder = [0, maxDiscountedOrder * 10];
+  const yAxisDomainOrderDay = [0, maxDiscountedOrderDay * 10];
 
   if (isOrderPending) {
     return <SmallHeightLoading />;
-  }
+  };
 
   return (
     <div className="space-y-5">
+
       <div className="flex flex-wrap mt-6 justify-center lg:justify-end items-center gap-3">
         <div className="flex items-center justify-center gap-2">
           <button
@@ -446,13 +459,26 @@ const PromotionPerformanceChart = () => {
                 <BarChart data={activeFilter === 'today' || activeFilter === 'yesterday' ? hourlyPromotionData : dailyData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey={activeFilter === 'today' || activeFilter === 'yesterday' ? "hour" : "date"} tickFormatter={activeFilter === 'today' || activeFilter === 'yesterday' ? "" : formatXAxis} />
-                  <YAxis domain={activeFilter === 'today' || activeFilter === 'yesterday' ? yAxisDomain : yAxisDomainDay} />
+
+                  <YAxis
+                    yAxisId="left"
+                    domain={activeFilter === 'today' || activeFilter === 'yesterday' ? yAxisDomain : yAxisDomainDay}
+                    tickFormatter={(value) => `${value}`} // Formatting for readability
+                  />
+
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    domain={activeFilter === 'today' || activeFilter === 'yesterday' ? yAxisDomainOrder : yAxisDomainOrderDay}
+                    tickFormatter={(value) => `${value}`}
+                  />
+
                   <Tooltip />
                   {selected.includes('totalDiscountedAmount') && (
-                    <Bar dataKey="discountedAmount" radius={[8, 8, 0, 0]} fill="#D2016E" name="Total Discounted Amount (৳)" />
+                    <Bar dataKey="discountedAmount" yAxisId="left" radius={[8, 8, 0, 0]} fill="#D2016E" name="Total Discounted Amount (৳)" />
                   )}
                   {selected.includes('totalDiscountedOrders') && (
-                    <Bar dataKey="discountedOrders" radius={[8, 8, 0, 0]} fill="#3480A3" name="Total Discounted Orders" />
+                    <Bar yAxisId="right" dataKey="discountedOrders" radius={[8, 8, 0, 0]} fill="#3480A3" name="Total Discounted Orders" />
                   )}
                 </BarChart>
               </ResponsiveContainer>

@@ -185,6 +185,7 @@ const AddPromo = () => {
     <div className='bg-gray-50 min-h-screen'>
 
       <div className='max-w-screen-2xl px-6 mx-auto'>
+
         <div className='max-w-screen-xl mx-auto pt-3 sticky top-0 z-10 bg-gray-50'>
           <div className='flex items-center justify-between'>
             <h3 className='w-full font-semibold text-lg md:text-xl lg:text-2xl'>Promo Configuration</h3>
@@ -195,11 +196,11 @@ const AddPromo = () => {
         <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto pt-1 pb-6 flex flex-col'>
 
           <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
-            <div className='grid grid-cols-1 lg:col-span-7 gap-8 mt-3 py-3 max-h-[650px]'>
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[300px]'>
+            <div className='grid grid-cols-1 lg:col-span-7 gap-8 mt-3 py-3 h-fit'>
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
                 <div>
-                  <label htmlFor='promoCode' className='flex justify-start font-medium text-[#D2016E] pb-2'>Promo Code *</label>
-                  <input id='promoCode' placeholder='Enter Promo Code'  {...register("promoCode", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md uppercase" type="text" />
+                  <label htmlFor='promoCode' className='flex justify-start font-medium text-[#9F5216] pb-2'>Promo Code *</label>
+                  <input id='promoCode' placeholder='Enter Promo Code'  {...register("promoCode", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md uppercase" type="text" />
                   {errors.promoCode?.type === "required" && (
                     <p className="text-red-600 text-left">Promo Code is required</p>
                   )}
@@ -211,14 +212,14 @@ const AddPromo = () => {
                     selectedKey={promoDiscountType}
                     onSelectionChange={handleTabChange}
                   >
-                    <Tab className='text-[#D2016E]' key="Percentage" title="Percentage">Percentage (%) *</Tab>
-                    <Tab className='text-[#D2016E]' key="Amount" title="Amount">Amount (Taka) *</Tab>
+                    <Tab className='text-[#9F5216]' key="Percentage" title="Percentage">Percentage (%) *</Tab>
+                    <Tab className='text-[#9F5216]' key="Amount" title="Amount">Amount (Taka) *</Tab>
                   </Tabs>
 
                   <input
                     type="number"
                     {...register('promoDiscountValue', { required: true })}
-                    className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000'
+                    className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
                     placeholder={`Enter ${promoDiscountType} Discount`} // Correct placeholder
                   />
                   {errors.promoDiscountValue?.type === "required" && (
@@ -227,26 +228,26 @@ const AddPromo = () => {
                 </div>
               </div>
 
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg max-h-[350px]'>
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
 
                 <div>
-                  <label htmlFor='minAmount' className='flex justify-start font-medium text-[#D2016E] pb-2'>Minimum Order Amount *</label>
-                  <input id='minAmount' {...register("minAmount", { required: true })} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="number" />
+                  <label htmlFor='minAmount' className='flex justify-start font-medium text-[#9F5216] pb-2'>Minimum Order Amount *</label>
+                  <input id='minAmount' {...register("minAmount", { required: true })} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
                   {errors.minAmount?.type === "required" && (
                     <p className="text-red-600 text-left">Min Amount is required</p>
                   )}
                 </div>
 
                 {promoDiscountType === "Percentage" && <div>
-                  <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#D2016E] pb-2'>Maximum Capped Amount *</label>
-                  <input id='maxAmount' {...register("maxAmount", { required: true })} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md" type="number" />
+                  <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#9F5216] pb-2'>Maximum Capped Amount *</label>
+                  <input id='maxAmount' {...register("maxAmount", { required: true })} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
                   {errors.maxAmount?.type === "required" && (
                     <p className="text-red-600 text-left">Max Amount is required</p>
                   )}
                 </div>}
 
                 <div>
-                  <label htmlFor='expiryDate' className='flex justify-start font-medium text-[#D2016E] pb-2'>Promo Expire On *</label>
+                  <label htmlFor='expiryDate' className='flex justify-start font-medium text-[#9F5216] pb-2'>Promo Expire On *</label>
                   <DatePicker
                     id='expiryDate'
                     placeholder="Select date"
@@ -259,7 +260,7 @@ const AddPromo = () => {
                         setValue('expiryDate', date); // If DatePicker returns something else, handle it here
                       }
                     }}
-                    className="w-full outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md"
+                    className="w-full outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                   />
 
                   {dateError && (
@@ -273,7 +274,7 @@ const AddPromo = () => {
               <div className='flex flex-col gap-6 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
                 <div className='flex w-full flex-col gap-2'>
-                  <label htmlFor='promoDescription' className='flex justify-start font-medium text-[#D2016E]'>Promo Description</label>
+                  <label htmlFor='promoDescription' className='flex justify-start font-medium text-[#9F5216]'>Promo Description</label>
                   <Controller
                     name="promoDescription"
                     defaultValue=""
@@ -333,8 +334,8 @@ const AddPromo = () => {
 
           <div className='flex justify-end items-center'>
 
-            <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#D2016E] hover:bg-[#d2016dca]'} text-white py-2 px-4 text-sm md:text-base rounded-md cursor-pointer font-medium flex items-center gap-2`}>
-              {isSubmitting ? 'Submitting...' : 'Submit'}
+            <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700 mt-4 mb-8`}>
+              {isSubmitting ? 'Submitting...' : 'Submit'} <MdOutlineFileUpload size={20} />
             </button>
 
           </div>

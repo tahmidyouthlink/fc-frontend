@@ -313,6 +313,9 @@ const FinancePerformance = () => {
     return <SmallHeightLoading />
   };
 
+  console.log(paymentMethodData, "paymentMethodData");
+  console.log(hourlyPaymentData, "hourlyPaymentData");
+
   return (
     <div className="space-y-5 relative">
 
