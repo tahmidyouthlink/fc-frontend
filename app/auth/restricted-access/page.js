@@ -321,7 +321,7 @@ const RestrictedAccessLoginPage = () => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
 
-      <div className="max-w-[550px] mx-auto px-6 lg:px-0 pt-48 relative">
+      <div className="max-w-[550px] mx-auto px-6 pt-28 lg:pt-48 relative">
 
         {/* Email and password login section */}
         <form noValidate onSubmit={handleSubmitForLogin(onSubmit)}>
@@ -330,11 +330,11 @@ const RestrictedAccessLoginPage = () => {
             <div>
 
               {/* Heading */}
-              <h1 className="text-4xl font-semibold sm:max-xl:text-center">
+              <h1 className="text-4xl font-semibold">
                 Login
               </h1>
 
-              <p className={`${error ? "mb-5" : "mb-10"} mt-2 sm:max-xl:text-center`}>
+              <p className={`${error ? "mb-5" : "mb-10"} mt-2`}>
                 Enter your credentials to access your account.
               </p>
 
@@ -431,7 +431,7 @@ const RestrictedAccessLoginPage = () => {
 
 
                 {/* OTP Input Boxes */}
-                <div className="flex space-x-6">
+                <div className="flex space-x-3 md:space-x-6">
                   {otp?.map((value, index) => (
                     <input
                       key={index}
@@ -496,6 +496,7 @@ const RestrictedAccessLoginPage = () => {
         </form>
 
       </div>
+
     </div>
   );
 };

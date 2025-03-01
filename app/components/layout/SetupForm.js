@@ -156,7 +156,7 @@ const SetupForm = ({ token, isValidToken }) => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
 
-      <div className="max-w-screen-sm mx-auto pt-48 relative">
+      <div className="max-w-screen-sm mx-auto px-6 pt-24 lg:pt-48 relative">
 
         {/* Heading */}
         <h1 className="mb-10 mt-2 text-4xl font-semibold sm:max-xl:text-center">
