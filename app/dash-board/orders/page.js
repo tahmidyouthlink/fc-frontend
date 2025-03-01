@@ -1354,7 +1354,7 @@ const OrdersPage = () => {
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 z-[1] bg-white">
               <tr>
-                {columnOrder.map((column) => selectedColumns.includes(column) && (
+                {columnOrder?.map((column) => selectedColumns.includes(column) && (
                   <th key={column} className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b text-center">{column}</th>
                 ))}
               </tr>
@@ -1368,7 +1368,7 @@ const OrdersPage = () => {
                   </td>
                 </tr>
               ) : (
-                paginatedOrders.map((order, index) => (
+                paginatedOrders?.map((order, index) => (
                   <tr key={order?._id || index} className="hover:bg-gray-50 transition-colors">
                     {columnOrder.map(
                       (column) =>

@@ -4,16 +4,15 @@ import { PiUsersThreeLight } from "react-icons/pi";
 import { BiCategory } from "react-icons/bi";
 import { RxDashboard } from "react-icons/rx";
 import { MdPayment, MdOutlineLocationOn, MdOutlineInventory2, MdOutlineCategory, MdOutlinePrivacyTip, MdOutlineLocalShipping } from "react-icons/md";
-import { RiContractLine } from "react-icons/ri";
+import { RiContractLine, RiUserShared2Line } from "react-icons/ri";
 import { TbBrandGoogleAnalytics, TbMessageCircleQuestion, TbClipboardList, TbBuildingBank } from "react-icons/tb";
 import Image from "next/image";
 import logoWhiteImage from "/public/logos/logo.png";
 import { FaChevronRight } from "react-icons/fa6";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FaAngleDown } from "react-icons/fa6";
 import { useState } from "react";
-import { ImCross } from "react-icons/im";
 import { LiaUserLockSolid } from "react-icons/lia";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { LuWarehouse } from "react-icons/lu";
@@ -28,12 +27,17 @@ import { LuNewspaper } from "react-icons/lu";
 import { PiBookOpen } from "react-icons/pi";
 import { IoSettingsOutline } from "react-icons/io5";
 import { AnimatePresence, motion } from "framer-motion";
+import { signOut, useSession } from "next-auth/react";
+import { HiOutlineLogout } from "react-icons/hi";
+import { CiLock } from "react-icons/ci";
 
 const SideNavbar = ({ onClose }) => {
   const pathname = usePathname();
   const [activeItem, setActiveItem] = useState(null);
   const [activeSubItem, setActiveSubItem] = useState(null);  // State for submenu
+  const { data: session, status } = useSession();
   const isAdmin = true;
+  const router = useRouter();
 
   const handleItemClick = (name) => {
     setActiveItem(activeItem === name ? null : name);
@@ -93,6 +97,7 @@ const SideNavbar = ({ onClose }) => {
         icon: <IoSettingsOutline />,
         links: [
           { label: 'Permissions', link: '/dash-board/permissions', icon: <LiaUserLockSolid /> },
+          { label: 'Enrollment', link: '/dash-board/enrollment', icon: <RiUserShared2Line /> },
           { label: 'Reward Level', link: '/dash-board/reward-level', icon: <CiMedal /> },
           { label: 'Payment Methods', link: '/dash-board/payment-methods', icon: <MdPayment /> },
 
@@ -127,9 +132,26 @@ const SideNavbar = ({ onClose }) => {
           },
         ]
       },
-    ] : [];
+      {
+        name: "Change Password",
+        icon: <CiLock />,
+        path: "/dash-board/password-change",
+      },
+    ] :
+    [
+      {
+        name: "Change Password",
+        icon: <CiLock />,
+        path: "/dash-board/password-change",
+      },
+    ];
 
   const fullMenu = [...allList, ...adminList]; // Merge both lists if isAdmin is true
+
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
+    router.push("/auth/restricted-access");
+  };
 
   return (
     <AnimatePresence>
@@ -138,10 +160,6 @@ const SideNavbar = ({ onClose }) => {
         animate={{ x: 0 }} // Moves in
         exit={{ x: "-100%", transition: { duration: 0.3 } }} // Moves out on close
         transition={{ duration: 0.3, ease: "easeInOut" }} className="h-screen w-[262px] fixed z-50 overflow-y-auto custom-scrollbar bg-white">
-
-        <button onClick={onClose} className="md:hidden p-2 absolute right-2 top-2">
-          <ImCross size={20} />
-        </button>
 
         <div className="px-4 transition-colors duration-1000 sticky top-0 pt-3 z-10 bg-white">
           <Link href="/" legacyBehavior>
@@ -156,7 +174,7 @@ const SideNavbar = ({ onClose }) => {
           <hr style={{ border: "0.5px solid #ccc", margin: "20px 0" }} />
         </div>
 
-        <div className="flex flex-col mt-6 mb-8">
+        <div className={`flex flex-col mt-6 ${session ? "" : "mb-8"}`}>
           <h1 className="px-4 text-neutral-500 mb-4 font-medium">MAIN MENU</h1>
           {
             fullMenu?.map((item, index) => (
@@ -244,7 +262,7 @@ const SideNavbar = ({ onClose }) => {
                             <motion.div
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: activeSubItem === linkItem.name ? "auto" : 0, opacity: activeSubItem === linkItem.name ? 1 : 0 }}
-                              transition={{ duration: 0.5 }} className="flex flex-col items-center w-full">
+                              transition={{ duration: 0.5, ease: "easeInOut" }} className="flex flex-col items-center w-full">
                               {linkItem?.links?.map((subLink, subIndex) => (
                                 <Link href={subLink.link} key={subIndex} legacyBehavior>
                                   <a
@@ -279,6 +297,8 @@ const SideNavbar = ({ onClose }) => {
             ))
           }
         </div>
+
+        {session && <button className='flex items-center gap-2 font-semibold text-neutral-600 hover:bg-[#E5F7F4] hover:text-[#00B795] px-5 py-3 w-full mb-8' onClick={handleLogout}> <HiOutlineLogout size={22} /> <span>Logout</span></button>}
 
       </motion.div>
     </AnimatePresence>
