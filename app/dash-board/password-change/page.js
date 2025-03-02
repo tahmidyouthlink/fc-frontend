@@ -125,7 +125,7 @@ const PasswordChangePage = () => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-sm mx-auto pt-56 px-6 relative'>
+      <div className='max-w-screen-sm mx-auto pt-28 lg:pt-56 px-6 relative'>
         {/* Heading */}
         <h1 className="text-4xl font-semibold sm:max-xl:text-center">
           Password & Security
