@@ -321,7 +321,7 @@ const RestrictedAccessLoginPage = () => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
 
-      <div className="max-w-[550px] mx-auto px-6 pt-28 lg:pt-48 relative">
+      <div className="max-w-[600px] mx-auto px-6 pt-28 lg:pt-48 relative">
 
         {/* Email and password login section */}
         <form noValidate onSubmit={handleSubmitForLogin(onSubmit)}>
@@ -431,7 +431,7 @@ const RestrictedAccessLoginPage = () => {
 
 
                 {/* OTP Input Boxes */}
-                <div className="flex space-x-3 md:space-x-6">
+                <div className="flex items-center justify-center space-x-3 md:space-x-7">
                   {otp?.map((value, index) => (
                     <input
                       key={index}
@@ -443,7 +443,7 @@ const RestrictedAccessLoginPage = () => {
                       onKeyDown={(e) => handleKeyDown(index, e)}
                       onPaste={(e) => handlePaste(index, e)} // Attach handlePaste here
                       maxLength={1}
-                      className="w-12 h-12 text-lg font-bold text-center border border-gray-300 rounded-lg outline-none transition-all duration-200 shadow-sm focus:border-[#F4D3BA] focus:ring-[#F4D3BA] focus:ring-2 focus:bg-white md:w-14 md:h-14"
+                      className="w-8 h-8 text-lg font-bold text-center border border-gray-300 rounded-lg outline-none transition-all duration-200 shadow-sm focus:border-[#F4D3BA] focus:ring-[#F4D3BA] focus:ring-2 focus:bg-white md:w-14 md:h-14"
                     />
                   ))}
                 </div>

@@ -11,11 +11,10 @@ import { DatePicker } from "@nextui-org/react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { RxCheck, RxCross2 } from "react-icons/rx";
 
-const SetupForm = ({ token, isValidToken }) => {
+const SetupForm = ({ email, isValidToken }) => {
 
   const { register: registerForSetup, control, handleSubmit, formState: { errors: errorsForSetup } } = useForm();
 
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
@@ -24,17 +23,6 @@ const SetupForm = ({ token, isValidToken }) => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const axiosPublic = useAxiosPublic();
-
-  useEffect(() => {
-    try {
-      const decoded = jwtDecode(token);
-      setEmail(decoded.email);  // Email from decoded JWT
-
-    } catch (error) {
-      // Handle error, for example if token is invalid or missing
-      toast.error(error);
-    }
-  }, [token]);
 
   // Inside your component
   useEffect(() => {
@@ -73,7 +61,6 @@ const SetupForm = ({ token, isValidToken }) => {
     const formattedDOB = `${data.dob.year}-${String(data.dob.month).padStart(2, "0")}-${String(data.dob.day).padStart(2, "0")}`;
 
     const setupInformation = {
-      email,
       username: data?.username,
       dob: formattedDOB,
       password,

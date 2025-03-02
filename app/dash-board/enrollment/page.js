@@ -26,6 +26,7 @@ const EnrollmentPage = () => {
       };
 
       const response = await axiosPublic.post('/invite', enrollmentInformation);
+
       if (response.data.success) {
 
         // ✅ Show success toast if the invitation is successfully sent
