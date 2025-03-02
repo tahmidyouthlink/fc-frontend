@@ -9,7 +9,7 @@ export default function SetupPage({ searchParams }) {
   const [isValidToken, setIsValidToken] = useState(null); // State to store token validation status
   const [errorMessage, setErrorMessage] = useState(""); // For displaying error message
   const axiosPublic = useAxiosPublic();
-  const token = searchParams.get("token");
+  const token = searchParams?.token; // Extract the token from query parameters
   const [email, setEmail] = useState("");
 
   useEffect(() => {
