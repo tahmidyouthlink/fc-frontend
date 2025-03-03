@@ -36,7 +36,7 @@ export default function HomeHero({ leftImgUrl, centerImgUrl, rightImgUrl }) {
               <Image src={arrowShape} alt="Arrow shape" />
             </div>
           </div>
-          <div className="flex items-center justify-center gap-8">
+          <div className="flex items-center justify-center">
             <TransitionLink
               href="/shop"
               className="flex cursor-pointer items-center gap-2 text-sm font-semibold transition-[gap] duration-300 ease-in-out hover:gap-3"
@@ -46,14 +46,6 @@ export default function HomeHero({ leftImgUrl, centerImgUrl, rightImgUrl }) {
                 <FaArrowRightLong size={12} />
               </span>
             </TransitionLink>
-            {!user && (
-              <TransitionLink
-                href="/login"
-                className="flex cursor-pointer items-center gap-1 rounded-md bg-[#FBEDE2] px-4 py-2.5 text-sm font-semibold transition-[background-color] duration-300 ease-in-out hover:bg-[#F4D3BA]"
-              >
-                Join Us
-              </TransitionLink>
-            )}
           </div>
         </div>
         <div className="hero-images pointer-events-none flex grow justify-center gap-2 max-sm:mt-7 max-sm:flex-wrap md:-mt-2 md:gap-3 xl:-mt-3 xl:justify-between xl:gap-4 landscape:mt-auto landscape:max-h-[550px]">
