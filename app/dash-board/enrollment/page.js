@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
@@ -8,13 +8,24 @@ import { Radio, RadioGroup } from '@nextui-org/react';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import toast from 'react-hot-toast';
+import Loading from '@/app/components/shared/Loading/Loading';
+import { useSession } from 'next-auth/react';
 
 const EnrollmentPage = () => {
 
   const { register: registerForLogin, control, reset, handleSubmit, formState: { errors: errorsForLogin } } = useForm();
 
-  const [selectedRole, setSelectedRole] = useState("");
+  const { data: session, status } = useSession();
   const axiosPublic = useAxiosPublic();
+  const userRole = session?.user?.role; // Get the current user's role
+  const [selectedRole, setSelectedRole] = useState("");
+
+  // Automatically set the role if user is an admin
+  useEffect(() => {
+    if (userRole === "admin") {
+      setSelectedRole("staff"); // Admins can only invite staff
+    }
+  }, [userRole]);
 
   const onSubmit = async (data) => {
 
@@ -144,6 +155,8 @@ const EnrollmentPage = () => {
     }
   };
 
+  if (status === "loading") return <Loading />;
+
   return (
     <div className='bg-gray-50 min-h-screen relative'>
 
@@ -228,30 +241,44 @@ const EnrollmentPage = () => {
             )}
           </div>
 
-          <Controller
-            name="newArrival"
-            control={control}
-            defaultValue={selectedRole}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <div className="flex flex-col gap-3">
-                <RadioGroup
-                  {...field}
-                  label="Make this account as?"
-                  value={selectedRole}
-                  onValueChange={setSelectedRole}
-                  orientation="horizontal"
-                >
-                  <Radio value="admin">Admin</Radio>
-                  <Radio value="staff">Staff</Radio>
-                </RadioGroup>
-                {selectedRole && <p className="text-default-500 text-small">{selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)} Account</p>}
-                {errorsForLogin.newArrival && (
-                  <p className="text-xs font-semibold text-red-500">Role Selection is required</p>
-                )}
-              </div>
-            )}
-          />
+          {userRole === "super-admin" ? (
+
+            <Controller
+              name="role"
+              control={control}
+              defaultValue={selectedRole}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <div className="flex flex-col gap-3">
+                  <RadioGroup
+                    {...field}
+                    label="Make this account as?"
+                    value={selectedRole}
+                    onValueChange={setSelectedRole}
+                    orientation="horizontal"
+                  >
+                    <Radio value="admin">Admin</Radio>
+                    <Radio value="staff">Staff</Radio>
+                  </RadioGroup>
+                  {selectedRole && <p className="text-default-500 text-small">{selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)} Account</p>}
+                  {errorsForLogin.role && (
+                    <p className="text-xs font-semibold text-red-500">You need to select an account type.</p>
+                  )}
+                </div>
+              )}
+            />
+
+          ) : (
+            <div className="w-full space-y-2 font-semibold">
+              <label>Role</label>
+              <input
+                type="text"
+                value="Staff"
+                disabled
+                className="h-11 w-full rounded-lg border-2 border-gray-300 px-3 text-xs text-gray-500 bg-gray-100 cursor-not-allowed"
+              />
+            </div>
+          )}
 
           <button
             type="submit"
