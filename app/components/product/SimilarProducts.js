@@ -27,7 +27,7 @@ export default function SimilarProducts({
       }`}
     >
       <div
-        className={`absolute inset-0 flex h-full w-full items-center justify-between space-y-5 px-5 sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0 ${similarProducts?.length < 5 ? "hidden" : "flex"}`}
+        className={`absolute inset-0 flex h-full w-full items-center justify-between space-y-5 px-5 sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0 ${similarProducts?.length < 6 ? "hidden" : "flex"}`}
       >
         <Button
           className={`z-[1] size-10 rounded-md bg-white p-0 text-xl shadow-[0_0_12px_0_rgba(0,0,0,0.15)] transition-[background-color,opacity] duration-300 ease-in-out hover:bg-[#FBEDE2] max-sm:hidden md:block md:-translate-x-1/2 [&>svg]:mx-auto ${!isSimilarProductsSlid ? "pointer-events-none !opacity-0" : "pointer-events-auto !opacity-100"}`}
@@ -51,9 +51,9 @@ export default function SimilarProducts({
           </h2>
         </div>
         <div
-          className={`grid grid-cols-2 gap-x-4 gap-y-12 sm:grid-cols-3 lg:[&>div]:min-w-[calc(25%-16px*3/4)] ${similarProducts?.length > 3 ? "sm:max-lg:[&>div:last-child]:hidden" : ""} ${similarProducts?.length < 5 ? "lg:grid-cols-4" : "transition-transform duration-300 ease-in-out lg:flex lg:flex-nowrap"} ${isSimilarProductsSlid ? "-translate-x-[calc(100%+16px)]" : "-translate-x-0"}`}
+          className={`grid-cols-2 gap-x-4 gap-y-12 max-sm:grid ${similarProducts?.length < 6 ? "grid sm:grid-cols-4 lg:grid-cols-5" : "sm:flex sm:flex-nowrap sm:transition-transform sm:duration-300 sm:ease-in-out sm:[&>div]:min-w-[calc(25%-16px*3/4)] lg:[&>div]:min-w-[calc(20%-16px*4/5)]"} ${isSimilarProductsSlid ? "-translate-x-[calc(100%+16px)]" : "-translate-x-0"}`}
         >
-          {similarProducts.map((similarProduct) => (
+          {similarProducts.map((similarProduct, index) => (
             <ProductCard
               key={similarProduct._id}
               product={similarProduct}
@@ -61,6 +61,7 @@ export default function SimilarProducts({
               setIsAddToCartModalOpen={setIsAddToCartModalOpen}
               setSelectedAddToCartProduct={setSelectedAddToCartProduct}
               getImageSetsBasedOnColors={getImageSetsBasedOnColors}
+              shouldBeHidden={index > 3}
             />
           ))}
         </div>

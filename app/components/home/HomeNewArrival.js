@@ -47,7 +47,7 @@ export default function HomeNewArrival({
               </span>
             </TransitionLink>
           </div>
-          <section className="grid grid-cols-2 gap-x-4 gap-y-12 sm:grid-cols-3 lg:grid-cols-5 sm:max-lg:[&>div:last-child]:hidden">
+          <section className="grid grid-cols-2 gap-x-4 gap-y-12 sm:grid-cols-4 lg:grid-cols-5 max-lg:[&>div:last-child]:hidden">
             {newlyArrivedProducts?.map((newlyArrivedProduct) => (
               <ProductCard
                 key={newlyArrivedProduct._id}

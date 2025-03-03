@@ -30,7 +30,7 @@ export default function ShopCards({
       if (window.innerWidth < 640) {
         setRows(Math.max(0, Math.floor(filteredProductCount / 2)));
       } else if (window.innerWidth < 1024) {
-        setRows(Math.max(0, Math.floor(filteredProductCount / 3)));
+        setRows(Math.max(0, Math.floor(filteredProductCount / 4)));
       } else {
         setRows(Math.max(0, Math.floor(filteredProductCount / 5)));
       }
@@ -45,7 +45,7 @@ export default function ShopCards({
   }, [filteredProductCount]);
 
   return (
-    <section className="relative grid grid-cols-2 gap-x-4 gap-y-12 sm:grid-cols-3 lg:grid-cols-5">
+    <section className="relative grid grid-cols-2 gap-x-4 gap-y-12 sm:grid-cols-4 lg:grid-cols-5">
       <Shapes cardHeight={cardHeight} rows={rows} />
       {filteredProducts?.map((filteredProduct) => {
         return (

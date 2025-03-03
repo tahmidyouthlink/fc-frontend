@@ -51,9 +51,9 @@ export default function RecentlyViewedProducts({
           </h2>
         </div>
         <div
-          className={`grid grid-cols-2 gap-x-4 gap-y-12 sm:grid-cols-3 lg:[&>div]:min-w-[calc(25%-16px*3/4)] ${recentlyViewedProducts?.length > 3 ? "sm:max-lg:[&>div:last-child]:hidden" : ""} ${recentlyViewedProducts?.length < 5 ? "lg:grid-cols-4" : "transition-transform duration-300 ease-in-out lg:flex lg:flex-nowrap"} ${isRecentlyViewedProductsSlid ? "-translate-x-[calc(100%+16px)]" : "-translate-x-0"}`}
+          className={`grid-cols-2 gap-x-4 gap-y-12 max-sm:grid ${recentlyViewedProducts?.length < 6 ? "grid sm:grid-cols-4 lg:grid-cols-5" : "sm:flex sm:flex-nowrap sm:transition-transform sm:duration-300 sm:ease-in-out sm:[&>div]:min-w-[calc(25%-16px*3/4)] lg:[&>div]:min-w-[calc(20%-16px*4/5)]"} ${isRecentlyViewedProductsSlid ? "-translate-x-[calc(100%+16px)]" : "-translate-x-0"}`}
         >
-          {recentlyViewedProducts.map((recentlyViewedProduct) => (
+          {recentlyViewedProducts.map((recentlyViewedProduct, index) => (
             <ProductCard
               key={recentlyViewedProduct._id}
               product={recentlyViewedProduct}
@@ -61,6 +61,7 @@ export default function RecentlyViewedProducts({
               setIsAddToCartModalOpen={setIsAddToCartModalOpen}
               setSelectedAddToCartProduct={setSelectedAddToCartProduct}
               getImageSetsBasedOnColors={getImageSetsBasedOnColors}
+              shouldBeHidden={index > 3}
             />
           ))}
         </div>

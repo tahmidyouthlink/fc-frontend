@@ -50,13 +50,13 @@ export default function HomeCategories({ featuredCategories }) {
               </div>
             </div>
           </div>
-          <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 sm:max-lg:[&>a:last-child]:hidden">
+          <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-5 max-lg:[&>a:last-child]:hidden">
             {featuredCategories?.map((featuredCategory) => {
               return (
                 <TransitionLink
                   key={"featured-category-" + featuredCategory?._id}
                   href={`/shop?category=${featuredCategory?.label?.split(" ")?.join("+")}${!!searchParams.get("search") ? `&search=${searchParams.get("search")}` : ""}`}
-                  className="relative flex h-72 items-center justify-center overflow-hidden rounded-2xl text-2xl font-semibold text-white"
+                  className="relative flex aspect-[4/5] items-center justify-center overflow-hidden rounded-2xl text-2xl font-semibold text-white"
                 >
                   <div
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-300 ease-in-out after:absolute after:inset-0 after:h-full after:w-full after:bg-black after:bg-opacity-40 after:content-[''] hover:scale-[1.15]"
