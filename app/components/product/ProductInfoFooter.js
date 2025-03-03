@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import toast from "react-hot-toast";
@@ -8,7 +9,6 @@ import {
   FaWhatsapp,
   FaLink,
 } from "react-icons/fa6";
-import TransitionLink from "../ui/TransitionLink";
 
 export default function ProductInfoFooter({ productId, productTitle }) {
   const pathname = usePathname();
@@ -41,40 +41,40 @@ export default function ProductInfoFooter({ productId, productTitle }) {
         <h4 className="font-semibold text-neutral-600">Share:</h4>
         <ul className="social-icons flex gap-x-1.5 [&_a>svg]:w-3.5 [&_a]:size-[26px]">
           <li>
-            <TransitionLink
+            <Link
               className="hover:bg-[#cfe6ff] hover:text-[#0080ff]"
               href={`https://www.facebook.com/sharer/sharer.php?u=${fullUrl}`}
               target="_blank"
             >
               <FaSquareFacebook />
-            </TransitionLink>
+            </Link>
           </li>
           <li>
-            <TransitionLink
+            <Link
               className="hover:bg-black hover:text-white"
               href={`https://twitter.com/intent/tweet?url=${fullUrl}&text=Check+out+this+${productTitle?.split(" ")?.join("+")}!`}
               target="_blank"
             >
               <FaXTwitter />
-            </TransitionLink>
+            </Link>
           </li>
           <li>
-            <TransitionLink
+            <Link
               className="hover:bg-[#cce6ff] hover:text-[#168AFF]"
               href={`fb-messenger://share/?link=${fullUrl}`}
               target="_blank"
             >
               <FaFacebookMessenger />
-            </TransitionLink>
+            </Link>
           </li>
           <li>
-            <TransitionLink
+            <Link
               className="hover:bg-[#25D366] hover:text-white"
               href={`https://api.whatsapp.com/send?text=Check+out+this+${productTitle?.split(" ")?.join("+")}!+${fullUrl}`}
               target="_blank"
             >
               <FaWhatsapp />
-            </TransitionLink>
+            </Link>
           </li>
           <li
             className="flex size-[26px] cursor-pointer items-center justify-center rounded-md bg-neutral-200 text-neutral-500 transition-colors duration-[400ms] ease-out hover:bg-black hover:text-white"
