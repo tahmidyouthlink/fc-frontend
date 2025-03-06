@@ -20,7 +20,7 @@ import EnrollmentForm from '@/app/components/layout/EnrollmentForm';
 const EnrollmentPage = () => {
 
   const axiosPublic = useAxiosPublic();
-  const [activeTab, setActiveTab] = useState('create user');
+  const [activeTab, setActiveTab] = useState('Create User');
   const [existingUsers, isExistingUsersPending, refetch] = useExistingUsers();
   const tabs = ["Create User", "Existing Users"];
 
