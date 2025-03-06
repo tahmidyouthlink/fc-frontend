@@ -10,13 +10,13 @@ import { today, getLocalTimeZone } from "@internationalized/date";
 const FinancePerformance = () => {
   const [orderList, isOrderPending] = useOrders();
   const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
-  const [activeFilter, setActiveFilter] = useState('all');
+  const [activeFilter, setActiveFilter] = useState('today');
   const [showDateRangePicker, setShowDateRangePicker] = useState(true); // New state
   const [selected, setSelected] = useState(['bKash', 'SSLCommerz']);
 
   useEffect(() => {
     // Set default date range to Today when the component mounts
-    handleDateFilter('all');
+    handleDateFilter('today');
   }, []);
 
   const parseDate = (dateString) => {
@@ -109,81 +109,59 @@ const FinancePerformance = () => {
       });
     };
 
-    if (activeFilter === "all") {
-      // Process all orders without date filtering
-      calculateTotals(orderList);
-    } else {
-      // Convert filter dates to Date objects
-      const startDateObj = new Date(filterStartDate);
-      const endDateObj = new Date(filterEndDate);
+    // Convert filter dates to Date objects
+    const startDateObj = new Date(filterStartDate);
+    const endDateObj = new Date(filterEndDate);
 
-      // Normalize dates to start and end of the day
-      const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0));
-      const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999));
+    // Normalize dates to start and end of the day
+    const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0));
+    const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999));
 
-      // Filter orders within the date range
-      const filteredOrders = orderList?.filter((order) => {
-        const orderDate = parseDate(order?.dateTime);
+    // Filter orders within the date range
+    const filteredOrders = orderList?.filter((order) => {
+      const orderDate = parseDate(order?.dateTime);
 
-        return (
-          orderDate >= adjustedStartDate &&
-          orderDate <= adjustedEndDate &&
-          order?.paymentInfo?.paymentStatus === "Paid"
-        );
-      });
+      return (
+        orderDate >= adjustedStartDate &&
+        orderDate <= adjustedEndDate &&
+        order?.paymentInfo?.paymentStatus === "Paid"
+      );
+    });
 
-      calculateTotals(filteredOrders);
-    }
+    calculateTotals(filteredOrders);
 
     return { bKashTransactions, sslCommerzTransactions, totalBKashRevenue, totalSSLCommerzRevenue };
-  }, [orderList, filterStartDate, filterEndDate, activeFilter]);
+  }, [orderList, filterStartDate, filterEndDate]);
 
   const paymentMethodData = useMemo(() => {
     const dailyData = {};
 
-    if (activeFilter === "all") {
-      orderList?.forEach((order) => {
-        if (order?.paymentInfo?.paymentStatus === "Paid") {
-          const orderDate = parseDate(order.dateTime);
-          const orderDateFormatted = format(orderDate, 'yyyy-MM-dd');
-          if (!dailyData[orderDateFormatted]) {
-            dailyData[orderDateFormatted] = { bKashTransactions: 0, sslCommerzTransactions: 0 };
-          }
-          if (order.paymentInfo.paymentMethod === "bKash") {
-            dailyData[orderDateFormatted].bKashTransactions += 1;
-          } else if (order.paymentInfo.paymentMethod === "SSL") {
-            dailyData[orderDateFormatted].sslCommerzTransactions += 1;
-          }
-        }
-      });
-    } else {
-      const startDateObj = new Date(filterStartDate);
-      const endDateObj = new Date(filterEndDate);
-      const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0));
-      const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999));
+    const startDateObj = new Date(filterStartDate);
+    const endDateObj = new Date(filterEndDate);
+    const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0));
+    const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999));
 
-      orderList?.forEach((order) => {
-        const orderDate = parseDate(order.dateTime);
-        const orderDateFormatted = format(orderDate, 'yyyy-MM-dd');
-        if (orderDate >= adjustedStartDate && orderDate <= adjustedEndDate && order?.paymentInfo?.paymentStatus === "Paid") {
-          if (!dailyData[orderDateFormatted]) {
-            dailyData[orderDateFormatted] = { bKashTransactions: 0, sslCommerzTransactions: 0 };
-          }
-          if (order.paymentInfo.paymentMethod === "bKash") {
-            dailyData[orderDateFormatted].bKashTransactions += 1;
-          } else if (order.paymentInfo.paymentMethod === "SSL") {
-            dailyData[orderDateFormatted].sslCommerzTransactions += 1;
-          }
+    orderList?.forEach((order) => {
+      const orderDate = parseDate(order.dateTime);
+      const orderDateFormatted = format(orderDate, 'yyyy-MM-dd');
+      if (orderDate >= adjustedStartDate && orderDate <= adjustedEndDate && order?.paymentInfo?.paymentStatus === "Paid") {
+        if (!dailyData[orderDateFormatted]) {
+          dailyData[orderDateFormatted] = { bKashTransactions: 0, sslCommerzTransactions: 0 };
         }
-      });
-    }
+        if (order.paymentInfo.paymentMethod === "bKash") {
+          dailyData[orderDateFormatted].bKashTransactions += 1;
+        } else if (order.paymentInfo.paymentMethod === "SSL") {
+          dailyData[orderDateFormatted].sslCommerzTransactions += 1;
+        }
+      }
+    });
 
     return Object.keys(dailyData).map((date) => ({
       date,
       bKashTransactions: dailyData[date].bKashTransactions,
       sslCommerzTransactions: dailyData[date].sslCommerzTransactions,
     }));
-  }, [orderList, filterStartDate, filterEndDate, activeFilter]);
+  }, [orderList, filterStartDate, filterEndDate]);
 
   // Memoize filtered data to group by hour for today or yesterday
   const hourlyPaymentData = useMemo(() => {
@@ -205,7 +183,7 @@ const FinancePerformance = () => {
         order.paymentInfo?.paymentStatus === "Paid";
     });
 
-    if (!filteredOrders.length) return Array.from({ length: 24 }, (_, hour) => ({
+    if (!filteredOrders?.length) return Array.from({ length: 24 }, (_, hour) => ({
       hour: `${hour}:00`,
       bKashTransactions: 0,
       sslCommerzTransactions: 0,
@@ -247,7 +225,7 @@ const FinancePerformance = () => {
       },
     });
 
-    setActiveFilter('all');
+    setActiveFilter('today');
     setShowDateRangePicker(true);
   };
 
@@ -313,20 +291,12 @@ const FinancePerformance = () => {
     return <SmallHeightLoading />
   };
 
-  console.log(paymentMethodData, "paymentMethodData");
-  console.log(hourlyPaymentData, "hourlyPaymentData");
-
   return (
     <div className="space-y-5 relative">
 
       <div className="flex flex-wrap mt-6 justify-center lg:justify-end items-center gap-3">
         <div className="flex items-center justify-center gap-2">
-          <button
-            onClick={() => handleDateFilter('all')}
-            className={`px-2 py-1 text-xs md:text-sm md:py-2 md:px-4 ${activeFilter === 'all' ? 'text-[#D2016E] border rounded-full border-[#D2016E] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
-          >
-            All
-          </button>
+
           <button
             onClick={() => handleDateFilter('today')}
             className={`px-2 py-1 text-xs md:text-sm md:py-2 md:px-4 ${activeFilter === 'today' ? 'text-[#D2016E] border rounded-full border-[#D2016E] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
@@ -351,6 +321,7 @@ const FinancePerformance = () => {
           >
             Last Month
           </button>
+
         </div>
 
         <div className='flex items-center gap-2'>

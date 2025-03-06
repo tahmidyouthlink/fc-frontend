@@ -189,7 +189,7 @@ const RestrictedAccessLoginPage = () => {
     }
 
     try {
-      const result = await signIn("credentials", {
+      const result = await signIn("credentials-backend", {
         redirect: false,
         emailOrUsername: data.emailOrUsername,
         password: data.password,
@@ -327,6 +327,7 @@ const RestrictedAccessLoginPage = () => {
         <form noValidate onSubmit={handleSubmitForLogin(onSubmit)}>
 
           {!otpRequested ? (
+
             <div>
 
               {/* Heading */}
@@ -420,8 +421,10 @@ const RestrictedAccessLoginPage = () => {
               </div>
 
             </div>
+
           ) : (
             <>
+
               <div className="flex flex-col w-full space-y-3 border p-10 rounded-lg">
 
                 {/* Heading */}
@@ -481,8 +484,9 @@ const RestrictedAccessLoginPage = () => {
                   </button>
                 </div>
                 {/* Resend Link */}
-                {resendOtpText && <p className='text-green-600'>A new OTP has been sent to your email.</p>}
+                {resendOtpText && <p className='text-green-600 text-center'>A new OTP has been sent to your email.</p>}
               </div>
+
             </>
           )}
 

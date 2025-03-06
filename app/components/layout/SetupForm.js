@@ -230,6 +230,21 @@ const SetupForm = ({ email, isValidToken }) => {
                 {...registerForSetup("password", {
                   required: !password ? "Password is required." : false,
                   minLength: { value: 8, message: "Password must be at least 8 characters." },
+                  validate: (value) => {
+                    if (!/[A-Z]/.test(value)) {
+                      return "Password must contain at least one uppercase letter.";
+                    }
+                    if (!/[a-z]/.test(value)) {
+                      return "Password must contain at least one lowercase letter.";
+                    }
+                    if (!/\d/.test(value)) {
+                      return "Password must contain at least one number.";
+                    }
+                    if (!/[@$!%*?&]/.test(value)) {
+                      return "Password must contain at least one special character (@$!%*?&).";
+                    }
+                    return true;
+                  },
                   onChange: (e) => setPassword(e.target.value), // Sync manual typing
                 })}
                 className={`h-11 w-full rounded-lg border-2 px-3 text-xs text-neutral-700 outline-none md:text-[13px] border-gray-300 focus:border-[#F4D3BA] focus:bg-white`}

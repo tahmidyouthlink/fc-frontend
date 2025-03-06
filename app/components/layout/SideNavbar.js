@@ -4,7 +4,7 @@ import { PiUsersThreeLight } from "react-icons/pi";
 import { BiCategory } from "react-icons/bi";
 import { RxDashboard } from "react-icons/rx";
 import { MdPayment, MdOutlineLocationOn, MdOutlineInventory2, MdOutlineCategory, MdOutlinePrivacyTip, MdOutlineLocalShipping } from "react-icons/md";
-import { RiContractLine, RiUserShared2Line } from "react-icons/ri";
+import { RiContractLine } from "react-icons/ri";
 import { TbBrandGoogleAnalytics, TbMessageCircleQuestion, TbClipboardList, TbBuildingBank } from "react-icons/tb";
 import Image from "next/image";
 import logoWhiteImage from "/public/logos/logo.png";
@@ -13,7 +13,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FaAngleDown } from "react-icons/fa6";
 import { useState } from "react";
-import { LiaUserLockSolid } from "react-icons/lia";
+import { LiaUserLockSolid, LiaUsersCogSolid } from "react-icons/lia";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { LuWarehouse } from "react-icons/lu";
 import { BsTags } from "react-icons/bs";
@@ -30,6 +30,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { signOut, useSession } from "next-auth/react";
 import { HiOutlineLogout } from "react-icons/hi";
 import { CiLock } from "react-icons/ci";
+import { GrUserSettings } from "react-icons/gr";
 
 const SideNavbar = ({ onClose }) => {
   const pathname = usePathname();
@@ -63,9 +64,21 @@ const SideNavbar = ({ onClose }) => {
       icon: <MdOutlineCategory />,
       links: [
         { label: 'Products', link: '/dash-board/products', icon: <FiShoppingBag /> },
-        { label: 'Inventory', link: '/dash-board/inventory', icon: <MdOutlineInventory2 /> },
+        { label: 'Manage Inventory', link: '/dash-board/inventory', icon: <MdOutlineInventory2 /> },
         { label: 'Purchase Orders', link: '/dash-board/purchase-orders', icon: <BiPurchaseTagAlt /> },
-        { label: 'Transfers', link: '/dash-board/transfers', icon: <BiTransferAlt /> }
+        { label: 'Transfers', link: '/dash-board/transfers', icon: <BiTransferAlt /> },
+        // Product Configuration nested within Settings
+        {
+          name: "Product Settings",  // New section for product configuration
+          icon: <IoSettingsOutline />,   // You can change this to any other icon you prefer
+          links: [
+            { label: 'Categories', link: '/dash-board/categories', icon: <BiCategory /> },
+            { label: 'Seasons', link: '/dash-board/seasons', icon: <FaGlobeAsia /> },
+            { label: 'Colors', link: '/dash-board/colors', icon: <IoColorPaletteOutline /> },
+            { label: 'Vendors', link: '/dash-board/vendors', icon: <LuWarehouse /> },
+            { label: 'Tags', link: '/dash-board/tags', icon: <BsTags /> },
+          ]
+        },
       ]
     },
     {
@@ -97,24 +110,11 @@ const SideNavbar = ({ onClose }) => {
         icon: <IoSettingsOutline />,
         links: [
           { label: 'Permissions', link: '/dash-board/permissions', icon: <LiaUserLockSolid /> },
-          { label: 'Enrollment', link: '/dash-board/enrollment', icon: <RiUserShared2Line /> },
+          { label: 'User Management', link: '/dash-board/enrollment', icon: <LiaUsersCogSolid /> },
           { label: 'Reward Level', link: '/dash-board/reward-level', icon: <CiMedal /> },
           { label: 'Payment Methods', link: '/dash-board/payment-methods', icon: <MdPayment /> },
-
-          // Product Configuration nested within Settings
-          {
-            name: "Product Settings",  // New section for product configuration
-            icon: <IoSettingsOutline />,   // You can change this to any other icon you prefer
-            links: [
-              { label: 'Categories', link: '/dash-board/categories', icon: <BiCategory /> },
-              { label: 'Seasons', link: '/dash-board/seasons', icon: <FaGlobeAsia /> },
-              { label: 'Colors', link: '/dash-board/colors', icon: <IoColorPaletteOutline /> },
-              { label: 'Vendors', link: '/dash-board/vendors', icon: <LuWarehouse /> },
-              { label: 'Tags', link: '/dash-board/tags', icon: <BsTags /> },
-              { label: 'Shipment', link: '/dash-board/zone', icon: <BsBoxSeam /> },
-              { label: 'Locations', link: '/dash-board/locations', icon: <MdOutlineLocationOn /> },
-            ]
-          },
+          { label: 'Shipment', link: '/dash-board/zone', icon: <BsBoxSeam /> },
+          { label: 'Locations', link: '/dash-board/locations', icon: <MdOutlineLocationOn /> },
 
           // legal policies 
           {
@@ -133,17 +133,21 @@ const SideNavbar = ({ onClose }) => {
         ]
       },
       {
-        name: "Change Password",
-        icon: <CiLock />,
-        path: "/dash-board/password-change",
-      },
+        name: "Account Settings",  // New section for product configuration
+        icon: <GrUserSettings />,   // You can change this to any other icon you prefer
+        links: [
+          { label: 'Update Password', link: '/dash-board/password-change', icon: <CiLock /> },
+        ]
+      }
     ] :
     [
       {
-        name: "Change Password",
-        icon: <CiLock />,
-        path: "/dash-board/password-change",
-      },
+        name: "Account Settings",  // New section for product configuration
+        icon: <IoSettingsOutline />,   // You can change this to any other icon you prefer
+        links: [
+          { label: 'Update Password', link: '/dash-board/password-change', icon: <CiLock /> },
+        ]
+      }
     ];
 
   const fullMenu = [...allList, ...adminList]; // Merge both lists if isAdmin is true

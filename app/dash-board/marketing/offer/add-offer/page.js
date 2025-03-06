@@ -687,7 +687,7 @@ const AddOffer = () => {
           <div className='flex justify-end items-center mt-3'>
 
             <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700 mt-4 mb-8`}>
-              {isSubmitting ? 'Submitting...' : 'Submit'} <MdOutlineFileUpload size={20} />
+              {isSubmitting ? 'Creating...' : 'Create'} <MdOutlineFileUpload size={20} />
             </button>
 
           </div>

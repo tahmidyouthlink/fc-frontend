@@ -774,7 +774,7 @@ const EditOffer = () => {
               disabled={isSubmitting}
               className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}
             >
-              {isSubmitting ? 'Saving...' : 'Save Changes'} <FiSave size={20} />
+              {isSubmitting ? 'Saving...' : 'Save'} <FiSave size={20} />
             </button>
 
           </div>

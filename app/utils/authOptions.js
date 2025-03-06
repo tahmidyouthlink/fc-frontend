@@ -4,7 +4,8 @@ import axios from 'axios';
 export const authOptions = {
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      id: "credentials-backend",
+      name: "Backend Credentials",
       credentials: {
         emailOrUsername: { label: "Email or Username", type: "text" },
         password: { label: "Password", type: "password" },
@@ -26,6 +27,32 @@ export const authOptions = {
             dob: data.dob,
             fullName: data.fullName
           };
+
+        } catch (error) {
+          // Return specific error messages from backend if available
+          throw new Error(error.response?.data?.message || "Login failed! Please check your credentials.");
+        }
+      },
+    }),
+    CredentialsProvider({
+      id: "credentials-frontend",
+      name: "Frontend Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        try {
+          const { customerDetails } = await axios.post(`https://fashion-commerce-backend.vercel.app/customer-signup`, credentials);
+
+          if (!customerDetails) {
+            throw new Error("Invalid email/username or password"); // ❌ Prevent returning `null`
+          };
+
+          console.log(customerDetails, "customerDetails");
+
+
+          return customerDetails;
 
         } catch (error) {
           // Return specific error messages from backend if available
