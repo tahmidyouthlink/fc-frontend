@@ -5,7 +5,7 @@ import arrivals2 from "/public/card-images/arrivals2.svg";
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -19,10 +19,14 @@ const DashboardPermissions = () => {
   const { reset, handleSubmit } = useForm();
   const axiosPublic = useAxiosPublic();
   const router = useRouter();
-  const [permissions, setPermissions] = useState(permissionsList);
+  const [permissions, setPermissions] = useState(() => {
+    const storedPermissions = localStorage.getItem("permissions");
+    return storedPermissions ? JSON.parse(storedPermissions) : permissionsList; // Load from storage or use default
+  });
 
   const handleAccessChange = (section) => {
     setPermissions((prevPermissions) => {
+
       // Check if the section is being unchecked (access is set to false)
       const newAccessState = !prevPermissions[section].access;
       const newPermissions = {
@@ -33,6 +37,13 @@ const DashboardPermissions = () => {
         },
       };
 
+      // If access is being enabled and there are actions, set all actions to true
+      if (newAccessState && prevPermissions[section].access === false && newPermissions[section].actions) {
+        Object.keys(newPermissions[section].actions).forEach((action) => {
+          newPermissions[section].actions[action] = true;
+        });
+      }
+
       // If access is false, reset all actions to false (unselect actions)
       if (!newAccessState && prevPermissions[section].actions) {
         Object.keys(prevPermissions[section].actions).forEach((action) => {
@@ -40,6 +51,7 @@ const DashboardPermissions = () => {
         });
       }
 
+      localStorage.setItem("permissions", JSON.stringify(newPermissions));
       return newPermissions;
     });
   };
@@ -221,6 +233,7 @@ const DashboardPermissions = () => {
         localStorage.removeItem('email');
         localStorage.removeItem('role');
         localStorage.removeItem('fullName');
+        localStorage.removeItem('permissions');
 
       } else {
 

@@ -4,12 +4,14 @@ import SetupForm from "@/app/components/layout/SetupForm";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
 import Loading from "@/app/components/shared/Loading/Loading";
 import AccessVerificationFailed from "@/app/components/layout/AccessVerificationFailed";
+import { useSearchParams } from "next/navigation";
 
-export default function SetupPage({ searchParams }) {
+export default function SetupPage() {
   const [isValidToken, setIsValidToken] = useState(null); // State to store token validation status
   const [errorMessage, setErrorMessage] = useState(""); // For displaying error message
   const axiosPublic = useAxiosPublic();
-  const token = searchParams?.token; // Extract the token from query parameters
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token"); // Extract the token correctly
   const [email, setEmail] = useState("");
 
   useEffect(() => {
