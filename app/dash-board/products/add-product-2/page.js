@@ -17,6 +17,7 @@ import { LuImagePlus } from "react-icons/lu";
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
+import CustomSwitch from '@/app/components/layout/CustomSwitch';
 
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
@@ -32,11 +33,21 @@ const SecondStepOfAddProduct = () => {
   const [locationList, isLocationPending] = useLocations();
   const [showModal, setShowModal] = useState(false);
   const [sizeError, setSizeError] = useState(false);
+  const [showInventory, setShowInventory] = useState(false);
 
   // Function to handle "Go Back" button click
   const handleGoBackClick = (e) => {
     e.preventDefault();  // Prevent immediate navigation
     setShowModal(true);  // Show confirmation modal
+  };
+
+  // Handle toggle change and update local storage
+  const handleToggleChange = () => {
+    setShowInventory((prevState) => {
+      const newState = !prevState;
+      localStorage.setItem("showInventory", JSON.stringify(newState));
+      return newState;
+    });
   };
 
   // Function to handle "Yes" button (confirm navigation)
@@ -60,6 +71,10 @@ const SecondStepOfAddProduct = () => {
       const storedColors = JSON.parse(localStorage.getItem('availableColors') || '[]');
       const storedSizes = JSON.parse(localStorage.getItem('allSizes') || '[]');
       const storedVariants = JSON.parse(localStorage.getItem('productVariants') || '[]');
+      const storedShowInventory = JSON.parse(localStorage.getItem("showInventory"));
+      if (storedShowInventory !== null) {
+        setShowInventory(storedShowInventory);
+      }
 
       // Filter locations with status true
       const activeLocations = locationList?.filter(location => location?.status === true);
@@ -348,6 +363,7 @@ const SecondStepOfAddProduct = () => {
     const storedTags = JSON.parse(localStorage.getItem('tags') || '[]');
     const storedProductId = localStorage.getItem('productId');
     const storedSizeGuideImageUrl = localStorage.getItem('sizeGuideImageUrl');
+    const storedShowInventory = localStorage.getItem('showInventory');
 
     // Filter only active locations
     const activeLocations = locationList?.filter(location => location.status === true);
@@ -404,6 +420,7 @@ const SecondStepOfAddProduct = () => {
       status: "draft",
       sizeGuideImageUrl: storedSizeGuideImageUrl,
       restOfOutfit: storedRestOfOutfit,
+      isInventoryShown: storedShowInventory,
     };
 
     try {
@@ -510,21 +527,36 @@ const SecondStepOfAddProduct = () => {
 
       <div className='max-w-screen-2xl mx-auto py-3 md:py-4 sticky top-0 z-10 bg-gray-50'>
         <div className='flex flex-wrap lg:flex-nowrap items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>INVENTORY VARIANTS</h3>
-          <h3 className='font-medium text-sm md:text-base w-full'>Primary Location: <strong>{primaryLocationName}</strong></h3>
-          <Link
-            className="flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
-            href="/dash-board/products"
-            onClick={handleGoBackClick}  // Trigger the modal on click
-          >
-            <span className="border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2">
-              <FaArrowLeft />
-            </span>
-            Go Back
-          </Link>
+          <div className='flex items-center w-full'>
+            <h3 className='w-full font-semibold text-xl lg:text-2xl'>INVENTORY VARIANTS</h3>
+            <h3 className='font-medium text-sm md:text-base w-full'>Primary Location: <strong>{primaryLocationName}</strong></h3>
+          </div>
+          <div className='flex flex-wrap lg:flex-nowrap items-center justify-between w-full'>
+            <div className="flex items-center gap-2 w-full">
+              <label htmlFor="show-inventory" className="text-sm font-medium">
+                <span>{showInventory ? "Inventory Details Visible" : "Show Inventory Details"}</span>
+              </label>
+
+              <CustomSwitch
+                checked={showInventory}
+                onChange={handleToggleChange}
+                size="md"
+                color="primary"
+              />
+            </div>
+            <Link
+              className="flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
+              href="/dash-board/products"
+              onClick={handleGoBackClick}  // Trigger the modal on click
+            >
+              <span className="border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2">
+                <FaArrowLeft />
+              </span>
+              Go Back
+            </Link>
+          </div>
         </div>
       </div>
-
       <form onSubmit={handleSubmit(onSubmit)} className='min-h-[91vh] flex flex-col justify-between max-w-screen-2xl mx-auto relative'>
         <div>
           <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 pt-3 pb-12'>

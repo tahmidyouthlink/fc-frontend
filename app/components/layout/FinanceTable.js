@@ -203,10 +203,10 @@ const FinanceTable = () => {
         </div>
 
         <div ref={dropdownRef} className="relative inline-block text-left z-50">
-          <button onClick={() => toggleDropdown('other')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[10px] md:text-[14px] text-neutral-700">
+          <button onClick={() => toggleDropdown('other')} className="relative z-[1] flex items-center gap-x-1.5 rounded-lg bg-[#ffddc2] px-3 py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[10px] md:text-[14px] text-neutral-700">
             CUSTOMIZE
             <svg
-              className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown === "other" ? 'rotate-180' : ''}`}
+              className={`h-5 w-5 transform transition-transform duration-300 ${openDropdown === "other" ? 'rotate-180' : ''}`}
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -217,7 +217,7 @@ const FinanceTable = () => {
           </button>
 
           {openDropdown === 'other' && (
-            <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <div className="absolute right-0 z-10 mt-2 w-64 md:w-72 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 
               <div className='p-1'>
 

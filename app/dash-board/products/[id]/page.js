@@ -37,6 +37,7 @@ import { HiCheckCircle } from 'react-icons/hi2';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
+import CustomSwitch from '@/app/components/layout/CustomSwitch';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
@@ -108,6 +109,7 @@ const EditProductPage = () => {
   const [tabSelections, setTabSelections] = useState({});
   const [dragging, setDragging] = useState(false);
   const [image, setImage] = useState(null);
+  const [showInventory, setShowInventory] = useState(false);
 
   // Filter categories based on search input and remove already selected categories
   const filteredSeasons = seasonList
@@ -183,6 +185,11 @@ const EditProductPage = () => {
       return;
     }
     setSeasonError(false);
+  };
+
+  // Handle toggle change
+  const handleToggleChange = () => {
+    setShowInventory((prevState) => !prevState);
   };
 
   // Handle adding/removing category selection
@@ -699,6 +706,7 @@ const EditProductPage = () => {
         setProductStatus(data?.status);
         setSelectedSeasons(data?.season || []);
         setSelectedProductIds(data?.restOfOutfit || []);
+        setShowInventory(data?.isInventoryShown);
 
         // Assuming existingData.productVariants contains variants for all locations
         setExistingVariants(data?.productVariants); // Store all variants
@@ -1003,6 +1011,7 @@ const EditProductPage = () => {
         season: selectedSeasons,
         sizeGuideImageUrl: selectedImageUrl,
         restOfOutfit: selectedProductIds,
+        isInventoryShown: showInventory,
       };
 
       const res = await axiosPublic.put(`/editProductDetails/${id}`, updatedProductData);
@@ -1613,6 +1622,18 @@ const EditProductPage = () => {
         {activeTab === "inventory" && <div className='relative'>
           <div className='2xl:max-w-screen-2xl 2xl:mx-auto'>
             <div className='flex flex-wrap items-center justify-between px-6 gap-4 text-neutral-700'>
+              <div className="flex items-center gap-2">
+                <label htmlFor="show-inventory" className="text-sm font-medium">
+                  <span>{showInventory ? "Inventory Details Visible" : "Show Inventory Details"}</span>
+                </label>
+
+                <CustomSwitch
+                  checked={showInventory}
+                  onChange={handleToggleChange}
+                  size="md"
+                  color="primary"
+                />
+              </div>
               <h3 className='font-semibold text-xl md:text-2xl xl:text-3xl'>UPDATE INVENTORY VARIANTS</h3>
               <h3 className='max-w-screen-2xl text-right bg-gray-50 font-medium text-sm md:text-base'>Primary Location: <strong>{primaryLocationName}</strong></h3>
               <p className="font-semibold text-xl md:text-2xl xl:text-3xl">

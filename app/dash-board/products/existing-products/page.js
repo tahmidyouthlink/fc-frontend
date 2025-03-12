@@ -116,7 +116,7 @@ ${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
           </button>
 
         </div>
-        <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={`/dash-board/products`}> <span className='border border-black rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={`/dash-board/products`}> <span className='border border-black rounded-full p-1 md:p-2 hover:scale-105 duration-300'><FaArrowLeft /></span> Go Back</Link>
       </div>
 
       {activeTab === "category" && <div>

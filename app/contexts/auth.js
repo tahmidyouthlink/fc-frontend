@@ -5,6 +5,9 @@ import { getIdToken, onIdTokenChanged } from "firebase/auth";
 import { auth } from "@/firebase.config";
 import { createSession, removeSession } from "../actions/auth";
 import useAxiosPublic from "../hooks/useAxiosPublic";
+import { useSession } from "next-auth/react";
+import Loading from "../components/shared/Loading/Loading";
+import toast from "react-hot-toast";
 
 // Create a new context for authentication
 const AuthContext = createContext({
@@ -21,6 +24,8 @@ export const AuthProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [isUserLoading, setIsUserLoading] = useState(true);
   const axiosPublic = useAxiosPublic();
+  const { data: session, status } = useSession();
+  const [existingUserData, setExistingUserData] = useState(null);
 
   // Listen for changes to the user's authentication state
   // When the token changes, update the states and token cookie accordingly
@@ -99,10 +104,28 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, [axiosPublic, userData]);
 
+  useEffect(() => {
+    const fetchExistingUserInformation = async () => {
+      try {
+        // Ensure _id is defined and valid
+        if (status === "loading" || !session?.user?._id || session?.user?._id.length !== 24) return;
+
+        const res = await axiosPublic.get(`/single-existing-user/${session?.user?._id}`);
+        setExistingUserData(res.data);
+      } catch (error) {
+        console.error('Error fetching existing user data:', error);
+        toast.error('Error fetching existing user data.');
+      }
+    };
+    fetchExistingUserInformation();
+  }, [session?.user?._id, axiosPublic, status]);
+
+  if (status === "loading") return <Loading />;
+
   // Provide the user state and loading state to child components through context
   return (
     <AuthContext.Provider
-      value={{ user, userData, setUserData, isUserLoading }}
+      value={{ user, userData, setUserData, isUserLoading, existingUserData }}
     >
       {children}
     </AuthContext.Provider>

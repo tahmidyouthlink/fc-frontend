@@ -192,6 +192,7 @@ const ThirdStepOfAddProduct = () => {
     const storedVariants = JSON.parse(localStorage.getItem('productVariants') || '[]');
     const storedProductId = localStorage.getItem('productId');
     const storedSizeGuideImageUrl = localStorage.getItem('sizeGuideImageUrl');
+    const storedShowInventory = localStorage.getItem('showInventory');
 
     const wholeProductData = {
       publishDate: storedFormattedDate,
@@ -220,6 +221,7 @@ const ThirdStepOfAddProduct = () => {
       status: "active",
       sizeGuideImageUrl: storedSizeGuideImageUrl,
       restOfOutfit: storedRestOfOutfit,
+      isInventoryShown: storedShowInventory,
     }
 
     try {

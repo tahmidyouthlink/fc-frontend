@@ -27,12 +27,8 @@ export const authOptions = {
           }
 
           return {
-            id: data._id,
-            email: data.email,
-            username: data.username,
+            _id: data._id,
             role: data.role,
-            dob: data.dob,
-            fullName: data.fullName,
           };
         } catch (error) {
           // Return specific error messages from backend if available
@@ -57,17 +53,12 @@ export const authOptions = {
             credentials,
           );
 
-          console.log("customer-login data", data);
-
           if (!data) {
             throw new Error("Invalid email/username or password"); // ❌ Prevent returning null
           }
 
           return {
             email: data.email,
-            userInfo: data.userInfo,
-            cartItems: data.cartItems,
-            wishlistItems: data.wishlistItems,
           };
         } catch (error) {
           // Return specific error messages from backend if available
@@ -82,33 +73,22 @@ export const authOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.username = user.username;
+        token._id = user._id;
         token.role = user.role;
-        token.dob = user.dob;
-        token.fullName = user.fullName;
         token.email = user.email;
-        token.userInfo = user.userInfo;
-        token.cartItems = user.cartItems;
-        token.wishlistItems = user.wishlistItems;
       }
       return token;
     },
     async session({ session, token }) {
-      session.user.id = token.id;
-      session.user.username = token.username;
+      session.user._id = token._id;
       session.user.role = token.role;
-      session.user.dob = token.dob;
-      session.user.fullName = token.fullName;
       session.user.email = token.email;
-      session.user.userInfo = token.userInfo;
-      session.user.cartItems = token.cartItems;
-      session.user.wishlistItems = token.wishlistItems;
-
       return session;
     },
   },
   pages: { signIn: "/auth/restricted-access" },
   secret: process.env.NEXTAUTH_SECRET,
-  session: { strategy: "jwt" },
+  session: {
+    strategy: "jwt",
+  },
 };

@@ -273,7 +273,7 @@ const EnrollmentPage = () => {
                     Invitation Status
                   </th>
                   <th className="text-sm md:text-base p-2 xl:p-3 text-gray-700 border-b border-gray-300">
-                    Permissions
+                    Actions
                   </th>
                 </tr>
               </thead>
@@ -281,7 +281,7 @@ const EnrollmentPage = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {existingUsers?.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="text-center p-4 text-gray-500 py-36 md:py-44 xl:py-52 2xl:py-80">
+                    <td colSpan="6" className="text-center p-4 text-gray-500 py-36 md:py-44 xl:py-52 2xl:py-80">
                       No users found.
                     </td>
                   </tr>
@@ -318,14 +318,9 @@ const EnrollmentPage = () => {
                                 <span className='flex items-center gap-1.5 rounded-md bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4'><AiOutlineEdit size={16} /> Edit</span>
                               </button>
 
-                              {/* Delete Button */}
-                              <button>
-                                <span className='flex items-center gap-1.5 rounded-md bg-red-50 p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-red-100 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs'> <RiDeleteBinLine size={16} />Delete</span>
-                              </button>
-
                               {/* Block Button */}
                               <button>
-                                <span className='flex items-center gap-1.5 rounded-md bg-red-200 p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-red-300 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs'> <MdBlock size={16} />Block</span>
+                                <span className='flex items-center gap-1.5 rounded-md bg-red-50 p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-red-100 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs'> <MdBlock size={16} />Remove</span>
                               </button>
 
                             </div>

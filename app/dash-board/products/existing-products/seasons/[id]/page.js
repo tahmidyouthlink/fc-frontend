@@ -16,8 +16,11 @@ import Link from 'next/link';
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { IoMdClose } from 'react-icons/io';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { TbColumnInsertRight } from 'react-icons/tb';
+import { TbBoxOff, TbColumnInsertRight } from 'react-icons/tb';
 import PaginationSelect from '@/app/components/layout/PaginationSelect';
+import { BsGraphDownArrow } from 'react-icons/bs';
+import useLocations from '@/app/hooks/useLocations';
+import Loading from '@/app/components/shared/Loading/Loading';
 
 const initialColumns = ['Product', 'Status', 'SKU', 'Category', 'Price', 'Discount (৳ / %)', 'Sizes', 'Colors', 'Vendor', 'Shipping Zones', 'Shipment Handlers'];
 
@@ -33,6 +36,9 @@ const SeasonPage = () => {
   const decodedSeasonName = decodeURIComponent(id);
 
   const [productDetails, setProductDetails] = useState([]);
+  const [showLowStock, setShowLowStock] = useState(false);
+  const [showOutOfStock, setShowOutOfStock] = useState(false);
+  const [locationList, isLocationPending] = useLocations();
   const [isLoading, setIsLoading] = useState(true); // Loading state
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [columnOrder, setColumnOrder] = useState(initialColumns);
@@ -137,6 +143,18 @@ const SeasonPage = () => {
 
   const currentDate = today(getLocalTimeZone());
 
+  // Function to get low stock products (SKU ≤ 10 and > 0)
+  const handleShowLowStockProducts = () => {
+    setShowLowStock(true);
+    setShowOutOfStock(false);
+  };
+
+  // Function to get out of stock products (SKU === 0)
+  const handleShowOutOfStockProducts = () => {
+    setShowOutOfStock(true);
+    setShowLowStock(false);
+  };
+
   // Filter products based on search and selected tab
   const searchedProductDetails = productDetails?.filter((product) => {
     const query = searchQuery.trim().toLowerCase();
@@ -202,9 +220,30 @@ const SeasonPage = () => {
     setSelectedDateRange(null); // Reset the selected date range
   };
 
-  const isFilterActive = searchQuery || (selectedDateRange?.start && selectedDateRange?.end);
+  const isFilterActive = searchQuery || (selectedDateRange?.start && selectedDateRange?.end) || showLowStock || showOutOfStock;;
 
-  const filteredProducts = isFilterActive ? searchedProductDetails : getFilteredProducts();
+  const filteredProducts = isFilterActive ? searchedProductDetails?.filter(product => {
+
+    const primaryLocation = locationList?.find(location => location.isPrimaryLocation)?.locationName || null;
+
+    if (showLowStock) {
+      // Function to get low stock products (SKU ≤ 10 and > 0)
+      const lowStockProducts = product.productVariants.some(variant =>
+        variant.location === primaryLocation && variant.sku <= 10
+      )
+      return lowStockProducts;
+    }
+
+    if (showOutOfStock) {
+      // Function to get out of stock products (SKU === 0)
+      const outOfStockProducts = product.productVariants.some(variant =>
+        variant.location === primaryLocation && variant.sku === 0
+      )
+      return outOfStockProducts;
+    }
+    return true;
+
+  }) : getFilteredProducts();
 
   const paginatedProducts = useMemo(() => {
     const startIndex = page * itemsPerPage;
@@ -267,6 +306,10 @@ const SeasonPage = () => {
     }
   }, [paginatedProducts]);
 
+  if (isLocationPending) {
+    return <Loading />
+  };
+
   return (
     <div className='relative w-full min-h-screen bg-gray-50'>
       <div
@@ -291,7 +334,7 @@ const SeasonPage = () => {
       <div className='max-w-screen-2xl mx-auto px-6 2xl:px-0 pt-6 pb-6 relative'>
         <div className='flex justify-between items-center'>
           <h1 className='font-bold text-xl md:text-2xl lg:text-3xl'>Look at {decodedSeasonName}</h1>
-          <Link className='flex items-center gap-2 text-[10px] md:text-base' href="/dash-board/products/existing-products"> <span className='border border-black rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+          <Link className='flex items-center gap-2 text-[10px] md:text-base' href="/dash-board/products/existing-products"> <span className='border border-black rounded-full p-1 md:p-2 hover:scale-105 duration-300'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
 
@@ -304,6 +347,7 @@ const SeasonPage = () => {
         />
 
         <div className='min-w-[40%]'>
+
           {/* Search Product Item */}
           <li className="flex items-center relative group">
             <svg
@@ -330,10 +374,10 @@ const SeasonPage = () => {
         </div>
 
         <div ref={dropdownRef} className="relative inline-block text-left z-50">
-          <button onClick={() => toggleDropdown('other')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[10px] md:text-[14px] text-neutral-700">
+          <button onClick={() => toggleDropdown('other')} className="relative z-[1] flex items-center gap-x-1.5 rounded-lg bg-[#ffddc2] p-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[10px] md:text-[14px] text-neutral-700">
             CUSTOMIZE
             <svg
-              className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown === "other" ? 'rotate-180' : ''}`}
+              className={`h-5 w-5 transform transition-transform duration-300 ${openDropdown === "other" ? 'rotate-180' : ''}`}
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -344,7 +388,7 @@ const SeasonPage = () => {
           </button>
 
           {openDropdown === 'other' && (
-            <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <div className="absolute right-0 z-10 mt-2 w-64 md:w-72 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="p-1 flex flex-col gap-2">
 
                 <div className='flex items-center gap-2'>
@@ -367,6 +411,29 @@ const SeasonPage = () => {
                 <button className="relative z-[1] flex items-center justify-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700 w-full" onClick={() => { setColumnModalOpen(true) }}>
                   Choose Columns <TbColumnInsertRight size={20} />
                 </button>
+
+                <div className='flex items-center gap-2'>
+                  {/* Low stock product Button */}
+                  <button className={`relative z-[1] flex items-center justify-center gap-x-3 rounded-lg px-[18px] ${showLowStock ? 'bg-[#ffe69d]' : 'bg-[#fff3cd] hover:bg-[#ffe69d]'
+                    } py-3 transition-[background-color] duration-300 ease-in-out font-semibold text-[14px] text-neutral-700 w-full`} onClick={handleShowLowStockProducts}>
+                    Low Stock <BsGraphDownArrow size={20} />
+                  </button>
+                  {showLowStock &&
+                    <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={() => { setShowLowStock(false) }}>
+                      <IoMdClose size={20} />
+                    </button>
+                  }
+                </div>
+
+                <div className='flex items-center gap-2'>
+                  {/* Out of stock Button */}
+                  <button className={`relative z-[1] flex items-center justify-center gap-x-3 rounded-lg ${showOutOfStock ? 'bg-[#bdf6b4]' : 'bg-[#d4ffce] hover:bg-[#bdf6b4]'} px-[18px] py-3 transition-[background-color] duration-300 ease-in-out font-semibold text-[14px] text-neutral-700 w-full`} onClick={handleShowOutOfStockProducts}>
+                    Out of Stock <TbBoxOff size={20} />
+                  </button>
+                  {showOutOfStock && <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={() => { setShowOutOfStock(false) }}>
+                    <IoMdClose size={20} />
+                  </button>}
+                </div>
 
               </div>
             </div>

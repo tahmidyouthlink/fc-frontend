@@ -1,17 +1,29 @@
 "use client";
 import { useEffect, useState } from "react";
 import { CgMenuLeft } from "react-icons/cg";
-import logoWhiteImage from "@/public/logos/logo.png";
 import SideNavbar from "./SideNavbar";
-import Link from "next/link";
-import Image from "next/image";
+import { RxAvatar } from "react-icons/rx";
 import { useRouter } from "next/navigation";
+import { Avatar, AvatarIcon, Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger } from "@nextui-org/react";
+import { PiSignOutLight } from "react-icons/pi";
+import TransitionLink from "../ui/TransitionLink";
+import { CiLock } from "react-icons/ci";
+import Loading from "../shared/Loading/Loading";
+import { useAuth } from "@/app/contexts/auth";
+import { signOut, useSession } from "next-auth/react";
 
 const DashboardNavbar = () => {
   const [isToggle, setIsToggle] = useState(false);
   const router = useRouter();
+  const { data: session, status } = useSession();
+  const { existingUserData, isUserLoading } = useAuth();
 
   const handleClose = () => setIsToggle(false);
+
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
+    router.push("/auth/restricted-access");
+  };
 
   useEffect(() => {
     const handleRouteChange = () => {
@@ -36,20 +48,120 @@ const DashboardNavbar = () => {
     };
   }, [isToggle]);
 
+  // Show loading state if data is not loaded yet
+  if (isUserLoading || !existingUserData || status === "loading") {
+    return <Loading />; // Or you can use any other custom loading spinner
+  };
+
   return (
     <div>
-      {/* Top Navbar */}
-      <div className="flex items-center justify-between px-4">
-        <button className="xl:hidden duration-300 p-2" onClick={() => setIsToggle(!isToggle)}>
+
+      {/* Top Navbar - XL to 2XL Device */}
+      <div className="hidden xl:flex items-center justify-between px-6 py-2">
+
+        <div>
+
+        </div>
+        {status === "authenticated" &&
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Avatar
+                isBordered
+                as="button"
+                className="transition-transform"
+                icon={<AvatarIcon />}
+              />
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Profile Actions" variant="flat">
+              <DropdownItem showDivider key="profile" className="h-14 gap-2">
+                <p className="font-semibold">Logged in as</p>
+                <p className="font-semibold">{existingUserData?.email}</p>
+              </DropdownItem>
+              {session && (
+                <DropdownItem
+                  key="Update Password"
+                  textValue="Update Password"
+                  startContent={<CiLock />}
+                  className="relative"
+                >
+                  Update Password
+                  <TransitionLink
+                    className="absolute inset-0"
+                    href="/dash-board/password-change"
+                  ></TransitionLink>
+                </DropdownItem>
+              )}
+
+              {session && (
+                <DropdownItem
+                  startContent={<PiSignOutLight />}
+                  key="logout"
+                  textValue="logout"
+                  color="danger"
+                  onClick={handleLogout}
+                >
+                  Log Out
+                </DropdownItem>
+              )}
+
+            </DropdownMenu>
+          </Dropdown>
+        }
+
+      </div>
+
+      {/* Top Navbar - Large to Mobile Device*/}
+      <div className="flex items-center justify-between px-4 py-3 xl:hidden">
+        <button className="duration-300 p-2" onClick={() => setIsToggle(!isToggle)}>
           {!isToggle && <CgMenuLeft size={20} />}
         </button>
-        <div className="w-full flex justify-center xl:hidden">
-          <Link href="/" legacyBehavior>
-            <a className="flex items-center gap-2 py-3">
-              <Image className="h-7 lg:h-10 w-auto" src={logoWhiteImage} alt="F-Commerce logo" />
-            </a>
-          </Link>
-        </div>
+
+        {status === "authenticated" &&
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Avatar
+                isBordered
+                as="button"
+                className="transition-transform"
+                icon={<AvatarIcon />}
+              />
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Profile Actions" variant="flat">
+              <DropdownItem showDivider key="profile" className="h-14 gap-2">
+                <p className="font-semibold">Logged in as</p>
+                <p className="font-semibold">{existingUserData?.email}</p>
+              </DropdownItem>
+              {session && (
+                <DropdownItem
+                  key="Update Password"
+                  textValue="Update Password"
+                  startContent={<CiLock />}
+                  className="relative"
+                >
+                  Update Password
+                  <TransitionLink
+                    className="absolute inset-0"
+                    href="/dash-board/password-change"
+                  ></TransitionLink>
+                </DropdownItem>
+              )}
+
+              {session && (
+                <DropdownItem
+                  startContent={<PiSignOutLight />}
+                  key="logout"
+                  textValue="logout"
+                  color="danger"
+                  onClick={handleLogout}
+                >
+                  Log Out
+                </DropdownItem>
+              )}
+
+            </DropdownMenu>
+          </Dropdown>
+        }
+
       </div>
 
       {/* Sidebar - only visible when toggled on small screens */}
