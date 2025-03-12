@@ -57,11 +57,7 @@ const SideNavbar = ({ onClose }) => {
       name: "Orders",
       icon: <TbClipboardList />,
       path: "/dash-board/orders",
-      permission:
-        permissions["Orders"]?.access ||
-        Object.values(permissions["Orders"]?.sections || {}).some(
-          (section) => section.view === true || section.access === true
-        ),
+      permission: permissions["Orders"]?.access
     },
     {
       name: "Product Hub",
@@ -284,56 +280,65 @@ const SideNavbar = ({ onClose }) => {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: activeItem === item.name ? "auto" : 0, opacity: activeItem === item.name ? 1 : 0 }}
                       transition={{ duration: 0.5, ease: "easeInOut" }} className="flex flex-col items-center w-full">
-                      {item?.links?.map((linkItem, linkIndex) => (
-                        linkItem?.links ? (
-                          // Render nested Product Configuration
-                          <div key={linkIndex} className="w-full">
-                            <div
-                              onClick={() => handleSubItemClick(linkItem?.name)}
-                              className="flex items-center gap-6 w-full hover:bg-[#E5F7F4] cursor-pointer px-4 py-3 justify-between group"
-                            >
-                              <div className="flex pl-2 items-center justify-between gap-2">
-                                <h2 className="p-1 text-base xl:text-lg 2xl:text-xl rounded-xl group-hover:text-[#00B795]">{linkItem?.icon}</h2>
-                                <h2 className={`font-semibold text-neutral-600 group-hover:text-[#00B795]`}>{linkItem?.name}</h2>
-                              </div>
-                              <div className="group-hover:text-[#00B795]">
-                                {activeSubItem === linkItem?.name ? <FaAngleDown /> : <FaChevronRight />}
-                              </div>
-                            </div>
+                      {item?.links?.map((linkItem, linkIndex) => {
 
-                            {/* Render links under Product Configuration */}
-                            {linkItem?.links && activeSubItem === linkItem?.name && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: activeSubItem === linkItem.name ? "auto" : 0, opacity: activeSubItem === linkItem.name ? 1 : 0 }}
-                                transition={{ duration: 0.5, ease: "easeInOut" }} className="flex flex-col items-center w-full">
-                                {linkItem?.links?.map((subLink, subIndex) => (
-                                  <Link href={subLink.link} key={subIndex} legacyBehavior>
-                                    <a
-                                      className={`flex items-center gap-2 w-full hover:bg-[#E5F7F4] pl-8 py-3 group ${pathname === subLink.link ? "text-[#00B795] bg-[#E5F7F4] border-l-5 border-[#00B795]" : "hover:text-[#00B795]"}`}
-                                      onClick={onClose}
-                                    >
-                                      <h2 className="p-1 text-base xl:text-lg 2xl:text-xl rounded-xl">{subLink.icon}</h2>
-                                      <h2 className={`font-semibold text-neutral-600 group-hover:text-[#00B795] ${pathname === subLink.link ? "!text-[#00B795]" : ""}`}>
-                                        {subLink.label}
-                                      </h2>
-                                    </a>
-                                  </Link>
-                                ))}
-                              </motion.div>
-                            )}
-                          </div>
-                        ) : (
-                          // Render regular links in Product Hub or Settings
-                          <Link href={linkItem.link} key={linkIndex} legacyBehavior>
-                            <a
-                              className={`flex pl-6 items-center gap-2 w-full hover:bg-[#E5F7F4] group py-3 ${pathname === linkItem.link ? "text-[#00B795] bg-[#E5F7F4] border-l-5 border-[#00B795]" : "hover:text-[#00B795]"}`} onClick={onClose}>
-                              <h2 className="p-1 text-base xl:text-lg 2xl:text-xl rounded-xl">{linkItem.icon}</h2>
-                              <h2 className={`font-semibold text-neutral-600 group-hover:text-[#00B795] ${pathname === linkItem.link ? "!text-[#00B795]" : ""}`}>{linkItem.label}</h2>
-                            </a>
-                          </Link>
+                        if (!linkItem.permission) return null;
+
+                        return (
+                          linkItem?.links ? (
+                            // Render nested Product Configuration
+                            <div key={linkIndex} className="w-full">
+                              <div
+                                onClick={() => handleSubItemClick(linkItem?.name)}
+                                className="flex items-center gap-6 w-full hover:bg-[#E5F7F4] cursor-pointer px-4 py-3 justify-between group"
+                              >
+                                <div className="flex pl-2 items-center justify-between gap-2">
+                                  <h2 className="p-1 text-base xl:text-lg 2xl:text-xl rounded-xl group-hover:text-[#00B795]">{linkItem?.icon}</h2>
+                                  <h2 className={`font-semibold text-neutral-600 group-hover:text-[#00B795]`}>{linkItem?.name}</h2>
+                                </div>
+                                <div className="group-hover:text-[#00B795]">
+                                  {activeSubItem === linkItem?.name ? <FaAngleDown /> : <FaChevronRight />}
+                                </div>
+                              </div>
+
+                              {/* Render links under Product Configuration */}
+                              {linkItem?.links && activeSubItem === linkItem?.name && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: activeSubItem === linkItem.name ? "auto" : 0, opacity: activeSubItem === linkItem.name ? 1 : 0 }}
+                                  transition={{ duration: 0.5, ease: "easeInOut" }} className="flex flex-col items-center w-full">
+                                  {linkItem?.links?.map((subLink, subIndex) => {
+                                    if (!subLink.permission) return null;
+                                    return (
+                                      <Link href={subLink.link} key={subIndex} legacyBehavior>
+                                        <a
+                                          className={`flex items-center gap-2 w-full hover:bg-[#E5F7F4] pl-8 py-3 group ${pathname === subLink.link ? "text-[#00B795] bg-[#E5F7F4] border-l-5 border-[#00B795]" : "hover:text-[#00B795]"}`}
+                                          onClick={onClose}
+                                        >
+                                          <h2 className="p-1 text-base xl:text-lg 2xl:text-xl rounded-xl">{subLink.icon}</h2>
+                                          <h2 className={`font-semibold text-neutral-600 group-hover:text-[#00B795] ${pathname === subLink.link ? "!text-[#00B795]" : ""}`}>
+                                            {subLink.label}
+                                          </h2>
+                                        </a>
+                                      </Link>
+                                    )
+                                  })}
+                                </motion.div>
+                              )}
+                            </div>
+                          ) : (
+                            // Render regular links in Product Hub or Settings
+                            <Link href={linkItem.link} key={linkIndex} legacyBehavior>
+                              <a
+                                className={`flex pl-6 items-center gap-2 w-full hover:bg-[#E5F7F4] group py-3 ${pathname === linkItem.link ? "text-[#00B795] bg-[#E5F7F4] border-l-5 border-[#00B795]" : "hover:text-[#00B795]"}`} onClick={onClose}>
+                                <h2 className="p-1 text-base xl:text-lg 2xl:text-xl rounded-xl">{linkItem.icon}</h2>
+                                <h2 className={`font-semibold text-neutral-600 group-hover:text-[#00B795] ${pathname === linkItem.link ? "!text-[#00B795]" : ""}`}>{linkItem.label}</h2>
+                              </a>
+                            </Link>
+                          )
                         )
-                      ))}
+                      }
+                      )}
                     </motion.div>
                   )}
 
