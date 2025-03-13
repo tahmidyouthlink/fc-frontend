@@ -32,6 +32,7 @@ import { HiCheckCircle } from 'react-icons/hi2';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
+import ProtectedRoute from '@/app/components/ProtectedRoutes/ProtectedRoute';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
@@ -824,576 +825,578 @@ const FirstStepOfAddProduct = () => {
   };
 
   return (
-    <div className='bg-gray-50 min-h-screen relative'>
+    <ProtectedRoute pageName="Products" requiredPermission="Add Product">
+      <div className='bg-gray-50 min-h-screen relative'>
 
-      <div
-        style={{
-          backgroundImage: `url(${arrivals1.src})`,
-        }}
-        className='absolute inset-0 z-0 hidden md:block bg-no-repeat xl:left-[15%] 2xl:left-[30%] bg-[length:1600px_900px]'
-      />
+        <div
+          style={{
+            backgroundImage: `url(${arrivals1.src})`,
+          }}
+          className='absolute inset-0 z-0 hidden md:block bg-no-repeat xl:left-[15%] 2xl:left-[30%] bg-[length:1600px_900px]'
+        />
 
-      <div
-        style={{
-          backgroundImage: `url(${arrivals2.src})`,
-        }}
-        className='absolute inset-0 z-0 bg-contain bg-center xl:-top-28 w-full bg-no-repeat'
-      />
+        <div
+          style={{
+            backgroundImage: `url(${arrivals2.src})`,
+          }}
+          className='absolute inset-0 z-0 bg-contain bg-center xl:-top-28 w-full bg-no-repeat'
+        />
 
-      <div
-        style={{
-          backgroundImage: `url(${arrowSvgImage.src})`,
-        }}
-        className='absolute inset-0 z-0 top-16 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[50%] bg-no-repeat'
-      />
+        <div
+          style={{
+            backgroundImage: `url(${arrowSvgImage.src})`,
+          }}
+          className='absolute inset-0 z-0 top-16 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[50%] bg-no-repeat'
+        />
 
-      <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
-        <div className='flex items-center justify-between'>
-          <h3 className='flex-1 font-semibold text-[13px] md:text-xl lg:text-3xl text-neutral-700'>PRODUCT CONFIGURATION</h3>
+        <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
+          <div className='flex items-center justify-between'>
+            <h3 className='flex-1 font-semibold text-[13px] md:text-xl lg:text-3xl text-neutral-700'>PRODUCT CONFIGURATION</h3>
 
-          <Link // Trigger the modal on click
-            className="flex items-center gap-2 text-[10px] md:text-base justify-end"
-            href="/dash-board/products"
-            onClick={handleGoBackClick}>
-            <span className="border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2">
-              <FaArrowLeft />
-            </span>
-            Go Back
-          </Link>
+            <Link // Trigger the modal on click
+              className="flex items-center gap-2 text-[10px] md:text-base justify-end"
+              href="/dash-board/products"
+              onClick={handleGoBackClick}>
+              <span className="border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2">
+                <FaArrowLeft />
+              </span>
+              Go Back
+            </Link>
 
+          </div>
         </div>
-      </div>
 
-      <form className='2xl:max-w-screen-2xl 2xl:mx-auto relative' onSubmit={handleSubmit(onSubmit)}>
+        <form className='2xl:max-w-screen-2xl 2xl:mx-auto relative' onSubmit={handleSubmit(onSubmit)}>
 
-        <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
+          <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
 
-          <div className='grid grid-cols-1 lg:col-span-7 gap-8 px-6 py-3 h-fit'>
-            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
-              <label htmlFor='productTitle' className='flex justify-start font-medium text-[#9F5216]'>Product Title *</label>
-              <input id='productTitle' {...register("productTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" placeholder='Enter Product Title' type="text" />
-              {errors.productTitle?.type === "required" && (
-                <p className="text-red-600 text-left">Product Title is required</p>
-              )}
+            <div className='grid grid-cols-1 lg:col-span-7 gap-8 px-6 py-3 h-fit'>
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
+                <label htmlFor='productTitle' className='flex justify-start font-medium text-[#9F5216]'>Product Title *</label>
+                <input id='productTitle' {...register("productTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" placeholder='Enter Product Title' type="text" />
+                {errors.productTitle?.type === "required" && (
+                  <p className="text-red-600 text-left">Product Title is required</p>
+                )}
 
-              <label htmlFor='productDetails' className='flex justify-start font-medium text-[#9F5216]'>
-                Details About This Product *
-              </label>
-              <Controller
-                name="productDetails"
-                defaultValue=""
-                rules={{ required: true }}
-                control={control}
-                render={({ field }) => <Editor
-                  value={field.value}
-                  onChange={(value) => {
-                    field.onChange(value);
-                    localStorage.setItem('productDetails', value); // Update local storage
-                  }}
-                />}
-              />
-              {errors.productDetails?.type === "required" && (
-                <p className="text-red-600 text-left pt-1">Product details is required</ p>
-              )}
-            </div>
-
-            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
-
-              <div className='flex flex-col rounded-md relative'>
-                <label htmlFor="category" className='text-xs px-2'>Category</label>
-                <select
-                  id="category"
-                  className={`bg-gray-100 p-2 rounded-md ${errors.category ? 'border-red-600' : ''}`}
-                  value={selectedCategory}
-                  {...register('category', { required: 'Category is required' })}
-                  onChange={(e) => {
-                    handleCategoryChange(e.target.value);
-                  }}
-                >
-                  <option value="" disabled className='bg-white'>Select a category</option>
-                  {categoryList?.map((category) => (
-                    <option className='bg-white' key={category.key} value={category.label}>
-                      {category.label}
-                    </option>
-                  ))}
-                </select>
-                {errors.category && (
-                  <p className="text-red-600 text-left">{errors.category.message}</p>
+                <label htmlFor='productDetails' className='flex justify-start font-medium text-[#9F5216]'>
+                  Details About This Product *
+                </label>
+                <Controller
+                  name="productDetails"
+                  defaultValue=""
+                  rules={{ required: true }}
+                  control={control}
+                  render={({ field }) => <Editor
+                    value={field.value}
+                    onChange={(value) => {
+                      field.onChange(value);
+                      localStorage.setItem('productDetails', value); // Update local storage
+                    }}
+                  />}
+                />
+                {errors.productDetails?.type === "required" && (
+                  <p className="text-red-600 text-left pt-1">Product details is required</ p>
                 )}
               </div>
 
-              {selectedCategory && sizeRangeList[selectedCategory] && (
-                <div className="flex flex-col gap-1 w-full">
-                  <CheckboxGroup
-                    className="gap-1"
-                    label="Select size"
-                    orientation="horizontal"
-                    value={groupSelected}
-                    onChange={handleGroupSelectedChange}
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
+
+                <div className='flex flex-col rounded-md relative'>
+                  <label htmlFor="category" className='text-xs px-2'>Category</label>
+                  <select
+                    id="category"
+                    className={`bg-gray-100 p-2 rounded-md ${errors.category ? 'border-red-600' : ''}`}
+                    value={selectedCategory}
+                    {...register('category', { required: 'Category is required' })}
+                    onChange={(e) => {
+                      handleCategoryChange(e.target.value);
+                    }}
                   >
-                    {sizeRangeList[selectedCategory]?.map((size) => (
-                      <CustomCheckbox
-                        key={size}
-                        value={size}
-                        isDisabled={groupSelected?.length > 0 && !groupSelected?.includes(size)} // Disable other sizes if one is selected
-                      >
-                        {size}
-                      </CustomCheckbox>
+                    <option value="" disabled className='bg-white'>Select a category</option>
+                    {categoryList?.map((category) => (
+                      <option className='bg-white' key={category.key} value={category.label}>
+                        {category.label}
+                      </option>
                     ))}
-                  </CheckboxGroup>
-                  {sizeError2 && (
-                    <p className="text-red-600 text-left">Please select at least one size.</p>
+                  </select>
+                  {errors.category && (
+                    <p className="text-red-600 text-left">{errors.category.message}</p>
                   )}
                 </div>
-              )}
 
-              {groupSelected?.length > 0 && (
-                <div className="flex flex-col gap-1 w-full">
-                  <CheckboxGroup
-                    className="gap-1"
-                    label="Unselect sizes"
-                    orientation="horizontal"
-                    value={groupSelected2}
-                    onChange={handleGroupSelected2Change}
-                  >
-                    {generateSizes(groupSelected[0] || '')?.map(size => (
-                      <CustomCheckbox2 key={size} value={size}>{size}</CustomCheckbox2>
-                    ))}
-                  </CheckboxGroup>
-                  <p className="mt-4 ml-1 text-default-500">
-                    Selected: {groupSelected2?.join(", ")}
-                  </p>
-                  {sizeError3 && (
-                    <p className="text-red-600 text-left">Please select at least one size.</p>
-                  )}
-                </div>
-              )}
-
-              {groupSelected2?.length > 0 && (
-                <div className="flex w-full flex-col gap-2">
-                  <Controller
-                    name="subCategories"
-                    control={control}
-                    defaultValue={selectedSubCategories}
-                    rules={{ required: 'Sub-Category is required' }}
-                    render={({ field }) => (
-                      <div>
-                        <Select
-                          label="Sub-categories"
-                          selectionMode="multiple"
-                          value={selectedSubCategories}
-                          placeholder="Select Sub-categories"
-                          selectedKeys={new Set(selectedSubCategories)}
-                          onSelectionChange={(keys) => {
-                            handleSubCategoryArray(keys);
-                            field.onChange([...keys]);
-                          }}
+                {selectedCategory && sizeRangeList[selectedCategory] && (
+                  <div className="flex flex-col gap-1 w-full">
+                    <CheckboxGroup
+                      className="gap-1"
+                      label="Select size"
+                      orientation="horizontal"
+                      value={groupSelected}
+                      onChange={handleGroupSelectedChange}
+                    >
+                      {sizeRangeList[selectedCategory]?.map((size) => (
+                        <CustomCheckbox
+                          key={size}
+                          value={size}
+                          isDisabled={groupSelected?.length > 0 && !groupSelected?.includes(size)} // Disable other sizes if one is selected
                         >
-                          {subCategoryList[selectedCategory]?.map((subCategory) => (
-                            <SelectItem key={subCategory.key}>
-                              {subCategory.label}
-                            </SelectItem>
-                          ))}
-                        </Select>
-
-                        {/* Conditional Error Display */}
-                        {errors.subCategories ? (
-                          <p className="text-red-600 text-left">{errors.subCategories.message}</p>
-                        ) : (
-                          sizeError4 && <p className="text-red-600 text-left">Sub-Category is required.</p>
-                        )}
-                      </div>
+                          {size}
+                        </CustomCheckbox>
+                      ))}
+                    </CheckboxGroup>
+                    {sizeError2 && (
+                      <p className="text-red-600 text-left">Please select at least one size.</p>
                     )}
-                  />
-                </div>
-              )}
+                  </div>
+                )}
 
-              <label htmlFor='availableColors' className='flex justify-start font-medium text-[#9F5216]'>Select Available Colors *</label>
-              <Controller
-                name="availableColors"
-                control={control}
-                defaultValue={selectedAvailableColors}
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <div className="parent-container">
-                    <ReactSelect
-                      {...field}
-                      options={colorList}
-                      isMulti
-                      className="w-full border rounded-md creatable-select-container"
-                      components={{ Option: ColorOption }}
-                      menuPortalTarget={menuPortalTarget}
-                      styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                      menuPlacement="auto"
-                      value={selectedAvailableColors}
-                      onChange={(newValue) => {
-                        setSelectedAvailableColors(newValue);
-                        field.onChange(newValue);
-                      }}
+                {groupSelected?.length > 0 && (
+                  <div className="flex flex-col gap-1 w-full">
+                    <CheckboxGroup
+                      className="gap-1"
+                      label="Unselect sizes"
+                      orientation="horizontal"
+                      value={groupSelected2}
+                      onChange={handleGroupSelected2Change}
+                    >
+                      {generateSizes(groupSelected[0] || '')?.map(size => (
+                        <CustomCheckbox2 key={size} value={size}>{size}</CustomCheckbox2>
+                      ))}
+                    </CheckboxGroup>
+                    <p className="mt-4 ml-1 text-default-500">
+                      Selected: {groupSelected2?.join(", ")}
+                    </p>
+                    {sizeError3 && (
+                      <p className="text-red-600 text-left">Please select at least one size.</p>
+                    )}
+                  </div>
+                )}
+
+                {groupSelected2?.length > 0 && (
+                  <div className="flex w-full flex-col gap-2">
+                    <Controller
+                      name="subCategories"
+                      control={control}
+                      defaultValue={selectedSubCategories}
+                      rules={{ required: 'Sub-Category is required' }}
+                      render={({ field }) => (
+                        <div>
+                          <Select
+                            label="Sub-categories"
+                            selectionMode="multiple"
+                            value={selectedSubCategories}
+                            placeholder="Select Sub-categories"
+                            selectedKeys={new Set(selectedSubCategories)}
+                            onSelectionChange={(keys) => {
+                              handleSubCategoryArray(keys);
+                              field.onChange([...keys]);
+                            }}
+                          >
+                            {subCategoryList[selectedCategory]?.map((subCategory) => (
+                              <SelectItem key={subCategory.key}>
+                                {subCategory.label}
+                              </SelectItem>
+                            ))}
+                          </Select>
+
+                          {/* Conditional Error Display */}
+                          {errors.subCategories ? (
+                            <p className="text-red-600 text-left">{errors.subCategories.message}</p>
+                          ) : (
+                            sizeError4 && <p className="text-red-600 text-left">Sub-Category is required.</p>
+                          )}
+                        </div>
+                      )}
                     />
                   </div>
                 )}
-              />
-              {errors.availableColors && (
-                <p className="text-red-600 text-left">Colors are required</p>
-              )}
 
-              <Controller
-                name="newArrival"
-                control={control}
-                defaultValue={selectedNewArrival}
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <div className="flex flex-col gap-3">
-                    <RadioGroup
-                      {...field}
-                      label="Is New Arrival?"
-                      value={selectedNewArrival}
-                      onValueChange={setSelectedNewArrival}
-                      orientation="horizontal"
-                    >
-                      <Radio value="Yes">Yes</Radio>
-                      <Radio value="No">No</Radio>
-                    </RadioGroup>
-                    <p className="text-default-500 text-small">Selected: {selectedNewArrival}</p>
-                    {errors.newArrival && (
-                      <p className="text-red-600 text-left">New Arrival Selection is required</p>
-                    )}
-                  </div>
-                )}
-              />
-            </div>
-
-            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
-              <label htmlFor='materialCare' className='flex justify-start font-medium text-[#9F5216]'>Material Care</label>
-              <Controller
-                name="materialCare"
-                defaultValue=""
-                control={control}
-                render={() => <Editor
-                  value={materialCare}
-                  onChange={(value) => {
-                    setMaterialCare(value);
-                    localStorage.setItem('materialCare', value); // Update local storage
-                  }}
-                />}
-              />
-
-              <label htmlFor='sizeFit' className='flex justify-start font-medium text-[#9F5216]'>Size Fit</label>
-              <Controller
-                name="sizeFit"
-                defaultValue=""
-                control={control}
-                render={() => <Editor
-                  value={sizeFit}
-                  onChange={(value) => {
-                    setSizeFit(value);
-                    localStorage.setItem('sizeFit', value); // Update local storage
-                  }}
-                />}
-              />
-            </div>
-          </div>
-
-          <div className='grid grid-cols-1 lg:col-span-5 gap-8 px-6 py-3'>
-            <div className='flex flex-col gap-4 h-fit'>
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-                <div>
-                  <label htmlFor='regularPrice' className='flex justify-start font-medium text-[#9F5216] mt-4'>Regular Price ৳ *</label>
-                  <input id='regularPrice' {...register("regularPrice", { required: true })} className="custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000" placeholder='Enter Product Price' type="number" />
-                  {errors.regularPrice?.type === "required" && (
-                    <p className="text-red-600 text-left">Product Price is required</p>
-                  )}
-                </div>
-
-                <div className="flex w-full flex-col">
-                  <Tabs
-                    aria-label="Discount Type"
-                    selectedKey={discountType}
-                    onSelectionChange={handleTabChange}
-                  >
-                    <Tab key="Percentage" title="Percentage" className='text-[#9F5216]'>Discount (%)</Tab>
-                    <Tab key="Flat" title="Flat" className='text-[#9F5216]'>Flat Discount (৳)</Tab>
-                  </Tabs>
-
-                  <input
-                    type="number"
-                    {...register('discountValue')}
-                    className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
-                    placeholder={`Enter ${discountType} Discount`} // Correct placeholder
-                  />
-                </div>
-              </div>
-
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-                <div>
-                  <label htmlFor={`batchCode`} className='font-medium text-[#9F5216]'>Batch Code *</label>
-                  <input
-                    id={`batchCode`}
-                    autoComplete="off"
-                    {...register(`batchCode`, {
-                      required: 'Batch Code is required',
-                      pattern: {
-                        value: /^[A-Z0-9]*$/,
-                        message: 'Batch Code must be alphanumeric and uppercase',
-                      },
-                    })}
-                    placeholder={`Enter Batch Code`}
-                    className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mt-2"
-                    type="text"
-                    onChange={(e) => {
-                      // Convert input to uppercase and remove non-alphanumeric characters
-                      e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                    }}
-                  />
-                  {errors.batchCode && (
-                    <p className="text-red-600 text-left">{errors.batchCode.message}</p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor={`weight`} className='font-medium text-[#9F5216]'>Weight (gram)</label>
-                  <input
-                    id={`weight`}
-                    {...register(`weight`)}
-                    placeholder={`Enter Weight (gram)`}
-                    className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mt-2"
-                    type="number"
-                  />
-                </div>
-              </div>
-
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-
-                <label htmlFor='tags' className='flex justify-start font-medium text-[#9F5216]'>Select Tag *</label>
+                <label htmlFor='availableColors' className='flex justify-start font-medium text-[#9F5216]'>Select Available Colors *</label>
                 <Controller
-                  name="tags"
+                  name="availableColors"
                   control={control}
-                  defaultValue={selectedTags}
+                  defaultValue={selectedAvailableColors}
                   rules={{ required: true }}
                   render={({ field }) => (
                     <div className="parent-container">
                       <ReactSelect
                         {...field}
-                        options={tagList}
+                        options={colorList}
                         isMulti
                         className="w-full border rounded-md creatable-select-container"
-                        value={selectedTags}
+                        components={{ Option: ColorOption }}
                         menuPortalTarget={menuPortalTarget}
                         styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                         menuPlacement="auto"
+                        value={selectedAvailableColors}
                         onChange={(newValue) => {
-                          setSelectedTags(newValue);
+                          setSelectedAvailableColors(newValue);
                           field.onChange(newValue);
                         }}
                       />
                     </div>
                   )}
                 />
-                {errors.tags && (
-                  <p className="text-red-600 text-left">Tags are required</p>
+                {errors.availableColors && (
+                  <p className="text-red-600 text-left">Colors are required</p>
                 )}
 
-                <label htmlFor='vendors' className='flex justify-start font-medium text-[#9F5216]'>Select Vendor</label>
                 <Controller
-                  name="vendors"
+                  name="newArrival"
                   control={control}
-                  defaultValue={selectedVendors}
+                  defaultValue={selectedNewArrival}
+                  rules={{ required: true }}
                   render={({ field }) => (
-                    <div className="parent-container">
-                      <ReactSelect
+                    <div className="flex flex-col gap-3">
+                      <RadioGroup
                         {...field}
-                        options={vendorList}
-                        isMulti
-                        className="w-full border rounded-md creatable-select-container"
-                        value={selectedVendors}
-                        menuPortalTarget={menuPortalTarget}
-                        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-                        menuPlacement="auto"
-                        onChange={(newValue) => {
-                          setSelectedVendors(newValue);
-                          field.onChange(newValue);
-                        }}
-                      />
+                        label="Is New Arrival?"
+                        value={selectedNewArrival}
+                        onValueChange={setSelectedNewArrival}
+                        orientation="horizontal"
+                      >
+                        <Radio value="Yes">Yes</Radio>
+                        <Radio value="No">No</Radio>
+                      </RadioGroup>
+                      <p className="text-default-500 text-small">Selected: {selectedNewArrival}</p>
+                      {errors.newArrival && (
+                        <p className="text-red-600 text-left">New Arrival Selection is required</p>
+                      )}
                     </div>
                   )}
                 />
-
-                <div className="w-full mx-auto" ref={dropdownRef}>
-                  {/* Search Box */}
-                  <label htmlFor='seasons' className='flex justify-start font-medium text-[#9F5216] pb-2'>Select Collection *</label>
-
-                  <input
-                    type="text"
-                    value={isDropdownOpen ? searchTerm : selectedSeasons.join(", ")} // Show selected IDs when closed
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    onClick={() => setIsDropdownOpen(true)} // dropdown on input click
-                    placeholder="Search & Select by Seasonal Collection"
-                    className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#9F5216] overflow-hidden text-ellipsis whitespace-nowrap"
-                  />
-
-                  {/* Dropdown list for search results */}
-                  {isDropdownOpen && (
-                    <div className="border flex flex-col gap-1.5 p-2 max-h-64 overflow-y-auto rounded-lg">
-                      {filteredSeasons?.length > 0 ? (
-                        filteredSeasons?.map((season) => (
-                          <div
-                            key={season?._id}
-                            className={`flex cursor-pointer items-center justify-between rounded-lg border p-1 transition-[border-color,background-color] duration-300 ease-in-out hover:border-[#d7ecd2] hover:bg-[#fafff9] ${selectedSeasons?.includes(season?.seasonName) ? 'border-[#d7ecd2] bg-[#fafff9]' : 'border-neutral-100'}`}
-                            onClick={() => toggleSeasonSelection(season?.seasonName)}
-                          >
-                            <div className='flex items-center gap-1'>
-                              <Image
-                                width={4000}
-                                height={4000}
-                                src={season?.imageUrl}
-                                alt="season-imageUrl"
-                                className="h-8 w-8 object-cover rounded"
-                              />
-                              <span className="ml-2">{season?.seasonName}</span>
-                            </div>
-                            <HiCheckCircle
-                              className={`pointer-events-none size-7 text-[#60d251] transition-opacity duration-300 ease-in-out ${selectedSeasons?.includes(season?.seasonName) ? "opacity-100" : "opacity-0"}`}
-                            />
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-gray-500">No collection found</p>
-                      )}
-                    </div>
-                  )}
-
-                  {seasonError && <p className="text-red-600 text-left">Season is required</p>}
-
-                </div>
-
-                <div className="w-full mx-auto" ref={dropdownRefForCompleteOutfit}>
-
-                  {/* Search Box */}
-                  <label htmlFor='completeOutfit' className='flex justify-start font-medium text-[#9F5216] pb-2'>Complete Your Outfit Section</label>
-
-                  <input
-                    type="text"
-                    value={isDropdownOpenForCompleteOutfit ? searchTermForCompleteOutfit : selectedProductIds.map(product => product.productId).join(", ")} // Show selected IDs when closed
-                    onChange={(e) => setSearchTermForCompleteOutfit(e.target.value)}
-                    onClick={() => setIsDropdownOpenForCompleteOutfit(true)} // Toggle dropdown on input click
-                    placeholder="Search & Select by Seasonal Collection"
-                    className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#9F5216] overflow-hidden text-ellipsis whitespace-nowrap"
-                  />
-
-                  {/* Dropdown list for search results */}
-                  {isDropdownOpenForCompleteOutfit && (
-                    <div className="border flex flex-col gap-1.5 p-2 max-h-64 overflow-y-auto rounded-lg">
-                      {filteredProducts?.length > 0 ? (
-                        filteredProducts?.map((product) => (
-                          <div
-                            key={product?._id}
-                            className={`flex cursor-pointer items-center justify-between rounded-lg border p-1 transition-[border-color,background-color] duration-300 ease-in-out hover:border-[#d7ecd2] hover:bg-[#fafff9] ${selectedProductIds?.map(product => product?.productId)?.includes(product?.productId) ? 'border-[#d7ecd2] bg-[#fafff9]' : 'border-neutral-100'}`}
-                            onClick={() => toggleProductSelection(product?.productId, product?.productTitle, product?._id, product?.thumbnailImageUrl)}>
-                            <div className='flex items-center gap-1'>
-                              <Image
-                                width={4000}
-                                height={4000}
-                                src={product?.thumbnailImageUrl}
-                                alt="season-imageUrl"
-                                className="h-8 w-8 object-cover rounded"
-                              />
-                              <div className='flex flex-col'>
-                                <span className="ml-2 font-bold">{product?.productId}</span>
-                                <span className="ml-2 text-sm">{product?.productTitle}</span>
-                              </div>
-                            </div>
-                            <HiCheckCircle
-                              className={`pointer-events-none size-7 text-[#60d251] transition-opacity duration-300 ease-in-out ${selectedProductIds?.map(product => product?.productId)?.includes(product?.productId) ? "opacity-100" : "opacity-0"}`}
-                            />
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-gray-500">No product found</p>
-                      )}
-                    </div>
-                  )}
-
-                </div>
-
               </div>
 
-              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
+                <label htmlFor='materialCare' className='flex justify-start font-medium text-[#9F5216]'>Material Care</label>
+                <Controller
+                  name="materialCare"
+                  defaultValue=""
+                  control={control}
+                  render={() => <Editor
+                    value={materialCare}
+                    onChange={(value) => {
+                      setMaterialCare(value);
+                      localStorage.setItem('materialCare', value); // Update local storage
+                    }}
+                  />}
+                />
 
-                <div className='flex flex-col gap-4'>
-                  <input
-                    id='imageUpload'
-                    type='file'
-                    className='hidden'
-                    onChange={handleImageChange}
-                  />
-                  <label
-                    htmlFor='imageUpload'
-                    className={`mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed hover:bg-blue-50 ${dragging ? "border-blue-300 bg-blue-50" : "border-gray-400 bg-white"
-                      } p-6 cursor-pointer`}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                  >
-                    <MdOutlineFileUpload size={60} />
-                    <div className='space-y-1.5 text-center'>
-                      <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                        Upload or Drag Media
-                      </h5>
-                      <p className='text-sm text-gray-500'>
-                        Photo Should be in PNG, JPEG or JPG format
-                      </p>
-                    </div>
-                  </label>
-                  {sizeError && (
-                    <p className="text-red-600 text-center">Select image</p>
-                  )}
-                  {image && (
-                    <div className='relative'>
-                      <Image
-                        src={image.src || image}
-                        alt='Uploaded image'
-                        height={3000}
-                        width={3000}
-                        className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
-                      />
-                      <button
-                        onClick={handleImageRemove}
-                        className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
-                      >
-                        <RxCross2 size={24} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-
+                <label htmlFor='sizeFit' className='flex justify-start font-medium text-[#9F5216]'>Size Fit</label>
+                <Controller
+                  name="sizeFit"
+                  defaultValue=""
+                  control={control}
+                  render={() => <Editor
+                    value={sizeFit}
+                    onChange={(value) => {
+                      setSizeFit(value);
+                      localStorage.setItem('sizeFit', value); // Update local storage
+                    }}
+                  />}
+                />
               </div>
-
             </div>
+
+            <div className='grid grid-cols-1 lg:col-span-5 gap-8 px-6 py-3'>
+              <div className='flex flex-col gap-4 h-fit'>
+                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+                  <div>
+                    <label htmlFor='regularPrice' className='flex justify-start font-medium text-[#9F5216] mt-4'>Regular Price ৳ *</label>
+                    <input id='regularPrice' {...register("regularPrice", { required: true })} className="custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000" placeholder='Enter Product Price' type="number" />
+                    {errors.regularPrice?.type === "required" && (
+                      <p className="text-red-600 text-left">Product Price is required</p>
+                    )}
+                  </div>
+
+                  <div className="flex w-full flex-col">
+                    <Tabs
+                      aria-label="Discount Type"
+                      selectedKey={discountType}
+                      onSelectionChange={handleTabChange}
+                    >
+                      <Tab key="Percentage" title="Percentage" className='text-[#9F5216]'>Discount (%)</Tab>
+                      <Tab key="Flat" title="Flat" className='text-[#9F5216]'>Flat Discount (৳)</Tab>
+                    </Tabs>
+
+                    <input
+                      type="number"
+                      {...register('discountValue')}
+                      className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
+                      placeholder={`Enter ${discountType} Discount`} // Correct placeholder
+                    />
+                  </div>
+                </div>
+
+                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+                  <div>
+                    <label htmlFor={`batchCode`} className='font-medium text-[#9F5216]'>Batch Code *</label>
+                    <input
+                      id={`batchCode`}
+                      autoComplete="off"
+                      {...register(`batchCode`, {
+                        required: 'Batch Code is required',
+                        pattern: {
+                          value: /^[A-Z0-9]*$/,
+                          message: 'Batch Code must be alphanumeric and uppercase',
+                        },
+                      })}
+                      placeholder={`Enter Batch Code`}
+                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mt-2"
+                      type="text"
+                      onChange={(e) => {
+                        // Convert input to uppercase and remove non-alphanumeric characters
+                        e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                      }}
+                    />
+                    {errors.batchCode && (
+                      <p className="text-red-600 text-left">{errors.batchCode.message}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label htmlFor={`weight`} className='font-medium text-[#9F5216]'>Weight (gram)</label>
+                    <input
+                      id={`weight`}
+                      {...register(`weight`)}
+                      placeholder={`Enter Weight (gram)`}
+                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md mt-2"
+                      type="number"
+                    />
+                  </div>
+                </div>
+
+                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+
+                  <label htmlFor='tags' className='flex justify-start font-medium text-[#9F5216]'>Select Tag *</label>
+                  <Controller
+                    name="tags"
+                    control={control}
+                    defaultValue={selectedTags}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <div className="parent-container">
+                        <ReactSelect
+                          {...field}
+                          options={tagList}
+                          isMulti
+                          className="w-full border rounded-md creatable-select-container"
+                          value={selectedTags}
+                          menuPortalTarget={menuPortalTarget}
+                          styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                          menuPlacement="auto"
+                          onChange={(newValue) => {
+                            setSelectedTags(newValue);
+                            field.onChange(newValue);
+                          }}
+                        />
+                      </div>
+                    )}
+                  />
+                  {errors.tags && (
+                    <p className="text-red-600 text-left">Tags are required</p>
+                  )}
+
+                  <label htmlFor='vendors' className='flex justify-start font-medium text-[#9F5216]'>Select Vendor</label>
+                  <Controller
+                    name="vendors"
+                    control={control}
+                    defaultValue={selectedVendors}
+                    render={({ field }) => (
+                      <div className="parent-container">
+                        <ReactSelect
+                          {...field}
+                          options={vendorList}
+                          isMulti
+                          className="w-full border rounded-md creatable-select-container"
+                          value={selectedVendors}
+                          menuPortalTarget={menuPortalTarget}
+                          styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                          menuPlacement="auto"
+                          onChange={(newValue) => {
+                            setSelectedVendors(newValue);
+                            field.onChange(newValue);
+                          }}
+                        />
+                      </div>
+                    )}
+                  />
+
+                  <div className="w-full mx-auto" ref={dropdownRef}>
+                    {/* Search Box */}
+                    <label htmlFor='seasons' className='flex justify-start font-medium text-[#9F5216] pb-2'>Select Collection *</label>
+
+                    <input
+                      type="text"
+                      value={isDropdownOpen ? searchTerm : selectedSeasons.join(", ")} // Show selected IDs when closed
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onClick={() => setIsDropdownOpen(true)} // dropdown on input click
+                      placeholder="Search & Select by Seasonal Collection"
+                      className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#9F5216] overflow-hidden text-ellipsis whitespace-nowrap"
+                    />
+
+                    {/* Dropdown list for search results */}
+                    {isDropdownOpen && (
+                      <div className="border flex flex-col gap-1.5 p-2 max-h-64 overflow-y-auto rounded-lg">
+                        {filteredSeasons?.length > 0 ? (
+                          filteredSeasons?.map((season) => (
+                            <div
+                              key={season?._id}
+                              className={`flex cursor-pointer items-center justify-between rounded-lg border p-1 transition-[border-color,background-color] duration-300 ease-in-out hover:border-[#d7ecd2] hover:bg-[#fafff9] ${selectedSeasons?.includes(season?.seasonName) ? 'border-[#d7ecd2] bg-[#fafff9]' : 'border-neutral-100'}`}
+                              onClick={() => toggleSeasonSelection(season?.seasonName)}
+                            >
+                              <div className='flex items-center gap-1'>
+                                <Image
+                                  width={4000}
+                                  height={4000}
+                                  src={season?.imageUrl}
+                                  alt="season-imageUrl"
+                                  className="h-8 w-8 object-cover rounded"
+                                />
+                                <span className="ml-2">{season?.seasonName}</span>
+                              </div>
+                              <HiCheckCircle
+                                className={`pointer-events-none size-7 text-[#60d251] transition-opacity duration-300 ease-in-out ${selectedSeasons?.includes(season?.seasonName) ? "opacity-100" : "opacity-0"}`}
+                              />
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-gray-500">No collection found</p>
+                        )}
+                      </div>
+                    )}
+
+                    {seasonError && <p className="text-red-600 text-left">Season is required</p>}
+
+                  </div>
+
+                  <div className="w-full mx-auto" ref={dropdownRefForCompleteOutfit}>
+
+                    {/* Search Box */}
+                    <label htmlFor='completeOutfit' className='flex justify-start font-medium text-[#9F5216] pb-2'>Complete Your Outfit Section</label>
+
+                    <input
+                      type="text"
+                      value={isDropdownOpenForCompleteOutfit ? searchTermForCompleteOutfit : selectedProductIds.map(product => product.productId).join(", ")} // Show selected IDs when closed
+                      onChange={(e) => setSearchTermForCompleteOutfit(e.target.value)}
+                      onClick={() => setIsDropdownOpenForCompleteOutfit(true)} // Toggle dropdown on input click
+                      placeholder="Search & Select by Seasonal Collection"
+                      className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#9F5216] overflow-hidden text-ellipsis whitespace-nowrap"
+                    />
+
+                    {/* Dropdown list for search results */}
+                    {isDropdownOpenForCompleteOutfit && (
+                      <div className="border flex flex-col gap-1.5 p-2 max-h-64 overflow-y-auto rounded-lg">
+                        {filteredProducts?.length > 0 ? (
+                          filteredProducts?.map((product) => (
+                            <div
+                              key={product?._id}
+                              className={`flex cursor-pointer items-center justify-between rounded-lg border p-1 transition-[border-color,background-color] duration-300 ease-in-out hover:border-[#d7ecd2] hover:bg-[#fafff9] ${selectedProductIds?.map(product => product?.productId)?.includes(product?.productId) ? 'border-[#d7ecd2] bg-[#fafff9]' : 'border-neutral-100'}`}
+                              onClick={() => toggleProductSelection(product?.productId, product?.productTitle, product?._id, product?.thumbnailImageUrl)}>
+                              <div className='flex items-center gap-1'>
+                                <Image
+                                  width={4000}
+                                  height={4000}
+                                  src={product?.thumbnailImageUrl}
+                                  alt="season-imageUrl"
+                                  className="h-8 w-8 object-cover rounded"
+                                />
+                                <div className='flex flex-col'>
+                                  <span className="ml-2 font-bold">{product?.productId}</span>
+                                  <span className="ml-2 text-sm">{product?.productTitle}</span>
+                                </div>
+                              </div>
+                              <HiCheckCircle
+                                className={`pointer-events-none size-7 text-[#60d251] transition-opacity duration-300 ease-in-out ${selectedProductIds?.map(product => product?.productId)?.includes(product?.productId) ? "opacity-100" : "opacity-0"}`}
+                              />
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-gray-500">No product found</p>
+                        )}
+                      </div>
+                    )}
+
+                  </div>
+
+                </div>
+
+                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+
+                  <div className='flex flex-col gap-4'>
+                    <input
+                      id='imageUpload'
+                      type='file'
+                      className='hidden'
+                      onChange={handleImageChange}
+                    />
+                    <label
+                      htmlFor='imageUpload'
+                      className={`mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed hover:bg-blue-50 ${dragging ? "border-blue-300 bg-blue-50" : "border-gray-400 bg-white"
+                        } p-6 cursor-pointer`}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                    >
+                      <MdOutlineFileUpload size={60} />
+                      <div className='space-y-1.5 text-center'>
+                        <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
+                          Upload or Drag Media
+                        </h5>
+                        <p className='text-sm text-gray-500'>
+                          Photo Should be in PNG, JPEG or JPG format
+                        </p>
+                      </div>
+                    </label>
+                    {sizeError && (
+                      <p className="text-red-600 text-center">Select image</p>
+                    )}
+                    {image && (
+                      <div className='relative'>
+                        <Image
+                          src={image.src || image}
+                          alt='Uploaded image'
+                          height={3000}
+                          width={3000}
+                          className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
+                        />
+                        <button
+                          onClick={handleImageRemove}
+                          className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                        >
+                          <RxCross2 size={24} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+
           </div>
 
-        </div>
+          <div className='flex justify-end gap-6 px-6 py-8'>
 
-        <div className='flex justify-end gap-6 px-6 py-8'>
+            <button type="button" onClick={handleSubmit(onSaveForNow)} className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700'>
+              Save For Now <FiSave size={19} />
+            </button>
 
-          <button type="button" onClick={handleSubmit(onSaveForNow)} className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700'>
-            Save For Now <FiSave size={19} />
-          </button>
+            <button type='submit' className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'>
+              Next Step <FaArrowRight />
+            </button>
 
-          <button type='submit' className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'>
-            Next Step <FaArrowRight />
-          </button>
+          </div>
 
-        </div>
+        </form>
 
-      </form>
+        <ExitConfirmationModal
+          isOpen={showModal}
+          onClose={handleCloseModal}  // Handle "No" action
+          onConfirm={handleConfirmExit}  // Handle "Yes" action
+        />
 
-      <ExitConfirmationModal
-        isOpen={showModal}
-        onClose={handleCloseModal}  // Handle "No" action
-        onConfirm={handleConfirmExit}  // Handle "Yes" action
-      />
-
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 };
 

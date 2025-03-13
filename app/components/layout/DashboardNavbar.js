@@ -56,58 +56,61 @@ const DashboardNavbar = () => {
   return (
     <div>
 
-      {/* Top Navbar - XL to 2XL Device */}
-      <div className="hidden xl:flex items-center justify-between px-6 py-2">
+      <div className="bg-gray-50">
+        {/* Top Navbar - XL to 2XL Device */}
+        <div className="max-w-screen-2xl mx-auto hidden xl:flex items-center justify-between px-4 pt-2 pb-1">
 
-        <div>
+          <div>
+
+          </div>
+          {status === "authenticated" &&
+            <Dropdown placement="bottom-end">
+              <DropdownTrigger>
+                <Avatar
+                  isBordered
+                  as="button"
+                  size="sm"
+                  className="transition-transform"
+                  icon={<AvatarIcon />}
+                />
+              </DropdownTrigger>
+              <DropdownMenu aria-label="Profile Actions" variant="flat">
+                <DropdownItem showDivider key="profile" className="h-14 gap-2">
+                  <p className="font-semibold">Logged in as</p>
+                  <p className="font-semibold">{existingUserData?.email}</p>
+                </DropdownItem>
+                {session && (
+                  <DropdownItem
+                    key="Update Password"
+                    textValue="Update Password"
+                    startContent={<CiLock />}
+                    className="relative"
+                  >
+                    Update Password
+                    <TransitionLink
+                      className="absolute inset-0"
+                      href="/dash-board/password-change"
+                    ></TransitionLink>
+                  </DropdownItem>
+                )}
+
+                {session && (
+                  <DropdownItem
+                    startContent={<PiSignOutLight />}
+                    key="logout"
+                    textValue="logout"
+                    color="danger"
+                    onClick={handleLogout}
+                  >
+                    Log Out
+                  </DropdownItem>
+                )}
+
+              </DropdownMenu>
+            </Dropdown>
+          }
 
         </div>
-        {status === "authenticated" &&
-          <Dropdown placement="bottom-end">
-            <DropdownTrigger>
-              <Avatar
-                isBordered
-                as="button"
-                className="transition-transform"
-                icon={<AvatarIcon />}
-              />
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Profile Actions" variant="flat">
-              <DropdownItem showDivider key="profile" className="h-14 gap-2">
-                <p className="font-semibold">Logged in as</p>
-                <p className="font-semibold">{existingUserData?.email}</p>
-              </DropdownItem>
-              {session && (
-                <DropdownItem
-                  key="Update Password"
-                  textValue="Update Password"
-                  startContent={<CiLock />}
-                  className="relative"
-                >
-                  Update Password
-                  <TransitionLink
-                    className="absolute inset-0"
-                    href="/dash-board/password-change"
-                  ></TransitionLink>
-                </DropdownItem>
-              )}
-
-              {session && (
-                <DropdownItem
-                  startContent={<PiSignOutLight />}
-                  key="logout"
-                  textValue="logout"
-                  color="danger"
-                  onClick={handleLogout}
-                >
-                  Log Out
-                </DropdownItem>
-              )}
-
-            </DropdownMenu>
-          </Dropdown>
-        }
-
       </div>
 
       {/* Top Navbar - Large to Mobile Device*/}

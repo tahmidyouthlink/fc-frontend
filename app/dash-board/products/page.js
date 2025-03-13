@@ -1,10 +1,32 @@
+"use client";
 import Link from 'next/link';
 import { FaListAlt, FaPlusCircle } from "react-icons/fa";
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
+import { useSession } from 'next-auth/react';
+import { useAuth } from '@/app/contexts/auth';
+import { useEffect, useState } from 'react';
+import Loading from '@/app/components/shared/Loading/Loading';
 
 const Products = () => {
+
+  const { data: session, status } = useSession();
+  const { existingUserData, isUserLoading } = useAuth();
+  const [isAddButtonAllowed, setIsAddButtonAllowed] = useState(false);
+  const [isViewEditButtonAllowed, setIsViewEditButtonAllowed] = useState(false);
+
+  useEffect(() => {
+    // Fetch user data if needed or check the permission dynamically
+    if (existingUserData) {
+      // Check if the user has permission to add a product
+      setIsAddButtonAllowed(existingUserData?.permissions?.["Products"]?.actions?.['Add Product'] ?? false);
+      setIsViewEditButtonAllowed(existingUserData?.permissions?.["Products"]?.actions?.['View/Edit Product'] ?? false);
+    }
+  }, [existingUserData]);
+
+  if (isUserLoading || status === "loading" || !session) return <Loading />;
+
   return (
     <div className='relative'>
 
@@ -29,24 +51,48 @@ const Products = () => {
 
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-10 py-8">
         <div className="w-full max-w-screen-lg space-y-8 lg:space-y-10">
-          <Link
-            href="/dash-board/products/add-product"
-            className="relative w-full h-52 md:h-60 lg:h-72 xl:h-80 border-2 border-dashed border-gray-600 bg-white text-gray-600 text-2xl sm:text-3xl md:text-4xl font-extrabold rounded-lg shadow-lg flex items-center justify-center gap-4 sm:gap-5 md:gap-6 transition-all duration-300 group hover:bg-[#ffddc2] hover:text-gray-800 hover:border-gray-800 hover:shadow-xl"
-          >
-            <FaPlusCircle className="text-4xl sm:text-5xl md:text-6xl transition-transform transform group-hover:scale-110 group-hover:text-gray-800 animate-pulse" />
-            <span className="relative transition-transform duration-300 group-hover:text-gray-800 group-hover:translate-x-2">
-              Add Product
-            </span>
-          </Link>
-          <Link
-            href="/dash-board/products/existing-products"
-            className="relative w-full h-52 md:h-60 lg:h-72 xl:h-80 border-2 border-dashed border-gray-600 bg-white text-gray-600 text-2xl sm:text-3xl md:text-4xl font-extrabold rounded-lg shadow-lg flex items-center justify-center gap-4 sm:gap-5 md:gap-6 transition-all duration-300 group hover:bg-[#d4ffce] hover:text-gray-800 hover:border-gray-800 hover:shadow-xl"
-          >
-            <FaListAlt className="text-4xl sm:text-5xl md:text-6xl transition-transform transform group-hover:scale-110 group-hover:text-gray-800 animate-pulse" />
-            <span className="relative transition-transform duration-300 group-hover:text-gray-800 group-hover:translate-x-2">
-              View/Edit Products
-            </span>
-          </Link>
+
+          {isAddButtonAllowed ? (
+            <Link
+              href="/dash-board/products/add-product"
+              className="relative w-full h-52 md:h-60 lg:h-72 xl:h-80 border-2 border-dashed border-gray-600 bg-white text-gray-600 text-2xl sm:text-3xl md:text-4xl font-extrabold rounded-lg shadow-lg flex items-center justify-center gap-4 sm:gap-5 md:gap-6 transition-all duration-300 group hover:bg-[#ffddc2] hover:text-gray-800 hover:border-gray-800 hover:shadow-xl"
+            >
+              <FaPlusCircle className="text-4xl sm:text-5xl md:text-6xl transition-transform transform group-hover:scale-110 group-hover:text-gray-800 animate-pulse" />
+              <span className="relative transition-transform duration-300 group-hover:text-gray-800 group-hover:translate-x-2">
+                Add Product
+              </span>
+            </Link>
+          ) : (
+            <div
+              className="relative w-full h-52 md:h-60 lg:h-72 xl:h-80 border-2 border-dashed border-gray-600 bg-white text-gray-600 text-2xl sm:text-3xl md:text-4xl font-extrabold rounded-lg shadow-lg flex items-center justify-center gap-4 sm:gap-5 md:gap-6 transition-all duration-300 group hover:bg-[#ffddc2] hover:text-gray-800 hover:border-gray-800 hover:shadow-xl"
+            >
+              <FaPlusCircle className="text-4xl sm:text-5xl md:text-6xl transition-transform transform group-hover:scale-110 group-hover:text-gray-800 animate-pulse" />
+              <span className="relative transition-transform duration-300 group-hover:text-gray-800 group-hover:translate-x-2">
+                Add Product
+              </span>
+            </div>
+          )}
+
+          {isViewEditButtonAllowed ? (
+            <Link
+              href="/dash-board/products/existing-products"
+              className="relative w-full h-52 md:h-60 lg:h-72 xl:h-80 border-2 border-dashed border-gray-600 bg-white text-gray-600 text-2xl sm:text-3xl md:text-4xl font-extrabold rounded-lg shadow-lg flex items-center justify-center gap-4 sm:gap-5 md:gap-6 transition-all duration-300 group hover:bg-[#d4ffce] hover:text-gray-800 hover:border-gray-800 hover:shadow-xl"
+            >
+              <FaListAlt className="text-4xl sm:text-5xl md:text-6xl transition-transform transform group-hover:scale-110 group-hover:text-gray-800 animate-pulse" />
+              <span className="relative transition-transform duration-300 group-hover:text-gray-800 group-hover:translate-x-2">
+                View/Edit Products
+              </span>
+            </Link>
+          ) : (
+            <div className="relative w-full h-52 md:h-60 lg:h-72 xl:h-80 border-2 border-dashed border-gray-600 bg-white text-gray-600 text-2xl sm:text-3xl md:text-4xl font-extrabold rounded-lg shadow-lg flex items-center justify-center gap-4 sm:gap-5 md:gap-6 transition-all duration-300 group hover:bg-[#d4ffce] hover:text-gray-800 hover:border-gray-800 hover:shadow-xl"
+            >
+              <FaListAlt className="text-4xl sm:text-5xl md:text-6xl transition-transform transform group-hover:scale-110 group-hover:text-gray-800 animate-pulse" />
+              <span className="relative transition-transform duration-300 group-hover:text-gray-800 group-hover:translate-x-2">
+                View/Edit Products
+              </span>
+            </div>
+          )}
+
         </div>
       </div>
     </div>

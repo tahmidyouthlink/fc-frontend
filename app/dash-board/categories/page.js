@@ -14,6 +14,8 @@ import { FaPlus, FaStar } from "react-icons/fa6";
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
+import { useSession } from 'next-auth/react';
+import { useAuth } from '@/app/contexts/auth';
 
 const CategoriesOverview = () => {
   const axiosPublic = useAxiosPublic();
@@ -22,6 +24,23 @@ const CategoriesOverview = () => {
   const [expandedCategory, setExpandedCategory] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedFeaturedCategories, setSelectedFeaturedCategories] = useState([]);
+  const { data: session, status } = useSession();
+  const { existingUserData, isUserLoading } = useAuth();
+  const [isAddButtonAllowed, setIsAddButtonAllowed] = useState(false);
+  const [isDeleteButtonAllowed, setIsDeleteButtonAllowed] = useState(false);
+  const [isFeaturedButtonAllowed, setIsFeaturedButtonAllowed] = useState(false);
+  const [isEditButtonAllowed, setIsEditButtonAllowed] = useState(false);
+
+  useEffect(() => {
+    // Fetch user data if needed or check the permission dynamically
+    if (existingUserData) {
+      // Check if the user has permission to add a product
+      setIsAddButtonAllowed(existingUserData?.permissions?.["Categories"]?.actions?.['Create New Category'] ?? false);
+      setIsFeaturedButtonAllowed(existingUserData?.permissions?.["Categories"]?.actions?.['Select Featured Category'] ?? false);
+      setIsEditButtonAllowed(existingUserData?.permissions?.["Categories"]?.actions?.['Edit Category'] ?? false);
+      setIsDeleteButtonAllowed(existingUserData?.permissions?.["Categories"]?.actions?.['Delete Category'] ?? false);
+    }
+  }, [existingUserData]);
 
   useEffect(() => {
     if (isOpen) {
@@ -145,7 +164,7 @@ const CategoriesOverview = () => {
     }
   };
 
-  if (isCategoryPending) {
+  if (isCategoryPending || isUserLoading || status === "loading" || !session) {
     return <Loading />
   }
 
@@ -173,12 +192,27 @@ const CategoriesOverview = () => {
 
       <div className='sticky top-0 z-10 bg-gray-50 flex items-center flex-wrap gap-4 justify-between max-w-screen-2xl mx-auto px-6 pt-6'>
         <h1 className='font-semibold text-center text-[16px] lg:text-3xl text-neutral-700'>CATEGORY MANAGEMENT</h1>
-        <button onClick={handleSelectFeaturedCategory} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[12px] lg:text-[14px] text-neutral-700">
-          <FaStar size={17} className='text-neutral-700' /> Select Featured Category
-        </button>
-        <button onClick={() => router.push('/dash-board/categories/add-category')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[12px] lg:text-[14px] text-neutral-700">
-          <FaPlus size={15} className='text-neutral-700' /> Add
-        </button>
+
+        {isFeaturedButtonAllowed ? (
+          <button onClick={handleSelectFeaturedCategory} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[12px] lg:text-[14px] text-neutral-700">
+            <FaStar size={17} className='text-neutral-700' /> Select Featured Category
+          </button>
+        ) : (
+          <button className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[12px] lg:text-[14px] text-neutral-700">
+            <FaStar size={17} className='text-neutral-700' /> Select Featured Category
+          </button>
+        )}
+
+        {isAddButtonAllowed ? (
+          <button onClick={() => router.push('/dash-board/categories/add-category')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[12px] lg:text-[14px] text-neutral-700">
+            <FaPlus size={15} className='text-neutral-700' /> Add
+          </button>
+        ) : (
+          <button className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[12px] lg:text-[14px] text-neutral-700">
+            <FaPlus size={15} className='text-neutral-700' /> Add
+          </button>
+        )}
+
       </div>
 
       <div className='max-w-screen-2xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 px-6 relative'>
@@ -189,14 +223,26 @@ const CategoriesOverview = () => {
               <div className='flex justify-end items-center gap-2'>
 
                 {/* Edit Button */}
-                <button onClick={() => router.push(`/dash-board/categories/${category._id}`)}>
-                  <span className='flex items-center gap-1.5 rounded-md bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4'><AiOutlineEdit size={16} /> Edit </span>
-                </button>
+                {isEditButtonAllowed ? (
+                  <button onClick={() => router.push(`/dash-board/categories/${category._id}`)}>
+                    <span className='flex items-center gap-1.5 rounded-md bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4'><AiOutlineEdit size={16} /> Edit </span>
+                  </button>
+                ) : (
+                  <button>
+                    <span className='flex items-center gap-1.5 rounded-md bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4'><AiOutlineEdit size={16} /> Edit </span>
+                  </button>
+                )}
 
                 {/* Delete Button */}
-                <button onClick={() => handleDelete(category?._id)}>
-                  <span className='flex items-center gap-1.5 rounded-md bg-red-50 p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-red-100 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs'> <RiDeleteBinLine size={16} />Delete </span>
-                </button>
+                {isDeleteButtonAllowed ? (
+                  <button onClick={() => handleDelete(category?._id)}>
+                    <span className='flex items-center gap-1.5 rounded-md bg-red-50 p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-red-100 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs'> <RiDeleteBinLine size={16} />Delete </span>
+                  </button>
+                ) : (
+                  <button>
+                    <span className='flex items-center gap-1.5 rounded-md bg-red-50 p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-red-100 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs'> <RiDeleteBinLine size={16} />Delete </span>
+                  </button>
+                )}
 
               </div>
             </div>
@@ -256,7 +302,7 @@ const CategoriesOverview = () => {
         </ModalContent>
       </Modal>
 
-    </div>
+    </div >
   );
 };
 

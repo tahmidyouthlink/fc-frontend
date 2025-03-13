@@ -216,6 +216,8 @@ const SideNavbar = ({ onClose }) => {
           {
             allList?.map((item, index) => {
 
+              if (item?.name === "Settings" && !item?.permission) return null;
+
               return item?.permission ? (
 
                 <div key={index}>
@@ -282,7 +284,8 @@ const SideNavbar = ({ onClose }) => {
                       transition={{ duration: 0.5, ease: "easeInOut" }} className="flex flex-col items-center w-full">
                       {item?.links?.map((linkItem, linkIndex) => {
 
-                        if (!linkItem.permission) return null;
+                        // Allow all links under Settings
+                        if (item?.name !== "Settings" && !linkItem?.permission) return null;
 
                         return (
                           linkItem?.links ? (
@@ -308,7 +311,9 @@ const SideNavbar = ({ onClose }) => {
                                   animate={{ height: activeSubItem === linkItem.name ? "auto" : 0, opacity: activeSubItem === linkItem.name ? 1 : 0 }}
                                   transition={{ duration: 0.5, ease: "easeInOut" }} className="flex flex-col items-center w-full">
                                   {linkItem?.links?.map((subLink, subIndex) => {
-                                    if (!subLink.permission) return null;
+
+                                    if (item?.name !== "Settings" && !subLink.permission) return null;
+
                                     return (
                                       <Link href={subLink.link} key={subIndex} legacyBehavior>
                                         <a
