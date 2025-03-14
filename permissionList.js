@@ -33,14 +33,16 @@ export const permissionsList = {
     "access": false,
     "actions": {
       "Create New Purchase Order": false,
-      "Edit Purchase Order": false
+      "Edit Purchase Order": false,
+      "Delete Purchase Order": false,
     }
   },
   "Transfers": {
     "access": false,
     "actions": {
       "Create New Transfer Order": false,
-      "Edit Transfer Order": false
+      "Edit Transfer Order": false,
+      "Delete Transfer Order": false
     }
   },
   "Categories": {
@@ -106,8 +108,12 @@ export const permissionsList = {
     "actions": {
       "Create Promo": false,
       "Edit Existing Promo": false,
+      "Delete Existing Promo": false,
+      "Allow Promo Toggle": false,
       "Create Offer": false,
       "Edit Existing Offer": false,
+      "Delete Existing Offer": false,
+      "Allow Offer Toggle": false,
       "Marketing Content": false,
       "Homepage Content": false,
       "Discounted Date range filtering": false

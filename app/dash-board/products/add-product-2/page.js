@@ -18,6 +18,7 @@ import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import CustomSwitch from '@/app/components/layout/CustomSwitch';
+import ProtectedRoute from '@/app/components/ProtectedRoutes/ProtectedRoute';
 
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
@@ -502,242 +503,244 @@ const SecondStepOfAddProduct = () => {
   }
 
   return (
-    <div className='bg-gray-50 min-h-screen px-6 relative'>
+    <ProtectedRoute pageName="Products" requiredPermission="Add Product">
+      <div className='bg-gray-50 min-h-screen px-6 relative'>
 
-      <div
-        style={{
-          backgroundImage: `url(${arrivals1.src})`,
-        }}
-        className='absolute inset-0 z-0 hidden md:block bg-no-repeat xl:left-[15%] 2xl:left-[30%] bg-[length:1600px_900px] -top-[90px]'
-      />
+        <div
+          style={{
+            backgroundImage: `url(${arrivals1.src})`,
+          }}
+          className='absolute inset-0 z-0 hidden md:block bg-no-repeat xl:left-[15%] 2xl:left-[30%] bg-[length:1600px_900px] -top-[90px]'
+        />
 
-      <div
-        style={{
-          backgroundImage: `url(${arrivals2.src})`,
-        }}
-        className='absolute inset-0 z-0 bg-contain bg-center xl:-top-28 w-full bg-no-repeat'
-      />
+        <div
+          style={{
+            backgroundImage: `url(${arrivals2.src})`,
+          }}
+          className='absolute inset-0 z-0 bg-contain bg-center xl:-top-28 w-full bg-no-repeat'
+        />
 
-      <div
-        style={{
-          backgroundImage: `url(${arrowSvgImage.src})`,
-        }}
-        className='absolute inset-0 z-0 top-8 xl:top-12 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[40%] 2xl:left-[41%] bg-no-repeat'
-      />
+        <div
+          style={{
+            backgroundImage: `url(${arrowSvgImage.src})`,
+          }}
+          className='absolute inset-0 z-0 top-8 xl:top-12 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[40%] 2xl:left-[41%] bg-no-repeat'
+        />
 
-      <div className='max-w-screen-2xl mx-auto py-3 md:py-4 sticky top-0 z-10 bg-gray-50'>
-        <div className='flex flex-wrap lg:flex-nowrap items-center justify-between'>
-          <div className='flex items-center w-full'>
-            <h3 className='w-full font-semibold text-xl lg:text-2xl'>INVENTORY VARIANTS</h3>
-            <h3 className='font-medium text-sm md:text-base w-full'>Primary Location: <strong>{primaryLocationName}</strong></h3>
-          </div>
-          <div className='flex flex-wrap lg:flex-nowrap items-center justify-between w-full'>
-            <div className="flex items-center gap-2 w-full">
-              <label htmlFor="show-inventory" className="text-sm font-medium">
-                <span>{showInventory ? "Inventory Details Visible" : "Show Inventory Details"}</span>
-              </label>
-
-              <CustomSwitch
-                checked={showInventory}
-                onChange={handleToggleChange}
-                size="md"
-                color="primary"
-              />
+        <div className='max-w-screen-2xl mx-auto py-3 md:py-4 sticky top-0 z-10 bg-gray-50'>
+          <div className='flex flex-wrap lg:flex-nowrap items-center justify-between'>
+            <div className='flex items-center w-full'>
+              <h3 className='w-full font-semibold text-xl lg:text-2xl'>INVENTORY VARIANTS</h3>
+              <h3 className='font-medium text-sm md:text-base w-full'>Primary Location: <strong>{primaryLocationName}</strong></h3>
             </div>
-            <Link
-              className="flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
-              href="/dash-board/products"
-              onClick={handleGoBackClick}  // Trigger the modal on click
-            >
-              <span className="border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2">
-                <FaArrowLeft />
-              </span>
-              Go Back
-            </Link>
-          </div>
-        </div>
-      </div>
-      <form onSubmit={handleSubmit(onSubmit)} className='min-h-[91vh] flex flex-col justify-between max-w-screen-2xl mx-auto relative'>
-        <div>
-          <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 pt-3 pb-12'>
-            {productVariants?.map((variant, index) => (
-              <div key={index} className='flex flex-col bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-                <div className='flex items-center gap-2 md:gap-4 h-fit'>
-                  <div className='w-1/3'>
-                    <label className='font-medium text-[#9F5216]'>Color</label>
-                    <input
-                      type="text"
-                      value={variant.color.label}
-                      className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                      disabled
-                    />
-                  </div>
-                  <div className='w-1/3'>
-                    <label className='font-medium text-[#9F5216]'>Size</label>
-                    <input
-                      type="text"
-                      value={variant.size}
-                      className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                      disabled
-                    />
-                  </div>
-                  <div className='md:w-1/3'>
-                    <label htmlFor={`sku-${index}`} className='font-medium text-[#9F5216]'>SKU *</label>
-                    <input
-                      id={`sku-${index}`}
-                      autocomplete="off"
-                      {...register(`sku-${index}`, { required: true })}
-                      value={variant.sku}
-                      onChange={(e) => handleVariantChange(index, 'sku', e.target.value)}
-                      className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                      type="number"
-                    />
-                    {errors[`sku-${index}`] && (
-                      <p className="text-red-600 text-left">SKU is required</p>
-                    )}
-                  </div>
-                </div>
+            <div className='flex flex-wrap lg:flex-nowrap items-center justify-between w-full'>
+              <div className="flex items-center gap-2 w-full">
+                <label htmlFor="show-inventory" className="text-sm font-medium">
+                  <span>{showInventory ? "Inventory Details Visible" : "Show Inventory Details"}</span>
+                </label>
 
-                <div className='flex flex-col lg:flex-row gap-3 mt-6 h-fit'>
-                  <input
-                    id={`imageUpload-${index}`}
-                    type='file'
-                    className='hidden'
-                    multiple
-                    onChange={(event) => handleImagesChange(event, index)}
-                  />
-                  {variant?.imageUrls?.length < 6 && (
-                    <label
-                      htmlFor={`imageUpload-${index}`}
-                      className='flex flex-col items-center justify-center space-y-3 rounded-xl border-2 border-dashed border-gray-400 px-3 2xl:px-5 py-6 min-h-[350px] max-h-[350px] bg-white hover:bg-blue-50 cursor-pointer'
-                      onDrop={(event) => handleDrop(event, index)}
-                      onDragOver={handleDragOver}
-                    >
-                      <LuImagePlus size={30} />
-                      <div className='space-y-1.5 text-center'>
-                        <h5 className='whitespace-nowrap text-xs font-medium tracking-tight'>
-                          <span className='text-blue-500 underline'>Click to upload</span> or <br />
-                          drag and drop
-                        </h5>
-                      </div>
-                    </label>
-                  )}
-                  {sizeError && (
-                    <p className="text-red-600 text-center">Please select at least one image</p>
-                  )}
-
-                  <div>
-                    <DragDropContext onDragEnd={(result) => handleOnDragEnd(result, index)}>
-                      <Droppable droppableId="row1" direction="horizontal">
-                        {(provided) => (
-                          <div
-                            className="grid grid-cols-3 gap-4"
-                            {...provided.droppableProps}
-                            ref={provided.innerRef}
-                          >
-                            {variant.imageUrls?.slice(0, 3).map((url, imgIndex) => (
-                              <Draggable key={url} draggableId={`row1-${url}`} index={imgIndex}>
-                                {(provided) => (
-                                  <li
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    className="flex items-center p-2 bg-white border border-gray-300 rounded-md relative"
-                                  >
-                                    <Image
-                                      src={url}
-                                      alt={`Variant ${index} Image ${imgIndex}`}
-                                      height={3000}
-                                      width={3000}
-                                      className="w-full h-auto min-h-[150px] max-h-[150px] rounded-md object-cover"
-                                    />
-                                    <button
-                                      onClick={() => handleImageRemove(index, imgIndex)}
-                                      className="absolute top-1 right-1 rounded-full p-0.5 bg-red-600 hover:bg-red-700 text-white font-bold"
-                                    >
-                                      <RxCross2 size={20} />
-                                    </button>
-                                  </li>
-                                )}
-                              </Draggable>
-                            ))}
-                            {provided.placeholder}
-                          </div>
-                        )}
-                      </Droppable>
-
-                      <Droppable droppableId="row2" direction="horizontal">
-                        {(provided) => (
-                          <div
-                            className="grid grid-cols-3 gap-4 mt-4"
-                            {...provided.droppableProps}
-                            ref={provided.innerRef}
-                          >
-                            {variant.imageUrls?.slice(3).map((url, imgIndex) => (
-                              <Draggable key={url} draggableId={`row2-${url}`} index={imgIndex + 3}>
-                                {(provided) => (
-                                  <li
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    className="flex items-center p-2 bg-white border border-gray-300 rounded-md relative"
-                                  >
-                                    <Image
-                                      src={url}
-                                      alt={`Variant ${index} Image ${imgIndex + 3}`}
-                                      height={3000}
-                                      width={3000}
-                                      className="w-full h-auto min-h-[150px] max-h-[150px] rounded-md object-contain"
-                                    />
-                                    <button
-                                      onClick={() => handleImageRemove(index, imgIndex + 3)}
-                                      className="absolute top-1 right-1 rounded-full p-0.5 bg-red-600 hover:bg-red-700 text-white font-bold"
-                                    >
-                                      <RxCross2 size={20} />
-                                    </button>
-                                  </li>
-                                )}
-                              </Draggable>
-                            ))}
-                            {provided.placeholder}
-                          </div>
-                        )}
-                      </Droppable>
-                    </DragDropContext>
-
-                  </div>
-
-                </div>
-
+                <CustomSwitch
+                  checked={showInventory}
+                  onChange={handleToggleChange}
+                  size="md"
+                  color="primary"
+                />
               </div>
-            ))}
-          </div>
-
-        </div>
-
-        <div className='flex flex-wrap gap-6 justify-between py-8'>
-          <Link href='/dash-board/products/add-product' className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'>
-            <FaArrowLeft /> Previous Step
-          </Link>
-          <div className='flex items-center gap-6'>
-            <button type="button" onClick={handleSubmit(onSaveForNow)} className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700'>
-              Save For Now <FiSave size={19} />
-            </button>
-            <button type='submit' className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'>
-              Next Step <FaArrowRight />
-            </button>
+              <Link
+                className="flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
+                href="/dash-board/products"
+                onClick={handleGoBackClick}  // Trigger the modal on click
+              >
+                <span className="border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2">
+                  <FaArrowLeft />
+                </span>
+                Go Back
+              </Link>
+            </div>
           </div>
         </div>
+        <form onSubmit={handleSubmit(onSubmit)} className='min-h-[91vh] flex flex-col justify-between max-w-screen-2xl mx-auto relative'>
+          <div>
+            <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 pt-3 pb-12'>
+              {productVariants?.map((variant, index) => (
+                <div key={index} className='flex flex-col bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+                  <div className='flex items-center gap-2 md:gap-4 h-fit'>
+                    <div className='w-1/3'>
+                      <label className='font-medium text-[#9F5216]'>Color</label>
+                      <input
+                        type="text"
+                        value={variant.color.label}
+                        className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                        disabled
+                      />
+                    </div>
+                    <div className='w-1/3'>
+                      <label className='font-medium text-[#9F5216]'>Size</label>
+                      <input
+                        type="text"
+                        value={variant.size}
+                        className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                        disabled
+                      />
+                    </div>
+                    <div className='md:w-1/3'>
+                      <label htmlFor={`sku-${index}`} className='font-medium text-[#9F5216]'>SKU *</label>
+                      <input
+                        id={`sku-${index}`}
+                        autocomplete="off"
+                        {...register(`sku-${index}`, { required: true })}
+                        value={variant.sku}
+                        onChange={(e) => handleVariantChange(index, 'sku', e.target.value)}
+                        className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                        type="number"
+                      />
+                      {errors[`sku-${index}`] && (
+                        <p className="text-red-600 text-left">SKU is required</p>
+                      )}
+                    </div>
+                  </div>
 
-      </form>
+                  <div className='flex flex-col lg:flex-row gap-3 mt-6 h-fit'>
+                    <input
+                      id={`imageUpload-${index}`}
+                      type='file'
+                      className='hidden'
+                      multiple
+                      onChange={(event) => handleImagesChange(event, index)}
+                    />
+                    {variant?.imageUrls?.length < 6 && (
+                      <label
+                        htmlFor={`imageUpload-${index}`}
+                        className='flex flex-col items-center justify-center space-y-3 rounded-xl border-2 border-dashed border-gray-400 px-3 2xl:px-5 py-6 min-h-[350px] max-h-[350px] bg-white hover:bg-blue-50 cursor-pointer'
+                        onDrop={(event) => handleDrop(event, index)}
+                        onDragOver={handleDragOver}
+                      >
+                        <LuImagePlus size={30} />
+                        <div className='space-y-1.5 text-center'>
+                          <h5 className='whitespace-nowrap text-xs font-medium tracking-tight'>
+                            <span className='text-blue-500 underline'>Click to upload</span> or <br />
+                            drag and drop
+                          </h5>
+                        </div>
+                      </label>
+                    )}
+                    {sizeError && (
+                      <p className="text-red-600 text-center">Please select at least one image</p>
+                    )}
 
-      <ExitConfirmationModal
-        isOpen={showModal}
-        onClose={handleCloseModal}  // Handle "No" action
-        onConfirm={handleConfirmExit}  // Handle "Yes" action
-      />
+                    <div>
+                      <DragDropContext onDragEnd={(result) => handleOnDragEnd(result, index)}>
+                        <Droppable droppableId="row1" direction="horizontal">
+                          {(provided) => (
+                            <div
+                              className="grid grid-cols-3 gap-4"
+                              {...provided.droppableProps}
+                              ref={provided.innerRef}
+                            >
+                              {variant.imageUrls?.slice(0, 3).map((url, imgIndex) => (
+                                <Draggable key={url} draggableId={`row1-${url}`} index={imgIndex}>
+                                  {(provided) => (
+                                    <li
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      {...provided.dragHandleProps}
+                                      className="flex items-center p-2 bg-white border border-gray-300 rounded-md relative"
+                                    >
+                                      <Image
+                                        src={url}
+                                        alt={`Variant ${index} Image ${imgIndex}`}
+                                        height={3000}
+                                        width={3000}
+                                        className="w-full h-auto min-h-[150px] max-h-[150px] rounded-md object-cover"
+                                      />
+                                      <button
+                                        onClick={() => handleImageRemove(index, imgIndex)}
+                                        className="absolute top-1 right-1 rounded-full p-0.5 bg-red-600 hover:bg-red-700 text-white font-bold"
+                                      >
+                                        <RxCross2 size={20} />
+                                      </button>
+                                    </li>
+                                  )}
+                                </Draggable>
+                              ))}
+                              {provided.placeholder}
+                            </div>
+                          )}
+                        </Droppable>
 
-    </div>
+                        <Droppable droppableId="row2" direction="horizontal">
+                          {(provided) => (
+                            <div
+                              className="grid grid-cols-3 gap-4 mt-4"
+                              {...provided.droppableProps}
+                              ref={provided.innerRef}
+                            >
+                              {variant.imageUrls?.slice(3).map((url, imgIndex) => (
+                                <Draggable key={url} draggableId={`row2-${url}`} index={imgIndex + 3}>
+                                  {(provided) => (
+                                    <li
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      {...provided.dragHandleProps}
+                                      className="flex items-center p-2 bg-white border border-gray-300 rounded-md relative"
+                                    >
+                                      <Image
+                                        src={url}
+                                        alt={`Variant ${index} Image ${imgIndex + 3}`}
+                                        height={3000}
+                                        width={3000}
+                                        className="w-full h-auto min-h-[150px] max-h-[150px] rounded-md object-contain"
+                                      />
+                                      <button
+                                        onClick={() => handleImageRemove(index, imgIndex + 3)}
+                                        className="absolute top-1 right-1 rounded-full p-0.5 bg-red-600 hover:bg-red-700 text-white font-bold"
+                                      >
+                                        <RxCross2 size={20} />
+                                      </button>
+                                    </li>
+                                  )}
+                                </Draggable>
+                              ))}
+                              {provided.placeholder}
+                            </div>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+
+                    </div>
+
+                  </div>
+
+                </div>
+              ))}
+            </div>
+
+          </div>
+
+          <div className='flex flex-wrap gap-6 justify-between py-8'>
+            <Link href='/dash-board/products/add-product' className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'>
+              <FaArrowLeft /> Previous Step
+            </Link>
+            <div className='flex items-center gap-6'>
+              <button type="button" onClick={handleSubmit(onSaveForNow)} className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700'>
+                Save For Now <FiSave size={19} />
+              </button>
+              <button type='submit' className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'>
+                Next Step <FaArrowRight />
+              </button>
+            </div>
+          </div>
+
+        </form>
+
+        <ExitConfirmationModal
+          isOpen={showModal}
+          onClose={handleCloseModal}  // Handle "No" action
+          onConfirm={handleConfirmExit}  // Handle "Yes" action
+        />
+
+      </div>
+    </ProtectedRoute>
   );
 };
 

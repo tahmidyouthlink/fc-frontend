@@ -15,6 +15,7 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { TbColumnInsertRight } from 'react-icons/tb';
 import { FaPlus } from 'react-icons/fa6';
 import PaginationSelect from '@/app/components/layout/PaginationSelect';
+import { useAuth } from '@/app/contexts/auth';
 
 const transferStatusTabs = [
   'All',
@@ -36,6 +37,18 @@ const Transfers = () => {
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
+  const { existingUserData, isUserLoading } = useAuth();
+  const [isAddButtonAllowed, setIsAddButtonAllowed] = useState(false);
+  const [isEditButtonAllowed, setIsEditButtonAllowed] = useState(false);
+
+  useEffect(() => {
+    // Fetch user data if needed or check the permission dynamically
+    if (existingUserData) {
+      // Check if the user has permission to add a product
+      setIsAddButtonAllowed(existingUserData?.permissions?.["Transfers"]?.actions?.['Create New Transfer Order'] ?? false);
+      setIsEditButtonAllowed(existingUserData?.permissions?.["Transfers"]?.actions?.['Edit Transfer Order'] ?? false);
+    }
+  }, [existingUserData]);
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedColumnsTransferOrder'));
@@ -202,7 +215,7 @@ const Transfers = () => {
     }
   }, [paginatedOrders]);
 
-  if (isTransferOrderPending) {
+  if (isTransferOrderPending || isUserLoading) {
     return <Loading />
   }
 
@@ -294,9 +307,13 @@ const Transfers = () => {
 
           <h3 className='text-center md:text-start font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>TRANSFERS</h3>
 
-          <button onClick={handleGoToTransferPage} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700">
-            <FaPlus size={15} className='text-neutral-700' /> ADD
-          </button>
+          {isAddButtonAllowed ? (
+            <button onClick={handleGoToTransferPage} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700">
+              <FaPlus size={15} className='text-neutral-700' /> ADD
+            </button>
+          ) : (
+            <></>
+          )}
 
         </div>
 
@@ -371,7 +388,8 @@ const Transfers = () => {
                           selectedColumns.includes(column) && (
                             <>
                               {column === 'Purchase order' && (
-                                <td key="Purchase order" onClick={() => handleGoToEditPage(order?._id)} className="text-sm p-3 cursor-pointer text-blue-600 hover:text-blue-800 text-center">
+                                <td key="Purchase order" onClick={isEditButtonAllowed ? () => handleGoToEditPage(order?._id) : undefined}
+                                  className={`text-sm p-3 ${isEditButtonAllowed ? "cursor-pointer text-blue-600 hover:text-blue-800" : "text-neutral-800"} text-center`}>
                                   {order?.transferOrderNumber}
                                 </td>
                               )}

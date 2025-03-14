@@ -6,6 +6,7 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Toolti
 import { IoMdClose } from 'react-icons/io';
 import { format, startOfToday, endOfToday, startOfYesterday, endOfYesterday, subDays, subMonths, startOfMonth, endOfMonth, isValid } from 'date-fns';
 import { today, getLocalTimeZone } from "@internationalized/date";
+import { useAuth } from '@/app/contexts/auth';
 
 const FinancePerformance = () => {
   const [orderList, isOrderPending] = useOrders();
@@ -13,6 +14,16 @@ const FinancePerformance = () => {
   const [activeFilter, setActiveFilter] = useState('today');
   const [showDateRangePicker, setShowDateRangePicker] = useState(true); // New state
   const [selected, setSelected] = useState(['bKash', 'SSLCommerz']);
+  const { existingUserData, isUserLoading } = useAuth();
+  const [isDateRangeButtonAllowed, setIsDateRangeButtonAllowed] = useState(false);
+
+  useEffect(() => {
+    // Fetch user data if needed or check the permission dynamically
+    if (existingUserData) {
+      // Check if the user has permission to add a product
+      setIsDateRangeButtonAllowed(existingUserData?.permissions?.["Finances"]?.actions?.['Completed Date range filtering'] ?? false);
+    }
+  }, [existingUserData]);
 
   useEffect(() => {
     // Set default date range to Today when the component mounts
@@ -287,7 +298,7 @@ const FinancePerformance = () => {
   // Set the maximum value for the Y-axis (slightly above the highest transaction count, minimum of 20)
   const maxYValue = Math.max(Math.ceil(Math.max(maxBKash, maxSSLCommerz, maxHourlyBKash, maxHourlySSLCommerz) * 1.1)); // Ensure minimum of 20
 
-  if (isOrderPending) {
+  if (isOrderPending || isUserLoading) {
     return <SmallHeightLoading />
   };
 
@@ -324,34 +335,42 @@ const FinancePerformance = () => {
 
         </div>
 
-        <div className='flex items-center gap-2'>
-          {showDateRangePicker && (
-            <DateRangePicker
-              label="Select Date Range"
-              visibleMonths={2}
-              maxValue={currentDate}
-              onChange={(range) => {
-                if (range && range.start && range.end) {
-                  normalizeDateRange(range.start, range.end);
-                }
-              }}
-              // Ensure the picker clears after reset and updates after new selection
-              value={selectedDateRange.start && selectedDateRange.end
-                ? [
-                  new Date(selectedDateRange.start.year, selectedDateRange.start.month - 1, selectedDateRange.start.day),
-                  new Date(selectedDateRange.end.year, selectedDateRange.end.month - 1, selectedDateRange.end.day)
-                ]
-                : null
-              }
-            />
-          )}
+        {isDateRangeButtonAllowed ? (
 
-          {selectedDateRange.start && selectedDateRange.end && activeFilter === 'custom' && (
-            <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={handleReset}>
-              <IoMdClose className="text-lg" />
-            </button>
-          )}
-        </div>
+          <div className='flex items-center gap-2'>
+            {showDateRangePicker && (
+              <DateRangePicker
+                label="Select Date Range"
+                visibleMonths={2}
+                maxValue={currentDate}
+                onChange={(range) => {
+                  if (range && range.start && range.end) {
+                    normalizeDateRange(range.start, range.end);
+                  }
+                }}
+                // Ensure the picker clears after reset and updates after new selection
+                value={selectedDateRange.start && selectedDateRange.end
+                  ? [
+                    new Date(selectedDateRange.start.year, selectedDateRange.start.month - 1, selectedDateRange.start.day),
+                    new Date(selectedDateRange.end.year, selectedDateRange.end.month - 1, selectedDateRange.end.day)
+                  ]
+                  : null
+                }
+              />
+            )}
+
+            {selectedDateRange.start && selectedDateRange.end && activeFilter === 'custom' && (
+              <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={handleReset}>
+                <IoMdClose className="text-lg" />
+              </button>
+            )}
+          </div>
+
+        ) : (
+          <></>
+        )}
+
+
       </div>
 
       <div className='flex flex-col lg:flex-row items-center justify-center gap-6'>

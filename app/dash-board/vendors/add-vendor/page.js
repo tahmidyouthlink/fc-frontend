@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import { MdOutlineFileUpload } from 'react-icons/md';
+import ProtectedRoute from '@/app/components/ProtectedRoutes/ProtectedRoute';
 
 const AddVendor = () => {
   const axiosPublic = useAxiosPublic();
@@ -73,86 +74,88 @@ const AddVendor = () => {
   };
 
   return (
-    <div className='bg-gray-50 min-h-screen px-6'>
+    <ProtectedRoute pageName="Vendors" requiredPermission="Create New Vendor">
+      <div className='bg-gray-50 min-h-screen px-6'>
 
-      <div className='max-w-screen-xl mx-auto pt-3 md:pt-6 px-6'>
-        <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Vendor Configuration</h3>
-          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/vendors"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        <div className='max-w-screen-xl mx-auto pt-3 md:pt-6 px-6'>
+          <div className='flex items-center justify-between'>
+            <h3 className='w-full font-semibold text-xl lg:text-2xl'>Vendor Configuration</h3>
+            <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/vendors"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+          </div>
         </div>
+
+        <form onSubmit={handleSubmit(onSubmit)}>
+
+          <div className='max-w-screen-xl mx-auto p-6 flex flex-col gap-4'>
+
+            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+              {/* Vendor name Input */}
+              <div className="w-full">
+                <label className="flex justify-start font-medium text-[#9F5216] pb-2">Vendor Name *</label>
+                <input
+                  type="text"
+                  placeholder="Add Vendor Name"
+                  {...register('vendorName', { required: 'Vendor Name is required' })}
+                  className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                />
+                {errors.vendorName && (
+                  <p className="text-red-600 text-left">{errors.vendorName.message}</p>
+                )}
+              </div>
+
+              {/* Contact person name of the Vendor Input */}
+              <div className="w-full">
+                <label className="flex justify-start font-medium text-[#9F5216] pb-2">Contact Person Name *</label>
+                <input
+                  type="text"
+                  placeholder="Add Contact Person Name"
+                  {...register('contactPersonName', { required: 'Contact Person Name is required' })}
+                  className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                />
+                {errors.contactPersonName && (
+                  <p className="text-red-600 text-left">{errors.contactPersonName.message}</p>
+                )}
+              </div>
+
+              {/* Contact person number of the Vendor Input */}
+              <div className="w-full">
+                <label className="flex justify-start font-medium text-[#9F5216] pb-2">Contact Person Number *</label>
+                <input
+                  type="number"
+                  placeholder="Add Contact Person Number"
+                  {...register('contactPersonNumber', { required: 'Contact Person Number is required' })}
+                  className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                />
+                {errors.contactPersonNumber && (
+                  <p className="text-red-600 text-left">{errors.contactPersonNumber.message}</p>
+                )}
+              </div>
+
+              {/* Vendor Address of the Vendor Input */}
+              <div className="w-full">
+                <label className="flex justify-start font-medium text-[#9F5216] pb-2">Vendor Address</label>
+                <input
+                  type="text"
+                  placeholder="Add Vendor Address"
+                  {...register('vendorAddress')}
+                  className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                />
+              </div>
+
+            </div>
+
+            {/* Submit Button */}
+            <div className='flex justify-end items-center'>
+              <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}>
+                {isSubmitting ? 'Submitting...' : 'Submit'} <MdOutlineFileUpload size={20} />
+              </button>
+            </div>
+          </div>
+
+        </form>
+
       </div>
-
-      <form onSubmit={handleSubmit(onSubmit)}>
-
-        <div className='max-w-screen-xl mx-auto p-6 flex flex-col gap-4'>
-
-          <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-            {/* Vendor name Input */}
-            <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Vendor Name *</label>
-              <input
-                type="text"
-                placeholder="Add Vendor Name"
-                {...register('vendorName', { required: 'Vendor Name is required' })}
-                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-              />
-              {errors.vendorName && (
-                <p className="text-red-600 text-left">{errors.vendorName.message}</p>
-              )}
-            </div>
-
-            {/* Contact person name of the Vendor Input */}
-            <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Contact Person Name *</label>
-              <input
-                type="text"
-                placeholder="Add Contact Person Name"
-                {...register('contactPersonName', { required: 'Contact Person Name is required' })}
-                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-              />
-              {errors.contactPersonName && (
-                <p className="text-red-600 text-left">{errors.contactPersonName.message}</p>
-              )}
-            </div>
-
-            {/* Contact person number of the Vendor Input */}
-            <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Contact Person Number *</label>
-              <input
-                type="number"
-                placeholder="Add Contact Person Number"
-                {...register('contactPersonNumber', { required: 'Contact Person Number is required' })}
-                className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-              />
-              {errors.contactPersonNumber && (
-                <p className="text-red-600 text-left">{errors.contactPersonNumber.message}</p>
-              )}
-            </div>
-
-            {/* Vendor Address of the Vendor Input */}
-            <div className="w-full">
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Vendor Address</label>
-              <input
-                type="text"
-                placeholder="Add Vendor Address"
-                {...register('vendorAddress')}
-                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-              />
-            </div>
-
-          </div>
-
-          {/* Submit Button */}
-          <div className='flex justify-end items-center'>
-            <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}>
-              {isSubmitting ? 'Submitting...' : 'Submit'} <MdOutlineFileUpload size={20} />
-            </button>
-          </div>
-        </div>
-
-      </form>
-
-    </div>
+    </ProtectedRoute>
   );
 };
 

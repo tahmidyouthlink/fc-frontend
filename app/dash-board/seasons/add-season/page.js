@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import { FaArrowLeft } from 'react-icons/fa6';
+import ProtectedRoute from '@/app/components/ProtectedRoutes/ProtectedRoute';
 
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
@@ -146,106 +147,108 @@ const AddSeason = () => {
   };
 
   return (
-    <div className='bg-gray-50 min-h-screen'>
+    <ProtectedRoute pageName="Seasons" requiredPermission="Create New Season">
+      <div className='bg-gray-50 min-h-screen'>
 
-      <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
-        <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>SEASON CONFIGURATION</h3>
-          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/seasons"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
+          <div className='flex items-center justify-between'>
+            <h3 className='w-full font-semibold text-xl lg:text-2xl'>SEASON CONFIGURATION</h3>
+            <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/seasons"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+          </div>
         </div>
+
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
+
+            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
+              <div>
+                <label className="flex justify-start font-medium text-[#9F5216] pb-2">Season *</label>
+                <input
+                  type="text"
+                  placeholder="Add Season Name"
+                  {...register('seasonName', { required: 'Season is required' })}
+                  className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                />
+                {errors.seasonName && (
+                  <p className="text-red-600 text-left">{errors.seasonName.message}</p>
+                )}
+              </div>
+
+            </div>
+
+            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+
+              <div>
+                <input
+                  id='imageUpload'
+                  type='file'
+                  className='hidden'
+                  onChange={handleImageChange}
+                />
+                <label
+                  htmlFor='imageUpload'
+                  className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
+                >
+                  <MdOutlineFileUpload size={60} />
+                  <div className='space-y-1.5 text-center'>
+                    <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
+                      Upload Thumbnail
+                    </h5>
+                    <p className='text-sm text-gray-500'>
+                      Photo Should be in PNG, JPEG or JPG format
+                    </p>
+                  </div>
+                </label>
+
+                {/* Display uploaded image or selected default image */}
+                {(image || selectedDefaultImage) && (
+                  <div className='relative'>
+                    <Image
+                      src={image?.src || selectedDefaultImage}
+                      alt='Selected or uploaded image'
+                      height={2000}
+                      width={2000}
+                      className='w-1/2 mx-auto md:h-[350px] mt-8 rounded-md'
+                    />
+                    <button
+                      onClick={handleImageRemove}
+                      className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                    >
+                      <RxCross2 size={24} />
+                    </button>
+                  </div>
+                )}
+
+                {/* Show default images for selection if no image is uploaded */}
+                {!image && !selectedDefaultImage && (
+                  <div className='grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-9 gap-8 xl:gap-4 my-16'>
+                    {defaultImages.map((defaultImage, index) => (
+                      <div key={index} onClick={() => handleDefaultImageSelect(defaultImage)} className='cursor-pointer'>
+                        <Image
+                          src={defaultImage}
+                          alt={`Default image ${index + 1}`}
+                          height={2000}
+                          width={2000}
+                          className='w-full rounded-md object-contain'
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+            </div>
+
+            <div className='flex justify-end pt-4 pb-8'>
+
+              <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}>
+                {isSubmitting ? 'Submitting...' : 'Submit'} <MdOutlineFileUpload size={20} />
+              </button>
+            </div>
+          </div>
+        </form >
       </div>
-
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
-
-          <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
-            <div>
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Season *</label>
-              <input
-                type="text"
-                placeholder="Add Season Name"
-                {...register('seasonName', { required: 'Season is required' })}
-                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-              />
-              {errors.seasonName && (
-                <p className="text-red-600 text-left">{errors.seasonName.message}</p>
-              )}
-            </div>
-
-          </div>
-
-          <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-
-            <div>
-              <input
-                id='imageUpload'
-                type='file'
-                className='hidden'
-                onChange={handleImageChange}
-              />
-              <label
-                htmlFor='imageUpload'
-                className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
-              >
-                <MdOutlineFileUpload size={60} />
-                <div className='space-y-1.5 text-center'>
-                  <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                    Upload Thumbnail
-                  </h5>
-                  <p className='text-sm text-gray-500'>
-                    Photo Should be in PNG, JPEG or JPG format
-                  </p>
-                </div>
-              </label>
-
-              {/* Display uploaded image or selected default image */}
-              {(image || selectedDefaultImage) && (
-                <div className='relative'>
-                  <Image
-                    src={image?.src || selectedDefaultImage}
-                    alt='Selected or uploaded image'
-                    height={2000}
-                    width={2000}
-                    className='w-1/2 mx-auto md:h-[350px] mt-8 rounded-md'
-                  />
-                  <button
-                    onClick={handleImageRemove}
-                    className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
-                  >
-                    <RxCross2 size={24} />
-                  </button>
-                </div>
-              )}
-
-              {/* Show default images for selection if no image is uploaded */}
-              {!image && !selectedDefaultImage && (
-                <div className='grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-9 gap-8 xl:gap-4 my-16'>
-                  {defaultImages.map((defaultImage, index) => (
-                    <div key={index} onClick={() => handleDefaultImageSelect(defaultImage)} className='cursor-pointer'>
-                      <Image
-                        src={defaultImage}
-                        alt={`Default image ${index + 1}`}
-                        height={2000}
-                        width={2000}
-                        className='w-full rounded-md object-contain'
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-          </div>
-
-          <div className='flex justify-end pt-4 pb-8'>
-
-            <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}>
-              {isSubmitting ? 'Submitting...' : 'Submit'} <MdOutlineFileUpload size={20} />
-            </button>
-          </div>
-        </div>
-      </form >
-    </div >
+    </ProtectedRoute>
   );
 };
 

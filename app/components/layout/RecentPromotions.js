@@ -18,6 +18,7 @@ import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 import { TbColumnInsertRight } from 'react-icons/tb';
 import { HiOutlineDownload } from 'react-icons/hi';
+import { useAuth } from '@/app/contexts/auth';
 
 const initialColumns = ["Promo Code / Offer Title", "Type", "Discount Value", "Expiry Date", "Total Times Applied", "Total Discount Given", "Min Order Amount", "Max Capped Amount", "Actions", "Status"];
 
@@ -37,6 +38,26 @@ const RecentPromotions = () => {
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
+  const { existingUserData, isUserLoading } = useAuth();
+  const [isEditPromoButtonAllowed, setIsEditPromoButtonAllowed] = useState(false);
+  const [isDeletePromoButtonAllowed, setIsDeletePromoButtonAllowed] = useState(false);
+  const [isTogglePromoButtonAllowed, setIsTogglePromoButtonAllowed] = useState(false);
+  const [isEditOfferButtonAllowed, setIsEditOfferButtonAllowed] = useState(false);
+  const [isDeleteOfferButtonAllowed, setIsDeleteOfferButtonAllowed] = useState(false);
+  const [isToggleOfferButtonAllowed, setIsToggleOfferButtonAllowed] = useState(false);
+
+  useEffect(() => {
+    // Fetch user data if needed or check the permission dynamically
+    if (existingUserData) {
+      // Check if the user has permission to add a product
+      setIsEditPromoButtonAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Edit Existing Promo'] ?? false);
+      setIsDeletePromoButtonAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Delete Existing Promo'] ?? false);
+      setIsTogglePromoButtonAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Allow Promo Toggle'] ?? false);
+      setIsEditOfferButtonAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Edit Existing Offer'] ?? false);
+      setIsDeleteOfferButtonAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Delete Existing Offer'] ?? false);
+      setIsToggleOfferButtonAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Allow Offer Toggle'] ?? false);
+    }
+  }, [existingUserData]);
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedMarketing'));
@@ -590,11 +611,13 @@ const RecentPromotions = () => {
                           ৳ {item?.maxAmount || '0'}
                         </td>
                       )}
+
                       {column === 'Actions' && (
                         <td key="actions" className="text-xs p-3 text-gray-700">
                           <div className="flex items-center gap-3 cursor-pointer">
+
                             <div className="group relative">
-                              <button disabled={isExpired}>
+                              <button disabled={isExpired || !(item?.promoCode ? isEditPromoButtonAllowed : isEditOfferButtonAllowed)}>
                                 <MdOutlineModeEdit
                                   onClick={() =>
                                     item?.promoCode
@@ -602,13 +625,19 @@ const RecentPromotions = () => {
                                       : router.push(`/dash-board/marketing/offer/${item._id}`)
                                   }
                                   size={22}
-                                  className={`text-blue-500 ${isExpired ? 'cursor-not-allowed' : 'hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
+                                  className={`text-blue-500 ${isExpired || !(item?.promoCode ? isEditPromoButtonAllowed : isEditOfferButtonAllowed) ? 'cursor-not-allowed' : 'hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
                                 />
                               </button>
-                              {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">Edit</span>}
+                              {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
+                                {isExpired ? "Expired"
+                                  : !(item?.promoCode ? isEditPromoButtonAllowed : isEditOfferButtonAllowed)
+                                    ? "No access"
+                                    : "Edit"}
+                              </span>}
                             </div>
+
                             <div className="group relative">
-                              <button disabled={isExpired}>
+                              <button disabled={isExpired || !(item?.promoCode ? isDeletePromoButtonAllowed : isDeleteOfferButtonAllowed)}>
                                 <RiDeleteBinLine
                                   onClick={() =>
                                     item?.promoCode
@@ -616,14 +645,20 @@ const RecentPromotions = () => {
                                       : handleDeleteOffer(item._id)
                                   }
                                   size={22}
-                                  className={`text-red-500 ${isExpired ? 'cursor-not-allowed' : 'hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
+                                  className={`text-red-500 ${isExpired || !(item?.promoCode ? isDeletePromoButtonAllowed : isDeleteOfferButtonAllowed) ? 'cursor-not-allowed' : 'hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
                                 />
                               </button>
-                              {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">Delete</span>}
+                              {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">{isExpired
+                                ? "Expired"
+                                : !(item?.promoCode ? isDeletePromoButtonAllowed : isDeleteOfferButtonAllowed)
+                                  ? "No access"
+                                  : "Delete"}</span>}
                             </div>
+
                           </div>
                         </td>
                       )}
+
                       {column === 'Status' && (
                         <td key="status" className="text-xs p-3 text-gray-700">
                           <CustomSwitch
@@ -631,10 +666,11 @@ const RecentPromotions = () => {
                             onChange={() => item?.promoCode ? handleStatusChangePromo(item?._id, item?.promoStatus) : handleStatusChangeOffer(item?._id, item?.offerStatus)}
                             size="md"
                             color="primary"
-                            disabled={isExpired}
+                            disabled={isExpired || (item?.promoCode ? !isTogglePromoButtonAllowed : !isToggleOfferButtonAllowed)}
                           />
                         </td>
                       )}
+
                     </>
                   )
                 )}
@@ -917,7 +953,7 @@ const RecentPromotions = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  if (isPromoPending || isOrderPending || isOfferPending) {
+  if (isPromoPending || isOrderPending || isOfferPending || isUserLoading) {
     return <SmallHeightLoading />;
   }
 

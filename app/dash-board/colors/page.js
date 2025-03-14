@@ -1,10 +1,11 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
+import { useAuth } from '@/app/contexts/auth';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useColors from '@/app/hooks/useColors';
 import { Button } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaPlus } from 'react-icons/fa6';
 import { MdDeleteOutline } from 'react-icons/md';
@@ -16,6 +17,18 @@ const ColorsPage = () => {
   const [colorList, isColorPending, refetchColors] = useColors();
   const axiosPublic = useAxiosPublic();
   const router = useRouter();
+  const { existingUserData, isUserLoading } = useAuth();
+  const [isAddButtonAllowed, setIsAddButtonAllowed] = useState(false);
+  const [isDeleteButtonAllowed, setIsDeleteButtonAllowed] = useState(false);
+
+  useEffect(() => {
+    // Fetch user data if needed or check the permission dynamically
+    if (existingUserData) {
+      // Check if the user has permission to add a product
+      setIsAddButtonAllowed(existingUserData?.permissions?.["Colors"]?.actions?.['Create New Color'] ?? false);
+      setIsDeleteButtonAllowed(existingUserData?.permissions?.["Colors"]?.actions?.['Delete Color'] ?? false);
+    }
+  }, [existingUserData]);
 
   const handleDeleteColor = async (colorId) => {
     Swal.fire({
@@ -73,7 +86,7 @@ const ColorsPage = () => {
     });
   };
 
-  if (isColorPending) {
+  if (isColorPending || isUserLoading) {
     return <Loading />
   }
 
@@ -81,9 +94,13 @@ const ColorsPage = () => {
     <div className='relative bg-gray-50'>
       <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between p-6'>
         <h1 className='font-semibold text-center text-lg md:text-xl lg:text-3xl text-neutral-700'>COLOR MANAGEMENT</h1>
-        <button onClick={() => router.push('/dash-board/colors/add-color')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
+
+        {isAddButtonAllowed ? (<button onClick={() => router.push('/dash-board/colors/add-color')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
           <FaPlus size={15} className='text-neutral-700' /> Add
-        </button>
+        </button>) : (
+          <></>
+        )}
+
       </div>
 
       <div className='w-full divide-y divide-gray-200 pt-2'>
@@ -104,7 +121,11 @@ const ColorsPage = () => {
                 />
                 {color?.value}
               </p>
-              <Button size="sm" className="text-xs" color="danger" variant="light" onClick={() => handleDeleteColor(color?._id)}><MdDeleteOutline className='text-red-800 hover:text-red-950 text-xl cursor-pointer' /></Button>
+              {isDeleteButtonAllowed ? (
+                <Button size="sm" className="text-xs" color="danger" variant="light" onClick={() => handleDeleteColor(color?._id)}><MdDeleteOutline className='text-red-800 hover:text-red-950 text-xl cursor-pointer' /></Button>
+              ) : (
+                <></>
+              )}
             </div>
           ))}
         </div>

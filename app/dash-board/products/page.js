@@ -4,14 +4,12 @@ import { FaListAlt, FaPlusCircle } from "react-icons/fa";
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
-import { useSession } from 'next-auth/react';
 import { useAuth } from '@/app/contexts/auth';
 import { useEffect, useState } from 'react';
 import Loading from '@/app/components/shared/Loading/Loading';
 
 const Products = () => {
 
-  const { data: session, status } = useSession();
   const { existingUserData, isUserLoading } = useAuth();
   const [isAddButtonAllowed, setIsAddButtonAllowed] = useState(false);
   const [isViewEditButtonAllowed, setIsViewEditButtonAllowed] = useState(false);
@@ -25,7 +23,7 @@ const Products = () => {
     }
   }, [existingUserData]);
 
-  if (isUserLoading || status === "loading" || !session) return <Loading />;
+  if (isUserLoading) return <Loading />;
 
   return (
     <div className='relative'>

@@ -17,6 +17,7 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
+import ProtectedRoute from '@/app/components/ProtectedRoutes/ProtectedRoute';
 
 const ThirdStepOfAddProduct = () => {
 
@@ -299,194 +300,196 @@ const ThirdStepOfAddProduct = () => {
   };
 
   return (
-    <div className='min-h-screen bg-gray-50 relative'>
+    <ProtectedRoute pageName="Products" requiredPermission="Add Product">
+      <div className='min-h-screen bg-gray-50 relative'>
 
-      <div
-        style={{
-          backgroundImage: `url(${arrivals1.src})`,
-        }}
-        className='absolute inset-0 z-0 hidden md:block bg-no-repeat xl:left-[15%] 2xl:left-[30%] bg-[length:1600px_900px] -top-[90px]'
-      />
+        <div
+          style={{
+            backgroundImage: `url(${arrivals1.src})`,
+          }}
+          className='absolute inset-0 z-0 hidden md:block bg-no-repeat xl:left-[15%] 2xl:left-[30%] bg-[length:1600px_900px] -top-[90px]'
+        />
 
-      <div
-        style={{
-          backgroundImage: `url(${arrivals2.src})`,
-        }}
-        className='absolute inset-0 z-0 bg-contain bg-center xl:-top-28 w-full bg-no-repeat'
-      />
+        <div
+          style={{
+            backgroundImage: `url(${arrivals2.src})`,
+          }}
+          className='absolute inset-0 z-0 bg-contain bg-center xl:-top-28 w-full bg-no-repeat'
+        />
 
-      <div
-        style={{
-          backgroundImage: `url(${arrowSvgImage.src})`,
-        }}
-        className='absolute inset-0 z-0 top-8 xl:top-12 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[40%] 2xl:left-[41%] bg-no-repeat'
-      />
+        <div
+          style={{
+            backgroundImage: `url(${arrowSvgImage.src})`,
+          }}
+          className='absolute inset-0 z-0 top-8 xl:top-12 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[40%] 2xl:left-[41%] bg-no-repeat'
+        />
 
-      <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
-        <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>SELECT SHIPPING DETAILS</h3>
-          <Link
-            className="flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
-            href="/dash-board/products"
-            onClick={handleGoBackClick}  // Trigger the modal on click
-          >
-            <span className="border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2">
-              <FaArrowLeft />
-            </span>
-            Go Back
-          </Link>
-        </div>
+        <div className='max-w-screen-2xl mx-auto py-3 md:py-6 px-6 sticky top-0 z-10 bg-gray-50'>
+          <div className='flex items-center justify-between'>
+            <h3 className='w-full font-semibold text-xl lg:text-2xl'>SELECT SHIPPING DETAILS</h3>
+            <Link
+              className="flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
+              href="/dash-board/products"
+              onClick={handleGoBackClick}  // Trigger the modal on click
+            >
+              <span className="border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2">
+                <FaArrowLeft />
+              </span>
+              Go Back
+            </Link>
+          </div>
 
-        <div className='flex flex-wrap items-center gap-3 bg-gray-50 mt-4'>
+          <div className='flex flex-wrap items-center gap-3 bg-gray-50 mt-4'>
 
-          <button
-            className={`relative text-sm py-1 transition-all duration-300
+            <button
+              className={`relative text-sm py-1 transition-all duration-300
 ${activeTab === 'Inside Dhaka' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
 after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
 after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
 ${activeTab === 'Inside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
 `}
-            onClick={() => handleTabChange("Inside Dhaka")}
-          >
-            Inside Dhaka
-          </button>
+              onClick={() => handleTabChange("Inside Dhaka")}
+            >
+              Inside Dhaka
+            </button>
 
-          <button
-            className={`relative text-sm py-1 transition-all duration-300
+            <button
+              className={`relative text-sm py-1 transition-all duration-300
 ${activeTab === 'Dhaka Suburbs' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
 after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
 after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
 ${activeTab === 'Dhaka Suburbs' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
 `}
-            onClick={() => handleTabChange("Dhaka Suburbs")}
-          >
-            Dhaka Suburbs
-          </button>
+              onClick={() => handleTabChange("Dhaka Suburbs")}
+            >
+              Dhaka Suburbs
+            </button>
 
-          <button
-            className={`relative text-sm py-1 transition-all duration-300
+            <button
+              className={`relative text-sm py-1 transition-all duration-300
 ${activeTab === 'Outside Dhaka' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
 after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
 after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
 ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
 `}
-            onClick={() => handleTabChange("Outside Dhaka")}
-          >
-            Outside Dhaka
-          </button>
-
-        </div>
-
-      </div>
-
-      <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-2xl mx-auto min-h-[85vh] flex flex-col justify-between relative'>
-
-        <div className="overflow-x-auto">
-          <table className="min-w-full table-auto bg-white">
-
-            <thead>
-              <tr className='rounded-lg bg-gray-50'>
-                <th className="px-2 py-1 md:px-4 md:py-2 border-b border-gray-300">
-                  <Checkbox
-                    isSelected={filteredShippingList.length > 0 && (tabSelections[activeTab]?.length === filteredShippingList.length)}
-                    onChange={toggleSelectAll}
-                    color="warning"
-                    size="lg"
-                  />
-                </th>
-                <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipping Zone</th>
-                <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipment Handlers</th>
-                <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipping Charges</th>
-                <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipping Hours</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredShippingList?.map((shipping, index) => {
-                const isSelected = selectedShipmentHandler.some(
-                  (handler) => handler.shippingZone === shipping?.shippingZone
-                );
-
-                return (
-                  <tr key={index}
-                    className={`cursor-pointer transition-all duration-200 ${isSelected ? 'bg-white' : 'bg-gray-50'}`}>
-                    {/* Checkbox for selecting a row */}
-                    <td className="text-center">
-                      <Checkbox
-                        isSelected={isSelected}
-                        onChange={() => toggleCardSelection(shipping)}
-                        color="warning"
-                        size='lg'
-                      />
-                    </td>
-
-                    {/* Shipping Zone Title */}
-                    <td className="text-xs md:text-base text-center font-bold text-gray-900">
-                      {shipping?.shippingZone}
-                    </td>
-
-                    {/* Shipment Handlers */}
-                    <td className="px-2 py-1 md:px-4 md:py-2">
-                      <div className="flex items-center justify-center md:gap-4">
-                        {shipmentHandlerList?.map((handler, handlerIndex) => (
-                          shipping?.selectedShipmentHandler?.shipmentHandlerName === handler?.shipmentHandlerName && (
-                            <div key={handlerIndex} className="p-4 rounded-lg flex flex-col items-center justify-center h-40 w-40">
-                              {handler?.imageUrl && (
-                                <Image
-                                  src={handler.imageUrl}
-                                  alt="shipping"
-                                  width={100}
-                                  height={100}
-                                  className="mb-2 object-contain h-32 w-32"
-                                />
-                              )}
-                            </div>
-                          )
-                        ))}
-                      </div>
-                    </td>
-
-                    <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{shipping?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
-                      <div key={idx}>
-                        {type}: ৳ {shipping?.shippingCharges[type]}
-                      </div>
-                    ))}</td>
-
-                    <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{shipping?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
-                      <div key={idx}>
-                        {type}: {shipping?.shippingDurations[type]} {type === "EXPRESS" ? "hours" : "days"}
-                      </div>
-                    ))}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-
-          </table>
-        </div>
-
-        <div className='flex justify-between px-6 2xl:px-0 py-6'>
-          <Link href='/dash-board/products/add-product-2' className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'>
-            <FaArrowLeft /> Previous Step
-          </Link>
-
-          <div className='flex items-center gap-6'>
-
-            <button type='submit' className={`relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700`}>
-              Publish <MdOutlineFileUpload size={20} />
+              onClick={() => handleTabChange("Outside Dhaka")}
+            >
+              Outside Dhaka
             </button>
+
           </div>
 
         </div>
-      </form>
 
-      <ExitConfirmationModal
-        isOpen={showModal}
-        onClose={handleCloseModal}  // Handle "No" action
-        onConfirm={handleConfirmExit}  // Handle "Yes" action
-      />
+        <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-2xl mx-auto min-h-[85vh] flex flex-col justify-between relative'>
 
-    </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full table-auto bg-white">
+
+              <thead>
+                <tr className='rounded-lg bg-gray-50'>
+                  <th className="px-2 py-1 md:px-4 md:py-2 border-b border-gray-300">
+                    <Checkbox
+                      isSelected={filteredShippingList.length > 0 && (tabSelections[activeTab]?.length === filteredShippingList.length)}
+                      onChange={toggleSelectAll}
+                      color="warning"
+                      size="lg"
+                    />
+                  </th>
+                  <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipping Zone</th>
+                  <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipment Handlers</th>
+                  <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipping Charges</th>
+                  <th className="px-2 py-1 md:px-4 md:py-2 text-xs md:text-base border-b border-gray-300">Shipping Hours</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {filteredShippingList?.map((shipping, index) => {
+                  const isSelected = selectedShipmentHandler.some(
+                    (handler) => handler.shippingZone === shipping?.shippingZone
+                  );
+
+                  return (
+                    <tr key={index}
+                      className={`cursor-pointer transition-all duration-200 ${isSelected ? 'bg-white' : 'bg-gray-50'}`}>
+                      {/* Checkbox for selecting a row */}
+                      <td className="text-center">
+                        <Checkbox
+                          isSelected={isSelected}
+                          onChange={() => toggleCardSelection(shipping)}
+                          color="warning"
+                          size='lg'
+                        />
+                      </td>
+
+                      {/* Shipping Zone Title */}
+                      <td className="text-xs md:text-base text-center font-bold text-gray-900">
+                        {shipping?.shippingZone}
+                      </td>
+
+                      {/* Shipment Handlers */}
+                      <td className="px-2 py-1 md:px-4 md:py-2">
+                        <div className="flex items-center justify-center md:gap-4">
+                          {shipmentHandlerList?.map((handler, handlerIndex) => (
+                            shipping?.selectedShipmentHandler?.shipmentHandlerName === handler?.shipmentHandlerName && (
+                              <div key={handlerIndex} className="p-4 rounded-lg flex flex-col items-center justify-center h-40 w-40">
+                                {handler?.imageUrl && (
+                                  <Image
+                                    src={handler.imageUrl}
+                                    alt="shipping"
+                                    width={100}
+                                    height={100}
+                                    className="mb-2 object-contain h-32 w-32"
+                                  />
+                                )}
+                              </div>
+                            )
+                          ))}
+                        </div>
+                      </td>
+
+                      <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{shipping?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
+                        <div key={idx}>
+                          {type}: ৳ {shipping?.shippingCharges[type]}
+                        </div>
+                      ))}</td>
+
+                      <td className='text-center font-bold text-gray-900 text-xs md:text-base'>{shipping?.selectedShipmentHandler?.deliveryType.map((type, idx) => (
+                        <div key={idx}>
+                          {type}: {shipping?.shippingDurations[type]} {type === "EXPRESS" ? "hours" : "days"}
+                        </div>
+                      ))}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+
+            </table>
+          </div>
+
+          <div className='flex justify-between px-6 2xl:px-0 py-6'>
+            <Link href='/dash-board/products/add-product-2' className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'>
+              <FaArrowLeft /> Previous Step
+            </Link>
+
+            <div className='flex items-center gap-6'>
+
+              <button type='submit' className={`relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700`}>
+                Publish <MdOutlineFileUpload size={20} />
+              </button>
+            </div>
+
+          </div>
+        </form>
+
+        <ExitConfirmationModal
+          isOpen={showModal}
+          onClose={handleCloseModal}  // Handle "No" action
+          onConfirm={handleConfirmExit}  // Handle "Yes" action
+        />
+
+      </div>
+    </ProtectedRoute>
   );
 };
 

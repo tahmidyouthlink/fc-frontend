@@ -6,6 +6,7 @@ import { format, startOfToday, endOfToday, startOfYesterday, endOfYesterday, sub
 import { Checkbox, CheckboxGroup, DateRangePicker } from '@nextui-org/react';
 import { IoMdClose } from 'react-icons/io';
 import { today, getLocalTimeZone } from "@internationalized/date";
+import { useAuth } from '@/app/contexts/auth';
 
 const PromotionPerformanceChart = () => {
   const [orderList, isOrderPending] = useOrders();
@@ -13,6 +14,16 @@ const PromotionPerformanceChart = () => {
   const [activeFilter, setActiveFilter] = useState('today');
   const [showDateRangePicker, setShowDateRangePicker] = useState(true); // New state
   const [selected, setSelected] = useState(['totalDiscountedAmount', 'totalDiscountedOrders']);
+  const { existingUserData, isUserLoading } = useAuth();
+  const [isDateRangeButtonAllowed, setIsDateRangeButtonAllowed] = useState(false);
+
+  useEffect(() => {
+    // Fetch user data if needed or check the permission dynamically
+    if (existingUserData) {
+      // Check if the user has permission to add a product
+      setIsDateRangeButtonAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Discounted Date range filtering'] ?? false);
+    }
+  }, [existingUserData]);
 
   const handleChange = (values) => {
     // Ensure at least one checkbox is always selected
@@ -349,7 +360,7 @@ const PromotionPerformanceChart = () => {
   const yAxisDomainOrder = [0, maxDiscountedOrder * 10];
   const yAxisDomainOrderDay = [0, maxDiscountedOrderDay * 10];
 
-  if (isOrderPending) {
+  if (isOrderPending || isUserLoading) {
     return <SmallHeightLoading />;
   };
 
@@ -385,34 +396,39 @@ const PromotionPerformanceChart = () => {
           </button>
         </div>
 
-        <div className='flex items-center gap-2'>
-          {showDateRangePicker && (
-            <DateRangePicker
-              label="Select Date Range"
-              visibleMonths={2}
-              maxValue={currentDate}
-              onChange={(range) => {
-                if (range && range.start && range.end) {
-                  normalizeDateRange(range.start, range.end);
+        {isDateRangeButtonAllowed ? (
+          <div className='flex items-center gap-2'>
+            {showDateRangePicker && (
+              <DateRangePicker
+                label="Select Date Range"
+                visibleMonths={2}
+                maxValue={currentDate}
+                onChange={(range) => {
+                  if (range && range.start && range.end) {
+                    normalizeDateRange(range.start, range.end);
+                  }
+                }}
+                // Ensure the picker clears after reset and updates after new selection
+                value={selectedDateRange.start && selectedDateRange.end
+                  ? [
+                    new Date(selectedDateRange.start.year, selectedDateRange.start.month - 1, selectedDateRange.start.day),
+                    new Date(selectedDateRange.end.year, selectedDateRange.end.month - 1, selectedDateRange.end.day)
+                  ]
+                  : null
                 }
-              }}
-              // Ensure the picker clears after reset and updates after new selection
-              value={selectedDateRange.start && selectedDateRange.end
-                ? [
-                  new Date(selectedDateRange.start.year, selectedDateRange.start.month - 1, selectedDateRange.start.day),
-                  new Date(selectedDateRange.end.year, selectedDateRange.end.month - 1, selectedDateRange.end.day)
-                ]
-                : null
-              }
-            />
-          )}
+              />
+            )}
 
-          {selectedDateRange.start && selectedDateRange.end && activeFilter === 'custom' && (
-            <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={handleReset}>
-              <IoMdClose className="text-lg" />
-            </button>
-          )}
-        </div>
+            {selectedDateRange.start && selectedDateRange.end && activeFilter === 'custom' && (
+              <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={handleReset}>
+                <IoMdClose className="text-lg" />
+              </button>
+            )}
+          </div>
+        ) : (
+          <></>
+        )}
+
       </div>
 
       <div className="flex flex-col lg:flex-row items-center justify-center gap-6">

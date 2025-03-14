@@ -1,10 +1,11 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
+import { useAuth } from '@/app/contexts/auth';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useTags from '@/app/hooks/useTags';
 import { Button } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaPlus } from 'react-icons/fa6';
 import { MdDeleteOutline } from 'react-icons/md';
@@ -16,6 +17,18 @@ const TagsPage = () => {
   const [tagList, isTagPending, refetchTags] = useTags();
   const axiosPublic = useAxiosPublic();
   const router = useRouter();
+  const { existingUserData, isUserLoading } = useAuth();
+  const [isAddButtonAllowed, setIsAddButtonAllowed] = useState(false);
+  const [isDeleteButtonAllowed, setIsDeleteButtonAllowed] = useState(false);
+
+  useEffect(() => {
+    // Fetch user data if needed or check the permission dynamically
+    if (existingUserData) {
+      // Check if the user has permission to add a product
+      setIsAddButtonAllowed(existingUserData?.permissions?.["Tags"]?.actions?.['Create New Tag'] ?? false);
+      setIsDeleteButtonAllowed(existingUserData?.permissions?.["Tags"]?.actions?.['Delete Tag'] ?? false);
+    }
+  }, [existingUserData]);
 
   const handleDeleteTag = async (tagId) => {
     Swal.fire({
@@ -73,7 +86,7 @@ const TagsPage = () => {
     });
   };
 
-  if (isTagPending) {
+  if (isTagPending || isUserLoading) {
     return <Loading />
   }
 
@@ -81,9 +94,13 @@ const TagsPage = () => {
     <div className='bg-gray-50 min-h-screen'>
       <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between p-6'>
         <h1 className='font-semibold text-center text-lg md:text-xl lg:text-3xl text-neutral-700'>TAG MANAGEMENT</h1>
-        <button onClick={() => router.push('/dash-board/tags/add-tag')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
-          <FaPlus size={15} className='text-neutral-700' /> Add
-        </button>
+        {isAddButtonAllowed ? (
+          <button onClick={() => router.push('/dash-board/tags/add-tag')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
+            <FaPlus size={15} className='text-neutral-700' /> Add
+          </button>
+        ) : (
+          <></>
+        )}
       </div>
 
       <div className='w-full'>
@@ -93,7 +110,11 @@ const TagsPage = () => {
               <p className='flex text-[15px] items-center gap-0.5 md:gap-1 p-2 w-full'>
                 {tag?.value}
               </p>
-              <Button size="sm" className="text-xs" color="danger" variant="light" onClick={() => handleDeleteTag(tag?._id)}><MdDeleteOutline className='text-red-800 hover:text-red-950 text-xl cursor-pointer' /></Button>
+              {isDeleteButtonAllowed ? (
+                <Button size="sm" className="text-xs" color="danger" variant="light" onClick={() => handleDeleteTag(tag?._id)}><MdDeleteOutline className='text-red-800 hover:text-red-950 text-xl cursor-pointer' /></Button>
+              ) : (
+                <></>
+              )}
             </div>
           ))}
         </div>

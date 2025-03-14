@@ -8,10 +8,16 @@ import { settingsRoutes } from "./app/components/ProtectedRoutes/SettingsRoutes"
 // Helper function to fetch user permissions
 const fetchUserPermissions = async (userId) => {
   try {
-    const response = await axios.get(
+    const response = await fetch(
       `https://fashion-commerce-backend.vercel.app/single-existing-user/${userId}`
     );
-    return response?.data?.permissions || null;
+
+    if (!response.ok) {
+      throw new Error(`Error fetching data: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data?.permissions || null;
   } catch (error) {
     console.error("Error fetching user permissions:", error);
     return null;
@@ -46,6 +52,16 @@ export async function middleware(req) {
 
   if (userId) {
     userPermissions = await fetchUserPermissions(userId);
+  }
+
+  // If no token, redirect to login
+  if (!token) {
+    return NextResponse.redirect(new URL("/auth/restricted-access", req.url));
+  }
+
+  // If no permissions, redirect to unauthorized page
+  if (!userPermissions) {
+    return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
   // 🔹 Check if user has permission for the accessed route

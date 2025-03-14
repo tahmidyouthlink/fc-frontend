@@ -13,6 +13,8 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 import ExitConfirmationModalProduct from '@/app/components/layout/ExitConfirmModalProduct';
 import dynamic from 'next/dynamic';
+import ProtectedRoute from '@/app/components/ProtectedRoutes/ProtectedRoute';
+import { useAuth } from '@/app/contexts/auth';
 const TransferOrderPDFButton = dynamic(() => import("@/app/components/layout/TransferOrderPDFButton"), { ssr: false });
 
 const EditTransferOrder = () => {
@@ -37,6 +39,16 @@ const EditTransferOrder = () => {
   const [modalMessage, setModalMessage] = useState("");
   const [headingMessage, setHeadingMessage] = useState("");
   const [selectedStatus, setSelectedStatus] = useState(null);
+  const { existingUserData, isUserLoading } = useAuth();
+  const [isDeleteButtonAllowed, setIsDeleteButtonAllowed] = useState(false);
+
+  useEffect(() => {
+    // Fetch user data if needed or check the permission dynamically
+    if (existingUserData) {
+      // Check if the user has permission to add a product
+      setIsDeleteButtonAllowed(existingUserData?.permissions?.["Transfers"]?.actions?.['Delete Transfer Order'] ?? false);
+    }
+  }, [existingUserData]);
 
   // Format date to yyyy-mm-dd for date input field
   const formatDateForInput = (dateStr) => {
@@ -236,235 +248,242 @@ const EditTransferOrder = () => {
       });
   };
 
-  if (isLoading) {
+  if (isLoading || isUserLoading) {
     return <Loading />;
   };
 
   return (
-    <div className='bg-gray-50 min-h-screen px-6'>
+    <ProtectedRoute pageName="Transfers" requiredPermission="Edit Transfer Order">
+      <div className='bg-gray-50 min-h-screen px-6'>
 
-      <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
-        <div className='flex flex-wrap md:flex-nowrap items-center justify-between w-full'>
-          <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700l'>#{transferOrderNumber} <span
-            className={`px-3 py-1 rounded-full
+        <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
+          <div className='flex flex-wrap md:flex-nowrap items-center justify-between w-full'>
+            <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700l'>#{transferOrderNumber} <span
+              className={`px-3 py-1 rounded-full
       ${transferOrderStatus === "pending" ? "bg-yellow-100 text-yellow-600"
-                : transferOrderStatus === "received" ? "bg-green-100 text-green-600"
-                  : transferOrderStatus === "canceled" ? "bg-red-100 text-red-600"
-                    : "bg-gray-100 text-gray-600"}`}
-          >
-            {transferOrderStatus === "pending" ? "Pending"
-              : transferOrderStatus === "received" ? "Received"
-                : transferOrderStatus === "canceled" ? "Canceled"
-                  : "Unknown"}
-          </span></h3>
-          <div className='flex justify-between md:justify-end gap-4 items-center w-full'>
-            <div className="flex gap-4 items-center">
-              <button onClick={() => handleDeleteTransferOrder(id)}
-                class="group relative inline-flex items-center justify-center w-[40px] h-[40px] bg-[#D2016E] text-white rounded-full shadow-lg transform scale-100 transition-transform duration-300"
-              >
-                <svg
-                  width="25px"
-                  height="25px"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="rotate-0 transition ease-out duration-300 scale-100 group-hover:-rotate-45 group-hover:scale-75"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    stroke-width="2"
-                    stroke-linejoin="round"
-                    stroke-linecap="round"
-                  ></path>
-                </svg>
-              </button>
+                  : transferOrderStatus === "received" ? "bg-green-100 text-green-600"
+                    : transferOrderStatus === "canceled" ? "bg-red-100 text-red-600"
+                      : "bg-gray-100 text-gray-600"}`}
+            >
+              {transferOrderStatus === "pending" ? "Pending"
+                : transferOrderStatus === "received" ? "Received"
+                  : transferOrderStatus === "canceled" ? "Canceled"
+                    : "Unknown"}
+            </span></h3>
+            <div className='flex justify-between md:justify-end gap-4 items-center w-full'>
+              <div className="flex gap-4 items-center">
 
-              <TransferOrderPDFButton transferOrderNumber={transferOrderNumber}
-                transferOrderStatus={transferOrderStatus}
-                selectedOrigin={selectedOrigin}
-                selectedDestination={selectedDestination}
-                estimatedArrival={estimatedArrival}
-                selectedProducts={selectedProducts}
-                transferOrderVariants={transferOrderVariants}
-                referenceNumber={referenceNumber}
-                supplierNote={supplierNote}
-                trackingNumber={trackingNumber}
-                shippingCarrier={shippingCarrier} />
+                {isDeleteButtonAllowed ? (
+                  <button onClick={() => handleDeleteTransferOrder(id)}
+                    class="group relative inline-flex items-center justify-center w-[40px] h-[40px] bg-[#D2016E] text-white rounded-full shadow-lg transform scale-100 transition-transform duration-300"
+                  >
+                    <svg
+                      width="25px"
+                      height="25px"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      className="rotate-0 transition ease-out duration-300 scale-100 group-hover:-rotate-45 group-hover:scale-75"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        stroke-width="2"
+                        stroke-linejoin="round"
+                        stroke-linecap="round"
+                      ></path>
+                    </svg>
+                  </button>
+                ) : (
+                  <></>
+                )}
+
+                <TransferOrderPDFButton transferOrderNumber={transferOrderNumber}
+                  transferOrderStatus={transferOrderStatus}
+                  selectedOrigin={selectedOrigin}
+                  selectedDestination={selectedDestination}
+                  estimatedArrival={estimatedArrival}
+                  selectedProducts={selectedProducts}
+                  transferOrderVariants={transferOrderVariants}
+                  referenceNumber={referenceNumber}
+                  supplierNote={supplierNote}
+                  trackingNumber={trackingNumber}
+                  shippingCarrier={shippingCarrier} />
+              </div>
+              <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end' href={"/dash-board/transfers"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
             </div>
-            <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end' href={"/dash-board/transfers"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
           </div>
         </div>
-      </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
 
-        <div className='max-w-screen-xl mx-auto py-6 flex flex-col gap-4'>
+          <div className='max-w-screen-xl mx-auto py-6 flex flex-col gap-4'>
 
-          <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-            <div className='flex-1 space-y-3'>
-              <h1 className='font-medium'>Origin</h1>
-              {selectedOrigin && (
-                <div className='space-y-3'>
-                  <p className='font-semibold'>{selectedOrigin?.locationName}</p>
-                  <p className="text-neutral-500 font-medium">
-                    {selectedOrigin?.locationAddress}, {selectedOrigin?.cityName}, {selectedOrigin?.postalCode}
-                  </p>
-                </div>
-              )}
-            </div>
+            <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+              <div className='flex-1 space-y-3'>
+                <h1 className='font-medium'>Origin</h1>
+                {selectedOrigin && (
+                  <div className='space-y-3'>
+                    <p className='font-semibold'>{selectedOrigin?.locationName}</p>
+                    <p className="text-neutral-500 font-medium">
+                      {selectedOrigin?.locationAddress}, {selectedOrigin?.cityName}, {selectedOrigin?.postalCode}
+                    </p>
+                  </div>
+                )}
+              </div>
 
-            <div className='flex-1 space-y-3'>
-              <h1 className='font-medium'>Destination</h1>
-              {selectedDestination && (
-                <div className='space-y-3'>
-                  <p className='font-semibold'>{selectedDestination?.locationName}</p>
-                  <p className="text-neutral-500 font-medium">
-                    {selectedDestination?.locationAddress}, {selectedDestination?.cityName}, {selectedDestination?.postalCode}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className='bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-            <div className='flex justify-between items-center gap-6'>
-              <h1 className='flex-1 font-bold text-lg'>Ordered products</h1>
-              <div className='flex flex-col flex-1'>
-                <Progressbar
-                  accepted={totalAcceptRejectValues.totalAccept}
-                  rejected={totalAcceptRejectValues.totalReject}
-                  total={totalAcceptRejectValues.totalQuantity}
-                />
-                <div className="mt-1">
-                  {totalAcceptRejectValues.totalAccept} of {totalAcceptRejectValues.totalQuantity}
-                </div>
+              <div className='flex-1 space-y-3'>
+                <h1 className='font-medium'>Destination</h1>
+                {selectedDestination && (
+                  <div className='space-y-3'>
+                    <p className='font-semibold'>{selectedDestination?.locationName}</p>
+                    <p className="text-neutral-500 font-medium">
+                      {selectedDestination?.locationAddress}, {selectedDestination?.cityName}, {selectedDestination?.postalCode}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
-            {selectedProducts?.length > 0 &&
-              <div
-                className={`max-w-screen-2xl mx-auto overflow-x-auto ${selectedProducts.length > 4 ? "overflow-y-auto max-h-[430px]" : ""
-                  } custom-scrollbar relative mt-4`}
-              >
-                <table className="w-full text-left border-collapse">
-                  <thead className="sticky top-0 z-[1] bg-white">
-                    <tr>
-                      <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b">
-                        Products
-                      </th>
-                      <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-right">
-                        Received
-                      </th>
-                    </tr>
-                  </thead>
+            <div className='bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+              <div className='flex justify-between items-center gap-6'>
+                <h1 className='flex-1 font-bold text-lg'>Ordered products</h1>
+                <div className='flex flex-col flex-1'>
+                  <Progressbar
+                    accepted={totalAcceptRejectValues.totalAccept}
+                    rejected={totalAcceptRejectValues.totalReject}
+                    total={totalAcceptRejectValues.totalQuantity}
+                  />
+                  <div className="mt-1">
+                    {totalAcceptRejectValues.totalAccept} of {totalAcceptRejectValues.totalQuantity}
+                  </div>
+                </div>
+              </div>
 
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {selectedProducts?.map((product, index) => {
+              {selectedProducts?.length > 0 &&
+                <div
+                  className={`max-w-screen-2xl mx-auto overflow-x-auto ${selectedProducts.length > 4 ? "overflow-y-auto max-h-[430px]" : ""
+                    } custom-scrollbar relative mt-4`}
+                >
+                  <table className="w-full text-left border-collapse">
+                    <thead className="sticky top-0 z-[1] bg-white">
+                      <tr>
+                        <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b">
+                          Products
+                        </th>
+                        <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-right">
+                          Received
+                        </th>
+                      </tr>
+                    </thead>
 
-                      return (
-                        <tr key={index} className="hover:bg-gray-50">
-                          <td className="text-sm p-3 text-neutral-500 text-center cursor-pointer flex flex-col lg:flex-row items-center gap-3">
-                            <div>
-                              <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt='productIMG' height={6000} width={6000} />
-                            </div>
-                            <div className='flex flex-col items-start justify-start gap-1'>
-                              <p className='font-bold text-blue-700 text-start'>{product?.productTitle}</p>
-                              <p className='font-medium'>{product?.size}</p>
-                              <span className='flex items-center gap-2'>
-                                {product.name}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="text-sm p-3 text-neutral-500 font-semibold">
-                            <div className='flex flex-col justify-center items-end'>
-                              <div className='w-full'>
-                                <Progressbar
-                                  accepted={transferOrderVariants[index]?.accept || 0}
-                                  rejected={transferOrderVariants[index]?.reject || 0}
-                                  total={transferOrderVariants[index]?.quantity}
-                                />
-                                <div className="mt-1">
-                                  {transferOrderVariants[index]?.accept || 0} of {transferOrderVariants[index]?.quantity}
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {selectedProducts?.map((product, index) => {
+
+                        return (
+                          <tr key={index} className="hover:bg-gray-50">
+                            <td className="text-sm p-3 text-neutral-500 text-center cursor-pointer flex flex-col lg:flex-row items-center gap-3">
+                              <div>
+                                <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt='productIMG' height={6000} width={6000} />
+                              </div>
+                              <div className='flex flex-col items-start justify-start gap-1'>
+                                <p className='font-bold text-blue-700 text-start'>{product?.productTitle}</p>
+                                <p className='font-medium'>{product?.size}</p>
+                                <span className='flex items-center gap-2'>
+                                  {product.name}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="text-sm p-3 text-neutral-500 font-semibold">
+                              <div className='flex flex-col justify-center items-end'>
+                                <div className='w-full'>
+                                  <Progressbar
+                                    accepted={transferOrderVariants[index]?.accept || 0}
+                                    rejected={transferOrderVariants[index]?.reject || 0}
+                                    total={transferOrderVariants[index]?.quantity}
+                                  />
+                                  <div className="mt-1">
+                                    {transferOrderVariants[index]?.accept || 0} of {transferOrderVariants[index]?.quantity}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            }
-            {selectedProducts?.length > 0 && <p className='px-4 pt-4 text-neutral-500 font-medium'>{selectedProducts?.length} variants on transfer order</p>}
-
-          </div>
-
-          <div className='flex flex-col lg:flex-row w-full justify-between items-start gap-6'>
-
-            <div className='w-full flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg min-h-[270px]'>
-              <h1 className='font-semibold'>Shipment Details</h1>
-
-              <div className='flex-1'>
-                <label htmlFor='estimatedArrival' className='flex justify-start font-medium text-neutral-800 pb-2'>Estimated Arrival</label>
-                <p className='text-neutral-500'>{estimatedArrival}</p>
-              </div>
-              <div>
-                <label htmlFor='shippingCarrier' className='flex justify-start font-medium text-neutral-500 pb-2'>Shipping carrier</label>
-                <p className='text-neutral-500'>{shippingCarrier === "" ? "--" : shippingCarrier}</p>
-              </div>
-              <div>
-                <label htmlFor='trackingNumber' className='flex justify-start font-medium text-neutral-500 pb-2'>Tracking Number</label>
-                <p className='text-neutral-500'>{trackingNumber === "" ? "--" : trackingNumber}</p>
-              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              }
+              {selectedProducts?.length > 0 && <p className='px-4 pt-4 text-neutral-500 font-medium'>{selectedProducts?.length} variants on transfer order</p>}
 
             </div>
 
-            <div className='w-full flex flex-col justify-between gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg min-h-[295px]'>
-              <h1 className='font-semibold'>Additional Details</h1>
-              <div>
-                <label htmlFor='referenceNumber' className='flex justify-start font-medium text-neutral-500 pb-2'>Reference Number</label>
-                <p className='text-neutral-500'>{referenceNumber === "" ? "--" : referenceNumber}</p>
+            <div className='flex flex-col lg:flex-row w-full justify-between items-start gap-6'>
+
+              <div className='w-full flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg min-h-[270px]'>
+                <h1 className='font-semibold'>Shipment Details</h1>
+
+                <div className='flex-1'>
+                  <label htmlFor='estimatedArrival' className='flex justify-start font-medium text-neutral-800 pb-2'>Estimated Arrival</label>
+                  <p className='text-neutral-500'>{estimatedArrival}</p>
+                </div>
+                <div>
+                  <label htmlFor='shippingCarrier' className='flex justify-start font-medium text-neutral-500 pb-2'>Shipping carrier</label>
+                  <p className='text-neutral-500'>{shippingCarrier === "" ? "--" : shippingCarrier}</p>
+                </div>
+                <div>
+                  <label htmlFor='trackingNumber' className='flex justify-start font-medium text-neutral-500 pb-2'>Tracking Number</label>
+                  <p className='text-neutral-500'>{trackingNumber === "" ? "--" : trackingNumber}</p>
+                </div>
+
               </div>
-              <div>
-                <label htmlFor='supplierNote' className='flex justify-start font-medium text-neutral-500 pb-2'>Note to supplier</label>
-                <p className='text-neutral-500'>{supplierNote === "" ? "--" : supplierNote}</p>
+
+              <div className='w-full flex flex-col justify-between gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg min-h-[295px]'>
+                <h1 className='font-semibold'>Additional Details</h1>
+                <div>
+                  <label htmlFor='referenceNumber' className='flex justify-start font-medium text-neutral-500 pb-2'>Reference Number</label>
+                  <p className='text-neutral-500'>{referenceNumber === "" ? "--" : referenceNumber}</p>
+                </div>
+                <div>
+                  <label htmlFor='supplierNote' className='flex justify-start font-medium text-neutral-500 pb-2'>Note to supplier</label>
+                  <p className='text-neutral-500'>{supplierNote === "" ? "--" : supplierNote}</p>
+                </div>
               </div>
             </div>
+
+            {/* Submit Button */}
+            {transferOrderStatus === "pending" && <div className='flex justify-between items-center'>
+
+              <button
+                type='button'
+                onClick={handleCancelClick}
+                className="bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold"
+              >
+                Cancel transfer
+              </button>
+              <button
+                type='button'
+                onClick={handleReceiveTransferClick}
+                className={`mt-4 mb-8 bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}
+              >
+                Receive transfer
+              </button>
+            </div>}
           </div>
 
-          {/* Submit Button */}
-          {transferOrderStatus === "pending" && <div className='flex justify-between items-center'>
+        </form>
 
-            <button
-              type='button'
-              onClick={handleCancelClick}
-              className="bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold"
-            >
-              Cancel transfer
-            </button>
-            <button
-              type='button'
-              onClick={handleReceiveTransferClick}
-              className={`mt-4 mb-8 bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}
-            >
-              Receive transfer
-            </button>
-          </div>}
-        </div>
+        <ExitConfirmationModalProduct
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onConfirm={handleModalConfirm}
+          message={modalMessage}
+          heading={headingMessage}
+        />
 
-      </form>
-
-      <ExitConfirmationModalProduct
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={handleModalConfirm}
-        message={modalMessage}
-        heading={headingMessage}
-      />
-
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 };
 

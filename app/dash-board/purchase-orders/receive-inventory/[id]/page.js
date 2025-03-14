@@ -1,5 +1,6 @@
 "use client";
 import Progressbar from '@/app/components/layout/Progressbar';
+import ProtectedRoute from '@/app/components/ProtectedRoutes/ProtectedRoute';
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useProductsInformation from '@/app/hooks/useProductsInformation';
@@ -251,124 +252,126 @@ const EditReceiveInventory = () => {
   }
 
   return (
-    <div className='bg-gray-50 min-h-screen px-6'>
+    <ProtectedRoute pageName="Purchase Orders" requiredPermission="Edit Purchase Order">
+      <div className='bg-gray-50 min-h-screen px-6'>
 
-      <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
-        <div className='flex items-center justify-between w-full'>
-          <div className='flex flex-col w-full'>
-            <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>Receive items</h3>
-            <span className='text-neutral-500 text-sm'>#{purchaseOrderNumber}</span>
+        <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
+          <div className='flex items-center justify-between w-full'>
+            <div className='flex flex-col w-full'>
+              <h3 className='w-full font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>Receive items</h3>
+              <span className='text-neutral-500 text-sm'>#{purchaseOrderNumber}</span>
+            </div>
+            <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={`/dash-board/purchase-orders/${id}`}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
           </div>
-          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={`/dash-board/purchase-orders/${id}`}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
-      </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
 
-        <div className="max-w-screen-xl mx-auto overflow-x-auto rounded-lg custom-scrollbar relative pt-4">
-          <table className="w-full text-left border-collapse">
-            <thead className="sticky top-0 z-[1] bg-white">
-              <tr>
-                <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b">
-                  Products
-                </th>
-                <th className="text-[10px] md:text-xs text-center font-bold p-2 xl:p-3 text-neutral-950 border-b">
-                  Available Quantity
-                </th>
-                <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-center">
-                  Accept
-                </th>
-                <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-center">
-                  Reject
-                </th>
-                <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-center">
-                  Received
-                </th>
-              </tr>
-            </thead>
-
-            <tbody className="bg-white divide-y divide-gray-200">
-              {selectedProducts.map((product, index) => (
-                <tr key={index} className="hover:bg-gray-50">
-                  <td className="text-sm p-3 text-neutral-500 text-center cursor-pointer flex flex-col lg:flex-row items-center gap-3">
-                    <div>
-                      <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt='productIMG' height={600} width={600} />
-                    </div>
-                    <div className='flex flex-col items-start justify-start gap-1'>
-                      <p className='font-bold text-blue-700 text-start'>{product?.productTitle}</p>
-                      <p className='font-medium'>{product?.size}</p>
-                      <span className='flex items-center gap-2'>
-                        {product.name}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
-                    {purchaseOrderVariants[index]?.quantity}
-                  </td>
-                  <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
-                    <div className='flex items-center gap-3'>
-                      <input
-                        type="number"
-                        className="custom-number-input w-20 lg:w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                        value={purchaseOrderVariants[index]?.accept || ''} // Set value to empty string when 0
-                        onChange={(e) => handleAcceptChange(index, e.target.value)}
-                      />
-                      <button
-                        type="button" // Prevent form submission
-                        onClick={() => handleAddAllAccept(index)}
-                        className="bg-white drop-shadow text-black px-4 py-2 rounded hover:bg-black hover:text-white"
-                      >
-                        All
-                      </button>
-                    </div>
-                    {acceptError && <p className='text-red-600 text-left'>This field is required</p>}
-                  </td>
-                  <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
-                    <div className='flex items-center gap-3'>
-                      <input
-                        type="number"
-                        className="custom-number-input w-20 lg:w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                        value={purchaseOrderVariants[index]?.reject || ''} // Set value to empty string when 0
-                        onChange={(e) => handleRejectChange(index, e.target.value)}
-                      />
-                      <button
-                        type="button" // Prevent form submission
-                        onClick={() => handleAddAllReject(index)}
-                        className="bg-white drop-shadow text-black px-4 py-2 rounded hover:bg-black hover:text-white"
-                      >
-                        All
-                      </button>
-                    </div>
-                  </td>
-                  <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
-                    <Progressbar
-                      accepted={purchaseOrderVariants[index]?.accept || 0}
-                      rejected={purchaseOrderVariants[index]?.reject || 0}
-                      total={purchaseOrderVariants[index]?.quantity}
-                    />
-                    <div className="mt-1">
-                      {purchaseOrderVariants[index]?.accept || 0} of {purchaseOrderVariants[index]?.quantity}
-                    </div>
-                  </td>
-
+          <div className="max-w-screen-xl mx-auto overflow-x-auto rounded-lg custom-scrollbar relative pt-4">
+            <table className="w-full text-left border-collapse">
+              <thead className="sticky top-0 z-[1] bg-white">
+                <tr>
+                  <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b">
+                    Products
+                  </th>
+                  <th className="text-[10px] md:text-xs text-center font-bold p-2 xl:p-3 text-neutral-950 border-b">
+                    Available Quantity
+                  </th>
+                  <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-center">
+                    Accept
+                  </th>
+                  <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-center">
+                    Reject
+                  </th>
+                  <th className="text-[10px] md:text-xs font-bold p-2 xl:p-3 text-neutral-950 border-b text-center">
+                    Received
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
 
-        <div className='flex justify-end items-center gap-6 w-full my-4 max-w-screen-xl mx-auto'>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {selectedProducts.map((product, index) => (
+                  <tr key={index} className="hover:bg-gray-50">
+                    <td className="text-sm p-3 text-neutral-500 text-center cursor-pointer flex flex-col lg:flex-row items-center gap-3">
+                      <div>
+                        <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt='productIMG' height={600} width={600} />
+                      </div>
+                      <div className='flex flex-col items-start justify-start gap-1'>
+                        <p className='font-bold text-blue-700 text-start'>{product?.productTitle}</p>
+                        <p className='font-medium'>{product?.size}</p>
+                        <span className='flex items-center gap-2'>
+                          {product.name}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
+                      {purchaseOrderVariants[index]?.quantity}
+                    </td>
+                    <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
+                      <div className='flex items-center gap-3'>
+                        <input
+                          type="number"
+                          className="custom-number-input w-20 lg:w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                          value={purchaseOrderVariants[index]?.accept || ''} // Set value to empty string when 0
+                          onChange={(e) => handleAcceptChange(index, e.target.value)}
+                        />
+                        <button
+                          type="button" // Prevent form submission
+                          onClick={() => handleAddAllAccept(index)}
+                          className="bg-white drop-shadow text-black px-4 py-2 rounded hover:bg-black hover:text-white"
+                        >
+                          All
+                        </button>
+                      </div>
+                      {acceptError && <p className='text-red-600 text-left'>This field is required</p>}
+                    </td>
+                    <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
+                      <div className='flex items-center gap-3'>
+                        <input
+                          type="number"
+                          className="custom-number-input w-20 lg:w-full p-2 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                          value={purchaseOrderVariants[index]?.reject || ''} // Set value to empty string when 0
+                          onChange={(e) => handleRejectChange(index, e.target.value)}
+                        />
+                        <button
+                          type="button" // Prevent form submission
+                          onClick={() => handleAddAllReject(index)}
+                          className="bg-white drop-shadow text-black px-4 py-2 rounded hover:bg-black hover:text-white"
+                        >
+                          All
+                        </button>
+                      </div>
+                    </td>
+                    <td className="text-sm p-3 text-neutral-500 text-center font-semibold">
+                      <Progressbar
+                        accepted={purchaseOrderVariants[index]?.accept || 0}
+                        rejected={purchaseOrderVariants[index]?.reject || 0}
+                        total={purchaseOrderVariants[index]?.quantity}
+                      />
+                      <div className="mt-1">
+                        {purchaseOrderVariants[index]?.accept || 0} of {purchaseOrderVariants[index]?.quantity}
+                      </div>
+                    </td>
 
-          <button
-            type='submit'
-            className={`bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}>
-            Accept
-          </button>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-        </div>
-      </form>
+          <div className='flex justify-end items-center gap-6 w-full my-4 max-w-screen-xl mx-auto'>
 
-    </div>
+            <button
+              type='submit'
+              className={`bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold`}>
+              Accept
+            </button>
+
+          </div>
+        </form>
+
+      </div>
+    </ProtectedRoute>
   );
 };
 

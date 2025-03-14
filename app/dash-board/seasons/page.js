@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
@@ -14,11 +14,26 @@ import { AiOutlineEdit } from 'react-icons/ai';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
+import { useAuth } from '@/app/contexts/auth';
 
 const Seasons = () => {
   const axiosPublic = useAxiosPublic();
   const router = useRouter();
   const [seasonList, isSeasonPending, refetch] = useSeasons();
+  const { existingUserData, isUserLoading } = useAuth();
+  const [isAddButtonAllowed, setIsAddButtonAllowed] = useState(false);
+  const [isEditButtonAllowed, setIsEditButtonAllowed] = useState(false);
+  const [isDeleteButtonAllowed, setIsDeleteButtonAllowed] = useState(false);
+
+  useEffect(() => {
+    // Fetch user data if needed or check the permission dynamically
+    if (existingUserData) {
+      // Check if the user has permission to add a product
+      setIsAddButtonAllowed(existingUserData?.permissions?.["Seasons"]?.actions?.['Create New Season'] ?? false);
+      setIsEditButtonAllowed(existingUserData?.permissions?.["Seasons"]?.actions?.['Edit Season'] ?? false);
+      setIsDeleteButtonAllowed(existingUserData?.permissions?.["Seasons"]?.actions?.['Delete Season'] ?? false);
+    }
+  }, [existingUserData]);
 
   const handleDelete = async (seasonId) => {
     Swal.fire({
@@ -80,7 +95,7 @@ const Seasons = () => {
     router.push(`/dash-board/seasons/${id}`);
   };
 
-  if (isSeasonPending) {
+  if (isSeasonPending || isUserLoading) {
     return <Loading />
   }
 
@@ -111,9 +126,16 @@ const Seasons = () => {
       <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between max-w-screen-2xl mx-auto px-6 py-6'>
         <h1 className='font-semibold text-center text-lg md:text-xl lg:text-3xl text-neutral-700'>SEASON MANAGEMENT</h1>
 
-        <button onClick={() => router.push('/dash-board/seasons/add-season')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
-          <FaPlus size={15} className='text-neutral-700' /> Add
-        </button>
+        {
+          isAddButtonAllowed ? (
+            <button onClick={() => router.push('/dash-board/seasons/add-season')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
+              <FaPlus size={15} className='text-neutral-700' /> Add
+            </button>
+          )
+            : (
+              <></>
+            )}
+
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 max-w-screen-2xl mx-auto px-6 relative">
@@ -143,21 +165,29 @@ const Seasons = () => {
               <div className="absolute inset-0 flex items-center gap-3 justify-center bg-black bg-opacity-60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg">
 
                 {/* Edit Button */}
-                <button onClick={() => handleGoToSeasonPage(season?._id)}>
-                  <span className='flex items-center gap-1.5 rounded-md bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4'><AiOutlineEdit size={16} /> Edit </span>
-                </button>
+                {isEditButtonAllowed ? (
+                  <button onClick={() => handleGoToSeasonPage(season?._id)}>
+                    <span className='flex items-center gap-1.5 rounded-md bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4'><AiOutlineEdit size={16} /> Edit </span>
+                  </button>
+                ) : (
+                  <></>
+                )}
 
                 {/* Delete Button */}
-                <button onClick={() => handleDelete(season?._id)}>
-                  <span className='flex items-center gap-1.5 rounded-md bg-red-50 p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-red-100 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs'> <RiDeleteBinLine size={16} />Delete </span>
-                </button>
+                {isDeleteButtonAllowed ? (
+                  <button onClick={() => handleDelete(season?._id)}>
+                    <span className='flex items-center gap-1.5 rounded-md bg-red-50 p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-red-100 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs'> <RiDeleteBinLine size={16} />Delete </span>
+                  </button>
+                ) : (
+                  <></>
+                )}
 
               </div>
             </div>
           );
         })}
       </div>
-    </div>
+    </div >
   );
 };
 

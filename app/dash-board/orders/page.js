@@ -14,7 +14,6 @@ import { IoMdClose } from 'react-icons/io';
 import Papa from 'papaparse';
 import useOrders from '@/app/hooks/useOrders';
 import CustomPagination from '@/app/components/layout/CustomPagination';
-import TabsOrder from '@/app/components/layout/TabsOrder';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 import arrowSvgImage from "/public/card-images/arrow.svg";
@@ -34,6 +33,9 @@ import ProductExpandedImageModalOrder from '@/app/components/product/ProductExpa
 import { TbColumnInsertRight } from 'react-icons/tb';
 import { HiOutlineDownload } from "react-icons/hi";
 import PaginationSelect from '@/app/components/layout/PaginationSelect';
+import { useAuth } from '@/app/contexts/auth';
+import TabsForOrderManagement from '@/app/components/layout/TabsForOrderManagement';
+
 const PrintButton = dynamic(() => import("@/app/components/layout/PrintButton"), { ssr: false });
 
 const initialColumns = ['Order Number', 'Date & Time', 'Customer Name', 'Order Amount', 'Order Status', 'Action', 'Email', 'Phone Number', 'Alt. Phone Number', 'Shipping Method', 'Payment Status', 'Payment Method'];
@@ -53,7 +55,6 @@ const columnsConfig = {
 };
 
 const OrdersPage = () => {
-  const isAdmin = true;
   const searchParams = useSearchParams();
   const promo = searchParams.get('promo');
   const offer = searchParams.get('offer');
@@ -90,6 +91,34 @@ const OrdersPage = () => {
   const [selectedHandler, setSelectedHandler] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isImageExpanded, setIsImageExpanded] = useState(false);
+  const { existingUserData, isUserLoading } = useAuth();
+  const [isOrderDetailsButtonAllowed, setIsOrderDetailsButtonAllowed] = useState(false);
+  const [isConfirmOrderButtonAllowed, setIsConfirmOrderButtonAllowed] = useState(false);
+  const [isShippedOrderButtonAllowed, setIsShippedOrderButtonAllowed] = useState(false);
+  const [isOnHoldOrderButtonAllowed, setIsOnHoldOrderButtonAllowed] = useState(false);
+  const [isDeliveredOrderButtonAllowed, setIsDeliveredOrderButtonAllowed] = useState(false);
+  const [isReturnApproveOrderButtonAllowed, setIsReturnApproveOrderButtonAllowed] = useState(false);
+  const [isReturnDeclineOrderButtonAllowed, setIsReturnDeclineOrderButtonAllowed] = useState(false);
+  const [isReturnOrderButtonAllowed, setIsReturnOrderButtonAllowed] = useState(false);
+  const [isRefundOrderButtonAllowed, setIsRefundOrderButtonAllowed] = useState(false);
+  const [isRevertOrderButtonAllowed, setIsRevertOrderButtonAllowed] = useState(false);
+
+  useEffect(() => {
+    // Fetch user data if needed or check the permission dynamically
+    if (existingUserData) {
+      // Check if the user has permission to add a product
+      setIsOrderDetailsButtonAllowed(existingUserData?.permissions?.["Orders"]?.actions?.['View Order Details'] ?? false);
+      setIsConfirmOrderButtonAllowed(existingUserData?.permissions?.["Orders"]?.actions?.['Confirm Order'] ?? false);
+      setIsShippedOrderButtonAllowed(existingUserData?.permissions?.["Orders"]?.actions?.['Shipped Order'] ?? false);
+      setIsOnHoldOrderButtonAllowed(existingUserData?.permissions?.["Orders"]?.actions?.['On Hold Order'] ?? false);
+      setIsDeliveredOrderButtonAllowed(existingUserData?.permissions?.["Orders"]?.actions?.['Delivered Order'] ?? false);
+      setIsReturnApproveOrderButtonAllowed(existingUserData?.permissions?.["Orders"]?.actions?.['Return Approve Order'] ?? false);
+      setIsReturnDeclineOrderButtonAllowed(existingUserData?.permissions?.["Orders"]?.actions?.['Return Decline Order'] ?? false);
+      setIsReturnOrderButtonAllowed(existingUserData?.permissions?.["Orders"]?.actions?.['Return Order'] ?? false);
+      setIsRefundOrderButtonAllowed(existingUserData?.permissions?.["Orders"]?.actions?.['Refund Order'] ?? false);
+      setIsRevertOrderButtonAllowed(existingUserData?.permissions?.["Orders"]?.actions?.['Revert Order'] ?? false);
+    }
+  }, [existingUserData]);
 
   // Load saved state from localStorage or use defaults
   useEffect(() => {
@@ -225,8 +254,34 @@ const OrdersPage = () => {
     setPage(0); // Reset to first page when changing items per page
   };
 
+  // Function to get filtered orders based on the selected tab and sort by last status change
+  const getFilteredOrders = () => {
+    const cleanTab = selectedTab.split(' (')[0];
+    let filtered = [];
+
+    switch (cleanTab) {
+      case 'New Orders':
+        filtered = orderList?.filter(order => order?.orderStatus === 'Pending');
+        break;
+      case 'Active Orders':
+        filtered = orderList?.filter(order => ['Processing', 'Shipped', 'On Hold'].includes(order?.orderStatus));
+        break;
+      case 'Completed Orders':
+        filtered = orderList?.filter(order => order?.orderStatus === 'Delivered');
+        break;
+      case 'Returns & Refunds':
+        filtered = orderList?.filter(order => ['Return Requested', 'Request Accepted', 'Request Declined', 'Return Initiated', 'Refunded'].includes(order?.orderStatus));
+        break;
+      default:
+        filtered = orderList;
+    }
+
+    // Sort the filtered orders based on last status change, most recent first
+    return filtered?.sort((a, b) => new Date(b.lastStatusChange) - new Date(a.lastStatusChange));
+  };
+
   // Filter orders based on search query and date range
-  const searchedOrders = orderList?.filter(order => {
+  const searchedOrders = getFilteredOrders()?.filter(order => {
 
     const query = searchQuery.toLowerCase();
     const isNumberQuery = !isNaN(query) && query.trim() !== '';
@@ -313,32 +368,6 @@ const OrdersPage = () => {
   const tabsWithCounts = useMemo(() => {
     return orderStatusTabs?.map(tab => `${tab} (${counts[tab] || 0})`);
   }, [counts]);
-
-  // Function to get filtered orders based on the selected tab and sort by last status change
-  const getFilteredOrders = () => {
-    const cleanTab = selectedTab.split(' (')[0];
-    let filtered = [];
-
-    switch (cleanTab) {
-      case 'New Orders':
-        filtered = orderList?.filter(order => order?.orderStatus === 'Pending');
-        break;
-      case 'Active Orders':
-        filtered = orderList?.filter(order => ['Processing', 'Shipped', 'On Hold'].includes(order?.orderStatus));
-        break;
-      case 'Completed Orders':
-        filtered = orderList?.filter(order => order?.orderStatus === 'Delivered');
-        break;
-      case 'Returns & Refunds':
-        filtered = orderList?.filter(order => ['Return Requested', 'Request Accepted', 'Request Declined', 'Return Initiated', 'Refunded'].includes(order?.orderStatus));
-        break;
-      default:
-        filtered = orderList;
-    }
-
-    // Sort the filtered orders based on last status change, most recent first
-    return filtered?.sort((a, b) => new Date(b.lastStatusChange) - new Date(a.lastStatusChange));
-  };
 
   // Filtered orders based on the selected tab
   const filteredOrders = isFilterActive ? searchedOrders : getFilteredOrders();
@@ -650,20 +679,9 @@ const OrdersPage = () => {
 
   // Adjust this logic to correctly determine the visibility of the Undo button
   const checkUndoAvailability = (order) => {
-    if (!order.undoAvailableUntil || !isAdmin) return false;
+    if (!order.undoAvailableUntil) return false;
     return new Date(order.undoAvailableUntil) > new Date(); // Check if undo is still valid
   };
-
-  // Adjust this logic to correctly determine the visibility of the Undo button - local storage previous logic
-  // const isUndoAvailable = (order) => {
-  //   if (!isAdmin) return false;
-  //   const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
-  //   const lastChange = new Date(order.lastStatusChange);
-
-  //   // Check localStorage to see if the undo button should be visible
-  //   const isVisible = localStorage.getItem(`undoVisible_${order._id}`);
-  //   return lastChange >= sixHoursAgo && isVisible;
-  // };
 
   // sending mail to customer
   const sendOrderEmail = (order, actionType) => {
@@ -1068,22 +1086,6 @@ const OrdersPage = () => {
     XLSX.writeFile(workbook, `${fileName}.xlsx`);
   };
 
-  // After delivered, only admin can change this within 7 days of order
-  // const isSevenDaysOrMore = (lastStatusChange) => {
-  //   const today = new Date();
-  //   const sevenDaysAgo = subDays(today, 7);
-  //   return isBefore(parseISO(lastStatusChange), sevenDaysAgo);
-  // };
-
-  // Disable the button based on admins or staffs
-  // const shouldDisableButton = (orderStatus, lastStatusChange, isAdmin) => {
-  //   if (!isAdmin) return false; // If admin, do not disable
-  //   if (['Delivered', 'Requested Return', 'Refunded'].includes(orderStatus)) {
-  //     return isSevenDaysOrMore(lastStatusChange); // Disable if last status change was 7 or more days ago
-  //   }
-  //   return false;
-  // };
-
   const handleDownload = (imgUrl) => {
     if (!imgUrl) return;
 
@@ -1107,7 +1109,7 @@ const OrdersPage = () => {
     }
   }, [paginatedOrders]);
 
-  if (isOrderListPending || isShippingPending) {
+  if (isOrderListPending || isShippingPending || isUserLoading) {
     return <Loading />;
   };
 
@@ -1163,7 +1165,7 @@ const OrdersPage = () => {
 
         <div className='pb-3 px-6 md:px-0 pt-3 md:pt-0 flex flex-wrap lg:flex-nowrap gap-3 lg:gap-0 justify-center md:justify-between'>
           <div className='flex justify-center md:justify-start w-full'>
-            <TabsOrder
+            <TabsForOrderManagement
               tabs={tabsWithCounts}
               selectedTab={`${selectedTab} (${counts[selectedTab] || 0})`} // Pass the selected tab with the count
               onTabChange={(tab) => setSelectedTab(tab.split(' (')[0])} // Extract the tab name without the count
@@ -1375,7 +1377,7 @@ const OrdersPage = () => {
                         selectedColumns.includes(column) && (
                           <>
                             {column === 'Order Number' && (
-                              <td key="orderNumber" className="text-xs p-3 font-mono cursor-pointer text-blue-600 hover:text-blue-800" onClick={() => handleOrderClick(order)}>
+                              <td key="orderNumber" className={`text-xs p-3 font-mono ${isOrderDetailsButtonAllowed ? "cursor-pointer text-blue-600 hover:text-blue-800" : "cursor-not-allowed text-neutral-800"}`} onClick={isOrderDetailsButtonAllowed ? () => handleOrderClick(order) : undefined}>
                                 {order?.orderNumber}
                               </td>
                             )}
@@ -1407,30 +1409,30 @@ const OrdersPage = () => {
                                 <div className="flex gap-2 items-center">
 
                                   {order.orderStatus === 'Pending' && (
-                                    <Button onClick={() => handleActions(order._id)} size="sm" className="text-xs w-20" color="primary" variant="flat">
+                                    <Button isDisabled={!isConfirmOrderButtonAllowed} onClick={() => handleActions(order._id)} size="sm" className="text-xs w-20" color="primary" variant="flat">
                                       Confirm
                                     </Button>
                                   )}
 
                                   {order.orderStatus === 'Processing' && (
-                                    <Button onClick={() => handleActions(order._id, 'shipped')} size="sm" className="text-xs w-20" color="secondary" variant="flat">
+                                    <Button isDisabled={!isShippedOrderButtonAllowed} onClick={() => handleActions(order._id, 'shipped')} size="sm" className="text-xs w-20" color="secondary" variant="flat">
                                       Shipped
                                     </Button>
                                   )}
 
                                   {order.orderStatus === 'Shipped' && (
                                     <div className="flex items-center gap-2">
-                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'onHold')} size="sm" color="warning" variant="flat">
+                                      <Button isDisabled={!isOnHoldOrderButtonAllowed} className="text-xs w-20" onClick={() => handleActions(order._id, 'onHold')} size="sm" color="warning" variant="flat">
                                         On Hold
                                       </Button>
-                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'delivered')} size="sm" color="success" variant="flat">
+                                      <Button isDisabled={!isDeliveredOrderButtonAllowed} className="text-xs w-20" onClick={() => handleActions(order._id, 'delivered')} size="sm" color="success" variant="flat">
                                         Delivered
                                       </Button>
                                     </div>
                                   )}
 
                                   {order.orderStatus === 'On Hold' && (
-                                    <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'delivered')} size="sm" color="success" variant="flat">
+                                    <Button isDisabled={!isDeliveredOrderButtonAllowed} className="text-xs w-20" onClick={() => handleActions(order._id, 'delivered')} size="sm" color="success" variant="flat">
                                       Delivered
                                     </Button>
                                   )}
@@ -1447,10 +1449,10 @@ const OrdersPage = () => {
 
                                   {order.orderStatus === 'Return Requested' && (
                                     <div className="flex items-center gap-2">
-                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'approved')} color='success' size="sm" variant="flat">
+                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'approved')} color='success' isDisabled={!isReturnApproveOrderButtonAllowed} size="sm" variant="flat">
                                         Approve
                                       </Button>
-                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'declined')} size="sm" color="danger" variant="flat">
+                                      <Button isDisabled={!isReturnDeclineOrderButtonAllowed} className="text-xs w-20" onClick={() => handleActions(order._id, 'declined')} size="sm" color="danger" variant="flat">
                                         Decline
                                       </Button>
                                     </div>
@@ -1458,7 +1460,9 @@ const OrdersPage = () => {
 
                                   {order.orderStatus === 'Request Accepted' && (
                                     <div className="flex items-center gap-2">
-                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'returned')} size="sm" color="secondary" variant="flat">
+                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'returned')} size="sm" color="secondary"
+                                        isDisabled={!isReturnOrderButtonAllowed}
+                                        variant="flat">
                                         Return
                                       </Button>
                                     </div>
@@ -1481,6 +1485,7 @@ const OrdersPage = () => {
                                       color="warning"
                                       variant='flat'
                                       onClick={() => handleActions(order._id, 'refunded')}
+                                      isDisabled={!isRefundOrderButtonAllowed}
                                     >
                                       Refund
                                     </Button>
@@ -1498,13 +1503,17 @@ const OrdersPage = () => {
                                   )}
 
                                   {/* Undo button logic */}
-                                  {isAdmin && checkUndoAvailability(order) && (
-                                    <button
-                                      onClick={() => handleActions(order._id, '', true)}
-                                      className="text-red-600 hover:text-red-800 focus:ring-2 focus:ring-red-500 rounded p-1"
-                                    >
-                                      <FaUndo />
-                                    </button>
+                                  {isRevertOrderButtonAllowed ? (
+                                    checkUndoAvailability(order) && (
+                                      <button
+                                        onClick={() => handleActions(order._id, '', true)}
+                                        className="text-red-600 hover:text-red-800 focus:ring-2 focus:ring-red-500 rounded p-1"
+                                      >
+                                        <FaUndo />
+                                      </button>
+                                    )
+                                  ) : (
+                                    <></>
                                   )}
 
                                 </div>

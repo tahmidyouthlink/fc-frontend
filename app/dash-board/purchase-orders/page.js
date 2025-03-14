@@ -16,6 +16,7 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { TbColumnInsertRight } from "react-icons/tb";
 import { FaPlus } from 'react-icons/fa6';
 import PaginationSelect from '@/app/components/layout/PaginationSelect';
+import { useAuth } from '@/app/contexts/auth';
 
 const orderStatusTabs = [
   'All',
@@ -38,6 +39,18 @@ const PurchaseOrders = () => {
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
+  const { existingUserData, isUserLoading } = useAuth();
+  const [isAddButtonAllowed, setIsAddButtonAllowed] = useState(false);
+  const [isEditButtonAllowed, setIsEditButtonAllowed] = useState(false);
+
+  useEffect(() => {
+    // Fetch user data if needed or check the permission dynamically
+    if (existingUserData) {
+      // Check if the user has permission to add a product
+      setIsAddButtonAllowed(existingUserData?.permissions?.["Purchase Orders"]?.actions?.['Create New Purchase Order'] ?? false);
+      setIsEditButtonAllowed(existingUserData?.permissions?.["Purchase Orders"]?.actions?.['Edit Purchase Order'] ?? false);
+    }
+  }, [existingUserData]);
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedColumnsPurchaseOrder'));
@@ -212,7 +225,7 @@ const PurchaseOrders = () => {
     }
   }, [paginatedOrders]);
 
-  if (isPurchaseOrderPending) {
+  if (isPurchaseOrderPending || isUserLoading) {
     return <Loading />
   }
 
@@ -304,9 +317,13 @@ const PurchaseOrders = () => {
 
           <h3 className='text-center md:text-start font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700l'>PURCHASE ORDERS</h3>
 
-          <button onClick={handleGoToPurchaseOrderPage} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700">
-            <FaPlus size={15} className='text-neutral-700' /> ADD
-          </button>
+          {isAddButtonAllowed ? (
+            <button onClick={handleGoToPurchaseOrderPage} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[18px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-semibold text-[14px] text-neutral-700">
+              <FaPlus size={15} className='text-neutral-700' /> ADD
+            </button>
+          ) : (
+            <></>
+          )}
         </div>
 
         <div className='flex flex-wrap lg:flex-nowrap justify-between items-center gap-6 w-full'>
@@ -380,7 +397,9 @@ const PurchaseOrders = () => {
                           selectedColumns.includes(column) && (
                             <>
                               {column === 'Purchase order' && (
-                                <td key="Purchase order" onClick={() => handleGoToEditPage(order?._id)} className="text-sm p-3 cursor-pointer text-blue-600 hover:text-blue-800 text-center">
+                                <td key="Purchase order"
+                                  onClick={isEditButtonAllowed ? () => handleGoToEditPage(order?._id) : undefined}
+                                  className={`text-sm p-3 ${isEditButtonAllowed ? "cursor-pointer text-blue-600 hover:text-blue-800" : "text-neutral-800"} text-center`}>
                                   {order?.purchaseOrderNumber}
                                 </td>
                               )}

@@ -17,6 +17,7 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import dynamic from 'next/dynamic';
 import { TbColumnInsertRight } from 'react-icons/tb';
 import PaginationSelect from '@/app/components/layout/PaginationSelect';
+import { useAuth } from '@/app/contexts/auth';
 const CustomerPrintButton = dynamic(() => import("@/app/components/layout/CustomerPrintButton"), { ssr: false });
 
 const initialColumns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alt. Phone Number', 'NewsLetter', 'Hometown', 'Status'];
@@ -37,6 +38,18 @@ const Customers = () => {
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const { existingUserData, isUserLoading } = useAuth();
+  const [isOrderDetailsAllowed, setIsOrderDetailsAllowed] = useState(false);
+  const [isOrderHistoryAllowed, setIsOrderHistoryAllowed] = useState(false);
+
+  useEffect(() => {
+    // Fetch user data if needed or check the permission dynamically
+    if (existingUserData) {
+      // Check if the user has permission to add a product
+      setIsOrderDetailsAllowed(existingUserData?.permissions?.["Customers"]?.actions?.['Customer Details'] ?? false);
+      setIsOrderHistoryAllowed(existingUserData?.permissions?.["Customers"]?.actions?.['Customer Order History'] ?? false);
+    }
+  }, [existingUserData]);
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedCustomer'));
@@ -231,7 +244,7 @@ const Customers = () => {
     }
   };
 
-  if (isCustomerListPending || isOrderListPending || isCustomerPending) {
+  if (isCustomerListPending || isOrderListPending || isCustomerPending || isUserLoading) {
     return <Loading />
   };
 
@@ -381,7 +394,7 @@ const Customers = () => {
                           selectedColumns.includes(column) && (
                             <>
                               {column === 'Customer ID' && (
-                                <td key="customerId" onClick={() => handleCustomerInfoClick(customer)} className="text-xs p-3 font-mono text-center cursor-pointer text-blue-600 hover:text-blue-800">
+                                <td key="customerId" onClick={isOrderDetailsAllowed ? () => handleCustomerInfoClick(customer) : undefined} className={`text-xs p-3 font-mono text-center ${isOrderDetailsAllowed ? "cursor-pointer text-blue-600 hover:text-blue-800" : "text-neutral-800"}`}>
                                   {customer?.customerId}
                                 </td>
                               )}
@@ -402,7 +415,7 @@ const Customers = () => {
                               )}
                               {column === 'Order History' && (
                                 <td>
-                                  {customer?.paymentMethods === "--" ? <p className='text-center'>--</p> : <p key="orderHistory" onClick={() => handleViewClick(customer?.customerId)} className="text-xs p-3 cursor-pointer text-blue-600 hover:text-blue-800 text-center">
+                                  {customer?.paymentMethods === "--" ? <p className='text-center'>--</p> : <p key="orderHistory" onClick={isOrderHistoryAllowed ? () => handleViewClick(customer?.customerId) : undefined} className={`text-xs p-3 font-mono text-center ${isOrderHistoryAllowed ? "cursor-pointer text-blue-600 hover:text-blue-800" : "text-neutral-800"}`}>
                                     View
                                   </p>}
                                 </td>

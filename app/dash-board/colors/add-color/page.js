@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import { FiPlus } from 'react-icons/fi';
+import ProtectedRoute from '@/app/components/ProtectedRoutes/ProtectedRoute';
 
 const AddColor = () => {
   const axiosPublic = useAxiosPublic();
@@ -82,65 +83,67 @@ const AddColor = () => {
   };
 
   return (
-    <div className='relative px-6 bg-gray-50 min-h-screen'>
+    <ProtectedRoute pageName="Colors" requiredPermission="Create New Color">
+      <div className='relative px-6 bg-gray-50 min-h-screen'>
 
-      <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
-        <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>CREATE NEW COLORS</h3>
-          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/colors"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
+          <div className='flex items-center justify-between'>
+            <h3 className='w-full font-semibold text-xl lg:text-2xl'>CREATE NEW COLORS</h3>
+            <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/colors"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+          </div>
         </div>
-      </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto'>
-        <div className="mt-8 w-full bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg">
-          <label className="flex justify-start font-medium text-[#9F5216] pb-2">Select Color</label>
-          {colorFields.map((item, index) => (
-            <div key={item.id} className="flex flex-col mb-4">
-              <div className="flex flex-col md:flex-row items-center gap-4 w-full">
-                <div className='flex flex-1 items-center gap-4'>
-                  <input
-                    type="color"
-                    {...register(`colors.${index}.colorCode`, {
-                      required: 'Color code is required',
-                      validate: value => value !== '#FFFFFF' || 'Please select a color other than the default white'
-                    })}
-                    className="w-16 h-16 p-0 border border-gray-300 rounded-md"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Enter color name"
-                    {...register(`colors.${index}.colorName`, { required: 'Color name is required' })}
-                    className="p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md w-full"
-                  />
+        <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto'>
+          <div className="mt-8 w-full bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg">
+            <label className="flex justify-start font-medium text-[#9F5216] pb-2">Select Color</label>
+            {colorFields.map((item, index) => (
+              <div key={item.id} className="flex flex-col mb-4">
+                <div className="flex flex-col md:flex-row items-center gap-4 w-full">
+                  <div className='flex flex-1 items-center gap-4'>
+                    <input
+                      type="color"
+                      {...register(`colors.${index}.colorCode`, {
+                        required: 'Color code is required',
+                        validate: value => value !== '#FFFFFF' || 'Please select a color other than the default white'
+                      })}
+                      className="w-16 h-16 p-0 border border-gray-300 rounded-md"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Enter color name"
+                      {...register(`colors.${index}.colorName`, { required: 'Color name is required' })}
+                      className="p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md w-full"
+                    />
+                  </div>
+                  <Button type="button" color="danger" onClick={() => removeColor(index)} variant="light">
+                    Remove
+                  </Button>
                 </div>
-                <Button type="button" color="danger" onClick={() => removeColor(index)} variant="light">
-                  Remove
-                </Button>
+                {errors.colors?.[index]?.colorCode && (
+                  <p className="text-red-600 text-left">{errors.colors[index].colorCode.message}</p>
+                )}
+                {errors.colors?.[index]?.colorName && (
+                  <p className="text-red-600 text-left">{errors.colors[index].colorName.message}</p>
+                )}
               </div>
-              {errors.colors?.[index]?.colorCode && (
-                <p className="text-red-600 text-left">{errors.colors[index].colorCode.message}</p>
-              )}
-              {errors.colors?.[index]?.colorName && (
-                <p className="text-red-600 text-left">{errors.colors[index].colorName.message}</p>
-              )}
-            </div>
-          ))}
-          <button
-            type="button"
-            onClick={() => appendColor({ colorName: '', colorCode: '#FFFFFF' })}
-            className="mt-4 mb-8 bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700 py-2 px-4 text-sm rounded-md cursor-pointer font-semibold flex items-center gap-2"
-          >
-            <FiPlus size={18} /> Add Color
-          </button>
-        </div>
-        <div className='flex justify-end items-center my-8'>
-          <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}>
-            <MdOutlineFileUpload size={20} /> {isSubmitting ? 'Submitting...' : 'Submit'}
-          </button>
-        </div>
-      </form>
+            ))}
+            <button
+              type="button"
+              onClick={() => appendColor({ colorName: '', colorCode: '#FFFFFF' })}
+              className="mt-4 mb-8 bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700 py-2 px-4 text-sm rounded-md cursor-pointer font-semibold flex items-center gap-2"
+            >
+              <FiPlus size={18} /> Add Color
+            </button>
+          </div>
+          <div className='flex justify-end items-center my-8'>
+            <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}>
+              <MdOutlineFileUpload size={20} /> {isSubmitting ? 'Submitting...' : 'Submit'}
+            </button>
+          </div>
+        </form>
 
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 };
 

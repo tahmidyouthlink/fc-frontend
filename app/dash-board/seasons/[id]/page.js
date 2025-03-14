@@ -1,4 +1,5 @@
 "use client";
+import ProtectedRoute from '@/app/components/ProtectedRoutes/ProtectedRoute';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { Button } from '@nextui-org/react';
 import Image from 'next/image';
@@ -154,92 +155,94 @@ export default function EditSeason() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='bg-gray-50'>
+    <ProtectedRoute pageName="Seasons" requiredPermission="Edit Season">
+      <form onSubmit={handleSubmit(onSubmit)} className='bg-gray-50'>
 
-      <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
-        <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>EDIT SEASON DETAILS</h3>
-          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/seasons"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
+          <div className='flex items-center justify-between'>
+            <h3 className='w-full font-semibold text-xl lg:text-2xl'>EDIT SEASON DETAILS</h3>
+            <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/seasons"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+          </div>
         </div>
-      </div>
 
-      <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
+        <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
 
-        <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
-          {/* Season Name Field */}
-          <div>
-            <label className="flex justify-start font-medium text-[#9F5216] pb-2">Season *</label>
-            <input
-              type="text"
-              placeholder="Add Season Name"
-              {...register('seasonName', { required: 'Season is required' })}
-              className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-            />
-            {errors.seasonName && (
-              <p className="text-red-600 text-left">{errors.seasonName.message}</p>
-            )}
+          <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
+            {/* Season Name Field */}
+            <div>
+              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Season *</label>
+              <input
+                type="text"
+                placeholder="Add Season Name"
+                {...register('seasonName', { required: 'Season is required' })}
+                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+              />
+              {errors.seasonName && (
+                <p className="text-red-600 text-left">{errors.seasonName.message}</p>
+              )}
+            </div>
+
           </div>
 
-        </div>
-
-        <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
+          <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
 
 
-          <div>
-            <input
-              id='imageUpload'
-              type='file'
-              className='hidden'
-              onChange={handleImageChange}
-            />
-            <label
-              htmlFor='imageUpload'
-              className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
+            <div>
+              <input
+                id='imageUpload'
+                type='file'
+                className='hidden'
+                onChange={handleImageChange}
+              />
+              <label
+                htmlFor='imageUpload'
+                className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
+              >
+                <MdOutlineFileUpload size={60} />
+                <div className='space-y-1.5 text-center'>
+                  <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
+                    Upload Thumbnail
+                  </h5>
+                  <p className='text-sm text-gray-500'>
+                    Photo Should be in PNG, JPEG, JPG, WEBP or Avif format
+                  </p>
+                </div>
+              </label>
+
+              {image && (
+                <div className='relative'>
+                  <Image
+                    src={typeof image === 'string' ? image : image.src}
+                    alt='Uploaded image'
+                    height={2000}
+                    width={2000}
+                    className='w-1/2 mx-auto h-[350px] mt-8 rounded-lg object-contain'
+                  />
+                  <button
+                    onClick={handleImageRemove}
+                    className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                  >
+                    <RxCross2 size={24} />
+                  </button>
+                </div>
+              )}
+
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className='flex justify-end pt-4 pb-8'>
+            <button
+              type='submit'
+              disabled={isSubmitting}
+              className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}
             >
-              <MdOutlineFileUpload size={60} />
-              <div className='space-y-1.5 text-center'>
-                <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                  Upload Thumbnail
-                </h5>
-                <p className='text-sm text-gray-500'>
-                  Photo Should be in PNG, JPEG, JPG, WEBP or Avif format
-                </p>
-              </div>
-            </label>
-
-            {image && (
-              <div className='relative'>
-                <Image
-                  src={typeof image === 'string' ? image : image.src}
-                  alt='Uploaded image'
-                  height={2000}
-                  width={2000}
-                  className='w-1/2 mx-auto h-[350px] mt-8 rounded-lg object-contain'
-                />
-                <button
-                  onClick={handleImageRemove}
-                  className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
-                >
-                  <RxCross2 size={24} />
-                </button>
-              </div>
-            )}
-
+              {isSubmitting ? 'Save Changes...' : 'Saved'} <FiSave size={20} />
+            </button>
           </div>
-        </div>
 
-        {/* Submit Button */}
-        <div className='flex justify-end pt-4 pb-8'>
-          <button
-            type='submit'
-            disabled={isSubmitting}
-            className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}
-          >
-            {isSubmitting ? 'Save Changes...' : 'Saved'} <FiSave size={20} />
-          </button>
         </div>
-
-      </div>
-    </form>
+      </form>
+    </ProtectedRoute>
   );
 }

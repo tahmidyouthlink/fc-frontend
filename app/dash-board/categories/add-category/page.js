@@ -12,6 +12,7 @@ import { MdOutlineFileUpload } from 'react-icons/md';
 import { FaArrowLeft } from 'react-icons/fa6';
 import useCategories from '@/app/hooks/useCategories';
 import Loading from '@/app/components/shared/Loading/Loading';
+import ProtectedRoute from '@/app/components/ProtectedRoutes/ProtectedRoute';
 
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
@@ -435,275 +436,277 @@ const AddCategory = () => {
   }
 
   return (
-    <div className='bg-gray-50 min-h-screen'>
+    <ProtectedRoute pageName="Categories" requiredPermission="Create New Category">
+      <div className='bg-gray-50 min-h-screen'>
 
-      <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
-        <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Category Configuration</h3>
-          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/categories"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
+          <div className='flex items-center justify-between'>
+            <h3 className='w-full font-semibold text-xl lg:text-2xl'>Category Configuration</h3>
+            <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/categories"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+          </div>
         </div>
-      </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
 
-          <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
-            <div>
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Category</label>
-              <input
-                type="text"
-                placeholder="Add Category"
-                {...register('category', { required: 'Category is required' })}
-                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-              />
-              {errors.category && (
-                <p className="text-red-600 text-left">{errors.category.message}</p>
-              )}
-            </div>
-
-            {/* Size input field with improved styling */}
-            <div className="w-full" ref={inputRef}>
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Size Range</label>
-              <div className="flex gap-2 items-center">
+            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
+              <div>
+                <label className="flex justify-start font-medium text-[#9F5216] pb-2">Category</label>
                 <input
                   type="text"
-                  placeholder="Add or Search Size Range (e.g., XXS-6XL)"
-                  value={sizeInput}
-                  onFocus={handleInputFocus}
-                  onChange={(e) => handleSizeInputChange(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9F5216] focus:border-transparent transition duration-300 ease-in-out"
+                  placeholder="Add Category"
+                  {...register('category', { required: 'Category is required' })}
+                  className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
                 />
-                <Button
-                  type="button"
-                  onClick={handleAddSize}
-                  disabled={!sizeInput}
-                  className={`px-4 py-2 rounded-md font-semibold ${sizeInput ? 'bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
-                >
-                  Add Size
-                </Button>
+                {errors.category && (
+                  <p className="text-red-600 text-left">{errors.category.message}</p>
+                )}
               </div>
 
-              {/* Display filtered size suggestions with a dropdown-like design */}
-              {showSuggestions && filteredSizes.length > 0 && (
-                <ul ref={suggestionsRef} className="w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto z-[9999]">
-                  {filteredSizes.map((size, i) => (
-                    <li
-                      key={i}
-                      className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors duration-150 flex items-center gap-2"
-                      onClick={() => handleSizeSelect(size)}
-                    >
-                      {/* Show the image next to the size */}
-                      {sizeImages[size] && (
-                        <Image
-                          src={sizeImages[size]}
-                          alt={`${size} size guide`}
-                          height={3000} // Adjust size as needed
-                          width={3000} // Adjust size as needed
-                          className="rounded-md h-12 w-12 object-contain"
-                        />
-                      )}
-                      <span>{size}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+              {/* Size input field with improved styling */}
+              <div className="w-full" ref={inputRef}>
+                <label className="flex justify-start font-medium text-[#9F5216] pb-2">Size Range</label>
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="text"
+                    placeholder="Add or Search Size Range (e.g., XXS-6XL)"
+                    value={sizeInput}
+                    onFocus={handleInputFocus}
+                    onChange={(e) => handleSizeInputChange(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9F5216] focus:border-transparent transition duration-300 ease-in-out"
+                  />
+                  <Button
+                    type="button"
+                    onClick={handleAddSize}
+                    disabled={!sizeInput}
+                    className={`px-4 py-2 rounded-md font-semibold ${sizeInput ? 'bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                  >
+                    Add Size
+                  </Button>
+                </div>
 
-            {/* Display selected sizes with a more polished look */}
-            <div className="selected-sizes flex flex-wrap gap-3">
-              {selectedSizes?.map((size, index) => (
-                <div key={index} className="flex flex-col items-start gap-2 bg-gray-100 border border-gray-300 rounded-md p-3">
-                  <div className="flex items-center justify-between w-full gap-2">
-                    <span className="text-sm font-bold text-gray-700">{size}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleSizeRemove(index)}
-                      className="ml-2 text-red-600 hover:text-red-900 focus:outline-none transition-colors duration-300 hover:scale-105"
-                    >
-                      <RxCross2 size={22} />
-                    </button>
-                  </div>
-
-                  {/* Image upload input - Only show this if there is no image for the selected size */}
-                  {!sizeImages[size] || (!sizeImages[size]?.src && typeof sizeImages[size] !== 'string') ? (
-                    <>
-                      {/* Image upload input field */}
-                      <input
-                        id={`imageUpload-${size}`}
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={(e) => handleImageChangeForSizeRange(size, e)} // Handle image upload
-                      />
-                      <label
-                        htmlFor={`imageUpload-${size}`}
-                        className="mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer"
+                {/* Display filtered size suggestions with a dropdown-like design */}
+                {showSuggestions && filteredSizes.length > 0 && (
+                  <ul ref={suggestionsRef} className="w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto z-[9999]">
+                    {filteredSizes.map((size, i) => (
+                      <li
+                        key={i}
+                        className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors duration-150 flex items-center gap-2"
+                        onClick={() => handleSizeSelect(size)}
                       >
-                        <MdOutlineFileUpload size={60} />
-                        <div className="space-y-1.5 text-center">
-                          <h5 className="whitespace-nowrap text-lg font-medium tracking-tight">
-                            Upload Size Guide Image
-                          </h5>
-                          <p className="text-sm text-gray-500">
-                            Photo should be in PNG, JPEG, or JPG format
-                          </p>
-                        </div>
-                      </label>
-                    </>
-                  ) : (
-                    <div className="relative">
-                      {/* Show the uploaded size guide image */}
-                      <Image
-                        src={typeof sizeImages[size] === 'string' ? sizeImages[size] : sizeImages[size].src}
-                        alt={`${size} size guide`}
-                        height={2000} // Adjust height
-                        width={2000} // Adjust width
-                        className="h-44 w-44 rounded-lg object-contain"
-                      />
+                        {/* Show the image next to the size */}
+                        {sizeImages[size] && (
+                          <Image
+                            src={sizeImages[size]}
+                            alt={`${size} size guide`}
+                            height={3000} // Adjust size as needed
+                            width={3000} // Adjust size as needed
+                            className="rounded-md h-12 w-12 object-contain"
+                          />
+                        )}
+                        <span>{size}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
 
-                      {/* Show "X" icon to allow removal of the image */}
+              {/* Display selected sizes with a more polished look */}
+              <div className="selected-sizes flex flex-wrap gap-3">
+                {selectedSizes?.map((size, index) => (
+                  <div key={index} className="flex flex-col items-start gap-2 bg-gray-100 border border-gray-300 rounded-md p-3">
+                    <div className="flex items-center justify-between w-full gap-2">
+                      <span className="text-sm font-bold text-gray-700">{size}</span>
                       <button
-                        onClick={() => handleImageRemoveForSizeRange(size)} // Remove the image
-                        className="absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold"
+                        type="button"
+                        onClick={() => handleSizeRemove(index)}
+                        className="ml-2 text-red-600 hover:text-red-900 focus:outline-none transition-colors duration-300 hover:scale-105"
                       >
-                        <RxCross2 size={24} />
+                        <RxCross2 size={22} />
                       </button>
                     </div>
-                  )}
 
-                </div>
-              ))}
+                    {/* Image upload input - Only show this if there is no image for the selected size */}
+                    {!sizeImages[size] || (!sizeImages[size]?.src && typeof sizeImages[size] !== 'string') ? (
+                      <>
+                        {/* Image upload input field */}
+                        <input
+                          id={`imageUpload-${size}`}
+                          type="file"
+                          className="hidden"
+                          accept="image/*"
+                          onChange={(e) => handleImageChangeForSizeRange(size, e)} // Handle image upload
+                        />
+                        <label
+                          htmlFor={`imageUpload-${size}`}
+                          className="mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer"
+                        >
+                          <MdOutlineFileUpload size={60} />
+                          <div className="space-y-1.5 text-center">
+                            <h5 className="whitespace-nowrap text-lg font-medium tracking-tight">
+                              Upload Size Guide Image
+                            </h5>
+                            <p className="text-sm text-gray-500">
+                              Photo should be in PNG, JPEG, or JPG format
+                            </p>
+                          </div>
+                        </label>
+                      </>
+                    ) : (
+                      <div className="relative">
+                        {/* Show the uploaded size guide image */}
+                        <Image
+                          src={typeof sizeImages[size] === 'string' ? sizeImages[size] : sizeImages[size].src}
+                          alt={`${size} size guide`}
+                          height={2000} // Adjust height
+                          width={2000} // Adjust width
+                          className="h-44 w-44 rounded-lg object-contain"
+                        />
 
-            </div>
+                        {/* Show "X" icon to allow removal of the image */}
+                        <button
+                          onClick={() => handleImageRemoveForSizeRange(size)} // Remove the image
+                          className="absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold"
+                        >
+                          <RxCross2 size={24} />
+                        </button>
+                      </div>
+                    )}
 
-          </div>
+                  </div>
+                ))}
 
-          <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-
-            <div className="w-full" ref={inputRefCategory}>
-              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Sub-Category</label>
-              <div className="flex gap-2 items-center">
-                <input
-                  type="text"
-                  placeholder="Add or Search Sub-Category"
-                  value={subCategoryInput}
-                  onFocus={handleSubCategoryInputFocus}
-                  onChange={(e) => handleSubCategoryInputChange(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9F5216] focus:border-transparent transition duration-300 ease-in-out"
-                />
-                <Button
-                  type="button"
-                  onClick={handleAddSubCategory}
-                  disabled={!subCategoryInput}
-                  className={`px-5 py-3 rounded-md font-semibold ${subCategoryInput ? 'bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
-                >
-                  Add Sub-Category
-                </Button>
               </div>
 
-              {/* Sub-category suggestions */}
-              {showSubCategorySuggestions && filteredSubCategories?.length > 0 && (
-                <ul ref={suggestionsRefCategory} className="w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto z-[9999]">
-                  {filteredSubCategories.map((subCategory, i) => (
-                    <li
-                      key={i}
-                      className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors duration-150"
-                      onClick={() => handleSubCategorySelect(subCategory)}
-                    >
-                      {subCategory}
-                    </li>
-                  ))}
-                </ul>
-              )}
             </div>
 
-            {/* Selected sub-categories */}
-            <div className="selected-subCategories flex flex-wrap gap-3 mb-8">
-              {selectedSubCategories?.map((subCategory, index) => (
-                <div key={index} className="flex items-center bg-gray-100 border border-gray-300 rounded-full py-1 px-3 text-sm text-gray-700">
-                  <span>{subCategory}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleSubCategoryRemove(index)}
-                    className="ml-2 text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-150"
-                  >
-                    <RxCross2 size={19} />
-                  </button>
-                </div>
-              ))}
-            </div>
+            <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
 
-            <div>
-              <input
-                id='imageUpload'
-                type='file'
-                className='hidden'
-                onChange={handleImageChange}
-              />
-              <label
-                htmlFor='imageUpload'
-                className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
-              >
-                <MdOutlineFileUpload size={60} />
-                <div className='space-y-1.5 text-center'>
-                  <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                    Upload Thumbnail
-                  </h5>
-                  <p className='text-sm text-gray-500'>
-                    Photo Should be in PNG, JPEG or JPG format
-                  </p>
-                </div>
-              </label>
-
-              {/* Display uploaded image or selected default image */}
-              {(image || selectedDefaultImage) && (
-                <div className='relative'>
-                  <Image
-                    src={image?.src || selectedDefaultImage}
-                    alt='Selected or uploaded image'
-                    height={2000}
-                    width={2000}
-                    className='w-1/2 mx-auto md:h-[350px] mt-8 rounded-md'
+              <div className="w-full" ref={inputRefCategory}>
+                <label className="flex justify-start font-medium text-[#9F5216] pb-2">Sub-Category</label>
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="text"
+                    placeholder="Add or Search Sub-Category"
+                    value={subCategoryInput}
+                    onFocus={handleSubCategoryInputFocus}
+                    onChange={(e) => handleSubCategoryInputChange(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9F5216] focus:border-transparent transition duration-300 ease-in-out"
                   />
-                  <button
-                    onClick={handleImageRemove}
-                    className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                  <Button
+                    type="button"
+                    onClick={handleAddSubCategory}
+                    disabled={!subCategoryInput}
+                    className={`px-5 py-3 rounded-md font-semibold ${subCategoryInput ? 'bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
                   >
-                    <RxCross2 size={24} />
-                  </button>
+                    Add Sub-Category
+                  </Button>
                 </div>
-              )}
 
-              {/* Show default images for selection if no image is uploaded */}
-              {!image && !selectedDefaultImage && (
-                <div className='grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 lg:gap-8 xl:gap-4 mt-8'>
-                  {defaultImages.map((defaultImage, index) => (
-                    <div key={index} onClick={() => handleDefaultImageSelect(defaultImage)} className='cursor-pointer'>
-                      <Image
-                        src={defaultImage}
-                        alt={`Default image ${index + 1}`}
-                        height={2000}
-                        width={2000}
-                        className='w-full h-52 xl:h-96 rounded-md object-contain'
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
+                {/* Sub-category suggestions */}
+                {showSubCategorySuggestions && filteredSubCategories?.length > 0 && (
+                  <ul ref={suggestionsRefCategory} className="w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto z-[9999]">
+                    {filteredSubCategories.map((subCategory, i) => (
+                      <li
+                        key={i}
+                        className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors duration-150"
+                        onClick={() => handleSubCategorySelect(subCategory)}
+                      >
+                        {subCategory}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              {/* Selected sub-categories */}
+              <div className="selected-subCategories flex flex-wrap gap-3 mb-8">
+                {selectedSubCategories?.map((subCategory, index) => (
+                  <div key={index} className="flex items-center bg-gray-100 border border-gray-300 rounded-full py-1 px-3 text-sm text-gray-700">
+                    <span>{subCategory}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleSubCategoryRemove(index)}
+                      className="ml-2 text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-150"
+                    >
+                      <RxCross2 size={19} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div>
+                <input
+                  id='imageUpload'
+                  type='file'
+                  className='hidden'
+                  onChange={handleImageChange}
+                />
+                <label
+                  htmlFor='imageUpload'
+                  className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
+                >
+                  <MdOutlineFileUpload size={60} />
+                  <div className='space-y-1.5 text-center'>
+                    <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
+                      Upload Thumbnail
+                    </h5>
+                    <p className='text-sm text-gray-500'>
+                      Photo Should be in PNG, JPEG or JPG format
+                    </p>
+                  </div>
+                </label>
+
+                {/* Display uploaded image or selected default image */}
+                {(image || selectedDefaultImage) && (
+                  <div className='relative'>
+                    <Image
+                      src={image?.src || selectedDefaultImage}
+                      alt='Selected or uploaded image'
+                      height={2000}
+                      width={2000}
+                      className='w-1/2 mx-auto md:h-[350px] mt-8 rounded-md'
+                    />
+                    <button
+                      onClick={handleImageRemove}
+                      className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                    >
+                      <RxCross2 size={24} />
+                    </button>
+                  </div>
+                )}
+
+                {/* Show default images for selection if no image is uploaded */}
+                {!image && !selectedDefaultImage && (
+                  <div className='grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 lg:gap-8 xl:gap-4 mt-8'>
+                    {defaultImages.map((defaultImage, index) => (
+                      <div key={index} onClick={() => handleDefaultImageSelect(defaultImage)} className='cursor-pointer'>
+                        <Image
+                          src={defaultImage}
+                          alt={`Default image ${index + 1}`}
+                          height={2000}
+                          width={2000}
+                          className='w-full h-52 xl:h-96 rounded-md object-contain'
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
             </div>
 
+            <div className='flex justify-end pt-4 pb-8'>
+
+              <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}>
+                {isSubmitting ? 'Submitting...' : 'Submit'} <MdOutlineFileUpload size={20} />
+              </button>
+
+            </div>
           </div>
-
-          <div className='flex justify-end pt-4 pb-8'>
-
-            <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}>
-              {isSubmitting ? 'Submitting...' : 'Submit'} <MdOutlineFileUpload size={20} />
-            </button>
-
-          </div>
-        </div>
-      </form >
-    </div >
+        </form >
+      </div>
+    </ProtectedRoute>
   );
 };
 

@@ -1,4 +1,5 @@
 "use client";
+import ProtectedRoute from '@/app/components/ProtectedRoutes/ProtectedRoute';
 import Loading from '@/app/components/shared/Loading/Loading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useCategories from '@/app/hooks/useCategories';
@@ -430,258 +431,260 @@ export default function EditCategory() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='bg-gray-50'>
+    <ProtectedRoute page="Categories" requiredPermission="Edit Category">
+      <form onSubmit={handleSubmit(onSubmit)} className='bg-gray-50'>
 
-      <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
-        <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Edit Category Details</h3>
-          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/categories"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
-        </div>
-      </div>
-
-      <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
-
-        <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
-          {/* Category Field */}
-          <div className="w-full">
-            <label className="flex justify-start font-medium text-[#9F5216] pb-2">Category</label>
-            <input
-              type="text"
-              placeholder="Add Category"
-              {...register('category', { required: 'Category is required' })}
-              className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-300 rounded-md shadow-sm"
-            />
-            {errors.category && (
-              <p className="text-red-600 text-left mt-1 text-sm">{errors.category.message}</p>
-            )}
+        <div className='max-w-screen-lg mx-auto pt-3 md:pt-6 px-6'>
+          <div className='flex items-center justify-between'>
+            <h3 className='w-full font-semibold text-xl lg:text-2xl'>Edit Category Details</h3>
+            <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/categories"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
           </div>
+        </div>
 
-          {/* Size input field with improved styling */}
-          <div className="w-full" ref={inputRef}>
-            <label className="flex justify-start font-medium text-[#9F5216] pb-2">Size Range</label>
-            <div className="flex gap-2 items-center">
+        <div className='max-w-screen-lg mx-auto p-6 flex flex-col gap-4'>
+
+          <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
+            {/* Category Field */}
+            <div className="w-full">
+              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Category</label>
               <input
                 type="text"
-                placeholder="Add or Search Size Range (e.g., XXS-6XL)"
-                value={sizeInput}
-                onFocus={handleInputFocus}
-                onChange={(e) => handleSizeInputChange(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9F5216] focus:border-transparent transition duration-300 ease-in-out"
+                placeholder="Add Category"
+                {...register('category', { required: 'Category is required' })}
+                className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-300 rounded-md shadow-sm"
               />
-              <Button
-                type="button"
-                onClick={handleAddSize}
-                disabled={!sizeInput}
-                className={`px-4 py-2 rounded-md font-semibold ${sizeInput ? 'bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
-              >
-                Add Size
-              </Button>
+              {errors.category && (
+                <p className="text-red-600 text-left mt-1 text-sm">{errors.category.message}</p>
+              )}
             </div>
 
-            {/* Display filtered size suggestions with a dropdown-like design */}
-            {showSuggestions && filteredSizes.length > 0 && (
-              <ul ref={suggestionsRef} className="w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto z-[9999]">
-                {filteredSizes.map((size, i) => (
-                  <li
-                    key={i}
-                    className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors duration-150 flex items-center gap-2"
-                    onClick={() => handleSizeSelect(size)}
-                  >
-                    {/* Show the image next to the size */}
-                    {sizeImagesForSuggestion[size] && (
-                      <Image
-                        src={sizeImagesForSuggestion[size]}
-                        alt={`${size} size guide`}
-                        height={3000} // Adjust size as needed
-                        width={3000} // Adjust size as needed
-                        className="rounded-md h-12 w-12 object-contain"
+            {/* Size input field with improved styling */}
+            <div className="w-full" ref={inputRef}>
+              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Size Range</label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="text"
+                  placeholder="Add or Search Size Range (e.g., XXS-6XL)"
+                  value={sizeInput}
+                  onFocus={handleInputFocus}
+                  onChange={(e) => handleSizeInputChange(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9F5216] focus:border-transparent transition duration-300 ease-in-out"
+                />
+                <Button
+                  type="button"
+                  onClick={handleAddSize}
+                  disabled={!sizeInput}
+                  className={`px-4 py-2 rounded-md font-semibold ${sizeInput ? 'bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                >
+                  Add Size
+                </Button>
+              </div>
+
+              {/* Display filtered size suggestions with a dropdown-like design */}
+              {showSuggestions && filteredSizes.length > 0 && (
+                <ul ref={suggestionsRef} className="w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto z-[9999]">
+                  {filteredSizes.map((size, i) => (
+                    <li
+                      key={i}
+                      className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors duration-150 flex items-center gap-2"
+                      onClick={() => handleSizeSelect(size)}
+                    >
+                      {/* Show the image next to the size */}
+                      {sizeImagesForSuggestion[size] && (
+                        <Image
+                          src={sizeImagesForSuggestion[size]}
+                          alt={`${size} size guide`}
+                          height={3000} // Adjust size as needed
+                          width={3000} // Adjust size as needed
+                          className="rounded-md h-12 w-12 object-contain"
+                        />
+                      )}
+                      <span>{size}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Display selected sizes with a more polished look */}
+            <div className="selected-sizes flex flex-wrap gap-3">
+              {selectedSizes?.map((size, index) => (
+                <div key={index} className="flex flex-col items-start gap-2 bg-gray-100 border border-gray-300 rounded-md p-3">
+                  <div className="flex items-center justify-between w-full gap-2">
+                    <span className="text-sm font-bold text-gray-700">{size}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleSizeRemove(index)}
+                      className="ml-2 text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-150"
+                    >
+                      <RxCross2 size={19} />
+                    </button>
+                  </div>
+
+                  {/* Image upload input - Only show this if there is no image for the selected size */}
+                  {!sizeImages[categoryKey]?.[size] || (!sizeImages[categoryKey][size]?.src && typeof sizeImages[categoryKey][size] !== 'string') ? (
+                    <>
+                      {/* Image upload input field */}
+                      <input
+                        id={`imageUpload-${size}`}
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={(e) => handleImageChangeForSizeRange(size, e)} // Handle image upload
                       />
-                    )}
-                    <span>{size}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+                      <label
+                        htmlFor={`imageUpload-${size}`}
+                        className="mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer"
+                      >
+                        <MdOutlineFileUpload size={60} />
+                        <div className="space-y-1.5 text-center">
+                          <h5 className="whitespace-nowrap text-lg font-medium tracking-tight">
+                            Upload Size Guide Image
+                          </h5>
+                          <p className="text-sm text-gray-500">
+                            Photo should be in PNG, JPEG, or JPG format
+                          </p>
+                        </div>
+                      </label>
+                    </>
+                  ) : (
+                    <div className="relative">
+                      {/* Show the uploaded size guide image */}
+                      <Image
+                        src={typeof sizeImages[categoryKey][size] === 'string' ? sizeImages[categoryKey][size] : sizeImages[categoryKey][size].src}
+                        alt={`${size} size guide`}
+                        height={2000} // Adjust height
+                        width={2000} // Adjust width
+                        className="h-44 w-44 rounded-lg object-contain"
+                      />
+
+                      {/* Show "X" icon to allow removal of the image */}
+                      <button
+                        onClick={() => handleImageRemoveForSizeRange(size)} // Remove the image
+                        className="absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold"
+                      >
+                        <RxCross2 size={24} />
+                      </button>
+                    </div>
+                  )}
+
+                </div>
+              ))}
+            </div>
+
           </div>
 
-          {/* Display selected sizes with a more polished look */}
-          <div className="selected-sizes flex flex-wrap gap-3">
-            {selectedSizes?.map((size, index) => (
-              <div key={index} className="flex flex-col items-start gap-2 bg-gray-100 border border-gray-300 rounded-md p-3">
-                <div className="flex items-center justify-between w-full gap-2">
-                  <span className="text-sm font-bold text-gray-700">{size}</span>
+          <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
+
+            <div className="w-full" ref={inputRefCategory}>
+              <label className="flex justify-start font-medium text-[#9F5216] pb-2">Sub-Category</label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="text"
+                  placeholder="Add or Search Sub-Category"
+                  value={subCategoryInput}
+                  onFocus={handleSubCategoryInputFocus}
+                  onChange={(e) => handleSubCategoryInputChange(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9F5216] focus:border-transparent transition duration-300 ease-in-out"
+                />
+                <Button
+                  type="button"
+                  onClick={handleAddSubCategory}
+                  disabled={!subCategoryInput}
+                  className={`px-5 py-3 rounded-md font-semibold ${subCategoryInput ? 'bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                >
+                  Add Sub-Category
+                </Button>
+              </div>
+
+              {/* Sub-category suggestions */}
+              {showSubCategorySuggestions && filteredSubCategories?.length > 0 && (
+                <ul ref={suggestionsRefCategory} className="w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto z-[9999]">
+                  {filteredSubCategories.map((subCategory, i) => (
+                    <li
+                      key={i}
+                      className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors duration-150"
+                      onClick={() => handleSubCategorySelect(subCategory)}
+                    >
+                      {subCategory}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Selected sub-categories */}
+            <div className="selected-subCategories flex flex-wrap gap-3 mb-8">
+              {selectedSubCategories?.map((subCategory, index) => (
+                <div key={index} className="flex items-center bg-gray-100 border border-gray-300 rounded-full py-1 px-3 text-sm text-gray-700">
+                  <span>{subCategory}</span>
                   <button
                     type="button"
-                    onClick={() => handleSizeRemove(index)}
+                    onClick={() => handleSubCategoryRemove(index)}
                     className="ml-2 text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-150"
                   >
                     <RxCross2 size={19} />
                   </button>
                 </div>
-
-                {/* Image upload input - Only show this if there is no image for the selected size */}
-                {!sizeImages[categoryKey]?.[size] || (!sizeImages[categoryKey][size]?.src && typeof sizeImages[categoryKey][size] !== 'string') ? (
-                  <>
-                    {/* Image upload input field */}
-                    <input
-                      id={`imageUpload-${size}`}
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={(e) => handleImageChangeForSizeRange(size, e)} // Handle image upload
-                    />
-                    <label
-                      htmlFor={`imageUpload-${size}`}
-                      className="mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer"
-                    >
-                      <MdOutlineFileUpload size={60} />
-                      <div className="space-y-1.5 text-center">
-                        <h5 className="whitespace-nowrap text-lg font-medium tracking-tight">
-                          Upload Size Guide Image
-                        </h5>
-                        <p className="text-sm text-gray-500">
-                          Photo should be in PNG, JPEG, or JPG format
-                        </p>
-                      </div>
-                    </label>
-                  </>
-                ) : (
-                  <div className="relative">
-                    {/* Show the uploaded size guide image */}
-                    <Image
-                      src={typeof sizeImages[categoryKey][size] === 'string' ? sizeImages[categoryKey][size] : sizeImages[categoryKey][size].src}
-                      alt={`${size} size guide`}
-                      height={2000} // Adjust height
-                      width={2000} // Adjust width
-                      className="h-44 w-44 rounded-lg object-contain"
-                    />
-
-                    {/* Show "X" icon to allow removal of the image */}
-                    <button
-                      onClick={() => handleImageRemoveForSizeRange(size)} // Remove the image
-                      className="absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold"
-                    >
-                      <RxCross2 size={24} />
-                    </button>
-                  </div>
-                )}
-
-              </div>
-            ))}
-          </div>
-
-        </div>
-
-        <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg w-full'>
-
-          <div className="w-full" ref={inputRefCategory}>
-            <label className="flex justify-start font-medium text-[#9F5216] pb-2">Sub-Category</label>
-            <div className="flex gap-2 items-center">
-              <input
-                type="text"
-                placeholder="Add or Search Sub-Category"
-                value={subCategoryInput}
-                onFocus={handleSubCategoryInputFocus}
-                onChange={(e) => handleSubCategoryInputChange(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9F5216] focus:border-transparent transition duration-300 ease-in-out"
-              />
-              <Button
-                type="button"
-                onClick={handleAddSubCategory}
-                disabled={!subCategoryInput}
-                className={`px-5 py-3 rounded-md font-semibold ${subCategoryInput ? 'bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
-              >
-                Add Sub-Category
-              </Button>
+              ))}
             </div>
 
-            {/* Sub-category suggestions */}
-            {showSubCategorySuggestions && filteredSubCategories?.length > 0 && (
-              <ul ref={suggestionsRefCategory} className="w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto z-[9999]">
-                {filteredSubCategories.map((subCategory, i) => (
-                  <li
-                    key={i}
-                    className="p-2 hover:bg-gray-100 cursor-pointer text-gray-700 transition-colors duration-150"
-                    onClick={() => handleSubCategorySelect(subCategory)}
+            <div>
+              <input
+                id='imageUpload'
+                type='file'
+                className='hidden'
+                onChange={handleImageChange}
+              />
+              <label
+                htmlFor='imageUpload'
+                className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
+              >
+                <MdOutlineFileUpload size={60} />
+                <div className='space-y-1.5 text-center'>
+                  <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
+                    Upload Thumbnail
+                  </h5>
+                  <p className='text-sm text-gray-500'>
+                    Photo Should be in PNG, JPEG, JPG, WEBP or Avif format
+                  </p>
+                </div>
+              </label>
+
+              {image && (
+                <div className='relative'>
+                  <Image
+                    src={typeof image === 'string' ? image : image.src}
+                    alt='Uploaded image'
+                    height={2000}
+                    width={2000}
+                    className='w-1/2 mx-auto h-[350px] mt-8 rounded-lg object-contain'
+                  />
+                  <button
+                    onClick={handleImageRemove}
+                    className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
                   >
-                    {subCategory}
-                  </li>
-                ))}
-              </ul>
-            )}
+                    <RxCross2 size={24} />
+                  </button>
+                </div>
+              )}
+
+            </div>
           </div>
 
-          {/* Selected sub-categories */}
-          <div className="selected-subCategories flex flex-wrap gap-3 mb-8">
-            {selectedSubCategories?.map((subCategory, index) => (
-              <div key={index} className="flex items-center bg-gray-100 border border-gray-300 rounded-full py-1 px-3 text-sm text-gray-700">
-                <span>{subCategory}</span>
-                <button
-                  type="button"
-                  onClick={() => handleSubCategoryRemove(index)}
-                  className="ml-2 text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-150"
-                >
-                  <RxCross2 size={19} />
-                </button>
-              </div>
-            ))}
-          </div>
-
-          <div>
-            <input
-              id='imageUpload'
-              type='file'
-              className='hidden'
-              onChange={handleImageChange}
-            />
-            <label
-              htmlFor='imageUpload'
-              className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
+          {/* Submit Button */}
+          <div className='flex justify-end pt-4 pb-8'>
+            <button
+              type='submit'
+              disabled={isSubmitting}
+              className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}
             >
-              <MdOutlineFileUpload size={60} />
-              <div className='space-y-1.5 text-center'>
-                <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                  Upload Thumbnail
-                </h5>
-                <p className='text-sm text-gray-500'>
-                  Photo Should be in PNG, JPEG, JPG, WEBP or Avif format
-                </p>
-              </div>
-            </label>
-
-            {image && (
-              <div className='relative'>
-                <Image
-                  src={typeof image === 'string' ? image : image.src}
-                  alt='Uploaded image'
-                  height={2000}
-                  width={2000}
-                  className='w-1/2 mx-auto h-[350px] mt-8 rounded-lg object-contain'
-                />
-                <button
-                  onClick={handleImageRemove}
-                  className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
-                >
-                  <RxCross2 size={24} />
-                </button>
-              </div>
-            )}
-
+              {isSubmitting ? 'Saving...' : 'Save Changes'} <FiSave size={20} />
+            </button>
           </div>
-        </div>
 
-        {/* Submit Button */}
-        <div className='flex justify-end pt-4 pb-8'>
-          <button
-            type='submit'
-            disabled={isSubmitting}
-            className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}
-          >
-            {isSubmitting ? 'Saving...' : 'Save Changes'} <FiSave size={20} />
-          </button>
         </div>
-
-      </div>
-    </form>
+      </form>
+    </ProtectedRoute>
   );
 }

@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { FaArrowLeft, FaPlus } from 'react-icons/fa6';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import { MdOutlineFileUpload } from 'react-icons/md';
+import ProtectedRoute from '@/app/components/ProtectedRoutes/ProtectedRoute';
 
 const AddTag = () => {
   const axiosPublic = useAxiosPublic();
@@ -79,48 +80,50 @@ const AddTag = () => {
   };
 
   return (
-    <div className='min-h-screen px-6 bg-gray-50'>
+    <ProtectedRoute pageName="Tags" requiredPermission="Create New Tag">
+      <div className='min-h-screen px-6 bg-gray-50'>
 
-      <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
-        <div className='flex items-center justify-between'>
-          <h3 className='w-full font-semibold text-xl lg:text-2xl'>Create New Tags</h3>
-          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/tags"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
+          <div className='flex items-center justify-between'>
+            <h3 className='w-full font-semibold text-xl lg:text-2xl'>Create New Tags</h3>
+            <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/tags"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+          </div>
         </div>
-      </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto'>
-        <div className="mt-8 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg">
-          <label className="flex justify-start font-medium text-[#9F5216]">Enter Tag</label>
-          {tagFields?.map((item, index) => (
-            <div key={item.id} className="flex flex-col">
-              <div className='w-full flex items-center gap-2'>
-                <input
-                  type="text"
-                  placeholder="Add Tag"
-                  {...register(`tag.${index}.tag`, { required: 'Tag is required' })}
-                  className="w-full my-2 p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
-                />
-                <Button type='button' color="danger" onClick={() => removeTag(index)} variant="light">
-                  Remove
-                </Button>
+        <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto'>
+          <div className="mt-8 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg">
+            <label className="flex justify-start font-medium text-[#9F5216]">Enter Tag</label>
+            {tagFields?.map((item, index) => (
+              <div key={item.id} className="flex flex-col">
+                <div className='w-full flex items-center gap-2'>
+                  <input
+                    type="text"
+                    placeholder="Add Tag"
+                    {...register(`tag.${index}.tag`, { required: 'Tag is required' })}
+                    className="w-full my-2 p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md"
+                  />
+                  <Button type='button' color="danger" onClick={() => removeTag(index)} variant="light">
+                    Remove
+                  </Button>
+                </div>
+                {errors.tag?.[index]?.tag && (
+                  <p className="text-red-600 text-left">{errors.tag[index].tag.message}</p>
+                )}
               </div>
-              {errors.tag?.[index]?.tag && (
-                <p className="text-red-600 text-left">{errors.tag[index].tag.message}</p>
-              )}
-            </div>
-          ))}
-          <button type="button" onClick={() => appendTag({ tag: '' })} className="mt-4 mb-8 bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700 py-2 px-4 text-sm rounded-md cursor-pointer font-semibold flex items-center gap-2">
-            Add Tag <FaPlus size={16} />
-          </button>
-        </div>
-        <div className='flex justify-end items-center my-8'>
-          <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}>
-            {isSubmitting ? 'Submitting...' : 'Submit'} <MdOutlineFileUpload size={20} />
-          </button>
-        </div>
-      </form>
+            ))}
+            <button type="button" onClick={() => appendTag({ tag: '' })} className="mt-4 mb-8 bg-[#ffddc2] hover:bg-[#fbcfb0] text-neutral-700 py-2 px-4 text-sm rounded-md cursor-pointer font-semibold flex items-center gap-2">
+              Add Tag <FaPlus size={16} />
+            </button>
+          </div>
+          <div className='flex justify-end items-center my-8'>
+            <button type='submit' disabled={isSubmitting} className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}>
+              {isSubmitting ? 'Submitting...' : 'Submit'} <MdOutlineFileUpload size={20} />
+            </button>
+          </div>
+        </form>
 
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 };
 

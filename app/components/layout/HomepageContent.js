@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import toast from 'react-hot-toast';
 import useHeroBannerImages from '@/app/hooks/useHeroBannerImages';
+import { useAuth } from '@/app/contexts/auth';
 
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
@@ -23,6 +24,18 @@ const HomepageContent = () => {
   const [sizeError, setSizeError] = useState(false);
   const [sizeError2, setSizeError2] = useState(false);
   const [sizeError3, setSizeError3] = useState(false);
+  const { existingUserData, isUserLoading } = useAuth();
+  const [isHomepageContentAllowed, setIsHomepageContentAllowed] = useState(false);
+
+  useEffect(() => {
+    // Fetch user data if needed or check the permission dynamically
+    if (existingUserData) {
+
+      // Check if the user has permission to add a product
+      setIsHomepageContentAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Homepage Content'] ?? false);
+
+    }
+  }, [existingUserData]);
 
   useEffect(() => {
     if (heroBannerImageList && heroBannerImageList.length > 0) {
@@ -315,192 +328,196 @@ const HomepageContent = () => {
     }
   };
 
-  if (isLoginRegisterHeroBannerImagePending) {
+  if (isLoginRegisterHeroBannerImagePending || isUserLoading) {
     return <Loading />
   };
 
   return (
     <div className='max-w-screen-2xl'>
 
-      <form onSubmit={handleSubmit(onSubmit)} className='my-6'>
+      {isHomepageContentAllowed && (
 
-        <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-between items-start bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
+        <form onSubmit={handleSubmit(onSubmit)} className='my-6'>
 
-          <div className='flex flex-col gap-4 p-5 md:p-7'>
-            <input
-              id='imageUpload'
-              type='file'
-              className='hidden'
-              onChange={handleImageChange}
-            />
-            <label
-              htmlFor='imageUpload'
-              className='flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
-            >
-              <MdOutlineFileUpload size={60} />
-              <div className='space-y-1.5 text-center'>
-                <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                  Upload Left Thumbnail
-                </h5>
-                <p className='text-sm text-gray-500'>
-                  Photo Should be in PNG, JPEG or JPG format
-                </p>
-              </div>
-            </label>
-            {sizeError && (
-              <p className="text-red-600 text-center">Banner left image is required!</p>
-            )}
+          <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-between items-start bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
 
-            {image && (
-              <div className='relative'>
-                <Image
-                  src={image.src}
-                  alt='Uploaded image'
-                  height={3000}
-                  width={3000}
-                  className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
-                />
-                <button
-                  onClick={handleImageRemove}
-                  className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
-                >
-                  <RxCross2 size={24} />
+            <div className='flex flex-col gap-4 p-5 md:p-7'>
+              <input
+                id='imageUpload'
+                type='file'
+                className='hidden'
+                onChange={handleImageChange}
+              />
+              <label
+                htmlFor='imageUpload'
+                className='flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
+              >
+                <MdOutlineFileUpload size={60} />
+                <div className='space-y-1.5 text-center'>
+                  <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
+                    Upload Left Thumbnail
+                  </h5>
+                  <p className='text-sm text-gray-500'>
+                    Photo Should be in PNG, JPEG or JPG format
+                  </p>
+                </div>
+              </label>
+              {sizeError && (
+                <p className="text-red-600 text-center">Banner left image is required!</p>
+              )}
+
+              {image && (
+                <div className='relative'>
+                  <Image
+                    src={image.src}
+                    alt='Uploaded image'
+                    height={3000}
+                    width={3000}
+                    className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
+                  />
+                  <button
+                    onClick={handleImageRemove}
+                    className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                  >
+                    <RxCross2 size={24} />
+                  </button>
+                </div>
+              )}
+
+              {image && <div className="flex justify-start">
+                <button type='button' className='inline-block text-blue-600 border-blue-500 font-bold border-b mt-6' onClick={handleGoToPreviewPageBeforeUpload}>
+                  Preview
                 </button>
-              </div>
-            )}
+              </div>}
 
-            {image && <div className="flex justify-start">
-              <button type='button' className='inline-block text-blue-600 border-blue-500 font-bold border-b mt-6' onClick={handleGoToPreviewPageBeforeUpload}>
-                Preview
-              </button>
-            </div>}
+            </div>
+
+            <div className='flex flex-col gap-4 p-5 md:p-7'>
+              <input
+                id='imageUpload2'
+                type='file'
+                className='hidden'
+                onChange={handleImageChange2}
+              />
+              <label
+                htmlFor='imageUpload2'
+                className='flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
+              >
+                <MdOutlineFileUpload size={60} />
+                <div className='space-y-1.5 text-center'>
+                  <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
+                    Upload Center Thumbnail
+                  </h5>
+                  <p className='text-sm text-gray-500'>
+                    Photo Should be in PNG, JPEG or JPG format
+                  </p>
+                </div>
+              </label>
+              {sizeError2 && (
+                <p className="text-red-600 text-center">Banner center image is required!</p>
+              )}
+
+              {image2 && (
+                <div className='relative'>
+                  <Image
+                    src={image2.src}
+                    alt='Uploaded image'
+                    height={3000}
+                    width={3000}
+                    className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
+                  />
+                  <button
+                    onClick={handleImageRemove2}
+                    className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                  >
+                    <RxCross2 size={24} />
+                  </button>
+                </div>
+              )}
+
+              {image2 && <div className="flex justify-start">
+                <button type='button' className='inline-block text-blue-600 border-blue-500 font-bold border-b mt-6' onClick={handleGoToPreviewPageBeforeUpload2}>
+                  Preview
+                </button>
+              </div>}
+
+            </div>
+
+            <div className='flex flex-col gap-4 p-5 md:p-7'>
+
+              <input
+                id='imageUpload3'
+                type='file'
+                className='hidden'
+                onChange={handleImageChange3}
+              />
+              <label
+                htmlFor='imageUpload3'
+                className='flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
+              >
+                <MdOutlineFileUpload size={60} />
+                <div className='space-y-1.5 text-center'>
+                  <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
+                    Upload Right Thumbnail
+                  </h5>
+                  <p className='text-sm text-gray-500'>
+                    Photo Should be in PNG, JPEG or JPG format
+                  </p>
+                </div>
+              </label>
+              {sizeError3 && (
+                <p className="text-red-600 text-center">Banner right image is required!</p>
+              )}
+
+              {image3 && (
+                <div className='relative'>
+                  <Image
+                    src={image3.src}
+                    alt='Uploaded image'
+                    height={3000}
+                    width={3000}
+                    className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
+                  />
+                  <button
+                    onClick={handleImageRemove3}
+                    className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                  >
+                    <RxCross2 size={24} />
+                  </button>
+                </div>
+              )}
+
+              {image3 && <div className="flex justify-start">
+                <button type='button' className='inline-block text-blue-600 border-blue-500 font-bold border-b mt-6' onClick={handleGoToPreviewPageBeforeUpload3}>
+                  Preview
+                </button>
+              </div>}
+
+            </div>
 
           </div>
 
-          <div className='flex flex-col gap-4 p-5 md:p-7'>
-            <input
-              id='imageUpload2'
-              type='file'
-              className='hidden'
-              onChange={handleImageChange2}
-            />
-            <label
-              htmlFor='imageUpload2'
-              className='flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
-            >
-              <MdOutlineFileUpload size={60} />
-              <div className='space-y-1.5 text-center'>
-                <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                  Upload Center Thumbnail
-                </h5>
-                <p className='text-sm text-gray-500'>
-                  Photo Should be in PNG, JPEG or JPG format
-                </p>
-              </div>
-            </label>
-            {sizeError2 && (
-              <p className="text-red-600 text-center">Banner center image is required!</p>
-            )}
+          {/* Submit Button */}
+          <div className="flex justify-between gap-6 items-center px-5 md:px-7 mt-6 lg:mt-12">
 
-            {image2 && (
-              <div className='relative'>
-                <Image
-                  src={image2.src}
-                  alt='Uploaded image'
-                  height={3000}
-                  width={3000}
-                  className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
-                />
-                <button
-                  onClick={handleImageRemove2}
-                  className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
-                >
-                  <RxCross2 size={24} />
-                </button>
-              </div>
-            )}
-
-            {image2 && <div className="flex justify-start">
-              <button type='button' className='inline-block text-blue-600 border-blue-500 font-bold border-b mt-6' onClick={handleGoToPreviewPageBeforeUpload2}>
+            {heroBannerImageList?.map((hero) => (
+              <button key={hero?._id} type='button' className='text-blue-600 border-blue-500 font-bold border-b' onClick={() => handleGoToPreviewPageAfterUpload(hero?.leftImgUrl, hero?.centerImgUrl, hero?.rightImgUrl)}>
                 Preview
               </button>
-            </div>}
+            ))}
 
-          </div>
-
-          <div className='flex flex-col gap-4 p-5 md:p-7'>
-
-            <input
-              id='imageUpload3'
-              type='file'
-              className='hidden'
-              onChange={handleImageChange3}
-            />
-            <label
-              htmlFor='imageUpload3'
-              className='flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
+            <button
+              type='submit'
+              className={`bg-[#d4ffce] hover:bg-[#bdf6b4] text-neutral-700 py-2 px-4 text-sm rounded-lg cursor-pointer font-bold transition-[background-color] duration-300`}
             >
-              <MdOutlineFileUpload size={60} />
-              <div className='space-y-1.5 text-center'>
-                <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                  Upload Right Thumbnail
-                </h5>
-                <p className='text-sm text-gray-500'>
-                  Photo Should be in PNG, JPEG or JPG format
-                </p>
-              </div>
-            </label>
-            {sizeError3 && (
-              <p className="text-red-600 text-center">Banner right image is required!</p>
-            )}
-
-            {image3 && (
-              <div className='relative'>
-                <Image
-                  src={image3.src}
-                  alt='Uploaded image'
-                  height={3000}
-                  width={3000}
-                  className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
-                />
-                <button
-                  onClick={handleImageRemove3}
-                  className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
-                >
-                  <RxCross2 size={24} />
-                </button>
-              </div>
-            )}
-
-            {image3 && <div className="flex justify-start">
-              <button type='button' className='inline-block text-blue-600 border-blue-500 font-bold border-b mt-6' onClick={handleGoToPreviewPageBeforeUpload3}>
-                Preview
-              </button>
-            </div>}
-
-          </div>
-
-        </div>
-
-        {/* Submit Button */}
-        <div className="flex justify-between gap-6 items-center px-5 md:px-7 mt-6 lg:mt-12">
-
-          {heroBannerImageList?.map((hero) => (
-            <button key={hero?._id} type='button' className='text-blue-600 border-blue-500 font-bold border-b' onClick={() => handleGoToPreviewPageAfterUpload(hero?.leftImgUrl, hero?.centerImgUrl, hero?.rightImgUrl)}>
-              Preview
+              Upload
             </button>
-          ))}
 
-          <button
-            type='submit'
-            className={`bg-[#d4ffce] hover:bg-[#bdf6b4] text-neutral-700 py-2 px-4 text-sm rounded-lg cursor-pointer font-bold transition-[background-color] duration-300`}
-          >
-            Upload
-          </button>
+          </div>
 
-        </div>
+        </form>
 
-      </form>
+      )}
 
     </div>
   );

@@ -7,19 +7,34 @@ import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { FaPlus } from 'react-icons/fa6';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
+import { useAuth } from '@/app/contexts/auth';
 
 const VendorsPage = () => {
 
   const [vendorList, isVendorPending, refetchVendors] = useVendors();
   const axiosPublic = useAxiosPublic();
   const router = useRouter();
+  const { existingUserData, isUserLoading } = useAuth();
+  const [isAddButtonAllowed, setIsAddButtonAllowed] = useState(false);
+  const [isEditButtonAllowed, setIsEditButtonAllowed] = useState(false);
+  const [isDeleteButtonAllowed, setIsDeleteButtonAllowed] = useState(false);
+
+  useEffect(() => {
+    // Fetch user data if needed or check the permission dynamically
+    if (existingUserData) {
+      // Check if the user has permission to add a product
+      setIsAddButtonAllowed(existingUserData?.permissions?.["Vendors"]?.actions?.['Create New Vendor'] ?? false);
+      setIsEditButtonAllowed(existingUserData?.permissions?.["Vendors"]?.actions?.['Edit Vendor'] ?? false);
+      setIsDeleteButtonAllowed(existingUserData?.permissions?.["Vendors"]?.actions?.['Delete Vendor'] ?? false);
+    }
+  }, [existingUserData]);
 
   const handleDeleteVendor = async (vendorId) => {
     Swal.fire({
@@ -77,7 +92,7 @@ const VendorsPage = () => {
     });
   };
 
-  if (isVendorPending) {
+  if (isVendorPending || isUserLoading) {
     return <Loading />
   }
 
@@ -107,9 +122,13 @@ const VendorsPage = () => {
 
       <div className='flex justify-between items-center px-6 max-w-screen-2xl mx-auto py-3 relative'>
         <h1 className='py-2 md:py-3 font-semibold text-center text-lg md:text-xl lg:text-3xl text-neutral-700 sticky top-0 z-[10] bg-gray-50'>VENDOR MANAGEMENT</h1>
-        <button className="relative z-[1] rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
-          <Link className='flex items-center gap-x-3' href={"/dash-board/vendors/add-vendor"}><FaPlus size={15} className='text-neutral-700' /> ADD</Link>
-        </button>
+        {isAddButtonAllowed ? (
+          <button className="relative z-[1] rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
+            <Link className='flex items-center gap-x-3' href={"/dash-board/vendors/add-vendor"}><FaPlus size={15} className='text-neutral-700' /> ADD</Link>
+          </button>
+        ) : (
+          <></>
+        )}
       </div>
 
       <div className="px-6 max-w-screen-2xl mx-auto custom-max-h-orders overflow-x-auto custom-scrollbar relative drop-shadow rounded-lg">
@@ -140,14 +159,22 @@ const VendorsPage = () => {
                 <td className="p-3">
                   <div className="flex gap-2 items-center">
                     {/* Edit Button */}
-                    <button onClick={() => router.push(`/dash-board/vendors/${vendor?._id}`)}>
-                      <span className='flex items-center gap-1.5 rounded-md bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4'><AiOutlineEdit size={16} /> Edit </span>
-                    </button>
+                    {isEditButtonAllowed ? (
+                      <button onClick={() => router.push(`/dash-board/vendors/${vendor?._id}`)}>
+                        <span className='flex items-center gap-1.5 rounded-md bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4'><AiOutlineEdit size={16} /> Edit </span>
+                      </button>
+                    ) : (
+                      <></>
+                    )}
 
                     {/* Delete Button */}
-                    <button onClick={() => handleDeleteVendor(vendor?._id)}>
-                      <span className='flex items-center gap-1.5 rounded-md bg-red-50 p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-red-100 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs'> <RiDeleteBinLine size={16} />Delete </span>
-                    </button>
+                    {isDeleteButtonAllowed ? (
+                      <button onClick={() => handleDeleteVendor(vendor?._id)}>
+                        <span className='flex items-center gap-1.5 rounded-md bg-red-50 p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-red-100 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs'> <RiDeleteBinLine size={16} />Delete </span>
+                      </button>
+                    ) : (
+                      <></>
+                    )}
                   </div>
                 </td>
               </tr>

@@ -7,8 +7,6 @@ const ProtectedRoute = ({ children, pageName, requiredPermission }) => {
   const { existingUserData, isUserLoading } = useAuth(); // Get the user data and loading state
   const router = useRouter();
 
-  console.log(existingUserData, "existingUserData");
-
   useEffect(() => {
 
     // If the user is still loading, don't do anything yet

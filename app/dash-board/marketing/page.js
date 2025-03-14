@@ -11,11 +11,31 @@ import RecentPromotions from '@/app/components/layout/RecentPromotions';
 import PromotionPerformance from '@/app/components/layout/PromotionPerformance';
 import MarketingContent from '@/app/components/layout/MarketingContent';
 import HomepageContent from '@/app/components/layout/HomepageContent';
+import { useAuth } from "@/app/contexts/auth";
+import Loading from "@/app/components/shared/Loading/Loading";
 
 const Marketing = () => {
 
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('view performance');
+  const { existingUserData, isUserLoading } = useAuth();
+  const [isMarketingContentAllowed, setIsMarketingContentAllowed] = useState(false);
+  const [isHomepageContentAllowed, setIsHomepageContentAllowed] = useState(false);
+  const [isAddPromoButtonAllowed, setIsAddPromoButtonAllowed] = useState(false);
+  const [isAddOfferButtonAllowed, setIsAddOfferButtonAllowed] = useState(false);
+
+  useEffect(() => {
+    // Fetch user data if needed or check the permission dynamically
+    if (existingUserData) {
+
+      // Check if the user has permission to add a product
+      setIsMarketingContentAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Marketing Content'] ?? false);
+      setIsHomepageContentAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Homepage Content'] ?? false);
+      setIsAddPromoButtonAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Create Promo'] ?? false);
+      setIsAddOfferButtonAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Create Offer'] ?? false);
+
+    }
+  }, [existingUserData]);
 
   // Ensure the code runs only on the client
   useEffect(() => {
@@ -33,6 +53,10 @@ const Marketing = () => {
       localStorage.setItem('activeTabMarketingPage', activeTab);
     }
   }, [activeTab]);
+
+  if (isUserLoading) {
+    return <Loading />
+  };
 
   return (
     <div className='px-6 md:px-10 bg-gray-50 min-h-screen relative'>
@@ -75,166 +99,194 @@ const Marketing = () => {
             View performance
           </button>
 
-          <button
-            className={`relative text-sm py-1 transition-all duration-300
+          {(isAddPromoButtonAllowed || isAddOfferButtonAllowed) ? (
+            <button
+              className={`relative text-sm py-1 transition-all duration-300
         ${activeTab === 'create promotions' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
         after:absolute after:left-0 after:right-0 after:bottom-0 
         after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300
         ${activeTab === 'create promotions' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
       `}
-            onClick={() => setActiveTab('create promotions')}
-          >
-            Create Promotions
-          </button>
+              onClick={() => setActiveTab('create promotions')}
+            >
+              Create Promotions
+            </button>
+          ) : (
+            <></>
+          )}
 
-          <button
-            className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'marketing content' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
-        after:absolute after:left-0 after:right-0 after:bottom-0 
-        after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300
-        ${activeTab === 'marketing content' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
-      `}
-            onClick={() => setActiveTab('marketing content')}
-          >
-            Marketing Content
-          </button>
 
-          <button
-            className={`relative text-sm py-1 transition-all duration-300
-        ${activeTab === 'homepage content' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
-        after:absolute after:left-0 after:right-0 hover:text-neutral-800 after:bottom-0 
-        after:h-[2px] after:bg-neutral-800 after:transition-all after:duration-300
-        ${activeTab === 'homepage content' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
-      `}
-            onClick={() => setActiveTab('homepage content')}
-          >
-            Homepage Content
-          </button>
+          {isMarketingContentAllowed ? (
+            <button
+              className={`relative text-sm py-1 transition-all duration-300
+          ${activeTab === 'marketing content' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
+          after:absolute after:left-0 after:right-0 after:bottom-0 
+          after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300
+          ${activeTab === 'marketing content' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
+        `}
+              onClick={() => setActiveTab('marketing content')}
+            >
+              Marketing Content
+            </button>
+          ) : (
+            <></>
+          )}
+
+          {isHomepageContentAllowed ? (
+            <button className={`relative text-sm py-1 transition-all duration-300 ${activeTab === 'homepage content' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 hover:text-neutral-800 after:bottom-0 after:h-[2px] after:bg-neutral-800 after:transition-all after:duration-300 ${activeTab === 'homepage content' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}`}
+              onClick={() => setActiveTab('homepage content')}>
+              Homepage Content
+            </button>
+          ) : (
+            <></>
+          )}
 
         </div>
       </div>
 
-      {activeTab === "view performance" && <div className='pt-4 relative'>
-        <h1 className='font-bold'>Promotion Performance</h1>
-        <p className='pt-1 text-neutral-400 text-sm font-medium'>The data includes all active, ended, or canceled deals. This report represents unaudited data, please refer to your invoice for accurate settlement numbers.</p>
-        <PromotionPerformance />
+      {
+        activeTab === "view performance" && <div className='pt-4 relative'>
+          <h1 className='font-bold'>Promotion Performance</h1>
+          <p className='pt-1 text-neutral-400 text-sm font-medium'>The data includes all active, ended, or canceled deals. This report represents unaudited data, please refer to your invoice for accurate settlement numbers.</p>
+          <PromotionPerformance />
 
-        <h1 className='font-bold pt-12 lg:pt-6'>Recent Promotions</h1>
-        <p className='pt-1 pb-8 text-neutral-400 text-sm font-medium'>Please use the following table to view your past and upcoming promotions.</p>
-        <RecentPromotions />
-      </div>}
-
-      {activeTab === "create promotions" && <div className='pt-6 relative'>
-        <h1 className='font-bold text-xl'>Recommended For You</h1>
-        <p className='pt-1 pb-8 text-neutral-400 font-medium'>Our recommendations are tailored to suit your fashion commerce and customer preferences.</p>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 max-w-screen-2xl">
-          {/* Promo Card */}
-          <div className="flex-1 overflow-hidden rounded-lg shadow transition hover:shadow-lg flex flex-col">
-            {/* Set the container to maintain the aspect ratio */}
-            <div className="relative w-full" style={{ paddingBottom: '38.25%' }}> {/* This maintains a 16:9 aspect ratio */}
-              <Image
-                alt="promo"
-                src={promo} // Ensure this path is correct
-                layout="fill"
-                className="object-contain" // Ensures the full image is visible
-              />
-            </div>
-            <div className="bg-white p-4 sm:p-6 flex flex-col flex-grow">
-              <h3 className="mb-0.5 text-xl text-gray-900 font-bold">
-                Launch Your Next Big Promo
-              </h3>
-              <p className="text-neutral-500 text-sm flex-grow">
-                Capture your customers attention with a well-crafted promotion. Whether
-                it is a seasonal sale or a flash discount, create a promo that aligns
-                with your brand and drives conversions. Customize the offer, set the
-                duration, and monitor its performance—all in one place.
-              </p>
-              <button
-                onClick={() => router.push('/dash-board/marketing/promo/add-promo')}
-                className="w-full rounded-lg bg-[#d4ffce] py-2.5 text-center text-sm transition-[background-color] duration-300 hover:bg-[#bdf6b4] font-semibold text-neutral-700"
-              >
-                Create Promo
-              </button>
-            </div>
-          </div>
-
-          {/* Offer Card */}
-          <div className="flex-1 overflow-hidden rounded-lg shadow transition hover:shadow-lg flex flex-col">
-            {/* Maintain the same aspect ratio for the second image */}
-            <div className="relative w-full" style={{ paddingBottom: '38.25%' }}> {/* This maintains a 16:9 aspect ratio */}
-              <Image
-                alt="offer"
-                src={specialOffer} // Ensure this path is correct
-                layout="fill"
-                className="object-contain" // Ensures the full image is visible
-              />
-            </div>
-            <div className="bg-white p-4 sm:p-6 flex flex-col flex-grow">
-              <h3 className="mb-0.5 text-xl text-gray-900 font-bold">
-                Unlock Special Offer Deals
-              </h3>
-              <p className="text-neutral-500 text-sm flex-grow">
-                Encourage repeat purchases and attract new customers with irresistible
-                offers. Create limited-time deals that fit your strategy, whether it is
-                a buy-one-get-one or a percentage discount. Stand out from the
-                competition with offers that make your store a go-to for shoppers.
-              </p>
-              <button
-                onClick={() => router.push('/dash-board/marketing/offer/add-offer')}
-                className="w-full rounded-lg bg-[#d4ffce] py-2.5 text-center text-sm transition-[background-color] duration-300 hover:bg-[#bdf6b4] font-semibold text-neutral-700 mt-4"
-              >
-                Create Offer
-              </button>
-            </div>
-          </div>
-
-          {/* bKash Card */}
-          <div className="flex-1 overflow-hidden rounded-lg shadow transition hover:shadow-lg flex flex-col">
-            {/* Set the container to maintain the aspect ratio */}
-            <div className="relative w-full" style={{ paddingBottom: '38.25%' }}> {/* This maintains a 16:9 aspect ratio */}
-              <Image
-                alt="promo"
-                src="https://i.ibb.co.com/whx7gqH/download-1.png" // Ensure this path is correct
-                layout="fill"
-                className="object-contain" // Ensures the full image is visible
-              />
-            </div>
-            <div className="bg-white p-4 sm:p-6 flex flex-col flex-grow">
-              <h3 className="mb-0.5 text-xl text-gray-900 font-bold">
-                Enjoy bKash Cashback Offer!
-              </h3>
-              <p className="text-neutral-500 text-sm flex-grow">
-                Avail exciting cashback offers with bKash. Use bKash to pay for your purchases and get instant cashback directly to your account. Hurry, limited-time offer!
-                Enjoy seamless transactions and more rewards with bKash.
-              </p>
-              <button
-                className="w-full rounded-lg bg-[#d4ffce] py-2.5 text-center text-sm transition-[background-color] duration-300 hover:bg-[#bdf6b4] font-semibold text-neutral-700 mt-4"
-              >
-                Start Cashback
-              </button>
-            </div>
-          </div>
+          <h1 className='font-bold pt-12 lg:pt-6'>Recent Promotions</h1>
+          <p className='pt-1 pb-8 text-neutral-400 text-sm font-medium'>Please use the following table to view your past and upcoming promotions.</p>
+          <RecentPromotions />
         </div>
-
-      </div>
       }
 
-      {activeTab === "marketing content" && <div className='pt-6 relative'>
-        <h1 className='font-bold text-xl'>Recommended For You</h1>
-        <p className='pt-1 pb-8 text-neutral-400 font-medium'>Our recommendations are tailored to suit your fashion commerce and customer preferences.</p>
-        <MarketingContent />
-      </div>
+      {
+        (isAddPromoButtonAllowed || isAddOfferButtonAllowed) &&
+        activeTab === "create promotions" && <div className='pt-6 relative'>
+          <h1 className='font-bold text-xl'>Recommended For You</h1>
+          <p className='pt-1 pb-8 text-neutral-400 font-medium'>Our recommendations are tailored to suit your fashion commerce and customer preferences.</p>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 max-w-screen-2xl">
+
+            {/* Promo Card */}
+            {isAddPromoButtonAllowed ? (
+
+              <div className="flex-1 overflow-hidden rounded-lg shadow transition hover:shadow-lg flex flex-col">
+
+                {/* Set the container to maintain the aspect ratio */}
+                <div className="relative w-full" style={{ paddingBottom: '38.25%' }}> {/* This maintains a 16:9 aspect ratio */}
+                  <Image
+                    alt="promo"
+                    src={promo} // Ensure this path is correct
+                    layout="fill"
+                    className="object-contain" // Ensures the full image is visible
+                  />
+                </div>
+
+                <div className="bg-white p-4 sm:p-6 flex flex-col flex-grow">
+                  <h3 className="mb-0.5 text-xl text-gray-900 font-bold">
+                    Launch Your Next Big Promo
+                  </h3>
+                  <p className="text-neutral-500 text-sm flex-grow">
+                    Capture your customers attention with a well-crafted promotion. Whether
+                    it is a seasonal sale or a flash discount, create a promo that aligns
+                    with your brand and drives conversions. Customize the offer, set the
+                    duration, and monitor its performance—all in one place.
+                  </p>
+                  <button
+                    onClick={() => router.push('/dash-board/marketing/promo/add-promo')}
+                    className="w-full rounded-lg bg-[#d4ffce] py-2.5 text-center text-sm transition-[background-color] duration-300 hover:bg-[#bdf6b4] font-semibold text-neutral-700"
+                  >
+                    Create Promo
+                  </button>
+                </div>
+
+              </div>
+
+            ) : (
+              <></>
+            )}
+
+            {/* Offer Card */}
+            {isAddOfferButtonAllowed ? (
+
+              <div className="flex-1 overflow-hidden rounded-lg shadow transition hover:shadow-lg flex flex-col">
+                {/* Maintain the same aspect ratio for the second image */}
+                <div className="relative w-full" style={{ paddingBottom: '38.25%' }}> {/* This maintains a 16:9 aspect ratio */}
+                  <Image
+                    alt="offer"
+                    src={specialOffer} // Ensure this path is correct
+                    layout="fill"
+                    className="object-contain" // Ensures the full image is visible
+                  />
+                </div>
+                <div className="bg-white p-4 sm:p-6 flex flex-col flex-grow">
+                  <h3 className="mb-0.5 text-xl text-gray-900 font-bold">
+                    Unlock Special Offer Deals
+                  </h3>
+                  <p className="text-neutral-500 text-sm flex-grow">
+                    Encourage repeat purchases and attract new customers with irresistible
+                    offers. Create limited-time deals that fit your strategy, whether it is
+                    a buy-one-get-one or a percentage discount. Stand out from the
+                    competition with offers that make your store a go-to for shoppers.
+                  </p>
+                  <button
+                    onClick={() => router.push('/dash-board/marketing/offer/add-offer')}
+                    className="w-full rounded-lg bg-[#d4ffce] py-2.5 text-center text-sm transition-[background-color] duration-300 hover:bg-[#bdf6b4] font-semibold text-neutral-700 mt-4"
+                  >
+                    Create Offer
+                  </button>
+                </div>
+              </div>
+
+            ) : (
+              <></>
+            )}
+
+            {/* bKash Card */}
+            <div className="flex-1 overflow-hidden rounded-lg shadow transition hover:shadow-lg flex flex-col">
+              {/* Set the container to maintain the aspect ratio */}
+              <div className="relative w-full" style={{ paddingBottom: '38.25%' }}> {/* This maintains a 16:9 aspect ratio */}
+                <Image
+                  alt="promo"
+                  src="https://i.ibb.co.com/whx7gqH/download-1.png" // Ensure this path is correct
+                  layout="fill"
+                  className="object-contain" // Ensures the full image is visible
+                />
+              </div>
+              <div className="bg-white p-4 sm:p-6 flex flex-col flex-grow">
+                <h3 className="mb-0.5 text-xl text-gray-900 font-bold">
+                  Enjoy bKash Cashback Offer!
+                </h3>
+                <p className="text-neutral-500 text-sm flex-grow">
+                  Avail exciting cashback offers with bKash. Use bKash to pay for your purchases and get instant cashback directly to your account. Hurry, limited-time offer!
+                  Enjoy seamless transactions and more rewards with bKash.
+                </p>
+                <button
+                  className="w-full rounded-lg bg-[#d4ffce] py-2.5 text-center text-sm transition-[background-color] duration-300 hover:bg-[#bdf6b4] font-semibold text-neutral-700 mt-4"
+                >
+                  Start Cashback
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
       }
 
-      {activeTab === "homepage content" && <div className='pt-6 relative'>
-        <h1 className='font-bold text-xl'>Recommended For You</h1>
-        <p className='pt-1 pb-8 text-neutral-400 font-medium'>Our recommendations are tailored to suit your fashion commerce and customer preferences.</p>
-        <HomepageContent />
-      </div>
+      {isMarketingContentAllowed &&
+        activeTab === "marketing content" && <div className='pt-6 relative'>
+          <h1 className='font-bold text-xl'>Recommended For You</h1>
+          <p className='pt-1 pb-8 text-neutral-400 font-medium'>Our recommendations are tailored to suit your fashion commerce and customer preferences.</p>
+          <MarketingContent />
+        </div>
       }
 
-    </div>
+      {isHomepageContentAllowed &&
+        activeTab === "homepage content" && <div className='pt-6 relative'>
+          <h1 className='font-bold text-xl'>Recommended For You</h1>
+          <p className='pt-1 pb-8 text-neutral-400 font-medium'>Our recommendations are tailored to suit your fashion commerce and customer preferences.</p>
+          <HomepageContent />
+        </div>
+      }
+
+    </div >
   );
 };
 
