@@ -12,7 +12,7 @@ import { FaChevronRight, FaAngleDown } from "react-icons/fa6";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { LiaUsersCogSolid } from "react-icons/lia";
+import { LiaUsersCogSolid, LiaPeopleCarrySolid } from "react-icons/lia";
 import { IoColorPaletteOutline, IoSettingsOutline } from "react-icons/io5";
 import { LuWarehouse, LuNewspaper } from "react-icons/lu";
 import { BsTags } from "react-icons/bs";
@@ -73,13 +73,13 @@ const SideNavbar = ({ onClose }) => {
         permissions["Tags"]?.access, // If any child has access, show "Product Hub",
       links: [
         {
-          label: "Products",
+          label: "Manage Products",
           link: "/dash-board/products",
           icon: <FiShoppingBag />,
           permission: permissions["Products"]?.access,
         },
         {
-          label: "Manage Inventory",
+          label: "Inventory",
           link: "/dash-board/inventory",
           icon: <MdOutlineInventory2 />,
           permission: permissions["Manage Inventory"]?.access,
@@ -164,6 +164,25 @@ const SideNavbar = ({ onClose }) => {
       permission: permissions["Marketing"]?.access
     },
     {
+      name: "Supply Chain",
+      icon: <LiaPeopleCarrySolid />,
+      permission: true,
+      links: [
+        {
+          label: "Shipment",
+          link: "/dash-board/zone",
+          icon: <CiDeliveryTruck />,
+          permission: true
+        },
+        {
+          label: "Locations",
+          link: "/dash-board/locations",
+          icon: <MdOutlineLocationOn />,
+          permission: true
+        }
+      ]
+    },
+    {
       name: "Settings",
       icon: <IoSettingsOutline />,
       permission: permissions["Settings"]?.access,
@@ -171,8 +190,6 @@ const SideNavbar = ({ onClose }) => {
         { label: "User Management", link: "/dash-board/enrollment", icon: <LiaUsersCogSolid /> },
         { label: "Reward Level", link: "/dash-board/reward-level", icon: <CiMedal /> },
         { label: "Payment Methods", link: "/dash-board/payment-methods", icon: <MdPayment /> },
-        { label: "Shipment", link: "/dash-board/zone", icon: <CiDeliveryTruck /> },
-        { label: "Locations", link: "/dash-board/locations", icon: <MdOutlineLocationOn /> },
         {
           name: "Legal Policies",
           icon: <LuNewspaper />,

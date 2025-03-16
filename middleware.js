@@ -54,16 +54,6 @@ export async function middleware(req) {
     userPermissions = await fetchUserPermissions(userId);
   }
 
-  // If no token, redirect to login
-  if (!token) {
-    return NextResponse.redirect(new URL("/auth/restricted-access", req.url));
-  }
-
-  // If no permissions, redirect to unauthorized page
-  if (!userPermissions) {
-    return NextResponse.redirect(new URL("/unauthorized", req.url));
-  }
-
   // 🔹 Check if user has permission for the accessed route
   const sortedRoutes = Object.keys(protectedRoutes).sort((a, b) => b.length - a.length); // Sort longest first
   const permissionKey = sortedRoutes.find(route => req.nextUrl.pathname.startsWith(route));

@@ -379,13 +379,13 @@ const RefundedPayments = () => {
           <div className='flex flex-row lg:flex-col xl:flex-row items-center justify-center gap-6 w-full'>
             {/* Total Order Count */}
             <div className="w-full border rounded-lg p-4 md:p-6 lg:p-8 space-y-3">
-              <p className="text-xs md:text-sm xl:text-base font-semibold">Total Refunded Order Count</p>
+              <p className="text-xs md:text-sm xl:text-base font-semibold">Total Refunds</p>
               <h3 className="font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl">{totalTransactions}</h3>
             </div>
 
             {/* Total Amount Received */}
             <div className="w-full border rounded-lg p-4 md:p-6 lg:p-8 space-y-3">
-              <p className="text-xs md:text-sm xl:text-base font-semibold">Total Amount refunded</p>
+              <p className="text-xs md:text-sm xl:text-base font-semibold">Total refunded amount</p>
               <h3 className="font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl">
                 ৳ {totalRevenue.toFixed(2)}
               </h3>
