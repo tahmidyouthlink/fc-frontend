@@ -1,9 +1,7 @@
-import axios from "axios";
 import { getToken } from "next-auth/jwt";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { protectedRoutes } from "./app/components/ProtectedRoutes/ProtectedRoutes";
-import { settingsRoutes } from "./app/components/ProtectedRoutes/SettingsRoutes";
+import { isEditRoute, protectedAddRoutes, protectedRoutes } from "./app/components/ProtectedRoutes/ProtectedRoutes";
 
 // Helper function to fetch user permissions
 const fetchUserPermissions = async (userId) => {
@@ -17,7 +15,12 @@ const fetchUserPermissions = async (userId) => {
     }
 
     const data = await response.json();
-    return data?.permissions || null;
+
+    return {
+      role: data?.role || "viewer", // Default to "viewer" if not found
+      permissions: data?.permissions || {} // Default to an empty object if no permissions found
+    };
+
   } catch (error) {
     console.error("Error fetching user permissions:", error);
     return null;
@@ -54,6 +57,25 @@ export async function middleware(req) {
     userPermissions = await fetchUserPermissions(userId);
   }
 
+  if (!userPermissions) {
+    console.error("Error fetching user permissions for user:", userId);
+    return NextResponse.redirect(new URL("/unauthorized", req.url));
+  }
+
+  const { role, permissions } = userPermissions;
+
+  // 🔹 Restrict "Viewer" role from Add Pages
+  if (role === "Viewer") {
+    if (Object.keys(protectedAddRoutes).some(route => req.nextUrl.pathname.startsWith(route))) {
+      return NextResponse.redirect(new URL("/unauthorized", req.url));
+    }
+
+    // 🔹 Restrict "Viewer" role from Edit Pages (using regex for dynamic IDs)
+    if (isEditRoute(req.nextUrl.pathname)) {
+      return NextResponse.redirect(new URL("/unauthorized", req.url));
+    }
+  }
+
   // 🔹 Check if user has permission for the accessed route
   const sortedRoutes = Object.keys(protectedRoutes).sort((a, b) => b.length - a.length); // Sort longest first
   const permissionKey = sortedRoutes.find(route => req.nextUrl.pathname.startsWith(route));
@@ -61,14 +83,9 @@ export async function middleware(req) {
   if (permissionKey) {
     const permissionCategory = protectedRoutes[permissionKey];
 
-    if (!userPermissions?.[permissionCategory]?.access) {
+    if (!permissions?.[permissionCategory]?.access) {
       return NextResponse.redirect(new URL("/unauthorized", req.url));
     }
-  }
-
-  // 🔹 Block all settings-related pages if `Settings` access is false
-  if (settingsRoutes.some(route => req.nextUrl.pathname.startsWith(route)) && !userPermissions?.["Settings"]?.access) {
-    return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
   return NextResponse.next();

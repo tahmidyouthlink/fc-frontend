@@ -25,17 +25,8 @@ const HomepageContent = () => {
   const [sizeError2, setSizeError2] = useState(false);
   const [sizeError3, setSizeError3] = useState(false);
   const { existingUserData, isUserLoading } = useAuth();
-  const [isHomepageContentAllowed, setIsHomepageContentAllowed] = useState(false);
-
-  useEffect(() => {
-    // Fetch user data if needed or check the permission dynamically
-    if (existingUserData) {
-
-      // Check if the user has permission to add a product
-      setIsHomepageContentAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Homepage Content'] ?? false);
-
-    }
-  }, [existingUserData]);
+  const role = existingUserData?.role;
+  const isAuthorized = role === "Owner" || role === "Editor";
 
   useEffect(() => {
     if (heroBannerImageList && heroBannerImageList.length > 0) {
@@ -335,7 +326,7 @@ const HomepageContent = () => {
   return (
     <div className='max-w-screen-2xl'>
 
-      {isHomepageContentAllowed && (
+      {isAuthorized && (
 
         <form onSubmit={handleSubmit(onSubmit)} className='my-6'>
 

@@ -23,7 +23,6 @@ import { IoIosReturnLeft } from "react-icons/io";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useAuth } from "@/app/contexts/auth";
-import Loading from "../shared/Loading/Loading";
 
 const SideNavbar = ({ onClose }) => {
   const pathname = usePathname();
@@ -35,7 +34,7 @@ const SideNavbar = ({ onClose }) => {
 
   // Show loading state if data is not loaded yet
   if (isUserLoading || !existingUserData) {
-    return <Loading />; // Or you can use any other custom loading spinner
+    return;
   }
 
   const handleItemClick = (name) => {
@@ -62,78 +61,56 @@ const SideNavbar = ({ onClose }) => {
     {
       name: "Product Hub",
       icon: <FiBox />,
-      permission: permissions["Products"]?.access ||
-        permissions["Manage Inventory"]?.access ||
-        permissions["Purchase Orders"]?.access ||
-        permissions["Transfers"]?.access ||
-        permissions["Categories"]?.access ||
-        permissions["Seasons"]?.access ||
-        permissions["Colors"]?.access ||
-        permissions["Vendors"]?.access ||
-        permissions["Tags"]?.access, // If any child has access, show "Product Hub",
+      permission: permissions["Product Hub"]?.access,
       links: [
         {
           label: "Manage Products",
-          link: "/dash-board/products",
+          link: "/dash-board/product-hub/products",
           icon: <FiShoppingBag />,
-          permission: permissions["Products"]?.access,
         },
         {
           label: "Inventory",
-          link: "/dash-board/inventory",
+          link: "/dash-board/product-hub/inventory",
           icon: <MdOutlineInventory2 />,
-          permission: permissions["Manage Inventory"]?.access,
         },
         {
           label: "Purchase Orders",
-          link: "/dash-board/purchase-orders",
+          link: "/dash-board/product-hub/purchase-orders",
           icon: <BiPurchaseTagAlt />,
-          permission: permissions["Purchase Orders"]?.access,
         },
         {
           label: "Transfers",
-          link: "/dash-board/transfers",
+          link: "/dash-board/product-hub/transfers",
           icon: <BiTransferAlt />,
-          permission: permissions["Transfers"]?.access,
         },
         {
           name: "Product Settings",
           icon: <IoSettingsOutline />,
-          permission: permissions["Categories"]?.access ||
-            permissions["Seasons"]?.access ||
-            permissions["Colors"]?.access ||
-            permissions["Vendors"]?.access ||
-            permissions["Tags"]?.access, // If any sub-item has access, show "Product Settings"
           links: [
             {
               label: "Categories",
-              link: "/dash-board/categories",
+              link: "/dash-board/product-hub/categories",
               icon: <BiCategory />,
-              permission: permissions["Categories"]?.access,
             },
             {
               label: "Seasons",
-              link: "/dash-board/seasons",
+              link: "/dash-board/product-hub/seasons",
               icon: <FaGlobeAsia />,
-              permission: permissions["Seasons"]?.access,
             },
             {
               label: "Colors",
-              link: "/dash-board/colors",
+              link: "/dash-board/product-hub/colors",
               icon: <IoColorPaletteOutline />,
-              permission: permissions["Colors"]?.access,
             },
             {
               label: "Vendors",
-              link: "/dash-board/vendors",
+              link: "/dash-board/product-hub/vendors",
               icon: <LuWarehouse />,
-              permission: permissions["Vendors"]?.access,
             },
             {
               label: "Tags",
-              link: "/dash-board/tags",
+              link: "/dash-board/product-hub/tags",
               icon: <BsTags />,
-              permission: permissions["Tags"]?.access,
             },
           ],
         },
@@ -166,17 +143,17 @@ const SideNavbar = ({ onClose }) => {
     {
       name: "Supply Chain",
       icon: <LiaPeopleCarrySolid />,
-      permission: true,
+      permission: permissions["Supply Chain"]?.access,
       links: [
         {
           label: "Shipment",
-          link: "/dash-board/zone",
+          link: "/dash-board/supply-chain/zone",
           icon: <CiDeliveryTruck />,
           permission: true
         },
         {
           label: "Locations",
-          link: "/dash-board/locations",
+          link: "/dash-board/supply-chain/locations",
           icon: <MdOutlineLocationOn />,
           permission: true
         }
@@ -187,20 +164,18 @@ const SideNavbar = ({ onClose }) => {
       icon: <IoSettingsOutline />,
       permission: permissions["Settings"]?.access,
       links: [
-        { label: "User Management", link: "/dash-board/enrollment", icon: <LiaUsersCogSolid /> },
-        { label: "Reward Level", link: "/dash-board/reward-level", icon: <CiMedal /> },
-        { label: "Payment Methods", link: "/dash-board/payment-methods", icon: <MdPayment /> },
+        { label: "User Management", link: "/dash-board/settings/enrollment", icon: <LiaUsersCogSolid /> },
         {
           name: "Legal Policies",
           icon: <LuNewspaper />,
           links: [
-            { label: "Terms & Conditions", link: "/dash-board/terms-condition", icon: <RiContractLine /> },
-            { label: "Privacy Policy", link: "/dash-board/privacy-policy", icon: <MdOutlinePrivacyTip /> },
-            { label: "Refund Policy", link: "/dash-board/refund-policy", icon: <HiOutlineReceiptRefund /> },
-            { label: "Shipping Policy", link: "/dash-board/shipping-policy", icon: <MdOutlineLocalShipping /> },
-            { label: "Return Policy", link: "/dash-board/return-policy", icon: <IoIosReturnLeft /> },
-            { label: "Our Story", link: "/dash-board/our-story", icon: <PiBookOpen /> },
-            { label: "FAQ", link: "/dash-board/faq", icon: <TbMessageCircleQuestion /> },
+            { label: "Terms & Conditions", link: "/dash-board/settings/terms-condition", icon: <RiContractLine /> },
+            { label: "Privacy Policy", link: "/dash-board/settings/privacy-policy", icon: <MdOutlinePrivacyTip /> },
+            { label: "Refund Policy", link: "/dash-board/settings/refund-policy", icon: <HiOutlineReceiptRefund /> },
+            { label: "Shipping Policy", link: "/dash-board/settings/shipping-policy", icon: <MdOutlineLocalShipping /> },
+            { label: "Return Policy", link: "/dash-board/settings/return-policy", icon: <IoIosReturnLeft /> },
+            { label: "Our Story", link: "/dash-board/settings/our-story", icon: <PiBookOpen /> },
+            { label: "FAQ", link: "/dash-board/settings/faq", icon: <TbMessageCircleQuestion /> },
           ],
         },
       ],
@@ -233,7 +208,7 @@ const SideNavbar = ({ onClose }) => {
           {
             allList?.map((item, index) => {
 
-              if (item?.name === "Settings" && !item?.permission) return null;
+              if (!item?.permission) return null;
 
               return item?.permission ? (
 
@@ -302,7 +277,7 @@ const SideNavbar = ({ onClose }) => {
                       {item?.links?.map((linkItem, linkIndex) => {
 
                         // Allow all links under Settings
-                        if (item?.name !== "Settings" && !linkItem?.permission) return null;
+                        // if (item?.name !== "Settings" && !linkItem?.permission) return null;
 
                         return (
                           linkItem?.links ? (
@@ -329,7 +304,7 @@ const SideNavbar = ({ onClose }) => {
                                   transition={{ duration: 0.5, ease: "easeInOut" }} className="flex flex-col items-center w-full">
                                   {linkItem?.links?.map((subLink, subIndex) => {
 
-                                    if (item?.name !== "Settings" && !subLink.permission) return null;
+                                    // if (item?.name !== "Settings" && !subLink.permission) return null;
 
                                     return (
                                       <Link href={subLink.link} key={subIndex} legacyBehavior>

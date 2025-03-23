@@ -24,7 +24,6 @@ const initialColumns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number',
 
 const Customers = () => {
 
-  // const isAdmin = true;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isOpenCustomerModal, onOpen: openCustomerModal, onClose: onCloseCustomerModal } = useDisclosure();
   const [orderList, isOrderListPending] = useOrders();
@@ -38,18 +37,9 @@ const Customers = () => {
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const { existingUserData, isUserLoading } = useAuth();
-  const [isOrderDetailsAllowed, setIsOrderDetailsAllowed] = useState(false);
-  const [isOrderHistoryAllowed, setIsOrderHistoryAllowed] = useState(false);
-
-  useEffect(() => {
-    // Fetch user data if needed or check the permission dynamically
-    if (existingUserData) {
-      // Check if the user has permission to add a product
-      setIsOrderDetailsAllowed(existingUserData?.permissions?.["Customers"]?.actions?.['Customer Details'] ?? false);
-      setIsOrderHistoryAllowed(existingUserData?.permissions?.["Customers"]?.actions?.['Customer Order History'] ?? false);
-    }
-  }, [existingUserData]);
+  // const { existingUserData, isUserLoading } = useAuth();
+  // const role = existingUserData?.role;
+  // const isAuthorized = role === "Owner" || role === "Editor";
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedCustomer'));
@@ -244,7 +234,11 @@ const Customers = () => {
     }
   };
 
-  if (isCustomerListPending || isOrderListPending || isCustomerPending || isUserLoading) {
+  // if (isCustomerListPending || isOrderListPending || isCustomerPending || isUserLoading) {
+  //   return <Loading />
+  // };
+
+  if (isCustomerListPending || isOrderListPending || isCustomerPending) {
     return <Loading />
   };
 
@@ -394,7 +388,10 @@ const Customers = () => {
                           selectedColumns.includes(column) && (
                             <>
                               {column === 'Customer ID' && (
-                                <td key="customerId" onClick={isOrderDetailsAllowed ? () => handleCustomerInfoClick(customer) : undefined} className={`text-xs p-3 font-mono text-center ${isOrderDetailsAllowed ? "cursor-pointer text-blue-600 hover:text-blue-800" : "text-neutral-800"}`}>
+                                // <td key="customerId" onClick={isAuthorized ? () => handleCustomerInfoClick(customer) : undefined} className={`text-xs p-3 font-mono text-center ${isAuthorized ? "cursor-pointer text-blue-600 hover:text-blue-800" : "text-neutral-800"}`}>
+                                //   {customer?.customerId}
+                                // </td>
+                                <td key="customerId" onClick={() => handleCustomerInfoClick(customer)} className={`text-xs p-3 font-mono text-center cursor-pointer text-blue-600 hover:text-blue-800`}>
                                   {customer?.customerId}
                                 </td>
                               )}
@@ -415,7 +412,10 @@ const Customers = () => {
                               )}
                               {column === 'Order History' && (
                                 <td>
-                                  {customer?.paymentMethods === "--" ? <p className='text-center'>--</p> : <p key="orderHistory" onClick={isOrderHistoryAllowed ? () => handleViewClick(customer?.customerId) : undefined} className={`text-xs p-3 font-mono text-center ${isOrderHistoryAllowed ? "cursor-pointer text-blue-600 hover:text-blue-800" : "text-neutral-800"}`}>
+                                  {/* {customer?.paymentMethods === "--" ? <p className='text-center'>--</p> : <p key="orderHistory" onClick={isAuthorized ? () => handleViewClick(customer?.customerId) : undefined} className={`text-xs p-3 font-mono text-center ${isAuthorized ? "cursor-pointer text-blue-600 hover:text-blue-800" : "text-neutral-800"}`}>
+                                    View
+                                  </p>} */}
+                                  {customer?.paymentMethods === "--" ? <p className='text-center'>--</p> : <p key="orderHistory" onClick={() => handleViewClick(customer?.customerId)} className={`text-xs p-3 font-mono text-center cursor-pointer text-blue-600 hover:text-blue-800`}>
                                     View
                                   </p>}
                                 </td>

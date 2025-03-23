@@ -13,7 +13,6 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Image from 'next/image';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import { FiSave } from 'react-icons/fi';
-import ProtectedRoute from '@/app/components/ProtectedRoutes/ProtectedRoute';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
@@ -229,173 +228,171 @@ const EditPromo = () => {
   }
 
   return (
-    <ProtectedRoute pageName="Marketing" requiredPermission="Edit Existing Promo">
-      <div className='bg-gray-50 min-h-screen'>
+    <div className='bg-gray-50 min-h-screen'>
 
-        <div className='max-w-screen-2xl px-6 mx-auto'>
+      <div className='max-w-screen-2xl px-6 mx-auto'>
 
-          <div className='max-w-screen-xl mx-auto pt-3 sticky top-0 z-10 bg-gray-50'>
-            <div className='flex items-center justify-between'>
-              <h3 className='w-full font-semibold text-lg md:text-xl lg:text-2xl'>Edit Promo Configuration</h3>
-              <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/marketing"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
-            </div>
+        <div className='max-w-screen-xl mx-auto pt-3 sticky top-0 z-10 bg-gray-50'>
+          <div className='flex items-center justify-between'>
+            <h3 className='w-full font-semibold text-lg md:text-xl lg:text-2xl'>Edit Promo Configuration</h3>
+            <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/marketing"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
           </div>
-
-          {/* Your form code */}
-          <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto pt-1 pb-6 flex flex-col gap-6'>
-
-            <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
-              <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 mt-3 py-3 h-fit'>
-                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
-                  <div>
-                    <label htmlFor='promoCode' className='flex justify-start font-medium text-[#9F5216]'>Promo Code *</label>
-                    <input id='promoCode' {...register("promoCode", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md uppercase" type="text" />
-                    {errors.promoCode?.type === "required" && (
-                      <p className="text-red-600 text-left">Promo Code is required</p>
-                    )}
-                  </div>
-
-                  <div className="flex w-full flex-col">
-                    <Tabs
-                      aria-label="Select Discount Type"
-                      selectedKey={promoDiscountType} // Default select based on fetched data
-                      onSelectionChange={handleTabChange}
-                    >
-                      <Tab key="Percentage" title="Percentage">Percentage (%)</Tab>
-                      <Tab key="Amount" title="Amount">Amount (Taka)</Tab>
-                    </Tabs>
-
-                    <input
-                      type="number"
-                      {...register('promoDiscountValue', { required: true })}
-                      className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
-                      placeholder={`Enter ${promoDiscountType} Discount`} // Correct placeholder
-                    />
-                    {errors.promoDiscountValue?.type === "required" && (
-                      <p className="text-red-600 text-left">Discount Value is required</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
-
-                  <div>
-                    <label htmlFor='minAmount' className='flex justify-start font-medium text-[#9F5216]'>Minimum Order Amount *</label>
-                    <input id='minAmount' {...register("minAmount", { required: true })} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
-                    {errors.minAmount?.type === "required" && (
-                      <p className="text-red-600 text-left">Min Amount is required</p>
-                    )}
-                  </div>
-
-                  {promoDiscountType === "Percentage" && <div>
-                    <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#9F5216]'>Maximum Capped Amount *</label>
-                    <input id='maxAmount' {...register("maxAmount", { required: true })} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
-                    {errors.maxAmount?.type === "required" && (
-                      <p className="text-red-600 text-left">Max Amount is required</p>
-                    )}
-                  </div>}
-
-                  <div className="space-y-2">
-                    <label htmlFor='expiryDate' className='block text-[#9F5216] font-medium text-sm'>
-                      Expiry Date <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      id="expiryDate"
-                      {...register("expiryDate", { required: true })}
-                      value={expiryDate}
-                      onChange={(e) => setExpiryDate(e.target.value)} // Update state with the input value
-                      className="w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000"
-                    />
-                    {errors.expiryDate?.type === "required" && (
-                      <p className="text-red-600 text-sm mt-1">Expiry Date is required</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className='grid grid-cols-1 lg:col-span-5 xl:col-span-5 gap-8 mt-3 py-3'>
-
-                <div className='flex flex-col gap-6 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-
-                  <div className='flex w-full flex-col gap-2'>
-                    <label htmlFor='promoDescription' className='flex justify-start font-medium text-[#9F5216] pb-2'>Offer Description</label>
-                    <Controller
-                      control={control}
-                      name="promoDescription"
-                      render={({ field }) => (
-                        <Editor
-                          {...field}
-                          value={promoDescription}
-                          onChange={setPromoDescription}
-                        />
-                      )}
-                    />
-                  </div>
-
-                  <div className='flex flex-col gap-4'>
-                    <input
-                      id='imageUpload'
-                      type='file'
-                      className='hidden'
-                      onChange={handleImageChange}
-                    />
-                    <label
-                      htmlFor='imageUpload'
-                      className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
-                    >
-                      <MdOutlineFileUpload size={60} />
-                      <div className='space-y-1.5 text-center'>
-                        <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                          Upload Thumbnail
-                        </h5>
-                        <p className='text-sm text-gray-500'>
-                          Photo Should be in PNG, JPEG or JPG format
-                        </p>
-                      </div>
-                    </label>
-
-                    {image && (
-                      <div className='relative'>
-                        <Image
-                          src={typeof image === 'string' ? image : image.src}
-                          alt='Uploaded image'
-                          height={3000}
-                          width={3000}
-                          className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
-                        />
-                        <button
-                          onClick={handleImageRemove}
-                          className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
-                        >
-                          <RxCross2 size={24} />
-                        </button>
-                      </div>
-                    )}
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-            <div className='flex justify-end items-center'>
-
-              <button
-                type='submit'
-                disabled={isSubmitting}
-                className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}
-              >
-                {isSubmitting ? 'Saving...' : 'Save'} <FiSave size={20} />
-              </button>
-            </div>
-          </form>
         </div>
 
+        {/* Your form code */}
+        <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto pt-1 pb-6 flex flex-col gap-6'>
+
+          <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
+            <div className='grid grid-cols-1 lg:col-span-7 xl:col-span-7 gap-8 mt-3 py-3 h-fit'>
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
+                <div>
+                  <label htmlFor='promoCode' className='flex justify-start font-medium text-[#9F5216]'>Promo Code *</label>
+                  <input id='promoCode' {...register("promoCode", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md uppercase" type="text" />
+                  {errors.promoCode?.type === "required" && (
+                    <p className="text-red-600 text-left">Promo Code is required</p>
+                  )}
+                </div>
+
+                <div className="flex w-full flex-col">
+                  <Tabs
+                    aria-label="Select Discount Type"
+                    selectedKey={promoDiscountType} // Default select based on fetched data
+                    onSelectionChange={handleTabChange}
+                  >
+                    <Tab key="Percentage" title="Percentage">Percentage (%)</Tab>
+                    <Tab key="Amount" title="Amount">Amount (Taka)</Tab>
+                  </Tabs>
+
+                  <input
+                    type="number"
+                    {...register('promoDiscountValue', { required: true })}
+                    className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
+                    placeholder={`Enter ${promoDiscountType} Discount`} // Correct placeholder
+                  />
+                  {errors.promoDiscountValue?.type === "required" && (
+                    <p className="text-red-600 text-left">Discount Value is required</p>
+                  )}
+                </div>
+              </div>
+
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
+
+                <div>
+                  <label htmlFor='minAmount' className='flex justify-start font-medium text-[#9F5216]'>Minimum Order Amount *</label>
+                  <input id='minAmount' {...register("minAmount", { required: true })} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
+                  {errors.minAmount?.type === "required" && (
+                    <p className="text-red-600 text-left">Min Amount is required</p>
+                  )}
+                </div>
+
+                {promoDiscountType === "Percentage" && <div>
+                  <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#9F5216]'>Maximum Capped Amount *</label>
+                  <input id='maxAmount' {...register("maxAmount", { required: true })} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
+                  {errors.maxAmount?.type === "required" && (
+                    <p className="text-red-600 text-left">Max Amount is required</p>
+                  )}
+                </div>}
+
+                <div className="space-y-2">
+                  <label htmlFor='expiryDate' className='block text-[#9F5216] font-medium text-sm'>
+                    Expiry Date <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    id="expiryDate"
+                    {...register("expiryDate", { required: true })}
+                    value={expiryDate}
+                    onChange={(e) => setExpiryDate(e.target.value)} // Update state with the input value
+                    className="w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000"
+                  />
+                  {errors.expiryDate?.type === "required" && (
+                    <p className="text-red-600 text-sm mt-1">Expiry Date is required</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className='grid grid-cols-1 lg:col-span-5 xl:col-span-5 gap-8 mt-3 py-3'>
+
+              <div className='flex flex-col gap-6 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+
+                <div className='flex w-full flex-col gap-2'>
+                  <label htmlFor='promoDescription' className='flex justify-start font-medium text-[#9F5216] pb-2'>Offer Description</label>
+                  <Controller
+                    control={control}
+                    name="promoDescription"
+                    render={({ field }) => (
+                      <Editor
+                        {...field}
+                        value={promoDescription}
+                        onChange={setPromoDescription}
+                      />
+                    )}
+                  />
+                </div>
+
+                <div className='flex flex-col gap-4'>
+                  <input
+                    id='imageUpload'
+                    type='file'
+                    className='hidden'
+                    onChange={handleImageChange}
+                  />
+                  <label
+                    htmlFor='imageUpload'
+                    className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
+                  >
+                    <MdOutlineFileUpload size={60} />
+                    <div className='space-y-1.5 text-center'>
+                      <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
+                        Upload Thumbnail
+                      </h5>
+                      <p className='text-sm text-gray-500'>
+                        Photo Should be in PNG, JPEG or JPG format
+                      </p>
+                    </div>
+                  </label>
+
+                  {image && (
+                    <div className='relative'>
+                      <Image
+                        src={typeof image === 'string' ? image : image.src}
+                        alt='Uploaded image'
+                        height={3000}
+                        width={3000}
+                        className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
+                      />
+                      <button
+                        onClick={handleImageRemove}
+                        className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                      >
+                        <RxCross2 size={24} />
+                      </button>
+                    </div>
+                  )}
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div className='flex justify-end items-center'>
+
+            <button
+              type='submit'
+              disabled={isSubmitting}
+              className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}
+            >
+              {isSubmitting ? 'Saving...' : 'Save'} <FiSave size={20} />
+            </button>
+          </div>
+        </form>
       </div>
-    </ProtectedRoute>
+
+    </div>
   );
 };
 

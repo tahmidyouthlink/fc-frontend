@@ -14,16 +14,7 @@ const PromotionPerformanceChart = () => {
   const [activeFilter, setActiveFilter] = useState('today');
   const [showDateRangePicker, setShowDateRangePicker] = useState(true); // New state
   const [selected, setSelected] = useState(['totalDiscountedAmount', 'totalDiscountedOrders']);
-  const { existingUserData, isUserLoading } = useAuth();
-  const [isDateRangeButtonAllowed, setIsDateRangeButtonAllowed] = useState(false);
-
-  useEffect(() => {
-    // Fetch user data if needed or check the permission dynamically
-    if (existingUserData) {
-      // Check if the user has permission to add a product
-      setIsDateRangeButtonAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Discounted Date range filtering'] ?? false);
-    }
-  }, [existingUserData]);
+  // const { existingUserData, isUserLoading } = useAuth();
 
   const handleChange = (values) => {
     // Ensure at least one checkbox is always selected
@@ -360,7 +351,11 @@ const PromotionPerformanceChart = () => {
   const yAxisDomainOrder = [0, maxDiscountedOrder * 10];
   const yAxisDomainOrderDay = [0, maxDiscountedOrderDay * 10];
 
-  if (isOrderPending || isUserLoading) {
+  // if (isOrderPending || isUserLoading) {
+  //   return <SmallHeightLoading />;
+  // };
+
+  if (isOrderPending) {
     return <SmallHeightLoading />;
   };
 
@@ -368,6 +363,7 @@ const PromotionPerformanceChart = () => {
     <div className="space-y-5">
 
       <div className="flex flex-wrap mt-6 justify-center lg:justify-end items-center gap-3">
+
         <div className="flex items-center justify-center gap-2">
 
           <button
@@ -396,38 +392,34 @@ const PromotionPerformanceChart = () => {
           </button>
         </div>
 
-        {isDateRangeButtonAllowed ? (
-          <div className='flex items-center gap-2'>
-            {showDateRangePicker && (
-              <DateRangePicker
-                label="Select Date Range"
-                visibleMonths={2}
-                maxValue={currentDate}
-                onChange={(range) => {
-                  if (range && range.start && range.end) {
-                    normalizeDateRange(range.start, range.end);
-                  }
-                }}
-                // Ensure the picker clears after reset and updates after new selection
-                value={selectedDateRange.start && selectedDateRange.end
-                  ? [
-                    new Date(selectedDateRange.start.year, selectedDateRange.start.month - 1, selectedDateRange.start.day),
-                    new Date(selectedDateRange.end.year, selectedDateRange.end.month - 1, selectedDateRange.end.day)
-                  ]
-                  : null
+        <div className='flex items-center gap-2'>
+          {showDateRangePicker && (
+            <DateRangePicker
+              label="Select Date Range"
+              visibleMonths={2}
+              maxValue={currentDate}
+              onChange={(range) => {
+                if (range && range.start && range.end) {
+                  normalizeDateRange(range.start, range.end);
                 }
-              />
-            )}
+              }}
+              // Ensure the picker clears after reset and updates after new selection
+              value={selectedDateRange.start && selectedDateRange.end
+                ? [
+                  new Date(selectedDateRange.start.year, selectedDateRange.start.month - 1, selectedDateRange.start.day),
+                  new Date(selectedDateRange.end.year, selectedDateRange.end.month - 1, selectedDateRange.end.day)
+                ]
+                : null
+              }
+            />
+          )}
 
-            {selectedDateRange.start && selectedDateRange.end && activeFilter === 'custom' && (
-              <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={handleReset}>
-                <IoMdClose className="text-lg" />
-              </button>
-            )}
-          </div>
-        ) : (
-          <></>
-        )}
+          {selectedDateRange.start && selectedDateRange.end && activeFilter === 'custom' && (
+            <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={handleReset}>
+              <IoMdClose className="text-lg" />
+            </button>
+          )}
+        </div>
 
       </div>
 

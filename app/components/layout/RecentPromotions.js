@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { FaAngleUp, FaAngleDown } from "react-icons/fa";
 import CustomSwitch from './CustomSwitch';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { MdOutlineModeEdit } from 'react-icons/md';
@@ -33,31 +32,14 @@ const RecentPromotions = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [selectedOption, setSelectedOption] = useState('all'); // New state for dropdown
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
-  // const [isExpanded, setIsExpanded] = useState(null); // To track which row is expanded
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
   const { existingUserData, isUserLoading } = useAuth();
-  const [isEditPromoButtonAllowed, setIsEditPromoButtonAllowed] = useState(false);
-  const [isDeletePromoButtonAllowed, setIsDeletePromoButtonAllowed] = useState(false);
-  const [isTogglePromoButtonAllowed, setIsTogglePromoButtonAllowed] = useState(false);
-  const [isEditOfferButtonAllowed, setIsEditOfferButtonAllowed] = useState(false);
-  const [isDeleteOfferButtonAllowed, setIsDeleteOfferButtonAllowed] = useState(false);
-  const [isToggleOfferButtonAllowed, setIsToggleOfferButtonAllowed] = useState(false);
-
-  useEffect(() => {
-    // Fetch user data if needed or check the permission dynamically
-    if (existingUserData) {
-      // Check if the user has permission to add a product
-      setIsEditPromoButtonAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Edit Existing Promo'] ?? false);
-      setIsDeletePromoButtonAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Delete Existing Promo'] ?? false);
-      setIsTogglePromoButtonAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Allow Promo Toggle'] ?? false);
-      setIsEditOfferButtonAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Edit Existing Offer'] ?? false);
-      setIsDeleteOfferButtonAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Delete Existing Offer'] ?? false);
-      setIsToggleOfferButtonAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Allow Offer Toggle'] ?? false);
-    }
-  }, [existingUserData]);
+  const role = existingUserData?.role;
+  const isAuthorized = role === "Owner" || role === "Editor";
+  const isOwner = role === "Owner";
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedMarketing'));
@@ -276,10 +258,6 @@ const RecentPromotions = () => {
       );
     });
   };
-
-  // const handleViewClick = (item) => {
-  //   setIsExpanded((prev) => (prev === item._id ? null : item._id)); // Use correct identifier for expansion
-  // };
 
   const handleDeletePromo = async (id) => {
     Swal.fire({
@@ -612,112 +590,82 @@ const RecentPromotions = () => {
                         </td>
                       )}
 
-                      {column === 'Actions' && (
+                      {column === 'Actions' && isAuthorized && (
                         <td key="actions" className="text-xs p-3 text-gray-700">
                           <div className="flex items-center gap-3 cursor-pointer">
 
-                            <div className="group relative">
-                              <button disabled={isExpired || !(item?.promoCode ? isEditPromoButtonAllowed : isEditOfferButtonAllowed)}>
-                                <MdOutlineModeEdit
-                                  onClick={() =>
-                                    item?.promoCode
-                                      ? router.push(`/dash-board/marketing/promo/${item._id}`)
-                                      : router.push(`/dash-board/marketing/offer/${item._id}`)
-                                  }
-                                  size={22}
-                                  className={`text-blue-500 ${isExpired || !(item?.promoCode ? isEditPromoButtonAllowed : isEditOfferButtonAllowed) ? 'cursor-not-allowed' : 'hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
-                                />
-                              </button>
-                              {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
-                                {isExpired ? "Expired"
-                                  : !(item?.promoCode ? isEditPromoButtonAllowed : isEditOfferButtonAllowed)
-                                    ? "No access"
-                                    : "Edit"}
-                              </span>}
-                            </div>
+                            {isAuthorized &&
+                              <div className="group relative">
+                                <button
+                                  disabled={isExpired || !isAuthorized}>
+                                  <MdOutlineModeEdit
+                                    onClick={() =>
+                                      item?.promoCode
+                                        ? router.push(`/dash-board/marketing/promo/${item._id}`)
+                                        : router.push(`/dash-board/marketing/offer/${item._id}`)
+                                    }
+                                    size={22}
+                                    className={`text-blue-500 ${isExpired || !isAuthorized ? 'cursor-not-allowed' : 'hover:text-blue-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
+                                  />
+                                </button>
+                                {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
 
-                            <div className="group relative">
-                              <button disabled={isExpired || !(item?.promoCode ? isDeletePromoButtonAllowed : isDeleteOfferButtonAllowed)}>
-                                <RiDeleteBinLine
-                                  onClick={() =>
-                                    item?.promoCode
-                                      ? handleDeletePromo(item._id)
-                                      : handleDeleteOffer(item._id)
+                                  {isExpired ? "Expired"
+                                    : !isAuthorized
+                                      ? "N/A"
+                                      : "Edit"}
+                                </span>}
+                              </div>
+                            }
+
+                            {isOwner &&
+                              <div className="group relative">
+
+                                <button disabled={isExpired || !isOwner}>
+                                  <RiDeleteBinLine
+                                    onClick={() =>
+                                      item?.promoCode
+                                        ? handleDeletePromo(item._id)
+                                        : handleDeleteOffer(item._id)
+                                    }
+                                    size={22}
+                                    className={`text-red-500 ${isExpired || !isOwner ? 'cursor-not-allowed' : 'hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
+                                  />
+                                </button>
+                                {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">
+                                  {isExpired
+                                    ? "Expired"
+                                    : !isOwner
+                                      ? "N/A"
+                                      : "Delete"
                                   }
-                                  size={22}
-                                  className={`text-red-500 ${isExpired || !(item?.promoCode ? isDeletePromoButtonAllowed : isDeleteOfferButtonAllowed) ? 'cursor-not-allowed' : 'hover:text-red-700 transition-transform transform hover:scale-105 hover:duration-200'}`}
-                                />
-                              </button>
-                              {!isExpired && <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">{isExpired
-                                ? "Expired"
-                                : !(item?.promoCode ? isDeletePromoButtonAllowed : isDeleteOfferButtonAllowed)
-                                  ? "No access"
-                                  : "Delete"}</span>}
-                            </div>
+                                </span>}
+                              </div>
+                            }
 
                           </div>
                         </td>
                       )}
 
-                      {column === 'Status' && (
+                      {column === 'Status' && isOwner && (
                         <td key="status" className="text-xs p-3 text-gray-700">
-                          <CustomSwitch
-                            checked={item?.promoCode ? item?.promoStatus : item?.offerStatus}
-                            onChange={() => item?.promoCode ? handleStatusChangePromo(item?._id, item?.promoStatus) : handleStatusChangeOffer(item?._id, item?.offerStatus)}
-                            size="md"
-                            color="primary"
-                            disabled={isExpired || (item?.promoCode ? !isTogglePromoButtonAllowed : !isToggleOfferButtonAllowed)}
-                          />
+                          {isOwner &&
+                            <CustomSwitch
+                              checked={item?.promoCode ? item?.promoStatus : item?.offerStatus}
+                              onChange={() => item?.promoCode ? handleStatusChangePromo(item?._id, item?.promoStatus) : handleStatusChangeOffer(item?._id, item?.offerStatus)}
+                              size="md"
+                              color="primary"
+                              // disabled={isExpired || (item?.promoCode ? !isTogglePromoButtonAllowed : !isToggleOfferButtonAllowed)}
+                              disabled={isExpired}
+                            />
+                          }
                         </td>
                       )}
 
                     </>
                   )
                 )}
-                {/* {selectedColumns.includes('Preview') && (
-                  <td className="text-xs p-3 text-gray-700 cursor-pointer">
-                    <button onClick={() =>
-                      handleViewClick(item)
-                    }>
-                      {isExpandedItem ? <FaAngleUp className='hover:text-red-600' size={22} /> : <FaAngleDown className='hover:text-red-600' size={22} />}
-                    </button>
-                  </td>
-                )} */}
               </tr>
-              {/* {isExpandedItem && (
-                <tr>
-                  <td colSpan="12" className="p-4 bg-gray-100">
-                    <div className="text-sm">
-                      {item?.promoCode ? (
-                        <>
-                          <p>
-                            Total Times Applied:
-
-                            {totalPromoApplied === 0
-                              ? " No Orders"
-                              : ` ${totalPromoApplied} ${totalPromoApplied === 1 ? " Order" : " Orders"}`}
-                          </p>
-                          <p>Total Amount Discounted : ৳ {totalAmountDiscounted}</p>
-                          <p>Minimum Order Amount : ৳ {item?.minAmount || '0'}</p>
-                          <p>Maximum Capped Amount : ৳ {item?.maxAmount || '0'}</p>
-                        </>
-                      ) : (
-                        <>
-                          <p>
-                            Total Times Applied:
-                            {totalOfferApplied === 0
-                              ? " No Orders"
-                              : ` ${totalOfferApplied} ${totalOfferApplied === 1 ? " Order" : " Orders"}`}
-                          </p>
-                          <p>Total Amount Discounted : ৳ {totalOfferAmountDiscounted}</p>
-                          <p>Minimum Order Amount : ৳ {item?.minAmount || '0'}</p>
-                          <p>Maximum Capped Amount : ৳ {item?.maxAmount || '0'}</p>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              )} */}
             </>
           )
         })}
@@ -805,8 +753,10 @@ const RecentPromotions = () => {
               data['Max Capped Amount'] = item.maxAmount || '0';
               break;
             case 'Status':
-              const isActive = item.promoStatus || item.offerStatus;
-              data['Status'] = isActive ? 'Active' : 'Inactive';
+              if (isOwner) {
+                const isActive = item.promoStatus || item.offerStatus;
+                data['Status'] = isActive ? 'Active' : 'Inactive';
+              }
               break;
             default:
               break;
@@ -835,7 +785,7 @@ const RecentPromotions = () => {
 
     // Define the columns based on columnOrder
     const columns = columnOrder
-      .filter((col) => selectedColumns.includes(col))
+      .filter((col) => selectedColumns.includes(col) && col !== 'Actions' && (col !== 'Status' || isOwner))
       .map((col) => ({
         header: col,
         dataKey: col,
@@ -872,8 +822,10 @@ const RecentPromotions = () => {
               rowData['Max Capped Amount'] = item.maxAmount || '0';
               break;
             case 'Status':
-              const isActive = item.promoStatus || item.offerStatus;
-              rowData['Status'] = isActive ? 'Active' : 'Inactive';
+              if (isOwner) {
+                const isActive = item.promoStatus || item.offerStatus;
+                rowData['Status'] = isActive ? 'Active' : 'Inactive';
+              }
               break;
             default:
               break;
@@ -930,8 +882,10 @@ const RecentPromotions = () => {
               data['Max Capped Amount'] = item.maxAmount || "0";
               break;
             case 'Status':
-              const isActive = item.promoStatus || item.offerStatus;
-              data['Status'] = isActive ? 'Active' : 'Inactive';
+              if (isOwner) {
+                const isActive = item.promoStatus || item.offerStatus;
+                data['Status'] = isActive ? 'Active' : 'Inactive';
+              }
               break;
             default:
               break;
@@ -1146,12 +1100,12 @@ const RecentPromotions = () => {
                       Max Capped Amount
                     </th>
                   )}
-                  {column === 'Actions' && selectedColumns.includes(column) && (
+                  {column === 'Actions' && isAuthorized && selectedColumns.includes(column) && (
                     <th key="actions" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
                       Actions
                     </th>
                   )}
-                  {column === 'Status' && selectedColumns.includes(column) && (
+                  {column === 'Status' && isOwner && selectedColumns.includes(column) && (
                     <th key="status" className="text-[10px] md:text-xs p-2 xl:p-3 text-gray-700 border-b border-gray-300">
                       Status
                     </th>
@@ -1225,6 +1179,7 @@ const RecentPromotions = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
     </>
   );
 };

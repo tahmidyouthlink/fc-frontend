@@ -1,124 +1,200 @@
 export const permissionsList = {
-  "Dashboard": { "access": false },
-
-  "Orders": {
-    "access": false,
-    "actions": {
-      "New Orders": false,
-      "Active Orders": false,
-      "Completed Orders": false,
-      "Returns & Refunds": false,
-      "View Order Details": false,
-      "Confirm Order": false,
-      "Shipped Order": false,
-      "On Hold Order": false,
-      "Delivered Order": false,
-      "Return Approve Order": false,
-      "Return Decline Order": false,
-      "Return Order": false,
-      "Refund Order": false,
-      "Revert Order": false
-    }
+  Viewer: {
+    "Dashboard": { "access": false },
+    "Orders": {
+      "access": false,
+      "actions": [
+        "New Orders",
+        "Active Orders",
+        "Completed Orders",
+        "Returns & Refunds",
+        "View Order Details",
+      ]
+    },
+    "Product Hub": {
+      "access": false,
+      "actions": [
+        "Manage Products",
+        "Inventory",
+        "Purchase Orders",
+        "Transfers",
+        "Product Settings",
+      ]
+    },
+    "Customers": {
+      "access": false,
+      "actions": [
+        "Customer Details",
+        "Customer Order History"
+      ]
+    },
+    "Finances": {
+      "access": false,
+      "actions": [
+        "Completed Date range filtering",
+        "Refunded Date range filtering",
+        "Payment methods"
+      ]
+    },
+    "Analytics": { "access": false },
+    "Marketing": {
+      "access": false,
+      "actions": [
+        "View Performance",
+        "Reward Level",
+        "Marketing Content",
+        "Homepage Content",
+        "Discounted Date range filtering"
+      ]
+    },
+    "Supply Chain": {
+      "access": false,
+      "actions": [
+        "Shipment",
+        "Location",
+      ]
+    },
   },
-
-  "Products": {
-    "access": false,
-    "actions": {
-      "Add Product": false,
-      "View/Edit Product": false
-    }
+  Editor: {
+    "Dashboard": { "access": false },
+    "Orders": {
+      "access": false,
+      "actions": [
+        "New Orders",
+        "Active Orders",
+        "Completed Orders",
+        "Returns & Refunds",
+        "View Order Details",
+        "Confirm Order",
+        "Shipped Order",
+        "On Hold Order",
+        "Delivered Order",
+        "Return Approve Order",
+        "Return Decline Order",
+        "Return Order",
+        "Refund Order",
+      ]
+    },
+    "Product Hub": {
+      "access": false,
+      "actions": [
+        "Manage Products",
+        "Inventory",
+        "Purchase Orders",
+        "Transfers",
+        "Product Settings",
+      ]
+    },
+    "Customers": {
+      "access": false,
+      "actions": [
+        "Customer Details",
+        "Customer Order History"
+      ]
+    },
+    "Finances": {
+      "access": false,
+      "actions": [
+        "Completed Date range filtering",
+        "Refunded Date range filtering",
+        "Payment methods"
+      ]
+    },
+    "Analytics": { "access": false },
+    "Marketing": {
+      "access": false,
+      "actions": [
+        "Create Promo",
+        "Edit Promo",
+        "Promo Toggle",
+        "Create Offer",
+        "Edit Offer",
+        "Offer Toggle",
+        "Reward Level",
+        "Marketing Content",
+        "Homepage Content",
+        "Discounted Date range filtering"
+      ]
+    },
+    "Supply Chain": {
+      "access": false,
+      "actions": [
+        "Shipment",
+        "Location",
+      ]
+    },
   },
-  "Manage Inventory": { "access": false },
-  "Purchase Orders": {
-    "access": false,
-    "actions": {
-      "Create New Purchase Order": false,
-      "Edit Purchase Order": false,
-      "Delete Purchase Order": false,
-    }
+  Owner: {
+    "Dashboard": { "access": false },
+    "Orders": {
+      "access": false,
+      "actions": [
+        "New Orders",
+        "Active Orders",
+        "Completed Orders",
+        "Returns & Refunds",
+        "View Order Details",
+        "Confirm Order",
+        "Shipped Order",
+        "On Hold Order",
+        "Delivered Order",
+        "Return Approve Order",
+        "Return Decline Order",
+        "Return Order",
+        "Refund Order",
+        "Revert Order"
+      ]
+    },
+    "Product Hub": {
+      "access": false,
+      "actions": [
+        "Manage Products",
+        "Inventory",
+        "Purchase Orders",
+        "Transfers",
+        "Product Settings",
+      ]
+    },
+    "Customers": {
+      "access": false,
+      "actions": [
+        "Customer Details",
+        "Customer Order History"
+      ]
+    },
+    "Finances": {
+      "access": false,
+      "actions": [
+        "Completed Date range filtering",
+        "Refunded Date range filtering",
+        "Payment methods"
+      ]
+    },
+    "Analytics": { "access": false },
+    "Marketing": {
+      "access": false,
+      "actions": [
+        "Create Promo",
+        "Edit Promo",
+        "Delete Promo",
+        "Promo Toggle",
+        "Create Offer",
+        "Edit Offer",
+        "Delete Offer",
+        "Offer Toggle",
+        "Reward Level",
+        "Marketing Content",
+        "Homepage Content",
+        "Discounted Date range filtering"
+      ]
+    },
+    "Supply Chain": {
+      "access": false,
+      "actions": [
+        "Shipment",
+        "Location",
+      ]
+    },
+    "Settings": { "access": false }
   },
-  "Transfers": {
-    "access": false,
-    "actions": {
-      "Create New Transfer Order": false,
-      "Edit Transfer Order": false,
-      "Delete Transfer Order": false
-    }
-  },
-  "Categories": {
-    "access": false,
-    "actions": {
-      "Create New Category": false,
-      "Select Featured Category": false,
-      "Edit Category": false,
-      "Delete Category": false
-    }
-  },
-  "Seasons": {
-    "access": false,
-    "actions": {
-      "Create New Season": false,
-      "Edit Season": false,
-      "Delete Season": false
-    }
-  },
-  "Colors": {
-    "access": false,
-    "actions": {
-      "Create New Color": false,
-      "Delete Color": false
-    }
-  },
-  "Vendors": {
-    "access": false,
-    "actions": {
-      "Create New Vendor": false,
-      "Edit Vendor": false,
-      "Delete Vendor": false
-    }
-  },
-  "Tags": {
-    "access": false,
-    "actions": {
-      "Create New Tag": false,
-      "Delete Tag": false
-    }
-  },
-
-  "Customers": {
-    "access": false,
-    "actions": {
-      "Customer Details": false,
-      "Customer Order History": false
-    }
-  },
-
-  "Finances": {
-    "access": false,
-    "actions": {
-      "Completed Date range filtering": false,
-      "Refunded Date range filtering": false
-    }
-  },
-
-  "Analytics": { "access": false },
-
-  "Marketing": {
-    "access": false,
-    "actions": {
-      "Create Promo": false,
-      "Edit Existing Promo": false,
-      "Delete Existing Promo": false,
-      "Allow Promo Toggle": false,
-      "Create Offer": false,
-      "Edit Existing Offer": false,
-      "Delete Existing Offer": false,
-      "Allow Offer Toggle": false,
-      "Marketing Content": false,
-      "Homepage Content": false,
-      "Discounted Date range filtering": false
-    }
-  },
-
-  "Settings": { "access": false }
 };

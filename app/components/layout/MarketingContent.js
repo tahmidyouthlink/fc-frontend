@@ -8,17 +8,8 @@ const MarketingContent = () => {
 
   const [activeTab, setActiveTab] = useState('marketing banner');
   const { existingUserData, isUserLoading } = useAuth();
-  const [isMarketingContentAllowed, setIsMarketingContentAllowed] = useState(false);
-
-  useEffect(() => {
-    // Fetch user data if needed or check the permission dynamically
-    if (existingUserData) {
-
-      // Check if the user has permission to add a product
-      setIsMarketingContentAllowed(existingUserData?.permissions?.["Marketing"]?.actions?.['Marketing Content'] ?? false);
-
-    }
-  }, [existingUserData]);
+  const role = existingUserData?.role;
+  const isAuthorized = role === "Owner" || role === "Editor";
 
   // Ensure the code runs only on the client
   useEffect(() => {
@@ -41,9 +32,10 @@ const MarketingContent = () => {
 
   return (
     <div>
-      <div className="flex flex-wrap items-center gap-3 bg-gray-50">
 
-        {isMarketingContentAllowed ? (
+      {isAuthorized &&
+        <div className="flex flex-wrap items-center gap-3 bg-gray-50">
+
           <button
             className={`relative text-sm py-1 transition-all duration-300
 ${activeTab === 'marketing banner' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
@@ -55,11 +47,7 @@ ${activeTab === 'marketing banner' ? 'after:w-full font-bold' : 'after:w-0 hover
           >
             Marketing banner
           </button>
-        ) : (
-          <></>
-        )}
 
-        {isMarketingContentAllowed ? (
           <button
             className={`relative text-sm py-1 transition-all duration-300
 ${activeTab === 'login/register slides' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
@@ -71,19 +59,21 @@ ${activeTab === 'login/register slides' ? 'after:w-full' : 'after:w-0 hover:afte
           >
             Login/Register slides
           </button>
-        ) : (
-          <></>
-        )}
 
-      </div>
+        </div>
+      }
 
-      {isMarketingContentAllowed && activeTab === "marketing banner" && <div>
-        <MarketingBanner />
-      </div>}
+      {isAuthorized &&
+        activeTab === "marketing banner" && <div>
+          <MarketingBanner />
+        </div>
+      }
 
-      {isMarketingContentAllowed && activeTab === "login/register slides" && <div>
-        <LoginRegisterSlides />
-      </div>}
+      {isAuthorized &&
+        activeTab === "login/register slides" && <div>
+          <LoginRegisterSlides />
+        </div>
+      }
 
     </div>
   );

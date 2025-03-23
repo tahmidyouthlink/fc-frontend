@@ -2,14 +2,32 @@
 import FinancePerformance from '@/app/components/layout/FinancePerformance';
 import FinanceTable from '@/app/components/layout/FinanceTable';
 import RefundedPayments from '@/app/components/layout/RefundedPayments';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
+import PaymentMethods from './payment-methods/page';
 
 const Finances = () => {
 
   const [activeTab, setActiveTab] = useState('completed');
+
+  // Ensure the code runs only on the client
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedTab = localStorage.getItem('activeTabFinancesPage');
+      if (savedTab) {
+        setActiveTab(savedTab);
+      }
+    }
+  }, []);
+
+  // Save the activeTab to localStorage when it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('activeTabFinancesPage', activeTab);
+    }
+  }, [activeTab]);
 
   return (
     <div className='px-6 md:px-10 bg-gray-50 relative min-h-screen'>
@@ -64,6 +82,11 @@ const Finances = () => {
             Refunded
           </button>
 
+          <button className={`relative text-sm py-1 transition-all duration-300 ${activeTab === 'payment methods' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300 ${activeTab === 'payment methods' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
+      `} onClick={() => setActiveTab('payment methods')}>
+            Payment methods
+          </button>
+
         </div>
       </div>
 
@@ -77,6 +100,12 @@ const Finances = () => {
         <h1 className='font-bold'>Performance</h1>
         <p className='pt-1 text-neutral-400 text-sm font-medium'>The data includes all Pending, Paid, Canceled, or Refunded transactions.</p>
         <RefundedPayments />
+      </div>}
+
+      {activeTab === "payment methods" && <div className='pt-4'>
+        <h1 className='font-bold'>Payment Methods</h1>
+        <p className='pt-1 text-neutral-400 text-sm font-medium'>The data includes all payment methods.</p>
+        <PaymentMethods />
       </div>}
 
       <div className='mt-12 md:mt-16'>

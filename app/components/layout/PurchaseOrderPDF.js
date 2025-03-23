@@ -21,8 +21,28 @@ const styles = StyleSheet.create({
     padding: 5,
     fontSize: 16,
     borderRadius: 10,
-    color: status === 'pending' ? '#b58900' : status === 'received' ? '#005f00' : '#d0011a',
-    backgroundColor: status === 'pending' ? '#fff3cd' : status === 'received' ? '#d4edda' : '#f8d7da',
+    // Dynamic colors (matching Tailwind classes)
+    color:
+      status === "pending"
+        ? "#b58900" // text-yellow-600
+        : status === "ordered"
+          ? "#1d4ed8" // text-blue-600
+          : status === "received"
+            ? "#166534" // text-green-600
+            : status === "canceled"
+              ? "#b91c1c" // text-red-600
+              : "#4b5563", // text-gray-600
+
+    backgroundColor:
+      status === "pending"
+        ? "#fef3c7" // bg-yellow-100
+        : status === "ordered"
+          ? "#dbeafe" // bg-blue-100
+          : status === "received"
+            ? "#d1fae5" // bg-green-100
+            : status === "canceled"
+              ? "#fee2e2" // bg-red-100
+              : "#f3f4f6", // bg-gray-100
   }),
   originDestination: {
     flexDirection: 'row',
@@ -212,7 +232,8 @@ const PurchaseOrderPDF = ({ data }) => {
           <Text style={styles.statusBadge(data?.purchaseOrderStatus)}>{data?.purchaseOrderStatus === "pending" ? "Pending"
             : data?.purchaseOrderStatus === "received" ? "Received"
               : data?.purchaseOrderStatus === "canceled" ? "Canceled"
-                : "Unknown"}</Text>
+                : data?.purchaseOrderStatus === "ordered" ? "Ordered"
+                  : "Unknown"}</Text>
         </View>
 
         {/* Supplier and Destination */}

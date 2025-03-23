@@ -50,7 +50,7 @@ const DashboardNavbar = () => {
 
   // Show loading state if data is not loaded yet
   if (isUserLoading || !existingUserData || status === "loading") {
-    return <Loading />; // Or you can use any other custom loading spinner
+    return // Or you can use any other custom loading spinner
   };
 
   return (

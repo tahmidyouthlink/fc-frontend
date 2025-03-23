@@ -1,4 +1,5 @@
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import axios from "axios";
 
 export const authOptions = {
@@ -28,7 +29,6 @@ export const authOptions = {
 
           return {
             _id: data._id,
-            role: data.role,
           };
         } catch (error) {
           // Return specific error messages from backend if available
@@ -58,7 +58,8 @@ export const authOptions = {
           }
 
           return {
-            email: data.email,
+            email: data?.email,
+            name: data?.userInfo?.personalInfo?.customerName,
           };
         } catch (error) {
           // Return specific error messages from backend if available
@@ -69,20 +70,25 @@ export const authOptions = {
         }
       },
     }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true,
+    }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, profile }) {
       if (user) {
-        token._id = user._id;
-        token.role = user.role;
-        token.email = user.email;
+        token._id = user?._id;
+        token.email = user?.email;
+        token.name = user?.name || profile?.name;
       }
       return token;
     },
     async session({ session, token }) {
       session.user._id = token._id;
-      session.user.role = token.role;
       session.user.email = token.email;
+      session.user.name = token.name;
       return session;
     },
   },

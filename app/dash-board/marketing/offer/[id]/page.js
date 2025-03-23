@@ -18,7 +18,6 @@ import { FiSave } from 'react-icons/fi';
 import useOffers from '@/app/hooks/useOffers';
 import ProductSearchSelect from '@/app/components/layout/ProductSearchSelect';
 import { HiCheckCircle } from 'react-icons/hi2';
-import ProtectedRoute from '@/app/components/ProtectedRoutes/ProtectedRoute';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
@@ -520,165 +519,164 @@ const EditOffer = () => {
   };
 
   return (
-    <ProtectedRoute pageName="" requiredPermission="Edit Existing Offer">
-      <div className='bg-gray-50 min-h-screen'>
-        <div className='max-w-screen-2xl px-6 2xl:px-0 mx-auto'>
+    <div className='bg-gray-50 min-h-screen'>
+      <div className='max-w-screen-2xl px-6 2xl:px-0 mx-auto'>
 
-          <div className='max-w-screen-xl mx-auto pt-3 sticky top-0 z-10 bg-gray-50'>
-            <div className='flex items-center justify-between'>
-              <h3 className='w-full font-semibold text-lg md:text-xl lg:text-2xl'>Edit Offer Configuration</h3>
-              <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/marketing"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
-            </div>
+        <div className='max-w-screen-xl mx-auto pt-3 sticky top-0 z-10 bg-gray-50'>
+          <div className='flex items-center justify-between'>
+            <h3 className='w-full font-semibold text-lg md:text-xl lg:text-2xl'>Edit Offer Configuration</h3>
+            <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/marketing"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
           </div>
+        </div>
 
-          {/* Your form code */}
-          <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto pt-1 pb-6 flex flex-col gap-6'>
+        {/* Your form code */}
+        <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-xl mx-auto pt-1 pb-6 flex flex-col gap-6'>
 
-            <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
-              <div className='grid grid-cols-1 lg:col-span-5 gap-8 mt-3 py-3 h-fit'>
-                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
-                  <div>
-                    <label htmlFor='offerTitle' className='flex justify-start font-medium text-[#9F5216]'>Offer Title *</label>
-                    <input id='offerTitle' {...register("offerTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="text" />
-                    {errors.offerTitle?.type === "required" && (
-                      <p className="text-red-600 text-left">Offer Title is required</p>
-                    )}
-                  </div>
-                  <div>
-                    <label htmlFor='badgeTitle' className='flex justify-start font-medium text-[#9F5216] pb-2'>Badge Title *</label>
-                    <input id='badgeTitle' placeholder='Enter Badge Title'  {...register("badgeTitle", { required: true, maxLength: 12 })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" maxLength="12" type="text" />
-                    {errors.badgeTitle?.type === "required" && (
-                      <p className="text-red-600 text-left">Badge Title is required</p>
-                    )}
-                  </div>
-
-                  <div className="flex w-full flex-col">
-                    <Tabs
-                      aria-label="Select Discount Type"
-                      selectedKey={offerDiscountType} // Default select based on fetched data
-                      onSelectionChange={handleTabChange}
-                    >
-                      <Tab key="Percentage" title="Percentage">Percentage (%)</Tab>
-                      <Tab key="Amount" title="Amount">Amount (Taka)</Tab>
-                    </Tabs>
-
-                    <input
-                      type="number"
-                      {...register('offerDiscountValue', { required: true })}
-                      className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
-                      placeholder={`Enter ${offerDiscountType} Discount`} // Correct placeholder
-                    />
-                    {errors.offerDiscountValue?.type === "required" && (
-                      <p className="text-red-600 text-left">Discount Value is required</p>
-                    )}
-                  </div>
-
+          <div className='grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6'>
+            <div className='grid grid-cols-1 lg:col-span-5 gap-8 mt-3 py-3 h-fit'>
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
+                <div>
+                  <label htmlFor='offerTitle' className='flex justify-start font-medium text-[#9F5216]'>Offer Title *</label>
+                  <input id='offerTitle' {...register("offerTitle", { required: true })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="text" />
+                  {errors.offerTitle?.type === "required" && (
+                    <p className="text-red-600 text-left">Offer Title is required</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor='badgeTitle' className='flex justify-start font-medium text-[#9F5216] pb-2'>Badge Title *</label>
+                  <input id='badgeTitle' placeholder='Enter Badge Title'  {...register("badgeTitle", { required: true, maxLength: 12 })} className="w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" maxLength="12" type="text" />
+                  {errors.badgeTitle?.type === "required" && (
+                    <p className="text-red-600 text-left">Badge Title is required</p>
+                  )}
                 </div>
 
-                <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
+                <div className="flex w-full flex-col">
+                  <Tabs
+                    aria-label="Select Discount Type"
+                    selectedKey={offerDiscountType} // Default select based on fetched data
+                    onSelectionChange={handleTabChange}
+                  >
+                    <Tab key="Percentage" title="Percentage">Percentage (%)</Tab>
+                    <Tab key="Amount" title="Amount">Amount (Taka)</Tab>
+                  </Tabs>
 
-                  <div>
-                    <label htmlFor='minAmount' className='flex justify-start font-medium text-[#9F5216]'>Minimum Order Amount *</label>
-                    <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
-                  </div>
-
-                  {offerDiscountType === "Percentage" && <div>
-                    <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#9F5216]'>Maximum Capped Amount *</label>
-                    <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
-                  </div>}
-
-                  <div className="space-y-2">
-                    <label htmlFor='expiryDate' className='block text-[#9F5216] font-medium text-sm'>
-                      Expiry Date <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      id="expiryDate"
-                      {...register("expiryDate", { required: true })}
-                      value={expiryDate}
-                      onChange={(e) => setExpiryDate(e.target.value)} // Update state with the input value
-                      className="w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000"
-                    />
-                    {dateError && (
-                      <p className="text-red-600 text-sm mt-1">Expiry Date is required</p>
-                    )}
-                  </div>
+                  <input
+                    type="number"
+                    {...register('offerDiscountValue', { required: true })}
+                    className='custom-number-input w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000'
+                    placeholder={`Enter ${offerDiscountType} Discount`} // Correct placeholder
+                  />
+                  {errors.offerDiscountValue?.type === "required" && (
+                    <p className="text-red-600 text-left">Discount Value is required</p>
+                  )}
                 </div>
+
               </div>
 
-              <div className='grid grid-cols-1 lg:col-span-7 gap-8 mt-3 py-3'>
+              <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>
 
-                <div className='flex flex-col bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+                <div>
+                  <label htmlFor='minAmount' className='flex justify-start font-medium text-[#9F5216]'>Minimum Order Amount *</label>
+                  <input id='minAmount' {...register("minAmount")} placeholder='Enter Minimum Order Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
+                </div>
 
-                  <Tabs
-                    aria-label="Product and Category Selection"
-                    selectedKey={selectedTab}
-                    onSelectionChange={handleTabChangeForCategoryOrProduct}
-                  >
-                    <Tab key="Products" title="Products">
-                      <div>
-                        <label htmlFor='Product Selection' className='flex justify-start font-medium text-[#9F5216] pb-2'>Product Selection *</label>
-                        {productList && (
-                          <ProductSearchSelect
-                            productList={productList}
-                            onSelectionChange={handleProductSelectionChange}
-                            selectedProductIds={selectedProductIds}
-                            setSelectedProductIds={setSelectedProductIds}
-                          />
-                        )}
-                        {productIdError && <p className="text-red-600 text-left">Please select at least one product ID</p>}
-                      </div>
-                    </Tab>
-                    <Tab key="Categories" title="Categories">
-                      <div>
-                        <label htmlFor='Category' className='flex justify-start font-medium text-[#9F5216] pb-2'>Category Selection *</label>
-                        {categoryList && (
-                          <div>
-                            <div className="w-full mx-auto" ref={dropdownRef}>
+                {offerDiscountType === "Percentage" && <div>
+                  <label htmlFor='maxAmount' className='flex justify-start font-medium text-[#9F5216]'>Maximum Capped Amount *</label>
+                  <input id='maxAmount' {...register("maxAmount")} placeholder='Enter Maximum Capped Amount' className="custom-number-input w-full p-3 border border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000 rounded-md" type="number" />
+                </div>}
 
-                              {/* Search Box */}
-                              <input
-                                type="text"
-                                value={isDropdownOpen ? searchTerm : selectedCategories.join(", ")} // Show selected IDs when closed
-                                onChange={(e) => setSearchTerm(e?.target?.value)}
-                                onClick={() => setIsDropdownOpen(true)} // Toggle dropdown on input click
-                                placeholder="Search & Select by Categories"
-                                className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#9F5216] overflow-hidden text-ellipsis whitespace-nowrap"
-                              />
+                <div className="space-y-2">
+                  <label htmlFor='expiryDate' className='block text-[#9F5216] font-medium text-sm'>
+                    Expiry Date <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    id="expiryDate"
+                    {...register("expiryDate", { required: true })}
+                    value={expiryDate}
+                    onChange={(e) => setExpiryDate(e.target.value)} // Update state with the input value
+                    className="w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#9F5216] transition-colors duration-1000"
+                  />
+                  {dateError && (
+                    <p className="text-red-600 text-sm mt-1">Expiry Date is required</p>
+                  )}
+                </div>
+              </div>
+            </div>
 
-                              {/* Dropdown list for search results */}
-                              {isDropdownOpen && (
-                                <div className="border flex flex-col gap-1.5 p-2 max-h-64 overflow-y-auto rounded-lg">
-                                  {filteredCategories?.length > 0 ? (
-                                    filteredCategories?.map((category) => (
-                                      <div
-                                        key={category?._id}
-                                        className={`flex cursor-pointer items-center justify-between rounded-lg border p-1 transition-[border-color,background-color] duration-300 ease-in-out hover:border-[#d7ecd2] hover:bg-[#fafff9] ${selectedCategories?.includes(category?.label) ? 'border-[#d7ecd2] bg-[#fafff9]' : 'border-neutral-100'}`}
-                                        onClick={() => handleCategorySelectionChange(category?.label)}
-                                      >
-                                        <div className='flex items-center gap-1'>
-                                          <Image
-                                            width={4000}
-                                            height={4000}
-                                            src={category?.imageUrl}
-                                            alt={category?.label}
-                                            className="h-12 w-12 object-cover rounded"
-                                          />
-                                          <span className="ml-2 font-medium">{category?.label}</span>
-                                        </div>
-                                        <HiCheckCircle
-                                          className={`pointer-events-none size-7 text-[#60d251] transition-opacity duration-300 ease-in-out ${selectedCategories?.includes(category?.label) ? "opacity-100" : "opacity-0"}`}
+            <div className='grid grid-cols-1 lg:col-span-7 gap-8 mt-3 py-3'>
+
+              <div className='flex flex-col bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+
+                <Tabs
+                  aria-label="Product and Category Selection"
+                  selectedKey={selectedTab}
+                  onSelectionChange={handleTabChangeForCategoryOrProduct}
+                >
+                  <Tab key="Products" title="Products">
+                    <div>
+                      <label htmlFor='Product Selection' className='flex justify-start font-medium text-[#9F5216] pb-2'>Product Selection *</label>
+                      {productList && (
+                        <ProductSearchSelect
+                          productList={productList}
+                          onSelectionChange={handleProductSelectionChange}
+                          selectedProductIds={selectedProductIds}
+                          setSelectedProductIds={setSelectedProductIds}
+                        />
+                      )}
+                      {productIdError && <p className="text-red-600 text-left">Please select at least one product ID</p>}
+                    </div>
+                  </Tab>
+                  <Tab key="Categories" title="Categories">
+                    <div>
+                      <label htmlFor='Category' className='flex justify-start font-medium text-[#9F5216] pb-2'>Category Selection *</label>
+                      {categoryList && (
+                        <div>
+                          <div className="w-full mx-auto" ref={dropdownRef}>
+
+                            {/* Search Box */}
+                            <input
+                              type="text"
+                              value={isDropdownOpen ? searchTerm : selectedCategories.join(", ")} // Show selected IDs when closed
+                              onChange={(e) => setSearchTerm(e?.target?.value)}
+                              onClick={() => setIsDropdownOpen(true)} // Toggle dropdown on input click
+                              placeholder="Search & Select by Categories"
+                              className="mb-2 w-full rounded-md border border-gray-300 p-2 outline-none transition-colors duration-1000 focus:border-[#9F5216] overflow-hidden text-ellipsis whitespace-nowrap"
+                            />
+
+                            {/* Dropdown list for search results */}
+                            {isDropdownOpen && (
+                              <div className="border flex flex-col gap-1.5 p-2 max-h-64 overflow-y-auto rounded-lg">
+                                {filteredCategories?.length > 0 ? (
+                                  filteredCategories?.map((category) => (
+                                    <div
+                                      key={category?._id}
+                                      className={`flex cursor-pointer items-center justify-between rounded-lg border p-1 transition-[border-color,background-color] duration-300 ease-in-out hover:border-[#d7ecd2] hover:bg-[#fafff9] ${selectedCategories?.includes(category?.label) ? 'border-[#d7ecd2] bg-[#fafff9]' : 'border-neutral-100'}`}
+                                      onClick={() => handleCategorySelectionChange(category?.label)}
+                                    >
+                                      <div className='flex items-center gap-1'>
+                                        <Image
+                                          width={4000}
+                                          height={4000}
+                                          src={category?.imageUrl}
+                                          alt={category?.label}
+                                          className="h-12 w-12 object-cover rounded"
                                         />
+                                        <span className="ml-2 font-medium">{category?.label}</span>
                                       </div>
-                                    ))
-                                  ) : (
-                                    <p className="text-gray-500">No categories found</p>
-                                  )}
-                                </div>
-                              )}
+                                      <HiCheckCircle
+                                        className={`pointer-events-none size-7 text-[#60d251] transition-opacity duration-300 ease-in-out ${selectedCategories?.includes(category?.label) ? "opacity-100" : "opacity-0"}`}
+                                      />
+                                    </div>
+                                  ))
+                                ) : (
+                                  <p className="text-gray-500">No categories found</p>
+                                )}
+                              </div>
+                            )}
 
-                              {/* Selected categories display */}
-                              {/* {selectedCategories.length > 0 && (
+                            {/* Selected categories display */}
+                            {/* {selectedCategories.length > 0 && (
                               <div className="mt-2 rounded-lg border p-2">
                                 <h4 className="mb-2 text-sm font-semibold">Selected Categories:</h4>
                                 <div className="flex flex-wrap gap-2">
@@ -697,93 +695,92 @@ const EditOffer = () => {
                                 </div>
                               </div>
                             )} */}
-                            </div>
                           </div>
-                        )}
-                        {categoryError && <p className="text-red-600 text-left">Select at least one category</p>}
-                      </div>
-                    </Tab>
-                  </Tabs>
-
-                </div>
-
-                <div className='flex flex-col gap-6 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
-                  <div className='flex w-full flex-col gap-2'>
-                    <label htmlFor='offerDescription' className='flex justify-start font-medium text-[#9F5216] pb-2'>Offer Description</label>
-                    <Controller
-                      control={control}
-                      name="offerDescription"
-                      render={({ field }) => (
-                        <Editor
-                          {...field}
-                          value={offerDescription}
-                          onChange={setOfferDescription}
-                        />
+                        </div>
                       )}
-                    />
-                  </div>
-
-                  <div className='flex flex-col gap-4'>
-                    <input
-                      id='imageUpload'
-                      type='file'
-                      className='hidden'
-                      onChange={handleImageChange}
-                    />
-                    <label
-                      htmlFor='imageUpload'
-                      className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
-                    >
-                      <MdOutlineFileUpload size={60} />
-                      <div className='space-y-1.5 text-center'>
-                        <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
-                          Upload Thumbnail
-                        </h5>
-                        <p className='text-sm text-gray-500'>
-                          Photo Should be in PNG, JPEG or JPG format
-                        </p>
-                      </div>
-                    </label>
-
-                    {image && (
-                      <div className='relative'>
-                        <Image
-                          src={typeof image === 'string' ? image : image.src}
-                          alt='Uploaded image'
-                          height={3000}
-                          width={3000}
-                          className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
-                        />
-                        <button
-                          onClick={handleImageRemove}
-                          className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
-                        >
-                          <RxCross2 size={24} />
-                        </button>
-                      </div>
-                    )}
-
-                  </div>
-                </div>
+                      {categoryError && <p className="text-red-600 text-left">Select at least one category</p>}
+                    </div>
+                  </Tab>
+                </Tabs>
 
               </div>
+
+              <div className='flex flex-col gap-6 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>
+                <div className='flex w-full flex-col gap-2'>
+                  <label htmlFor='offerDescription' className='flex justify-start font-medium text-[#9F5216] pb-2'>Offer Description</label>
+                  <Controller
+                    control={control}
+                    name="offerDescription"
+                    render={({ field }) => (
+                      <Editor
+                        {...field}
+                        value={offerDescription}
+                        onChange={setOfferDescription}
+                      />
+                    )}
+                  />
+                </div>
+
+                <div className='flex flex-col gap-4'>
+                  <input
+                    id='imageUpload'
+                    type='file'
+                    className='hidden'
+                    onChange={handleImageChange}
+                  />
+                  <label
+                    htmlFor='imageUpload'
+                    className='mx-auto flex flex-col items-center justify-center space-y-3 rounded-lg border-2 border-dashed border-gray-400 p-6 bg-white cursor-pointer'
+                  >
+                    <MdOutlineFileUpload size={60} />
+                    <div className='space-y-1.5 text-center'>
+                      <h5 className='whitespace-nowrap text-lg font-medium tracking-tight'>
+                        Upload Thumbnail
+                      </h5>
+                      <p className='text-sm text-gray-500'>
+                        Photo Should be in PNG, JPEG or JPG format
+                      </p>
+                    </div>
+                  </label>
+
+                  {image && (
+                    <div className='relative'>
+                      <Image
+                        src={typeof image === 'string' ? image : image.src}
+                        alt='Uploaded image'
+                        height={3000}
+                        width={3000}
+                        className='w-full min-h-[200px] max-h-[200px] rounded-md object-contain'
+                      />
+                      <button
+                        onClick={handleImageRemove}
+                        className='absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white font-bold'
+                      >
+                        <RxCross2 size={24} />
+                      </button>
+                    </div>
+                  )}
+
+                </div>
+              </div>
+
             </div>
+          </div>
 
-            <div className='flex justify-end items-center'>
+          <div className='flex justify-end items-center'>
 
-              <button
-                type='submit'
-                disabled={isSubmitting}
-                className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}
-              >
-                {isSubmitting ? 'Saving...' : 'Save'} <FiSave size={20} />
-              </button>
+            <button
+              type='submit'
+              disabled={isSubmitting}
+              className={`${isSubmitting ? 'bg-gray-400' : 'bg-[#ffddc2] hover:bg-[#fbcfb0]'} relative z-[1] flex items-center gap-x-3 rounded-lg  px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out font-bold text-[14px] text-neutral-700`}
+            >
+              {isSubmitting ? 'Saving...' : 'Save'} <FiSave size={20} />
+            </button>
 
-            </div>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
-    </ProtectedRoute>
+    </div>
   );
 };
 
