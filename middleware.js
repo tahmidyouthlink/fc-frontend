@@ -72,10 +72,8 @@ export async function middleware(req) {
     if (!userPermissions) {
       const response = NextResponse.redirect(new URL("/auth/restricted-access", req.url));
 
-      // 🔹 Expire NextAuth session cookies (optional, better to handle in frontend)
-      response.cookies.set("next-auth.session-token", "", { expires: new Date(0) });
-      response.cookies.set("__Secure-next-auth.session-token", "", { expires: new Date(0) });
-      response.cookies.set("next-auth.csrf-token", "", { expires: new Date(0) });
+      response.cookies.set("next-auth.session-token", "", { expires: new Date(0), path: "/", secure: true, httpOnly: true, sameSite: "Strict" });
+      response.cookies.set("__Secure-next-auth.session-token", "", { expires: new Date(0), path: "/", secure: true, httpOnly: true, sameSite: "Strict" });
 
       return response;
     }

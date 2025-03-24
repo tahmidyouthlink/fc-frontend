@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useCallback } from 'react';
 import 'react-quill/dist/quill.snow.css';
 
 // Dynamically load ReactQuill
@@ -20,7 +20,7 @@ export default function LegalPoliciesEditor({ value, onChange }) {
   const imgbbApiKey = '54b5f65b4f81c5ddfc0f32e2581e8e62';
   const imgbbApiUrl = `https://api.imgbb.com/1/upload?key=${imgbbApiKey}`;
 
-  const imageHandler = () => {
+  const imageHandler = useCallback(() => {
     const input = document.createElement('input');
     input.setAttribute('type', 'file');
     input.setAttribute('accept', 'image/*');
@@ -60,7 +60,7 @@ export default function LegalPoliciesEditor({ value, onChange }) {
         console.error("Error uploading image:", error);
       }
     };
-  };
+  }, [imgbbApiUrl]);
 
   const modules = useMemo(() => ({
     toolbar: {
@@ -76,7 +76,7 @@ export default function LegalPoliciesEditor({ value, onChange }) {
         image: imageHandler,
       },
     },
-  }), []);
+  }), [imageHandler]);
 
   return (
     <div className='custom-editor-legal-policies'>

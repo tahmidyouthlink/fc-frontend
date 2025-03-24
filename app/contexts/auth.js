@@ -5,7 +5,6 @@ import { auth } from "@/firebase.config";
 import { createSession, removeSession } from "../actions/auth";
 import useAxiosPublic from "../hooks/useAxiosPublic";
 import { useSession } from "next-auth/react";
-import toast from "react-hot-toast";
 
 // Create a new context for authentication
 const AuthContext = createContext({
@@ -117,10 +116,7 @@ export const AuthProvider = ({ children }) => {
         setExistingUserData(res.data);
 
       } catch (error) {
-
         console.error('Error fetching existing user data:', error);
-        toast.error('Error fetching existing user data.');
-
       }
       finally {
         setIsUserLoading(false);

@@ -4,23 +4,29 @@ import SetupForm from "@/app/components/layout/SetupForm";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
 import Loading from "@/app/components/shared/Loading/Loading";
 import AccessVerificationFailed from "@/app/components/layout/AccessVerificationFailed";
-import { useSearchParams } from "next/navigation";
 
 export default function SetupPage() {
   const [isValidToken, setIsValidToken] = useState(null); // State to store token validation status
   const [errorMessage, setErrorMessage] = useState(""); // For displaying error message
   const axiosPublic = useAxiosPublic();
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token"); // Extract the token correctly
   const [email, setEmail] = useState("");
+  const [token, setToken] = useState(null);
+
+  // Get the token from URL only once
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const tokenFromURL = searchParams.get("token");
+    if (tokenFromURL) {
+      setToken(tokenFromURL);
+    } else {
+      setIsValidToken(false);
+      setErrorMessage("Token is required. Please provide a valid token.");
+    }
+  }, []);
 
   useEffect(() => {
     const validateToken = async () => {
-      if (!token) {
-        setIsValidToken(false);
-        setErrorMessage("Token is required. Please provide a valid token.");
-        return;
-      }
+      if (!token) return;
 
       try {
         const response = await axiosPublic.post("/validate-token", { token });
