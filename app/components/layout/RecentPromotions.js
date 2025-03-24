@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import CustomSwitch from './CustomSwitch';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { MdOutlineModeEdit } from 'react-icons/md';
@@ -41,31 +41,45 @@ const RecentPromotions = () => {
   const isAuthorized = role === "Owner" || role === "Editor";
   const isOwner = role === "Owner";
 
+  const roleBasedColumnRestrictions = useMemo(() => ({
+    Viewer: ["Actions", "Status"],
+    Editor: ["Status"],
+    Owner: [], // Owner has access to all columns
+  }), []);
+
+  const getAllowedColumns = useCallback((role) => {
+    return initialColumns?.filter(col => !roleBasedColumnRestrictions[role]?.includes(col));
+  }, [roleBasedColumnRestrictions]);
+
   useEffect(() => {
-    const savedColumns = JSON.parse(localStorage.getItem('selectedMarketing'));
-    const savedMarketingColumns = JSON.parse(localStorage.getItem('selectedMarketingColumns'));
+    const savedColumns = JSON.parse(localStorage.getItem("selectedMarketing"));
+    const savedMarketingColumns = JSON.parse(localStorage.getItem("selectedMarketingColumns"));
+
+    // Get allowed columns based on role
+    const allowedColumns = getAllowedColumns(role);
+
     if (savedColumns) {
-      setSelectedColumns(savedColumns);
+      setSelectedColumns(savedColumns?.filter(col => allowedColumns?.includes(col)));
     } else {
-      // Set to default if no saved columns exist
-      setSelectedColumns(initialColumns);
+      setSelectedColumns(allowedColumns);
     }
 
     if (savedMarketingColumns) {
-      setColumnOrder(savedMarketingColumns);
+      setColumnOrder(savedMarketingColumns?.filter(col => allowedColumns?.includes(col)));
     } else {
-      // Set to default column order if no saved order exists
-      setColumnOrder(initialColumns);
+      setColumnOrder(allowedColumns);
     }
-  }, []);
+  }, [role, getAllowedColumns]); // Ensure it updates when role changes
 
   const handleColumnChange = (selected) => {
-    setSelectedColumns(selected);
+    const allowedColumns = getAllowedColumns(role);
+    setSelectedColumns(selected?.filter(col => allowedColumns?.includes(col)));
   };
 
   const handleSelectAll = () => {
-    setSelectedColumns(initialColumns);
-    setColumnOrder(initialColumns);
+    const allowedColumns = getAllowedColumns(role);
+    setSelectedColumns(allowedColumns);
+    setColumnOrder(allowedColumns);
   };
 
   const handleDeselectAll = () => {
@@ -81,11 +95,17 @@ const RecentPromotions = () => {
   const handleOnDragEnd = (result) => {
     if (!result.destination) return;
 
+    const allowedColumns = getAllowedColumns(role);
     const reorderedColumns = Array.from(columnOrder);
-    const [draggedColumn] = reorderedColumns.splice(result.source.index, 1);
-    reorderedColumns.splice(result.destination.index, 0, draggedColumn);
 
-    setColumnOrder(reorderedColumns); // Update the column order both in modal and table
+    // Find dragged column
+    const [draggedColumn] = reorderedColumns.splice(result.source.index, 1);
+
+    // Prevent reordering restricted columns
+    if (!allowedColumns.includes(draggedColumn)) return;
+
+    reorderedColumns.splice(result.destination.index, 0, draggedColumn);
+    setColumnOrder(reorderedColumns);
   };
 
   // Memoized current date
@@ -912,7 +932,7 @@ const RecentPromotions = () => {
   }
 
   return (
-    <>
+    <div className='max-w-screen-2xl mx-auto'>
       <div className='flex flex-wrap justify-between items-center gap-6 mb-6 pr-4'>
         <div className="flex-1 flex flex-col gap-4">
           <select
@@ -1024,24 +1044,24 @@ const RecentPromotions = () => {
 
       {/* Conditionally render the tabs only if "All" is NOT selected */}
       {selectedOption !== 'all' && (
-        <div className="flex space-x-4">
+        <div className="flex items-center gap-4">
           <button
-            className={`relative px-4 py-2 transition-all duration-300 ${activeTab === 'all' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 
-        after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300 ${activeTab === 'all' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
+            className={`relative text-sm py-1 transition-all duration-300 ${activeTab === 'all' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 
+        after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300 ${activeTab === 'all' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
             onClick={() => setActiveTab('all')}
           >
             {selectedOption === 'promos' ? `All Promos (${allPromos.length})` : `All Offers (${allOffers.length})`}
           </button>
           <button
-            className={`relative px-4 py-2 transition-all duration-300 ${activeTab === 'active' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 
-        after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300 ${activeTab === 'active' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
+            className={`relative text-sm py-1 transition-all duration-300 ${activeTab === 'active' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 
+        after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300 ${activeTab === 'active' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
             onClick={() => setActiveTab('active')}
           >
             {selectedOption === 'promos' ? `Active (${activePromos.length})` : `Active (${activeOffers.length})`}
           </button>
           <button
-            className={`relative px-4 py-2 transition-all duration-300 ${activeTab === 'expired' ? 'text-[#D2016E] font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 
-        after:h-[2px] after:bg-[#D2016E] hover:text-[#D2016E] after:transition-all after:duration-300 ${activeTab === 'expired' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
+            className={`relative text-sm py-1 transition-all duration-300 ${activeTab === 'expired' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 after:bottom-0 
+        after:h-[2px] after:bg-neutral-800 hover:text-neutral-800 after:transition-all after:duration-300 ${activeTab === 'expired' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}`}
             onClick={() => setActiveTab('expired')}
           >
             {selectedOption === 'promos' ? `Expired (${expiredPromos.length})` : `Expired (${expiredOffers.length})`}
@@ -1049,7 +1069,7 @@ const RecentPromotions = () => {
         </div>
       )}
 
-      <div className="max-w-screen-2xl mx-auto custom-max-discount custom-scrollbar overflow-x-auto my-4 drop-shadow rounded-lg">
+      <div className="custom-max-discount custom-scrollbar overflow-x-auto my-4 drop-shadow rounded-lg w-full">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-50 sticky top-0 z-[1] rounded-md">
             <tr>
@@ -1121,66 +1141,68 @@ const RecentPromotions = () => {
       </div>
 
       {/* Column Selection Modal */}
-      <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
-        <ModalContent>
-          <ModalHeader className='bg-gray-200'>Choose Columns</ModalHeader>
-          <ModalBody className="modal-body-scroll">
-            <DragDropContext onDragEnd={handleOnDragEnd}>
-              <Droppable droppableId="droppable">
-                {(provided) => (
-                  <div ref={provided.innerRef} {...provided.droppableProps}>
-                    <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
-                      {columnOrder.map((column, index) => (
-                        <Draggable key={column} draggableId={column} index={index}>
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className="flex items-center justify-between p-2 border-b"
-                            >
-                              <Checkbox
-                                value={column}
-                                isChecked={selectedColumns.includes(column)}
-                                onChange={() => {
-                                  // Toggle column selection
-                                  if (selectedColumns.includes(column)) {
-                                    setSelectedColumns(selectedColumns.filter(col => col !== column));
-                                  } else {
-                                    setSelectedColumns([...selectedColumns, column]);
-                                  }
-                                }}
+      {isColumnModalOpen &&
+        <Modal isOpen={isColumnModalOpen} onClose={() => setColumnModalOpen(false)}>
+          <ModalContent>
+            <ModalHeader className='bg-gray-200'>Choose Columns</ModalHeader>
+            <ModalBody className="modal-body-scroll">
+              <DragDropContext onDragEnd={handleOnDragEnd}>
+                <Droppable droppableId="droppable">
+                  {(provided) => (
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                      <CheckboxGroup value={selectedColumns} onChange={handleColumnChange}>
+                        {columnOrder.map((column, index) => (
+                          <Draggable key={column} draggableId={column} index={index}>
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className="flex items-center justify-between p-2 border-b"
                               >
-                                {column}
-                              </Checkbox>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </CheckboxGroup>
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          </ModalBody>
-          <ModalFooter className='flex justify-between items-center'>
-            <div className='flex items-center gap-2'>
-              <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
-                Deselect All
+                                <Checkbox
+                                  value={column}
+                                  isChecked={selectedColumns.includes(column)}
+                                  onChange={() => {
+                                    // Toggle column selection
+                                    if (selectedColumns.includes(column)) {
+                                      setSelectedColumns(selectedColumns.filter(col => col !== column));
+                                    } else {
+                                      setSelectedColumns([...selectedColumns, column]);
+                                    }
+                                  }}
+                                >
+                                  {column}
+                                </Checkbox>
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </CheckboxGroup>
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
+            </ModalBody>
+            <ModalFooter className='flex justify-between items-center'>
+              <div className='flex items-center gap-2'>
+                <Button onClick={handleDeselectAll} size="sm" color="default" variant="flat">
+                  Deselect All
+                </Button>
+                <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
+                  Select All
+                </Button>
+              </div>
+              <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
+                Save
               </Button>
-              <Button onClick={handleSelectAll} size="sm" color="primary" variant="flat">
-                Select All
-              </Button>
-            </div>
-            <Button variant="solid" color="primary" size='sm' onClick={handleSave}>
-              Save
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      }
 
-    </>
+    </div>
   );
 };
 

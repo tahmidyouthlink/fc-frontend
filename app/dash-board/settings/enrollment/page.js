@@ -176,6 +176,66 @@ const EnrollmentPage = () => {
       }
     });
 
+  };
+
+  const handleRemoveUser = async (userId) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await axiosPublic.delete(`/delete-existing-user/${userId}`);
+          if (res?.data?.deletedCount) {
+            refetch(); // Call your refetch function to refresh data
+            toast.custom((t) => (
+              <div
+                className={`${t.visible ? 'animate-enter' : 'animate-leave'
+                  } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+              >
+                <div className="pl-6">
+                  <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+                </div>
+                <div className="flex-1 w-0 p-4">
+                  <div className="flex items-start">
+                    <div className="ml-3 flex-1">
+                      <p className="text-base font-bold text-gray-900">
+                        User Removed!
+                      </p>
+                      <p className="mt-1 text-sm text-gray-500">
+                        User has been removed successfully!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex border-l border-gray-200">
+                  <button
+                    onClick={() => toast.dismiss(t.id)}
+                    className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+                  >
+                    <RxCross2 />
+                  </button>
+                </div>
+              </div>
+            ), {
+              position: "bottom-right",
+              duration: 5000
+            })
+          }
+        } catch (error) {
+          toast.error('Failed to delete this user. Please try again.');
+        }
+      }
+    });
+  };
+
+  const handleEditUser = async (userId) => {
+
   }
 
   // Function to determine the status and render appropriate UI
@@ -313,11 +373,11 @@ const EnrollmentPage = () => {
 
                               {/* Edit Button */}
                               <button>
-                                <span className='flex items-center gap-1.5 rounded-md bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4'><AiOutlineEdit size={16} /> Edit</span>
+                                <span onClick={() => handleEditUser(user?._id)} className='flex items-center gap-1.5 rounded-md bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4'><AiOutlineEdit size={16} /> Edit</span>
                               </button>
 
                               {/* Block Button */}
-                              <button>
+                              <button onClick={() => handleRemoveUser(user?._id)}>
                                 <span className='flex items-center gap-1.5 rounded-md bg-red-50 p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-red-100 hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-md:[&_p]:hidden max-md:[&_svg]:size-4 text-xs'> <MdBlock size={16} />Remove</span>
                               </button>
 

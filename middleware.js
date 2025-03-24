@@ -30,6 +30,7 @@ const fetchUserPermissions = async (userId) => {
 export async function middleware(req) {
   const session = cookies().get("user_session")?.value;
   const pathname = req.url;
+  const nextUrlPathname = req.nextUrl.pathname;
 
   // If user enters wrong user/shop page URL, redirect to the correct one
   if (/\/user\/?$/i.test(pathname))
@@ -42,50 +43,67 @@ export async function middleware(req) {
     return NextResponse.redirect(new URL("/", pathname));
   }
 
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  // 🔹 Check if user is accessing backend dashboard
+  const isBackendRoute = nextUrlPathname.startsWith("/dash-board");
 
-  // If the user is not logged in, redirect to login
-  if (!token && pathname.includes("dash-board")) {
-    return NextResponse.redirect(new URL("/auth/restricted-access", pathname));
+  // 🔹 Redirect frontend users if no session but allow backend access check separately
+  if (!session && !isBackendRoute) {
+    return NextResponse.next(); // Allow frontend pages to load normally
   }
 
-  // 🔹 Fetch user permissions from your API
-  const userId = token?._id; // Assuming `sub` contains the user ID
-  let userPermissions = null;
+  if (isBackendRoute) {
 
-  if (userId) {
-    userPermissions = await fetchUserPermissions(userId);
-  }
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-  if (!userPermissions) {
-    console.error("Error fetching user permissions for user:", userId);
-    return NextResponse.redirect(new URL("/unauthorized", req.url));
-  }
-
-  const { role, permissions } = userPermissions;
-
-  // 🔹 Restrict "Viewer" role from Add Pages
-  if (role === "Viewer") {
-    if (Object.keys(protectedAddRoutes).some(route => req.nextUrl.pathname.startsWith(route))) {
-      return NextResponse.redirect(new URL("/unauthorized", req.url));
+    // If the user is not logged in, redirect to login
+    if (!token && pathname.includes("dash-board")) {
+      return NextResponse.redirect(new URL("/auth/restricted-access", pathname));
     }
 
-    // 🔹 Restrict "Viewer" role from Edit Pages (using regex for dynamic IDs)
-    if (isEditRoute(req.nextUrl.pathname)) {
-      return NextResponse.redirect(new URL("/unauthorized", req.url));
+    // 🔹 Fetch user permissions from your API
+    const userId = token?._id; // Assuming `sub` contains the user ID
+    let userPermissions = null;
+
+    if (userId) {
+      userPermissions = await fetchUserPermissions(userId);
     }
-  }
 
-  // 🔹 Check if user has permission for the accessed route
-  const sortedRoutes = Object.keys(protectedRoutes).sort((a, b) => b.length - a.length); // Sort longest first
-  const permissionKey = sortedRoutes.find(route => req.nextUrl.pathname.startsWith(route));
+    // 🔹 If userPermissions is null, auto-logout and redirect to login
+    if (!userPermissions) {
+      const response = NextResponse.redirect(new URL("/auth/restricted-access", req.url));
 
-  if (permissionKey) {
-    const permissionCategory = protectedRoutes[permissionKey];
+      // 🔹 Expire NextAuth session cookies (optional, better to handle in frontend)
+      response.cookies.set("next-auth.session-token", "", { expires: new Date(0) });
+      response.cookies.set("__Secure-next-auth.session-token", "", { expires: new Date(0) });
+      response.cookies.set("next-auth.csrf-token", "", { expires: new Date(0) });
 
-    if (!permissions?.[permissionCategory]?.access) {
-      return NextResponse.redirect(new URL("/unauthorized", req.url));
+      return response;
     }
+
+    // 🔹 Restrict "Viewer" role from Add Pages
+    if (userPermissions?.role === "Viewer") {
+      if (Object.keys(protectedAddRoutes).some(route => nextUrlPathname.startsWith(route))) {
+        return NextResponse.redirect(new URL("/unauthorized", req.url));
+      }
+
+      // 🔹 Restrict "Viewer" role from Edit Pages (using regex for dynamic IDs)
+      if (isEditRoute(nextUrlPathname)) {
+        return NextResponse.redirect(new URL("/unauthorized", req.url));
+      }
+    }
+
+    // 🔹 Check if user has permission for the accessed route
+    const sortedRoutes = Object.keys(protectedRoutes).sort((a, b) => b.length - a.length); // Sort longest first
+    const permissionKey = sortedRoutes.find(route => nextUrlPathname.startsWith(route));
+
+    if (permissionKey) {
+      const permissionCategory = protectedRoutes[permissionKey];
+
+      if (!userPermissions?.permissions?.[permissionCategory]?.access) {
+        return NextResponse.redirect(new URL("/unauthorized", req.url));
+      }
+    }
+
   }
 
   return NextResponse.next();

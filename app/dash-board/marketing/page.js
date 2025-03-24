@@ -68,7 +68,7 @@ const Marketing = () => {
         className='absolute inset-0 z-0 top-52 md:top-36 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[20%] lg:bg-[length:200px_100px] md:left-[0%] xl:left-[10%] 2xl:left-[25%] bg-no-repeat'
       />
 
-      <div className="bg-gray-50 sticky top-0 z-10">
+      <div className="bg-gray-50 sticky top-0 z-10 max-w-screen-2xl mx-auto">
         <h1 className="font-bold text-lg md:text-xl lg:text-3xl text-neutral-700 py-1 2xl:py-3 bg-gray-50">MARKETING</h1>
 
         <div className="flex flex-wrap items-center gap-3 bg-gray-50">
@@ -136,7 +136,8 @@ const Marketing = () => {
       </div>
 
       {
-        activeTab === "view performance" && <div className='pt-4 relative'>
+        activeTab === "view performance" &&
+        <div className='pt-4 relative max-w-screen-2xl mx-auto'>
           <h1 className='font-bold'>Promotion Performance</h1>
           <p className='pt-1 text-neutral-400 text-sm font-medium'>The data includes all active, ended, or canceled deals. This report represents unaudited data, please refer to your invoice for accurate settlement numbers.</p>
           <PromotionPerformance />
@@ -150,7 +151,7 @@ const Marketing = () => {
       {
         isAuthorized &&
         activeTab === "create promotions" &&
-        <div className='pt-6 relative'>
+        <div className='pt-6 relative max-w-screen-2xl mx-auto'>
           <h1 className='font-bold text-xl'>Recommended For You</h1>
           <p className='pt-1 pb-8 text-neutral-400 font-medium'>Our recommendations are tailored to suit your fashion commerce and customer preferences.</p>
 
@@ -258,7 +259,7 @@ const Marketing = () => {
         </div>
       }
 
-      {activeTab === "reward level" && <div className='pt-6 relative'>
+      {activeTab === "reward level" && <div className='pt-6 relative max-w-screen-2xl mx-auto'>
         <h1 className='font-bold text-xl'>Recommended For You</h1>
         <p className='pt-1 pb-8 text-neutral-400 font-medium'>Our recommendations are tailored to suit your fashion commerce and customer preferences.</p>
         <RewardLevel />
@@ -266,7 +267,7 @@ const Marketing = () => {
 
       {
         isAuthorized &&
-        activeTab === "marketing content" && <div className='pt-6 relative'>
+        activeTab === "marketing content" && <div className='pt-6 relative max-w-screen-2xl mx-auto'>
           <h1 className='font-bold text-xl'>Recommended For You</h1>
           <p className='pt-1 pb-8 text-neutral-400 font-medium'>Our recommendations are tailored to suit your fashion commerce and customer preferences.</p>
           <MarketingContent />
@@ -275,7 +276,7 @@ const Marketing = () => {
 
       {
         isAuthorized &&
-        activeTab === "homepage content" && <div className='pt-6 relative'>
+        activeTab === "homepage content" && <div className='pt-6 relative max-w-screen-2xl mx-auto'>
           <h1 className='font-bold text-xl'>Recommended For You</h1>
           <p className='pt-1 pb-8 text-neutral-400 font-medium'>Our recommendations are tailored to suit your fashion commerce and customer preferences.</p>
           <HomepageContent />
