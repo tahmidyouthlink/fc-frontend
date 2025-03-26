@@ -179,17 +179,21 @@ const CategoriesOverview = () => {
       <div className='sticky top-0 z-10 bg-gray-50 flex items-center flex-wrap gap-4 justify-between max-w-screen-2xl mx-auto px-6 pt-6'>
         <h1 className='font-semibold text-center text-[16px] lg:text-3xl text-neutral-700'>CATEGORY MANAGEMENT</h1>
 
-        {isOwner &&
-          <button onClick={handleSelectFeaturedCategory} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[12px] lg:text-[14px] text-neutral-700">
-            <FaStar size={17} className='text-neutral-700' /> Select Featured Category
-          </button>
-        }
+        <div className='flex items-center gap-3 justify-center'>
 
-        {isAuthorized &&
-          <button onClick={() => router.push('/dash-board/product-hub/categories/add-category')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[12px] lg:text-[14px] text-neutral-700">
-            <FaPlus size={15} className='text-neutral-700' /> Add
-          </button>
-        }
+          {isOwner &&
+            <button onClick={handleSelectFeaturedCategory} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[12px] lg:text-[14px] text-neutral-700">
+              <FaStar size={17} className='text-neutral-700' /> Select Featured Category
+            </button>
+          }
+
+          {isAuthorized &&
+            <button onClick={() => router.push('/dash-board/product-hub/categories/add-category')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[12px] lg:text-[14px] text-neutral-700">
+              <FaPlus size={15} className='text-neutral-700' /> Add
+            </button>
+          }
+
+        </div>
 
       </div>
 

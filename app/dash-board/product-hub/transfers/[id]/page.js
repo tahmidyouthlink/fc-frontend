@@ -41,6 +41,7 @@ const EditTransferOrder = () => {
   const [selectedStatus, setSelectedStatus] = useState(null);
   const { existingUserData, isUserLoading } = useAuth();
   const role = existingUserData?.role;
+  const isAuthorized = role === "Owner" || role === "Editor";
   const isOwner = role === "Owner";
 
   // Format date to yyyy-mm-dd for date input field
@@ -443,15 +444,17 @@ const EditTransferOrder = () => {
           </div>
 
           {/* Submit Button */}
-          {transferOrderStatus === "pending" && isOwner === true && <div className='flex justify-between items-center'>
+          {transferOrderStatus === "pending" && isAuthorized === true && <div className={`flex ${isOwner === true ? "justify-between" : "justify-end"} items-center`}>
 
-            <button
-              type='button'
-              onClick={handleCancelClick}
-              className="bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold"
-            >
-              Cancel transfer
-            </button>
+            {isOwner &&
+              <button
+                type='button'
+                onClick={handleCancelClick}
+                className="bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold"
+              >
+                Cancel transfer
+              </button>
+            }
 
             <button
               type='button'

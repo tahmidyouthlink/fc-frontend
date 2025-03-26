@@ -57,6 +57,7 @@ const EditPurchaseOrderPage = () => {
   const [attachment, setAttachment] = useState(null);
   const { existingUserData, isUserLoading } = useAuth();
   const role = existingUserData?.role;
+  const isAuthorized = role === "Owner" || role === "Editor";
   const isOwner = role === "Owner";
 
   // Format date to yyyy-mm-dd for date input field
@@ -1132,7 +1133,7 @@ const EditPurchaseOrderPage = () => {
             </div>
           )}
 
-          {purchaseOrderStatus === "ordered" && isOwner === true && (
+          {purchaseOrderStatus === "ordered" && isAuthorized === true && (
             <div className='w-full flex justify-end my-4'>
               <Link href={`/dash-board/product-hub/purchase-orders/receive-inventory/${id}`}
                 className="bg-neutral-950 hover:bg-neutral-800 text-white py-2 px-4 text-sm rounded-md cursor-pointer font-bold"
