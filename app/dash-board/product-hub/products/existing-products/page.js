@@ -11,6 +11,7 @@ import { FaArrowLeft } from "react-icons/fa6";
 import useCategories from "@/app/hooks/useCategories";
 import { useEffect, useState } from "react";
 import useSeasons from "@/app/hooks/useSeasons";
+import { useAuth } from "@/app/contexts/auth";
 
 const EditProduct = () => {
 
@@ -20,6 +21,9 @@ const EditProduct = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('category');
+  const { existingUserData, isUserLoading } = useAuth();
+  const role = existingUserData?.role;
+  const isAuthorized = role === "Owner" || role === "Editor";
 
   // Scroll event listener to track when to add background color
   useEffect(() => {
@@ -62,7 +66,7 @@ const EditProduct = () => {
     }
   }, [activeTab]);
 
-  if (isProductPending || isCategoryPending || isSeasonPending) {
+  if (isProductPending || isCategoryPending || isSeasonPending || isUserLoading) {
     return <Loading />
   }
 
@@ -116,7 +120,12 @@ ${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
           </button>
 
         </div>
-        <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={`/dash-board/product-hub/products`}> <span className='border border-black rounded-full p-1 md:p-2 hover:scale-105 duration-300'><FaArrowLeft /></span> Go Back</Link>
+
+        {
+          isAuthorized &&
+          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={`/dash-board/product-hub/products`}> <span className='border border-black rounded-full p-1 md:p-2 hover:scale-105 duration-300'><FaArrowLeft /></span> Go Back</Link>
+        }
+
       </div>
 
       {activeTab === "category" && <div>

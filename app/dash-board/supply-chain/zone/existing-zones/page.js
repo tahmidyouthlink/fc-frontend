@@ -122,8 +122,14 @@ const ExistingZones = () => {
     <div className='px-5 bg-gray-50 min-h-screen'>
 
       <div className='py-4 w-full flex justify-between max-w-screen-2xl mx-auto'>
+
         <h3 className='text-start font-medium md:font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700 w-full'>SHIPPING MANAGEMENT</h3>
-        <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/supply-chain/zone"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+
+        {
+          isAuthorized &&
+          <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/supply-chain/zone"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
+        }
+
       </div>
 
       <div className='flex flex-wrap items-center gap-3 bg-gray-50 pt-2 max-w-screen-2xl mx-auto'>

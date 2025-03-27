@@ -31,6 +31,8 @@ const SideNavbar = ({ onClose }) => {
   const { data: session } = useSession();
   const { existingUserData, isUserLoading } = useAuth();
   const permissions = existingUserData?.permissions;
+  const role = existingUserData?.role;
+  const isViewer = role === "Viewer";
 
   // Show loading state if data is not loaded yet
   if (isUserLoading || !existingUserData) {
@@ -149,13 +151,11 @@ const SideNavbar = ({ onClose }) => {
           label: "Shipment",
           link: "/dash-board/supply-chain/zone",
           icon: <CiDeliveryTruck />,
-          permission: true
         },
         {
           label: "Locations",
           link: "/dash-board/supply-chain/locations",
           icon: <MdOutlineLocationOn />,
-          permission: true
         }
       ]
     },
@@ -325,7 +325,16 @@ const SideNavbar = ({ onClose }) => {
                             </div>
                           ) : (
                             // Render regular links in Product Hub or Settings
-                            <Link href={linkItem.link} key={linkIndex} legacyBehavior>
+                            <Link key={linkIndex} legacyBehavior
+                              href={
+                                isViewer
+                                  ? linkItem.link === "/dash-board/product-hub/products"
+                                    ? "/dash-board/product-hub/products/existing-products"
+                                    : linkItem.link === "/dash-board/supply-chain/zone"
+                                      ? "/dash-board/supply-chain/zone/existing-zones"
+                                      : linkItem.link
+                                  : linkItem.link
+                              }>
                               <a
                                 className={`flex pl-6 items-center gap-2 w-full hover:bg-[#E5F7F4] group py-3 ${pathname === linkItem.link ? "text-[#00B795] bg-[#E5F7F4] border-l-5 border-[#00B795]" : "hover:text-[#00B795]"}`} onClick={onClose}>
                                 <h2 className="p-1 text-base xl:text-lg 2xl:text-xl rounded-xl">{linkItem.icon}</h2>
