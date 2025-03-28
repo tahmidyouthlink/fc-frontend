@@ -38,6 +38,7 @@ import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import CustomSwitch from '@/app/components/layout/CustomSwitch';
 import { useAuth } from '@/app/contexts/auth';
+import DOMPurify from "dompurify";
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
@@ -834,6 +835,18 @@ const EditProductPage = () => {
     if (!validateSelections()) return;
 
     try {
+
+      // Product details validation
+      const strippedText = DOMPurify.sanitize(data?.productDetails, { ALLOWED_TAGS: [] }).trim();
+      if (!strippedText) {
+        toast.error("Product details are required.");
+        return;
+      }
+      if (strippedText.length < 10) {
+        toast.error("Product details must be at least 10 characters.");
+        return;
+      }
+
       if (!image) {
         setSizeError(true);
         toast.error("Please upload a thumbnail!")
@@ -1136,7 +1149,7 @@ const EditProductPage = () => {
           <Link
             className='flex items-center gap-2 text-[10px] md:text-base justify-end'
             href={`/dash-board/product-hub/products/existing-products/seasons/${decodedSeasonName}`}>
-            <span className='border border-black rounded-full p-1 md:p-2'>
+            <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'>
               <FaArrowLeft />
             </span>
             Go Back
@@ -1145,7 +1158,7 @@ const EditProductPage = () => {
           <Link
             className='flex items-center gap-2 text-[10px] md:text-base justify-end'
             href={`/dash-board/product-hub/products/existing-products/${selectedCategory}`}>
-            <span className='border border-black rounded-full p-1 md:p-2'>
+            <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'>
               <FaArrowLeft />
             </span>
             Go Back
@@ -1178,7 +1191,13 @@ const EditProductPage = () => {
                       name="productDetails"
                       defaultValue=""
                       control={control}
-                      rules={{ required: true }}
+                      rules={{
+                        required: "Product details are required.",
+                        validate: (value) => {
+                          const strippedText = DOMPurify.sanitize(value, { ALLOWED_TAGS: [] }).trim();
+                          return strippedText.length >= 10 || "Product details must be at least 10 characters.";
+                        },
+                      }}
                       render={({ field }) => <Editor
                         // value={productDetails}
                         value={field.value}
@@ -1188,8 +1207,8 @@ const EditProductPage = () => {
                         }}
                       />}
                     />
-                    {errors.productDetails?.type === "required" && (
-                      <p className="text-red-600 text-left pt-1">Product details is required</ p>
+                    {errors.productDetails && (
+                      <p className="text-red-600 text-left pt-1">{errors.productDetails.message}</p>
                     )}
                   </div>
 
@@ -2001,6 +2020,7 @@ ${activeTab2 === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:a
         </div>
 
       </form>
+
     </div>
   );
 };

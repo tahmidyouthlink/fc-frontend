@@ -15,7 +15,7 @@ const FAQPage = () => {
   return (
     <div className='bg-gray-50 min-h-screen'>
 
-      <div className='px-6 max-w-screen-2xl mx-auto pb-6'>
+      <div className='px-6 max-w-screen-md mx-auto pb-6'>
 
         <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between py-6'>
 
@@ -64,7 +64,7 @@ const FAQPage = () => {
                       title={faq?.question}
                       className="[&_h2>button_span]:font-normal [&_h2]:!my-2"
                     >
-                      {faq?.answer}
+                      <MarkdownRenderer content={faq?.answer} />
                     </AccordionItem>
                   );
                 })}

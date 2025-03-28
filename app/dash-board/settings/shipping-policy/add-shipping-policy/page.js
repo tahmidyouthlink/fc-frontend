@@ -108,7 +108,7 @@ const AddShippingPolicy = () => {
         className='absolute inset-0 z-0 top-16 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[50%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl mx-auto py-3 md:py-6 sticky top-0 z-10 bg-gray-50'>
+      <div className='max-w-screen-md mx-auto py-3 md:py-6 sticky top-0 z-10 bg-gray-50'>
         <div className='flex items-center justify-between'>
           <h3 className='flex-1 font-semibold text-base md:text-xl lg:text-3xl text-neutral-700'>SHIPPING POLICY CONFIGURATION</h3>
 
@@ -124,7 +124,7 @@ const AddShippingPolicy = () => {
         </div>
       </div>
 
-      <form className='2xl:max-w-screen-2xl 2xl:mx-auto relative flex flex-col gap-4' onSubmit={handleSubmit(onSubmit)}>
+      <form className='2xl:max-w-screen-md 2xl:mx-auto relative flex flex-col gap-4' onSubmit={handleSubmit(onSubmit)}>
 
         <div className="w-full space-y-2 bg-gray-50">
           <label htmlFor="pageTitle" className='text-[#9F5216]'>Page Title *</label>

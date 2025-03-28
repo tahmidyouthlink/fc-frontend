@@ -113,14 +113,14 @@ const EditReturnPolicyPage = () => {
         className='absolute inset-0 z-0 top-16 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[50%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl mx-auto py-3 md:py-6 relative'>
+      <div className='max-w-screen-md mx-auto py-3 md:py-6 relative'>
         <div className='flex items-center justify-between'>
           <h3 className='w-full font-semibold text-xl lg:text-2xl'>Edit Return Policy</h3>
           <Link className='flex items-center gap-2 text-[10px] md:text-base justify-end w-full' href={"/dash-board/settings/return-policy"}> <span className='border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2'><FaArrowLeft /></span> Go Back</Link>
         </div>
       </div>
 
-      <form className='2xl:max-w-screen-2xl 2xl:mx-auto relative flex flex-col gap-4' onSubmit={handleSubmit(onSubmit)}>
+      <form className='2xl:max-w-screen-md 2xl:mx-auto relative flex flex-col gap-4' onSubmit={handleSubmit(onSubmit)}>
 
         <div className="w-full space-y-2 bg-gray-50">
           <label htmlFor="pageTitle" className='text-[#9F5216]'>Page Title *</label>
@@ -168,7 +168,7 @@ const EditReturnPolicyPage = () => {
 
         <div className='flex justify-end w-full py-8'>
           <button type="submit" className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700'>
-            Submit <FiSave size={19} />
+            Save <FiSave size={19} />
           </button>
         </div>
 

@@ -577,7 +577,7 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 
 .custom-editor-legal-policies .ql-editor {
   /* Custom styles for the editor input field */
-  min-height: 400px;
+  min-height: 100px;
   padding: 14px;
   font-size: 16px;
   line-height: 1.5;
@@ -592,6 +592,40 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 }
 
 .custom-editor-legal-policies .ql-editor img {
+  max-width: 100%; /* Ensure the image scales responsively */
+  display: block; /* Display the image as a block to avoid inline styling issues */
+  margin: 10px 0; /* Add spacing around the image */
+}
+
+.custom-editor-faq {
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+  border: 1px solid #dbd3d1a1; /* Custom border */
+  border-radius: 5px; /* Custom border radius */
+  overflow: hidden; /* To ensure the border radius is applied correctly */
+}
+
+.custom-editor-faq .ql-container {
+  height: 100%; /* Ensure the editor takes the full height */
+  border: none; /* Remove default border */
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+}
+
+.custom-editor-faq .ql-editor {
+  /* Custom styles for the editor input field */
+  padding: 14px;
+  font-size: 16px;
+  line-height: 1.5;
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+  border: none; /* Remove default border */
+}
+
+.custom-editor-faq .ql-toolbar {
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd; /* Custom border */
+  font-family: "Oxygen", sans-serif; /* Apply Oxygen font */
+}
+
+.custom-editor-faq .ql-editor img {
   max-width: 100%; /* Ensure the image scales responsively */
   display: block; /* Display the image as a block to avoid inline styling issues */
   margin: 10px 0; /* Add spacing around the image */

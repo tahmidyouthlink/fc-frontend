@@ -32,6 +32,7 @@ import { HiCheckCircle } from 'react-icons/hi2';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
+import DOMPurify from "dompurify";
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
@@ -882,7 +883,13 @@ const FirstStepOfAddProduct = () => {
               <Controller
                 name="productDetails"
                 defaultValue=""
-                rules={{ required: true }}
+                rules={{
+                  required: "Product details are required.",
+                  validate: (value) => {
+                    const strippedText = DOMPurify.sanitize(value, { ALLOWED_TAGS: [] }).trim();
+                    return strippedText.length >= 10 || "Product details must be at least 10 characters.";
+                  },
+                }}
                 control={control}
                 render={({ field }) => <Editor
                   value={field.value}
@@ -892,8 +899,8 @@ const FirstStepOfAddProduct = () => {
                   }}
                 />}
               />
-              {errors.productDetails?.type === "required" && (
-                <p className="text-red-600 text-left pt-1">Product details is required</ p>
+              {errors.productDetails && (
+                <p className="text-red-600 text-left pt-1">{errors.productDetails.message}</p>
               )}
             </div>
 

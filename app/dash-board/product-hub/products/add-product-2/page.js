@@ -527,34 +527,18 @@ const SecondStepOfAddProduct = () => {
 
       <div className='max-w-screen-2xl mx-auto py-3 md:py-4 sticky top-0 z-10 bg-gray-50'>
         <div className='flex flex-wrap lg:flex-nowrap items-center justify-between'>
-          <div className='flex items-center w-full'>
-            <h3 className='w-full font-semibold text-xl lg:text-2xl'>INVENTORY VARIANTS</h3>
-            <h3 className='font-medium text-sm md:text-base w-full'>Primary Location: <strong>{primaryLocationName}</strong></h3>
-          </div>
-          <div className='flex flex-wrap lg:flex-nowrap items-center justify-between w-full'>
-            <div className="flex items-center gap-2 w-full">
-              <label htmlFor="show-inventory" className="text-sm font-medium">
-                <span>{showInventory ? "Inventory Details Visible" : "Show Inventory Details"}</span>
-              </label>
-
-              <CustomSwitch
-                checked={showInventory}
-                onChange={handleToggleChange}
-                size="md"
-                color="primary"
-              />
-            </div>
-            <Link
-              className="flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
-              href="/dash-board/product-hub/products"
-              onClick={handleGoBackClick}  // Trigger the modal on click
-            >
-              <span className="border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2">
-                <FaArrowLeft />
-              </span>
-              Go Back
-            </Link>
-          </div>
+          <h3 className='flex-1 font-semibold text-xl lg:text-2xl'>INVENTORY VARIANTS</h3>
+          <h3 className='flex-1 font-medium text-sm md:text-base'>Primary Location: <strong>{primaryLocationName}</strong></h3>
+          <Link
+            className="flex-1 flex items-center gap-2 text-[10px] md:text-base justify-end w-full"
+            href="/dash-board/product-hub/products"
+            onClick={handleGoBackClick}  // Trigger the modal on click
+          >
+            <span className="border border-black hover:scale-105 duration-300 rounded-full p-1 md:p-2">
+              <FaArrowLeft />
+            </span>
+            Go Back
+          </Link>
         </div>
       </div>
       <form onSubmit={handleSubmit(onSubmit)} className='min-h-[91vh] flex flex-col justify-between max-w-screen-2xl mx-auto relative'>
@@ -715,11 +699,30 @@ const SecondStepOfAddProduct = () => {
 
         </div>
 
-        <div className='flex flex-wrap gap-6 justify-between py-8'>
-          <Link href='/dash-board/product-hub/products/add-product' className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'>
-            <FaArrowLeft /> Previous Step
-          </Link>
-          <div className='flex items-center gap-6'>
+        <div className='flex flex-col md:flex-row gap-6 justify-between py-8'>
+
+          <div className='flex-1 flex flex-wrap gap-2 lg:gap-6 w-full'>
+
+            <Link href='/dash-board/product-hub/products/add-product' className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'>
+              <FaArrowLeft /> Previous Step
+            </Link>
+
+            <div className="flex items-center gap-2">
+              <label htmlFor="show-inventory" className="text-sm font-medium">
+                <span>{showInventory ? "Inventory Details Visible" : "Show Inventory Details"}</span>
+              </label>
+
+              <CustomSwitch
+                checked={showInventory}
+                onChange={handleToggleChange}
+                size="md"
+                color="primary"
+              />
+            </div>
+          </div>
+
+          <div className='flex-1 flex flex-wrap items-center justify-end gap-6'>
+
             <button type="button" onClick={handleSubmit(onSaveForNow)} className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[14px] text-neutral-700'>
               Save For Now <FiSave size={19} />
             </button>
@@ -727,6 +730,7 @@ const SecondStepOfAddProduct = () => {
               Next Step <FaArrowRight />
             </button>
           </div>
+
         </div>
 
       </form>

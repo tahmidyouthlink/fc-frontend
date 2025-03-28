@@ -14,7 +14,7 @@ const TermsConditionsPage = () => {
   return (
     <div className='bg-gray-50 min-h-screen'>
 
-      <div className='px-6 max-w-screen-2xl mx-auto'>
+      <div className='px-6 max-w-screen-md mx-auto'>
 
         <div className='sticky top-0 z-10 bg-gray-50 flex items-center justify-between py-6'>
 
