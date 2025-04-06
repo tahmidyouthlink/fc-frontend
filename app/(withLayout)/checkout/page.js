@@ -526,7 +526,7 @@ export default function Checkout() {
 
   return (
     <main
-      className={`relative -mt-[calc(240*3px)] pb-10 pt-[88px] text-sm text-neutral-500 sm:pt-24 md:text-base lg:pb-6 lg:pt-28 [&_h2]:uppercase [&_h2]:text-neutral-700 ${!!cartItems?.length ? "bg-neutral-50" : "min-h-[calc(100dvh+240*3px)] bg-white font-semibold"}`}
+      className={`relative -mt-[calc(240*3px)] pb-[var(--section-padding-double)] text-sm text-neutral-500 md:text-base lg:pb-[var(--section-padding)] [&_h2]:uppercase [&_h2]:text-neutral-700 ${!!cartItems?.length ? "bg-neutral-50" : "bg-white font-semibold"}`}
     >
       <div
         className={`sticky left-[5%] top-1/3 size-60 animate-blob rounded-full bg-[#ffecdc] mix-blend-multiply blur-md ${!cartItems?.length ? "opacity-0" : "opacity-100"}`}
@@ -538,11 +538,10 @@ export default function Checkout() {
         className={`sticky left-[80%] top-1/2 size-60 animate-blob rounded-full bg-[#d3f9ce] mix-blend-multiply blur-md [animation-delay:2s] ${!cartItems?.length ? "opacity-0" : "opacity-100"}`}
       />
       {!!cartItems?.length ? (
-        <div className="relative gap-4 px-5 sm:px-8 lg:flex lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0">
-          <div className="bottom-5 top-5 h-fit space-y-4 lg:sticky lg:w-[calc(55%-16px/2)]">
+        <div className="pt-header-h-full-section-pb relative min-h-dvh gap-4 px-5 sm:px-8 lg:flex lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0">
+          <div className="bottom-[var(--section-padding)] top-[var(--section-padding)] h-fit space-y-4 lg:sticky lg:w-[calc(55%-16px/2)]">
             {!user && (
               <CheckoutLogin
-                setUserData={setUserData}
                 onError={onError}
                 setIsPageLoading={setIsPageLoading}
                 setIsRegisterModalOpen={setIsRegisterModalOpen}
@@ -631,7 +630,7 @@ export default function Checkout() {
           />
         </div>
       ) : (
-        <div className="flex h-[calc(100dvh-112px-24px)] flex-col items-center justify-center [&>*]:w-fit">
+        <div className="pt-header-h-full-section-pb flex min-h-dvh flex-col items-center justify-center font-semibold [&>*]:w-fit">
           <TbShoppingCartExclamation className="size-24 text-[#F4D3BA]" />
           <p className="mt-2 text-neutral-400">The cart is empty.</p>
           <TransitionLink

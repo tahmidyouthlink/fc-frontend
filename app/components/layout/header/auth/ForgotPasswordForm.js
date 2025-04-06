@@ -1,12 +1,11 @@
-import { sendPasswordResetEmail } from "firebase/auth";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { auth } from "@/firebase.config";
 import { useLoading } from "@/app/contexts/loading";
-import createErrorMessage from "@/app/utils/createErrorMessage";
+import useAxiosPublic from "@/app/hooks/useAxiosPublic";
 
 export default function ForgotPasswordForm({ setIsAuthModalOpen }) {
   const { setIsPageLoading } = useLoading();
+  const axiosPublic = useAxiosPublic();
   const {
     register: registerForForgotPassword,
     handleSubmit: handleSubmitForForgotPassword,
@@ -19,20 +18,25 @@ export default function ForgotPasswordForm({ setIsAuthModalOpen }) {
     mode: "onBlur",
   });
 
-  // Function that handles form submission (user sign in)
+  // Function that handles form submission (send password reset email)
   const onSubmit = async (data) => {
     setIsPageLoading(true);
 
     try {
-      await sendPasswordResetEmail(auth, data.email);
-      resetForForgotPassword(); // Reset form
-      toast.success("Email with password reset link sent.");
-      setIsAuthModalOpen(false);
-    } catch (error) {
-      toast.error(createErrorMessage(error));
-    }
+      const response = await axiosPublic.put("/request-password-reset", data);
 
-    setIsPageLoading(false);
+      if (response.data.success) {
+        resetForForgotPassword(); // Reset form
+        toast.success(response.data.message);
+        setIsAuthModalOpen(false);
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    } finally {
+      setIsPageLoading(false);
+    }
   };
 
   // Function that handles form submission error (displays error messages)

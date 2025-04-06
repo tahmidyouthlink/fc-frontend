@@ -69,7 +69,8 @@ export default function TopFooter() {
         setIsUserSubscribed(!!response?.data);
       } catch (error) {
         setIsUserSubscribed(false);
-        console.log("Error fetching user newsletter subscription.");
+        if (error.status != 404)
+          console.log("Error fetching user newsletter subscription.");
       }
     };
 
@@ -91,7 +92,7 @@ export default function TopFooter() {
 
   if (!pathname.includes("checkout"))
     return (
-      <div className="bg-[#ebfeeb]">
+      <div className="relative bg-[#ebfeeb]">
         <div
           className={`flex items-center justify-evenly overflow-hidden px-5 py-14 sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0 ${footerBanner?.position !== "center" ? "gap-5 py-[72px]" : "flex-col gap-12 py-14"}`}
         >
@@ -111,7 +112,7 @@ export default function TopFooter() {
               />
             )}
           </TransitionLink>
-          {!isUserSubscribed ? (
+          {!isUserSubscribed && (
             <form
               noValidate
               onSubmit={handleSubmit(onSubmit, onError)}
@@ -137,13 +138,6 @@ export default function TopFooter() {
                 </button>
               </div>
             </form>
-          ) : (
-            <p
-              className={`w-full text-center text-xs text-neutral-700 md:text-sm ${footerBanner?.position === "center" ? "max-w-lg" : "max-w-sm"}`}
-            >
-              Thank you for subscribing to our newsletter! You&apos;ll get more
-              offers like this daily!
-            </p>
           )}
         </div>
       </div>

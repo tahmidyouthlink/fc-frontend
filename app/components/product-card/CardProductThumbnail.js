@@ -90,11 +90,7 @@ export default function CardProductThumbnail({
             </div>
           );
         })}
-        {isProductOutOfStock ? (
-          <CardOutOfStockBanner />
-        ) : (
-          isProductLimitedStock && <CardLimitedStockBanner />
-        )}
+        {isProductOutOfStock && <CardOutOfStockBanner />}
       </TransitionLink>
       {!isProductOutOfStock && (
         <CardColorSelectionTool

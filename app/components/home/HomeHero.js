@@ -2,15 +2,12 @@ import Image from "next/image";
 import { FaArrowRightLong } from "react-icons/fa6";
 import squigglyShape from "@/public/shapes/squiggly.png";
 import arrowShape from "@/public/shapes/arrow.png";
-import { useAuth } from "@/app/contexts/auth";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 
 export default function HomeHero({ leftImgUrl, centerImgUrl, rightImgUrl }) {
-  const { user } = useAuth();
-
   if (!(!leftImgUrl || !centerImgUrl || !rightImgUrl))
     return (
-      <div className="relative flex h-dvh flex-col px-5 pb-6 pt-[100px] sm:h-[65dvh] sm:px-8 sm:pt-32 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0 2xl:pb-[6vh] 2xl:pt-[calc(88px+6vh)] portrait:md:h-[75dvh] portrait:lg:h-[60dvh] landscape:h-dvh">
+      <div className="relative flex h-dvh flex-col px-5 pb-6 pt-[106px] sm:h-[65dvh] sm:px-8 sm:pt-32 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0 2xl:pb-[6vh] 2xl:pt-[calc(88px+6vh)] portrait:md:h-[75dvh] portrait:lg:h-[60dvh] landscape:h-dvh">
         <div className="z-[-2]">
           <div className="absolute left-[76%] top-[80%] h-[150px] w-[150px] translate-x-[-50%] translate-y-[-50%] rounded-[100%] bg-[#FEDCBF] blur-[40px] md:left-[90%] md:top-[50%] xl:h-[187px] xl:w-[214px] 2xl:left-[100%]"></div>
           <div className="absolute left-[10%] top-[40%] h-[150px] w-[150px] translate-x-[-50%] translate-y-[-50%] rounded-[100%] bg-[#FEDCBF] blur-[60px] md:left-[20%] md:blur-[40px] lg:top-[30%] xl:h-[187px] xl:w-[214px]"></div>

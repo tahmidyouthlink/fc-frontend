@@ -21,7 +21,7 @@ export default function ProductImageGallery({
   specialOffer,
 }) {
   return (
-    <section className="relative flex flex-col gap-2 sm:max-md:flex-row xl:sticky xl:top-[14px] xl:h-[calc(100dvh-112px-14px)]">
+    <section className="relative flex flex-col gap-2 sm:max-md:flex-row xl:sticky xl:top-[var(--section-padding)] xl:h-[calc(100dvh-(var(--header-height-lg)+var(--section-padding-double)))]">
       {/* Shape (curved dotted line) */}
       <div className="absolute -bottom-16 right-0 z-[-1] aspect-[3.5/1] w-[1150px] opacity-50 sm:-bottom-28 sm:w-[1050px] md:w-[1100px] lg:w-[1200px]">
         <Image

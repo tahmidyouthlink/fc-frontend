@@ -193,7 +193,7 @@ export default function Shop() {
 
   if (!(isProductListLoading || !productList?.length))
     return (
-      <main className="relative flex min-h-dvh overflow-hidden pb-16 pt-28 [&_img]:pointer-events-none">
+      <main className="pt-header-h-full-section-pb relative flex min-h-dvh overflow-hidden pb-[var(--section-padding)] [&_img]:pointer-events-none">
         <div className="absolute -left-3 top-28 z-[-1] size-40 rounded-full bg-[#d3f9ce] blur-3xl min-[1200px]:fixed" />
         <div className="absolute -bottom-20 -right-3 z-[-1] size-40 rounded-full bg-[#d3f9ce] blur-3xl lg:-bottom-5 min-[1200px]:fixed" />
         <div className="flex min-h-full grow flex-col gap-y-7 px-5 sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0">

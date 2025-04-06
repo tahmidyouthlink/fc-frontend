@@ -1,12 +1,11 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { getIdToken, onIdTokenChanged } from "firebase/auth";
-import { auth } from "@/firebase.config";
-import { createSession, removeSession } from "../actions/auth";
+import { useSession } from "next-auth/react";
 import useAxiosPublic from "../hooks/useAxiosPublic";
+import useCustomers from "../hooks/useCustomers";
 
-// Create a new context for authentication
+// Create a new context for authentication and user data
 const AuthContext = createContext({
   user: null,
   userData: null,
@@ -14,16 +13,17 @@ const AuthContext = createContext({
   isUserLoading: false,
 });
 
-// A Provider component that provides authentication context to its children.
+// A Provider component that provides authentication and user data context to its children.
 export const AuthProvider = ({ children }) => {
-  // State hooks to hold the authenticated user and loading status
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isUserLoading, setIsUserLoading] = useState(true);
+  const { data: session, status } = useSession();
   const axiosPublic = useAxiosPublic();
+  const [customerList, isCustomerListLoading, customerRefetch] = useCustomers();
 
   // Listen for changes to the user's authentication state
-  // When the token changes, update the states and token cookie accordingly
+  // When the token changes, update the states accordingly
   useEffect(() => {
     const updateUserData = async (userEmail) => {
       try {
@@ -81,25 +81,39 @@ export const AuthProvider = ({ children }) => {
       setIsUserLoading(false);
     };
 
-    const unsubscribe = onIdTokenChanged(auth, async (user) => {
-      if (!user) {
-        setUser(null);
-        await removeSession();
-        setUserData(null);
-        setIsUserLoading(false);
-      } else {
-        const token = await getIdToken(user, true);
-        setUser(user);
-        await createSession(token);
-        if (!userData) updateUserData(user?.email);
-        setIsUserLoading(false);
-      }
-    });
+    if (
+      status === "loading" ||
+      isCustomerListLoading ||
+      !customerList?.length
+    ) {
+      return () => !isUserLoading && setIsUserLoading(true);
+    }
 
-    return () => unsubscribe();
-  }, [axiosPublic, userData]);
+    if (status === "unauthenticated") {
+      setUser(null);
+      setUserData(null);
+      setIsUserLoading(false);
+    } else {
+      setUser(session?.user);
+      if (!userData)
+        updateUserData(
+          session?.user?.email,
+          session?.user?.name,
+          session?.user?.provider,
+        );
+      setIsUserLoading(false);
+    }
+  }, [
+    axiosPublic,
+    customerList,
+    isCustomerListLoading,
+    isUserLoading,
+    session,
+    status,
+    userData,
+  ]);
 
-  // Provide the user state and loading state to child components through context
+  // Provide the user state, loading state, and user data to child components through context
   return (
     <AuthContext.Provider
       value={{ user, userData, setUserData, isUserLoading }}

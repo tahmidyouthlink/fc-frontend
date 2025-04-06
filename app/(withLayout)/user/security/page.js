@@ -2,24 +2,17 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import {
-  EmailAuthProvider,
-  linkWithCredential,
-  reauthenticateWithCredential,
-  reauthenticateWithPopup,
-  updatePassword,
-} from "firebase/auth";
 import toast from "react-hot-toast";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { googleProvider } from "@/firebase.config";
 import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
-import createErrorMessage from "@/app/utils/createErrorMessage";
-import GoogleSignIn from "@/app/components/layout/header/auth/GoogleSignIn";
+import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import GoogleSignInButton from "@/app/components/layout/header/auth/GoogleSignInButton";
 
-export default function Profile() {
-  const { user } = useAuth();
+export default function Security() {
+  const { userData } = useAuth();
   const { setIsPageLoading } = useLoading();
+  const axiosPublic = useAxiosPublic();
   const [isOldPasswordVisible, SetIsOldPasswordVisible] = useState(false);
   const [isNewPasswordVisible, SetIsNewPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, SetIsConfirmPasswordVisible] =
@@ -44,50 +37,34 @@ export default function Profile() {
   const newPassword = watch("newPassword");
   const confirmPassword = watch("confirmPassword");
 
-  const isProviderPresent = (id) => {
-    return user?.providerData.some((provider) =>
-      provider.providerId.includes(id),
-    );
-  };
-
   const onSubmit = async (data) => {
     setIsPageLoading(true);
 
     try {
-      if (isProviderPresent("password")) {
-        // Reauthenticate user with old password
-        await reauthenticateWithCredential(
-          user,
-          EmailAuthProvider.credential(user?.email, data.oldPassword),
-        );
+      const apiEndpoint = userData?.isLinkedWithCredentials
+        ? "/user-update-password"
+        : "/user-set-password";
+      const apiData = {
+        email: userData?.email,
+        ...(userData?.isLinkedWithCredentials && {
+          oldPassword: data.oldPassword,
+        }),
+        newPassword: data.newPassword,
+      };
 
-        // Exit if old and new passwords are same
-        if (data.oldPassword === data.newPassword) {
-          toast.error("Your old and new passwords are same.");
-          return setIsPageLoading(false);
-        }
+      const response = await axiosPublic.put(apiEndpoint, apiData);
 
-        // Update user password
-        await updatePassword(user, data.newPassword);
-        toast.success("Password updated successfully.");
-        reset();
+      if (response.data.success) {
+        toast.success(response.data.message);
       } else {
-        // Reauthenticate user with Google provider
-        await reauthenticateWithPopup(user, googleProvider);
-
-        // Link user's Google account with email/password provider
-        await linkWithCredential(
-          user,
-          EmailAuthProvider.credential(user?.email, data.newPassword),
-        );
-        toast.success("Password added successfully.");
-        reset();
+        toast.error(response.data.message);
       }
     } catch (error) {
-      toast.error(createErrorMessage(error, true));
+      toast.error(error.response.data.message);
+    } finally {
+      setIsPageLoading(false);
+      reset();
     }
-
-    setIsPageLoading(false);
   };
 
   const onError = (errors) => {
@@ -114,12 +91,12 @@ export default function Profile() {
       >
         <section className="w-full space-y-4 rounded-md border-2 border-neutral-200 p-5">
           <h2 className="text-lg font-semibold uppercase md:text-xl">
-            {isProviderPresent("password") ? "Update" : "Set"} Password
+            {userData?.isLinkedWithCredentials ? "Update" : "Set"} Password
           </h2>
           <div className="space-y-4">
-            {isProviderPresent("password") && (
+            {userData?.isLinkedWithCredentials && (
               <div className="w-full space-y-2 font-semibold">
-                <label htmlFor="old-password">Old Password</label>
+                <label htmlFor="old-password">Current Password</label>
                 <div className="relative">
                   <input
                     id="old-password"
@@ -128,7 +105,7 @@ export default function Profile() {
                     placeholder="••••••••••••••"
                     {...register("oldPassword", {
                       required: {
-                        value: isProviderPresent("password"),
+                        value: userData?.isLinkedWithCredentials,
                         message: "Old password is required.",
                       },
                     })}
@@ -258,7 +235,7 @@ export default function Profile() {
               )}
             </div>
             <button className="block h-fit w-full self-end rounded-lg bg-[#d4ffce] px-5 py-2.5 text-center text-sm font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[#bdf6b4]">
-              Update
+              {userData?.isLinkedWithCredentials ? "Update" : "Set"} Password
             </button>
           </div>
         </section>
@@ -271,10 +248,12 @@ export default function Profile() {
             You&apos;ll get some additional rewards for connecting with the
             account.
           </p>
-          <GoogleSignIn
-            isConnected={isProviderPresent("google.com")}
-            buttonText={
-              isProviderPresent("google.com") ? user?.displayName : "Connect"
+          <GoogleSignInButton
+            isLinkedWithGoogle={userData?.isLinkedWithGoogle}
+            ctaText={
+              userData?.isLinkedWithGoogle
+                ? userData?.userInfo?.personalInfo?.customerName
+                : "Connect to Google"
             }
           />
         </section>

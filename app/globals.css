@@ -5,6 +5,24 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --top-header-height: 28.5px;
+  --bottom-header-height-xs: 56px;
+  --bottom-header-height-sm: 60px;
+  --bottom-header-height-lg: 66px;
+  --section-padding: 20px;
+  --section-padding-double: calc(var(--section-padding) * 2);
+  --header-height-xs: calc(
+    var(--top-header-height) + var(--bottom-header-height-xs)
+  );
+  --header-height-sm: calc(
+    var(--top-header-height) + var(--bottom-header-height-sm)
+  );
+  --header-height-lg: calc(
+    var(--top-header-height) + var(--bottom-header-height-lg)
+  );
+}
+
 @layer base {
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
@@ -89,6 +107,46 @@
 }
 
 @layer utilities {
+  /* Responsive section height (min) with a value of 100dvh and the full header height */
+  .min-h-dvh-header-h-full {
+    @apply min-h-[calc(100dvh-var(--header-height-xs))] sm:min-h-[calc(100dvh-var(--header-height-sm))] lg:min-h-[calc(100dvh-var(--header-height-lg))];
+  }
+
+  /* Responsive section height (min) with a value of 100dvh and the bottom header height */
+  .min-h-dvh-header-h-bottom {
+    @apply min-h-[calc(100dvh-var(--bottom-header-height-xs))] sm:min-h-[calc(100dvh-var(--bottom-header-height-sm))] lg:min-h-[calc(100dvh-var(--bottom-header-height-lg))];
+  }
+
+  /* Responsive section height (min) with a value of 100dvh and the full header height and section bottom padding */
+  .min-h-dvh-header-h-full-section-pb {
+    @apply min-h-[calc(100dvh-(var(--header-height-xs)+var(--section-padding)))] sm:min-h-[calc(100dvh-(var(--header-height-sm)+var(--section-padding)))] lg:min-h-[calc(100dvh-(var(--header-height-lg)+var(--section-padding)))];
+  }
+
+  /* Responsive section height (min) with a value of 100dvh and the bottom header height and section bottom padding */
+  .min-h-dvh-header-h-bottom-section-pb {
+    @apply min-h-[calc(100dvh-(var(--bottom-header-height-xs)+var(--section-padding)))] sm:min-h-[calc(100dvh-(var(--bottom-header-height-sm)+var(--section-padding)))] lg:min-h-[calc(100dvh-(var(--bottom-header-height-lg)+var(--section-padding)))];
+  }
+
+  /* Responsive top padding with a value of the full header height */
+  .pt-header-h-full {
+    @apply pt-[var(--header-height-xs)] sm:pt-[var(--header-height-sm)] lg:pt-[var(--header-height-lg)];
+  }
+
+  /* Responsive top padding with a value of the bottom header height */
+  .pt-header-h-bottom {
+    @apply pt-[var(--bottom-header-height-xs)] sm:pt-[var(--bottom-header-height-sm)] lg:pt-[var(--bottom-header-height-lg)];
+  }
+
+  /* Responsive top padding with a value of the full header height and section bottom padding */
+  .pt-header-h-full-section-pb {
+    @apply pt-[calc(var(--header-height-xs)+var(--section-padding))] sm:pt-[calc(var(--header-height-sm)+var(--section-padding))] lg:pt-[calc(var(--header-height-lg)+var(--section-padding))];
+  }
+
+  /* Responsive top padding with a value of the bottom header height and section bottom padding */
+  .pt-header-h-bottom-section-pb {
+    @apply pt-[calc(var(--bottom-header-height-xs)+var(--section-padding))] sm:pt-[calc(var(--bottom-header-height-sm)+var(--section-padding))] lg:pt-[calc(var(--bottom-header-height-lg)+var(--section-padding))];
+  }
+
   /* For normal and on hover footer links (except for the social ones) */
   footer div:not(:has(.social-links)) a {
     @apply transition-[color] duration-300 ease-in-out hover:text-neutral-900;

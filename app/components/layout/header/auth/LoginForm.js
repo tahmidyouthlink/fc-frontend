@@ -1,19 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { auth } from "@/firebase.config";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
-import createErrorMessage from "@/app/utils/createErrorMessage";
 
 export default function LoginForm({ setModalContent, setIsAuthModalOpen }) {
-  const axiosPublic = useAxiosPublic();
-  const { setUserData } = useAuth();
   const { setIsPageLoading } = useLoading();
   const [isPasswordVisible, SetIsPasswordVisible] = useState(false);
 
@@ -21,6 +15,7 @@ export default function LoginForm({ setModalContent, setIsAuthModalOpen }) {
     register: registerForLogin,
     handleSubmit: handleSubmitForLogin,
     reset: resetForLogin,
+    resetField: resetFieldForLogin,
     formState: { errors: errorsForLogin },
   } = useForm({
     defaultValues: {
@@ -35,60 +30,26 @@ export default function LoginForm({ setModalContent, setIsAuthModalOpen }) {
     setIsPageLoading(true);
 
     try {
-      await signInWithEmailAndPassword(auth, data.email, data.password);
-      toast.success("Successfully logged in.");
+      const result = await signIn("credentials-frontend", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
 
-      const res = await axiosPublic.get(
-        `/customerDetailsViaEmail/${data.email}`,
-      );
-      if (!res?.data) return toast.error("Failed to fetch user data.");
-
-      const currentUserData = res?.data;
-
-      const localWishlist = JSON.parse(localStorage.getItem("wishlistItems"));
-      const localCart = JSON.parse(localStorage.getItem("cartItems"));
-      const updatedWishlist = !!localWishlist?.length
-        ? localWishlist
-        : !!currentUserData?.wishlistItems?.length
-          ? currentUserData?.wishlistItems
-          : [];
-      const updatedCartItems = !!localCart?.length
-        ? localCart
-        : !!currentUserData?.cartItems?.length
-          ? currentUserData?.cartItems
-          : [];
-
-      localStorage.setItem("wishlistItems", JSON.stringify(updatedWishlist));
-      window.dispatchEvent(new Event("storageWishlist"));
-      localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
-      window.dispatchEvent(new Event("storageCart"));
-
-      try {
-        const updatedUserData = {
-          ...currentUserData,
-          wishlistItems: updatedWishlist,
-          cartItems: updatedCartItems,
-        };
-
-        const response = await axiosPublic.put(
-          `/updateUserInformation/${currentUserData?._id}`,
-          updatedUserData,
-        );
-
-        if (!!response?.data?.modifiedCount || !!response?.data?.matchedCount) {
-          setUserData(updatedUserData);
-        }
-      } catch (error) {
-        toast.error("Unable to update user data to server.");
+      if (result?.error) {
+        resetFieldForLogin("password");
+        return toast.error(result?.error);
+      } else {
+        toast.success("Successfully signed in.");
       }
 
       resetForLogin(); // Reset form
       setIsAuthModalOpen(false);
     } catch (error) {
-      toast.error(createErrorMessage(error));
+      toast.error(error?.response?.data?.error);
+    } finally {
+      setIsPageLoading(false);
     }
-
-    setIsPageLoading(false);
   };
 
   // Function that handles form submission error (displays error messages)

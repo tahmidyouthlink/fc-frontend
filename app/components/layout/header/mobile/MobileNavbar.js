@@ -20,12 +20,12 @@ export default function MobileNavbar({
   }, [isNavMenuOpen]);
 
   return (
-    <nav className="relative h-full w-full text-sm md:text-[15px] lg:hidden">
+    <nav className="relative h-full w-full text-sm lg:hidden">
       <div className="relative flex h-full w-full items-center justify-between bg-white">
         {/* Logo */}
         <TransitionLink href="/">
           <Image
-            className="h-9 w-auto"
+            className="h-8 w-auto lg:h-9"
             src={logoImage}
             alt="YouthLink logo with white text"
           />
@@ -33,6 +33,7 @@ export default function MobileNavbar({
         <ul className="flex gap-x-4">
           {/* Search Button */}
           <li
+            className="flex cursor-pointer items-center"
             onClick={() => setIsMobileSearchSelected((prevState) => !prevState)}
           >
             <IoSearchOutline className="text-lg text-neutral-600" />

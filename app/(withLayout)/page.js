@@ -13,6 +13,7 @@ import HomeCategories from "../components/home/HomeCategories";
 import HomeTrending from "../components/home/HomeTrending";
 import HomeNewArrival from "../components/home/HomeNewArrival";
 import AddToCartModal from "../components/shop/cart/AddToCartModal";
+import HomeFeatures from "../components/home/HomeFeatures";
 
 export default function Home() {
   const { setIsPageLoading } = useLoading();
@@ -36,10 +37,10 @@ export default function Home() {
     ?.filter(
       (product) =>
         product?.status === "active" &&
-        product?.salesThisMonth >= 10 &&
+        // product?.salesThisMonth >= 10 &&
         !CheckIfProductIsOutOfStock(product?.productVariants, primaryLocation),
     )
-    ?.slice(0, 4);
+    ?.slice(0, 5);
   const newlyArrivedProducts = productList
     ?.filter(
       (product) =>
@@ -96,6 +97,10 @@ export default function Home() {
         setIsAddToCartModalOpen={setIsAddToCartModalOpen}
         setSelectedAddToCartProduct={setSelectedAddToCartProduct}
         getImageSetsBasedOnColors={getImageSetsBasedOnColors}
+      />
+      <HomeFeatures
+        isAnyTrendingProductAvailable={trendingProducts?.length}
+        isAnyNewProductAvailable={newlyArrivedProducts?.length}
       />
       <AddToCartModal
         isAddToCartModalOpen={isAddToCartModalOpen}

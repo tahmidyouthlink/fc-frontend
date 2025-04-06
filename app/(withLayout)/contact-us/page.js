@@ -11,22 +11,24 @@ import ContactForm from "@/app/components/contact/ContactForm";
 
 export default function ContactUs() {
   return (
-    <main className="relative overflow-hidden bg-[#f0f0f0] pb-5 pt-20 text-sm text-neutral-500 sm:pt-24 md:text-base lg:pb-6 lg:pt-28 xl:min-h-dvh [&_h2]:text-neutral-600">
+    <main className="pt-header-h-full-section-pb relative overflow-hidden bg-[#f0f0f0] pb-[var(--section-padding)] text-sm text-neutral-500 md:text-base xl:min-h-dvh [&_h2]:text-neutral-600">
       <div className="absolute left-[5%] top-1/2 size-60 animate-blob rounded-full bg-[#d3f9ce] mix-blend-multiply blur-md" />
       <div className="absolute left-[55%] top-[60%] size-60 animate-blob rounded-full bg-[#ebc6a6] mix-blend-multiply blur-md [animation-delay:1s]" />
       <div className="absolute left-[80%] top-1/3 size-60 animate-blob rounded-full bg-[#d3f9ce] mix-blend-multiply blur-md [animation-delay:2s]" />
-      <div className="z-[1] mx-5 items-stretch gap-4 overflow-hidden rounded-xl border-2 border-neutral-50/20 bg-white/40 backdrop-blur-2xl max-md:space-y-4 sm:mx-8 md:mx-12 md:flex xl:mx-auto xl:min-h-[calc(100dvh-112px-24px)] xl:max-w-[1200px]">
-        <section className="grow p-9 md:order-last">
-          <h2 className="text-xl font-semibold">SEND A MESSAGE</h2>
-          <p className="!mb-10 !mt-1.5">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          </p>
+      <div className="z-[1] mx-5 items-stretch gap-4 overflow-hidden rounded-xl border-2 border-neutral-50/20 bg-white/40 backdrop-blur-2xl max-md:space-y-4 sm:mx-8 md:mx-12 md:flex xl:mx-auto xl:min-h-[calc(100dvh-(var(--header-height-lg)+var(--section-padding-double)))] xl:max-w-[1200px]">
+        <section className="flex grow flex-col gap-y-10 p-9 md:order-last">
+          <div className="space-y-1.5">
+            <h2 className="text-xl font-semibold">SEND A MESSAGE</h2>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+          </div>
           <ContactForm />
         </section>
-        <section className="bg-white/5 p-9 backdrop-blur-xl lg:w-2/5">
-          <h2 className="text-xl font-semibold">REACH OUT TO US</h2>
-          <p className="mb-10 mt-1.5">Lorem ipsum dolor sit amet.</p>
-          <div className="min-h-[calc(100%-112px)] justify-between max-sm:space-y-10 sm:flex md:flex-col">
+        <section className="flex flex-col gap-y-10 bg-white/5 p-9 backdrop-blur-xl lg:w-2/5">
+          <div className="space-y-1.5">
+            <h2 className="text-xl font-semibold">REACH OUT TO US</h2>
+            <p>Lorem ipsum dolor sit amet.</p>
+          </div>
+          <div className="grow justify-between max-sm:space-y-10 sm:flex md:flex-col">
             <div className="space-y-5">
               <div className="flex items-center gap-2.5">
                 <PiMapPinLight size={24} />

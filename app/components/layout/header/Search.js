@@ -85,7 +85,7 @@ export default function Search({ isMobile, setIsMobileSearchSelected }) {
         placeholder="Search Products"
         type="search"
         defaultValue={searchParams.get("search") || ""}
-        className="h-10 w-full rounded-lg border-2 border-transparent bg-[#f3f3f4] px-4 pl-[2.5rem] outline-none transition-[border-color,background-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white [&::-webkit-search-cancel-button]:[-webkit-appearance:none] [&:not(:placeholder-shown)]:border-[#F4D3BA] [&:not(:placeholder-shown)]:bg-white"
+        className="h-9 w-full rounded-lg border-2 border-transparent bg-[#f3f3f4] px-4 pl-[2.5rem] outline-none transition-[border-color,background-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white [&::-webkit-search-cancel-button]:[-webkit-appearance:none] [&:not(:placeholder-shown)]:border-[#F4D3BA] [&:not(:placeholder-shown)]:bg-white"
         onChange={handleInputChange}
       />
     </form>

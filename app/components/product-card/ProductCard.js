@@ -73,6 +73,8 @@ export default function ProductCard({
         product={product}
         specialOffers={specialOffers}
         needsWhiteBackgroundText={needsWhiteBackgroundText}
+        isProductOutOfStock={isProductOutOfStock}
+        isProductLimitedStock={isProductLimitedStock}
       />
       <ProductBadges
         isTrending={product.salesThisMonth >= 10}

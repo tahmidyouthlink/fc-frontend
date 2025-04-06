@@ -44,7 +44,7 @@ export default function CheckoutCart({
     !!selectedCity && (selectedCity !== "Dhaka" || !!selectedDeliveryType);
 
   return (
-    <section className="relative bottom-5 top-5 h-full min-h-full w-full rounded-xl pt-5 font-semibold shadow-[0_0_20px_0_rgba(0,0,0,0.05)] before:pointer-events-none before:absolute before:top-0 before:h-full before:w-full before:rounded-xl before:border-2 before:border-neutral-50/20 before:bg-white/40 before:backdrop-blur-2xl before:content-[''] lg:sticky lg:w-[calc(45%-16px/2)]">
+    <section className="relative bottom-[var(--section-padding)] top-[var(--section-padding)] h-full min-h-full w-full rounded-xl pt-5 font-semibold shadow-[0_0_20px_0_rgba(0,0,0,0.05)] before:pointer-events-none before:absolute before:top-0 before:h-full before:w-full before:rounded-xl before:border-2 before:border-neutral-50/20 before:bg-white/40 before:backdrop-blur-2xl before:content-[''] lg:sticky lg:w-[calc(45%-16px/2)]">
       <div className="relative flex h-full min-h-full w-full flex-col justify-between">
         {!!cartItems?.length && (
           <div

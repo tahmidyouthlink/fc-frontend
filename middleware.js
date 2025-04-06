@@ -1,9 +1,7 @@
-import { getToken } from "next-auth/jwt";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
 export async function middleware(req) {
-  const session = cookies().get("user_session")?.value;
   const pathname = req.url;
 
   // If user enters wrong user/shop page URL, redirect to the correct one
@@ -12,16 +10,16 @@ export async function middleware(req) {
   if (/\/product\/?$/i.test(pathname))
     return NextResponse.redirect(new URL("/shop", pathname));
 
-  // Redirect to login page, if user tries to access any user page without being logged in
-  if (!session && pathname.includes("user")) {
-    return NextResponse.redirect(new URL("/", pathname));
-  }
-
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-  // If the user is not logged in, redirect to login
+  // If the user is not logged in and tries to access backend dashboard, redirect to login page
   if (!token && pathname.includes("dash-board")) {
     return NextResponse.redirect(new URL("/auth/restricted-access", pathname));
+  }
+
+  // If the user is not logged in and tries to access any of the user pages, redirect to homepage
+  if (!token && pathname.includes("user")) {
+    return NextResponse.redirect(new URL("/", pathname));
   }
 
   return NextResponse.next();

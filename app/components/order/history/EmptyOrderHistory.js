@@ -3,7 +3,7 @@ import TransitionLink from "@/app/components/ui/TransitionLink";
 
 export default function EmptyOrderHistory() {
   return (
-    <section className="bottom-5 top-5 grow auto-rows-max rounded-xl border-2 border-neutral-50/20 bg-white/60 p-3.5 shadow-[0_0_20px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl lg:sticky xl:p-5">
+    <section className="bottom-[var(--section-padding)] top-[var(--section-padding)] grow auto-rows-max rounded-xl border-2 border-neutral-50/20 bg-white/60 p-3.5 shadow-[0_0_20px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl lg:sticky xl:p-5">
       <div className="flex min-h-full flex-col items-center justify-center font-semibold">
         <HiOutlineArchiveBoxXMark className="size-24 text-[#F4D3BA]" />
         <p className="mt-2 text-neutral-400">

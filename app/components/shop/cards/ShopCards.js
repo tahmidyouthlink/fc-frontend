@@ -45,7 +45,7 @@ export default function ShopCards({
   }, [filteredProductCount]);
 
   return (
-    <section className="relative grid grid-cols-2 gap-x-4 gap-y-12 sm:grid-cols-4 lg:grid-cols-5">
+    <section className="relative grid grid-cols-2 gap-x-4 gap-y-12 pb-7 sm:grid-cols-4 lg:grid-cols-5">
       <Shapes cardHeight={cardHeight} rows={rows} />
       {filteredProducts?.map((filteredProduct) => {
         return (

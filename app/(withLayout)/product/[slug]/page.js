@@ -118,7 +118,7 @@ export default function Product({ params: { slug } }) {
   ]);
 
   return (
-    <main className="relative overflow-hidden pt-20 text-sm sm:pt-24 lg:pt-28 [&_img]:pointer-events-none">
+    <main className="pt-header-h-full-section-pb relative overflow-hidden text-sm [&_img]:pointer-events-none">
       {/* Mesh Gradient */}
       <div className="absolute -left-3 top-28 z-[-1] size-40 rounded-full bg-[#d3f9ce] blur-3xl" />
       {/* Shape/SVG (circle with star) */}

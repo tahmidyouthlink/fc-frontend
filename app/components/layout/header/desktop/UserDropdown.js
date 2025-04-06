@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { signOut } from "firebase/auth";
+import { signOut } from "next-auth/react";
 import toast from "react-hot-toast";
 import {
   Dropdown,
@@ -18,7 +18,6 @@ import {
   PiUserCirclePlusLight,
 } from "react-icons/pi";
 import { IoPersonOutline } from "react-icons/io5";
-import { auth } from "@/firebase.config";
 import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
 import TransitionLink from "@/app/components/ui/TransitionLink";
@@ -42,7 +41,7 @@ export default function UserDropdown() {
     setIsPageLoading(true);
 
     try {
-      await signOut(auth);
+      await signOut({ redirect: false });
       if (pathname.includes("user") || pathname.includes("checkout"))
         router.push("/");
       localStorage.removeItem("cartItems");
@@ -63,7 +62,7 @@ export default function UserDropdown() {
         <DropdownTrigger className="z-[0]">
           <span className="flex cursor-pointer items-center gap-1.5 hover:text-neutral-700">
             <IoPersonOutline className="text-lg" />
-            {!user ? "Account" : user.displayName?.split(" ")[0] || "User"}
+            {!user ? "Account" : user.name?.split(" ")[0] || "User"}
           </span>
         </DropdownTrigger>
         <DropdownMenu aria-label="Profile Actions" variant="flat">

@@ -2,7 +2,7 @@ import TransitionLink from "@/app/components/ui/TransitionLink";
 
 export default function CartFooter({ subtotal, setIsCartDrawerOpen }) {
   return (
-    <div className="sticky bottom-0 space-y-4 bg-neutral-50 pb-5 font-semibold sm:pb-6">
+    <div className="sticky bottom-0 space-y-4 bg-neutral-50 pb-[var(--section-padding)] font-semibold">
       {/* Divider */}
       <hr className="h-0.5 w-full bg-neutral-100" />
       {/* Subtotal */}

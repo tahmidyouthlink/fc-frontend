@@ -117,6 +117,8 @@ export default function ProductInfoOverview({
         productSizes={product?.allSizes}
         selectedOptions={selectedOptions}
         setSelectedOptions={setSelectedOptions}
+        productVariantSku={productVariantSku}
+        showSku={!!selectedOptions?.size && product?.isInventoryShown}
       />
       <ProductColorSelection
         productColors={getImageSetsBasedOnColors(product?.productVariants)?.map(
@@ -133,7 +135,7 @@ export default function ProductInfoOverview({
         setSelectedOptions={setSelectedOptions}
       />
       {/* Call to Action Buttons */}
-      <div className="mb-7 flex gap-2 max-lg:flex-wrap [&>button>svg]:text-lg [&>button]:rounded-lg [&>button]:px-5 [&>button]:py-6 [&>button]:text-sm [&>button]:font-semibold [&>button]:text-neutral-600 [&>button]:duration-300 hover:[&>button]:opacity-100">
+      <div className="flex gap-2 max-lg:flex-wrap [&>button>svg]:text-lg [&>button]:rounded-lg [&>button]:px-5 [&>button]:py-6 [&>button]:text-sm [&>button]:font-semibold [&>button]:text-neutral-600 [&>button]:duration-300 hover:[&>button]:opacity-100">
         <ProductCartButton
           productId={product?._id}
           defaultColor={
@@ -148,6 +150,10 @@ export default function ProductInfoOverview({
           sizeGuideImageUrl={product?.sizeGuideImageUrl}
         />
       </div>
+      {/* Stock Message */}
+      {!!selectedOptions?.size && !productVariantSku && (
+        <p className="mt-3.5 font-semibold text-red-600">*Out of stock</p>
+      )}
     </section>
   );
 }

@@ -133,7 +133,7 @@ export default function ProductCartButton({
           >
             <button
               disabled={!!selectedOptions?.size && !productVariantSku}
-              className={`relative hidden h-11 items-center gap-1.5 overflow-visible whitespace-nowrap bg-[#FBEDE2] !transition-[background-color] !duration-300 !ease-in-out after:absolute after:-bottom-2 after:left-0 after:translate-y-full after:text-red-600 disabled:mb-6 disabled:text-neutral-400 disabled:!opacity-50 disabled:after:content-['*_Out_of_Stock'] xl:flex ${!selectedOptions?.size ? "cursor-default text-neutral-400 !opacity-50" : "[&:not(:disabled):hover]:bg-[#F4D3BA]"}`}
+              className={`relative hidden h-11 items-center gap-1.5 overflow-visible whitespace-nowrap bg-[#FBEDE2] !transition-[background-color] !duration-300 !ease-in-out after:absolute after:-bottom-2 after:left-0 after:translate-y-full after:text-red-600 disabled:text-neutral-400 disabled:!opacity-50 disabled:after:content-['*_Out_of_Stock'] xl:flex ${!selectedOptions?.size ? "cursor-default text-neutral-400 !opacity-50" : "[&:not(:disabled):hover]:bg-[#F4D3BA]"}`}
               onClick={() => {
                 if (!!selectedOptions?.size) {
                   handleAddToCart();
@@ -162,7 +162,7 @@ export default function ProductCartButton({
             <PopoverTrigger className="z-[0] outline-none xl:hidden">
               <button
                 disabled={!!selectedOptions?.size && !productVariantSku}
-                className={`relative flex h-11 items-center gap-1.5 overflow-visible whitespace-nowrap bg-[#FBEDE2] !transition-[background-color] !duration-300 !ease-in-out after:absolute after:-bottom-2 after:left-0 after:translate-y-full after:text-red-600 disabled:mb-6 disabled:text-neutral-400 disabled:!opacity-50 disabled:after:content-['*_Out_of_Stock'] ${!selectedOptions?.size ? "cursor-default text-neutral-400 !opacity-50" : "[&:not(:disabled):hover]:bg-[#F4D3BA]"}`}
+                className={`!ease-in-outdisabled:mb-6 relative flex h-11 items-center gap-1.5 overflow-visible whitespace-nowrap bg-[#FBEDE2] !transition-[background-color] !duration-300 disabled:text-neutral-400 disabled:!opacity-50 ${!selectedOptions?.size ? "cursor-default text-neutral-400 !opacity-50" : "[&:not(:disabled):hover]:bg-[#F4D3BA]"}`}
                 onClick={() => {
                   if (!!selectedOptions?.size) {
                     handleAddToCart();
@@ -188,7 +188,7 @@ export default function ProductCartButton({
       ) : (
         <button
           disabled={!!selectedOptions?.size && !productVariantSku}
-          className={`relative flex h-11 items-center gap-1.5 overflow-visible whitespace-nowrap bg-[#FBEDE2] !transition-[background-color] !duration-300 !ease-in-out after:absolute after:-bottom-2 after:left-0 after:translate-y-full after:text-red-600 disabled:mb-6 disabled:text-neutral-400 disabled:!opacity-50 disabled:after:content-['*_Out_of_Stock'] ${!selectedOptions?.size ? "cursor-default text-neutral-400 !opacity-50" : "[&:not(:disabled):hover]:bg-[#F4D3BA]"}`}
+          className={`relative flex h-11 items-center gap-1.5 overflow-visible whitespace-nowrap bg-[#FBEDE2] !transition-[background-color] !duration-300 !ease-in-out disabled:text-neutral-400 disabled:!opacity-50 ${!selectedOptions?.size ? "cursor-default text-neutral-400 !opacity-50" : "[&:not(:disabled):hover]:bg-[#F4D3BA]"}`}
           onClick={() => {
             if (!!selectedOptions?.size) {
               handleAddToCart();

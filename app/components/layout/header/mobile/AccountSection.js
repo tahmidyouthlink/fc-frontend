@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { signOut } from "firebase/auth";
+import { signOut } from "next-auth/react";
 import toast from "react-hot-toast";
 import { PiSignIn, PiSignOut, PiUser, PiUserCirclePlus } from "react-icons/pi";
-import { auth } from "@/firebase.config";
 import { useLoading } from "@/app/contexts/loading";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import createErrorMessage from "@/app/utils/createErrorMessage";
@@ -24,7 +23,7 @@ export default function AccountSection({ user, setIsNavMenuOpen }) {
   const handleSignOut = async () => {
     setIsPageLoading(true);
     try {
-      await signOut(auth);
+      await signOut({ redirect: false });
       if (pathname.includes("user") || pathname.includes("checkout"))
         router.push("/");
       localStorage.removeItem("cartItems");

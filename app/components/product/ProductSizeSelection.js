@@ -2,6 +2,8 @@ export default function ProductSizeSelection({
   productSizes,
   selectedOptions,
   setSelectedOptions,
+  productVariantSku,
+  showSku,
 }) {
   return (
     <div className="mb-3.5 flex items-center gap-x-2.5">
@@ -25,6 +27,9 @@ export default function ProductSizeSelection({
           );
         })}
       </div>
+      {showSku && (
+        <p className="text-neutral-600">({productVariantSku} available)</p>
+      )}
     </div>
   );
 }

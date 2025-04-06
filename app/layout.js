@@ -24,13 +24,11 @@ export default function RootLayout({ children }) {
       <body className={oxygen.className}>
         <ReactTanstackProvider>
           <NextUIProvider>
-            <AuthProvider>
-              <LoadingProvider>
-                <SessionWrapper>
-                  {children}
-                </SessionWrapper>
-              </LoadingProvider>
-            </AuthProvider>
+            <SessionWrapper>
+              <AuthProvider>
+                <LoadingProvider>{children}</LoadingProvider>
+              </AuthProvider>
+            </SessionWrapper>
           </NextUIProvider>
           <Toaster />
         </ReactTanstackProvider>

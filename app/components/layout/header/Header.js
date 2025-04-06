@@ -6,8 +6,9 @@ import { useLoading } from "@/app/contexts/loading";
 import useProductsInformation from "@/app/hooks/useProductsInformation";
 import MobileNavbar from "./mobile/MobileNavbar";
 import DesktopNavbar from "./desktop/DesktopNavbar";
+import TopHeader from "./TopHeader";
 
-export default function Header() {
+export default function Header({ isTopHeaderEnabled }) {
   const { isUserLoading } = useAuth();
   const { setIsPageLoading } = useLoading();
   const [productList, isProductListLoading, refetch] = useProductsInformation();
@@ -22,10 +23,11 @@ export default function Header() {
   }, [isUserLoading, isProductListLoading, productList, setIsPageLoading]);
 
   return (
-    <header
-      className={`absolute z-10 w-full bg-white px-5 pt-4 text-black shadow-[5px_5px_24px_0_rgba(0,0,0,0.035)] transition-[padding-bottom] duration-300 ease-in-out sm:px-8 sm:pt-5 lg:px-12 lg:py-6 ${isMobileSearchSelected ? "pb-16 sm:pb-20" : "pb-4 sm:pb-5"}`}
-    >
-      <div className="mx-auto flex items-center justify-between xl:max-w-[1200px]">
+    <header className="absolute z-10 w-full bg-white shadow-[5px_5px_24px_0_rgba(0,0,0,0.035)]">
+      {isTopHeaderEnabled && <TopHeader />}
+      <div
+        className={`mx-auto flex items-center justify-between px-5 pt-3 transition-[padding-bottom] duration-300 ease-in-out sm:px-8 sm:pt-3.5 lg:px-12 lg:py-[15px] xl:max-w-[1200px] xl:px-0 ${isMobileSearchSelected ? "pb-[60px]" : "pb-3 sm:pb-3.5"}`}
+      >
         <MobileNavbar
           productList={productList}
           isMobileSearchSelected={isMobileSearchSelected}

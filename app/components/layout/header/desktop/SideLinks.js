@@ -11,7 +11,7 @@ export default function SideLinks({ productList }) {
 
   return (
     <div className="text-neutral-600">
-      <ul className="flex items-center gap-x-2.5 text-xs md:text-sm xl:gap-x-4">
+      <ul className="flex items-center gap-x-2.5 text-xs md:text-sm xl:gap-x-5">
         {/* Shop page button */}
         <li>
           <TransitionLink

@@ -1,26 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { useState } from "react";
+import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { Checkbox } from "@nextui-org/react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import toast from "react-hot-toast";
-import { auth } from "@/firebase.config";
 import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
-import useCustomers from "@/app/hooks/useCustomers";
 import generateCustomerId from "@/app/utils/generateCustomerId";
-import createErrorMessage from "@/app/utils/createErrorMessage";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 
 export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
   const axiosPublic = useAxiosPublic();
   const { setUserData } = useAuth();
   const { setIsPageLoading } = useLoading();
-  const [customerList, isCustomerListLoading, customerRefetch] = useCustomers();
-  const [subscribedEmails, setSubscribedEmails] = useState(null);
   const [isPasswordVisible, SetIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, SetIsConfirmPasswordVisible] =
     useState(false);
@@ -28,12 +23,6 @@ export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
     useState(true);
   const [isNewsletterCheckboxSelected, setIsNewsletterCheckboxSelected] =
     useState(true);
-
-  useEffect(() => {
-    setIsPageLoading(isCustomerListLoading || !customerList?.length);
-
-    return () => setIsPageLoading(false);
-  }, [isCustomerListLoading, customerList, setIsPageLoading]);
 
   const {
     register: registerForRegister,
@@ -65,25 +54,18 @@ export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
     setIsPageLoading(true);
 
     try {
-      // Attempt to create user account with email and password
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        data.email,
-        data.password,
+      const { data: customerList } = await axiosPublic.get(
+        "/allCustomerDetails",
       );
-      toast.success("Account created successfully.");
-
-      // Update user profile with the given name
-      await updateProfile(userCredential?.user, { displayName: data.name });
-
-      const localWishlist = JSON.parse(localStorage.getItem("wishlistItems"));
-      const localCart = JSON.parse(localStorage.getItem("cartItems"));
       const allCustomerIds = customerList?.map(
         (customer) => customer.userInfo?.customerId,
       );
 
       const newUserData = {
         email: data.email,
+        password: data.password,
+        isLinkedWithCredentials: true,
+        isLinkedWithGoogle: false,
         userInfo: {
           customerId: generateCustomerId(allCustomerIds),
           personalInfo: {
@@ -98,22 +80,46 @@ export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
           savedDeliveryAddress: null,
           score: 0,
         },
-        wishlistItems: !!localWishlist?.length ? localWishlist : [],
-        cartItems: !!localCart?.length ? localCart : [],
+        wishlistItems: [],
+        cartItems: [],
       };
 
-      // Store user data to server
-      const response = await axiosPublic.post(
-        "/addCustomerDetails",
-        newUserData,
-      );
-      if (response?.data?.insertedId) setUserData(response?.data);
-      else toast.error("Unable to store user data to server.");
+      // Register user
+      const response = await axiosPublic.post("/customer-signup", newUserData);
 
-      if (
-        isNewsletterCheckboxSelected &&
-        !subscribedEmails?.includes(data.email)
-      ) {
+      if (response?.data?.insertedId) {
+        toast.success("Account created successfully.");
+
+        setUserData(response?.data);
+
+        // Login user with the credentials
+        const result = await signIn("credentials-frontend", {
+          redirect: false,
+          email: data.email,
+          password: data.password,
+        });
+
+        if (result?.error) {
+          toast.error(result?.error);
+        }
+      } else {
+        resetForRegister(
+          {
+            password: "",
+            confirmPassword: "",
+          },
+          { keepValues: true },
+        );
+        return toast.error(response?.data?.message);
+      }
+
+      const { data: subscribedUsers } =
+        await axiosPublic.get("/allNewsletters");
+      const isAlreadySubscribed = subscribedUsers?.some(
+        (subscribedUser) => subscribedUser.email === data.email,
+      );
+
+      if (isNewsletterCheckboxSelected && !isAlreadySubscribed) {
         try {
           const newsletterData = {
             email: data.email,
@@ -133,10 +139,10 @@ export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
       resetForRegister(); // Reset form
       setIsAuthModalOpen(false);
     } catch (error) {
-      toast.error(createErrorMessage(error));
+      toast.error(error?.response?.data?.error);
+    } finally {
+      setIsPageLoading(false);
     }
-
-    setIsPageLoading(false);
   };
 
   // Function that handles form submission error (displays error messages)
@@ -154,21 +160,6 @@ export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
       toast.error("Passwords do not match.");
     else toast.error("Something went wrong. Please try again.");
   };
-
-  useEffect(() => {
-    const getSubscribedEmails = async () => {
-      try {
-        const response = await axiosPublic.get("allNewsletters");
-        setSubscribedEmails(
-          response?.data?.map((item) => item.email).filter((email) => !!email),
-        );
-      } catch (error) {
-        console.log("Error fetching subscribed emails.", error);
-      }
-    };
-
-    getSubscribedEmails();
-  }, [axiosPublic]);
 
   return (
     <form

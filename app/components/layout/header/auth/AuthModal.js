@@ -1,7 +1,7 @@
 import { Modal, ModalBody, ModalContent, ModalHeader } from "@nextui-org/react";
 import RegisterForm from "./RegisterForm";
 import LoginForm from "./LoginForm";
-import GoogleSignIn from "./GoogleSignIn";
+import GoogleSignInButton from "./GoogleSignInButton";
 import ForgotPasswordForm from "./ForgotPasswordForm";
 
 export default function AuthModal({
@@ -47,9 +47,8 @@ export default function AuthModal({
                     <p className="text-xs md:text-sm">or</p>
                     <hr className="h-0.5 w-full bg-neutral-100" />
                   </div>
-                  <GoogleSignIn
-                    isConnected={false}
-                    buttonText={`Sign ${modalContent === "register" ? "up" : "in"}`}
+                  <GoogleSignInButton
+                    ctaText={`Sign ${modalContent === "register" ? "up" : "in"} with Google`}
                     isAuthModalOpen={isAuthModalOpen}
                     setIsAuthModalOpen={setIsAuthModalOpen}
                   />

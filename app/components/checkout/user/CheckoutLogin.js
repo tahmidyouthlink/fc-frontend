@@ -1,27 +1,23 @@
 import { useState } from "react";
+import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import toast from "react-hot-toast";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { auth } from "@/firebase.config";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
-import createErrorMessage from "@/app/utils/createErrorMessage";
 import CheckoutForgotPassword from "./CheckoutForgotPassword";
-import GoogleSignIn from "../../layout/header/auth/GoogleSignIn";
+import GoogleSignInButton from "../../layout/header/auth/GoogleSignInButton";
 
 export default function CheckoutLogin({
-  setUserData,
   onError,
   setIsPageLoading,
   setIsRegisterModalOpen,
 }) {
-  const axiosPublic = useAxiosPublic();
   const [isPasswordVisible, SetIsPasswordVisible] = useState(false);
 
   const {
     register: registerForLogin,
     handleSubmit: handleSubmitForLogin,
     reset: resetForLogin,
+    resetField: resetFieldForLogin,
     formState: { errors: errorsForLogin },
   } = useForm({
     defaultValues: {
@@ -35,50 +31,25 @@ export default function CheckoutLogin({
     setIsPageLoading(true);
 
     try {
-      await signInWithEmailAndPassword(
-        auth,
-        data.loginEmail,
-        data.loginPassword,
-      );
-      toast.success("Successfully logged in.");
+      const result = await signIn("credentials-frontend", {
+        redirect: false,
+        email: data.loginEmail,
+        password: data.loginPassword,
+      });
 
-      const res = await axiosPublic.get(
-        `/customerDetailsViaEmail/${data.loginEmail}`,
-      );
-      if (!res?.data) return toast.error("Failed to fetch user data.");
-
-      const currentUserData = res?.data;
-
-      const localWishlist = JSON.parse(localStorage.getItem("wishlistItems"));
-      const localCart = JSON.parse(localStorage.getItem("cartItems"));
-      const updatedWishlist = !!localWishlist?.length ? localWishlist : [];
-      const updatedCartItems = !!localCart?.length ? localCart : [];
-
-      try {
-        const updatedUserData = {
-          ...currentUserData,
-          wishlistItems: updatedWishlist,
-          cartItems: updatedCartItems,
-        };
-
-        const response = await axiosPublic.put(
-          `/updateUserInformation/${currentUserData?._id}`,
-          updatedUserData,
-        );
-
-        if (!!response?.data?.modifiedCount || !!response?.data?.matchedCount) {
-          setUserData(updatedUserData);
-        }
-      } catch (error) {
-        toast.error("Unable to update user data to server.");
+      if (result?.error) {
+        resetFieldForLogin("loginPassword");
+        return toast.error(result?.error);
+      } else {
+        toast.success("Successfully signed in.");
       }
 
       resetForLogin(); // Reset login fields
     } catch (error) {
-      toast.error(createErrorMessage(error));
+      toast.error(error?.response?.data?.error);
+    } finally {
+      setIsPageLoading(false);
     }
-
-    setIsPageLoading(false);
   };
 
   return (
@@ -166,7 +137,7 @@ export default function CheckoutLogin({
           >
             Sign in
           </button>
-          <GoogleSignIn isConnected={false} buttonText="Sign in" />
+          <GoogleSignInButton ctaText="Sign in with Google" />
         </div>
         {/* Register Modal Button */}
         <div className="w-full font-semibold">

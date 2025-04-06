@@ -66,26 +66,32 @@ export default function Filter({
       arrayKey: "sizes",
       selectionMode: "multiple",
       type: "select",
-      options: [
-        ...new Set(filteredProducts?.flatMap((product) => product.allSizes)),
-        "Clear",
-      ],
+      options: !filteredProducts?.length
+        ? []
+        : [
+            ...new Set(
+              filteredProducts?.flatMap((product) => product.allSizes),
+            ),
+            "Clear",
+          ],
     },
     {
       label: "Colors",
       arrayKey: "colors",
       selectionMode: "multiple",
       type: "select",
-      options: [
-        ...[
-          ...new Set(
-            filteredProducts
-              ?.flatMap((product) => product.availableColors)
-              .map(JSON.stringify),
-          ),
-        ].map(JSON.parse),
-        "Clear",
-      ],
+      options: !filteredProducts?.length
+        ? []
+        : [
+            ...[
+              ...new Set(
+                filteredProducts
+                  ?.flatMap((product) => product.availableColors)
+                  .map(JSON.stringify),
+              ),
+            ].map(JSON.parse),
+            "Clear",
+          ],
     },
     {
       label: "Price",
@@ -94,14 +100,14 @@ export default function Filter({
       type: "range",
       options: [
         {
-          min: !filteredProducts
+          min: !filteredProducts?.length
             ? 0
             : Math.min(
                 ...filteredProducts?.map((product) =>
                   calculateFinalPrice(product, specialOffers),
                 ),
               ),
-          max: !filteredProducts
+          max: !filteredProducts?.length
             ? 0
             : Math.max(
                 ...filteredProducts?.map((product) =>
@@ -158,9 +164,10 @@ export default function Filter({
                     : Array.from(newSelectedKeys),
                 }));
               }}
+              disabled={!filterOption.options.length}
               classNames={{
                 mainWrapper: [
-                  `z-[1] text-neutral-700 [&>button]:px-4 [&>button]:duration-300 hover:[&>button]:bg-[#F4D3BA] ${selectedFilterOptions[filterOption.arrayKey].length ? "[&>button]:bg-[#F4D3BA]" : "[&>button]:bg-[#FBEDE2]"}`,
+                  `z-[1] text-neutral-700 [&>button]:px-4 [&>button]:duration-300 ${!selectedFilterOptions[filterOption.arrayKey].length ? "[&>button]:bg-[#FBEDE2] hover:[&>button]:bg-[#F4D3BA]" : "[&>button]:bg-[#F4D3BA] hover:[&>button]:bg-[#E7BF9E]"} ${!filterOption.options.length ? (!selectedFilterOptions[filterOption.arrayKey].length ? "[&>button]:opacity-50 hover:[&>button]:bg-[#FBEDE2]" : "[&>button]:opacity-40 hover:[&>button]:bg-[#F4D3BA]") : ""}`,
                 ],
                 label: [
                   "text-neutral-700 static mr-4 group-data-[filled=true]:scale-100 group-data-[filled=true]:-translate-y-0",
@@ -236,10 +243,10 @@ export default function Filter({
                   >{`: ৳ ${selectedFilterOptions.price.min?.toLocaleString()} - ৳ ${selectedFilterOptions.price.max?.toLocaleString()}`}</span>
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="items-start gap-y-8 p-4">
-                <div className="flex gap-x-2.5">
+              <PopoverContent className="min-w-56 items-start gap-y-8 p-4">
+                <div className="flex w-full gap-x-2.5">
                   <Input
-                    className="w-fit font-semibold"
+                    className="font-semibold"
                     type="number"
                     label="Min price:"
                     labelPlacement="outside"
@@ -274,7 +281,7 @@ export default function Filter({
                     }}
                   />
                   <Input
-                    className="w-fit font-semibold"
+                    className="font-semibold"
                     type="number"
                     label="Max price:"
                     labelPlacement="outside"

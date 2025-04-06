@@ -32,7 +32,7 @@ export default function ProductInfo({
   };
 
   return (
-    <div className="relative mt-4 flex flex-col xl:mt-0 xl:h-[calc(100dvh-112px-14px)] xl:grow">
+    <div className="relative mt-4 flex flex-col xl:mt-0 xl:h-[calc(100dvh-(var(--header-height-lg)+var(--section-padding-double)))] xl:grow">
       {/* Shape/SVG (circle with star) */}
       <div className="absolute -right-16 top-10 z-[-1] aspect-square w-52 translate-x-1/2 opacity-85 sm:-right-10 sm:max-md:w-64 lg:-right-20 min-[1200px]:hidden">
         <Image
@@ -57,7 +57,7 @@ export default function ProductInfo({
         specialOffer={specialOffer}
       />
       {/* Divider */}
-      <hr className="h-0.5 bg-neutral-100 sm:max-md:mb-4 xl:mb-4" />
+      <hr className="mt-7 h-0.5 bg-neutral-100 sm:max-md:mb-4 xl:mb-4" />
       {/* Details Section */}
       <ProductInfoDetails
         productInfoDetails={{
