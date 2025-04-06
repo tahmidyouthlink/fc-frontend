@@ -39,22 +39,22 @@ export async function middleware(req) {
   if (/\/product\/?$/i.test(pathname))
     return NextResponse.redirect(new URL("/shop", pathname));
 
-  // Redirect to login page, if user tries to access any user page without being logged in
-  if (!session && pathname.includes("user")) {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+
+  // If the user is not logged in and tries to access any of the user pages, redirect to homepage
+  if (!token && pathname.includes("user")) {
     return NextResponse.redirect(new URL("/", pathname));
   }
 
   // 🔹 Check if user is accessing backend dashboard
   const isBackendRoute = nextUrlPathname.startsWith("/dash-board");
 
-  // 🔹 Redirect frontend users if no session but allow backend access check separately
-  if (!session && !isBackendRoute) {
+  // 🔹 Redirect frontend users if no token but allow backend access check separately
+  if (!token && !isBackendRoute) {
     return NextResponse.next(); // Allow frontend pages to load normally
   }
 
   if (isBackendRoute) {
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-
     // If the user is not logged in, redirect to login
     if (!token && pathname.includes("dash-board")) {
       return NextResponse.redirect(
@@ -125,11 +125,6 @@ export async function middleware(req) {
         return NextResponse.redirect(new URL("/unauthorized", req.url));
       }
     }
-  }
-
-  // If the user is not logged in and tries to access any of the user pages, redirect to homepage
-  if (!token && pathname.includes("user")) {
-    return NextResponse.redirect(new URL("/", pathname));
   }
 
   return NextResponse.next();
