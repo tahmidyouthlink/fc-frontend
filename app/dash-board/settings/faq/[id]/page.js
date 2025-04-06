@@ -136,9 +136,16 @@ const EditFAQPage = () => {
         className='absolute inset-0 z-0 top-16 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[50%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-md mx-auto py-3 md:py-6 sticky top-0 z-10 bg-gray-50'>
-        <div className='flex items-center justify-between px-8'>
+      <div className='max-w-screen-xl mx-auto py-3 md:py-6 sticky top-0 z-10 bg-gray-50'>
+        <div className='flex items-center justify-between px-8 gap-4'>
+
           <h3 className='flex-1 font-semibold text-base md:text-xl lg:text-3xl text-neutral-700'>Edit FAQ</h3>
+
+          <div className='flex justify-start'>
+            <button type="button" onClick={() => append({ question: "", answer: "" })} className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'>
+              Add <FaPlus size={16} />
+            </button>
+          </div>
 
           <Link // Trigger the modal on click
             className="flex items-center gap-2 text-[10px] md:text-base justify-end"
@@ -152,7 +159,7 @@ const EditFAQPage = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="2xl:max-w-screen-md 2xl:mx-auto relative flex flex-col gap-8">
+      <form onSubmit={handleSubmit(onSubmit)} className="2xl:max-w-screen-xl 2xl:mx-auto relative flex flex-col gap-8">
 
         <div className='flex flex-col gap-8 items-center bg-white p-4 lg:p-8 drop-shadow rounded-lg'>
 
@@ -185,7 +192,7 @@ const EditFAQPage = () => {
             )}
           </div>
 
-          <div className='flex flex-col gap-4 rounded-lg h-fit'>
+          <div className='flex flex-col gap-4 rounded-lg h-fit w-full'>
             <label htmlFor='faqDescription' className='flex justify-start font-medium text-[#9F5216]'>
               Details About FAQ *
             </label>
@@ -210,69 +217,65 @@ const EditFAQPage = () => {
 
         <div className='grid grid-cols-1 gap-4 w-full'>
           <h3 className='font-semibold text-[#9F5216] px-8'>Question & Answers</h3>
-          {fields.map((faq, index) => (
-            <div key={faq.id} className="bg-white p-4 lg:p-8 drop-shadow rounded-lg">
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 w-full'>
+            {fields.map((faq, index) => (
+              <div key={faq.id} className="bg-white p-4 lg:p-8 drop-shadow rounded-lg h-fit">
 
-              <div className="relative w-full">
-                <input
-                  type="text"
-                  className="w-full border-b-2 border-neutral-300 bg-transparent py-2 text-neutral-800 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-neutral-400 text-sm"
-                  placeholder="Enter question"
-                  {...register(`faqs.${index}.question`, {
-                    required: {
-                      value: true,
-                      message: "Question is required.",
-                    },
-                    minLength: {
-                      value: 5,
-                      message: "Question must have at least 5 characters.",
-                    },
-                  })}
-                />
-                {errors.faqs?.[index]?.question && (
-                  <p className="absolute -bottom-5 left-0 text-xs font-semibold text-red-500">
-                    {errors.faqs[index].question.message}
-                  </p>
-                )}
-              </div>
-
-              <div className={`flex flex-col gap-4 rounded-lg h-fit pt-8`}>
-                <Controller
-                  name={`faqs.${index}.answer`}
-                  control={control}
-                  defaultValue=""
-                  rules={{
-                    required: "Answer is required.",
-                    validate: (value) => {
-                      const strippedText = DOMPurify.sanitize(value, { ALLOWED_TAGS: [] }).trim();
-                      return strippedText.length >= 10 || "Answer must be at least 10 characters.";
-                    },
-                  }}
-                  render={({ field }) => (
-                    <EditorFAQ
-                      value={field.value}
-                      onChange={(value) => field.onChange(value)}
-                    />
+                <div className="relative w-full">
+                  <input
+                    type="text"
+                    className="w-full border-b-2 border-neutral-300 bg-transparent py-2 text-neutral-800 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-neutral-400 text-sm"
+                    placeholder="Enter question"
+                    {...register(`faqs.${index}.question`, {
+                      required: {
+                        value: true,
+                        message: "Question is required.",
+                      },
+                      minLength: {
+                        value: 5,
+                        message: "Question must have at least 5 characters.",
+                      },
+                    })}
+                  />
+                  {errors.faqs?.[index]?.question && (
+                    <p className="absolute -bottom-5 left-0 text-xs font-semibold text-red-500">
+                      {errors.faqs[index].question.message}
+                    </p>
                   )}
-                />
-                {errors.faqs?.[index]?.answer && (
-                  <p className="text-red-600 text-left pt-1">
-                    {errors.faqs[index].answer.message}
-                  </p>
-                )}
+                </div>
+
+                <div className={`flex flex-col gap-4 rounded-lg h-fit pt-8`}>
+                  <Controller
+                    name={`faqs.${index}.answer`}
+                    control={control}
+                    defaultValue=""
+                    rules={{
+                      required: "Answer is required.",
+                      validate: (value) => {
+                        const strippedText = DOMPurify.sanitize(value, { ALLOWED_TAGS: [] }).trim();
+                        return strippedText.length >= 10 || "Answer must be at least 10 characters.";
+                      },
+                    }}
+                    render={({ field }) => (
+                      <EditorFAQ
+                        value={field.value}
+                        onChange={(value) => field.onChange(value)}
+                      />
+                    )}
+                  />
+                  {errors.faqs?.[index]?.answer && (
+                    <p className="text-red-600 text-left pt-1">
+                      {errors.faqs[index].answer.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className='flex justify-end pt-2'>
+                  <p type="button" className='cursor-pointer hover:bg-gray-50 p-3 rounded-full' onClick={() => remove(index)}><RiDeleteBinLine size={20} /></p>
+                </div>
+
               </div>
-
-              <div className='flex justify-end pt-2'>
-                <p type="button" className='cursor-pointer hover:bg-gray-50 p-3 rounded-full' onClick={() => remove(index)}><RiDeleteBinLine size={20} /></p>
-              </div>
-
-            </div>
-          ))}
-
-          <div className='flex justify-start'>
-            <button type="button" onClick={() => append({ question: "", answer: "" })} className='relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700'>
-              <FaPlus size={16} />
-            </button>
+            ))}
           </div>
 
         </div>

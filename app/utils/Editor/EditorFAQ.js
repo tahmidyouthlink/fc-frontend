@@ -6,10 +6,11 @@ const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 const EditorFAQ = ({ value, onChange, placeholder = "Write your answer here..." }) => {
   const modules = {
-    toolbar: [['bold', 'italic', 'underline']],
+    toolbar: [
+      ['bold', 'italic', 'underline'],
+      ['link'],
+    ],
   };
-
-  const formats = ["bold", "italic", "underline"];
 
   return (
     <div className="custom-editor-faq">
@@ -17,7 +18,6 @@ const EditorFAQ = ({ value, onChange, placeholder = "Write your answer here..." 
         value={value}
         onChange={onChange}
         modules={modules}
-        formats={formats} // ✅ Enables bold, italic, underline
         placeholder={placeholder} // ✅ Add placeholder here
       />
     </div>

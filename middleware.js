@@ -17,7 +17,7 @@ const fetchUserPermissions = async (userId) => {
     const data = await response.json();
 
     return {
-      role: data?.role || "viewer", // Default to "viewer" if not found
+      role: data?.role || "Viewer", // Default to "viewer" if not found
       permissions: data?.permissions || {} // Default to an empty object if no permissions found
     };
 

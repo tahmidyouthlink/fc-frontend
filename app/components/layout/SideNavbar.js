@@ -5,7 +5,7 @@ import { BiCategory, BiPurchaseTagAlt, BiTransferAlt } from "react-icons/bi";
 import { RxDashboard } from "react-icons/rx";
 import { MdPayment, MdOutlineLocationOn, MdOutlineInventory2, MdOutlinePrivacyTip, MdOutlineLocalShipping } from "react-icons/md";
 import { RiContractLine } from "react-icons/ri";
-import { TbBrandGoogleAnalytics, TbMessageCircleQuestion, TbClipboardList, TbBuildingBank } from "react-icons/tb";
+import { TbBrandGoogleAnalytics, TbMessageCircleQuestion, TbClipboardList, TbBuildingBank, TbHomeCog } from "react-icons/tb";
 import Image from "next/image";
 import logoWhiteImage from "/public/logos/logo.png";
 import { FaChevronRight, FaAngleDown } from "react-icons/fa6";
@@ -165,6 +165,7 @@ const SideNavbar = ({ onClose }) => {
       permission: permissions["Settings"]?.access,
       links: [
         { label: "User Management", link: "/dash-board/settings/enrollment", icon: <LiaUsersCogSolid /> },
+        { label: "Homepage Settings", link: "/dash-board/settings/homepage-settings", icon: <TbHomeCog /> },
         {
           name: "Legal Policies",
           icon: <LuNewspaper />,

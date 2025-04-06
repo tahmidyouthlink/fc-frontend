@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 
-const TabsForUserManagement = ({ activeTab, setActiveTab, tabs }) => {
+const TabsForSettings = ({ activeTab, setActiveTab, tabs }) => {
 
   return (
     <div className="flex flex-wrap items-center gap-3 bg-gray-50">
@@ -18,4 +18,4 @@ const TabsForUserManagement = ({ activeTab, setActiveTab, tabs }) => {
   );
 };
 
-export default TabsForUserManagement;
+export default TabsForSettings;
