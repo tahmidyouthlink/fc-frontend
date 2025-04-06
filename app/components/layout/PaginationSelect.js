@@ -26,7 +26,7 @@ const PaginationSelect = ({ options, value, onChange }) => {
       label={value} // ✅ Shows selected value dynamically
     >
       {options.map((option) => (
-        <SelectItem key={option.toString()} value={option.toString()}>
+        <SelectItem key={option.toString()} value={option.toString()} textValue={option.toString()}>
           {option}
         </SelectItem>
       ))}

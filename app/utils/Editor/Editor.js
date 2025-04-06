@@ -11,7 +11,7 @@ const Editor = ({ value, onChange }) => {
       [{ 'align': [] }],
       [{ 'color': [] }, { 'background': [] }],
       [{ 'list': 'bullet' }],
-      ['link', 'image'],
+      ['link'],
     ],
   };
 

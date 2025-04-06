@@ -1,5 +1,4 @@
 "use client";
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import useAxiosPublic from "../hooks/useAxiosPublic";
@@ -21,6 +20,7 @@ export const AuthProvider = ({ children }) => {
   const { data: session, status } = useSession();
   const axiosPublic = useAxiosPublic();
   const [customerList, isCustomerListLoading, customerRefetch] = useCustomers();
+  const [existingUserData, setExistingUserData] = useState(null);
 
   // Listen for changes to the user's authentication state
   // When the token changes, update the states accordingly
@@ -114,9 +114,37 @@ export const AuthProvider = ({ children }) => {
   ]);
 
   // Provide the user state, loading state, and user data to child components through context
+  useEffect(() => {
+    const fetchExistingUserInformation = async () => {
+      // Ensure _id is defined and valid
+      if (
+        status === "loading" ||
+        !session?.user?._id ||
+        session?.user?._id.length !== 24
+      )
+        return;
+
+      try {
+        // Set loading to true when the fetch starts
+        setIsUserLoading(true);
+
+        const res = await axiosPublic.get(
+          `/single-existing-user/${session?.user?._id}`,
+        );
+        setExistingUserData(res.data);
+      } catch (error) {
+        console.error("Error fetching existing user data:", error);
+      } finally {
+        setIsUserLoading(false);
+      }
+    };
+    fetchExistingUserInformation();
+  }, [session?.user?._id, axiosPublic, status]);
+
+  // Provide the user state and loading state to child components through context
   return (
     <AuthContext.Provider
-      value={{ user, userData, setUserData, isUserLoading }}
+      value={{ user, userData, setUserData, isUserLoading, existingUserData }}
     >
       {children}
     </AuthContext.Provider>

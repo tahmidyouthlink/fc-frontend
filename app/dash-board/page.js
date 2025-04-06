@@ -3,14 +3,8 @@ import React from 'react';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
-import { useSession } from 'next-auth/react';
-import Loading from '../components/shared/Loading/Loading';
 
 const DashboardMainPage = () => {
-
-  const { data: session, status } = useSession();
-
-  if (status === "loading") return <Loading />;
 
   return (
     <div className='bg-gray-50 min-h-screen relative'>
@@ -33,15 +27,6 @@ const DashboardMainPage = () => {
         }}
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
-
-      {status === "authenticated" &&
-        <div className='flex flex-col justify-center gap-2 p-6 relative'>
-          <h1>Welcome, {session?.user?.username}</h1>
-          <p>Email: {session?.user?.email}</p>
-          <p>Date of birth: {session?.user?.dob}</p>
-          <p>Full name: {session?.user?.fullName}</p>
-        </div>
-      }
 
     </div>
   );

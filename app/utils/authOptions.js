@@ -24,16 +24,11 @@ export const authOptions = {
           );
 
           if (!data) {
-            throw new Error("Invalid email/username or password"); // ❌ Prevent returning `null`
+            throw new Error("Invalid email/username or password"); // ❌ Prevent returning null
           }
 
           return {
-            id: data._id,
-            email: data.email,
-            username: data.username,
-            role: data.role,
-            dob: data.dob,
-            fullName: data.fullName,
+            _id: data._id,
           };
         } catch (error) {
           // Return specific error messages from backend if available
@@ -58,15 +53,13 @@ export const authOptions = {
             credentials,
           );
 
-          console.log("customer-login data", data);
-
           if (!data) {
-            throw new Error("Invalid email/username or password"); // ❌ Prevent returning `null`
+            throw new Error("Invalid email/username or password"); // ❌ Prevent returning null
           }
 
           return {
-            email: data.email,
-            name: data.userInfo.personalInfo.customerName,
+            email: data?.email,
+            name: data?.userInfo?.personalInfo?.customerName,
           };
         } catch (error) {
           // Return specific error messages from backend if available
@@ -86,26 +79,17 @@ export const authOptions = {
   callbacks: {
     async jwt({ token, user, profile }) {
       if (user) {
-        token.id = user.id;
-        token.username = user.username;
-        token.role = user.role;
-        token.dob = user.dob;
-        token.fullName = user.fullName;
-        token.email = user.email;
-        token.name = user.name || profile.name;
+        token._id = user?._id;
+        token.email = user?.email;
+        token.name = user?.name || profile?.name;
       }
 
       return token;
     },
     async session({ session, token }) {
-      session.user.id = token.id;
-      session.user.username = token.username;
-      session.user.role = token.role;
-      session.user.dob = token.dob;
-      session.user.fullName = token.fullName;
+      session.user._id = token._id;
       session.user.email = token.email;
       session.user.name = token.name;
-
       return session;
     },
   },

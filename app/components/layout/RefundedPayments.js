@@ -6,17 +6,28 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Toolti
 import { IoMdClose } from 'react-icons/io';
 import { format, startOfToday, endOfToday, startOfYesterday, endOfYesterday, subDays, subMonths, startOfMonth, endOfMonth, isValid } from 'date-fns';
 import { today, getLocalTimeZone } from "@internationalized/date";
+import { useAuth } from '@/app/contexts/auth';
 
 const RefundedPayments = () => {
   const [orderList, isOrderPending] = useOrders();
   const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
-  const [activeFilter, setActiveFilter] = useState('all');
+  const [activeFilter, setActiveFilter] = useState('today');
   const [showDateRangePicker, setShowDateRangePicker] = useState(true); // New state
   const [selected, setSelected] = useState(['bKash', 'SSLCommerz']);
+  // const { existingUserData, isUserLoading } = useAuth();
+  // const [isDateRangeButtonAllowed, setIsDateRangeButtonAllowed] = useState(false);
+
+  // useEffect(() => {
+  //   // Fetch user data if needed or check the permission dynamically
+  //   if (existingUserData) {
+  //     // Check if the user has permission to add a product
+  //     setIsDateRangeButtonAllowed(existingUserData?.permissions?.["Finances"]?.actions?.['Refunded Date range filtering'] ?? false);
+  //   }
+  // }, [existingUserData]);
 
   useEffect(() => {
     // Set default date range to Today when the component mounts
-    handleDateFilter('all');
+    handleDateFilter('today');
   }, []);
 
   const parseDate = (dateString) => {
@@ -107,81 +118,60 @@ const RefundedPayments = () => {
       });
     };
 
-    if (activeFilter === "all") {
-      // Process all orders without date filtering
-      calculateTotals(orderList);
-    } else {
-      // Convert filter dates to Date objects
-      const startDateObj = new Date(filterStartDate);
-      const endDateObj = new Date(filterEndDate);
+    // Convert filter dates to Date objects
+    const startDateObj = new Date(filterStartDate);
+    const endDateObj = new Date(filterEndDate);
 
-      // Normalize dates to start and end of the day
-      const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0));
-      const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999));
+    // Normalize dates to start and end of the day
+    const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0));
+    const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999));
 
-      // Filter orders within the date range
-      const filteredOrders = orderList?.filter((order) => {
-        const orderDate = parseDate(order?.dateTime);
+    // Filter orders within the date range
+    const filteredOrders = orderList?.filter((order) => {
+      const orderDate = parseDate(order?.dateTime);
 
-        return (
-          orderDate >= adjustedStartDate &&
-          orderDate <= adjustedEndDate &&
-          order?.paymentInfo?.paymentStatus === "Refunded"
-        );
-      });
+      return (
+        orderDate >= adjustedStartDate &&
+        orderDate <= adjustedEndDate &&
+        order?.paymentInfo?.paymentStatus === "Refunded"
+      );
+    });
 
-      calculateTotals(filteredOrders);
-    }
+    calculateTotals(filteredOrders);
 
     return { bKashTransactions, sslCommerzTransactions, totalBKashRevenue, totalSSLCommerzRevenue };
-  }, [orderList, filterStartDate, filterEndDate, activeFilter]);
+  }, [orderList, filterStartDate, filterEndDate]);
 
   const paymentMethodData = useMemo(() => {
     const dailyData = {};
 
-    if (activeFilter === "all") {
-      orderList?.forEach((order) => {
-        if (order?.paymentInfo?.paymentStatus === "Refunded") {
-          const orderDate = parseDate(order.dateTime);
-          const orderDateFormatted = format(orderDate, 'yyyy-MM-dd');
-          if (!dailyData[orderDateFormatted]) {
-            dailyData[orderDateFormatted] = { bKashTransactions: 0, sslCommerzTransactions: 0 };
-          }
-          if (order.paymentInfo.paymentMethod === "bKash") {
-            dailyData[orderDateFormatted].bKashTransactions += 1;
-          } else if (order.paymentInfo.paymentMethod === "SSL") {
-            dailyData[orderDateFormatted].sslCommerzTransactions += 1;
-          }
-        }
-      });
-    } else {
-      const startDateObj = new Date(filterStartDate);
-      const endDateObj = new Date(filterEndDate);
-      const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0));
-      const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999));
+    const startDateObj = new Date(filterStartDate);
+    const endDateObj = new Date(filterEndDate);
+    const adjustedStartDate = new Date(startDateObj.setHours(0, 0, 0, 0));
+    const adjustedEndDate = new Date(endDateObj.setHours(23, 59, 59, 999));
 
-      orderList?.forEach((order) => {
-        const orderDate = parseDate(order.dateTime);
-        const orderDateFormatted = format(orderDate, 'yyyy-MM-dd');
-        if (orderDate >= adjustedStartDate && orderDate <= adjustedEndDate && order?.paymentInfo?.paymentStatus === "Refunded") {
-          if (!dailyData[orderDateFormatted]) {
-            dailyData[orderDateFormatted] = { bKashTransactions: 0, sslCommerzTransactions: 0 };
-          }
-          if (order.paymentInfo.paymentMethod === "bKash") {
-            dailyData[orderDateFormatted].bKashTransactions += 1;
-          } else if (order.paymentInfo.paymentMethod === "SSL") {
-            dailyData[orderDateFormatted].sslCommerzTransactions += 1;
-          }
+    orderList?.forEach((order) => {
+      const orderDate = parseDate(order.dateTime);
+      const orderDateFormatted = format(orderDate, 'yyyy-MM-dd');
+      if (orderDate >= adjustedStartDate && orderDate <= adjustedEndDate && order?.paymentInfo?.paymentStatus === "Refunded") {
+        if (!dailyData[orderDateFormatted]) {
+          dailyData[orderDateFormatted] = { bKashTransactions: 0, sslCommerzTransactions: 0 };
         }
-      });
-    }
+        if (order.paymentInfo.paymentMethod === "bKash") {
+          dailyData[orderDateFormatted].bKashTransactions += 1;
+        } else if (order.paymentInfo.paymentMethod === "SSL") {
+          dailyData[orderDateFormatted].sslCommerzTransactions += 1;
+        }
+      }
+    });
 
-    return Object.keys(dailyData).map((date) => ({
+    return Object?.keys(dailyData)?.map((date) => ({
       date,
       bKashTransactions: dailyData[date].bKashTransactions,
       sslCommerzTransactions: dailyData[date].sslCommerzTransactions,
     }));
-  }, [orderList, filterStartDate, filterEndDate, activeFilter]);
+
+  }, [orderList, filterStartDate, filterEndDate]);
 
   // Memoize filtered data to group by hour for today or yesterday
   const hourlyPaymentData = useMemo(() => {
@@ -203,7 +193,7 @@ const RefundedPayments = () => {
         order.paymentInfo?.paymentStatus === "Refunded";
     });
 
-    if (!filteredOrders.length) return Array.from({ length: 24 }, (_, hour) => ({
+    if (!filteredOrders?.length) return Array.from({ length: 24 }, (_, hour) => ({
       hour: `${hour}:00`,
       bKashTransactions: 0,
       sslCommerzTransactions: 0,
@@ -217,7 +207,7 @@ const RefundedPayments = () => {
     }));
 
     // Group orders by the hour
-    filteredOrders.forEach((order) => {
+    filteredOrders?.forEach((order) => {
       const orderDate = parseDate(order.dateTime);
       const hour = orderDate.getHours();
       if (order.paymentInfo?.paymentMethod === "bKash") {
@@ -245,7 +235,7 @@ const RefundedPayments = () => {
       },
     });
 
-    setActiveFilter('all');
+    setActiveFilter('today');
     setShowDateRangePicker(true);
   };
 
@@ -309,6 +299,10 @@ const RefundedPayments = () => {
   // Set the maximum value for the Y-axis (slightly above the highest transaction count, minimum of 20)
   const maxYValue = Math.max(Math.ceil(Math.max(maxBKash, maxSSLCommerz, maxHourlyBKash, maxHourlySSLCommerz) * 1.1)); // Ensure minimum of 20
 
+  // if (isOrderPending || isUserLoading) {
+  //   return <SmallHeightLoading />;
+  // }
+
   if (isOrderPending) {
     return <SmallHeightLoading />;
   }
@@ -317,13 +311,9 @@ const RefundedPayments = () => {
     <div className="space-y-5 relative">
 
       <div className="flex flex-wrap mt-6 justify-center lg:justify-end items-center gap-3">
+
         <div className="flex items-center justify-center gap-2">
-          <button
-            onClick={() => handleDateFilter('all')}
-            className={`px-2 py-1 text-xs md:text-sm md:py-2 md:px-4 ${activeFilter === 'all' ? 'text-[#D2016E] border rounded-full border-[#D2016E] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
-          >
-            All
-          </button>
+
           <button
             onClick={() => handleDateFilter('today')}
             className={`px-2 py-1 text-xs md:text-sm md:py-2 md:px-4 ${activeFilter === 'today' ? 'text-[#D2016E] border rounded-full border-[#D2016E] font-semibold' : "text-neutral-500 font-semibold border border-gray-200 rounded-full"}`}
@@ -348,6 +338,7 @@ const RefundedPayments = () => {
           >
             Last Month
           </button>
+
         </div>
 
         <div className='flex items-center gap-2'>
@@ -378,7 +369,9 @@ const RefundedPayments = () => {
             </button>
           )}
         </div>
+
       </div>
+
       <div className='flex flex-col lg:flex-row items-center justify-center gap-6'>
 
         {/* Summary Section */}
@@ -387,13 +380,13 @@ const RefundedPayments = () => {
           <div className='flex flex-row lg:flex-col xl:flex-row items-center justify-center gap-6 w-full'>
             {/* Total Order Count */}
             <div className="w-full border rounded-lg p-4 md:p-6 lg:p-8 space-y-3">
-              <p className="text-xs md:text-sm xl:text-base font-semibold">Total Refunded Order Count</p>
+              <p className="text-xs md:text-sm xl:text-base font-semibold">Total Refunds</p>
               <h3 className="font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl">{totalTransactions}</h3>
             </div>
 
             {/* Total Amount Received */}
             <div className="w-full border rounded-lg p-4 md:p-6 lg:p-8 space-y-3">
-              <p className="text-xs md:text-sm xl:text-base font-semibold">Total Amount refunded</p>
+              <p className="text-xs md:text-sm xl:text-base font-semibold">Total refunded amount</p>
               <h3 className="font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl">
                 ৳ {totalRevenue.toFixed(2)}
               </h3>
@@ -462,8 +455,10 @@ const RefundedPayments = () => {
             </div>
           )}
         </div>
+
       </div>
-    </div>
+
+    </div >
   );
 };
 

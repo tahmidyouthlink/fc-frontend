@@ -22,16 +22,16 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={oxygen.className}>
-        <ReactTanstackProvider>
-          <NextUIProvider>
-            <SessionWrapper>
+        <SessionWrapper>
+          <ReactTanstackProvider>
+            <NextUIProvider>
               <AuthProvider>
                 <LoadingProvider>{children}</LoadingProvider>
               </AuthProvider>
-            </SessionWrapper>
-          </NextUIProvider>
-          <Toaster />
-        </ReactTanstackProvider>
+            </NextUIProvider>
+            <Toaster />
+          </ReactTanstackProvider>
+        </SessionWrapper>
       </body>
     </html>
   );

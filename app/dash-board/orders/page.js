@@ -14,7 +14,6 @@ import { IoMdClose } from 'react-icons/io';
 import Papa from 'papaparse';
 import useOrders from '@/app/hooks/useOrders';
 import CustomPagination from '@/app/components/layout/CustomPagination';
-import TabsOrder from '@/app/components/layout/TabsOrder';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 import arrowSvgImage from "/public/card-images/arrow.svg";
@@ -34,6 +33,9 @@ import ProductExpandedImageModalOrder from '@/app/components/product/ProductExpa
 import { TbColumnInsertRight } from 'react-icons/tb';
 import { HiOutlineDownload } from "react-icons/hi";
 import PaginationSelect from '@/app/components/layout/PaginationSelect';
+import { useAuth } from '@/app/contexts/auth';
+import TabsOrder from '@/app/components/layout/TabsOrder';
+
 const PrintButton = dynamic(() => import("@/app/components/layout/PrintButton"), { ssr: false });
 
 const initialColumns = ['Order Number', 'Date & Time', 'Customer Name', 'Order Amount', 'Order Status', 'Action', 'Email', 'Phone Number', 'Alt. Phone Number', 'Shipping Method', 'Payment Status', 'Payment Method'];
@@ -53,7 +55,6 @@ const columnsConfig = {
 };
 
 const OrdersPage = () => {
-  const isAdmin = true;
   const searchParams = useSearchParams();
   const promo = searchParams.get('promo');
   const offer = searchParams.get('offer');
@@ -90,6 +91,10 @@ const OrdersPage = () => {
   const [selectedHandler, setSelectedHandler] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isImageExpanded, setIsImageExpanded] = useState(false);
+  const { existingUserData, isUserLoading } = useAuth();
+  const role = existingUserData?.role;
+  const isAuthorized = role === "Owner" || role === "Editor";
+  const isOwner = role === "Owner";
 
   // Load saved state from localStorage or use defaults
   useEffect(() => {
@@ -225,8 +230,34 @@ const OrdersPage = () => {
     setPage(0); // Reset to first page when changing items per page
   };
 
+  // Function to get filtered orders based on the selected tab and sort by last status change
+  const getFilteredOrders = () => {
+    const cleanTab = selectedTab.split(' (')[0];
+    let filtered = [];
+
+    switch (cleanTab) {
+      case 'New Orders':
+        filtered = orderList?.filter(order => order?.orderStatus === 'Pending');
+        break;
+      case 'Active Orders':
+        filtered = orderList?.filter(order => ['Processing', 'Shipped', 'On Hold'].includes(order?.orderStatus));
+        break;
+      case 'Completed Orders':
+        filtered = orderList?.filter(order => order?.orderStatus === 'Delivered');
+        break;
+      case 'Returns & Refunds':
+        filtered = orderList?.filter(order => ['Return Requested', 'Request Accepted', 'Request Declined', 'Return Initiated', 'Refunded'].includes(order?.orderStatus));
+        break;
+      default:
+        filtered = orderList;
+    }
+
+    // Sort the filtered orders based on last status change, most recent first
+    return filtered?.sort((a, b) => new Date(b.lastStatusChange) - new Date(a.lastStatusChange));
+  };
+
   // Filter orders based on search query and date range
-  const searchedOrders = orderList?.filter(order => {
+  const searchedOrders = getFilteredOrders()?.filter(order => {
 
     const query = searchQuery.toLowerCase();
     const isNumberQuery = !isNaN(query) && query.trim() !== '';
@@ -313,32 +344,6 @@ const OrdersPage = () => {
   const tabsWithCounts = useMemo(() => {
     return orderStatusTabs?.map(tab => `${tab} (${counts[tab] || 0})`);
   }, [counts]);
-
-  // Function to get filtered orders based on the selected tab and sort by last status change
-  const getFilteredOrders = () => {
-    const cleanTab = selectedTab.split(' (')[0];
-    let filtered = [];
-
-    switch (cleanTab) {
-      case 'New Orders':
-        filtered = orderList?.filter(order => order?.orderStatus === 'Pending');
-        break;
-      case 'Active Orders':
-        filtered = orderList?.filter(order => ['Processing', 'Shipped', 'On Hold'].includes(order?.orderStatus));
-        break;
-      case 'Completed Orders':
-        filtered = orderList?.filter(order => order?.orderStatus === 'Delivered');
-        break;
-      case 'Returns & Refunds':
-        filtered = orderList?.filter(order => ['Return Requested', 'Request Accepted', 'Request Declined', 'Return Initiated', 'Refunded'].includes(order?.orderStatus));
-        break;
-      default:
-        filtered = orderList;
-    }
-
-    // Sort the filtered orders based on last status change, most recent first
-    return filtered?.sort((a, b) => new Date(b.lastStatusChange) - new Date(a.lastStatusChange));
-  };
 
   // Filtered orders based on the selected tab
   const filteredOrders = isFilterActive ? searchedOrders : getFilteredOrders();
@@ -650,20 +655,9 @@ const OrdersPage = () => {
 
   // Adjust this logic to correctly determine the visibility of the Undo button
   const checkUndoAvailability = (order) => {
-    if (!order.undoAvailableUntil || !isAdmin) return false;
+    if (!order.undoAvailableUntil) return false;
     return new Date(order.undoAvailableUntil) > new Date(); // Check if undo is still valid
   };
-
-  // Adjust this logic to correctly determine the visibility of the Undo button - local storage previous logic
-  // const isUndoAvailable = (order) => {
-  //   if (!isAdmin) return false;
-  //   const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
-  //   const lastChange = new Date(order.lastStatusChange);
-
-  //   // Check localStorage to see if the undo button should be visible
-  //   const isVisible = localStorage.getItem(`undoVisible_${order._id}`);
-  //   return lastChange >= sixHoursAgo && isVisible;
-  // };
 
   // sending mail to customer
   const sendOrderEmail = (order, actionType) => {
@@ -1068,22 +1062,6 @@ const OrdersPage = () => {
     XLSX.writeFile(workbook, `${fileName}.xlsx`);
   };
 
-  // After delivered, only admin can change this within 7 days of order
-  // const isSevenDaysOrMore = (lastStatusChange) => {
-  //   const today = new Date();
-  //   const sevenDaysAgo = subDays(today, 7);
-  //   return isBefore(parseISO(lastStatusChange), sevenDaysAgo);
-  // };
-
-  // Disable the button based on admins or staffs
-  // const shouldDisableButton = (orderStatus, lastStatusChange, isAdmin) => {
-  //   if (!isAdmin) return false; // If admin, do not disable
-  //   if (['Delivered', 'Requested Return', 'Refunded'].includes(orderStatus)) {
-  //     return isSevenDaysOrMore(lastStatusChange); // Disable if last status change was 7 or more days ago
-  //   }
-  //   return false;
-  // };
-
   const handleDownload = (imgUrl) => {
     if (!imgUrl) return;
 
@@ -1107,7 +1085,7 @@ const OrdersPage = () => {
     }
   }, [paginatedOrders]);
 
-  if (isOrderListPending || isShippingPending) {
+  if (isOrderListPending || isShippingPending || isUserLoading) {
     return <Loading />;
   };
 
@@ -1173,10 +1151,10 @@ const OrdersPage = () => {
           <div className='flex w-full items-center max-w-screen-2xl px-3 mx-auto justify-center md:justify-end gap-3 md:gap-6'>
 
             <div ref={dropdownRefDownload} className="relative inline-block text-left z-10">
-              <button onClick={() => toggleDropdown('download')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#d4ffce] px-[14px] md:px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[10px] md:text-[14px] text-neutral-700">
+              <button onClick={() => toggleDropdown('download')} className="relative z-[1] flex items-center gap-x-1.5 rounded-lg bg-[#d4ffce] px-3 md:px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#bdf6b4] font-bold text-[10px] md:text-[14px] text-neutral-700">
                 EXPORT AS
                 <svg
-                  className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown === "download" ? 'rotate-180' : ''}`}
+                  className={`h-5 w-5 transform transition-transform duration-300 ${openDropdown === "download" ? 'rotate-180' : ''}`}
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -1241,10 +1219,10 @@ const OrdersPage = () => {
 
             <div ref={dropdownRef} className="relative inline-block text-left z-10">
 
-              <button onClick={() => toggleDropdown2('other')} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[16px] py-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[10px] md:text-[14px] text-neutral-700">
+              <button onClick={() => toggleDropdown2('other')} className="relative z-[1] flex items-center gap-x-1.5 rounded-lg bg-[#ffddc2] p-3 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[10px] md:text-[14px] text-neutral-700">
                 CUSTOMIZE
                 <svg
-                  className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${openDropdown2 === "other" ? 'rotate-180' : ''}`}
+                  className={`h-5 w-5 transform transition-transform duration-300 ${openDropdown2 === "other" ? 'rotate-180' : ''}`}
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -1255,7 +1233,7 @@ const OrdersPage = () => {
               </button>
 
               {openDropdown2 === 'other' && (
-                <div className="absolute right-0 z-10 mt-2 w-64 md:w-96 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div className="absolute right-0 z-10 mt-2 w-64 md:w-72 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
 
                   <div className="p-1">
 
@@ -1375,7 +1353,7 @@ const OrdersPage = () => {
                         selectedColumns.includes(column) && (
                           <>
                             {column === 'Order Number' && (
-                              <td key="orderNumber" className="text-xs p-3 font-mono cursor-pointer text-blue-600 hover:text-blue-800" onClick={() => handleOrderClick(order)}>
+                              <td key="orderNumber" className={`text-xs p-3 font-mono ${isAuthorized ? "cursor-pointer text-blue-600 hover:text-blue-800" : "cursor-not-allowed text-neutral-800"}`} onClick={isAuthorized ? () => handleOrderClick(order) : undefined}>
                                 {order?.orderNumber}
                               </td>
                             )}
@@ -1407,30 +1385,32 @@ const OrdersPage = () => {
                                 <div className="flex gap-2 items-center">
 
                                   {order.orderStatus === 'Pending' && (
-                                    <Button onClick={() => handleActions(order._id)} size="sm" className="text-xs w-20" color="primary" variant="flat">
+                                    <Button isDisabled={!isAuthorized} onClick={() => handleActions(order._id)} size="sm" className="text-xs w-20" color="primary" variant="flat">
                                       Confirm
                                     </Button>
                                   )}
 
                                   {order.orderStatus === 'Processing' && (
-                                    <Button onClick={() => handleActions(order._id, 'shipped')} size="sm" className="text-xs w-20" color="secondary" variant="flat">
+                                    <Button isDisabled={!isAuthorized} onClick={() => handleActions(order._id, 'shipped')} size="sm" className="text-xs w-20" color="secondary" variant="flat">
                                       Shipped
                                     </Button>
                                   )}
 
                                   {order.orderStatus === 'Shipped' && (
                                     <div className="flex items-center gap-2">
-                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'onHold')} size="sm" color="warning" variant="flat">
+
+                                      <Button isDisabled={!isAuthorized} className="text-xs w-20" onClick={() => handleActions(order._id, 'onHold')} size="sm" color="warning" variant="flat">
                                         On Hold
                                       </Button>
-                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'delivered')} size="sm" color="success" variant="flat">
+
+                                      <Button isDisabled={!isAuthorized} className="text-xs w-20" onClick={() => handleActions(order._id, 'delivered')} size="sm" color="success" variant="flat">
                                         Delivered
                                       </Button>
                                     </div>
                                   )}
 
                                   {order.orderStatus === 'On Hold' && (
-                                    <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'delivered')} size="sm" color="success" variant="flat">
+                                    <Button isDisabled={!isAuthorized} className="text-xs w-20" onClick={() => handleActions(order._id, 'delivered')} size="sm" color="success" variant="flat">
                                       Delivered
                                     </Button>
                                   )}
@@ -1447,10 +1427,10 @@ const OrdersPage = () => {
 
                                   {order.orderStatus === 'Return Requested' && (
                                     <div className="flex items-center gap-2">
-                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'approved')} color='success' size="sm" variant="flat">
+                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'approved')} color='success' isDisabled={!isAuthorized} size="sm" variant="flat">
                                         Approve
                                       </Button>
-                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'declined')} size="sm" color="danger" variant="flat">
+                                      <Button isDisabled={!isAuthorized} className="text-xs w-20" onClick={() => handleActions(order._id, 'declined')} size="sm" color="danger" variant="flat">
                                         Decline
                                       </Button>
                                     </div>
@@ -1458,7 +1438,9 @@ const OrdersPage = () => {
 
                                   {order.orderStatus === 'Request Accepted' && (
                                     <div className="flex items-center gap-2">
-                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'returned')} size="sm" color="secondary" variant="flat">
+                                      <Button className="text-xs w-20" onClick={() => handleActions(order._id, 'returned')} size="sm" color="secondary"
+                                        isDisabled={!isAuthorized}
+                                        variant="flat">
                                         Return
                                       </Button>
                                     </div>
@@ -1481,6 +1463,7 @@ const OrdersPage = () => {
                                       color="warning"
                                       variant='flat'
                                       onClick={() => handleActions(order._id, 'refunded')}
+                                      isDisabled={!isAuthorized}
                                     >
                                       Refund
                                     </Button>
@@ -1498,13 +1481,17 @@ const OrdersPage = () => {
                                   )}
 
                                   {/* Undo button logic */}
-                                  {isAdmin && checkUndoAvailability(order) && (
-                                    <button
-                                      onClick={() => handleActions(order._id, '', true)}
-                                      className="text-red-600 hover:text-red-800 focus:ring-2 focus:ring-red-500 rounded p-1"
-                                    >
-                                      <FaUndo />
-                                    </button>
+                                  {isOwner ? (
+                                    checkUndoAvailability(order) && (
+                                      <button
+                                        onClick={() => handleActions(order._id, '', true)}
+                                        className="text-red-600 hover:text-red-800 focus:ring-2 focus:ring-red-500 rounded p-1"
+                                      >
+                                        <FaUndo />
+                                      </button>
+                                    )
+                                  ) : (
+                                    <></>
                                   )}
 
                                 </div>
