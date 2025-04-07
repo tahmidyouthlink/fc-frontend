@@ -8,7 +8,6 @@ import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import LegalPoliciesEditor from '@/app/utils/Editor/LegalPoliciesEditor';
 import { FiSave } from 'react-icons/fi';
-import { Button } from '@nextui-org/react';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import toast from 'react-hot-toast';
