@@ -11,15 +11,16 @@ import { RiDeleteBinLine } from 'react-icons/ri';
 import { FaPlus } from 'react-icons/fa6';
 import useTopHeader from '@/app/hooks/useTopHeader';
 import Loading from '@/app/components/shared/Loading/Loading';
+import HomepageContent from '@/app/components/layout/HomepageContent';
 
 const HomepageSettings = () => {
 
-  const { register, reset, handleSubmit, control, setValue, formState: { errors } } = useForm({
+  const { register, handleSubmit, control, setValue, formState: { errors } } = useForm({
     defaultValues: { slides: [{ slideText: "", optionalLink: "" }] }
   });
   const { fields, append, remove } = useFieldArray({ control, name: "slides" });
   const [activeTab, setActiveTab] = useState('Top Header Settings');
-  const tabs = ["Top Header Settings", "Low Stock Settings"];
+  const tabs = ["Top Header Settings", "Homepage Content"];
   const [slideEnabled, setSlideEnabled] = useState(false);
   const [topHeaderList, isTopHeaderPending, refetch] = useTopHeader();
   const axiosPublic = useAxiosPublic();
@@ -54,6 +55,22 @@ const HomepageSettings = () => {
       }
     }
   }, [topHeaderList, setValue]);
+
+  const handleGoToPreviewPage = async () => {
+
+    // ✅ Check if slide is enabled but no slides provided
+    if (slideEnabled && (!topHeaderList[0]?.slides || topHeaderList[0]?.slides.length === 0)) {
+      toast.error("Please add at least one slide before preview.");
+      return; // ❌ Stop submission
+    }
+
+    if (slideEnabled && topHeaderList[0]?.slides.length > 0) {
+      const previewURL = `/previewTopHeader`;
+      window.open(previewURL, '_blank');
+    } else {
+      toast.error("Please upload an image and select a position.");
+    }
+  };
 
   const onSubmit = async (data) => {
 
@@ -205,15 +222,7 @@ const HomepageSettings = () => {
 
         <h1 className="font-bold text-lg md:text-xl lg:text-3xl text-neutral-700 py-1 2xl:py-3 bg-gray-50">HOMEPAGE SETTINGS</h1>
 
-        <div className='flex items-center justify-between'>
-
-          <TabsForSettings tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
-
-          <button type="button" onClick={() => append({ slideText: "", optionalLink: "" })} className="flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
-            Add <FaPlus size={16} />
-          </button>
-
-        </div>
+        <TabsForSettings tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
 
       </div>
 
@@ -275,7 +284,12 @@ const HomepageSettings = () => {
                     )}
                   </div>
 
-                  <h2 className='text-lg font-semibold mt-6'>Slides</h2>
+                  <div className='pt-6 flex items-center justify-between'>
+                    <h2 className='text-lg font-semibold'>Slides</h2>
+                    <button type="button" onClick={() => append({ slideText: "", optionalLink: "" })} className="flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
+                      Add <FaPlus size={16} />
+                    </button>
+                  </div>
 
                   <div className='grid grid-cols-1 gap-4 w-full'>
 
@@ -321,10 +335,15 @@ const HomepageSettings = () => {
               )}
 
               {/* Submit Button */}
-              <div className='w-full flex justify-end'>
+              <div className='w-full flex justify-between !mt-7'>
+
+                <button type='button' onClick={handleGoToPreviewPage} className='text-blue-600 border-blue-500 font-bold border-b'>
+                  Preview
+                </button>
+
                 <button
                   type='submit'
-                  className="!mt-7 w-fit rounded-lg bg-[#d4ffce] px-4 py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[#bdf6b4] md:text-sm relative z-[1] flex items-center justify-center gap-x-3 ease-in-out"
+                  className="w-fit rounded-lg bg-[#d4ffce] px-4 py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[#bdf6b4] md:text-sm relative z-[1] flex items-center justify-center gap-x-3 ease-in-out"
                 >
                   Save <FiSave size={19} />
                 </button>
@@ -336,9 +355,9 @@ const HomepageSettings = () => {
         </div>
       }
 
-      {activeTab === "Low Stock Settings" &&
+      {activeTab === "Homepage Content" &&
         <div className='pt-4'>
-
+          <HomepageContent />
         </div>
       }
 

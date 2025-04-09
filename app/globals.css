@@ -668,6 +668,8 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 
 .custom-editor-faq .ql-editor {
   /* Custom styles for the editor input field */
+  min-height: 117px;
+  max-height: 117px;
   padding: 14px;
   font-size: 16px;
   line-height: 1.5;

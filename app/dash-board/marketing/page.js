@@ -274,15 +274,6 @@ const Marketing = () => {
         </div>
       }
 
-      {
-        isAuthorized &&
-        activeTab === "homepage content" && <div className='pt-6 relative max-w-screen-2xl mx-auto'>
-          <h1 className='font-bold text-xl'>Recommended For You</h1>
-          <p className='pt-1 pb-8 text-neutral-400 font-medium'>Our recommendations are tailored to suit your fashion commerce and customer preferences.</p>
-          <HomepageContent />
-        </div>
-      }
-
     </div >
   );
 };

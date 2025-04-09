@@ -414,30 +414,36 @@ const ProductPage = () => {
                 </div>
 
                 {/* Choose Columns Button */}
-                <button className="relative z-[1] flex items-center justify-center gap-x-3 rounded-lg bg-yellow-400 hover:bg-yellow-500 px-[18px] py-3 transition-[background-color] text-white duration-300 ease-in-out font-semibold text-[14px] w-full" onClick={() => { setColumnModalOpen(true) }}>
+                <button className="relative z-[1] flex items-center justify-center gap-x-3 rounded-lg bg-[#d4ffce] hover:bg-[#bdf6b4] px-[18px] py-3 transition-[background-color] text-neutral-700 duration-300 ease-in-out font-semibold text-[14px] w-full" onClick={() => { setColumnModalOpen(true) }}>
                   Choose Columns <TbColumnInsertRight size={20} />
                 </button>
 
                 <div className='flex items-center gap-2'>
+
                   {/* Low stock product Button */}
-                  <button className={`relative z-[1] flex items-center justify-center gap-x-3 rounded-lg px-[18px] ${showLowStock ? 'bg-orange-600 text-white' : 'bg-orange-500 hover:bg-orange-600 text-white'} py-3 transition-[background-color] duration-300 ease-in-out font-semibold text-[14px] w-full`} onClick={handleShowLowStockProducts}>
+                  <button className={`relative z-[1] flex items-center justify-center gap-x-3 rounded-lg px-[18px] ${showLowStock ? 'bg-orange-500 text-white' : 'bg-orange-400 hover:bg-orange-500 text-white'} py-3 transition-[background-color] duration-300 ease-in-out font-semibold text-[14px] w-full`} onClick={handleShowLowStockProducts}>
                     Low Stock <BsGraphDownArrow size={20} />
                   </button>
+
                   {showLowStock &&
                     <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={() => { setShowLowStock(false) }}>
                       <IoMdClose size={20} />
                     </button>
                   }
+
                 </div>
 
                 <div className='flex items-center gap-2'>
+
                   {/* Out of stock Button */}
-                  <button className={`relative z-[1] flex items-center justify-center gap-x-3 rounded-lg ${showOutOfStock ? 'bg-red-700 text-white' : 'bg-red-600 text-white hover:bg-red-700'} px-[18px] py-3 transition-[background-color] duration-300 ease-in-out font-semibold text-[14px] w-full`} onClick={handleShowOutOfStockProducts}>
+                  <button className={`relative z-[1] flex items-center justify-center gap-x-3 rounded-lg ${showOutOfStock ? 'bg-red-600 text-white' : 'bg-red-500 text-white hover:bg-red-600'} px-[18px] py-3 transition-[background-color] duration-300 ease-in-out font-semibold text-[14px] w-full`} onClick={handleShowOutOfStockProducts}>
                     Out of Stock <TbBoxOff size={20} />
                   </button>
+
                   {showOutOfStock && <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={() => { setShowOutOfStock(false) }}>
                     <IoMdClose size={20} />
                   </button>}
+
                 </div>
 
               </div>

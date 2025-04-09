@@ -631,18 +631,23 @@ const EnrollmentPage = () => {
 
             <div className='flex flex-col gap-2'>
 
-              <Select onSelectionChange={handleRoleChange}
-                selectionMode="single"
-                size="sm"
-                className='px-6 pb-2'
-                label="Edit this role"
-                selectedKeys={selectedRole ? [selectedRole] : []}
-                variant="underlined">
-                {roles.map((role) => (
-                  <SelectItem key={role} textValue={role} value={role}>{role}</SelectItem>
-                ))}
-              </Select>
-              {error && <p className="text-red-500 text-sm mt-1">Role selection is required.</p>}
+              <div className="w-full px-4 pt-3">
+                <Select onSelectionChange={handleRoleChange}
+                  selectionMode="single"
+                  size="sm"
+                  className='px-6 pb-2'
+                  classNames={{
+                    label: "font-bold text-neutral-900", // ✅ bold placeholder
+                  }}
+                  label="Edit role"
+                  selectedKeys={selectedRole ? [selectedRole] : []}
+                  variant="underlined">
+                  {roles.map((role) => (
+                    <SelectItem key={role} textValue={role} value={role}>{role}</SelectItem>
+                  ))}
+                </Select>
+                {error && <p className="text-red-500 text-sm mt-1">Role selection is required.</p>}
+              </div>
 
               {selectedRole &&
                 <div className='p-6'>

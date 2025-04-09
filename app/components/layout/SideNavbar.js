@@ -165,7 +165,7 @@ const SideNavbar = ({ onClose }) => {
       permission: permissions["Settings"]?.access,
       links: [
         { label: "User Management", link: "/dash-board/settings/enrollment", icon: <LiaUsersCogSolid /> },
-        { label: "Homepage Settings", link: "/dash-board/settings/homepage-settings", icon: <TbHomeCog /> },
+        { label: "Homepage", link: "/dash-board/settings/homepage-settings", icon: <TbHomeCog /> },
         {
           name: "Legal Policies",
           icon: <LuNewspaper />,
