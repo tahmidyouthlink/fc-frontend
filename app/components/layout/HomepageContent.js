@@ -134,7 +134,7 @@ const HomepageContent = () => {
     }
 
     if (imageUrl) {
-      const previewURL = `/previewHomeContent?leftImage=${encodeURIComponent(imageUrl)}`;
+      const previewURL = `/dash-board/preview/previewHomeContent?leftImage=${encodeURIComponent(imageUrl)}`;
       window.open(previewURL, '_blank');
     } else {
       toast.error("Please upload an image");
@@ -163,7 +163,7 @@ const HomepageContent = () => {
     }
 
     if (imageUrl2) {
-      const previewURL = `/previewHomeContent?centerImage=${encodeURIComponent(imageUrl2)}`;
+      const previewURL = `/dash-board/preview/previewHomeContent?centerImage=${encodeURIComponent(imageUrl2)}`;
       window.open(previewURL, '_blank');
     } else {
       toast.error("Please upload an image");
@@ -192,7 +192,7 @@ const HomepageContent = () => {
     }
 
     if (imageUrl3) {
-      const previewURL = `/previewHomeContent?rightImage=${encodeURIComponent(imageUrl3)}`;
+      const previewURL = `/dash-board/preview/previewHomeContent?rightImage=${encodeURIComponent(imageUrl3)}`;
       window.open(previewURL, '_blank');
     } else {
       toast.error("Please upload an image");
@@ -200,7 +200,7 @@ const HomepageContent = () => {
   };
 
   const handleGoToPreviewPageAfterUpload = (imageUrl, imageUrl2, imageUrl3) => {
-    const previewURL = `/previewHomeContent?leftImage=${encodeURIComponent(imageUrl)}&centerImage=${encodeURIComponent(imageUrl2)}&rightImage=${encodeURIComponent(imageUrl3)}`;
+    const previewURL = `/dash-board/preview/previewHomeContent?leftImage=${encodeURIComponent(imageUrl)}&centerImage=${encodeURIComponent(imageUrl2)}&rightImage=${encodeURIComponent(imageUrl3)}`;
     window.open(previewURL, '_blank');
   }
 

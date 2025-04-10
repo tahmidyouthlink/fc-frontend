@@ -204,7 +204,7 @@ const SideNavbar = ({ onClose }) => {
           <hr style={{ border: "0.5px solid #ccc", margin: "8px 0" }} />
         </div>
 
-        <div className={`flex flex-col mt-6 ${session ? "" : "mb-8"}`}>
+        <div className={`flex flex-col mt-6 ${session ? "mb-8" : "mb-8"}`}>
           <h1 className="px-4 text-neutral-500 mb-4 font-medium">MAIN MENU</h1>
           {
             allList?.map((item, index) => {

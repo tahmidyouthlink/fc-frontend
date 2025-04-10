@@ -94,7 +94,7 @@ const MarketingBanner = () => {
     }
 
     if (imageUrl && selectedPosition) {
-      const previewURL = `/preview?image=${encodeURIComponent(imageUrl)}&position=${encodeURIComponent(selectedPosition)}`;
+      const previewURL = `/dash-board/previewNewsletter/?image=${encodeURIComponent(imageUrl)}&position=${encodeURIComponent(selectedPosition)}`;
       window.open(previewURL, '_blank');
     } else {
       toast.error("Please upload an image and select a position.");
@@ -102,7 +102,7 @@ const MarketingBanner = () => {
   };
 
   const handleGoToPreviewPageAfterUpload = (imageUrl, position) => {
-    const previewURL = `/preview?image=${encodeURIComponent(imageUrl)}&position=${encodeURIComponent(position)}`;
+    const previewURL = `/dash-board/previewNewsletter/?image=${encodeURIComponent(imageUrl)}&position=${encodeURIComponent(position)}`;
     window.open(previewURL, '_blank');
   }
 

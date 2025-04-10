@@ -22,6 +22,7 @@ const HomepageSettings = () => {
   const [activeTab, setActiveTab] = useState('Top Header Settings');
   const tabs = ["Top Header Settings", "Homepage Content"];
   const [slideEnabled, setSlideEnabled] = useState(false);
+  const [autoSlideEnabled, setAutoSlideEnabled] = useState(false);
   const [topHeaderList, isTopHeaderPending, refetch] = useTopHeader();
   const axiosPublic = useAxiosPublic();
 
@@ -46,6 +47,7 @@ const HomepageSettings = () => {
     if (topHeaderList && topHeaderList.length > 0) {
 
       setSlideEnabled(topHeaderList[0]?.isSlideEnabled);
+      setAutoSlideEnabled(topHeaderList[0]?.isAutoSlideEnabled);
       setValue('topHeaderColor', topHeaderList[0]?.topHeaderColor);
       setValue('textColor', topHeaderList[0]?.textColor);
       setValue('slideDuration', topHeaderList[0]?.slideDuration);
@@ -65,7 +67,7 @@ const HomepageSettings = () => {
     }
 
     if (slideEnabled && topHeaderList[0]?.slides.length > 0) {
-      const previewURL = `/previewTopHeader`;
+      const previewURL = `/dash-board/preview/previewTopHeader/`;
       window.open(previewURL, '_blank');
     } else {
       toast.error("Please upload an image and select a position.");
@@ -87,9 +89,10 @@ const HomepageSettings = () => {
 
         const topHeaderInformation = {
           isSlideEnabled: slideEnabled,
+          isAutoSlideEnabled: autoSlideEnabled,
           topHeaderColor: slideEnabled ? data.topHeaderColor : "",
           textColor: slideEnabled ? data.textColor : "",
-          slideDuration: slideEnabled ? parseInt(data.slideDuration) : null,
+          slideDuration: slideEnabled ? parseFloat(data.slideDuration) : null,
           slides: slideEnabled ? data.slides : [],
         }
 
@@ -234,7 +237,7 @@ const HomepageSettings = () => {
 
               {/* Slide Enable/Disable */}
               <div className='w-full font-semibold flex items-center gap-4'>
-                <label>Enable Slide</label>
+                <label>{slideEnabled ? "Disable Top Header" : "Enable Top Header"}</label>
                 <CustomSwitch
                   checked={slideEnabled}
                   onChange={() => setSlideEnabled(prev => !prev)}
@@ -245,6 +248,17 @@ const HomepageSettings = () => {
 
               {slideEnabled && (
                 <div className='space-y-4'>
+
+                  {/* Slide Enable/Disable */}
+                  <div className='w-full font-semibold flex items-center gap-4'>
+                    <label>{autoSlideEnabled ? "Disable Auto Slide" : "Enable Auto Slide"}</label>
+                    <CustomSwitch
+                      checked={autoSlideEnabled}
+                      onChange={() => setAutoSlideEnabled(prev => !prev)}
+                      size="md"
+                      color="primary"
+                    />
+                  </div>
 
                   {/* Slide background Color */}
                   <div className="w-full font-semibold flex items-center gap-4">
@@ -278,6 +292,7 @@ const HomepageSettings = () => {
                       placeholder={`Enter slide duration (seconds) *`}
                       className="custom-number-input w-full border-b-2 border-neutral-300 bg-transparent py-2 text-neutral-800 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-neutral-400 text-sm"
                       type="number"
+                      step="any"
                     />
                     {errors.slideDuration?.type === "required" && (
                       <p className="text-red-600 text-left pt-2 text-sm">Slide Duration is required</p>
@@ -335,11 +350,13 @@ const HomepageSettings = () => {
               )}
 
               {/* Submit Button */}
-              <div className='w-full flex justify-between !mt-7'>
+              <div className={`w-full flex ${slideEnabled ? "justify-between" : "justify-end"} !mt-7`}>
 
-                <button type='button' onClick={handleGoToPreviewPage} className='text-blue-600 border-blue-500 font-bold border-b'>
-                  Preview
-                </button>
+                {slideEnabled &&
+                  <button type='button' onClick={handleGoToPreviewPage} className='text-blue-600 border-blue-500 font-bold border-b'>
+                    Preview
+                  </button>
+                }
 
                 <button
                   type='submit'

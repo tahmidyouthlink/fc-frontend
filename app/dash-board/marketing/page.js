@@ -10,7 +10,6 @@ import specialOffer from "/public/card-images/special-offer.jpg";
 import RecentPromotions from '@/app/components/layout/RecentPromotions';
 import PromotionPerformance from '@/app/components/layout/PromotionPerformance';
 import MarketingContent from '@/app/components/layout/MarketingContent';
-import HomepageContent from '@/app/components/layout/HomepageContent';
 import { useAuth } from "@/app/contexts/auth";
 import Loading from "@/app/components/shared/Loading/Loading";
 import RewardLevel from "../reward-level/page";
@@ -122,13 +121,6 @@ const Marketing = () => {
               onClick={() => setActiveTab('marketing content')}
             >
               Marketing Content
-            </button>
-          }
-
-          {isAuthorized &&
-            <button className={`relative text-sm py-1 transition-all duration-300 ${activeTab === 'homepage content' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'} after:absolute after:left-0 after:right-0 hover:text-neutral-800 after:bottom-0 after:h-[2px] after:bg-neutral-800 after:transition-all after:duration-300 ${activeTab === 'homepage content' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}`}
-              onClick={() => setActiveTab('homepage content')}>
-              Homepage Content
             </button>
           }
 

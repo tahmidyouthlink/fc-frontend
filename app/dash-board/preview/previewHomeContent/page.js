@@ -2,8 +2,8 @@
 import React from 'react';
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import { FaArrowRightLong } from "react-icons/fa6";
-import vector1 from "../../../public/bg-banner/vector1.png";
-import vector2 from "../../../public/bg-banner/vector2.png";
+import vector1 from "/public/bg-banner/vector1.png";
+import vector2 from "/public/bg-banner/vector2.png";
 import Image from "next/image";
 import { useSearchParams } from 'next/navigation';
 
