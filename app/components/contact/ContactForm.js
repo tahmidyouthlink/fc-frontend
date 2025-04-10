@@ -6,10 +6,12 @@ import { Select, SelectItem } from "@nextui-org/react";
 import toast from "react-hot-toast";
 import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
+import useAxiosPublic from "@/app/hooks/useAxiosPublic";
 
 export default function ContactForm() {
   const { userData } = useAuth();
   const { setIsPageLoading } = useLoading();
+  const axiosPublic = useAxiosPublic();
 
   const {
     register,
@@ -23,7 +25,7 @@ export default function ContactForm() {
       name: "",
       email: "",
       phone: "",
-      topic: "",
+      topic: new Set([]),
       message: "",
     },
     mode: "onBlur",
@@ -34,18 +36,37 @@ export default function ContactForm() {
       name: userData?.userInfo?.personalInfo?.customerName || "",
       email: userData?.email || "",
       phone: userData?.userInfo?.personalInfo?.phoneNumber || "",
-      topic: getValues("topic") || "",
+      topic: getValues("topic") || new Set([]),
       message: getValues("message") || "",
     });
   }, [getValues, reset, userData]);
 
   const onSubmit = async (data) => {
-    console.log("rhf contact form data", data);
-
     setIsPageLoading(true);
-    toast.success("Form submitted successfully.");
-    reset();
-    setIsPageLoading(false);
+
+    try {
+      const response = await axiosPublic.post("/contact", {
+        ...data,
+        topic: [...data.topic][0],
+      });
+
+      if (response.data.success) {
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    } finally {
+      reset({
+        name: userData?.userInfo?.personalInfo?.customerName || "",
+        email: userData?.email || "",
+        phone: userData?.userInfo?.personalInfo?.phoneNumber || "",
+        topic: new Set([]),
+        message: "",
+      });
+      setIsPageLoading(false);
+    }
   };
 
   const onError = (errors) => {
