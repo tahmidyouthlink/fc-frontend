@@ -111,6 +111,7 @@ export default function ShopCards({
                 isAddToCartModalOpen={isAddToCartModalOpen}
                 setIsAddToCartModalOpen={setIsAddToCartModalOpen}
                 setSelectedAddToCartProduct={setSelectedAddToCartProduct}
+                isAllowedToShowLimitedStock={true}
               />
             ),
         )}

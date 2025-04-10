@@ -2,13 +2,11 @@ import Image from "next/image";
 import { useEffect } from "react";
 import TransitionLink from "../ui/TransitionLink";
 import CardOutOfStockBanner from "./CardOutOfStockBanner";
-import CardLimitedStockBanner from "./CardLimitedStockBanner";
 import CardColorSelectionTool from "./CardColorSelectionTool";
 
 export default function CardProductThumbnail({
   product,
   isProductOutOfStock,
-  isProductLimitedStock,
   imageSets,
 }) {
   useEffect(() => {
