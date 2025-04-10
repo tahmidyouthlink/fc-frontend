@@ -911,7 +911,7 @@ const EditPurchaseOrderPage = () => {
                         <tr key={index} className="hover:bg-gray-50">
                           <td className="text-sm p-3 text-neutral-500 text-center cursor-pointer flex flex-col lg:flex-row items-center gap-3">
                             <div>
-                              <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt='productIMG' height={600} width={600} />
+                              <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.imageUrl} alt={product?.productTitle} height={600} width={600} />
                             </div>
                             <div className='flex flex-col items-start justify-start gap-1'>
                               <p className='font-bold text-blue-700 text-start'>{product?.productTitle}</p>
@@ -1211,7 +1211,7 @@ const EditPurchaseOrderPage = () => {
                                 <Image
                                   className="h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5"
                                   src={product.imageUrl}
-                                  alt="productIMG"
+                                  alt={product.productTitle}
                                   height={600}
                                   width={600}
                                 />

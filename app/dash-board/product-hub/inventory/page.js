@@ -495,7 +495,7 @@ const InventoryPage = () => {
                           <Image
                             className="h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5"
                             src={product?.imageUrl}
-                            alt="productIMG"
+                            alt={product?.productTitle}
                             height={600}
                             width={600}
                           />
