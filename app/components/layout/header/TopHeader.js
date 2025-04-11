@@ -64,7 +64,7 @@ export default function OfferSlider({
 
   return (
     <div
-      className="relative text-center text-[11px] font-bold"
+      className="relative text-center text-xs font-bold"
       style={{
         backgroundColor: bgColor,
         color: textColor,
