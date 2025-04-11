@@ -7,6 +7,9 @@ import { IoClose } from "react-icons/io5";
 export default function Search({ isMobile, setIsMobileSearchSelected }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const keywordParam = searchParams.get("search");
+  const filterParam = searchParams.get("filterBy");
+  const categoryParam = searchParams.get("category");
   const { setIsPageLoading } = useLoading();
   const closeBtnRef = useRef(null);
 
@@ -14,12 +17,20 @@ export default function Search({ isMobile, setIsMobileSearchSelected }) {
     event.preventDefault();
 
     const keyword = event.target.lastChild?.value;
+
+    if (keyword === keywordParam || (!keyword && !keywordParam)) return;
+
+    const keywordQuery = !keyword ? "" : `?search=${keyword}`;
+    const filterQuery = !filterParam
+      ? ""
+      : `${!keyword ? "?" : "&"}filterBy=${filterParam}`;
+    const categoryQuery = !categoryParam
+      ? ""
+      : `${!keyword ? "?" : "&"}category=${categoryParam}`;
+
     setIsPageLoading(true);
-    router.push(
-      !keyword
-        ? "/shop"
-        : `/shop?search=${keyword}${!!searchParams.get("filterBy") ? `&filterBy=${searchParams.get("filterBy")}` : ""}`,
-    );
+
+    router.push(`/shop${keywordQuery}${filterQuery}${categoryQuery}`);
     if (isMobile) setIsMobileSearchSelected(false);
   };
 
@@ -31,10 +42,12 @@ export default function Search({ isMobile, setIsMobileSearchSelected }) {
     closeButtonElement.style.pointerEvents = "none";
     inputElement.value = "";
 
-    if (!!searchParams.get("search"))
-      router.push(
-        `/shop${!!searchParams.get("filterBy") ? `?filterBy=${searchParams.get("filterBy")}` : ""}`,
-      );
+    if (!!keywordParam) {
+      const filterQuery = !filterParam ? "" : `?filterBy=${filterParam}`;
+      const categoryQuery = !categoryParam ? "" : `?category=${categoryParam}`;
+
+      router.push(`/shop${filterQuery}${categoryQuery}`);
+    }
     if (isMobile) setIsMobileSearchSelected(false);
   };
 
@@ -49,10 +62,10 @@ export default function Search({ isMobile, setIsMobileSearchSelected }) {
   };
 
   useEffect(() => {
-    if (!searchParams.get("search") && !!closeBtnRef?.current) {
+    if (!keywordParam && !!closeBtnRef?.current) {
       closeBtnRef.current.click();
     }
-  }, [searchParams]);
+  }, [keywordParam]);
 
   return (
     <form
@@ -62,7 +75,11 @@ export default function Search({ isMobile, setIsMobileSearchSelected }) {
       {/* Close button */}
       <button
         ref={closeBtnRef}
-        className="absolute right-3 top-1/2 z-[1] flex size-5 -translate-y-1/2 items-center justify-center rounded-full bg-neutral-200 opacity-0 transition-[background-color,opacity] duration-300 ease-in-out hover:bg-neutral-300 [&>svg]:hover:text-neutral-800"
+        className="absolute right-3 top-1/2 z-[1] flex size-5 -translate-y-1/2 items-center justify-center rounded-full bg-neutral-200 transition-[background-color,opacity] duration-300 ease-in-out hover:bg-neutral-300 [&>svg]:hover:text-neutral-800"
+        style={{
+          opacity: !keywordParam ? "0" : "1",
+          pointerEvents: !keywordParam ? "none" : "auto",
+        }}
         type="button"
         onClick={handleCloseButtonClick}
       >
@@ -84,7 +101,7 @@ export default function Search({ isMobile, setIsMobileSearchSelected }) {
         id={`search-bar-${isMobile ? "mobile" : "desktop"}`}
         placeholder="Search Products"
         type="search"
-        defaultValue={searchParams.get("search") || ""}
+        defaultValue={keywordParam || ""}
         className="h-9 w-full rounded-lg border-2 border-transparent bg-[#f3f3f4] px-4 pl-[2.5rem] outline-none transition-[border-color,background-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white [&::-webkit-search-cancel-button]:[-webkit-appearance:none] [&:not(:placeholder-shown)]:border-[#F4D3BA] [&:not(:placeholder-shown)]:bg-white"
         onChange={handleInputChange}
       />
