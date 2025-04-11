@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Suspense } from "react";
 import { useAuth } from "@/app/contexts/auth";
 import logoImage from "/public/logos/logo.png";
 import TransitionLink from "@/app/components/ui/TransitionLink";
@@ -6,6 +7,7 @@ import Drawer from "@/app/components/shared/Drawer";
 import MenuSection from "./MenuSection";
 import OrderSection from "./OrderSection";
 import AccountSection from "./AccountSection";
+import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
 
 export default function NavMenu({ isNavMenuOpen, setIsNavMenuOpen }) {
   const { user } = useAuth();
@@ -31,7 +33,9 @@ export default function NavMenu({ isNavMenuOpen, setIsNavMenuOpen }) {
             alt="YouthLink logo with white text"
           />
         </TransitionLink>
-        <MenuSection setIsNavMenuOpen={setIsNavMenuOpen} />
+        <Suspense fallback={<LoadingSpinner />}>
+          <MenuSection setIsNavMenuOpen={setIsNavMenuOpen} />
+        </Suspense>
         <OrderSection user={user} setIsNavMenuOpen={setIsNavMenuOpen} />
         <AccountSection user={user} setIsNavMenuOpen={setIsNavMenuOpen} />
       </nav>

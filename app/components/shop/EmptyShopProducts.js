@@ -1,4 +1,4 @@
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { TbZoomExclamation } from "react-icons/tb";
 
 export default function EmptyShopProducts({
@@ -7,7 +7,6 @@ export default function EmptyShopProducts({
   setSelectedFilterOptions,
 }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   return (
     <section className="flex grow flex-col items-center justify-center self-center font-semibold">
@@ -33,7 +32,7 @@ export default function EmptyShopProducts({
             },
           });
 
-          if (!!searchParams.get("search")) router.push("/shop");
+          router.push("/shop");
         }}
       >
         Clear All Filters

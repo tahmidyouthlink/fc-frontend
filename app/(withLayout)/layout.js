@@ -1,9 +1,11 @@
+import { Suspense } from "react";
 import axios from "axios";
 import Header from "../components/layout/header/Header";
-import LoaderFrontend from "../components/shared/LoaderFrontend";
 import ScrollTopButton from "../components/ui/ScrollTopButton";
 import Footer from "../components/footer/Footer";
 import ChatButton from "../components/ui/ChatButton";
+import LoaderFrontend from "../components/shared/LoaderFrontend";
+import LoadingSpinner from "../components/shared/LoadingSpinner";
 
 export const metadata = {
   title: "Fashion Commerce",
@@ -29,7 +31,7 @@ export default async function RootLayout({ children }) {
   const topHeaderHeight = topHeaderData?.isSlideEnabled ? "28.5px" : "0px";
 
   return (
-    <>
+    <Suspense fallback={<LoadingSpinner />}>
       <style>{`:root { --top-header-height: ${topHeaderHeight}; }`}</style>
       <div className="flex min-h-dvh flex-col [&>main]:grow">
         <Header
@@ -46,6 +48,6 @@ export default async function RootLayout({ children }) {
         {children}
         <Footer />
       </div>
-    </>
+    </Suspense>
   );
 }

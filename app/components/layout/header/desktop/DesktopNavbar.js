@@ -1,8 +1,10 @@
 import Image from "next/image";
-import TransitionLink from "@/app/components/ui/TransitionLink";
+import { Suspense } from "react";
 import MainLinks from "./MainLinks";
 import Search from "../Search";
 import SideLinks from "./SideLinks";
+import TransitionLink from "@/app/components/ui/TransitionLink";
+import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
 import logoImage from "@/public/logos/logo.png";
 
 export default function DesktopNavbar({ productList }) {
@@ -11,8 +13,10 @@ export default function DesktopNavbar({ productList }) {
       <TransitionLink href="/">
         <Image className="h-9 w-auto" src={logoImage} alt="F-commerce logo" />
       </TransitionLink>
-      <MainLinks />
-      <Search />
+      <Suspense fallback={<LoadingSpinner />}>
+        <MainLinks />
+        <Search />
+      </Suspense>
       <SideLinks productList={productList} />
     </nav>
   );

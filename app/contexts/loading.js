@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 const LoadingContext = createContext({
   isPageLoading: false,
@@ -10,14 +10,13 @@ const LoadingContext = createContext({
 
 export const LoadingProvider = ({ children }) => {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [isPageLoading, setIsPageLoading] = useState(true);
 
   useEffect(() => {
     setIsPageLoading(false);
 
     return () => setIsPageLoading(true);
-  }, [pathname, searchParams]);
+  }, [pathname]);
 
   return (
     <LoadingContext.Provider value={{ isPageLoading, setIsPageLoading }}>
