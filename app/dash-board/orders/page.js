@@ -1354,12 +1354,12 @@ const OrdersPage = () => {
                           selectedColumns.includes(column) && (
                             <>
                               {column === 'Order Number' && (
-                                <td key="orderNumber" className={`text-xs p-3 font-mono ${isAuthorized ? "cursor-pointer text-blue-600 hover:text-blue-800" : "cursor-not-allowed text-neutral-800"}`} onClick={isAuthorized ? () => handleOrderClick(order) : undefined}>
+                                <td key="orderNumber" className={`text-xs p-3 font-mono ${isAuthorized ? "cursor-pointer text-blue-600 hover:text-blue-800" : "text-neutral-800"}`} onClick={isAuthorized ? () => handleOrderClick(order) : undefined}>
                                   {order?.orderNumber}
                                 </td>
                               )}
                               {column === 'R. Order Number' && (
-                                <td key="returnNumber" className="text-xs p-3 font-mono cursor-pointer text-blue-600 hover:text-blue-800" onClick={() => handleOrderClick(order)}>
+                                <td key="returnNumber" className={`text-xs p-3 font-mono ${isAuthorized ? "cursor-pointer text-blue-600 hover:text-blue-800" : "text-neutral-800"}`} onClick={isAuthorized ? () => handleOrderClick(order) : undefined}>
                                   {order?.orderNumber}
                                 </td>
                               )}

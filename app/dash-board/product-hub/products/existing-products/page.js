@@ -141,7 +141,7 @@ ${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                 <Image
                   className="object-cover rounded-lg"
                   src={category?.imageUrl}
-                  alt="category-image"
+                  alt={`${category?.label} - Explore products in the ${category?.label} category`}
                   layout="fill"
                   objectFit="cover"
                   quality={100}
@@ -183,7 +183,7 @@ ${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                 <Image
                   className="object-cover rounded-lg px-1.5"
                   src={season?.imageUrl}
-                  alt="season-image"
+                  alt={`${season?.seasonName} – Discover products for the ${season?.seasonName} season`}
                   layout="fill"
                   objectFit="contain"
                   quality={100}

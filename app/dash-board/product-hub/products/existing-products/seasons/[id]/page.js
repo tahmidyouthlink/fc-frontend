@@ -478,7 +478,7 @@ const SeasonPage = () => {
                               {column === 'Product' && (
                                 <td onClick={isAuthorized ? () => handleGoToEditPage(product?._id) : undefined} className={`text-xs p-3 ${isAuthorized ? "cursor-pointer text-blue-600 hover:text-blue-800" : "text-neutral-800"} flex flex-col lg:flex-row items-center gap-3`}>
                                   <div>
-                                    <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.thumbnailImageUrl} alt='productIMG' height={600} width={600} />
+                                    <Image className='h-8 w-8 md:h-12 md:w-12 object-contain bg-white rounded-lg border py-0.5' src={product?.thumbnailImageUrl} alt={`${product?.productTitle}`} height={600} width={600} />
                                   </div>
                                   <div className='flex flex-col'>
                                     <p>{product?.productTitle}</p>
