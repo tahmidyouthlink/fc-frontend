@@ -32,10 +32,10 @@ export default function OfferSlider({
   // Auto-slide logic with pause on hover
   useEffect(() => {
     if (isAutoSlideEnabled && slides?.length > 1 && !isPaused) {
-      const interval = setInterval(nextSlide, 3000);
+      const interval = setInterval(nextSlide, slideDuration * 1000);
       return () => clearInterval(interval);
     }
-  }, [isAutoSlideEnabled, slides?.length, isPaused]);
+  }, [isAutoSlideEnabled, slides?.length, isPaused, slideDuration]);
 
   // Handle infinite loop logic
   useEffect(() => {
@@ -47,7 +47,7 @@ export default function OfferSlider({
           setIsTransitioning(false);
           setCurrentIndex(slides?.length); // Jump to last offer
         },
-        Number(slideDuration) * 1000, // Match transition duration
+        1000, // Match transition duration
       );
     }
 
@@ -57,10 +57,10 @@ export default function OfferSlider({
           setIsTransitioning(false);
           setCurrentIndex(1); // Jump to first offer
         },
-        Number(slideDuration) * 1000, // Match transition duration
+        1000, // Match transition duration
       );
     }
-  }, [currentIndex, extendedSlides?.length, slideDuration, slides?.length]);
+  }, [currentIndex, extendedSlides?.length, slides?.length]);
 
   return (
     <div
@@ -82,12 +82,9 @@ export default function OfferSlider({
         {/* Offer Text */}
         <div className="w-full overflow-hidden py-1.5">
           <div
-            className={`flex ${isTransitioning ? "transition-transform ease-in-out" : ""}`}
+            className={`flex ${isTransitioning ? "transition-transform duration-1000 ease-in-out" : ""}`}
             style={{
               transform: `translateX(-${currentIndex * 100}%)`,
-              ...(isTransitioning && {
-                transitionDuration: `${Number(slideDuration) * 1000}ms`,
-              }),
             }}
           >
             {extendedSlides?.map((slide, index) =>
