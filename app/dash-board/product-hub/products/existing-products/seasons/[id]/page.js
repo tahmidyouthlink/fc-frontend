@@ -147,16 +147,22 @@ const SeasonPage = () => {
 
   const currentDate = today(getLocalTimeZone());
 
-  // Function to get low stock products (SKU ≤ 10 and > 0)
+  // Function to toggle low stock products (SKU ≤ 10 and > 0)
   const handleShowLowStockProducts = () => {
-    setShowLowStock(true);
-    setShowOutOfStock(false);
+    setShowLowStock(prev => {
+      const newState = !prev;
+      if (newState) setShowOutOfStock(false); // Turn off the other filter
+      return newState;
+    });
   };
 
-  // Function to get out of stock products (SKU === 0)
+  // Function to toggle out of stock products (SKU === 0)
   const handleShowOutOfStockProducts = () => {
-    setShowOutOfStock(true);
-    setShowLowStock(false);
+    setShowOutOfStock(prev => {
+      const newState = !prev;
+      if (newState) setShowLowStock(false); // Turn off the other filter
+      return newState;
+    });
   };
 
   // Filter products based on search and selected tab
@@ -414,30 +420,22 @@ const SeasonPage = () => {
                 </div>
 
                 {/* Choose Columns Button */}
-                <button className="relative z-[1] flex items-center justify-center gap-x-3 rounded-lg bg-yellow-400 hover:bg-yellow-500 px-[18px] py-3 transition-[background-color] text-white duration-300 ease-in-out font-semibold text-[14px] w-full" onClick={() => { setColumnModalOpen(true) }}>
+                <button className="relative z-[1] flex items-center justify-center gap-x-3 rounded-lg bg-[#d4ffce] hover:bg-[#bdf6b4] px-[18px] py-3 transition-[background-color] text-neutral-700 duration-300 ease-in-out font-semibold text-[14px] w-full" onClick={() => { setColumnModalOpen(true) }}>
                   Choose Columns <TbColumnInsertRight size={20} />
                 </button>
 
-                <div className='flex items-center gap-2'>
+                <div className='flex items-center gap-2 w-full py-1'>
+
                   {/* Low stock product Button */}
-                  <button className={`relative z-[1] flex items-center justify-center gap-x-3 rounded-lg px-[18px] ${showLowStock ? 'bg-orange-600 text-white' : 'bg-orange-500 hover:bg-orange-600 text-white'} py-3 transition-[background-color] duration-300 ease-in-out font-semibold text-[14px] w-full`} onClick={handleShowLowStockProducts}>
+                  <button className={`flex items-center rounded-lg py-2 px-3 gap-2 transition-[background-color] duration-300 ease-in-out font-semibold text-[14px] w-full ${showLowStock ? 'border border-orange-600 text-white bg-orange-600' : 'bg-orange-400 text-white'}`} onClick={handleShowLowStockProducts}>
                     Low Stock <BsGraphDownArrow size={20} />
                   </button>
-                  {showLowStock &&
-                    <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={() => { setShowLowStock(false) }}>
-                      <IoMdClose size={20} />
-                    </button>
-                  }
-                </div>
 
-                <div className='flex items-center gap-2'>
                   {/* Out of stock Button */}
-                  <button className={`relative z-[1] flex items-center justify-center gap-x-3 rounded-lg ${showOutOfStock ? 'bg-red-700 text-white' : 'bg-red-600 text-white hover:bg-red-700'} px-[18px] py-3 transition-[background-color] duration-300 ease-in-out font-semibold text-[14px] w-full`} onClick={handleShowOutOfStockProducts}>
+                  <button className={`flex items-center gap-2 rounded-lg px-3 py-2 transition-[background-color] duration-300 ease-in-out font-semibold text-[14px] w-full ${showOutOfStock ? 'border border-red-700 bg-red-700 text-white' : 'bg-red-500 text-white'}`} onClick={handleShowOutOfStockProducts}>
                     Out of Stock <TbBoxOff size={20} />
                   </button>
-                  {showOutOfStock && <button className="hover:text-red-500 font-bold text-white rounded-lg bg-red-600 hover:bg-white p-1" onClick={() => { setShowOutOfStock(false) }}>
-                    <IoMdClose size={20} />
-                  </button>}
+
                 </div>
 
               </div>

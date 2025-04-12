@@ -72,37 +72,8 @@ const MarketingBanner = () => {
     setSelectedPosition(e.target.value);
   };
 
-  const handleGoToPreviewPageBeforeUpload = async () => {
-
-    if (!image && !marketingBannerList?.length) {
-      setSizeError(true);
-      return;
-    }
-    setSizeError(false);
-
-    let imageUrl = '';
-    // If the image is new, upload it
-    if (image?.file) {
-      imageUrl = await uploadImageToImgbb(image);
-      if (!imageUrl) {
-        toast.error('Image upload failed, cannot proceed.');
-        return;
-      }
-    } else if (marketingBannerList?.length > 0) {
-      // Use the existing URL if no new image was uploaded
-      imageUrl = marketingBannerList[0]?.url;
-    }
-
-    if (imageUrl && selectedPosition) {
-      const previewURL = `/dash-board/preview/previewNewsletter/?image=${encodeURIComponent(imageUrl)}&position=${encodeURIComponent(selectedPosition)}`;
-      window.open(previewURL, '_blank');
-    } else {
-      toast.error("Please upload an image and select a position.");
-    }
-  };
-
   const handleGoToPreviewPageAfterUpload = (imageUrl, position) => {
-    const previewURL = `/dash-board/preview/previewNewsletter/?image=${encodeURIComponent(imageUrl)}&position=${encodeURIComponent(position)}`;
+    const previewURL = `/preview/previewNewsletter/?image=${encodeURIComponent(imageUrl)}&position=${encodeURIComponent(position)}`;
     window.open(previewURL, '_blank');
   }
 
@@ -261,10 +232,8 @@ const MarketingBanner = () => {
         </div>
 
         {/* Submit Button */}
-        <div className={`flex ${image && selectedPosition ? "justify-between" : "justify-end"} items-center px-5 md:px-7`}>
-          {image && selectedPosition && <button type='button' className='text-blue-600 border-blue-500 font-bold border-b' onClick={handleGoToPreviewPageBeforeUpload}>
-            Preview
-          </button>}
+        <div className={`flex justify-end items-center px-5 md:px-7`}>
+
           <button
             type='submit'
             className={`bg-[#d4ffce] hover:bg-[#bdf6b4] text-neutral-700 py-2 px-4 text-sm rounded-lg cursor-pointer font-bold transition-[background-color] duration-300`}

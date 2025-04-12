@@ -5,14 +5,12 @@ import { FaArrowRightLong } from "react-icons/fa6";
 import vector1 from "/public/bg-banner/vector1.png";
 import vector2 from "/public/bg-banner/vector2.png";
 import Image from "next/image";
-import { useSearchParams } from 'next/navigation';
 
-const PreviewHomeContent = () => {
+const PreviewHomeContent = ({ searchParams }) => {
 
-  const searchParams = useSearchParams();
-  const leftImage = searchParams.get('leftImage');
-  const centerImage = searchParams.get('centerImage');
-  const rightImage = searchParams.get('rightImage');
+  const leftImage = searchParams.leftImage;
+  const centerImage = searchParams.centerImage;
+  const rightImage = searchParams.rightImage;
 
   return (
     <div className="relative flex h-dvh flex-col px-5 pb-6 pt-[100px] sm:h-[65dvh] sm:px-8 sm:pt-32 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0 2xl:pb-[6vh] 2xl:pt-[calc(88px+6vh)] portrait:md:h-[75dvh] portrait:lg:h-[60dvh] landscape:h-dvh">

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import TabsForSettings from '@/app/components/layout/TabsForSettings';
 import CustomSwitch from '@/app/components/layout/CustomSwitch';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import toast from 'react-hot-toast';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
@@ -12,6 +12,7 @@ import { FaPlus } from 'react-icons/fa6';
 import useTopHeader from '@/app/hooks/useTopHeader';
 import Loading from '@/app/components/shared/Loading/Loading';
 import HomepageContent from '@/app/components/layout/HomepageContent';
+import { Slider } from '@nextui-org/react';
 
 const HomepageSettings = () => {
 
@@ -57,22 +58,6 @@ const HomepageSettings = () => {
       }
     }
   }, [topHeaderList, setValue]);
-
-  const handleGoToPreviewPage = async () => {
-
-    // ✅ Check if slide is enabled but no slides provided
-    if (slideEnabled && (!topHeaderList[0]?.slides || topHeaderList[0]?.slides.length === 0)) {
-      toast.error("Please add at least one slide before preview.");
-      return; // ❌ Stop submission
-    }
-
-    if (slideEnabled && topHeaderList[0]?.slides.length > 0) {
-      const previewURL = `/dash-board/preview/previewTopHeader/`;
-      window.open(previewURL, '_blank');
-    } else {
-      toast.error("Please upload an image and select a position.");
-    }
-  };
 
   const onSubmit = async (data) => {
 
@@ -237,7 +222,7 @@ const HomepageSettings = () => {
 
               {/* Slide Enable/Disable */}
               <div className='w-full font-semibold flex items-center gap-4'>
-                <label>{slideEnabled ? "Disable Top Header" : "Enable Top Header"}</label>
+                <label className='text-sm'>{slideEnabled ? "Disable Top Header" : "Enable Top Header"}</label>
                 <CustomSwitch
                   checked={slideEnabled}
                   onChange={() => setSlideEnabled(prev => !prev)}
@@ -251,7 +236,7 @@ const HomepageSettings = () => {
 
                   {/* Slide Enable/Disable */}
                   <div className='w-full font-semibold flex items-center gap-4'>
-                    <label>{autoSlideEnabled ? "Disable Auto Slide" : "Enable Auto Slide"}</label>
+                    <label className='text-sm'>{autoSlideEnabled ? "Disable Auto Slide" : "Enable Auto Slide"}</label>
                     <CustomSwitch
                       checked={autoSlideEnabled}
                       onChange={() => setAutoSlideEnabled(prev => !prev)}
@@ -262,7 +247,7 @@ const HomepageSettings = () => {
 
                   {/* Slide background Color */}
                   <div className="w-full font-semibold flex items-center gap-4">
-                    <label htmlFor="topHeaderColor">Slide Background Color</label>
+                    <label htmlFor="topHeaderColor" className='text-sm'>Slide Background Color</label>
                     <input
                       type="color"
                       {...register(`topHeaderColor`, {
@@ -274,7 +259,7 @@ const HomepageSettings = () => {
 
                   {/* Slide Text Color Selection */}
                   <div className="w-full font-semibold flex items-center gap-4">
-                    <label htmlFor="textColor">Slide Text Color</label>
+                    <label htmlFor="textColor" className='text-sm'>Slide Text Color</label>
                     <input
                       type="color"
                       {...register(`textColor`, {
@@ -285,19 +270,38 @@ const HomepageSettings = () => {
                   </div>
 
                   {/* Slide Duration */}
-                  <div>
-                    <input
-                      id={`slideDuration`}
-                      {...register(`slideDuration`, { required: true })}
-                      placeholder={`Enter slide duration (seconds) *`}
-                      className="custom-number-input w-full border-b-2 border-neutral-300 bg-transparent py-2 text-neutral-800 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-neutral-400 text-sm"
-                      type="number"
-                      step="any"
-                    />
-                    {errors.slideDuration?.type === "required" && (
-                      <p className="text-red-600 text-left pt-2 text-sm">Slide Duration is required</p>
+                  <Controller
+                    name="slideDuration"
+                    control={control}
+                    rules={{ required: true }}
+                    defaultValue={1.5}
+                    render={({ field }) => (
+                      <div className="w-full pt-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <label htmlFor="slideDuration" className="text-sm text-neutral-800 font-bold">
+                            Slide Duration (seconds) *
+                          </label>
+                          <span className="text-sm text-neutral-500 font-bold">
+                            {`${field.value?.toFixed(2)} s`}
+                          </span>
+                        </div>
+                        <Slider
+                          id="slideDuration"
+                          minValue={0.5}
+                          maxValue={2.5}
+                          step={0.25}
+                          aria-label="Slide Duration"
+                          className="w-full"
+                          {...field}
+                        />
+                        {errors.slideDuration && (
+                          <p className="text-red-600 text-left pt-2 text-sm">
+                            Slide Duration is required
+                          </p>
+                        )}
+                      </div>
                     )}
-                  </div>
+                  />
 
                   <div className='pt-6 flex items-center justify-between'>
                     <h2 className='text-lg font-semibold'>Slides</h2>
@@ -350,13 +354,7 @@ const HomepageSettings = () => {
               )}
 
               {/* Submit Button */}
-              <div className={`w-full flex ${slideEnabled ? "justify-between" : "justify-end"} !mt-7`}>
-
-                {slideEnabled &&
-                  <button type='button' onClick={handleGoToPreviewPage} className='text-blue-600 border-blue-500 font-bold border-b'>
-                    Preview
-                  </button>
-                }
+              <div className={`w-full flex justify-end !mt-7`}>
 
                 <button
                   type='submit'

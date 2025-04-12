@@ -112,95 +112,8 @@ const HomepageContent = () => {
     return null;
   };
 
-  const handleGoToPreviewPageBeforeUpload = async () => {
-
-    if (!image) {
-      setSizeError(true);
-      return;
-    }
-    setSizeError(false);
-
-    let imageUrl = '';
-    // If the image is new, upload it
-    if (image?.file) {
-      imageUrl = await uploadImageToImgbb(image);
-      if (!imageUrl) {
-        toast.error('Image upload failed, cannot proceed.');
-        return;
-      }
-    } else if (heroBannerImageList?.length > 0) {
-      // Use the existing URL if no new image was uploaded
-      imageUrl = heroBannerImageList[0]?.leftImgUrl;
-    }
-
-    if (imageUrl) {
-      const previewURL = `/dash-board/preview/previewHomeContent?leftImage=${encodeURIComponent(imageUrl)}`;
-      window.open(previewURL, '_blank');
-    } else {
-      toast.error("Please upload an image");
-    }
-  };
-
-  const handleGoToPreviewPageBeforeUpload2 = async () => {
-
-    if (!image2) {
-      setSizeError2(true);
-      return;
-    }
-    setSizeError2(false);
-
-    let imageUrl2 = '';
-    // If the image is new, upload it
-    if (image2?.file) {
-      imageUrl2 = await uploadImageToImgbb(image2);
-      if (!imageUrl2) {
-        toast.error('Image upload failed, cannot proceed.');
-        return;
-      }
-    } else if (heroBannerImageList?.length > 0) {
-      // Use the existing URL if no new image was uploaded
-      imageUrl2 = heroBannerImageList[0]?.centerImgUrl;
-    }
-
-    if (imageUrl2) {
-      const previewURL = `/dash-board/preview/previewHomeContent?centerImage=${encodeURIComponent(imageUrl2)}`;
-      window.open(previewURL, '_blank');
-    } else {
-      toast.error("Please upload an image");
-    }
-  };
-
-  const handleGoToPreviewPageBeforeUpload3 = async () => {
-
-    if (!image3) {
-      setSizeError3(true);
-      return;
-    }
-    setSizeError3(false);
-
-    let imageUrl3 = '';
-    // If the image is new, upload it
-    if (image3?.file) {
-      imageUrl3 = await uploadImageToImgbb(image3);
-      if (!imageUrl3) {
-        toast.error('Image upload failed, cannot proceed.');
-        return;
-      }
-    } else if (heroBannerImageList?.length > 0) {
-      // Use the existing URL if no new image was uploaded
-      imageUrl3 = heroBannerImageList[0]?.rightImgUrl;
-    }
-
-    if (imageUrl3) {
-      const previewURL = `/dash-board/preview/previewHomeContent?rightImage=${encodeURIComponent(imageUrl3)}`;
-      window.open(previewURL, '_blank');
-    } else {
-      toast.error("Please upload an image");
-    }
-  };
-
   const handleGoToPreviewPageAfterUpload = (imageUrl, imageUrl2, imageUrl3) => {
-    const previewURL = `/dash-board/preview/previewHomeContent?leftImage=${encodeURIComponent(imageUrl)}&centerImage=${encodeURIComponent(imageUrl2)}&rightImage=${encodeURIComponent(imageUrl3)}`;
+    const previewURL = `/preview/previewHomeContent?leftImage=${encodeURIComponent(imageUrl)}&centerImage=${encodeURIComponent(imageUrl2)}&rightImage=${encodeURIComponent(imageUrl3)}`;
     window.open(previewURL, '_blank');
   }
 
@@ -375,12 +288,6 @@ const HomepageContent = () => {
                 </div>
               )}
 
-              {image && <div className="flex justify-start">
-                <button type='button' className='inline-block text-blue-600 border-blue-500 font-bold border-b mt-6' onClick={handleGoToPreviewPageBeforeUpload}>
-                  Preview
-                </button>
-              </div>}
-
             </div>
 
             <div className='flex flex-col gap-4 p-5 md:p-7'>
@@ -425,12 +332,6 @@ const HomepageContent = () => {
                   </button>
                 </div>
               )}
-
-              {image2 && <div className="flex justify-start">
-                <button type='button' className='inline-block text-blue-600 border-blue-500 font-bold border-b mt-6' onClick={handleGoToPreviewPageBeforeUpload2}>
-                  Preview
-                </button>
-              </div>}
 
             </div>
 
@@ -477,12 +378,6 @@ const HomepageContent = () => {
                   </button>
                 </div>
               )}
-
-              {image3 && <div className="flex justify-start">
-                <button type='button' className='inline-block text-blue-600 border-blue-500 font-bold border-b mt-6' onClick={handleGoToPreviewPageBeforeUpload3}>
-                  Preview
-                </button>
-              </div>}
 
             </div>
 

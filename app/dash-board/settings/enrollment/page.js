@@ -639,7 +639,7 @@ const EnrollmentPage = () => {
                   classNames={{
                     label: "font-bold text-neutral-900", // ✅ bold placeholder
                   }}
-                  label="Edit role"
+                  label="Role"
                   selectedKeys={selectedRole ? [selectedRole] : []}
                   variant="underlined">
                   {roles.map((role) => (

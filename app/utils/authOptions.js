@@ -34,7 +34,7 @@ export const authOptions = {
           // Return specific error messages from backend if available
           throw new Error(
             error.response?.data?.message ||
-              "Login failed! Please check your credentials.",
+            "Login failed! Please check your credentials.",
           );
         }
       },
@@ -65,7 +65,7 @@ export const authOptions = {
           // Return specific error messages from backend if available
           throw new Error(
             error.response?.data?.message ||
-              "Login failed! Please check your credentials.",
+            "Login failed! Please check your credentials.",
           );
         }
       },
