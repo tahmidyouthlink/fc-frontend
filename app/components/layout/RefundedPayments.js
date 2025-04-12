@@ -6,7 +6,6 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Toolti
 import { IoMdClose } from 'react-icons/io';
 import { format, startOfToday, endOfToday, startOfYesterday, endOfYesterday, subDays, subMonths, startOfMonth, endOfMonth, isValid } from 'date-fns';
 import { today, getLocalTimeZone } from "@internationalized/date";
-import { useAuth } from '@/app/contexts/auth';
 
 const RefundedPayments = () => {
   const [orderList, isOrderPending] = useOrders();
@@ -14,16 +13,6 @@ const RefundedPayments = () => {
   const [activeFilter, setActiveFilter] = useState('today');
   const [showDateRangePicker, setShowDateRangePicker] = useState(true); // New state
   const [selected, setSelected] = useState(['bKash', 'SSLCommerz']);
-  // const { existingUserData, isUserLoading } = useAuth();
-  // const [isDateRangeButtonAllowed, setIsDateRangeButtonAllowed] = useState(false);
-
-  // useEffect(() => {
-  //   // Fetch user data if needed or check the permission dynamically
-  //   if (existingUserData) {
-  //     // Check if the user has permission to add a product
-  //     setIsDateRangeButtonAllowed(existingUserData?.permissions?.["Finances"]?.actions?.['Refunded Date range filtering'] ?? false);
-  //   }
-  // }, [existingUserData]);
 
   useEffect(() => {
     // Set default date range to Today when the component mounts
@@ -104,8 +93,9 @@ const RefundedPayments = () => {
 
     const calculateTotals = (orders) => {
       orders?.forEach((order) => {
-        if (order?.paymentInfo?.paymentStatus === "Refunded") { // Only consider Refunded orders
-          const orderTotal = order.total || 0; // Use the total from the order
+
+        if (order?.orderStatus === "Refunded") { // Only consider Refunded orders
+          const orderTotal = order.returnInfo.refundAmount || 0; // Use the total from the order
 
           if (order?.paymentInfo?.paymentMethod === "bKash") {
             bKashTransactions += 1;
@@ -133,7 +123,7 @@ const RefundedPayments = () => {
       return (
         orderDate >= adjustedStartDate &&
         orderDate <= adjustedEndDate &&
-        order?.paymentInfo?.paymentStatus === "Refunded"
+        order?.orderStatus === "Refunded"
       );
     });
 
@@ -153,7 +143,7 @@ const RefundedPayments = () => {
     orderList?.forEach((order) => {
       const orderDate = parseDate(order.dateTime);
       const orderDateFormatted = format(orderDate, 'yyyy-MM-dd');
-      if (orderDate >= adjustedStartDate && orderDate <= adjustedEndDate && order?.paymentInfo?.paymentStatus === "Refunded") {
+      if (orderDate >= adjustedStartDate && orderDate <= adjustedEndDate && order?.orderStatus === "Refunded") {
         if (!dailyData[orderDateFormatted]) {
           dailyData[orderDateFormatted] = { bKashTransactions: 0, sslCommerzTransactions: 0 };
         }
@@ -190,7 +180,7 @@ const RefundedPayments = () => {
       const orderDate = parseDate(order.dateTime);
       return orderDate >= adjustedStartDate &&
         orderDate <= adjustedEndDate &&
-        order.paymentInfo?.paymentStatus === "Refunded";
+        order.orderStatus === "Refunded";
     });
 
     if (!filteredOrders?.length) return Array.from({ length: 24 }, (_, hour) => ({
@@ -298,10 +288,6 @@ const RefundedPayments = () => {
 
   // Set the maximum value for the Y-axis (slightly above the highest transaction count, minimum of 20)
   const maxYValue = Math.max(Math.ceil(Math.max(maxBKash, maxSSLCommerz, maxHourlyBKash, maxHourlySSLCommerz) * 1.1)); // Ensure minimum of 20
-
-  // if (isOrderPending || isUserLoading) {
-  //   return <SmallHeightLoading />;
-  // }
 
   if (isOrderPending) {
     return <SmallHeightLoading />;

@@ -287,9 +287,9 @@ const HomepageSettings = () => {
                         </div>
                         <Slider
                           id="slideDuration"
-                          minValue={0.5}
-                          maxValue={2.5}
-                          step={0.25}
+                          minValue={2}
+                          maxValue={5}
+                          step={0.50}
                           aria-label="Slide Duration"
                           className="w-full"
                           {...field}

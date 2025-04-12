@@ -23,13 +23,13 @@ const RestrictedAccessLoginPage = () => {
   const [resendOtpText, setResendOtpText] = useState(false);
   const [isResendDisabled, setIsResendDisabled] = useState(false); // Track resend state
   const [timer, setTimer] = useState(30); // Timer state for countdown
-  const [trustDevice, setTrustDevice] = useState(false);
+  // const [trustDevice, setTrustDevice] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    const trusted = localStorage.getItem("trust-device") === "true";
-    setTrustDevice(trusted);
-  }, []); // Run only once on mount
+  // useEffect(() => {
+  //   const trusted = localStorage.getItem("trust-device") === "true";
+  //   setTrustDevice(trusted);
+  // }, []); // Run only once on mount
 
   useEffect(() => {
     if (otpRequested && inputRefs.current[0]) {
@@ -54,14 +54,14 @@ const RestrictedAccessLoginPage = () => {
     return () => clearInterval(interval); // Clean up the interval on component unmount or when OTP is reset
   }, [otpRequested, isResendDisabled]);
 
-  const handleToggle = (value) => {
-    setTrustDevice(value);
-    if (value) {
-      localStorage.setItem("trust-device", "true");
-    } else {
-      localStorage.removeItem("trust-device")
-    }
-  }
+  // const handleToggle = (value) => {
+  //   setTrustDevice(value);
+  //   if (value) {
+  //     localStorage.setItem("trust-device", "true");
+  //   } else {
+  //     localStorage.removeItem("trust-device")
+  //   }
+  // }
 
   const handleChange = (index, e) => {
     let value = e.target.value;
@@ -210,7 +210,7 @@ const RestrictedAccessLoginPage = () => {
         emailOrUsername: data.emailOrUsername,
         password: data.password,
         otp: otpRequested ? finalOtp : "",
-        isOtpShouldNotSend: trustDevice
+        // isOtpShouldNotSend: trustDevice
       });
 
       if (result?.error) {
@@ -317,43 +317,43 @@ const RestrictedAccessLoginPage = () => {
       }
 
       // If no error and OTP was already requested, proceed with login success
-      if (trustDevice === true && result.ok) {
-        toast.custom((t) => (
-          <div
-            className={`${t.visible ? 'animate-enter' : 'animate-leave'
-              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
-          >
-            <div className="pl-6">
-              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
-            </div>
-            <div className="flex-1 w-0 p-4">
-              <div className="flex items-start">
-                <div className="ml-3 flex-1">
-                  <p className="text-base font-bold text-gray-900">
-                    Login successful! 🎉
-                  </p>
-                  <p className="mt-1 text-sm text-gray-500">
-                    You&apos;re now logged into the dashboard. Manage your products, orders, and more!
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="flex border-l border-gray-200">
-              <button
-                onClick={() => toast.dismiss(t.id)}
-                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
-              >
-                <RxCross2 />
-              </button>
-            </div>
-          </div>
-        ), {
-          position: "bottom-right",
-          duration: 5000
-        });
+      // if (trustDevice === true && result.ok) {
+      //   toast.custom((t) => (
+      //     <div
+      //       className={`${t.visible ? 'animate-enter' : 'animate-leave'
+      //         } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
+      //     >
+      //       <div className="pl-6">
+      //         <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
+      //       </div>
+      //       <div className="flex-1 w-0 p-4">
+      //         <div className="flex items-start">
+      //           <div className="ml-3 flex-1">
+      //             <p className="text-base font-bold text-gray-900">
+      //               Login successful! 🎉
+      //             </p>
+      //             <p className="mt-1 text-sm text-gray-500">
+      //               You&apos;re now logged into the dashboard. Manage your products, orders, and more!
+      //             </p>
+      //           </div>
+      //         </div>
+      //       </div>
+      //       <div className="flex border-l border-gray-200">
+      //         <button
+      //           onClick={() => toast.dismiss(t.id)}
+      //           className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
+      //         >
+      //           <RxCross2 />
+      //         </button>
+      //       </div>
+      //     </div>
+      //   ), {
+      //     position: "bottom-right",
+      //     duration: 5000
+      //   });
 
-        router.push("/dash-board"); // Redirect after login
-      }
+      //   router.push("/dash-board"); // Redirect after login
+      // }
 
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
@@ -468,14 +468,14 @@ const RestrictedAccessLoginPage = () => {
                   )}
                 </div>
 
-                <div className='flex items-center'>
+                {/* <div className='flex items-center'>
                   <Checkbox
                     isSelected={trustDevice}
                     onValueChange={handleToggle}
                     color='success'
                   />
                   <span className='text-sm text-neutral-700 font-bold'>Trust this device</span>
-                </div>
+                </div> */}
 
               </div>
 

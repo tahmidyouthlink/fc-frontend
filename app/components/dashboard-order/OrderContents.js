@@ -1557,20 +1557,6 @@ const OrderContents = () => {
                   </AccordionItem>
 
                   <AccordionItem
-                    key="2"
-                    aria-label="Shipment Information"
-                    title={<strong>Shipment Information</strong>}
-                  >
-                    <div className='mb-3 flex flex-col gap-2'>
-                      <div className='flex justify-between items-center'>
-                        <p className='text-xs md:text-base'>Shipment Handler: {selectedOrder?.shipmentInfo?.selectedShipmentHandlerName === undefined ? '--' : selectedOrder?.shipmentInfo?.selectedShipmentHandlerName}</p>
-                        <p className='text-xs md:text-base'>Tracking Number: {selectedOrder?.shipmentInfo?.trackingNumber ? selectedOrder?.shipmentInfo?.trackingNumber : "--"}</p>
-                      </div>
-                      {selectedOrder?.onHoldReason && <p className='text-xs md:text-base'>On Hold reason: <strong>{selectedOrder?.onHoldReason}</strong></p>}
-                    </div>
-                  </AccordionItem>
-
-                  <AccordionItem
                     key="3"
                     aria-label="Product Information"
                     title={<strong>Product Information</strong>}
@@ -1638,6 +1624,20 @@ const OrderContents = () => {
                         <p className='w-full'><strong>Shipping Charge:</strong>  ৳ {selectedOrder?.shippingCharge}</p>
                         <p className='w-full'><strong>Total Amount:</strong>  ৳ {selectedOrder?.total?.toFixed(2)}</p>
                       </div>
+                    </div>
+                  </AccordionItem>
+
+                  <AccordionItem
+                    key="2"
+                    aria-label="Shipment Information"
+                    title={<strong>Shipment Information</strong>}
+                  >
+                    <div className='mb-3 flex flex-col gap-2'>
+                      <div className='flex justify-between items-center'>
+                        <p className='text-xs md:text-base'>Shipment Handler: {selectedOrder?.shipmentInfo?.selectedShipmentHandlerName === undefined ? '--' : selectedOrder?.shipmentInfo?.selectedShipmentHandlerName}</p>
+                        <p className='text-xs md:text-base'>Tracking Number: {selectedOrder?.shipmentInfo?.trackingNumber ? selectedOrder?.shipmentInfo?.trackingNumber : "--"}</p>
+                      </div>
+                      {selectedOrder?.onHoldReason && <p className='text-xs md:text-base'>On Hold reason: <strong>{selectedOrder?.onHoldReason}</strong></p>}
                     </div>
                   </AccordionItem>
 
