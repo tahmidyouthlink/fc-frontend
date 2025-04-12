@@ -39,7 +39,7 @@ export default function MenuSection({ setIsNavMenuOpen }) {
         </li>
         <li>
           <TransitionLink
-            href={`/shop?filterBy=Popular${!!searchParams.get("search") ? `&search=${searchParams.get("search")}` : ""}`}
+            href="/shop?filterBy=Popular"
             hasDrawer={true}
             setIsDrawerOpen={setIsNavMenuOpen}
             className={
@@ -52,7 +52,7 @@ export default function MenuSection({ setIsNavMenuOpen }) {
         </li>
         <li>
           <TransitionLink
-            href={`/shop?filterBy=New+Arrivals${!!searchParams.get("search") ? `&search=${searchParams.get("search")}` : ""}`}
+            href="/shop?filterBy=New+Arrivals"
             hasDrawer={true}
             setIsDrawerOpen={setIsNavMenuOpen}
             className={

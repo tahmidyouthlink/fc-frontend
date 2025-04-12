@@ -54,7 +54,7 @@ export default function HomeTrending({
               </h1>
               <TransitionLink
                 className="flex items-center gap-2 text-[10px] transition-[gap] duration-300 ease-in-out hover:gap-3 md:text-base"
-                href={`/shop?filterBy=Popular${!!searchParams.get("search") ? `&search=${searchParams.get("search")}` : ""}`}
+                href="/shop?filterBy=Popular"
               >
                 View All{" "}
                 <span className="rounded-full border border-black p-1 md:p-2">

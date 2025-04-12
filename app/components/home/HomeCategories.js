@@ -55,7 +55,7 @@ export default function HomeCategories({ featuredCategories }) {
               return (
                 <TransitionLink
                   key={"featured-category-" + featuredCategory?._id}
-                  href={`/shop?category=${featuredCategory?.label?.split(" ")?.join("+")}${!!searchParams.get("search") ? `&search=${searchParams.get("search")}` : ""}`}
+                  href={`/shop?category=${featuredCategory?.label?.split(" ")?.join("+")}`}
                   className="relative flex aspect-[4/5] items-center justify-center overflow-hidden rounded-2xl text-2xl font-semibold text-white"
                 >
                   <div

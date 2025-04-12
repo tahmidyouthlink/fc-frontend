@@ -1,10 +1,11 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useLoading } from "@/app/contexts/loading";
 
-export default function TransitionLink({
+function TransitionLinkInner({
   children,
   href,
   hasDrawer,
@@ -19,11 +20,12 @@ export default function TransitionLink({
   const handleTransition = (event) => {
     event.preventDefault();
 
-    if (
-      !searchParams.get("filterBy")
-        ? href !== pathname
-        : !href.includes(searchParams.get("filterBy")?.split(" ")?.join("+"))
-    ) {
+    const filterParam = searchParams.get("filterBy");
+    const isSamePage = !filterParam
+      ? href === pathname
+      : href.includes(filterParam.split(" ").join("+"));
+
+    if (!isSamePage) {
       setIsPageLoading(true);
       if (hasDrawer) setIsDrawerOpen(false);
       router.push(href);
@@ -34,5 +36,19 @@ export default function TransitionLink({
     <Link href={href} onClick={handleTransition} {...props}>
       {children}
     </Link>
+  );
+}
+
+export default function TransitionLink(props) {
+  return (
+    <Suspense
+      fallback={
+        <Link href={props.href} {...props}>
+          {props.children}
+        </Link>
+      }
+    >
+      <TransitionLinkInner {...props} />
+    </Suspense>
   );
 }

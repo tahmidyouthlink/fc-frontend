@@ -11,12 +11,10 @@ import {
   getProductSpecialOffer,
 } from "@/app/utils/orderCalculations";
 import getImageSetsBasedOnColors from "@/app/utils/getImageSetsBasedOnColors";
-import TransitionLink from "../ui/TransitionLink";
 import ProductBadges from "../ui/badges/ProductBadges";
 import CardProductThumbnail from "./CardProductThumbnail";
 import CardProductInfo from "./CardProductInfo";
 import CardButtons from "./CardButtons";
-import CardColorSelectionTool from "./CardColorSelectionTool";
 
 export default function ProductCard({
   product,
@@ -25,6 +23,7 @@ export default function ProductCard({
   setIsAddToCartModalOpen,
   setSelectedAddToCartProduct,
   shouldBeHidden,
+  isAllowedToShowLimitedStock,
 }) {
   const { setIsPageLoading } = useLoading();
   const [specialOffers, isSpecialOffersLoading, specialOffersRefetch] =
@@ -66,7 +65,6 @@ export default function ProductCard({
       <CardProductThumbnail
         product={product}
         isProductOutOfStock={isProductOutOfStock}
-        isProductLimitedStock={isProductLimitedStock}
         imageSets={getImageSetsBasedOnColors(product.productVariants)}
       />
       <CardProductInfo
@@ -74,7 +72,9 @@ export default function ProductCard({
         specialOffers={specialOffers}
         needsWhiteBackgroundText={needsWhiteBackgroundText}
         isProductOutOfStock={isProductOutOfStock}
-        isProductLimitedStock={isProductLimitedStock}
+        isProductLimitedStock={
+          isAllowedToShowLimitedStock && isProductLimitedStock
+        }
       />
       <ProductBadges
         isTrending={product.salesThisMonth >= 10}
@@ -96,12 +96,6 @@ export default function ProductCard({
         setIsAddToCartModalOpen={setIsAddToCartModalOpen}
         setSelectedAddToCartProduct={setSelectedAddToCartProduct}
       />
-      {/* {!isProductOutOfStock && (
-        <CardColorSelectionTool
-          productTitle={product.productTitle}
-          productColors={product.availableColors}
-        />
-      )} */}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useLoading } from "@/app/contexts/loading";
 import useProductsInformation from "@/app/hooks/useProductsInformation";
 import useCategories from "../hooks/useCategories";
@@ -14,6 +14,7 @@ import HomeTrending from "../components/home/HomeTrending";
 import HomeNewArrival from "../components/home/HomeNewArrival";
 import AddToCartModal from "../components/shop/cart/AddToCartModal";
 import HomeFeatures from "../components/home/HomeFeatures";
+import LoadingSpinner from "../components/shared/LoadingSpinner";
 
 export default function Home() {
   const { setIsPageLoading } = useLoading();
@@ -82,22 +83,24 @@ export default function Home() {
         centerImgUrl={centerImgUrl}
         rightImgUrl={rightImgUrl}
       />
-      <HomeCategories featuredCategories={featuredCategories} />
-      <HomeTrending
-        trendingProducts={trendingProducts}
-        isAddToCartModalOpen={isAddToCartModalOpen}
-        setIsAddToCartModalOpen={setIsAddToCartModalOpen}
-        setSelectedAddToCartProduct={setSelectedAddToCartProduct}
-        getImageSetsBasedOnColors={getImageSetsBasedOnColors}
-      />
-      <HomeNewArrival
-        isAnyTrendingProductAvailable={trendingProducts?.length}
-        newlyArrivedProducts={newlyArrivedProducts}
-        isAddToCartModalOpen={isAddToCartModalOpen}
-        setIsAddToCartModalOpen={setIsAddToCartModalOpen}
-        setSelectedAddToCartProduct={setSelectedAddToCartProduct}
-        getImageSetsBasedOnColors={getImageSetsBasedOnColors}
-      />
+      <Suspense fallback={<LoadingSpinner />}>
+        <HomeCategories featuredCategories={featuredCategories} />
+        <HomeTrending
+          trendingProducts={trendingProducts}
+          isAddToCartModalOpen={isAddToCartModalOpen}
+          setIsAddToCartModalOpen={setIsAddToCartModalOpen}
+          setSelectedAddToCartProduct={setSelectedAddToCartProduct}
+          getImageSetsBasedOnColors={getImageSetsBasedOnColors}
+        />
+        <HomeNewArrival
+          isAnyTrendingProductAvailable={trendingProducts?.length}
+          newlyArrivedProducts={newlyArrivedProducts}
+          isAddToCartModalOpen={isAddToCartModalOpen}
+          setIsAddToCartModalOpen={setIsAddToCartModalOpen}
+          setSelectedAddToCartProduct={setSelectedAddToCartProduct}
+          getImageSetsBasedOnColors={getImageSetsBasedOnColors}
+        />
+      </Suspense>
       <HomeFeatures
         isAnyTrendingProductAvailable={trendingProducts?.length}
         isAnyNewProductAvailable={newlyArrivedProducts?.length}

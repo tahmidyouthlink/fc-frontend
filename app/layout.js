@@ -6,7 +6,6 @@ import { LoadingProvider } from "./contexts/loading";
 import { AuthProvider } from "./contexts/auth";
 import SessionWrapper from "./components/layout/SessionWrapper";
 import "./globals.css";
-import { Suspense } from "react";
 
 const oxygen = Oxygen({ subsets: ["latin"], weight: ["300", "400", "700"] });
 
@@ -26,13 +25,9 @@ export default function RootLayout({ children }) {
         <SessionWrapper>
           <ReactTanstackProvider>
             <NextUIProvider>
-              <Suspense fallback={<div>Loading...</div>}>
-                <AuthProvider>
-                  <LoadingProvider>
-                    {children}
-                  </LoadingProvider>
-                </AuthProvider>
-              </Suspense>
+              <AuthProvider>
+                <LoadingProvider>{children}</LoadingProvider>
+              </AuthProvider>
             </NextUIProvider>
             <Toaster />
           </ReactTanstackProvider>

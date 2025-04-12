@@ -25,7 +25,7 @@ export default function MainLinks() {
                 ? "text-neutral-800"
                 : "hover:text-neutral-500"
             }
-            href={`/shop?filterBy=Popular${!!searchParams.get("search") ? `&search=${searchParams.get("search")}` : ""}`}
+            href="/shop?filterBy=Popular"
           >
             Popular
           </TransitionLink>
@@ -37,7 +37,7 @@ export default function MainLinks() {
                 ? "text-neutral-800"
                 : "hover:text-neutral-500"
             }
-            href={`/shop?filterBy=New+Arrivals${!!searchParams.get("search") ? `&search=${searchParams.get("search")}` : ""}`}
+            href="/shop?filterBy=New+Arrivals"
           >
             New Arrivals
           </TransitionLink>

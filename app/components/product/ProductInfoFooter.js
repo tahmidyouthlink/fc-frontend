@@ -58,7 +58,7 @@ export default function ProductInfoFooter({ productId, productTitle }) {
               <FaXTwitter />
             </Link>
           </li>
-          <li>
+          <li className="[@media_(hover:hover)_and_(pointer:fine)]:hidden">
             <Link
               className="hover:bg-[#cce6ff] hover:text-[#168AFF]"
               href={`fb-messenger://share/?link=${fullUrl}`}
