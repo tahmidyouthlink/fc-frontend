@@ -1,10 +1,10 @@
-import React, { Suspense } from "react";
+import React from "react";
 import SideNavbar from "../components/layout/SideNavbar";
 import DashboardNavbar from "../components/layout/DashboardNavbar";
 
 const Layout = ({ children }) => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <div>
       {/* Only render sidebar on large devices */}
       <div className="inset-y-0 hidden flex-col xl:flex">
         <SideNavbar />
@@ -15,7 +15,7 @@ const Layout = ({ children }) => {
         <DashboardNavbar />
         {children}
       </div>
-    </Suspense>
+    </div>
   );
 };
 

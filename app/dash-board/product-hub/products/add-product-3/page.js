@@ -341,9 +341,9 @@ const ThirdStepOfAddProduct = () => {
 
           <button
             className={`relative text-sm py-1 transition-all duration-300
-${activeTab === 'Inside Dhaka' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
-after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
-after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
+${activeTab === 'Inside Dhaka' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
+after:absolute after:left-0 after:right-0 hover:text-neutral-800 after:bottom-0 
+after:h-[2px] after:bg-neutral-800 after:transition-all after:duration-300
 ${activeTab === 'Inside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
 `}
             onClick={() => handleTabChange("Inside Dhaka")}
@@ -353,9 +353,9 @@ ${activeTab === 'Inside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:aft
 
           <button
             className={`relative text-sm py-1 transition-all duration-300
-${activeTab === 'Dhaka Suburbs' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
-after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
-after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
+${activeTab === 'Dhaka Suburbs' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
+after:absolute after:left-0 after:right-0 hover:text-neutral-800 after:bottom-0 
+after:h-[2px] after:bg-neutral-800 after:transition-all after:duration-300
 ${activeTab === 'Dhaka Suburbs' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
 `}
             onClick={() => handleTabChange("Dhaka Suburbs")}
@@ -365,9 +365,9 @@ ${activeTab === 'Dhaka Suburbs' ? 'after:w-full font-bold' : 'after:w-0 hover:af
 
           <button
             className={`relative text-sm py-1 transition-all duration-300
-${activeTab === 'Outside Dhaka' ? 'text-[#9F5216] font-semibold' : 'text-neutral-400 font-medium'}
-after:absolute after:left-0 after:right-0 hover:text-[#9F5216] after:bottom-0 
-after:h-[2px] after:bg-[#9F5216] after:transition-all after:duration-300
+${activeTab === 'Outside Dhaka' ? 'text-neutral-800 font-semibold' : 'text-neutral-400 font-medium'}
+after:absolute after:left-0 after:right-0 hover:text-neutral-800 after:bottom-0 
+after:h-[2px] after:bg-neutral-800 after:transition-all after:duration-300
 ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:after:w-full'}
 `}
             onClick={() => handleTabChange("Outside Dhaka")}
@@ -390,7 +390,7 @@ ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:af
                   <Checkbox
                     isSelected={filteredShippingList.length > 0 && (tabSelections[activeTab]?.length === filteredShippingList.length)}
                     onChange={toggleSelectAll}
-                    color="warning"
+                    color="success"
                     size="lg"
                   />
                 </th>
@@ -415,7 +415,7 @@ ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:af
                       <Checkbox
                         isSelected={isSelected}
                         onChange={() => toggleCardSelection(shipping)}
-                        color="warning"
+                        color="success"
                         size='lg'
                       />
                     </td>
