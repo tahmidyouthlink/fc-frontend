@@ -145,6 +145,8 @@ const AddSeason = () => {
     }
   };
 
+  console.log("IMGBB API KEY:", process.env.NEXT_PUBLIC_IMGBB_API_KEY);
+
   return (
     <div className='bg-gray-50 min-h-screen'>
 

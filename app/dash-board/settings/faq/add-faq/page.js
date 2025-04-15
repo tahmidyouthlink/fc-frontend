@@ -230,7 +230,7 @@ const AddFAQPage = () => {
                   )}
                 </div>
 
-                <div className={`flex flex-col gap-4 rounded-lg h-fit pt-8`}>
+                <div className={`flex flex-col gap-2 rounded-lg h-fit pt-8`}>
                   <Controller
                     name={`faqs.${index}.answer`}
                     control={control}
@@ -250,7 +250,7 @@ const AddFAQPage = () => {
                     )}
                   />
                   {errors.faqs?.[index]?.answer && (
-                    <p className="absolute -bottom-5 left-0 text-xs font-semibold text-red-500">
+                    <p className="left-0 text-xs font-semibold text-red-500">
                       {errors.faqs[index].answer.message}
                     </p>
                   )}
