@@ -112,11 +112,12 @@ const EnrollmentForm = () => {
     try {
 
       const enrollmentInformation = {
-        fullName: data.fullName,
         email: data.email,
         role: selectedRole,
         permissions,
       }
+
+      console.log(enrollmentInformation, "enrollmentInformation");
 
       const response = await axiosPublic.post('/invite', enrollmentInformation);
 
@@ -246,29 +247,6 @@ const EnrollmentForm = () => {
 
       {/* Email and password login section */}
       <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
-
-        <div className="w-full space-y-2 font-semibold bg-gray-50">
-          <label htmlFor="fullName">Full Name</label>
-          <input
-            id="fullName"
-            type="text"
-            placeholder="John Doe"
-            {...register("fullName", {
-              required: {
-                value: true,
-                message: "Full name is required.",
-              },
-            })}
-            className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px]"
-            required
-          />
-          {/* Email Error Message */}
-          {errors.fullName && (
-            <p className="text-xs font-semibold text-red-500">
-              {errors.fullName?.message}
-            </p>
-          )}
-        </div>
 
         <div className="w-full space-y-2 font-semibold bg-gray-50">
           <label htmlFor="email">Email</label>

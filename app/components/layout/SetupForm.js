@@ -8,7 +8,7 @@ import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import { DatePicker } from "@nextui-org/react";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { AiOutlineCheck, AiOutlineClose, AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { RxCheck, RxCross2 } from "react-icons/rx";
 
 const SetupForm = ({ email, isValidToken }) => {
@@ -61,6 +61,7 @@ const SetupForm = ({ email, isValidToken }) => {
     const formattedDOB = `${data.dob.year}-${String(data.dob.month).padStart(2, "0")}-${String(data.dob.day).padStart(2, "0")}`;
 
     const setupInformation = {
+      fullName: data.fullName,
       username: data?.username,
       dob: formattedDOB,
       password,
@@ -144,7 +145,7 @@ const SetupForm = ({ email, isValidToken }) => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
 
-      <div className="max-w-screen-sm mx-auto px-6 pt-24 lg:pt-48 relative">
+      <div className="max-w-screen-sm mx-auto px-6 pt-24 relative">
 
         {/* Heading */}
         <h1 className="mb-10 mt-2 text-4xl font-semibold sm:max-xl:text-center">
@@ -153,6 +154,29 @@ const SetupForm = ({ email, isValidToken }) => {
 
         {/* Email and password login section */}
         <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
+
+          <div className="w-full space-y-2 font-semibold bg-gray-50">
+            <label htmlFor="fullName">Full Name</label>
+            <input
+              id="fullName"
+              type="text"
+              placeholder="John Doe"
+              {...registerForSetup("fullName", {
+                required: {
+                  value: true,
+                  message: "Full name is required.",
+                },
+              })}
+              className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px]"
+              required
+            />
+            {/* Email Error Message */}
+            {errorsForSetup.fullName && (
+              <p className="text-xs font-semibold text-red-500">
+                {errorsForSetup.fullName?.message}
+              </p>
+            )}
+          </div>
 
           <div className="w-full space-y-2 font-semibold bg-gray-50">
             <label htmlFor="username">Username</label>
@@ -223,6 +247,7 @@ const SetupForm = ({ email, isValidToken }) => {
             <div className="flex items-center justify-between">
               <label htmlFor="password">Password</label>
             </div>
+
             <div className="relative">
               <input
                 id="password"
@@ -232,21 +257,13 @@ const SetupForm = ({ email, isValidToken }) => {
                   required: !password ? "Password is required." : false,
                   minLength: { value: 8, message: "Password must be at least 8 characters." },
                   validate: (value) => {
-                    if (!/[A-Z]/.test(value)) {
-                      return "Password must contain at least one uppercase letter.";
-                    }
-                    if (!/[a-z]/.test(value)) {
-                      return "Password must contain at least one lowercase letter.";
-                    }
-                    if (!/\d/.test(value)) {
-                      return "Password must contain at least one number.";
-                    }
-                    if (!/[@$!%*?&]/.test(value)) {
-                      return "Password must contain at least one special character (@$!%*?&).";
-                    }
+                    if (!/[A-Z]/.test(value)) return "Password must contain at least one uppercase letter.";
+                    if (!/[a-z]/.test(value)) return "Password must contain at least one lowercase letter.";
+                    if (!/\d/.test(value)) return "Password must contain at least one number.";
+                    if (!/[@$!%*?&]/.test(value)) return "Password must contain at least one special character (@$!%*?&).";
                     return true;
                   },
-                  onChange: (e) => setPassword(e.target.value), // Sync manual typing
+                  onChange: (e) => setPassword(e.target.value),
                 })}
                 className={`h-11 w-full rounded-lg border-2 px-3 text-xs text-neutral-700 outline-none md:text-[13px] border-gray-300 focus:border-[#F4D3BA] focus:bg-white`}
                 required
@@ -262,7 +279,30 @@ const SetupForm = ({ email, isValidToken }) => {
                 )}
               </div>
             </div>
+
             {errorsForSetup.password && <p className="text-xs text-red-500">{errorsForSetup.password.message}</p>}
+
+            {/* Password Rules Checklist */}
+            <div className="w-full rounded-md border px-4 py-3 text-xs space-y-2 bg-gray-50">
+              {[
+                { label: "At least 8 characters", isValid: password.length >= 8 },
+                { label: "At least one uppercase letter", isValid: /[A-Z]/.test(password) },
+                { label: "At least one lowercase letter", isValid: /[a-z]/.test(password) },
+                { label: "At least one number", isValid: /\d/.test(password) },
+                { label: "At least one special character (@$!%*?&)", isValid: /[@$!%*?&]/.test(password) },
+              ].map((rule, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  {rule.isValid ? (
+                    <AiOutlineCheck className="text-green-600" />
+                  ) : (
+                    <AiOutlineClose className="text-red-400" />
+                  )}
+                  <span className={`${rule.isValid ? "text-green-700" : "text-neutral-500"}`}>
+                    {rule.label}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="w-full space-y-2 font-semibold">
@@ -308,6 +348,7 @@ const SetupForm = ({ email, isValidToken }) => {
         </form>
 
       </div>
+
     </div>
   );
 };

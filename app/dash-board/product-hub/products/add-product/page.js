@@ -57,6 +57,7 @@ const FirstStepOfAddProduct = () => {
   const [menuPortalTarget, setMenuPortalTarget] = useState(null);
   const [selectedSubCategories, setSelectedSubCategories] = useState([]);
   const [selectedNewArrival, setSelectedNewArrival] = useState("");
+  const [isTrending, setIsTrending] = useState("");
   const [selectedAvailableColors, setSelectedAvailableColors] = useState([]);
   const [selectedVendors, setSelectedVendors] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
@@ -530,6 +531,12 @@ const FirstStepOfAddProduct = () => {
         setValue('newArrival', storedNewArrival);
       }
 
+      const storedIsTrending = localStorage.getItem('trending');
+      if (storedIsTrending) {
+        setIsTrending(storedIsTrending);
+        setValue('trending', storedIsTrending);
+      }
+
       const storedVendors = JSON.parse(localStorage.getItem('vendors') || '[]');
       if (Array.isArray(storedVendors)) {
         setSelectedVendors(storedVendors);
@@ -677,6 +684,7 @@ const FirstStepOfAddProduct = () => {
       localStorage.setItem('vendors', JSON.stringify(data.vendors));
       localStorage.setItem('tags', JSON.stringify(data.tags));
       localStorage.setItem('newArrival', data.newArrival);
+      localStorage.setItem('trending', data.trending);
       localStorage.setItem('productId', productId);
       setNavigate(true);
     } catch (err) {
@@ -1069,6 +1077,32 @@ const FirstStepOfAddProduct = () => {
                   </div>
                 )}
               />
+
+              <Controller
+                name="trending"
+                control={control}
+                defaultValue={isTrending}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <div className="flex flex-col gap-3">
+                    <RadioGroup
+                      {...field}
+                      label="Is Trending?"
+                      value={isTrending}
+                      onValueChange={setIsTrending}
+                      orientation="horizontal"
+                    >
+                      <Radio value="Yes">Yes</Radio>
+                      <Radio value="No">No</Radio>
+                    </RadioGroup>
+                    <p className="text-default-500 text-small">Selected: {isTrending}</p>
+                    {errors.trending && (
+                      <p className="text-red-600 text-left">Trending Selection is required</p>
+                    )}
+                  </div>
+                )}
+              />
+
             </div>
 
             <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>

@@ -264,7 +264,7 @@ const EditFAQPage = () => {
                     )}
                   />
                   {errors.faqs?.[index]?.answer && (
-                    <p className="text-red-600 text-left pt-1">
+                    <p className="absolute -bottom-5 left-0 text-xs font-semibold text-red-500">
                       {errors.faqs[index].answer.message}
                     </p>
                   )}

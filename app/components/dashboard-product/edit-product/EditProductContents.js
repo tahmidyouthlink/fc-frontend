@@ -73,9 +73,11 @@ const EditProductContents = () => {
   const [colorError, setColorError] = useState(false);
   const [tagError, setTagError] = useState(false);
   const [newArrivalError, setNewArrivalError] = useState(false);
+  const [trendingError, setTrendingError] = useState(false);
   const [menuPortalTarget, setMenuPortalTarget] = useState(null);
   const [selectedSubCategories, setSelectedSubCategories] = useState([]);
   const [selectedNewArrival, setSelectedNewArrival] = useState("");
+  const [isTrending, setIsTrending] = useState("");
   const [selectedAvailableColors, setSelectedAvailableColors] = useState([]);
   const [selectedVendors, setSelectedVendors] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
@@ -698,6 +700,7 @@ const EditProductContents = () => {
         setGroupSelected2(data?.allSizes);
         setSelectedAvailableColors(data?.availableColors);
         setSelectedNewArrival(data?.newArrival);
+        setIsTrending(data?.trending);
         setSelectedVendors(data?.vendors);
         setSelectedTags(data?.tags);
         initializeVariants(data?.availableColors || [], data?.allSizes || [], data?.productVariants || []);
@@ -790,6 +793,15 @@ const EditProductContents = () => {
       setNewArrivalError(false);  // Show error if no color is selected
     } else {
       setNewArrivalError(true); // Hide error if at least one color is selected
+    }
+  };
+
+  const handleTrendingChange = (newValue) => {
+    setIsTrending(newValue);
+    if (newValue) {
+      setTrendingError(false);  // Show error if no color is selected
+    } else {
+      setTrendingError(true); // Hide error if at least one color is selected
     }
   };
 
@@ -896,7 +908,14 @@ const EditProductContents = () => {
 
       if (selectedNewArrival === '') {
         setNewArrivalError(true);
-        toast.error("New Arrival is required");
+        toast.error("New Arrival selection is required");
+        return;
+      }
+      setNewArrivalError(false);
+
+      if (isTrending === '') {
+        setTrendingError(true);
+        toast.error("Trending selection is required");
         return;
       }
       setNewArrivalError(false);
@@ -1024,6 +1043,7 @@ const EditProductContents = () => {
         allSizes: groupSelected2,
         availableColors: selectedAvailableColors,
         newArrival: selectedNewArrival,
+        trending: isTrending,
         vendors: selectedVendors,
         tags: selectedTags,
         productVariants: finalData,
@@ -1352,6 +1372,23 @@ const EditProductContents = () => {
                         <p className="text-red-600 text-left">New Arrival Selection is required</p>
                       )}
                     </div>
+
+                    <div className="flex flex-col gap-3">
+                      <RadioGroup
+                        label="Is Trending?"
+                        value={isTrending}
+                        onValueChange={handleTrendingChange}
+                        orientation="horizontal"
+                      >
+                        <Radio value="Yes">Yes</Radio>
+                        <Radio value="No">No</Radio>
+                      </RadioGroup>
+                      <p className="text-default-500 text-small">Selected: {isTrending}</p>
+                      {trendingError && (
+                        <p className="text-red-600 text-left">Trending Selection is required</p>
+                      )}
+                    </div>
+
                   </div>
 
                   <div className='flex flex-col gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg h-fit'>

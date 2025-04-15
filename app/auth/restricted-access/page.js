@@ -8,7 +8,7 @@ import arrivals1 from "/public/card-images/arrivals1.svg";
 import { useRouter } from 'next/navigation';
 import { RxCheck, RxCross1, RxCross2 } from 'react-icons/rx';
 import toast from 'react-hot-toast';
-import { Checkbox } from '@nextui-org/react';
+// import { Checkbox } from '@nextui-org/react';
 
 const RestrictedAccessLoginPage = () => {
 
@@ -142,7 +142,7 @@ const RestrictedAccessLoginPage = () => {
     setFinalOtp(""); // Clear stored OTP
 
     try {
-      const result = await signIn("credentials", {
+      const result = await signIn("credentials-backend", {
         redirect: false,
         emailOrUsername: data.emailOrUsername,
         password: data.password,

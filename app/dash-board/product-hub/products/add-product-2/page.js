@@ -359,6 +359,7 @@ const SecondStepOfAddProduct = () => {
     const storedAllSizes = JSON.parse(localStorage.getItem('allSizes') || '[]');
     const storedAvailableColors = JSON.parse(localStorage.getItem('availableColors') || '[]');
     const storedNewArrival = localStorage.getItem('newArrival');
+    const storedIsTrending = localStorage.getItem('trending');
     const storedVendors = JSON.parse(localStorage.getItem('vendors') || '[]');
     const storedTags = JSON.parse(localStorage.getItem('tags') || '[]');
     const storedProductId = localStorage.getItem('productId');
@@ -412,6 +413,7 @@ const SecondStepOfAddProduct = () => {
       allSizes: storedAllSizes,
       availableColors: storedAvailableColors,
       newArrival: storedNewArrival,
+      trending: storedIsTrending,
       vendors: storedVendors,
       tags: storedTags,
       productId: storedProductId,

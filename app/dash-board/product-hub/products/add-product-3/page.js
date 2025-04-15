@@ -56,12 +56,13 @@ const ThirdStepOfAddProduct = () => {
     const storedAllSizes = JSON.parse(localStorage.getItem('allSizes') || '[]');
     const storedAvailableColors = JSON.parse(localStorage.getItem('availableColors') || '[]');
     const storedNewArrival = localStorage.getItem('newArrival');
+    const storedIsTrending = localStorage.getItem('trending');
     const storedTags = JSON.parse(localStorage.getItem('tags') || '[]');
     const storedProductId = localStorage.getItem('productId');
     const storedSizeGuideImageUrl = localStorage.getItem('sizeGuideImageUrl');
 
     // If any of these values are missing, redirect the user to the first step of the add-product process
-    if (!storedProductTitle || !storedProductBatchCode || !storedRegularPrice || !storedUploadedImageUrls || !storedCategory || !storedSeason || !storedSubCategories || !storedGroupOfSizes || !storedAllSizes || !storedAvailableColors || !storedNewArrival || !storedTags || !storedProductId || !storedSizeGuideImageUrl) {
+    if (!storedProductTitle || !storedProductBatchCode || !storedRegularPrice || !storedUploadedImageUrls || !storedCategory || !storedSeason || !storedSubCategories || !storedGroupOfSizes || !storedAllSizes || !storedAvailableColors || !storedNewArrival || !storedTags || !storedProductId || !storedSizeGuideImageUrl || !storedIsTrending) {
       toast.error("Colors or sizes are missing. Please go back and select them.");
       router.push('/dash-board/product-hub/products/add-product'); // Redirect to the first step
       return;
@@ -187,6 +188,7 @@ const ThirdStepOfAddProduct = () => {
     const storedAllSizes = JSON.parse(localStorage.getItem('allSizes') || '[]');
     const storedAvailableColors = JSON.parse(localStorage.getItem('availableColors') || '[]');
     const storedNewArrival = localStorage.getItem('newArrival');
+    const storedIsTrending = localStorage.getItem('trending');
     const storedVendors = JSON.parse(localStorage.getItem('vendors') || '[]');
     const storedTags = JSON.parse(localStorage.getItem('tags') || '[]');
     const storedVariants = JSON.parse(localStorage.getItem('productVariants') || '[]');
@@ -212,6 +214,7 @@ const ThirdStepOfAddProduct = () => {
       allSizes: storedAllSizes,
       availableColors: storedAvailableColors,
       newArrival: storedNewArrival,
+      trending: storedIsTrending,
       vendors: storedVendors,
       tags: storedTags,
       season: storedSeason,
@@ -279,6 +282,7 @@ const ThirdStepOfAddProduct = () => {
         JSON.parse(localStorage.removeItem('allSizes') || '[]');
         JSON.parse(localStorage.removeItem('availableColors') || '[]');
         localStorage.removeItem('newArrival');
+        localStorage.removeItem('trending');
         JSON.parse(localStorage.removeItem('vendors') || '[]');
         JSON.parse(localStorage.removeItem('restOfOutfit') || '[]');
         JSON.parse(localStorage.removeItem('tags') || '[]');
