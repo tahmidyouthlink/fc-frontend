@@ -10,7 +10,7 @@ import { getLocalTimeZone, today } from '@internationalized/date';
 import { TbColumnInsertRight } from 'react-icons/tb';
 import PaginationSelect from './PaginationSelect';
 
-const initialColumns = ["Date & Time", 'Order ID', 'Customer Name', 'Payment Method', 'Transaction ID', 'Payment Status'];
+const initialColumns = ["Date & Time", 'Order ID', 'Customer Name', 'Payment Method', 'Transaction ID', 'Order Amount', 'Refunded Amount', 'Payment Status'];
 
 const FinanceTable = () => {
 
@@ -362,6 +362,18 @@ const FinanceTable = () => {
                               {column === 'Transaction ID' && (
                                 <td key="transactionId" className="text-xs p-3 text-gray-700">
                                   {order?.paymentInfo?.transactionId ? order?.paymentInfo?.transactionId : '--'}
+                                </td>
+                              )}
+                              {column === 'Order Amount' && (
+                                <td key="orderAmount" className="text-xs p-3 text-gray-700">
+                                  {order?.total}
+                                </td>
+                              )}
+                              {column === 'Refunded Amount' && (
+                                <td key="refundedAmount" className="text-xs p-3 text-gray-700">
+                                  {order?.orderStatus === "Refunded" ?
+                                    order?.returnInfo?.refundAmount ?? 0
+                                    : 0}
                                 </td>
                               )}
                               {column === 'Payment Status' && (

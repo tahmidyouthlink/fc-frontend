@@ -35,6 +35,7 @@ import PaginationSelect from '@/app/components/layout/PaginationSelect';
 import { useAuth } from '@/app/contexts/auth';
 import TabsOrder from '@/app/components/layout/TabsOrder';
 import { useSearchParams } from 'next/navigation';
+import { placeShipmentOrder } from '@/app/utils/shipping/placeShipmentOrder';
 
 const PrintButton = dynamic(() => import("@/app/components/layout/PrintButton"), { ssr: false });
 
@@ -86,7 +87,6 @@ const OrderContents = () => {
   const [orderToUpdateDeclined, setOrderToUpdateDeclined] = useState({}); // selected order for update
   const [declinedReason, setDeclinedReason] = useState("");
   const [isDeclinedModalOpen, setDeclinedModalOpen] = useState(false);
-  const [isToggleOn, setIsToggleOn] = useState(true);
   const [shippingList, isShippingPending] = useShippingZones();
   const [selectedHandler, setSelectedHandler] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -150,8 +150,20 @@ const OrderContents = () => {
   }, []);
 
   // Handler for selecting a shipment handler
-  const handleSelectHandler = (handler) => {
-    setSelectedHandler(handler);
+  const handleSelectHandler = async (handler) => {
+    try {
+      setSelectedHandler(handler);
+
+      const tracking = await placeShipmentOrder(handler, orderToUpdate);
+
+      if (tracking) {
+        setTrackingNumber(tracking.toUpperCase());
+        toast.success("Tracking number generated from " + handler.shipmentHandlerName);
+      }
+    } catch (err) {
+      toast.error("Failed to generate tracking number from " + handler.shipmentHandlerName);
+      console.error(err);
+    }
   };
 
   const handleColumnChange = (selected) => {
@@ -1111,7 +1123,7 @@ const OrderContents = () => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl px-3 md:px-6 2xl:px-3 mx-auto'>
+      <div className='max-w-screen-2xl px-3 md:px-6 mx-auto'>
 
         <div className='flex items-center justify-between py-2 md:py-5 gap-2'>
 
@@ -1780,7 +1792,6 @@ const OrderContents = () => {
                         const minutes = String(date.getMinutes()).padStart(2, '0');
                         return `${day}-${month}-${year} | ${hours}:${minutes}`;
                       })()}
-                      {" "} by {" "}
                     </i>
                   ) : (
                     ""
@@ -1795,12 +1806,19 @@ const OrderContents = () => {
           </Modal>
         )}
 
-        {/* Modal of tracking number */}
+        {/* Modal of selecting shipment handler & tracking number */}
         {matchingShipmentHandlers?.length > 0 && (
-          <Modal size='lg' isOpen={isTrackingModalOpen} onOpenChange={() => setTrackingModalOpen(false)}>
-            <ModalContent className='px-2'>
-              <ModalHeader className="flex flex-col gap-1">Select Shipment Handler</ModalHeader>
-              <ModalBody>
+          <Modal size='lg' isOpen={isTrackingModalOpen} onOpenChange={(isOpen) => {
+            setTrackingModalOpen(isOpen);
+            if (!isOpen) {
+              // Reset state when modal closes
+              setTrackingNumber('');
+              setSelectedHandler(null);
+            }
+          }}>
+            <ModalContent>
+              <ModalHeader className="flex flex-col gap-1 bg-gray-200">Select Shipment Handler</ModalHeader>
+              <ModalBody className='p-4'>
                 <div className='flex flex-wrap items-center justify-center gap-2'>
                   {matchingShipmentHandlers?.map((handler, index) => (
                     <div
@@ -1839,7 +1857,7 @@ const OrderContents = () => {
                     }
 
                     // When toggle is ON, ensure tracking number is entered
-                    if (isToggleOn && !trackingNumber) {
+                    if (!trackingNumber) {
                       toast.error("Please enter a tracking number.");
                       return; // Stop execution if no tracking number is provided
                     }
@@ -1850,7 +1868,6 @@ const OrderContents = () => {
                       setTrackingModalOpen(false); // Close modal after submission
                       setTrackingNumber(''); // Clear input field
                       setSelectedHandler(null); // Clear the selected handler
-                      setIsToggleOn(true); // Reset toggle to true
                     } catch (error) {
                       console.error("Failed to updated order status:", error)
                       toast.error("Something went wrong while updating the order status.")
@@ -1865,7 +1882,14 @@ const OrderContents = () => {
         )}
 
         {/* Modal of on hold */}
-        <Modal size='lg' isOpen={isOnHoldModalOpen} onOpenChange={() => setOnHoldModalOpen(false)}>
+        <Modal size='lg' isOpen={isOnHoldModalOpen} onOpenChange={(isOpen) => {
+          setOnHoldModalOpen(isOpen);
+          if (!isOpen) {
+            // Reset state when modal closes
+            setOnHoldModalOpen(false);
+            setOnHoldReason('');
+          }
+        }}>
           <ModalContent className='px-2'>
             <ModalHeader className="flex flex-col gap-1">On Hold Reason</ModalHeader>
             <ModalBody>
@@ -1899,7 +1923,6 @@ const OrderContents = () => {
                   await updateOrderStatus(orderToUpdateOnHold, orderIdToUpdateOnHold, "onHold", false, onHoldReason);
                   setOnHoldModalOpen(false); // Close modal after submission
                   setOnHoldReason(''); // Clear input field
-                  setIsToggleOn(true); // Reset toggle to true
                 }}
               >
                 Confirm
@@ -1909,7 +1932,13 @@ const OrderContents = () => {
         </Modal>
 
         {/* Modal of Declined reason */}
-        <Modal size='lg' isOpen={isDeclinedModalOpen} onOpenChange={() => setDeclinedModalOpen(false)}>
+        <Modal size='lg' isOpen={isDeclinedModalOpen} onOpenChange={(isOpen) => {
+          setDeclinedModalOpen(isOpen)
+          if (!isOpen) {
+            setDeclinedModalOpen(false);
+            setDeclinedReason('');
+          }
+        }}>
           <ModalContent>
             <ModalHeader className="flex flex-col gap-1 bg-gray-200 px-8">Provide a Reason for Declining the Order</ModalHeader>
             <ModalBody>
@@ -1944,7 +1973,6 @@ const OrderContents = () => {
                   await updateOrderStatus(orderToUpdateDeclined, orderIdToUpdateDeclined, "declined", false, declinedReason);
                   setDeclinedModalOpen(false); // Close modal after submission
                   setDeclinedReason(''); // Clear input field
-                  setIsToggleOn(true); // Reset toggle to true
                 }}
               >
                 Confirm
