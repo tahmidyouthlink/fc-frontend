@@ -177,6 +177,10 @@
     @apply bg-green-100 text-green-600;
   }
 
+  .chat-sub-btn {
+    @apply absolute bottom-0 right-0 flex size-10 origin-center items-center justify-center rounded-full text-neutral-700 transition-[background-color,transform,opacity] duration-300 ease-out hover:text-neutral-900 [&>svg]:size-6 [&>svg]:transition-[color] [&>svg]:duration-300 [&>svg]:ease-out;
+  }
+
   .filter-options {
     @apply flex-wrap gap-3 text-sm font-semibold [&>div]:relative;
   }
