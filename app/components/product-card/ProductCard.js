@@ -77,8 +77,6 @@ export default function ProductCard({
         }
       />
       <ProductBadges
-        isTrending={product.salesThisMonth >= 10}
-        isNewArrival={product.newArrival === "Yes"}
         hasSpecialOffer={checkIfSpecialOfferIsAvailable(product, specialOffers)}
         specialOffer={getProductSpecialOffer(product, specialOffers, "NA")}
         hasDiscount={!!Number(product.discountValue)}

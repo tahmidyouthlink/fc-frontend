@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import { HiOutlineLightningBolt } from "react-icons/hi";
 import { LuBadge } from "react-icons/lu";
+import { MdOutlineNewReleases } from "react-icons/md";
 import { TbRosetteDiscount } from "react-icons/tb";
 import { TiStarOutline } from "react-icons/ti";
 
 export default function ProductBadges({
+  isTrending,
+  isNewArrival,
   hasSpecialOffer,
   specialOffer,
   hasDiscount,
@@ -70,11 +74,42 @@ export default function ProductBadges({
 
   const baseWidth = 32; // Width for the icon
   const padding = 7; // Additional padding
+  const expandedTrendingWidth = baseWidth + 52 + padding;
+  const expandedNewArrivalWidth = baseWidth + 28 + padding;
   const expandedSpecialOfferWidth = baseWidth + specialOfferTextWidth + padding;
   const expandedDiscountWidth = baseWidth + discountTextWidth + padding;
 
   return (
     <div className="absolute left-3 top-3 z-[3] space-y-2">
+      {isTrending && (
+        <div
+          className="relative size-8 overflow-hidden rounded-lg bg-[#cd4747] font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[width] hover:w-[var(--expanded-width)]"
+          style={{
+            "--expanded-width": `${expandedTrendingWidth}px`,
+          }}
+        >
+          <div className="relative mx-1 h-8 w-6">
+            <LuBadge className="h-full w-full object-contain" />
+            <HiOutlineLightningBolt className="absolute left-1/2 top-1/2 h-full w-2/3 -translate-x-1/2 -translate-y-1/2 object-contain" />
+          </div>
+          <p className="absolute left-8 top-1/2 -translate-y-1/2 text-nowrap text-xs">
+            Trending!
+          </p>
+        </div>
+      )}
+      {isNewArrival && (
+        <div
+          className="relative size-8 overflow-hidden rounded-lg bg-[#5c49d9] font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[width] hover:w-[var(--expanded-width)]"
+          style={{
+            "--expanded-width": `${expandedNewArrivalWidth}px`,
+          }}
+        >
+          <MdOutlineNewReleases className="mx-1 h-8 w-6 object-contain" />
+          <p className="absolute left-8 top-1/2 -translate-y-1/2 text-nowrap text-xs">
+            New!
+          </p>
+        </div>
+      )}
       {hasSpecialOffer ? (
         <div
           className="relative w-8 overflow-hidden rounded-lg bg-[#a138b1] font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[width] duration-300 hover:w-[var(--expanded-width)] [&:hover>div:last-child]:animate-[scroll_3s_linear_infinite]"
