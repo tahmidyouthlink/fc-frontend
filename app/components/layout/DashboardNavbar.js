@@ -4,7 +4,7 @@ import { CgMenuLeft } from "react-icons/cg";
 import SideNavbar from "./SideNavbar";
 import { RxAvatar } from "react-icons/rx";
 import { useRouter } from "next/navigation";
-import { Avatar, AvatarIcon, Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger } from "@nextui-org/react";
+import { Avatar, AvatarIcon, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
 import { PiSignOutLight } from "react-icons/pi";
 import TransitionLink from "../ui/TransitionLink";
 import { CiLock } from "react-icons/ci";

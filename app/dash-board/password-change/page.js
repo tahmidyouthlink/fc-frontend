@@ -49,7 +49,6 @@ const PasswordChangePage = () => {
 
     try {
       const response = await axiosPublic.put('/change-password', passwordData);
-      console.log(response);
       if (response.data.success) {
         toast.custom((t) => (
           <div

@@ -371,9 +371,9 @@ const FinanceTable = () => {
                               )}
                               {column === 'Refunded Amount' && (
                                 <td key="refundedAmount" className="text-xs p-3 text-gray-700">
-                                  {order?.orderStatus === "Refunded" ?
-                                    order?.returnInfo?.refundAmount ?? 0
-                                    : 0}
+                                  {order?.orderStatus === "Refunded"
+                                    ? Number(order?.returnInfo?.refundAmount) || 0
+                                    : "Not Applicable"}
                                 </td>
                               )}
                               {column === 'Payment Status' && (

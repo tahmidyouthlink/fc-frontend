@@ -317,7 +317,7 @@ const SetupForm = ({ email, isValidToken }) => {
                 {...registerForSetup("confirmPassword", {
                   required: !confirmPassword ? "Confirm Password is required." : false,
                   minLength: { value: 8, message: "Password must be at least 8 characters." },
-                  validate: (value) => value === password || "Passwords do not match.", // Real-time password match validation
+                  validate: (value) => value === password || "Password doesn't match.", // Real-time password match validation
                   onChange: (e) => setConfirmPassword(e.target.value), // Sync manual typing
                 })}
                 className={`h-11 w-full rounded-lg border-2 px-3 text-xs text-neutral-700 outline-none md:text-[13px] border-gray-300 focus:border-[#F4D3BA] focus:bg-white`}
