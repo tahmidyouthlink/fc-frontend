@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
 import useProductsInformation from "@/app/hooks/useProductsInformation";
@@ -19,7 +19,6 @@ export default function Header({
   const { isUserLoading } = useAuth();
   const { setIsPageLoading } = useLoading();
   const [productList, isProductListLoading, refetch] = useProductsInformation();
-  const [isMobileSearchSelected, setIsMobileSearchSelected] = useState(false);
 
   useEffect(() => {
     setIsPageLoading(
@@ -40,14 +39,8 @@ export default function Header({
           textColor={textColor}
         />
       )}
-      <div
-        className={`mx-auto flex items-center justify-between px-5 pt-3 transition-[padding-bottom] duration-300 ease-in-out sm:px-8 sm:pt-3.5 lg:px-12 lg:py-[15px] xl:max-w-[1200px] xl:px-0 ${isMobileSearchSelected ? "pb-[60px]" : "pb-3 sm:pb-3.5"}`}
-      >
-        <MobileNavbar
-          productList={productList}
-          isMobileSearchSelected={isMobileSearchSelected}
-          setIsMobileSearchSelected={setIsMobileSearchSelected}
-        />
+      <div className="mx-auto flex items-center justify-between px-5 py-3 transition-[padding-bottom] duration-300 ease-in-out sm:px-8 sm:py-3.5 lg:px-12 lg:py-4 xl:max-w-[1200px] xl:px-0">
+        <MobileNavbar productList={productList} />
         <DesktopNavbar productList={productList} />
       </div>
     </header>

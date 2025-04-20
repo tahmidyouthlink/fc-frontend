@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { FiSearch } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 
-export default function Search({ isMobile, setIsMobileSearchSelected }) {
+export default function Search() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const keywordParam = searchParams.get("search");
@@ -31,7 +31,6 @@ export default function Search({ isMobile, setIsMobileSearchSelected }) {
     setIsPageLoading(true);
 
     router.push(`/shop${keywordQuery}${filterQuery}${categoryQuery}`);
-    if (isMobile) setIsMobileSearchSelected(false);
   };
 
   const handleCloseButtonClick = (event) => {
@@ -48,7 +47,6 @@ export default function Search({ isMobile, setIsMobileSearchSelected }) {
 
       router.push(`/shop${filterQuery}${categoryQuery}`);
     }
-    if (isMobile) setIsMobileSearchSelected(false);
   };
 
   const handleInputChange = (event) => {
@@ -91,18 +89,18 @@ export default function Search({ isMobile, setIsMobileSearchSelected }) {
           event, // Focus on search bar input
         ) =>
           event.currentTarget.parentElement
-            ?.querySelector(`search-bar-${isMobile ? "mobile" : "desktop"}`)
+            ?.querySelector("#search-bar")
             ?.focus()
         }
         className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2"
       />
       {/* Search bar */}
       <input
-        id={`search-bar-${isMobile ? "mobile" : "desktop"}`}
+        id="search-bar"
         placeholder="Search Products"
         type="search"
         defaultValue={keywordParam || ""}
-        className="h-9 w-full rounded-lg border-2 border-transparent bg-[#f3f3f4] px-4 pl-[2.5rem] outline-none transition-[border-color,background-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white [&::-webkit-search-cancel-button]:[-webkit-appearance:none] [&:not(:placeholder-shown)]:border-[#F4D3BA] [&:not(:placeholder-shown)]:bg-white"
+        className="h-9 w-full rounded-lg border-2 border-transparent bg-[#f3f3f4] px-4 pl-[2.5rem] outline-none transition-[border-color,background-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white max-[390px]:max-w-[168px] min-[390px]:max-sm:max-w-44 sm:max-sm:text-sm [&::-webkit-search-cancel-button]:[-webkit-appearance:none] [&:not(:placeholder-shown)]:border-[#F4D3BA] [&:not(:placeholder-shown)]:bg-white"
         onChange={handleInputChange}
       />
     </form>

@@ -38,7 +38,7 @@ export default function Home() {
     ?.filter(
       (product) =>
         product?.status === "active" &&
-        // product?.salesThisMonth >= 10 &&
+        product?.trending === "Yes" &&
         !CheckIfProductIsOutOfStock(product?.productVariants, primaryLocation),
     )
     ?.slice(0, 5);

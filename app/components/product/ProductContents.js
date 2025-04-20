@@ -56,7 +56,7 @@ export default function ProductContents({
           setIsImageExpanded={setIsImageExpanded}
           numOfTimesThumbnailsMoved={numOfTimesThumbnailsMoved}
           setNumOfTimesThumbnailsMoved={setNumOfTimesThumbnailsMoved}
-          isTrending={product?.salesThisMonth >= 10}
+          isTrending={product?.trending === "Yes"}
           isNewArrival={product?.newArrival === "Yes"}
           hasDiscount={!!Number(product?.discountValue)}
           discount={{

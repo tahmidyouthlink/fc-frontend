@@ -21,6 +21,18 @@ export default function MainLinks() {
         <li>
           <TransitionLink
             className={
+              pathname.startsWith("/shop") && !searchParams.get("filterBy")
+                ? "text-neutral-800"
+                : "hover:text-neutral-500"
+            }
+            href="/shop"
+          >
+            Products
+          </TransitionLink>
+        </li>
+        <li>
+          <TransitionLink
+            className={
               searchParams.get("filterBy") === "Popular"
                 ? "text-neutral-800"
                 : "hover:text-neutral-500"
@@ -40,6 +52,18 @@ export default function MainLinks() {
             href="/shop?filterBy=New+Arrivals"
           >
             New Arrivals
+          </TransitionLink>
+        </li>
+        <li>
+          <TransitionLink
+            className={
+              pathname.startsWith("/our-story")
+                ? "text-neutral-800"
+                : "hover:text-neutral-500"
+            }
+            href="/our-story"
+          >
+            Our Story
           </TransitionLink>
         </li>
       </ul>

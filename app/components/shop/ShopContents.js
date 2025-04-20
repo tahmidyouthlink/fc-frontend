@@ -103,7 +103,7 @@ export default function ShopContents() {
                   .includes(keyword.toLowerCase())) &&
               (!selectedFilterOptions.filterBy.length ||
                 (selectedFilterOptions.filterBy.includes("Popular") &&
-                  product.salesThisMonth >= 10) ||
+                  product.trending === "Yes") ||
                 (selectedFilterOptions.filterBy.includes("New Arrivals") &&
                   product.newArrival === "Yes") ||
                 (selectedFilterOptions.filterBy.includes("Special Offers") &&

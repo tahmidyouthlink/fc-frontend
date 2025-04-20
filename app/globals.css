@@ -6,10 +6,10 @@
 @tailwind utilities;
 
 :root {
-  --top-header-height: 28.5px;
-  --bottom-header-height-xs: 56px;
-  --bottom-header-height-sm: 60px;
-  --bottom-header-height-lg: 66px;
+  --top-header-height: 28px;
+  --bottom-header-height-xs: 60px;
+  --bottom-header-height-sm: 64px;
+  --bottom-header-height-lg: 68px;
   --section-padding: 20px;
   --section-padding-double: calc(var(--section-padding) * 2);
   --header-height-xs: calc(
@@ -175,6 +175,10 @@
   /* For on hover and active mobile nav links */
   nav.mobile :is(.active, a:not(:has(img)):hover, li:not(:has(a)):hover) {
     @apply bg-green-100 text-green-600;
+  }
+
+  .chat-sub-btn {
+    @apply absolute bottom-0 right-0 flex size-10 origin-center items-center justify-center rounded-full text-neutral-700 transition-[background-color,transform,opacity] duration-300 ease-out hover:text-neutral-900 [&>svg]:size-6 [&>svg]:transition-[color] [&>svg]:duration-300 [&>svg]:ease-out;
   }
 
   .filter-options {

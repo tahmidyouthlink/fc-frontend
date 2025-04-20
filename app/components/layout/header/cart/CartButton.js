@@ -26,9 +26,6 @@ export default function CartButton({ productList }) {
     const handleStorageUpdate = () => {
       const updatedCart = JSON.parse(localStorage.getItem("cartItems"));
       setCartItems(updatedCart);
-
-      if (localStorage.getItem("shouldCartDrawerOpen") === "true")
-        setIsCartDrawerOpen(true);
     };
 
     window.addEventListener("storageCart", handleStorageUpdate);
@@ -42,32 +39,25 @@ export default function CartButton({ productList }) {
     <>
       {/* Cart button */}
       <li
-        className="flex cursor-pointer items-center gap-x-1.5"
+        className="relative my-auto cursor-pointer"
         onClick={() => {
           window.dispatchEvent(new Event("storageCart"));
           setIsCartDrawerOpen(true);
         }}
       >
-        <div className="relative">
-          {/* Cart icon */}
-          <IoCartOutline
-            size={18}
-            className="text-neutral-600 lg:text-neutral-500"
-          />
-          {/* Badge (to display total cart items) */}
-          <span
-            className={`absolute right-0 top-0 flex size-3.5 -translate-y-1/2 translate-x-1/2 select-none items-center justify-center rounded-full bg-red-500 text-[8px] font-semibold text-white ${!cartItems?.length ? "hidden" : ""}`}
-          >
-            {!!cartItems?.length &&
-              cartItems.reduce(
-                (accumulator, item) =>
-                  Number(item.selectedQuantity) + accumulator,
-                0,
-              )}
-          </span>
-        </div>
-        {/* Cart text */}
-        <span className="max-lg:hidden">Cart</span>
+        {/* Cart icon */}
+        <IoCartOutline className="size-[18px] text-neutral-600 lg:size-[22px]" />
+        {/* Badge (to display total cart items) */}
+        <span
+          className={`absolute right-0 top-0 flex size-3.5 -translate-y-1/2 translate-x-1/2 select-none items-center justify-center rounded-full bg-red-500 text-[8px] font-semibold text-white ${!cartItems?.length ? "hidden" : ""}`}
+        >
+          {!!cartItems?.length &&
+            cartItems.reduce(
+              (accumulator, item) =>
+                Number(item.selectedQuantity) + accumulator,
+              0,
+            )}
+        </span>
       </li>
       {/* Cart drawer */}
       <CartDrawer
