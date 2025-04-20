@@ -195,7 +195,6 @@ const FinanceTable = () => {
             className="border border-gray-300 py-2 px-4 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#9f511681] focus:border-transparent bg-white transition-all duration-200 ease-in-out w-full lg:w-1/2"
           >
             <option value="All">All</option>
-            <option value="Pending">Pending</option>
             <option value="Paid">Paid</option>
             <option value="Cancelled">Cancelled</option>
             <option value="Refunded">Refunded</option>
