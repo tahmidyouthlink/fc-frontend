@@ -6,10 +6,10 @@
 @tailwind utilities;
 
 :root {
-  --top-header-height: 28.5px;
-  --bottom-header-height-xs: 56px;
-  --bottom-header-height-sm: 60px;
-  --bottom-header-height-lg: 66px;
+  --top-header-height: 28px;
+  --bottom-header-height-xs: 60px;
+  --bottom-header-height-sm: 64px;
+  --bottom-header-height-lg: 68px;
   --section-padding: 20px;
   --section-padding-double: calc(var(--section-padding) * 2);
   --header-height-xs: calc(

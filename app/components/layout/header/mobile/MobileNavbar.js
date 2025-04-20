@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { Suspense, useEffect, useState } from "react";
-import { IoMenuOutline, IoSearchOutline } from "react-icons/io5";
-import logoImage from "/public/logos/logo.png";
+import { IoMenuOutline } from "react-icons/io5";
+import logoWithTextImage from "/public/logos/logo.png";
+import logoOnlyImage from "/public/logos/logo-mobile.png";
 import WishlistButton from "../wishlist/WishlistButton";
 import CartButton from "../cart/CartButton";
 import Search from "../Search";
@@ -9,11 +10,7 @@ import NavMenu from "./NavMenu";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
 
-export default function MobileNavbar({
-  productList,
-  isMobileSearchSelected,
-  setIsMobileSearchSelected,
-}) {
+export default function MobileNavbar({ productList }) {
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -26,39 +23,33 @@ export default function MobileNavbar({
         {/* Logo */}
         <TransitionLink href="/">
           <Image
-            className="h-8 w-auto lg:h-9"
-            src={logoImage}
-            alt="YouthLink logo with white text"
+            className="h-8 w-auto sm:hidden"
+            src={logoOnlyImage}
+            alt="YouthLink logo"
+          />
+          <Image
+            className="h-8 w-auto max-sm:hidden lg:h-9"
+            src={logoWithTextImage}
+            alt="YouthLink logo with text"
           />
         </TransitionLink>
-        <ul className="flex gap-x-4">
-          {/* Search Button */}
-          <li
-            className="flex cursor-pointer items-center"
-            onClick={() => setIsMobileSearchSelected((prevState) => !prevState)}
-          >
-            <IoSearchOutline className="text-lg text-neutral-600" />
+        <ul className="flex gap-x-3.5">
+          {/* Search bar */}
+          <li>
+            <Suspense fallback={<LoadingSpinner />}>
+              <Search />
+            </Suspense>
           </li>
           <WishlistButton productList={productList} />
           <CartButton productList={productList} />
           {/* Navigation button */}
-          <li>
+          <li className="my-auto">
             <IoMenuOutline
               className="h-5 w-auto cursor-pointer sm:h-6 lg:hidden"
               onClick={() => setIsNavMenuOpen(true)}
             />
           </li>
         </ul>
-      </div>
-      <div
-        className={`absolute left-0 right-0 top-0 mt-2 transition-[transform,opacity] duration-300 ease-in-out ${isMobileSearchSelected ? "pointer-events-auto translate-y-full opacity-100" : "pointer-events-none translate-y-0 opacity-0"}`}
-      >
-        <Suspense fallback={<LoadingSpinner />}>
-          <Search
-            isMobile={true}
-            setIsMobileSearchSelected={setIsMobileSearchSelected}
-          />
-        </Suspense>
       </div>
       <NavMenu
         isNavMenuOpen={isNavMenuOpen}

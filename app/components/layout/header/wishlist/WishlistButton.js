@@ -40,27 +40,20 @@ export default function WishlistButton({ productList }) {
     <>
       {/* Wishlist button */}
       <li
-        className="flex cursor-pointer items-center gap-x-1.5"
+        className="relative my-auto cursor-pointer"
         onClick={() => {
           window.dispatchEvent(new Event("storageWishlist"));
           setIsWishlistDrawerOpen(true);
         }}
       >
-        <div className="relative">
-          {/* Wishlist icon */}
-          <IoHeartOutline
-            size={18}
-            className="text-neutral-600 lg:text-neutral-500"
-          />
-          {/* Badge (to display total wishlist items) */}
-          <span
-            className={`absolute right-0 top-0 flex size-3.5 -translate-y-1/2 translate-x-1/2 select-none items-center justify-center rounded-full bg-red-500 text-[8px] font-semibold text-white ${!wishlistItems?.length ? "hidden" : ""}`}
-          >
-            {wishlistItems?.reduce((accumulator, item) => accumulator + 1, 0)}
-          </span>
-        </div>
-        {/* Wishlist text */}
-        <span className="max-lg:hidden">Wishlist</span>
+        {/* Wishlist icon */}
+        <IoHeartOutline className="size-[18px] text-neutral-600 lg:size-[22px]" />
+        {/* Badge (to display total wishlist items) */}
+        <span
+          className={`absolute right-0 top-0 flex size-3.5 -translate-y-1/2 translate-x-1/2 select-none items-center justify-center rounded-full bg-red-500 text-[8px] font-semibold text-white ${!wishlistItems?.length ? "hidden" : ""}`}
+        >
+          {wishlistItems?.reduce((accumulator, item) => accumulator + 1, 0)}
+        </span>
       </li>
       {/* Wishlist drawer */}
       <WishlistDrawer

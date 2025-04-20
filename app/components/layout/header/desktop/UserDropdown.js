@@ -60,12 +60,25 @@ export default function UserDropdown() {
     <>
       <Dropdown placement="bottom-end">
         <DropdownTrigger className="z-[0]">
-          <span className="flex cursor-pointer items-center gap-1.5 hover:text-neutral-700">
-            <IoPersonOutline className="text-lg" />
-            {!user ? "Account" : user.name?.split(" ")[0] || "User"}
+          <span className="cursor-pointer">
+            <IoPersonOutline className="size-[18px] text-neutral-600 lg:size-[22px]" />
           </span>
         </DropdownTrigger>
         <DropdownMenu aria-label="Profile Actions" variant="flat">
+          {!!user && (
+            <DropdownSection title="You're signed in as" showDivider>
+              <DropdownItem
+                key="profile"
+                isReadOnly
+                className="cursor-default [&_*]:w-fit [&_*]:cursor-text [&_*]:font-semibold"
+              >
+                <h5 className="text-sm text-neutral-600">{user.name}</h5>
+                <p className="-mt-0.5 text-[11px] text-neutral-500">
+                  {user.email}
+                </p>
+              </DropdownItem>
+            </DropdownSection>
+          )}
           <DropdownSection title="Order" showDivider>
             <DropdownItem
               key="order-tracking"
