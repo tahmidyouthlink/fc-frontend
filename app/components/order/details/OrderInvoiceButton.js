@@ -30,16 +30,7 @@ const OrderInvoiceButton = ({ selectedOrder }) => {
       const blob = await pdf(<PDFDocument order={selectedOrder} />).toBlob();
       const pdfURL = URL.createObjectURL(blob);
 
-      const a = document.createElement("a");
-      a.href = pdfURL;
-      a.download = `Invoice-${selectedOrder?.orderNumber}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-
-      URL.revokeObjectURL(pdfURL);
-
-      // window.open(pdfURL, "_blank"); // Opens the PDF in a new tab
+      window.open(pdfURL, "_blank"); // Opens the PDF in a new tab
     } catch (error) {
       console.error("Error generating PDF:", error);
     } finally {
