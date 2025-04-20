@@ -15,12 +15,17 @@ import Swal from 'sweetalert2';
 import { AiOutlineEdit } from 'react-icons/ai';
 import { useAuth } from '@/app/contexts/auth';
 
+const currentModule = "Finances";
+
 const PaymentMethods = () => {
 
   const [paymentMethodList, isPaymentMethodPending, refetch] = usePaymentMethods();
   const axiosPublic = useAxiosPublic();
   const { existingUserData, isUserLoading } = useAuth();
-  const role = existingUserData?.role;
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
   const isOwner = role === "Owner";
 

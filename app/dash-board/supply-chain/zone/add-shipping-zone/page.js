@@ -18,6 +18,8 @@ import { RiDeleteBinLine } from 'react-icons/ri';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 
+const currentModule = "Supply Chain";
+
 const AddShippingZone = () => {
   const axiosPublic = useAxiosPublic();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,7 +33,10 @@ const AddShippingZone = () => {
   const [showCitySuggestions, setShowCitySuggestions] = useState(false);
   const suggestionsRefCity = useRef(null);
   const { existingUserData, isUserLoading } = useAuth();
-  const role = existingUserData?.role;
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isOwner = role === "Owner";
 
   const { register, handleSubmit, resetField, formState: { errors } } = useForm();

@@ -7,10 +7,15 @@ import arrivals2 from "/public/card-images/arrivals2.svg";
 import { useAuth } from '@/app/contexts/auth';
 import Loading from '@/app/components/shared/Loading/Loading';
 
+const currentModule = "Product Hub";
+
 const Products = () => {
 
   const { existingUserData, isUserLoading } = useAuth();
-  const role = existingUserData?.role;
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
 
   if (isUserLoading) return <Loading />

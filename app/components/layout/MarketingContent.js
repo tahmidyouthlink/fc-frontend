@@ -4,11 +4,16 @@ import LoginRegisterSlides from './LoginRegisterSlides';
 import { useAuth } from '@/app/contexts/auth';
 import Loading from '../shared/Loading/Loading';
 
+const currentModule = "Marketing";
+
 const MarketingContent = () => {
 
   const [activeTab, setActiveTab] = useState('marketing banner');
   const { existingUserData, isUserLoading } = useAuth();
-  const role = existingUserData?.role;
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
 
   // Ensure the code runs only on the client

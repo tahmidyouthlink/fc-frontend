@@ -17,7 +17,6 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import dynamic from 'next/dynamic';
 import { TbColumnInsertRight } from 'react-icons/tb';
 import PaginationSelect from '@/app/components/layout/PaginationSelect';
-import { useAuth } from '@/app/contexts/auth';
 const CustomerPrintButton = dynamic(() => import("@/app/components/layout/CustomerPrintButton"), { ssr: false });
 
 const initialColumns = ['Customer ID', 'Customer Name', 'Email', 'Phone Number', 'Order History', 'City', 'Postal Code', 'Street Address', 'Preferred Payment Method', 'Shipping Method', 'Alt. Phone Number', 'NewsLetter', 'Hometown', 'Status'];
@@ -37,9 +36,6 @@ const Customers = () => {
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  // const { existingUserData, isUserLoading } = useAuth();
-  // const role = existingUserData?.role;
-  // const isAuthorized = role === "Owner" || role === "Editor";
 
   useEffect(() => {
     const savedColumns = JSON.parse(localStorage.getItem('selectedCustomer'));

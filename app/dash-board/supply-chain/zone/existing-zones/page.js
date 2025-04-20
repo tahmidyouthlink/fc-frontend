@@ -13,6 +13,8 @@ import { RiDeleteBinLine } from 'react-icons/ri';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 
+const currentModule = "Supply Chain";
+
 const ExistingZones = () => {
 
   const axiosPublic = useAxiosPublic();
@@ -20,7 +22,10 @@ const ExistingZones = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('inside dhaka');
   const { existingUserData, isUserLoading } = useAuth();
-  const role = existingUserData?.role;
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
   const isOwner = role === "Owner";
 

@@ -6,7 +6,6 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Toolti
 import { IoMdClose } from 'react-icons/io';
 import { format, startOfToday, endOfToday, startOfYesterday, endOfYesterday, subDays, subMonths, startOfMonth, endOfMonth, isValid } from 'date-fns';
 import { today, getLocalTimeZone } from "@internationalized/date";
-// import { useAuth } from '@/app/contexts/auth';
 
 const FinancePerformance = () => {
   const [orderList, isOrderPending] = useOrders();
@@ -14,16 +13,6 @@ const FinancePerformance = () => {
   const [activeFilter, setActiveFilter] = useState('today');
   const [showDateRangePicker, setShowDateRangePicker] = useState(true); // New state
   const [selected, setSelected] = useState(['bKash', 'SSLCommerz']);
-  // const { existingUserData, isUserLoading } = useAuth();
-  // const [isDateRangeButtonAllowed, setIsDateRangeButtonAllowed] = useState(false);
-
-  // useEffect(() => {
-  //   // Fetch user data if needed or check the permission dynamically
-  //   if (existingUserData) {
-  //     // Check if the user has permission to add a product
-  //     setIsDateRangeButtonAllowed(existingUserData?.permissions?.["Finances"]?.actions?.['Completed Date range filtering'] ?? false);
-  //   }
-  // }, [existingUserData]);
 
   useEffect(() => {
     // Set default date range to Today when the component mounts

@@ -13,6 +13,8 @@ import { useAuth } from '@/app/contexts/auth';
 const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 
+const currentModule = "Settings";
+
 const HomepageContent = () => {
 
   const { handleSubmit } = useForm();
@@ -25,7 +27,10 @@ const HomepageContent = () => {
   const [sizeError2, setSizeError2] = useState(false);
   const [sizeError3, setSizeError3] = useState(false);
   const { existingUserData, isUserLoading } = useAuth();
-  const role = existingUserData?.role;
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
 
   useEffect(() => {

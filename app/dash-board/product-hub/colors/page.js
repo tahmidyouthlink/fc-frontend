@@ -12,13 +12,18 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Swal from 'sweetalert2';
 import { useAuth } from '@/app/contexts/auth';
 
+const currentModule = "Product Hub";
+
 const ColorsPage = () => {
 
   const [colorList, isColorPending, refetchColors] = useColors();
   const axiosPublic = useAxiosPublic();
   const router = useRouter();
   const { existingUserData, isUserLoading } = useAuth();
-  const role = existingUserData?.role;
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
   const isOwner = role === "Owner";
 

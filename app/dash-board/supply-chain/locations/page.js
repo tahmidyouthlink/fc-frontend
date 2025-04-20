@@ -18,13 +18,18 @@ import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import { useAuth } from '@/app/contexts/auth';
 
+const currentModule = "Supply Chain";
+
 const LocationsPage = () => {
 
   const [locationList, isLocationPending, refetch] = useLocations();
   const axiosPublic = useAxiosPublic();
   const router = useRouter();
   const { existingUserData, isUserLoading } = useAuth();
-  const role = existingUserData?.role;
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
   const isOwner = role === "Owner";
 

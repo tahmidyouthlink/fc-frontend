@@ -21,6 +21,8 @@ import { useAuth } from '@/app/contexts/auth';
 
 const initialColumns = ["Promo Code / Offer Title", "Type", "Discount Value", "Expiry Date", "Total Times Applied", "Total Discount Given", "Min Order Amount", "Max Capped Amount", "Actions", "Status"];
 
+const currentModule = "Marketing";
+
 const RecentPromotions = () => {
 
   const dropdownRef = useRef(null);
@@ -37,7 +39,10 @@ const RecentPromotions = () => {
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
   const { existingUserData, isUserLoading } = useAuth();
-  const role = existingUserData?.role;
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
   const isOwner = role === "Owner";
 

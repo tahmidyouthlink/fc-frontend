@@ -27,6 +27,8 @@ const initialColumns = ['Product', 'Status', 'SKU', 'Category', 'Price', 'Discou
 
 const productStatusTab = ['All', 'Active', 'Draft', 'Archived'];
 
+const currentModule = "Product Hub";
+
 const SeasonPage = () => {
 
   const axiosPublic = useAxiosPublic();
@@ -54,7 +56,10 @@ const SeasonPage = () => {
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [selectedDateRange, setSelectedDateRange] = useState({ start: null, end: null });
   const { existingUserData, isUserLoading } = useAuth();
-  const role = existingUserData?.role;
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
 
   useEffect(() => {

@@ -28,6 +28,8 @@ const orderStatusTabs = [
 
 const initialColumns = ['Purchase order', 'Supplier', 'Destination', 'Status', 'Received', 'Total', 'Expected Arrival', 'Attachment'];
 
+const currentModule = "Product Hub";
+
 const PurchaseOrders = () => {
 
   const router = useRouter();
@@ -40,7 +42,10 @@ const PurchaseOrders = () => {
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
   const { existingUserData, isUserLoading } = useAuth();
-  const role = existingUserData?.role;
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
   const isOwner = role === "Owner";
 

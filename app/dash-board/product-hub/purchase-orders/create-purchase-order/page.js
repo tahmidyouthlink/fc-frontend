@@ -16,6 +16,8 @@ import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 
+const currentModule = "Product Hub";
+
 const CreatePurchaseOrder = () => {
 
 	const axiosPublic = useAxiosPublic();
@@ -36,7 +38,10 @@ const CreatePurchaseOrder = () => {
 	const [purchaseOrderList, isPurchaseOrderPending] = usePurchaseOrders();
 	const [file, setFile] = useState(null);
 	const { existingUserData, isUserLoading } = useAuth();
-	const role = existingUserData?.role;
+	const permissions = existingUserData?.permissions || [];
+	const role = permissions?.find(
+		(group) => group.modules?.[currentModule]?.access === true
+	)?.role;
 	const isOwner = role === "Owner";
 
 	// Update handleVariantChange to initialize values if not set

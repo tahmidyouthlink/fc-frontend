@@ -132,7 +132,7 @@ export default function EditCartDrawer({
     setIsGrantAccessOpen(false); // close the drawer
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = async () => {
 
     // Check if no role is added at all
     if (roleGroups.length === 0) {
@@ -169,7 +169,6 @@ export default function EditCartDrawer({
     try {
 
       const userEditedPermissions = {
-        email: data.email,
         permissions: roleGroups
       };
 
@@ -324,6 +323,7 @@ export default function EditCartDrawer({
               id="email"
               type="email"
               placeholder="john.doe@gmail.com"
+              disabled
               autoComplete="email"
               {...register("email", {
                 pattern: {

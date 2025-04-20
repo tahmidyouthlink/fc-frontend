@@ -17,6 +17,8 @@ import { useAuth } from '@/app/contexts/auth';
 
 const TransferOrderPDFButton = dynamic(() => import("@/app/components/layout/TransferOrderPDFButton"), { ssr: false });
 
+const currentModule = "Product Hub";
+
 const EditTransferOrder = () => {
 
   const { id } = useParams();
@@ -40,7 +42,10 @@ const EditTransferOrder = () => {
   const [headingMessage, setHeadingMessage] = useState("");
   const [selectedStatus, setSelectedStatus] = useState(null);
   const { existingUserData, isUserLoading } = useAuth();
-  const role = existingUserData?.role;
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
   const isOwner = role === "Owner";
 
