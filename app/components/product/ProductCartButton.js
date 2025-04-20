@@ -62,7 +62,6 @@ export default function ProductCartButton({
     }
 
     localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save item in local cart
-    localStorage.setItem("shouldCartDrawerOpen", true); // Update state to open cart drawer
 
     // Save item in server cart, if user is logged in
     if (!!user) {
@@ -90,7 +89,6 @@ export default function ProductCartButton({
 
     setIsPageLoading(false);
     window.dispatchEvent(new Event("storageCart")); // Dispatch event so that event listener is triggered
-    localStorage.setItem("shouldCartDrawerOpen", false); // Reset state dispatching the event
   };
 
   return (

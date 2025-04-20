@@ -26,9 +26,6 @@ export default function CartButton({ productList }) {
     const handleStorageUpdate = () => {
       const updatedCart = JSON.parse(localStorage.getItem("cartItems"));
       setCartItems(updatedCart);
-
-      if (localStorage.getItem("shouldCartDrawerOpen") === "true")
-        setIsCartDrawerOpen(true);
     };
 
     window.addEventListener("storageCart", handleStorageUpdate);
