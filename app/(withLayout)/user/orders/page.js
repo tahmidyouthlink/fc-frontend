@@ -27,7 +27,7 @@ export default function Orders() {
       {!userOrders?.length ? (
         <EmptyOrderHistory />
       ) : (
-        <OrderHistory orders={userOrders} />
+        <OrderHistory orders={userOrders} orderRefetch={orderRefetch} />
       )}
     </>
   );

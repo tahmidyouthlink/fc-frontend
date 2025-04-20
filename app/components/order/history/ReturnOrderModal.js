@@ -31,6 +31,7 @@ export default function ReturnOrderModal({
   reset,
   trigger,
   errors,
+  orderRefetch,
 }) {
   const { setIsPageLoading } = useLoading();
   const axiosPublic = useAxiosPublic();
@@ -137,6 +138,7 @@ export default function ReturnOrderModal({
 
       if (!!response?.data?.modifiedCount) {
         toast.success("Return request has been submitted.");
+        orderRefetch();
         setIsReturnModalOpen(false);
       }
     } catch (error) {

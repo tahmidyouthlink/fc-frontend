@@ -4,7 +4,7 @@ import OrderCard from "./OrderCard";
 import TrackOrderModal from "./TrackOrderModal";
 import ReturnOrderModal from "./ReturnOrderModal";
 
-export default function OrderHistory({ orders }) {
+export default function OrderHistory({ orders, orderRefetch }) {
   const [isTrackModalOpen, setIsTrackModalOpen] = useState(false);
   const [activeTrackOrder, setActiveTrackOrder] = useState(null);
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
@@ -71,6 +71,7 @@ export default function OrderHistory({ orders }) {
           reset={reset}
           trigger={trigger}
           errors={errors}
+          orderRefetch={orderRefetch}
         />
       </div>
     </section>
