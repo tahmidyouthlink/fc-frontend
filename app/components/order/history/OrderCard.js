@@ -97,7 +97,10 @@ export default function OrderCard({
             <LuTruck size={14} />
           </button>
         )}
-        {isOrderReturnable(order?.orderStatus, order?.dateTime) &&
+        {isOrderReturnable(
+          order?.orderStatus,
+          order?.deliveryInfo?.deliveredAt,
+        ) &&
           orderStatus?.text !== "Return Requested" && (
             <button
               className="flex items-center gap-2 rounded-lg bg-[#d4ffce] px-4 py-2.5 text-center text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[#bdf6b4] max-sm:w-full max-sm:justify-center"
