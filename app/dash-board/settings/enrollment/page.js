@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import { MdBlock } from "react-icons/md";
@@ -14,13 +14,16 @@ import Swal from 'sweetalert2';
 import EnrollmentForm from '@/app/components/layout/EnrollmentForm';
 import EditCartDrawer from '@/app/components/enrollment/cart/EditCartDrawer';
 import { AiOutlineEdit } from 'react-icons/ai';
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
 
 const EnrollmentPage = () => {
 
   const axiosPublic = useAxiosPublic();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [existingUsers, isExistingUsersPending, refetch] = useExistingUsers();
   const [isGrantAccessOpen, setIsGrantAccessOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [selectedUserPermissions, setSelectedUserPermissions] = useState(null);
 
   const handleResendInvitationMail = async (email, fullName, role) => {
 
@@ -258,7 +261,28 @@ const EnrollmentPage = () => {
   const handleEditClick = (userId) => {
     setIsGrantAccessOpen(true);
     setSelectedUserId(userId);
-  }
+  };
+
+  // Inside your component
+  const mergedPermissions = useMemo(() => {
+    const result = {};
+
+    selectedUserPermissions?.forEach(({ role, modules }) => {
+      if (!result[role]) {
+        result[role] = {};
+      }
+
+      Object.entries(modules).forEach(([module, { access }]) => {
+        if (!result[role][module]) {
+          result[role][module] = { access };
+        } else {
+          result[role][module].access = result[role][module].access || access;
+        }
+      });
+    });
+
+    return result;
+  }, [selectedUserPermissions]);
 
   if (isExistingUsersPending) return <Loading />;
 
@@ -334,7 +358,15 @@ const EnrollmentPage = () => {
                         {user?.email}
                       </td>
                       <td className="text-xs md:text-sm font-medium p-3 text-neutral-950">
-                        {user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1) || "--"}
+                        <button
+                          onClick={() => {
+                            setSelectedUserPermissions(user.permissions); // `user` should be the current row data
+                            onOpen();
+                          }}
+                          className="text-blue-600 underline hover:text-blue-800"
+                        >
+                          View
+                        </button>
                       </td>
                       <td className="text-xs md:text-sm font-medium p-3 text-neutral-950">
                         <div className='flex items-center gap-2'>
@@ -372,6 +404,59 @@ const EnrollmentPage = () => {
         </div>
 
       </div>
+
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size='2xl'>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="bg-gray-200">
+                <h2 className="text-lg font-semibold px-2">User Roles by Module</h2>
+              </ModalHeader>
+              <ModalBody className="modal-body-scroll">
+                <div className="space-y-4 max-h-80 overflow-y-auto p-1">
+                  {Object.entries(mergedPermissions).map(([role, modules]) => (
+                    <div
+                      key={role}
+                      className="border border-neutral-200 rounded-xl p-4 bg-white shadow hover:shadow-md duration-200"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-sm font-semibold text-neutral-800">
+                          Role: <span className="text-blue-600">{role}</span>
+                        </h3>
+                        <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md font-medium">
+                          {Object.entries(modules).filter(([, { access }]) => access).length} Modules
+                        </span>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        {Object.entries(modules).map(
+                          ([module, { access }]) =>
+                            access && (
+                              <span
+                                key={module}
+                                className="text-xs px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-medium tracking-tight"
+                              >
+                                {module}
+                              </span>
+                            )
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+              </ModalBody>
+              <ModalFooter className='flex justify-end items-center border'>
+                <div className='flex gap-4 items-center'>
+                  <Button size='sm' color='danger' variant="flat" onPress={onClose}>
+                    Cancel
+                  </Button>
+                </div>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
 
       {/* Edit Grant access drawer */}
       <EditCartDrawer
