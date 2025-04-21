@@ -25,6 +25,8 @@ import { useAuth } from '@/app/contexts/auth';
 
 const PurchaseOrderPDFButton = dynamic(() => import("@/app/components/layout/PurchaseOrderPDFButton"), { ssr: false });
 
+const currentModule = "Product Hub";
+
 const EditPurchaseOrderPage = () => {
 
   const { id } = useParams();
@@ -56,7 +58,10 @@ const EditPurchaseOrderPage = () => {
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [attachment, setAttachment] = useState(null);
   const { existingUserData, isUserLoading } = useAuth();
-  const role = existingUserData?.role;
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
   const isOwner = role === "Owner";
 

@@ -14,12 +14,17 @@ import { useAuth } from "@/app/contexts/auth";
 import Loading from "@/app/components/shared/Loading/Loading";
 import RewardLevel from "../reward-level/page";
 
+const currentModule = "Marketing";
+
 const Marketing = () => {
 
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('view performance');
   const { existingUserData, isUserLoading } = useAuth();
-  const role = existingUserData?.role;
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
 
   // Ensure the code runs only on the client

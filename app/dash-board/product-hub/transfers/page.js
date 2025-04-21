@@ -26,6 +26,8 @@ const transferStatusTabs = [
 
 const initialColumns = ['Purchase order', 'Origin', 'Destination', 'Status', 'Received', 'Expected Arrival'];
 
+const currentModule = "Product Hub";
+
 const Transfers = () => {
 
   const router = useRouter();
@@ -38,7 +40,10 @@ const Transfers = () => {
   const [columnOrder, setColumnOrder] = useState(initialColumns);
   const [isColumnModalOpen, setColumnModalOpen] = useState(false);
   const { existingUserData, isUserLoading } = useAuth();
-  const role = existingUserData?.role;
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
 
   useEffect(() => {

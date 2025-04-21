@@ -6,7 +6,6 @@ import { format, startOfToday, endOfToday, startOfYesterday, endOfYesterday, sub
 import { Checkbox, CheckboxGroup, DateRangePicker } from '@nextui-org/react';
 import { IoMdClose } from 'react-icons/io';
 import { today, getLocalTimeZone } from "@internationalized/date";
-import { useAuth } from '@/app/contexts/auth';
 
 const PromotionPerformanceChart = () => {
   const [orderList, isOrderPending] = useOrders();
@@ -14,7 +13,6 @@ const PromotionPerformanceChart = () => {
   const [activeFilter, setActiveFilter] = useState('today');
   const [showDateRangePicker, setShowDateRangePicker] = useState(true); // New state
   const [selected, setSelected] = useState(['totalDiscountedAmount', 'totalDiscountedOrders']);
-  // const { existingUserData, isUserLoading } = useAuth();
 
   const handleChange = (values) => {
     // Ensure at least one checkbox is always selected

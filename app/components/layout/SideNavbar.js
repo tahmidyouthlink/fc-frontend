@@ -16,7 +16,7 @@ import { LiaUsersCogSolid, LiaPeopleCarrySolid } from "react-icons/lia";
 import { IoColorPaletteOutline, IoSettingsOutline } from "react-icons/io5";
 import { LuWarehouse, LuNewspaper } from "react-icons/lu";
 import { BsTags } from "react-icons/bs";
-import { CiMedal, CiDeliveryTruck } from "react-icons/ci";
+import { CiDeliveryTruck } from "react-icons/ci";
 import { FiShoppingBag, FiBox } from "react-icons/fi";
 import { HiOutlineReceiptRefund } from "react-icons/hi2";
 import { IoIosReturnLeft } from "react-icons/io";
@@ -30,9 +30,14 @@ const SideNavbar = ({ onClose }) => {
   const [activeSubItem, setActiveSubItem] = useState(null);  // State for submenu
   const { data: session } = useSession();
   const { existingUserData, isUserLoading } = useAuth();
-  const permissions = existingUserData?.permissions;
-  const role = existingUserData?.role;
+  const currentModule = "Product Hub";
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isViewer = role === "Viewer";
+
+  console.log(isViewer, "isViewer");
 
   // Show loading state if data is not loaded yet
   if (isUserLoading || !existingUserData) {
@@ -47,23 +52,39 @@ const SideNavbar = ({ onClose }) => {
     setActiveSubItem(activeSubItem === subName ? null : subName);
   };
 
+  const checkPermission = (label) => {
+    if (!permissions || !Array.isArray(permissions)) return false;
+
+    for (const group of permissions) {
+      if (
+        group.modules &&
+        group.modules[label] &&
+        group.modules[label].access === true
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
   const allList = [
     {
       name: "Dashboard",
       icon: <RxDashboard />,
       path: "/dash-board",
-      permission: permissions["Dashboard"]?.access,
+      permission: checkPermission("Dashboard"),
     },
     {
       name: "Orders",
       icon: <TbClipboardList />,
       path: "/dash-board/orders",
-      permission: permissions["Orders"]?.access
+      permission: checkPermission("Orders"),
     },
     {
       name: "Product Hub",
       icon: <FiBox />,
-      permission: permissions["Product Hub"]?.access,
+      permission: checkPermission("Product Hub"),
       links: [
         {
           label: "Manage Products",
@@ -122,30 +143,30 @@ const SideNavbar = ({ onClose }) => {
       name: "Customers",
       icon: <PiUsersThreeLight />,
       path: "/dash-board/customers",
-      permission: permissions["Customers"]?.access
+      permission: checkPermission("Customers"),
     },
     {
       name: "Finances",
       icon: <TbBuildingBank />,
       path: "/dash-board/finances",
-      permission: permissions["Finances"]?.access
+      permission: checkPermission("Finances"),
     },
     {
       name: "Analytics",
       icon: <TbBrandGoogleAnalytics />,
       path: "/dash-board/analytics",
-      permission: permissions["Analytics"]?.access,
+      permission: checkPermission("Analytics"),
     },
     {
       name: "Marketing",
       icon: <FaBullhorn />,
       path: "/dash-board/marketing",
-      permission: permissions["Marketing"]?.access
+      permission: checkPermission("Marketing")
     },
     {
       name: "Supply Chain",
       icon: <LiaPeopleCarrySolid />,
-      permission: permissions["Supply Chain"]?.access,
+      permission: checkPermission("Supply Chain"),
       links: [
         {
           label: "Shipment",
@@ -162,7 +183,7 @@ const SideNavbar = ({ onClose }) => {
     {
       name: "Settings",
       icon: <IoSettingsOutline />,
-      permission: permissions["Settings"]?.access,
+      permission: checkPermission("Settings"),
       links: [
         { label: "User Management", link: "/dash-board/settings/enrollment", icon: <LiaUsersCogSolid /> },
         { label: "Homepage", link: "/dash-board/settings/homepage-settings", icon: <TbHomeCog /> },

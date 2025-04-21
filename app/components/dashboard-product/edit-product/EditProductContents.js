@@ -46,6 +46,8 @@ const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 
 const dhakaSuburbs = ["Savar", "Nabinagar", "Ashulia", "Keraniganj", "Tongi", "Gazipur", "Narayanganj"];
 
+const currentModule = "Product Hub";
+
 const EditProductContents = () => {
 
   const { register, handleSubmit, setValue, control, formState: { errors } } = useForm();
@@ -113,7 +115,10 @@ const EditProductContents = () => {
   const [image, setImage] = useState(null);
   const [showInventory, setShowInventory] = useState(false);
   const { existingUserData, isUserLoading } = useAuth();
-  const role = existingUserData?.role;
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isOwner = role === "Owner";
 
   // Filter categories based on search input and remove already selected categories

@@ -55,6 +55,8 @@ const columnsConfig = {
   'Returns & Refunds': ['R. Order Number', 'Date & Time', 'Customer Name', 'Refund Amount', 'Status', 'Action', 'Email', 'Phone Number', 'Alt. Phone Number', 'Shipping Method', 'Payment Status', 'Payment Method'],
 };
 
+const currentModule = "Orders";
+
 const OrderContents = () => {
   const searchParams = useSearchParams();
   const promo = searchParams.get("promo");
@@ -92,7 +94,10 @@ const OrderContents = () => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isImageExpanded, setIsImageExpanded] = useState(false);
   const { existingUserData, isUserLoading } = useAuth();
-  const role = existingUserData?.role;
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
   const isOwner = role === "Owner";
 

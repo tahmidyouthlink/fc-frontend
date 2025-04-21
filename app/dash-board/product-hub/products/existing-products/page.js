@@ -13,6 +13,8 @@ import { useEffect, useState } from "react";
 import useSeasons from "@/app/hooks/useSeasons";
 import { useAuth } from "@/app/contexts/auth";
 
+const currentModule = "Product Hub";
+
 const EditProduct = () => {
 
   const [categoryList, isCategoryPending] = useCategories();
@@ -22,7 +24,10 @@ const EditProduct = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('category');
   const { existingUserData, isUserLoading } = useAuth();
-  const role = existingUserData?.role;
+  const permissions = existingUserData?.permissions || [];
+  const role = permissions?.find(
+    (group) => group.modules?.[currentModule]?.access === true
+  )?.role;
   const isAuthorized = role === "Owner" || role === "Editor";
 
   // Scroll event listener to track when to add background color
