@@ -3,11 +3,13 @@ import { useFieldArray, useForm } from "react-hook-form";
 import OrderCard from "./OrderCard";
 import TrackOrderModal from "./TrackOrderModal";
 import ReturnOrderModal from "./ReturnOrderModal";
+import ReturnInfoModal from "./ReturnInfoModal";
 
 export default function OrderHistory({ orders, orderRefetch }) {
   const [isTrackModalOpen, setIsTrackModalOpen] = useState(false);
   const [activeTrackOrder, setActiveTrackOrder] = useState(null);
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+  const [isReturnInfoModalOpen, setIsReturnInfoModalOpen] = useState(false);
   const [activeReturnOrder, setActiveReturnOrder] = useState(null);
 
   const {
@@ -50,6 +52,7 @@ export default function OrderHistory({ orders, orderRefetch }) {
               setIsTrackModalOpen={setIsTrackModalOpen}
               setActiveTrackOrder={setActiveTrackOrder}
               setIsReturnModalOpen={setIsReturnModalOpen}
+              setIsReturnInfoModalOpen={setIsReturnInfoModalOpen}
               setActiveReturnOrder={setActiveReturnOrder}
             />
           );
@@ -72,6 +75,11 @@ export default function OrderHistory({ orders, orderRefetch }) {
           trigger={trigger}
           errors={errors}
           orderRefetch={orderRefetch}
+        />
+        <ReturnInfoModal
+          isReturnInfoModalOpen={isReturnInfoModalOpen}
+          setIsReturnInfoModalOpen={setIsReturnInfoModalOpen}
+          activeReturnOrder={activeReturnOrder}
         />
       </div>
     </section>

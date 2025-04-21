@@ -12,6 +12,7 @@ export default function OrderCard({
   setIsTrackModalOpen,
   setActiveTrackOrder,
   setIsReturnModalOpen,
+  setIsReturnInfoModalOpen,
   setActiveReturnOrder,
 }) {
   const orderStatus = getOrderStatusWithColor(order?.orderStatus);
@@ -26,6 +27,10 @@ export default function OrderCard({
     orderStatus?.text == "Confirmed" ||
     orderStatus?.text == "On Its Way" ||
     orderStatus?.text == "On Hold";
+  const isReturnRequested =
+    order?.orderStatus?.toLowerCase().includes("return") ||
+    order?.orderStatus?.toLowerCase().includes("refund") ||
+    order?.orderStatus?.toLowerCase().includes("request");
 
   return (
     <div className="h-fit w-full rounded-md border-2 border-neutral-300 p-3.5 text-sm xl:p-5">
@@ -82,7 +87,7 @@ export default function OrderCard({
           href={`/user/orders/${order?.orderNumber?.toLowerCase()}`}
           className="flex items-center gap-2 rounded-lg bg-[#ffddc2] px-4 py-2.5 text-center text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[#fbcfb0] max-sm:w-full max-sm:justify-center"
         >
-          View Details
+          Order Details
           <LuFileText size={14} />
         </TransitionLink>
         {isOrderTrackable && (
@@ -121,6 +126,18 @@ export default function OrderCard({
               <IoReturnDownBack size={14} />
             </button>
           )}
+        {isReturnRequested && (
+          <button
+            className="flex items-center gap-2 rounded-lg bg-[#d4ffce] px-4 py-2.5 text-center text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[#bdf6b4] max-sm:w-full max-sm:justify-center"
+            onClick={() => {
+              setActiveReturnOrder(order);
+              setIsReturnInfoModalOpen(true);
+            }}
+          >
+            Return Info
+            <LuFileText size={14} />
+          </button>
+        )}
       </div>
     </div>
   );

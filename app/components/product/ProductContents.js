@@ -5,7 +5,7 @@ import {
 } from "@/app/utils/orderCalculations";
 import getImageSetsBasedOnColors from "@/app/utils/getImageSetsBasedOnColors";
 import ProductImageGallery from "./ProductImageGallery";
-import ProductExpandedImageModal from "./ProductExpandedImageModal";
+import ExpandedImagesModal from "../shared/ExpandedImageModal";
 import ProductInfo from "./ProductInfo";
 
 export default function ProductContents({
@@ -69,7 +69,8 @@ export default function ProductContents({
           hasSpecialOffer={isSpecialOfferIsAvailable}
           specialOffer={specialOffer}
         />
-        <ProductExpandedImageModal
+        <ExpandedImagesModal
+          modalFor="products"
           productTitle={product?.productTitle}
           selectedColorLabel={selectedOptions?.color?.label}
           expandedImgUrl={activeImageUrl}
