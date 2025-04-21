@@ -3,14 +3,14 @@ import { FaBullhorn, FaGlobeAsia } from "react-icons/fa";
 import { PiUsersThreeLight, PiBookOpen } from "react-icons/pi";
 import { BiCategory, BiPurchaseTagAlt, BiTransferAlt } from "react-icons/bi";
 import { RxDashboard } from "react-icons/rx";
-import { MdPayment, MdOutlineLocationOn, MdOutlineInventory2, MdOutlinePrivacyTip, MdOutlineLocalShipping } from "react-icons/md";
+import { MdOutlineLocationOn, MdOutlineInventory2, MdOutlinePrivacyTip, MdOutlineLocalShipping } from "react-icons/md";
 import { RiContractLine } from "react-icons/ri";
 import { TbBrandGoogleAnalytics, TbMessageCircleQuestion, TbClipboardList, TbBuildingBank, TbHomeCog } from "react-icons/tb";
 import Image from "next/image";
 import logoWhiteImage from "/public/logos/logo.png";
 import { FaChevronRight, FaAngleDown } from "react-icons/fa6";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { LiaUsersCogSolid, LiaPeopleCarrySolid } from "react-icons/lia";
 import { IoColorPaletteOutline, IoSettingsOutline } from "react-icons/io5";
@@ -30,14 +30,16 @@ const SideNavbar = ({ onClose }) => {
   const [activeSubItem, setActiveSubItem] = useState(null);  // State for submenu
   const { data: session } = useSession();
   const { existingUserData, isUserLoading } = useAuth();
-  const currentModule = "Product Hub";
   const permissions = existingUserData?.permissions || [];
-  const role = permissions?.find(
-    (group) => group.modules?.[currentModule]?.access === true
-  )?.role;
-  const isViewer = role === "Viewer";
-
-  console.log(isViewer, "isViewer");
+  const getUserRoleForModule = (moduleName) => {
+    return permissions.find(
+      (group) => group.modules?.[moduleName]?.access === true
+    )?.role;
+  };
+  const role1 = getUserRoleForModule("Product Hub");
+  const role2 = getUserRoleForModule("Supply Chain");
+  const isViewer1 = role1 === "Viewer";
+  const isViewer2 = role2 === "Viewer";
 
   // Show loading state if data is not loaded yet
   if (isUserLoading || !existingUserData) {
@@ -298,9 +300,6 @@ const SideNavbar = ({ onClose }) => {
                       transition={{ duration: 0.5, ease: "easeInOut" }} className="flex flex-col items-center w-full">
                       {item?.links?.map((linkItem, linkIndex) => {
 
-                        // Allow all links under Settings
-                        // if (item?.name !== "Settings" && !linkItem?.permission) return null;
-
                         return (
                           linkItem?.links ? (
                             // Render nested Product Configuration
@@ -349,14 +348,11 @@ const SideNavbar = ({ onClose }) => {
                             // Render regular links in Product Hub or Settings
                             <Link key={linkIndex} legacyBehavior
                               href={
-                                isViewer
-                                  ? linkItem.link === "/dash-board/product-hub/products"
-                                    ? "/dash-board/product-hub/products/existing-products"
-                                    : linkItem.link === "/dash-board/supply-chain/zone"
-                                      ? "/dash-board/supply-chain/zone/existing-zones"
-                                      : linkItem.link
-                                  : linkItem.link
-                              }>
+                                isViewer1 && linkItem.link === "/dash-board/product-hub/products"
+                                  ? "/dash-board/product-hub/products/existing-products"
+                                  : isViewer2 && linkItem.link === "/dash-board/supply-chain/zone"
+                                    ? "/dash-board/supply-chain/zone/existing-zones"
+                                    : linkItem.link}>
                               <a
                                 className={`flex pl-6 items-center gap-2 w-full hover:bg-[#E5F7F4] group py-3 ${pathname === linkItem.link ? "text-[#00B795] bg-[#E5F7F4] border-l-5 border-[#00B795]" : "hover:text-[#00B795]"}`} onClick={onClose}>
                                 <h2 className="p-1 text-base xl:text-lg 2xl:text-xl rounded-xl">{linkItem.icon}</h2>

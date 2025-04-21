@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { jwtDecode } from "jwt-decode";
 import { Controller, useForm } from "react-hook-form";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
 import arrowSvgImage from "/public/card-images/arrow.svg";
@@ -28,7 +27,7 @@ const SetupForm = ({ email, isValidToken }) => {
   useEffect(() => {
     // Check if password and confirm password match
     if (confirmPassword && password !== confirmPassword) {
-      setConfirmPasswordError("Passwords do not match.");
+      setConfirmPasswordError("Password doesn't match.");
     } else {
       setConfirmPasswordError(null); // Clear error if they match
     }
@@ -279,8 +278,6 @@ const SetupForm = ({ email, isValidToken }) => {
                 )}
               </div>
             </div>
-
-            {errorsForSetup.password && <p className="text-xs text-red-500">{errorsForSetup.password.message}</p>}
 
             {/* Password Rules Checklist */}
             <div className="w-full rounded-md border px-4 py-3 text-xs space-y-2 bg-gray-50">

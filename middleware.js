@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import {
+  getModuleNameFromPath,
   isEditRoute,
   protectedAddRoutes,
   protectedRoutes,
@@ -20,8 +21,7 @@ const fetchUserPermissions = async (userId) => {
     const data = await response.json();
 
     return {
-      role: data?.role || "Viewer", // Default to "viewer" if not found
-      permissions: data?.permissions || {}, // Default to an empty object if no permissions found
+      permissions: data?.permissions || [], // Default to an empty object if no permissions found
     };
   } catch (error) {
     console.error("Error fetching user permissions:", error);
@@ -54,78 +54,107 @@ export async function middleware(req) {
     return NextResponse.next(); // Allow frontend pages to load normally
   }
 
-  // if (isBackendRoute) {
-  //   // If the user is not logged in, redirect to login
-  //   if (!token && pathname.includes("dash-board")) {
-  //     return NextResponse.redirect(
-  //       new URL("/auth/restricted-access", pathname),
-  //     );
-  //   }
+  if (isBackendRoute) {
+    // If the user is not logged in, redirect to login
+    if (!token && pathname.includes("dash-board")) {
+      return NextResponse.redirect(
+        new URL("/auth/restricted-access", pathname),
+      );
+    }
 
-  //   // 🔹 Fetch user permissions from your API
-  //   const userId = token?._id; // Assuming `sub` contains the user ID
-  //   let userPermissions = null;
+    // 🔹 Fetch user permissions from your API
+    const userId = token?._id; // Assuming `sub` contains the user ID
+    let userPermissions = null;
 
-  //   if (userId) {
-  //     userPermissions = await fetchUserPermissions(userId);
-  //   }
+    if (userId) {
+      userPermissions = await fetchUserPermissions(userId);
+    }
 
-  //   // 🔹 If userPermissions is null, auto-logout and redirect to login
-  //   if (!userPermissions) {
-  //     const response = NextResponse.redirect(
-  //       new URL("/auth/restricted-access", req.url),
-  //     );
+    // 🔹 If userPermissions is null, auto-logout and redirect to login
+    if (!userPermissions) {
+      const response = NextResponse.redirect(
+        new URL("/auth/restricted-access", req.url),
+      );
 
-  //     response.cookies.set("next-auth.session-token", "", {
-  //       expires: new Date(0),
-  //       path: "/",
-  //       secure: true,
-  //       httpOnly: true,
-  //       sameSite: "Strict",
-  //     });
-  //     response.cookies.set("__Secure-next-auth.session-token", "", {
-  //       expires: new Date(0),
-  //       path: "/",
-  //       secure: true,
-  //       httpOnly: true,
-  //       sameSite: "Strict",
-  //     });
+      response.cookies.set("next-auth.session-token", "", {
+        expires: new Date(0),
+        path: "/",
+        secure: true,
+        httpOnly: true,
+        sameSite: "Strict",
+      });
+      response.cookies.set("__Secure-next-auth.session-token", "", {
+        expires: new Date(0),
+        path: "/",
+        secure: true,
+        httpOnly: true,
+        sameSite: "Strict",
+      });
 
-  //     return response;
-  //   }
+      return response;
+    }
 
-  //   // 🔹 Restrict "Viewer" role from Add Pages
-  //   if (userPermissions?.role === "Viewer") {
-  //     if (
-  //       Object.keys(protectedAddRoutes).some((route) =>
-  //         nextUrlPathname.startsWith(route),
-  //       )
-  //     ) {
-  //       return NextResponse.redirect(new URL("/unauthorized", req.url));
-  //     }
+    // 🔹 Restrict "Viewer" access on Add/Edit routes
+    const viewerRoles = userPermissions?.permissions?.filter(
+      (perm) => perm.role === "Viewer"
+    );
 
-  //     // 🔹 Restrict "Viewer" role from Edit Pages (using regex for dynamic IDs)
-  //     if (isEditRoute(nextUrlPathname)) {
-  //       return NextResponse.redirect(new URL("/unauthorized", req.url));
-  //     }
-  //   }
+    if (viewerRoles?.length) {
 
-  //   // 🔹 Check if user has permission for the accessed route
-  //   const sortedRoutes = Object.keys(protectedRoutes).sort(
-  //     (a, b) => b.length - a.length,
-  //   ); // Sort longest first
-  //   const permissionKey = sortedRoutes.find((route) =>
-  //     nextUrlPathname.startsWith(route),
-  //   );
+      // 👉 Check Add Routes
+      const matchedAddRoute = Object.keys(protectedAddRoutes).find((route) =>
+        nextUrlPathname.startsWith(route)
+      );
 
-  //   if (permissionKey) {
-  //     const permissionCategory = protectedRoutes[permissionKey];
+      if (matchedAddRoute) {
+        const moduleName = getModuleNameFromPath(matchedAddRoute); // e.g. "Product Hub", "Marketing"
 
-  //     if (!userPermissions?.permissions?.[permissionCategory]?.access) {
-  //       return NextResponse.redirect(new URL("/unauthorized", req.url));
-  //     }
-  //   }
-  // }
+        const isViewerBlocked = viewerRoles.some(
+          (perm) => perm.modules?.[moduleName]?.access === true
+        );
+
+        if (isViewerBlocked) {
+          return NextResponse.redirect(new URL("/unauthorized", req.url));
+        }
+      }
+
+      // 👉 Check Edit Routes
+      if (isEditRoute(nextUrlPathname)) {
+        const moduleName = getModuleNameFromPath(nextUrlPathname); // infer module from path
+
+        const isViewerBlocked = viewerRoles.some(
+          (perm) => perm.modules?.[moduleName]?.access === true
+        );
+
+        if (isViewerBlocked) {
+          return NextResponse.redirect(new URL("/unauthorized", req.url));
+        }
+      }
+
+    }
+
+    // 🔹 Check if user has permission for the accessed route
+    const sortedRoutes = Object.keys(protectedRoutes).sort(
+      (a, b) => b.length - a.length
+    ); // Sort longest first
+
+    const permissionKey = sortedRoutes.find((route) =>
+      nextUrlPathname.startsWith(route)
+    );
+
+    if (permissionKey) {
+      const permissionCategory = protectedRoutes[permissionKey]; // e.g., "Orders", "Product Hub", etc.
+
+      const hasAccess = userPermissions?.permissions?.some(
+        (perm) => perm.modules?.[permissionCategory]?.access === true
+      );
+
+      if (!hasAccess) {
+        return NextResponse.redirect(new URL("/unauthorized", req.url));
+      }
+    }
+
+  }
 
   return NextResponse.next();
 }
