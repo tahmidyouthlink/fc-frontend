@@ -2,7 +2,8 @@ import Image from "next/image";
 import { useEffect } from "react";
 import { CgArrowLeft, CgArrowRight, CgClose } from "react-icons/cg";
 
-export default function ProductExpandedImageModal({
+export default function ExpandedImagesModal({
+  modalFor,
   productTitle,
   selectedColorLabel,
   expandedImgUrl,
@@ -13,8 +14,10 @@ export default function ProductExpandedImageModal({
   setIsImageExpanded,
 }) {
   useEffect(() => {
-    document.body.style.overflow = isImageExpanded ? "hidden" : "unset";
-  }, [isImageExpanded]);
+    if (modalFor === "products") {
+      document.body.style.overflow = isImageExpanded ? "hidden" : "unset";
+    }
+  }, [isImageExpanded, modalFor]);
 
   return (
     <div
@@ -48,7 +51,11 @@ export default function ProductExpandedImageModal({
       {!!expandedImgUrl && (
         <Image
           src={expandedImgUrl}
-          alt={`${productTitle} ${selectedColorLabel} ${activeImageIndex + 1} Expanded`}
+          alt={
+            modalFor === "products"
+              ? `${productTitle} ${selectedColorLabel} ${activeImageIndex + 1} Expanded`
+              : `Provided proof image ${activeImageIndex + 1} Expanded`
+          }
           height={0}
           width={0}
           className="bg-[#F0F0F0] object-contain portrait:h-auto portrait:max-h-[calc(100dvh-20*4px-24*2px)] portrait:w-[calc(100dvw-10*4px-20px*2)] portrait:sm:w-[calc(100dvw-20*4px-24px*2)] landscape:h-[90vh] landscape:w-auto"
