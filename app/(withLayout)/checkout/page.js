@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { TbShoppingCartExclamation } from "react-icons/tb";
 import toast from "react-hot-toast";
-import { parseDate } from "@internationalized/date";
 import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
@@ -83,9 +82,6 @@ export default function Checkout() {
       name: userData?.userInfo?.personalInfo?.customerName || "",
       email: userData?.email || "",
       hometown: userData?.userInfo?.personalInfo?.hometown || "",
-      dob: userData?.userInfo?.personalInfo?.dob
-        ? parseDate(userData.userInfo.personalInfo.dob)
-        : null,
       phoneNumber: userData?.userInfo?.personalInfo?.phoneNumber || "",
       altPhoneNumber: userData?.userInfo?.personalInfo?.phoneNumber2 || "",
       addressLineOne: userData?.userInfo?.savedDeliveryAddress?.address1 || "",
@@ -219,9 +215,6 @@ export default function Checkout() {
           phoneNumber: data.phoneNumber,
           phoneNumber2: data.altPhoneNumber,
           hometown: data.hometown || userData?.userInfo?.personalInfo?.hometown,
-          dob: !!data.dob
-            ? new Date(data.dob).toISOString().split("T")[0]
-            : userData?.userInfo?.personalInfo?.dob,
         },
         deliveryInfo: {
           address1: data.addressLineOne,
@@ -288,9 +281,6 @@ export default function Checkout() {
         phoneNumber: data.phoneNumber,
         phoneNumber2: data.altPhoneNumber,
         hometown: userData?.userInfo?.personalInfo?.hometown || data.hometown,
-        dob:
-          userData?.userInfo?.personalInfo?.dob ||
-          new Date(data.dob).toISOString().split("T")[0],
       };
 
       const existingAddressId = userData?.userInfo?.deliveryAddresses?.find(
@@ -403,11 +393,6 @@ export default function Checkout() {
         getValues("hometown") ||
         userData?.userInfo?.personalInfo?.hometown ||
         "",
-      dob:
-        getValues("dob") ||
-        (userData?.userInfo?.personalInfo?.dob
-          ? parseDate(userData.userInfo.personalInfo.dob)
-          : null),
       phoneNumber:
         getValues("phoneNumber") ||
         userData?.userInfo?.personalInfo?.phoneNumber ||
@@ -565,7 +550,6 @@ export default function Checkout() {
                 errors={errors}
                 isUserLoggedIn={!!userData}
                 userHometown={userData?.userInfo?.personalInfo?.hometown}
-                userDob={userData?.userInfo?.personalInfo?.dob}
               />
               <CheckoutDeliveryAddress
                 register={register}
