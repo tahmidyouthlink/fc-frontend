@@ -44,6 +44,7 @@ export default function UserDropdown() {
       await signOut({ redirect: false });
       if (pathname.includes("user") || pathname.includes("checkout"))
         router.push("/");
+      localStorage.removeItem("checkoutFormDraft");
       localStorage.removeItem("cartItems");
       window.dispatchEvent(new Event("storageCart"));
       localStorage.removeItem("wishlistItems");
