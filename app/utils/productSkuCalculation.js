@@ -31,5 +31,18 @@ export const checkIfProductIsLimitedStock = (
   productVariants,
   primaryLocation,
 ) => {
-  return getProductTotalSku(productVariants, primaryLocation) < 20;
+  const primaryLocationVariants = productVariants?.filter(
+    (variant) => variant?.location === primaryLocation,
+  );
+
+  if (!primaryLocationVariants?.length) return false;
+
+  const totalSku = primaryLocationVariants.reduce(
+    (acc, variant) => acc + Number(variant?.sku),
+    0,
+  );
+
+  const averageSku = totalSku / primaryLocationVariants.length;
+
+  return averageSku < 10;
 };
