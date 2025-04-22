@@ -200,9 +200,9 @@ export default function ReturnOrderModal({
             </ModalHeader>
             <ModalBody className="-mt-5">
               <p className="mb-5 text-sm text-neutral-500">
-                You can request for return if you found any issue with our
-                products. Please submit the following form with the necessary
-                details and we&apos;ll get back to you as soon as possible.
+                If you found any issues with our products, you can request to
+                return them. However, please note that it can be done within 7
+                days after getting delivered and only once.
               </p>
               <form
                 className="space-y-8 [&_label]:text-neutral-700"
