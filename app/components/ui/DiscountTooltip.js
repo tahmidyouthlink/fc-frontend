@@ -78,14 +78,13 @@ export default function DiscountTooptip({
                 <ul className="text-[13px]">
                   {!!discountMaxAmount && (
                     <li>
-                      Discount up to ৳{" "}
-                      {Number(discountMaxAmount)?.toLocaleString()}*
+                      Discount up to ৳ {discountMaxAmount?.toLocaleString()}*
                     </li>
                   )}
                   {!!discountMinAmount && (
                     <li>
                       Valid for a minimum order of ৳{" "}
-                      {Number(discountMinAmount)?.toLocaleString()}
+                      {discountMinAmount?.toLocaleString()}
                     </li>
                   )}
                 </ul>

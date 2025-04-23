@@ -67,13 +67,13 @@ export default function DiscountModal({
                         {!!discountMaxAmount && (
                           <li>
                             Discount up to ৳{" "}
-                            {Number(discountMaxAmount)?.toLocaleString()}*
+                            {discountMaxAmount?.toLocaleString()}*
                           </li>
                         )}
                         {!!discountMinAmount && (
                           <li>
                             Valid for a minimum order of ৳{" "}
-                            {Number(discountMinAmount)?.toLocaleString()}
+                            {discountMinAmount?.toLocaleString()}
                           </li>
                         )}
                       </ul>

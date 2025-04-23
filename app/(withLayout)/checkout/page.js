@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { TbShoppingCartExclamation } from "react-icons/tb";
 import toast from "react-hot-toast";
-import { parseDate } from "@internationalized/date";
 import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
@@ -64,8 +63,6 @@ export default function Checkout() {
   const [orderDetails, setOrderDetails] = useState(null);
   const [isAgreementCheckboxSelected, setIsAgreementCheckboxSelected] =
     useState(true);
-  const [isSaveAddressCheckboxSelected, setIsSaveAddressCheckboxSelected] =
-    useState(false);
   const [isPaymentStepDone, setIsPaymentStepDone] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
@@ -74,7 +71,6 @@ export default function Checkout() {
     watch,
     control,
     setValue,
-    getValues,
     handleSubmit,
     reset,
     formState: { errors },
@@ -83,9 +79,6 @@ export default function Checkout() {
       name: userData?.userInfo?.personalInfo?.customerName || "",
       email: userData?.email || "",
       hometown: userData?.userInfo?.personalInfo?.hometown || "",
-      dob: userData?.userInfo?.personalInfo?.dob
-        ? parseDate(userData.userInfo.personalInfo.dob)
-        : null,
       phoneNumber: userData?.userInfo?.personalInfo?.phoneNumber || "",
       altPhoneNumber: userData?.userInfo?.personalInfo?.phoneNumber2 || "",
       addressLineOne: userData?.userInfo?.savedDeliveryAddress?.address1 || "",
@@ -99,6 +92,7 @@ export default function Checkout() {
     mode: "onBlur",
   });
 
+  const formData = watch();
   const selectedCity = watch("city");
   const selectedDeliveryType = watch("deliveryType");
 
@@ -219,9 +213,6 @@ export default function Checkout() {
           phoneNumber: data.phoneNumber,
           phoneNumber2: data.altPhoneNumber,
           hometown: data.hometown || userData?.userInfo?.personalInfo?.hometown,
-          dob: !!data.dob
-            ? new Date(data.dob).toISOString().split("T")[0]
-            : userData?.userInfo?.personalInfo?.dob,
         },
         deliveryInfo: {
           address1: data.addressLineOne,
@@ -288,9 +279,6 @@ export default function Checkout() {
         phoneNumber: data.phoneNumber,
         phoneNumber2: data.altPhoneNumber,
         hometown: userData?.userInfo?.personalInfo?.hometown || data.hometown,
-        dob:
-          userData?.userInfo?.personalInfo?.dob ||
-          new Date(data.dob).toISOString().split("T")[0],
       };
 
       const existingAddressId = userData?.userInfo?.deliveryAddresses?.find(
@@ -339,14 +327,12 @@ export default function Checkout() {
           ...userData.userInfo,
           personalInfo: updatedPersonalInfo,
           deliveryAddresses: updatedDeliveryAddresses,
-          savedDeliveryAddress: !isSaveAddressCheckboxSelected
-            ? null
-            : {
-                address1: data.addressLineOne,
-                address2: data.addressLineTwo,
-                city: data.city,
-                postalCode: data.postalCode,
-              },
+          savedDeliveryAddress: {
+            address1: data.addressLineOne,
+            address2: data.addressLineTwo,
+            city: data.city,
+            postalCode: data.postalCode,
+          },
         },
         cartItems: [],
         wishlistItems: updatedWishlist,
@@ -360,6 +346,7 @@ export default function Checkout() {
           updatedUserData,
         );
 
+        localStorage.removeItem("checkoutFormDraft");
         localStorage.removeItem("cartItems");
         window.dispatchEvent(new Event("storageCart"));
         localStorage.setItem("wishlistItems", JSON.stringify(updatedWishlist));
@@ -392,52 +379,60 @@ export default function Checkout() {
     setValue("deliveryType", "");
   }, [selectedCity, setValue]);
 
+  // Save form data to localStorage on input change
   useEffect(() => {
+    const timeout = setTimeout(() => {
+      localStorage.setItem("checkoutFormDraft", JSON.stringify(formData));
+    }, 500); // debounce to prevent excessive writes
+
+    return () => clearTimeout(timeout);
+  }, [formData]);
+
+  // Load draft from localStorage or update form on user session change
+  useEffect(() => {
+    const draftData = (() => {
+      try {
+        const raw = localStorage.getItem("checkoutFormDraft");
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        console.error("Failed to parse form draft from localStorage:", e);
+        return {};
+      }
+    })();
+
     reset({
       name:
-        getValues("name") ||
-        userData?.userInfo?.personalInfo?.customerName ||
-        "",
-      email: getValues("email") || userData?.email || "",
+        draftData.name ?? userData?.userInfo?.personalInfo?.customerName ?? "",
+      email: draftData.email ?? userData?.email ?? "",
       hometown:
-        getValues("hometown") ||
-        userData?.userInfo?.personalInfo?.hometown ||
-        "",
-      dob:
-        getValues("dob") ||
-        (userData?.userInfo?.personalInfo?.dob
-          ? parseDate(userData.userInfo.personalInfo.dob)
-          : null),
+        draftData.hometown ?? userData?.userInfo?.personalInfo?.hometown ?? "",
       phoneNumber:
-        getValues("phoneNumber") ||
-        userData?.userInfo?.personalInfo?.phoneNumber ||
+        draftData.phoneNumber ??
+        userData?.userInfo?.personalInfo?.phoneNumber ??
         "",
       altPhoneNumber:
-        getValues("altPhoneNumber") ||
-        userData?.userInfo?.personalInfo?.phoneNumber2 ||
+        draftData.altPhoneNumber ??
+        userData?.userInfo?.personalInfo?.phoneNumber2 ??
         "",
       addressLineOne:
-        getValues("addressLineOne") ||
-        userData?.userInfo?.savedDeliveryAddress?.address1 ||
+        draftData.addressLineOne ??
+        userData?.userInfo?.savedDeliveryAddress?.address1 ??
         "",
       addressLineTwo:
-        getValues("addressLineTwo") ||
-        userData?.userInfo?.savedDeliveryAddress?.address2 ||
+        draftData.addressLineTwo ??
+        userData?.userInfo?.savedDeliveryAddress?.address2 ??
         "",
       city:
-        getValues("city") ||
-        userData?.userInfo?.savedDeliveryAddress?.city ||
-        "",
+        draftData.city ?? userData?.userInfo?.savedDeliveryAddress?.city ?? "",
       postalCode:
-        getValues("postalCode") ||
-        userData?.userInfo?.savedDeliveryAddress?.postalCode ||
+        draftData.postalCode ??
+        userData?.userInfo?.savedDeliveryAddress?.postalCode ??
         "",
+      note: draftData.note ?? "",
+      deliveryType: draftData.deliveryType ?? "",
+      paymentMethod: draftData.paymentMethod ?? "",
     });
-
-    setIsSaveAddressCheckboxSelected(
-      !!userData?.userInfo?.savedDeliveryAddress?.city,
-    );
-  }, [getValues, reset, userData]);
+  }, [reset, userData]);
 
   useEffect(() => {
     const autocompleteElements = document.querySelectorAll(
@@ -565,7 +560,6 @@ export default function Checkout() {
                 errors={errors}
                 isUserLoggedIn={!!userData}
                 userHometown={userData?.userInfo?.personalInfo?.hometown}
-                userDob={userData?.userInfo?.personalInfo?.dob}
               />
               <CheckoutDeliveryAddress
                 register={register}
@@ -576,10 +570,6 @@ export default function Checkout() {
                 selectedCity={selectedCity}
                 selectedDeliveryType={selectedDeliveryType}
                 shippingZones={shippingZones}
-                isSaveAddressCheckboxSelected={isSaveAddressCheckboxSelected}
-                setIsSaveAddressCheckboxSelected={
-                  setIsSaveAddressCheckboxSelected
-                }
               />
               {/* If none of the cart item has special offer, show promo code section */}
               {cartItems?.every(

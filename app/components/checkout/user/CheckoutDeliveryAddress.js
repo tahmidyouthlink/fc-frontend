@@ -18,8 +18,6 @@ export default function CheckoutDeliveryAddress({
   selectedCity,
   selectedDeliveryType,
   shippingZones,
-  isSaveAddressCheckboxSelected,
-  setIsSaveAddressCheckboxSelected,
 }) {
   return (
     <section className="w-full space-y-4 rounded-xl border-2 border-neutral-50/20 bg-white/40 p-5 shadow-[0_0_20px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl">
@@ -259,15 +257,6 @@ export default function CheckoutDeliveryAddress({
               .
             </p>
           )}
-        <div className="flex gap-x-2 [&_span]:text-xs lg:[&_span]:text-[13px]">
-          <Checkbox
-            className="[&_span:has(svg):after]:bg-[#d4ffce] [&_span:has(svg)]:text-neutral-700"
-            isSelected={isSaveAddressCheckboxSelected}
-            onValueChange={setIsSaveAddressCheckboxSelected}
-          >
-            Save this information for future orders
-          </Checkbox>
-        </div>
       </div>
     </section>
   );

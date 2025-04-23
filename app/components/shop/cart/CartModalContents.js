@@ -89,6 +89,11 @@ export default function CartModalContents({
               );
             })}
           </div>
+          {!!selectedOptions?.size && product?.isInventoryShown && (
+            <p className="font-normal text-neutral-600">
+              ({productVariantSku} available)
+            </p>
+          )}
         </div>
         <div className="mb-3.5 flex items-center gap-x-2.5">
           <h4 className="font-semibold text-neutral-600">Colors:</h4>
