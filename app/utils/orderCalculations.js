@@ -110,8 +110,10 @@ export const calculatePromoDiscount = (
       calculateSubtotal(productList, cartItems);
   }
 
-  if (userPromoCode.maxAmount > 0 && promoDiscount > userPromoCode.maxAmount) {
-    promoDiscount = userPromoCode.maxAmount;
+  const promoMaxAmount = Number(userPromoCode.maxAmount);
+
+  if (promoMaxAmount > 0 && promoDiscount > promoMaxAmount) {
+    promoDiscount = promoMaxAmount;
   }
 
   return promoDiscount;
@@ -136,8 +138,10 @@ export const calculateProductSpecialOfferDiscount = (
     specialDiscount = offerDiscountValue;
   }
 
-  if (specialOffer.maxAmount > 0 && specialDiscount > specialOffer.maxAmount) {
-    specialDiscount = specialOffer.maxAmount;
+  const offerMaxAmount = Number(specialOffer.maxAmount);
+
+  if (offerMaxAmount > 0 && specialDiscount > offerMaxAmount) {
+    specialDiscount = offerMaxAmount;
   }
 
   return Number(specialDiscount);

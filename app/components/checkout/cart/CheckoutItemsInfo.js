@@ -75,6 +75,7 @@ export default function CheckoutItemsInfo({
               onClick={() => setIsPromoModalOpen(true)}
             >
               {userPromoCode?.promoCode}
+              {!Number(userPromoCode?.maxAmount) ? "" : "*"}
             </span>
             )
           </h5>
@@ -87,8 +88,8 @@ export default function CheckoutItemsInfo({
                 ? userPromoCode?.promoDiscountValue + "%"
                 : "৳ " + userPromoCode?.promoDiscountValue
             }
-            discountMinAmount={userPromoCode?.minAmount}
-            discountMaxAmount={userPromoCode?.maxAmount}
+            discountMinAmount={Number(userPromoCode?.minAmount)}
+            discountMaxAmount={Number(userPromoCode?.maxAmount)}
           />
           <h5 className="text-neutral-500 max-xl:hidden">
             Promo (
@@ -99,11 +100,12 @@ export default function CheckoutItemsInfo({
                   ? userPromoCode?.promoDiscountValue + "%"
                   : "৳ " + userPromoCode?.promoDiscountValue
               }
-              discountMinAmount={userPromoCode?.minAmount}
-              discountMaxAmount={userPromoCode?.maxAmount}
+              discountMinAmount={Number(userPromoCode?.minAmount)}
+              discountMaxAmount={Number(userPromoCode?.maxAmount)}
             >
               <span className="cursor-default text-[#57944e] underline underline-offset-2">
                 {userPromoCode?.promoCode}
+                {!Number(userPromoCode?.maxAmount) ? "" : "*"}
               </span>
             </DiscountTooptip>
             )

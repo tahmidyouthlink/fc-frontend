@@ -83,8 +83,8 @@ export default function ProductInfoOverview({
                   ? specialOffer?.offerDiscountValue + "%"
                   : "৳ " + specialOffer?.offerDiscountValue
               }
-              discountMinAmount={specialOffer?.minAmount}
-              discountMaxAmount={specialOffer?.maxAmount}
+              discountMinAmount={Number(specialOffer?.minAmount)}
+              discountMaxAmount={Number(specialOffer?.maxAmount)}
             />
             <div className="max-xl:hidden">
               <DiscountTooptip
@@ -94,8 +94,8 @@ export default function ProductInfoOverview({
                     ? specialOffer?.offerDiscountValue + "%"
                     : "৳ " + specialOffer?.offerDiscountValue
                 }
-                discountMinAmount={specialOffer?.minAmount}
-                discountMaxAmount={specialOffer?.maxAmount}
+                discountMinAmount={Number(specialOffer?.minAmount)}
+                discountMaxAmount={Number(specialOffer?.maxAmount)}
               >
                 <div className="flex h-9 cursor-default items-center gap-1.5 rounded-lg bg-[#a138b1] px-2 font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[background-color] duration-300 ease-in-out">
                   <div className="relative h-9 w-6">

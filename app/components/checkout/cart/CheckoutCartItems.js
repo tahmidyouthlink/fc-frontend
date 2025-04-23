@@ -197,7 +197,11 @@ export default function CheckoutCartItems({
                             }}
                           >
                             <span>
-                              Special Offer (
+                              Special Offer
+                              {!Number(specialOfferInfo?.maxAmount)
+                                ? ""
+                                : "*"}{" "}
+                              (
                               {specialOfferInfo?.offerDiscountType ===
                               "Percentage"
                                 ? specialOfferInfo?.offerDiscountValue + "%"
@@ -228,14 +232,22 @@ export default function CheckoutCartItems({
                               cartItemInfo,
                               specialOfferInfo,
                             )}
-                            discountMinAmount={specialOfferInfo?.minAmount}
-                            discountMaxAmount={specialOfferInfo?.maxAmount}
+                            discountMinAmount={Number(
+                              specialOfferInfo?.minAmount,
+                            )}
+                            discountMaxAmount={Number(
+                              specialOfferInfo?.maxAmount,
+                            )}
                           >
                             <span
                               className={`mt-[3px] hidden cursor-default items-center gap-x-1 text-xs underline-offset-2 hover:underline xl:flex ${isEligibleForSpecialOffer ? "text-[#57944e]" : "text-[#90623a]"}`}
                             >
                               <span>
-                                Special Offer (
+                                Special Offer
+                                {!Number(specialOfferInfo?.maxAmount)
+                                  ? ""
+                                  : "*"}{" "}
+                                (
                                 {specialOfferInfo?.offerDiscountType ===
                                 "Percentage"
                                   ? specialOfferInfo?.offerDiscountValue + "%"
@@ -385,8 +397,8 @@ export default function CheckoutCartItems({
             : "৳ " + activeModalItem?.offerDiscountValue
         }
         savedAmount={activeModalItem?.savedAmount}
-        discountMinAmount={activeModalItem?.minAmount}
-        discountMaxAmount={activeModalItem?.maxAmount}
+        discountMinAmount={Number(activeModalItem?.minAmount)}
+        discountMaxAmount={Number(activeModalItem?.maxAmount)}
       />
     </>
   );
