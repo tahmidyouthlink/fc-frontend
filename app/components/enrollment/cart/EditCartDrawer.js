@@ -458,7 +458,7 @@ export default function EditCartDrawer({
 
                       {/* Error */}
                       {moduleErrors[index] && (
-                        <p className="text-red-600 text-left text-sm mt-1">
+                        <p className="left-0 text-xs font-semibold text-red-500">
                           {moduleErrors[index]}
                         </p>
                       )}
