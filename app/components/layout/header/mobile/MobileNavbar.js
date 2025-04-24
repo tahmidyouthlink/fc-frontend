@@ -41,7 +41,9 @@ export default function MobileNavbar({ productList }) {
             </Suspense>
           </li>
           <WishlistButton productList={productList} />
-          <CartButton productList={productList} />
+          <Suspense fallback={<LoadingSpinner />}>
+            <CartButton productList={productList} />
+          </Suspense>
           {/* Navigation button */}
           <li className="my-auto">
             <IoMenuOutline
