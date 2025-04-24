@@ -19,7 +19,7 @@ export default function ChatButton() {
 
   return (
     <div
-      className="fixed right-3 top-1/2 z-[3] -translate-y-1/2 rounded-full lg:right-5"
+      className="pointer-events-none fixed right-3 top-1/2 z-[3] -translate-y-1/2 rounded-full lg:right-5"
       style={{
         marginTop: `-${canvasOffset * 2}px`, // Adjust position (push upwards about twice the size of the offset) due to position adjustment of the big button
       }}
@@ -31,7 +31,7 @@ export default function ChatButton() {
             width: `${bigBtnWithCanvasSize}px`,
             height: `${bigBtnWithCanvasSize}px`,
           }}
-          className={`size-20 scale-100 transition-[opacity,transform] duration-400 ease-out hover:scale-125 hover:opacity-100 ${
+          className={`pointer-events-auto size-20 scale-100 transition-[opacity,transform] duration-400 ease-out hover:scale-125 hover:opacity-100 ${
             isButtonClicked ? "opacity-100" : "opacity-60"
           }`}
           onClick={() => setIsButtonClicked((prevState) => !prevState)}
