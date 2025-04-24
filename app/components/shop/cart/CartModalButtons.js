@@ -192,7 +192,7 @@ export default function CartModalButtons({
       ) : (
         <button
           disabled={!!selectedOptions?.size && !productVariantSku}
-          className={`relative select-none whitespace-nowrap rounded-lg bg-[#ffddc2] px-4 py-2.5 text-sm text-neutral-600 transition-[background-color,opacity] duration-300 ease-in-out ${!selectedOptions?.size ? "cursor-default rounded-lg opacity-50" : "opacity-100 hover:bg-[#fbcfb0]"}`}
+          className={`relative select-none whitespace-nowrap rounded-lg bg-[#ffddc2] px-4 py-2.5 text-sm text-neutral-600 transition-[background-color,opacity] duration-300 ease-in-out ${!selectedOptions?.size || !productVariantSku ? "cursor-default rounded-lg opacity-50" : "opacity-100 hover:bg-[#fbcfb0]"}`}
           onClick={() => {
             if (!!selectedOptions?.size) {
               handleAddToCart();
