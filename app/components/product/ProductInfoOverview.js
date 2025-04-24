@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useState } from "react";
 import { LuBadge } from "react-icons/lu";
 import { TiStarOutline } from "react-icons/ti";
 import {
@@ -16,6 +17,7 @@ import ProductWishlistButton from "./ProductWishlistButton";
 import ProductSizeGuideButton from "./ProductSizeGuideButton";
 import ProductSpecialOfferButton from "./ProductSpecialOfferButton";
 import DiscountTooptip from "../ui/DiscountTooltip";
+import NotifyMeButton from "../shop/cart/NotifyMeButton";
 
 export default function ProductInfoOverview({
   product,
@@ -28,6 +30,8 @@ export default function ProductInfoOverview({
   hasSpecialOffer,
   specialOffer,
 }) {
+  const [isNotifyMeModalOpen, setIsNotifyMeModalOpen] = useState(false);
+  const [isUserSubscribed, setIsUserSubscribed] = useState(false);
   const productVariantSku = getProductVariantSku(
     product?.productVariants,
     primaryLocation,
@@ -152,7 +156,18 @@ export default function ProductInfoOverview({
       </div>
       {/* Stock Message */}
       {!!selectedOptions?.size && !productVariantSku && (
-        <p className="mt-3.5 font-semibold text-red-600">*Out of stock</p>
+        <div className="mt-3.5 flex items-center gap-4">
+          <p className="font-semibold text-red-600">Out of Stock*</p>
+          <NotifyMeButton
+            productId={product?._id}
+            productVariantSku={productVariantSku}
+            selectedOptions={selectedOptions}
+            isNotifyMeModalOpen={isNotifyMeModalOpen}
+            setIsNotifyMeModalOpen={setIsNotifyMeModalOpen}
+            isUserSubscribed={isUserSubscribed}
+            setIsUserSubscribed={setIsUserSubscribed}
+          />
+        </div>
       )}
     </section>
   );

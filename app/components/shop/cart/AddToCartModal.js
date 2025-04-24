@@ -12,6 +12,7 @@ export default function AddToCartModal({
 }) {
   const [selectedOptions, setSelectedOptions] = useState(null);
   const [productVariantSku, setProductVariantSku] = useState(null);
+  const [isNotifyMeModalOpen, setIsNotifyMeModalOpen] = useState(false);
 
   useEffect(() => {
     if (!!product)
@@ -33,7 +34,12 @@ export default function AddToCartModal({
             selectedOptions.size,
           ),
     );
-  }, [primaryLocation, product, selectedOptions]);
+  }, [
+    primaryLocation,
+    product,
+    selectedOptions?.color?._id,
+    selectedOptions?.size,
+  ]);
 
   useEffect(() => {
     document.body.style.overflow = isAddToCartModalOpen ? "hidden" : "unset";
@@ -56,7 +62,7 @@ export default function AddToCartModal({
       }}
     >
       <div
-        className={`rounded-xl bg-neutral-50 p-5 text-neutral-500 transition-[transform,opacity] duration-300 ease-in-out max-md:pt-14 ${isAddToCartModalOpen ? "translate-y-0 opacity-100 delay-200" : "translate-y-20 opacity-0 delay-0"}`}
+        className={`rounded-xl bg-neutral-50 p-5 text-neutral-500 transition-[transform,opacity] duration-300 ease-in-out max-md:pt-14 ${isAddToCartModalOpen && !isNotifyMeModalOpen ? "translate-y-0 opacity-100 delay-200" : "translate-y-20 opacity-0 delay-0"}`}
       >
         <CartModalContents
           product={product}
@@ -65,6 +71,8 @@ export default function AddToCartModal({
           setIsAddToCartModalOpen={setIsAddToCartModalOpen}
           selectedOptions={selectedOptions}
           setSelectedOptions={setSelectedOptions}
+          isNotifyMeModalOpen={isNotifyMeModalOpen}
+          setIsNotifyMeModalOpen={setIsNotifyMeModalOpen}
         />
         <hr className="mb-5 mt-10 h-0.5 bg-neutral-100 md:my-5" />
         <CartModalButtons

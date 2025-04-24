@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button, Input } from "@nextui-org/react";
 import { CgClose } from "react-icons/cg";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
@@ -9,16 +9,20 @@ import {
   calculateFinalPrice,
   checkIfOnlyRegularDiscountIsAvailable,
 } from "@/app/utils/orderCalculations";
+import NotifyMeButton from "./NotifyMeButton";
 
 export default function CartModalContents({
   product,
   productVariantSku,
   imageSets,
+  setIsAddToCartModalOpen,
   selectedOptions,
   setSelectedOptions,
-  setIsAddToCartModalOpen,
+  isNotifyMeModalOpen,
+  setIsNotifyMeModalOpen,
 }) {
   const { setIsPageLoading } = useLoading();
+  const [isUserSubscribed, setIsUserSubscribed] = useState(false);
   const [specialOffers, isSpecialOffersLoading, specialOffersRefetch] =
     useOffers();
   const isOnlyRegularDiscountAvailable = checkIfOnlyRegularDiscountIsAvailable(
@@ -175,9 +179,18 @@ export default function CartModalContents({
           </div>
         </div>
         {!!selectedOptions?.size && productVariantSku === 0 && (
-          <p className="mt-1 text-sm font-semibold text-red-600">
-            Out of Stock
-          </p>
+          <div className="mt-1 flex items-center gap-4">
+            <p className="text-sm font-semibold text-red-600">Out of Stock*</p>
+            <NotifyMeButton
+              productId={product?._id}
+              productVariantSku={productVariantSku}
+              selectedOptions={selectedOptions}
+              isNotifyMeModalOpen={isNotifyMeModalOpen}
+              setIsNotifyMeModalOpen={setIsNotifyMeModalOpen}
+              isUserSubscribed={isUserSubscribed}
+              setIsUserSubscribed={setIsUserSubscribed}
+            />
+          </div>
         )}
       </div>
       <CgClose
