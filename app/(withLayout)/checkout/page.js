@@ -402,8 +402,8 @@ export default function Checkout() {
 
     reset({
       name:
-        draftData.name ?? userData?.userInfo?.personalInfo?.customerName ?? "",
-      email: draftData.email ?? userData?.email ?? "",
+        userData?.userInfo?.personalInfo?.customerName ?? draftData.name ?? "",
+      email: userData?.email ?? draftData.email ?? "",
       hometown:
         draftData.hometown ?? userData?.userInfo?.personalInfo?.hometown ?? "",
       phoneNumber:
