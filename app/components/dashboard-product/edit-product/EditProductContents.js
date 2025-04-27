@@ -1061,7 +1061,7 @@ const EditProductContents = () => {
       };
 
       const res = await axiosPublic.put(`/editProductDetails/${id}`, updatedProductData);
-      if (res.data.modifiedCount > 0) {
+      if (res.data.success) {
         toast.custom((t) => (
           <div
             className={`${t.visible ? 'animate-enter' : 'animate-leave'
