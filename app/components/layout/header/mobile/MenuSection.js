@@ -34,7 +34,7 @@ export default function MenuSection({ setIsNavMenuOpen }) {
             }
           >
             <PiBagSimple />
-            Shop
+            Products
           </TransitionLink>
         </li>
         <li>
