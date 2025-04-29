@@ -185,7 +185,7 @@ const EditReceiveInventory = () => {
         if (updatedProduct) {
           try {
             // Send the update request for each modified product
-            const response = await axiosPublic.put(`/editProductDetailsInventory/${productId}`, updatedProduct);
+            const response = await axiosPublic.put(`/editProductDetails/${productId}`, updatedProduct);
             return { productId, success: true, response: response.data };
           } catch (error) {
             console.error(`Failed to update product ${productId}:`, error.response?.data || error.message);
