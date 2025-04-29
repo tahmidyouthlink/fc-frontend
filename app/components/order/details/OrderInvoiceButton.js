@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { LuDownload } from "react-icons/lu";
+import { LuFileText } from "react-icons/lu";
 import { useLoading } from "@/app/contexts/loading";
 import PDFDocument from "../../layout/PDFDocument";
 
@@ -43,8 +43,8 @@ const OrderInvoiceButton = ({ selectedOrder }) => {
       className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#d4ffce] py-3 text-center text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[#bdf6b4]"
       onClick={handlePreview}
     >
-      Download Invoice
-      <LuDownload size={14} />
+      View Invoice
+      <LuFileText size={14} />
     </button>
   );
 };
