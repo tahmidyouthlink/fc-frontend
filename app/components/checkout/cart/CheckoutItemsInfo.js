@@ -74,8 +74,7 @@ export default function CheckoutItemsInfo({
               className="cursor-default text-[#57944e] underline underline-offset-2"
               onClick={() => setIsPromoModalOpen(true)}
             >
-              {userPromoCode?.promoCode}
-              {!Number(userPromoCode?.maxAmount) ? "" : "*"}
+              {userPromoCode?.promoCode}*
             </span>
             )
           </h5>
@@ -104,8 +103,7 @@ export default function CheckoutItemsInfo({
               discountMaxAmount={Number(userPromoCode?.maxAmount)}
             >
               <span className="cursor-default text-[#57944e] underline underline-offset-2">
-                {userPromoCode?.promoCode}
-                {!Number(userPromoCode?.maxAmount) ? "" : "*"}
+                {userPromoCode?.promoCode}*
               </span>
             </DiscountTooptip>
             )

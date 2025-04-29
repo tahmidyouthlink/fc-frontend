@@ -20,7 +20,7 @@ export default function StoryDetails({
         className="sticky top-5 h-[calc(100dvh-var(--section-padding-double))] w-full rounded-xl object-cover lg:w-2/5"
       />
       <div
-        className="story-texts relative flex min-h-full flex-col items-end justify-center gap-[30dvw] px-5 py-32 sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0 [&_p]:max-w-2xl [&_p]:text-3xl [&_p]:font-semibold [&_p]:text-neutral-600 [&_span]:bg-[linear-gradient(to_right,theme(colors.orange.500),theme(colors.yellow.400))] [&_span]:bg-clip-text [&_span]:text-transparent"
+        className="story-texts relative flex min-h-full flex-col items-end justify-center gap-[30dvw] px-5 py-32 sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0 [&_p]:max-w-2xl [&_p]:text-3xl [&_p]:font-semibold [&_p]:text-neutral-600 [&_span]:bg-[linear-gradient(to_right,theme(colors.green.600),theme(colors.emerald.400))] [&_span]:bg-clip-text [&_span]:text-transparent"
         dangerouslySetInnerHTML={{
           __html: selectedDept.staff.comments,
         }}

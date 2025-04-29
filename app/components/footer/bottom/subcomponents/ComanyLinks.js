@@ -6,7 +6,7 @@ export default function CompanyLinks() {
       <h3 className="font-semibold uppercase">Company Links</h3>
       <ul>
         <li>
-          <TransitionLink href="/shop">Shop</TransitionLink>
+          <TransitionLink href="/shop">Products</TransitionLink>
         </li>
         <li>
           <TransitionLink href="/our-story">Our Story</TransitionLink>
