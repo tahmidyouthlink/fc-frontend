@@ -19,11 +19,14 @@ export default function HomeHero({ leftImgUrl, centerImgUrl, rightImgUrl }) {
               <Image src={squigglyShape} alt="Squiggly shape" />
             </div>
             <div className="max-w-[88%] sm:max-w-[60%] md:max-w-lg lg:max-w-screen-sm">
-              <h1 className="text-center text-3xl font-semibold md:text-4xl lg:text-5xl portrait:[@media_(max-height:_700px)]:text-2xl">
-                Discover <span className="text-[#9F5216]">Unique</span> Styles
-                for This Season
+              <h1 className="text-center text-3xl font-semibold text-neutral-600 md:text-4xl lg:text-5xl portrait:[@media_(max-height:_700px)]:text-2xl">
+                Discover{" "}
+                <span className="bg-[linear-gradient(to_right,theme(colors.green.600),theme(colors.emerald.400))] bg-clip-text text-transparent">
+                  Unique
+                </span>{" "}
+                Styles for This Season
               </h1>
-              <p className="py-6 text-center text-[#383838] portrait:[@media_(max-height:_700px)]:text-sm">
+              <p className="py-6 text-center text-neutral-500 portrait:[@media_(max-height:_700px)]:text-sm">
                 Uncover the latest trends with our one-of-a-kind men&apos;s
                 fashion. Each item is uniquely designed and available in limited
                 numbers.

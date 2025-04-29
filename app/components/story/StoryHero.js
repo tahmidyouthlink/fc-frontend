@@ -79,7 +79,7 @@ export default function StoryHero({
       <div className="z-[1] mx-5 sm:mx-8 md:mx-12 xl:mx-auto xl:max-w-[1200px]">
         <h1 className="mx-auto mb-14 max-w-2xl text-center text-6xl font-semibold text-neutral-700 [clip-path:polygon(0_0,100%_0,100%_100%,0_100%)]">
           Providing the{" "}
-          <span className="bg-[linear-gradient(to_right,theme(colors.orange.600),theme(colors.yellow.500))] bg-clip-text text-transparent">
+          <span className="bg-[linear-gradient(to_right,theme(colors.green.600),theme(colors.emerald.400))] bg-clip-text text-transparent">
             Ultimate
           </span>{" "}
           Solution Needed.
@@ -108,8 +108,8 @@ export default function StoryHero({
                   sizes="350px"
                   className="size-48 cursor-pointer rounded-xl object-cover transition-[width,filter] delay-150 duration-500 ease-in-out"
                 />
-                <div className="absolute -top-5 left-1/2 h-3 w-3 -translate-x-1/2 -translate-y-full rotate-45 bg-[linear-gradient(to_right,theme(colors.yellow.200),theme(colors.yellow.200))] opacity-0 transition-opacity duration-300 ease-in-out"></div>
-                <h4 className="pointer-events-none absolute -top-6 left-0 w-80 -translate-y-full rounded-xl bg-[linear-gradient(to_right,theme(colors.yellow.200),theme(colors.yellow.200))] p-2 text-center text-neutral-700 opacity-0 transition-opacity duration-300 ease-in-out">
+                <div className="absolute -top-5 left-1/2 h-3 w-3 -translate-x-1/2 -translate-y-full rotate-45 bg-[linear-gradient(to_right,theme(colors.orange.100),theme(colors.orange.100))] opacity-0 transition-opacity duration-300 ease-in-out"></div>
+                <h4 className="pointer-events-none absolute -top-6 left-0 w-80 -translate-y-full rounded-xl bg-[linear-gradient(to_right,theme(colors.orange.100),theme(colors.orange.100))] p-2 text-center text-neutral-700 opacity-0 transition-opacity duration-300 ease-in-out">
                   {dept.workSummary}
                 </h4>
               </div>
