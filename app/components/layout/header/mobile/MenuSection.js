@@ -1,5 +1,5 @@
 import { usePathname, useSearchParams } from "next/navigation";
-import { PiBagSimple, PiGift, PiHouseLine } from "react-icons/pi";
+import { PiBagSimple, PiGift, PiHouseLine, PiUsersThree } from "react-icons/pi";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 
 export default function MenuSection({ setIsNavMenuOpen }) {
@@ -48,6 +48,17 @@ export default function MenuSection({ setIsNavMenuOpen }) {
           >
             <PiGift />
             New Arrivals
+          </TransitionLink>
+        </li>
+        <li>
+          <TransitionLink
+            href="/our-story"
+            hasDrawer={true}
+            setIsDrawerOpen={setIsNavMenuOpen}
+            className={pathname.startsWith("/our-story") ? "active" : undefined}
+          >
+            <PiUsersThree />
+            Our Story
           </TransitionLink>
         </li>
       </ul>
