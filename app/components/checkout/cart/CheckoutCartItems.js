@@ -197,11 +197,7 @@ export default function CheckoutCartItems({
                             }}
                           >
                             <span>
-                              Special Offer
-                              {!Number(specialOfferInfo?.maxAmount)
-                                ? ""
-                                : "*"}{" "}
-                              (
+                              Special Offer* (
                               {specialOfferInfo?.offerDiscountType ===
                               "Percentage"
                                 ? specialOfferInfo?.offerDiscountValue + "%"
@@ -243,11 +239,7 @@ export default function CheckoutCartItems({
                               className={`mt-[3px] hidden cursor-default items-center gap-x-1 text-xs underline-offset-2 hover:underline xl:flex ${isEligibleForSpecialOffer ? "text-[#57944e]" : "text-[#90623a]"}`}
                             >
                               <span>
-                                Special Offer
-                                {!Number(specialOfferInfo?.maxAmount)
-                                  ? ""
-                                  : "*"}{" "}
-                                (
+                                Special Offer* (
                                 {specialOfferInfo?.offerDiscountType ===
                                 "Percentage"
                                   ? specialOfferInfo?.offerDiscountValue + "%"
