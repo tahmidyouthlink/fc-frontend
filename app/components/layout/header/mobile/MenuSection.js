@@ -1,5 +1,5 @@
 import { usePathname, useSearchParams } from "next/navigation";
-import { PiBagSimple, PiGift, PiHouseLine, PiLightning } from "react-icons/pi";
+import { PiBagSimple, PiGift, PiHouseLine } from "react-icons/pi";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 
 export default function MenuSection({ setIsNavMenuOpen }) {
@@ -35,19 +35,6 @@ export default function MenuSection({ setIsNavMenuOpen }) {
           >
             <PiBagSimple />
             Shop
-          </TransitionLink>
-        </li>
-        <li>
-          <TransitionLink
-            href="/shop?filterBy=Popular"
-            hasDrawer={true}
-            setIsDrawerOpen={setIsNavMenuOpen}
-            className={
-              searchParams.get("filterBy") === "Popular" ? "active" : ""
-            }
-          >
-            <PiLightning />
-            Popular
           </TransitionLink>
         </li>
         <li>

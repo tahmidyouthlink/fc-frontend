@@ -33,18 +33,6 @@ export default function MainLinks() {
         <li>
           <TransitionLink
             className={
-              searchParams.get("filterBy") === "Popular"
-                ? "text-neutral-800"
-                : "hover:text-neutral-500"
-            }
-            href="/shop?filterBy=Popular"
-          >
-            Popular
-          </TransitionLink>
-        </li>
-        <li>
-          <TransitionLink
-            className={
               searchParams.get("filterBy") === "New Arrivals"
                 ? "text-neutral-800"
                 : "hover:text-neutral-500"
