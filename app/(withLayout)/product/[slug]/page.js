@@ -118,9 +118,13 @@ export default function Product({ params: { slug } }) {
   ]);
 
   return (
-    <main className="pt-header-h-full-section-pb relative overflow-hidden text-sm [&_img]:pointer-events-none">
+    <main className="relative overflow-hidden">
       {/* Mesh Gradient */}
-      <div className="absolute -left-3 top-28 z-[-1] size-40 rounded-full bg-[#d3f9ce] blur-3xl" />
+      <div className="relative h-full w-full">
+        <div className="fixed left-[5%] top-2/3 size-60 animate-blob rounded-full bg-[#d3f9ce] mix-blend-multiply blur-md sm:top-1/2 sm:bg-[#ebc6a6]" />
+        <div className="fixed left-[30%] top-[5%] size-60 animate-blob rounded-full bg-[#ebc6a6] mix-blend-multiply blur-md [animation-delay:1s] sm:top-[20%] sm:bg-[#d3f9ce]" />
+        <div className="fixed left-[80%] top-1/3 size-60 animate-blob rounded-full bg-[#d3f9ce] mix-blend-multiply blur-md [animation-delay:2s] max-sm:hidden" />
+      </div>
       {/* Shape/SVG (circle with star) */}
       <div className="absolute right-3 top-36 z-[-1] aspect-square w-56 translate-x-1/2 opacity-85 max-[1200px]:hidden">
         <Image
@@ -132,39 +136,41 @@ export default function Product({ params: { slug } }) {
           sizes="25vw"
         />
       </div>
-      {/* Product Contents Section */}
-      <ProductContents
-        product={product}
-        specialOffers={specialOffers}
-        primaryLocation={primaryLocation}
-        selectedOptions={selectedOptions}
-        setSelectedOptions={setSelectedOptions}
-      />
-      {/* Complete Your Outfit Section */}
-      {!!completeOutfitProducts?.length && (
-        <CompleteOutfitProducts
-          completeOutfitProducts={completeOutfitProducts}
+      <div className="pt-header-h-full-section-pb relative overflow-hidden text-sm [&_img]:pointer-events-none">
+        {/* Product Contents Section */}
+        <ProductContents
+          product={product}
+          specialOffers={specialOffers}
           primaryLocation={primaryLocation}
+          selectedOptions={selectedOptions}
+          setSelectedOptions={setSelectedOptions}
         />
-      )}
-      {/* Similar Products Section */}
-      {!!similarProducts?.length && (
-        <SimilarProducts
-          similarProducts={similarProducts}
-          hasCompleteOutfitSection={!!completeOutfitProducts?.length}
-          hasRecentlyViewedSection={!!recentlyViewedProducts?.length}
-          primaryLocation={primaryLocation}
-        />
-      )}
-      {/* Recently Viewed Products Section */}
-      {!!recentlyViewedProducts?.length && (
-        <RecentlyViewedProducts
-          recentlyViewedProducts={recentlyViewedProducts}
-          hasCompleteOutfitSection={!!completeOutfitProducts?.length}
-          hasSimilarSection={!!similarProducts?.length}
-          primaryLocation={primaryLocation}
-        />
-      )}
+        {/* Complete Your Outfit Section */}
+        {!!completeOutfitProducts?.length && (
+          <CompleteOutfitProducts
+            completeOutfitProducts={completeOutfitProducts}
+            primaryLocation={primaryLocation}
+          />
+        )}
+        {/* Similar Products Section */}
+        {!!similarProducts?.length && (
+          <SimilarProducts
+            similarProducts={similarProducts}
+            hasCompleteOutfitSection={!!completeOutfitProducts?.length}
+            hasRecentlyViewedSection={!!recentlyViewedProducts?.length}
+            primaryLocation={primaryLocation}
+          />
+        )}
+        {/* Recently Viewed Products Section */}
+        {!!recentlyViewedProducts?.length && (
+          <RecentlyViewedProducts
+            recentlyViewedProducts={recentlyViewedProducts}
+            hasCompleteOutfitSection={!!completeOutfitProducts?.length}
+            hasSimilarSection={!!similarProducts?.length}
+            primaryLocation={primaryLocation}
+          />
+        )}
+      </div>
     </main>
   );
 }

@@ -3,7 +3,7 @@ import BottomFooter from "./bottom/BottomFooter";
 
 export default function Footer() {
   return (
-    <footer className="bg-white">
+    <footer className="relative bg-white">
       <TopFooter />
       <BottomFooter />
     </footer>

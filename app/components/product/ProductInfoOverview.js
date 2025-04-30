@@ -114,8 +114,6 @@ export default function ProductInfoOverview({
             </div>
           </>
         )}
-        {/* Mesh Gradient */}
-        <div className="absolute -bottom-48 -right-10 z-[-1] size-32 -translate-y-1/2 rounded-full bg-[#ebc6a6] opacity-75 blur-3xl sm:max-md:right-16 xl:right-24" />
       </div>
       <ProductSizeSelection
         productSizes={product?.allSizes}
