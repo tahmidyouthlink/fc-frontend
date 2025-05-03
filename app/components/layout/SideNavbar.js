@@ -3,7 +3,7 @@ import { FaBullhorn, FaGlobeAsia } from "react-icons/fa";
 import { PiUsersThreeLight, PiBookOpen } from "react-icons/pi";
 import { BiCategory, BiPurchaseTagAlt, BiTransferAlt } from "react-icons/bi";
 import { RxDashboard } from "react-icons/rx";
-import { MdOutlineLocationOn, MdOutlineInventory2, MdOutlinePrivacyTip, MdOutlineLocalShipping } from "react-icons/md";
+import { MdOutlineLocationOn, MdOutlineInventory2, MdOutlinePrivacyTip, MdOutlineLocalShipping, MdOutlinePolicy } from "react-icons/md";
 import { RiContractLine } from "react-icons/ri";
 import { TbBrandGoogleAnalytics, TbMessageCircleQuestion, TbClipboardList, TbBuildingBank, TbHomeCog } from "react-icons/tb";
 import Image from "next/image";
@@ -193,6 +193,7 @@ const SideNavbar = ({ onClose }) => {
           name: "Legal Policies",
           icon: <LuNewspaper />,
           links: [
+            { label: "Policy Pages", link: "/dash-board/settings/policy-pages", icon: <MdOutlinePolicy /> },
             { label: "Terms & Conditions", link: "/dash-board/settings/terms-condition", icon: <RiContractLine /> },
             { label: "Privacy Policy", link: "/dash-board/settings/privacy-policy", icon: <MdOutlinePrivacyTip /> },
             { label: "Refund Policy", link: "/dash-board/settings/refund-policy", icon: <HiOutlineReceiptRefund /> },
