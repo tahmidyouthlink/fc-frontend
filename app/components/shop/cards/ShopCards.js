@@ -107,7 +107,6 @@ export default function ShopCards({
               <ProductCard
                 key={filteredProduct._id}
                 product={filteredProduct}
-                needsWhiteBackgroundText={true}
                 isAddToCartModalOpen={isAddToCartModalOpen}
                 setIsAddToCartModalOpen={setIsAddToCartModalOpen}
                 setSelectedAddToCartProduct={setSelectedAddToCartProduct}

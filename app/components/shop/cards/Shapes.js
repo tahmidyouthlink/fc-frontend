@@ -8,14 +8,6 @@ export default function Shapes({ cardHeight, rows }) {
       <div className="absolute inset-0" key={"shop-shapes-" + (index + 1)}>
         {index % 3 === 0 && (
           <div
-            className="absolute -right-9 z-[-1] size-40 -translate-y-1/2 translate-x-1/2 rounded-full bg-[#ebc6a6] blur-3xl"
-            style={{
-              top: `${(142 + cardHeight) * index + cardHeight / 2}px`,
-            }}
-          />
-        )}
-        {index % 3 === 0 && (
-          <div
             className="absolute -left-5 aspect-[1.5/1] w-dvw opacity-50 sm:-left-8 sm:aspect-[2/1] lg:-left-12 lg:aspect-[3.5/1] min-[1200px]:-left-[calc((100dvw-1200px)/2)]"
             style={{
               top: `${(142 + cardHeight) * index + cardHeight / 2}px`,

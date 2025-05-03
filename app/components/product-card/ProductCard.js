@@ -18,7 +18,6 @@ import CardButtons from "./CardButtons";
 
 export default function ProductCard({
   product,
-  needsWhiteBackgroundText,
   isAddToCartModalOpen,
   setIsAddToCartModalOpen,
   setSelectedAddToCartProduct,
@@ -70,7 +69,6 @@ export default function ProductCard({
       <CardProductInfo
         product={product}
         specialOffers={specialOffers}
-        needsWhiteBackgroundText={needsWhiteBackgroundText}
         isProductOutOfStock={isProductOutOfStock}
         isProductLimitedStock={
           isAllowedToShowLimitedStock && isProductLimitedStock
