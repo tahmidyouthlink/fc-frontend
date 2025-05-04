@@ -140,6 +140,13 @@ export default function ProductInfoOverview({
       <div className="flex gap-2 max-lg:flex-wrap [&>button>svg]:text-lg [&>button]:rounded-lg [&>button]:px-5 [&>button]:py-6 [&>button]:text-sm [&>button]:font-semibold [&>button]:text-neutral-600 [&>button]:duration-300 hover:[&>button]:opacity-100">
         <ProductCartButton
           productId={product?._id}
+          productTitle={product?.productTitle}
+          productImg={
+            getImageSetsBasedOnColors(product?.productVariants)?.find(
+              (imgSet) =>
+                imgSet?.color?.label === selectedOptions?.color?.label,
+            )?.images[0]
+          }
           defaultColor={
             product?.availableColors[Object.keys(product?.availableColors)[0]]
           }

@@ -18,7 +18,10 @@ export default function MobileNavbar({ productList }) {
   }, [isNavMenuOpen]);
 
   return (
-    <nav className="relative h-full w-full text-sm lg:hidden">
+    <nav
+      id="mobile-navbar"
+      className="relative h-full w-full text-sm lg:hidden"
+    >
       <div className="relative flex h-full w-full items-center justify-between bg-white">
         {/* Logo */}
         <TransitionLink href="/">
