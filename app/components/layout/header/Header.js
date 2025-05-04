@@ -29,7 +29,10 @@ export default function Header({
   }, [isUserLoading, isProductListLoading, productList, setIsPageLoading]);
 
   return (
-    <header className="absolute z-10 w-full bg-white shadow-[5px_5px_24px_0_rgba(0,0,0,0.035)]">
+    <header
+      id="header"
+      className="absolute z-10 w-full bg-white shadow-[5px_5px_24px_0_rgba(0,0,0,0.035)]"
+    >
       {isTopHeaderEnabled && (
         <TopHeader
           slides={slides}

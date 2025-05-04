@@ -141,7 +141,9 @@ export default function Checkout() {
           productTitle: correspondingProduct?.productTitle,
           productId: correspondingProduct?.productId,
           batchCode: correspondingProduct?.batchCode,
-          size: cartItem.selectedSize,
+          size: /^\d+$/.test(cartItem.selectedSize)
+            ? Number(cartItem.selectedSize)
+            : cartItem.selectedSize,
           color: cartItem.selectedColor,
           sku: cartItem.selectedQuantity,
           vendors: correspondingProduct?.vendors?.map((vendor) => vendor.label),

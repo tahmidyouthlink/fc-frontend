@@ -77,6 +77,13 @@ export default function AddToCartModal({
         <hr className="mb-5 mt-10 h-0.5 bg-neutral-100 md:my-5" />
         <CartModalButtons
           productId={product?._id}
+          productTitle={product?.productTitle}
+          productImg={
+            getImageSetsBasedOnColors(product?.productVariants)?.find(
+              (imgSet) =>
+                imgSet?.color?.label === selectedOptions?.color?.label,
+            )?.images[0]
+          }
           defaultColor={
             product?.availableColors[Object.keys(product?.availableColors)[0]]
           }

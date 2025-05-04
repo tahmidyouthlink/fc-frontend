@@ -10,9 +10,12 @@ import { CgShoppingCart } from "react-icons/cg";
 import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import addToCartToast from "@/app/utils/addToCartToast";
 
 export default function ProductCartButton({
   productId,
+  productTitle,
+  productImg,
   defaultColor,
   productVariantSku,
   selectedOptions,
@@ -78,13 +81,40 @@ export default function ProductCartButton({
 
         if (!!response?.data?.modifiedCount || !!response?.data?.matchedCount) {
           setUserData(updatedUserData);
-          toast.success("Item added to cart."); // If server cart is updated
+
+          // Display custom success toast notification, if server cart is updated
+          toast.custom(
+            (t) =>
+              addToCartToast(
+                t,
+                productImg,
+                productTitle,
+                selectedOptions?.size,
+                selectedOptions?.color,
+              ),
+            {
+              position: "top-right",
+            },
+          );
         }
       } catch (error) {
         toast.error("Failed to add item to cart."); // If server error occurs
       }
     } else {
-      toast.success("Item added to cart."); // If saved only locally
+      // Display custom success toast notification, if saved only locally
+      toast.custom(
+        (t) =>
+          addToCartToast(
+            t,
+            productImg,
+            productTitle,
+            selectedOptions?.size,
+            selectedOptions?.color,
+          ),
+        {
+          position: "top-right",
+        },
+      );
     }
 
     setIsPageLoading(false);

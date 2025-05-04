@@ -1,28 +1,42 @@
-import TransitionLink from "@/app/components/ui/TransitionLink";
+import Link from "next/link";
+import axios from "axios";
 
-export default function Importantlinks() {
+export const dynamic = "force-dynamic";
+
+export default async function Importantlinks() {
+  const response = await axios.get(
+    "https://fashion-commerce-backend.vercel.app/get-all-policy-pdfs",
+  );
+  const [legalPolicyPdfLinks] = response.data || [];
+
   return (
     <div className="col-span-1 space-y-2.5">
       <h3 className="font-semibold uppercase">Important Links</h3>
       <ul>
         <li>
-          <TransitionLink href="/terms-and-conditions">
+          <Link target="_blank" href={legalPolicyPdfLinks?.terms}>
             Terms & Conditions
-          </TransitionLink>
+          </Link>
         </li>
         <li>
-          <TransitionLink href="/privacy-policy">Privacy Policy</TransitionLink>
+          <Link target="_blank" href={legalPolicyPdfLinks?.privacy}>
+            Privacy Policy
+          </Link>
         </li>
         <li>
-          <TransitionLink href="/refund-policy">Refund Policy</TransitionLink>
+          <Link target="_blank" href={legalPolicyPdfLinks?.refund}>
+            Refund Policy
+          </Link>
         </li>
         <li>
-          <TransitionLink href="/shipping-policy">
+          <Link target="_blank" href={legalPolicyPdfLinks?.shipping}>
             Shipping Policy
-          </TransitionLink>
+          </Link>
         </li>
         <li>
-          <TransitionLink href="/return-policy">Return Policy</TransitionLink>
+          <Link target="_blank" href={legalPolicyPdfLinks?.return}>
+            Return Policy
+          </Link>
         </li>
       </ul>
     </div>

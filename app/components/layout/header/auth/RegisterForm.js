@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { Checkbox } from "@nextui-org/react";
@@ -9,13 +10,15 @@ import toast from "react-hot-toast";
 import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import usePolicyPages from "@/app/hooks/usePolicyPages";
 import generateCustomerId from "@/app/utils/generateCustomerId";
-import TransitionLink from "@/app/components/ui/TransitionLink";
 
 export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
   const axiosPublic = useAxiosPublic();
   const { setUserData } = useAuth();
   const { setIsPageLoading } = useLoading();
+  const [[legalPolicyPdfLinks] = [], isLegalDataLoading, legalDataRefetch] =
+    usePolicyPages();
   const [isPasswordVisible, SetIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, SetIsConfirmPasswordVisible] =
     useState(false);
@@ -340,13 +343,13 @@ export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
             isInvalid={!isPoliciesCheckboxSelected}
           >
             I agree to the{" "}
-            <TransitionLink href="/terms-and-conditions">
+            <Link target="_blank" href={legalPolicyPdfLinks?.terms}>
               Terms & Conditions
-            </TransitionLink>
+            </Link>
             {" and "}
-            <TransitionLink href="/privacy-policy">
+            <Link target="_blank" href={legalPolicyPdfLinks?.privacy}>
               Privacy Policy
-            </TransitionLink>
+            </Link>
           </Checkbox>
         </div>
         {/* Newsletter Agreement */}

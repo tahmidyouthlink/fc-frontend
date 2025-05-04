@@ -9,9 +9,12 @@ import {
   PopoverTrigger,
   Tooltip,
 } from "@nextui-org/react";
+import addToCartToast from "@/app/utils/addToCartToast";
 
 export default function CartModalButtons({
   productId,
+  productTitle,
+  productImg,
   defaultColor,
   productVariantSku,
   productPageLink,
@@ -79,13 +82,40 @@ export default function CartModalButtons({
 
         if (!!response?.data?.modifiedCount || !!response?.data?.matchedCount) {
           setUserData(updatedUserData);
-          toast.success("Item added to cart."); // If server cart is updated
+
+          // Display custom success toast notification, if server cart is updated
+          toast.custom(
+            (t) =>
+              addToCartToast(
+                t,
+                productImg,
+                productTitle,
+                selectedOptions?.size,
+                selectedOptions?.color,
+              ),
+            {
+              position: "top-right",
+            },
+          );
         }
       } catch (error) {
         toast.error("Failed to add item to cart."); // If server error occurs
       }
     } else {
-      toast.success("Item added to cart."); // If saved only locally
+      // Display custom success toast notification, if saved only locally
+      toast.custom(
+        (t) =>
+          addToCartToast(
+            t,
+            productImg,
+            productTitle,
+            selectedOptions?.size,
+            selectedOptions?.color,
+          ),
+        {
+          position: "top-right",
+        },
+      );
     }
 
     setIsPageLoading(false);
