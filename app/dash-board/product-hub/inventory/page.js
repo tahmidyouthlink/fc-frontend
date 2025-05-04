@@ -14,6 +14,7 @@ import useOrders from '@/app/hooks/useOrders';
 import useLocations from '@/app/hooks/useLocations';
 import { HiOutlineDownload } from 'react-icons/hi';
 import PaginationSelect from '@/app/components/layout/PaginationSelect';
+import { IoCheckmarkOutline } from "react-icons/io5";
 
 const InventoryPage = () => {
 
@@ -25,8 +26,12 @@ const InventoryPage = () => {
   const [locationList, isLocationPending] = useLocations();
   const [filteredProducts, setFilteredProducts] = useState([]);
   const dropdownRef = useRef(null);
+  const dropdownRef2 = useRef(null);
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
+  const [isOpenDropdown2, setIsOpenDropdown2] = useState(false);
   const [locationNameForMessage, setLocationNameForMessage] = useState("");
+  const [showLowStock, setShowLowStock] = useState(false);
+  const [showOutOfStock, setShowOutOfStock] = useState(false);
 
   useEffect(() => {
     if (searchQuery) {
@@ -92,7 +97,7 @@ const InventoryPage = () => {
     const onHandSku = (product?.onHandSku || '').toString();
 
     // Check for matches
-    return (
+    const matchesSearch = (
       productTitle?.includes(query) ||
       productId?.includes(query) ||
       size?.includes(query) ||
@@ -100,6 +105,18 @@ const InventoryPage = () => {
       (isNumberQuery && sku === query) || // Numeric comparison for SKU 
       (isNumberQuery && onHandSku === query) // Numeric comparison for SKU
     );
+
+    const isLowStock = showLowStock && product?.sku >= 1 && product.sku <= 9;
+    const isOutOfStock = showOutOfStock && product.sku === 0;
+
+    // If any stock filter is active, include both stock and search criteria
+    if (showLowStock || showOutOfStock) {
+      return (isLowStock || isOutOfStock) && matchesSearch;
+    }
+
+    // If no stock filter, apply only search
+    return matchesSearch;
+
   });
 
   const handleItemsPerPageChange = (newValue) => {
@@ -116,6 +133,7 @@ const InventoryPage = () => {
   const totalPages = Math.ceil(searchedProducts?.length / itemsPerPage);
 
   const toggleDropdown = () => setIsOpenDropdown(!isOpenDropdown);
+  const toggleDropdown2 = () => setIsOpenDropdown2(!isOpenDropdown2);
 
   // Export to CSV
   const exportToCSV = () => {
@@ -282,10 +300,40 @@ const InventoryPage = () => {
     }
   };
 
+  // Close dropdown when clicking outside
+  const handleClickOutside2 = (event) => {
+    if (dropdownRef2.current && !dropdownRef2.current.contains(event.target)) {
+      setIsOpenDropdown2(false);
+    }
+  };
+
+  // Function to toggle low stock products (SKU ≤ 10 and > 0)
+  const handleShowLowStockProducts = () => {
+    setShowLowStock(prev => {
+      const newState = !prev;
+      if (newState) setShowOutOfStock(false); // Turn off the other filter
+      return newState;
+    });
+  };
+
+  // Function to toggle out of stock products (SKU === 0)
+  const handleShowOutOfStockProducts = () => {
+    setShowOutOfStock(prev => {
+      const newState = !prev;
+      if (newState) setShowLowStock(false); // Turn off the other filter
+      return newState;
+    });
+  };
+
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside2);
+    return () => document.removeEventListener('mousedown', handleClickOutside2);
+  }, [])
 
   useEffect(() => {
     if (paginatedProducts?.length === 0) {
@@ -322,8 +370,53 @@ const InventoryPage = () => {
       <div className='max-w-screen-2xl px-6 2xl:px-0 mx-auto'>
         <div className='flex flex-wrap lg:flex-nowrap items-center justify-between py-2 md:py-5 gap-2'>
 
-          <div className='w-full'>
+          <div className='w-full flex flex-col xl:flex-row items-center justify-start gap-3'>
             <LocationDropdown onLocationSelect={handleLocationSelect} />
+
+            {/* Stock Filters */}
+            <div ref={dropdownRef2} className="relative inline-block text-left">
+
+              <button onClick={toggleDropdown2} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-white border border-dashed px-[14px] md:px-[16px] py-3 transition-[background-color] duration-300 ease-in-out text-[10px] md:text-[14px]">
+                <p>
+                  <span className='text-neutral-600 font-semibold'>Filter</span>
+                  <span className='text-neutral-800 font-bold'>
+                    {showLowStock ? `: Low Stock` : ""} {showOutOfStock ? `: Out Of Stock` : ""}
+                  </span>
+                </p>
+                <svg
+                  className={`-mr-1 ml-2 h-5 w-5 transform transition-transform duration-300 ${isOpenDropdown2 ? 'rotate-180' : ''}`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {isOpenDropdown2 && (
+                <div className="absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <div className="p-1">
+
+                    <div className="p-1 flex flex-col gap-2">
+
+                      {/* Low stock product Button */}
+                      <button className={`relative z-[1] flex items-center justify-between rounded-lg px-[10px] md:px-[12px] py-2 transition-[background-color] duration-300 ease-in-out text-[10px] md:text-[14px] min-w-[150px] hover:bg-gray-200 ${showLowStock ? 'bg-gray-200' : ''}`} onClick={handleShowLowStockProducts}>
+                        Low Stock {showLowStock ? <IoCheckmarkOutline size={14} /> : ""}
+                      </button>
+
+                      {/* Out of stock Button */}
+                      <button className={`relative z-[1] flex items-center justify-between rounded-lg px-[10px] md:px-[12px] py-2 transition-[background-color] duration-300 ease-in-out text-[10px] md:text-[14px] min-w-[150px] hover:bg-gray-200 ${showOutOfStock ? 'border bg-gray-200' : ''}`} onClick={handleShowOutOfStockProducts}>
+                        Out of Stock {showOutOfStock ? <IoCheckmarkOutline size={14} /> : ""}
+                      </button>
+
+                    </div>
+
+                  </div>
+                </div>
+              )}
+            </div>
+
           </div>
 
           <div className='flex justify-center items-center gap-2 w-full'>

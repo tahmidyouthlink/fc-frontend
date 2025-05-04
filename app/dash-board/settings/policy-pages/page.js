@@ -33,12 +33,13 @@ const PolicyPages = () => {
       const reconstructedFiles = {};
 
       for (const key of Object.keys(urls)) {
-        const filesArray = urls[key];
-        if (Array.isArray(filesArray) && filesArray.length > 0) {
-          // Currently assuming only one file per category; adjust if multiple needed
-          const fileUrl = filesArray[0];
+        // Only include expected policy keys
+        if (!policyLabels.some(label => label.key === key)) continue;
+
+        const fileUrl = urls[key];
+        if (typeof fileUrl === 'string' && fileUrl.startsWith('http')) {
           reconstructedFiles[key] = {
-            name: fileUrl.split('/').pop().split('?')[0], // Extract file name
+            name: fileUrl.split('/').pop()?.split('?')[0] || `${key}.pdf`,
             url: fileUrl,
           };
         }
@@ -114,14 +115,14 @@ const PolicyPages = () => {
         if (file instanceof File) {
           // If it's a new file, upload it
           const url = await uploadFile(file, key);
-          if (!url) {
+          if (!url?.[0]) {
             toast.error(`Upload failed for ${key}`);
             return;
           }
-          uploadResults[key] = url;
+          uploadResults[key] = url[0];
         } else if (file?.url) {
           // If it's an existing file (not changed), reuse its URL
-          uploadResults[key] = [file.url];
+          uploadResults[key] = file.url;
         } else {
           toast.error(`Invalid file for ${key}`);
           return;
@@ -129,6 +130,7 @@ const PolicyPages = () => {
       }
 
       setUploadedUrls(uploadResults); // Save URLs for preview
+      console.log(uploadResults, "uploadResults");
 
       try {
         const response = await axiosPublic.put(`/edit-policy-pdfs/${pdfId}`, uploadResults);

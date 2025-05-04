@@ -3,6 +3,7 @@ import React from 'react';
 import arrowSvgImage from "/public/card-images/arrow.svg";
 import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
+import TodaySummaryTabs from '../components/dashboard/TodaySummaryTabs';
 
 const DashboardMainPage = () => {
 
@@ -28,7 +29,22 @@ const DashboardMainPage = () => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[48%] 2xl:left-[40%] bg-no-repeat'
       />
 
+      <div className='relative max-w-screen-2xl mx-auto'>
 
+        <div className='w-full'>
+          <h3 className='text-center md:text-start font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>OVERVIEW</h3>
+        </div>
+
+        <div className='flex flex-col md:flex-row justify-between items-center gap-6'>
+
+          <TodaySummaryTabs />
+
+          <div className='mt-6 border'>
+            {/* <h1 className='font-semibold text-neutral-700'>Todays orders</h1> */}
+          </div>
+        </div>
+
+      </div>
 
     </div>
   );
