@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import {
@@ -11,8 +12,8 @@ import {
 import toast from "react-hot-toast";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import usePolicyPages from "@/app/hooks/usePolicyPages";
 import generateCustomerId from "@/app/utils/generateCustomerId";
-import TransitionLink from "../../ui/TransitionLink";
 import GoogleSignInButton from "../../layout/header/auth/GoogleSignInButton";
 
 export default function CheckoutRegister({
@@ -23,6 +24,8 @@ export default function CheckoutRegister({
   setIsRegisterModalOpen,
 }) {
   const axiosPublic = useAxiosPublic();
+  const [[legalPolicyPdfLinks] = [], isLegalDataLoading, legalDataRefetch] =
+    usePolicyPages();
   const [isNewPasswordVisible, SetIsNewPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, SetIsConfirmPasswordVisible] =
     useState(false);
@@ -354,13 +357,13 @@ export default function CheckoutRegister({
                     isInvalid={!isPoliciesCheckboxSelected}
                   >
                     I agree to the{" "}
-                    <TransitionLink href="/terms-and-conditions">
+                    <Link target="_blank" href={legalPolicyPdfLinks?.terms}>
                       Terms & Conditions
-                    </TransitionLink>
+                    </Link>
                     {" and "}
-                    <TransitionLink href="/privacy-policy">
+                    <Link target="_blank" href={legalPolicyPdfLinks?.privacy}>
                       Privacy Policy
-                    </TransitionLink>
+                    </Link>
                   </Checkbox>
                 </div>
                 {/* Newsletter Agreement */}

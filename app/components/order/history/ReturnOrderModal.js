@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   Modal,
   ModalContent,
@@ -11,8 +12,8 @@ import {
 import toast from "react-hot-toast";
 import { useLoading } from "@/app/contexts/loading";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import usePolicyPages from "@/app/hooks/usePolicyPages";
 import customCurrentDateTimeFormat from "@/app/utils/customCurrentDateTimeFormat";
-import TransitionLink from "@/app/components/ui/TransitionLink";
 import ReturnReasonField from "./ReturnReasonField";
 import ReturnIssueField from "./ReturnIssueField";
 import ReturnBriefDescriptionField from "./ReturnBriefDescriptionField";
@@ -35,6 +36,8 @@ export default function ReturnOrderModal({
 }) {
   const { setIsPageLoading } = useLoading();
   const axiosPublic = useAxiosPublic();
+  const [[legalPolicyPdfLinks] = [], isLegalDataLoading, legalDataRefetch] =
+    usePolicyPages();
   const selectedReason = Object.values(watch("reason") || {})[0];
   const selectedIssue = Object.values(watch("issue") || {})[0];
   const returnItems = watch("items");
@@ -269,13 +272,13 @@ export default function ReturnOrderModal({
                     isInvalid={!isPolicyChecked}
                   >
                     I have read and agree to the{" "}
-                    <TransitionLink href="/return-policy">
+                    <Link target="_blank" href={legalPolicyPdfLinks?.return}>
                       Return Policy
-                    </TransitionLink>
+                    </Link>
                     {" & "}
-                    <TransitionLink href="/refund-policy">
+                    <Link target="_blank" href={legalPolicyPdfLinks?.refund}>
                       Refund Policy
-                    </TransitionLink>
+                    </Link>
                     .
                   </Checkbox>
                 </div>
