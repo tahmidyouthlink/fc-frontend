@@ -59,7 +59,7 @@ export default function UserDropdown() {
 
   return (
     <>
-      <Dropdown placement="bottom-end">
+      <Dropdown placement="bottom-end" className="mt-5 sm:mt-6 xl:mt-7">
         <DropdownTrigger className="z-[0]">
           <span className="cursor-pointer">
             <IoPersonOutline className="size-[18px] text-neutral-600 lg:size-[22px]" />

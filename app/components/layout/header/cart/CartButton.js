@@ -222,7 +222,7 @@ export default function CartButton({ productList }) {
   ]);
 
   return (
-    <Dropdown placement="bottom-end">
+    <Dropdown placement="bottom-end" className="mt-5 sm:mt-6 xl:mt-7">
       <DropdownTrigger className="z-[0] !scale-100 !opacity-100">
         {/* Cart button */}
         <li
