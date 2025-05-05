@@ -13,6 +13,8 @@ import { useLoading } from "@/app/contexts/loading";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
 import useOffers from "@/app/hooks/useOffers";
 import useLocations from "@/app/hooks/useLocations";
+import addToCartToast from "@/app/utils/addToCartToast";
+import getImageSetsBasedOnColors from "@/app/utils/getImageSetsBasedOnColors";
 import {
   calculateSubtotal,
   getTotalItemCount,
@@ -166,10 +168,12 @@ export default function CartButton({ productList }) {
                 (t) =>
                   addToCartToast(
                     t,
-                    productImg,
-                    productTitle,
-                    selectedOptions?.size,
-                    selectedOptions?.color,
+                    getImageSetsBasedOnColors(product?.productVariants)?.find(
+                      (imgSet) => imgSet?.color?.color === colorCode,
+                    )?.images[0],
+                    product?.productTitle,
+                    productVariant?.size,
+                    productVariant?.color,
                   ),
                 {
                   position: "top-right",
@@ -185,10 +189,12 @@ export default function CartButton({ productList }) {
             (t) =>
               addToCartToast(
                 t,
-                productImg,
-                productTitle,
-                selectedOptions?.size,
-                selectedOptions?.color,
+                getImageSetsBasedOnColors(product?.productVariants)?.find(
+                  (imgSet) => imgSet?.color?.color === colorCode,
+                )?.images[0],
+                product?.productTitle,
+                productVariant?.size,
+                productVariant?.color,
               ),
             {
               position: "top-right",
