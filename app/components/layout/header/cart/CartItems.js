@@ -18,7 +18,6 @@ export default function CartItems({
   specialOffers,
   primaryLocation,
   setIsPageLoading,
-  setIsCartDrawerOpen,
 }) {
   const { user, userData, setUserData } = useAuth();
   const axiosPublic = useAxiosPublic();
@@ -54,7 +53,7 @@ export default function CartItems({
   };
 
   return (
-    <ul className="mb-4 space-y-2.5">
+    <ul className="mb-4 space-y-[18px]">
       {cartItems.map((cartItemInfo) => {
         const cartItem = productList?.find(
           (product) => product._id === cartItemInfo._id,
@@ -84,14 +83,12 @@ export default function CartItems({
               "-color-" +
               cartItemInfo.selectedColor.label
             }
-            className="flex w-full items-stretch justify-between gap-x-2.5 rounded-lg bg-white p-2.5 shadow-[2px_2px_10px_0_rgba(0,0,0,0.025)]"
+            className="flex w-full items-stretch justify-between gap-x-2.5 rounded-lg bg-white shadow-[2px_2px_10px_0_rgba(0,0,0,0.025)]"
           >
             {/* Cart Item Image (with link to product page) */}
             <TransitionLink
               href={`/product/${cartItem?.productTitle?.split(" ")?.join("-")?.toLowerCase()}`}
               className="relative block min-h-full w-1/4 overflow-hidden rounded-md bg-[#F0F0F0] max-sm:w-20"
-              hasDrawer={true}
-              setIsDrawerOpen={setIsCartDrawerOpen}
             >
               {!!cartItemImgUrl && (
                 <Image
@@ -111,8 +108,6 @@ export default function CartItems({
                     <TransitionLink
                       href={`/product/${cartItem?.productTitle?.split(" ")?.join("-")?.toLowerCase()}`}
                       className="underline-offset-1 hover:underline"
-                      hasDrawer={true}
-                      setIsDrawerOpen={setIsCartDrawerOpen}
                     >
                       <h4 className="text-neutral-600">
                         {cartItem?.productTitle}
