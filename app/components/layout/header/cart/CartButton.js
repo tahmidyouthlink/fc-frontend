@@ -222,7 +222,29 @@ export default function CartButton({ productList }) {
   ]);
 
   return (
-    <Dropdown placement="bottom-end" className="mt-5 sm:mt-6 xl:mt-7">
+    <Dropdown
+      placement="bottom-end"
+      className="mt-5 sm:mt-6 xl:mt-7"
+      motionProps={{
+        initial: { opacity: 0, scale: 0.95 },
+        animate: {
+          opacity: 1,
+          scale: 1,
+          transition: {
+            duration: 0.25,
+            ease: "easeInOut",
+          },
+        },
+        exit: {
+          opacity: 0,
+          scale: 0.95,
+          transition: {
+            duration: 0.25,
+            ease: "easeInOut",
+          },
+        },
+      }}
+    >
       <DropdownTrigger className="z-[0] !scale-100 !opacity-100">
         {/* Cart button */}
         <li
