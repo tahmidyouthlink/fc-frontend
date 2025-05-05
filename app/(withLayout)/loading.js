@@ -25,7 +25,7 @@ export default function Loading() {
         >
           {[0, 72, 144, 216, 288].map((rotate, i) => (
             <path
-              key={i}
+              key={"loading-spinner-" + rotate + colors[i % colors.length] + i}
               className="pl__worm"
               stroke={colors[i % colors.length]}
               d="M 31.94 3.191 L 40.388 20.309 L 59.279 23.054 L 45.61 36.379 L 48.836 55.193 L 31.94 46.31 L 15.044 55.193 L 18.27 36.379 L 4.601 23.054 L 23.492 20.309 Z"

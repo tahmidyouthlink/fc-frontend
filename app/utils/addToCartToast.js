@@ -14,13 +14,6 @@ export default function addToCartToast(
 
   if (!headerHeight) return null;
 
-  const isSmallScreen = window.innerWidth < 1024;
-  const mobileNavbar = document.querySelector("#mobile-navbar");
-  const desktopNavbar = document.querySelector("#desktop-navbar");
-  const mobilePadding = mobileNavbar.getBoundingClientRect().right;
-  const desktopPadding = desktopNavbar.getBoundingClientRect().right;
-  const mainPadding =
-    window.innerWidth - (isSmallScreen ? mobilePadding : desktopPadding);
   const offset = headerHeight - window.scrollY;
   const isHeaderOutOfViewport = offset < 0;
   const marginTopVal = isHeaderOutOfViewport ? 0 : offset;
@@ -35,10 +28,9 @@ export default function addToCartToast(
           });
         }
       }}
-      className="z-[99] -translate-y-6 rounded-lg bg-white p-2.5 opacity-0 shadow-[4px_4px_16px_0_rgba(0,0,0,0.15)] transition-[opacity,transform] duration-400 ease-out"
+      className="z-[99] min-w-60 -translate-y-6 rounded-lg bg-white p-2.5 opacity-0 shadow-[4px_4px_16px_0_rgba(0,0,0,0.15)] transition-[opacity,transform] duration-400 ease-out"
       style={{
         marginTop: `${marginTopVal}px`,
-        marginRight: `calc(${mainPadding}px - 2.1dvw)`,
       }}
     >
       {/* Confirmation of Addition to Cart */}

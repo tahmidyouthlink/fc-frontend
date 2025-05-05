@@ -46,7 +46,7 @@ export default function CompleteOutfitProducts({
         >
           {completeOutfitProducts.map((completeOutfitProduct, index) => (
             <ProductCard
-              key={completeOutfitProduct._id}
+              key={"product-complete-outfit-" + completeOutfitProduct._id}
               product={completeOutfitProduct}
               isAddToCartModalOpen={isAddToCartModalOpen}
               setIsAddToCartModalOpen={setIsAddToCartModalOpen}

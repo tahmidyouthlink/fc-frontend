@@ -3,7 +3,7 @@ import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
 
-export default function CartHeader({ totalItems, setIsCartDrawerOpen }) {
+export default function CartHeader({ totalItems }) {
   const { user, userData, setUserData } = useAuth();
   const { setIsPageLoading } = useLoading();
   const axiosPublic = useAxiosPublic();
@@ -40,24 +40,17 @@ export default function CartHeader({ totalItems, setIsCartDrawerOpen }) {
   };
 
   return (
-    <>
-      <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold md:text-lg">
-          Shopping Cart ({totalItems})
-        </h3>
-        <CgClose
-          className="cursor-pointer"
-          size={24}
-          onClick={() => setIsCartDrawerOpen(false)}
-        />
-      </div>
+    <div className="mb-[22px] flex items-center justify-between">
+      <h3 className="text-base font-semibold md:text-lg">
+        Shopping Cart ({totalItems})
+      </h3>
       <div
-        className={`mb-3 mt-7 flex w-fit cursor-pointer items-center justify-between gap-x-1.5 text-xs font-semibold text-red-500 md:text-sm ${!totalItems ? "hidden" : ""}`}
+        className={`flex w-fit cursor-pointer items-center justify-between gap-x-1.5 text-xs font-semibold text-red-500 md:text-sm ${!totalItems ? "hidden" : ""}`}
         onClick={() => removeAllItems()}
       >
         <CgTrash size={15} />
         Remove All
       </div>
-    </>
+    </div>
   );
 }

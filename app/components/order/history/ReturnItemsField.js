@@ -35,7 +35,7 @@ export default function ReturnItemsField({
 
           return (
             <div
-              key={item?._id + item?.size + item?.color._id}
+              key={"return-item-" + item?._id + item?.size + item?.color._id}
               className={`flex w-full cursor-pointer items-stretch justify-between gap-x-2.5 rounded-lg border-2 p-2 transition-[border-color,background-color] duration-300 ease-in-out hover:border-[#d7ecd2] hover:bg-[#fafff9] ${returnItem.isRequested ? "border-[#d7ecd2] bg-[#fafff9]" : "border-neutral-100"}`}
               onClick={(event) => {
                 const tagName = event.target.tagName.toLowerCase();

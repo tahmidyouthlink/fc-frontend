@@ -105,7 +105,7 @@ export default function ShopCards({
           (filteredProduct) =>
             isProductWithinPriceRange(filteredProduct) && (
               <ProductCard
-                key={filteredProduct._id}
+                key={"filtered-product-" + filteredProduct._id}
                 product={filteredProduct}
                 isAddToCartModalOpen={isAddToCartModalOpen}
                 setIsAddToCartModalOpen={setIsAddToCartModalOpen}
