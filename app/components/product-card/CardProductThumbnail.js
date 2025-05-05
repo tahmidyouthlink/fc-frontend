@@ -5,7 +5,8 @@ import CardOutOfStockBanner from "./CardOutOfStockBanner";
 import CardColorSelectionTool from "./CardColorSelectionTool";
 
 export default function CardProductThumbnail({
-  product,
+  productTitle,
+  productColors,
   isProductOutOfStock,
   imageSets,
 }) {
@@ -56,12 +57,17 @@ export default function CardProductThumbnail({
   return (
     <div className="product-card relative aspect-[4/5] w-full overflow-hidden rounded-[20px] bg-[#F0F0F0]">
       <TransitionLink
-        href={`/product/${product.productTitle.split(" ").join("-").toLowerCase()}`}
+        href={`/product/${productTitle.split(" ").join("-").toLowerCase()}`}
       >
         {imageSets.map((imgSet, imgSetIndex) => {
           return (
             <div
-              key={imgSet.color.label + imgSetIndex}
+              key={
+                "card-thumbnail-img-" +
+                productTitle +
+                imgSet.color.label +
+                imgSetIndex
+              }
               className="img-container absolute aspect-[4/5] w-full transition-[opacity] duration-300 ease-in-out"
               style={{
                 opacity: imgSetIndex === 0 ? "1" : "0",
@@ -72,11 +78,17 @@ export default function CardProductThumbnail({
                 imgSet.images.map((imgUrl, imgIndex) => {
                   return (
                     <Image
-                      key={imgSet.color.label + imgUrl + imgIndex}
+                      key={
+                        "card-thumbnail-sub-img-" +
+                        productTitle +
+                        imgSet.color.label +
+                        imgUrl +
+                        imgIndex
+                      }
                       className={`h-full w-full object-contain transition-[transform,opacity] duration-300 ease-in-out ${imgIndex === 0 ? "opacity-100" : "opacity-0"}`}
                       src={imgUrl}
                       alt={
-                        product.productTitle +
+                        productTitle +
                         imgSet.color.label +
                         (Number(imgIndex) + 1)
                       }
@@ -92,8 +104,8 @@ export default function CardProductThumbnail({
       </TransitionLink>
       {!isProductOutOfStock && (
         <CardColorSelectionTool
-          productTitle={product.productTitle}
-          productColors={product.availableColors}
+          productTitle={productTitle}
+          productColors={productColors}
         />
       )}
     </div>

@@ -55,7 +55,7 @@ export default function RecentlyViewedProducts({
         >
           {recentlyViewedProducts.map((recentlyViewedProduct, index) => (
             <ProductCard
-              key={recentlyViewedProduct._id}
+              key={"product-recently-viewed-" + recentlyViewedProduct._id}
               product={recentlyViewedProduct}
               isAddToCartModalOpen={isAddToCartModalOpen}
               setIsAddToCartModalOpen={setIsAddToCartModalOpen}

@@ -62,7 +62,8 @@ export default function ProductCard({
       className={`relative ${shouldBeHidden ? "max-sm:hidden" : ""} ${!isAddToCartModalOpen ? "[&>div>a_img]:hover:scale-110 [&_:is(#card-buttons,#color-select)]:hover:opacity-100" : ""} ${isProductOutOfStock ? "[&>div]:hover:translate-x-0" : "[&_#card-buttons]:hover:translate-x-0 [&_#color-select]:hover:translate-y-0"}`}
     >
       <CardProductThumbnail
-        product={product}
+        productTitle={product.productTitle}
+        productColors={product.availableColors}
         isProductOutOfStock={isProductOutOfStock}
         imageSets={getImageSetsBasedOnColors(product.productVariants)}
       />

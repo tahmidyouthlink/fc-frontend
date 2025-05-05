@@ -79,6 +79,8 @@ export default function CartItems({
             key={
               "cart-item-" +
               cartItemInfo._id +
+              "-size-" +
+              cartItemInfo.selectedSize +
               "-color-" +
               cartItemInfo.selectedColor.label
             }

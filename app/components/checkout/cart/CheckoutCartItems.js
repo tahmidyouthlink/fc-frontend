@@ -102,6 +102,8 @@ export default function CheckoutCartItems({
               key={
                 "cart-item-" +
                 cartItemInfo._id +
+                "-size-" +
+                cartItemInfo.selectedSize +
                 "-color-" +
                 cartItemInfo.selectedColor.label
               }

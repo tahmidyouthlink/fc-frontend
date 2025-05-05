@@ -12,11 +12,10 @@ export default function PaymentMethodPartners() {
         {paymentMethods.map((paymentMethod) => {
           return (
             <li
-              key={paymentMethod.name}
+              key={paymentMethod.name + paymentMethod.websiteLink}
               className="overflow-hidden rounded-md shadow-[2px_2px_8px_0_rgba(0,0,0,0.1)] transition-shadow duration-300 ease-in-out hover:shadow-[2px_2px_16px_0_rgba(0,0,0,0.175)]"
             >
               <TransitionLink
-                key={paymentMethod.name}
                 href={paymentMethod.websiteLink}
                 target="_blank"
                 rel="noopener noreferrer"

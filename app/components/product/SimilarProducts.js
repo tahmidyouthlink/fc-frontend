@@ -55,7 +55,7 @@ export default function SimilarProducts({
         >
           {similarProducts.map((similarProduct, index) => (
             <ProductCard
-              key={similarProduct._id}
+              key={"product-similar-" + similarProduct._id}
               product={similarProduct}
               isAddToCartModalOpen={isAddToCartModalOpen}
               setIsAddToCartModalOpen={setIsAddToCartModalOpen}
