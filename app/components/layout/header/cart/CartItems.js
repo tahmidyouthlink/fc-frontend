@@ -18,6 +18,7 @@ export default function CartItems({
   specialOffers,
   primaryLocation,
   setIsPageLoading,
+  setIsDropdownOpen,
 }) {
   const { user, userData, setUserData } = useAuth();
   const axiosPublic = useAxiosPublic();
@@ -88,6 +89,8 @@ export default function CartItems({
             {/* Cart Item Image (with link to product page) */}
             <TransitionLink
               href={`/product/${cartItem?.productTitle?.split(" ")?.join("-")?.toLowerCase()}`}
+              hasDrawer={true}
+              setIsDrawerOpen={setIsDropdownOpen}
               className="relative block min-h-full w-1/4 overflow-hidden rounded-md bg-[#F0F0F0] max-sm:w-20"
             >
               {!!cartItemImgUrl && (
@@ -107,6 +110,8 @@ export default function CartItems({
                     {/* Cart Item Title (with link to product page) */}
                     <TransitionLink
                       href={`/product/${cartItem?.productTitle?.split(" ")?.join("-")?.toLowerCase()}`}
+                      hasDrawer={true}
+                      setIsDrawerOpen={setIsDropdownOpen}
                       className="underline-offset-1 hover:underline"
                     >
                       <h4 className="text-neutral-600">

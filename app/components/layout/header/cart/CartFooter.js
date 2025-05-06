@@ -1,6 +1,6 @@
 import TransitionLink from "@/app/components/ui/TransitionLink";
 
-export default function CartFooter({ subtotal }) {
+export default function CartFooter({ subtotal, setIsDropdownOpen }) {
   return (
     <div className="sticky bottom-0 space-y-4 bg-white px-2 pb-2 font-semibold">
       {/* Divider */}
@@ -14,6 +14,8 @@ export default function CartFooter({ subtotal }) {
         {/* Shop Page Button */}
         <TransitionLink
           href="/shop"
+          hasDrawer={true}
+          setIsDrawerOpen={setIsDropdownOpen}
           className="block w-full rounded-lg bg-[#d4ffce] py-2.5 text-center text-sm transition-[background-color] duration-300 hover:bg-[#bdf6b4]"
         >
           Continue Shopping
@@ -21,6 +23,8 @@ export default function CartFooter({ subtotal }) {
         {/* Checkout Page Button */}
         <TransitionLink
           href="/checkout"
+          hasDrawer={true}
+          setIsDrawerOpen={setIsDropdownOpen}
           className="block w-full rounded-lg bg-[#ffddc2] py-2.5 text-center text-sm transition-[background-color] duration-300 hover:bg-[#fbcfb0]"
         >
           Checkout
