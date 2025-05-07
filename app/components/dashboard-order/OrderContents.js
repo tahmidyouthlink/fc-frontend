@@ -61,6 +61,8 @@ const OrderContents = () => {
   const searchParams = useSearchParams();
   const promo = searchParams.get("promo");
   const offer = searchParams.get("offer");
+  const orderNumber = searchParams.get("orderNumber");
+  const orderStatus = searchParams.get("orderStatus");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderList, isOrderListPending, refetchOrder] = useOrders();
@@ -132,10 +134,16 @@ const OrderContents = () => {
     // Set the search query to promo or offer
     if (promo) {
       setSearchQuery(promo);
-    } else if (offer) {
+    } if (offer) {
       setSearchQuery(offer);
     }
-  }, [promo, offer]);
+    if (orderNumber) {
+      setSearchQuery(orderNumber)
+    }
+    if (orderStatus === "Return Requested") {
+      setSelectedTab("Returns & Refunds")
+    }
+  }, [promo, offer, orderNumber, orderStatus]);
 
   // Click outside handler
   useEffect(() => {

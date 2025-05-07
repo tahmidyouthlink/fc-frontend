@@ -7,12 +7,13 @@ const LocationDropdown = ({ onLocationSelect }) => {
   const [locationList, isLocationPending] = useLocations();
   const [selectedLocation, setSelectedLocation] = useState(new Set());
 
-  // Set the first item as default when the location list loads
+  // Set the primary location as default when the location list loads
   useEffect(() => {
     if (locationList?.length && selectedLocation.size === 0) {
-      const firstLocation = locationList[0].locationName;
-      setSelectedLocation(new Set([firstLocation]));
-      onLocationSelect(firstLocation);
+      const primaryLocation = locationList.find(loc => loc.isPrimaryLocation);
+      const defaultLocation = primaryLocation?.locationName || locationList[0].locationName;
+      setSelectedLocation(new Set([defaultLocation]));
+      onLocationSelect(defaultLocation);
     }
   }, [locationList, onLocationSelect, selectedLocation.size]); // Runs only when locationList changes
 

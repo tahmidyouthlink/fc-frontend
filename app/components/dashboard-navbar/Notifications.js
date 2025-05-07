@@ -1,42 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { GrNotification } from 'react-icons/gr';
 import { Popover, PopoverTrigger, PopoverContent, useDisclosure, } from "@nextui-org/react";
 import { RxCross2 } from 'react-icons/rx';
-import useNotifyMeNotifications from '@/app/hooks/useNotifyMeNotifications';
 import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
+import { PiChecksLight } from "react-icons/pi";
+import { GoDotFill } from "react-icons/go";
+import useNotifications from '@/app/hooks/useNotifications';
 
 const Notifications = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [notifyMeNotificationList, isNotifyMeNotificationPending] = useNotifyMeNotifications();
+  const [notificationList, isNotificationPending, refetch] = useNotifications();
   const [productId, setProductId] = useState({}); // Store the fetched product names
   const axiosPublic = useAxiosPublic();
   const [showAll, setShowAll] = useState(false);
+  const [filter, setFilter] = useState("all"); // 'all' or 'unread'
 
-  const flattenedTimeBasedNotifications = notifyMeNotificationList?.flatMap(details =>
-    details?.emails?.map(detail => ({
-      _id: details?._id,
-      productId: details?.productId,
-      size: details?.size,
-      colorCode: details?.colorCode,
-      email: detail?.email,
-      notified: detail?.notified,
-      dateTime: detail?.dateTime,
-    })
-    ))
+  const displayedNotifications = useMemo(() => {
+    let baseList = filter === "unread"
+      ? notificationList?.filter(n => !n.isRead)
+      : notificationList;
 
-  const sortedNotifications = flattenedTimeBasedNotifications?.sort((a, b) => {
-    const aLatest = Math.max(new Date(a.dateTime).getTime());
-    const bLatest = Math.max(new Date(b.dateTime).getTime());
-    return bLatest - aLatest;
-  });
+    if (!showAll) {
+      baseList = baseList?.slice(0, 5);
+    }
 
-  const slicedNotifications = flattenedTimeBasedNotifications?.slice(0, 5);
-
-  const showAllNotifications = showAll
-    ? sortedNotifications || []
-    : slicedNotifications || [];
+    return baseList;
+  }, [showAll, notificationList, filter]);
 
   const getTimeAgo = (dateTimeStr) => {
     // Convert "May 5, 2025 | 5:50 PM" -> "May 5, 2025 5:50 PM"
@@ -62,10 +53,57 @@ const Notifications = () => {
     return `${years}y ago`;
   };
 
+  // const handleMarkAllAsRead = async () => {
+  //   try {
+  //     await axiosPublic.post('/notifications/mark-all-read', { email: "user@example.com" }); // Replace with dynamic email
+  //     // Optionally: Refresh notifications
+  //   } catch (error) {
+  //     console.error("Failed to mark notifications as read:", error);
+  //   }
+  // };
+
+  const handleNotificationClick = async (detail) => {
+
+    try {
+      const notificationDetails = {
+        type: detail.type,
+        orderNumber: detail.orderNumber,
+        productId: detail.productId,
+        dateTime: detail.dateTime,
+        email: detail.email
+      };
+
+      const response = await axiosPublic.post("/mark-notification-read", notificationDetails)
+      if (response?.data?.message === "Notification marked as read") {
+        refetch();
+      }
+
+      // 2. Open appropriate page in a new tab
+      if (detail.type === "Ordered") {
+        const query = new URLSearchParams({
+          orderNumber: detail.orderNumber,
+          orderStatus: detail.orderStatus,
+        }).toString();
+        window.open(`/dash-board/orders?${query}`, "_blank");
+      }
+
+      if (detail.type === "Notified") {
+        const query = new URLSearchParams({
+          productId: productId[detail.productId],
+        }).toString();
+        window.open(`/dash-board/product-hub/inventory?${query}`, "_blank");
+      }
+    } catch (error) {
+      console.error("Failed to mark notification as read:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchProductNames = async () => {
       try {
-        const productIds = notifyMeNotificationList?.map(item => item.productId);
+        const productIds = notificationList
+          ?.filter(item => item.type === "Notified")
+          .map(item => item.productId);
 
         if (!productIds || productIds.length === 0) return;
 
@@ -86,23 +124,21 @@ const Notifications = () => {
     };
 
     fetchProductNames();
-  }, [notifyMeNotificationList, axiosPublic]);
+  }, [notificationList, axiosPublic]);
 
-  if (isNotifyMeNotificationPending) return <SmallHeightLoading />;
-
-  console.log(showAllNotifications, "showAllNotifications");
+  if (isNotificationPending) return <SmallHeightLoading />;
 
   return (
     <Popover isOpen={isOpen}
       onOpenChange={(open) => {
         if (!open) {
           setShowAll(false); // reset on close
+          setFilter("all");
           onClose();
         } else {
           onOpen();
         }
-      }}
-      placement="bottom-end" showArrow offset={10}>
+      }} placement="bottom-end" showArrow offset={10}>
       <PopoverTrigger>
         <div className="cursor-pointer" role="button" onClick={onOpen}>
           <GrNotification size={22} />
@@ -119,66 +155,102 @@ const Notifications = () => {
             <button onClick={() => {
               onClose();         // Close the popover
               setShowAll(false); // Reset showAll state
+              setFilter("all");
             }} className="text-gray-500 hover:text-black">
               <RxCross2 size={24} />
             </button>
           </div>
+          <div className='flex items-center justify-between py-2 px-4 bg-gray-200'>
+            <div className='flex items-center gap-2'>
+              <button onClick={() => setFilter("all")}
+                className={filter === "all" ? "font-bold text-green-800" : "text-gray-600"}>All</button>
+              <button onClick={() => setFilter("unread")}
+                className={filter === "unread" ? "font-bold text-green-800" : "text-gray-600"}>Unread</button>
+            </div>
+            {/* <button onClick={handleMarkAllAsRead} className='flex items-center gap-1.5'><PiChecksLight size={20} />Mark all as read</button> */}
+          </div>
           <div className="space-y-4 max-h-[400px] overflow-y-auto">
             <div>
-              {showAllNotifications?.length === 0 ? (
+
+              {displayedNotifications?.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">No notifications to show.</div>
               ) : (
-                showAllNotifications.map((detail, idx) => (
+                displayedNotifications.map((detail, idx) => (
                   <div
                     key={`${idx}`}
                     className="px-4 py-2 border-b last:border-none cursor-pointer hover:bg-gray-50 transition"
+                    onClick={() => handleNotificationClick(detail)}
                   >
                     <div className="flex justify-between items-center w-full">
-                      <div className="w-full">
-                        <div className="text-sm text-gray-700 flex flex-wrap items-center gap-x-1">
-                          <span>New request for</span>
-                          <span className="font-medium text-black whitespace-nowrap">
-                            {productId[detail.productId] || (
-                              <span className="text-gray-400">Loading product...</span>
-                            )}
-                          </span>
-                          <span>{`,`}</span>
-                          <div className="flex flex-wrap items-center text-sm text-gray-600 gap-x-1">
-                            <span>Size:</span>
-                            <span className="font-medium whitespace-nowrap">{detail.size}</span>
-                            <span>|</span>
-                            <span className="flex items-center whitespace-nowrap">
-                              Color:
-                              <span
-                                className="w-4 h-4 ml-2 rounded-full border border-gray-300"
-                                style={{ backgroundColor: detail.colorCode }}
-                              ></span>
+                      {detail.type === "Notified" ? (
+                        // 🔔 NOTIFIED TYPE UI
+                        <div className="w-full space-y-1">
+                          <div className="text-sm text-gray-700 flex flex-wrap items-center gap-x-1">
+                            <span>New request for</span>
+                            <span className="font-medium text-black whitespace-nowrap">
+                              {productId[detail.productId] || (
+                                <span className="text-gray-400">Loading product...</span>
+                              )}
                             </span>
+                            <span>{`,`}</span>
+                            <div className="flex flex-wrap items-center text-sm text-gray-600 gap-x-1">
+                              <span>Size:</span>
+                              <span className="font-medium whitespace-nowrap">{detail.size}</span>
+                              <span>|</span>
+                              <span className="flex items-center whitespace-nowrap">
+                                Color:
+                                <span
+                                  className="w-4 h-4 ml-2 rounded-full border border-gray-300"
+                                  style={{ backgroundColor: detail.colorCode }}
+                                ></span>
+                              </span>
+                            </div>
+                          </div>
+                          <div className='flex items-center gap-32'>
+                            <p className="text-sm text-gray-500">{getTimeAgo(detail.dateTime)}</p>
+                            <p className="flex items-center gap-1">
+                              {detail.notified ? (
+                                <span className="text-green-600 text-xs font-medium flex items-center">
+                                  ✅ Notified
+                                </span>
+                              ) : (
+                                <span className="text-red-500 text-xs font-medium flex items-center">
+                                  ❌ Not Notified
+                                </span>
+                              )}
+                            </p>
                           </div>
                         </div>
-                        <div className='flex items-center justify-between gap-4'>
-                          <p className="text-sm text-gray-500">
-                            {getTimeAgo(detail.dateTime)}
-                          </p>
-                          <p className="flex items-center gap-1">
-                            {detail.notified ? (
-                              <span className="text-green-600 text-xs font-medium flex items-center">
-                                ✅ Notified
-                              </span>
-                            ) : (
-                              <span className="text-red-500 text-xs font-medium flex items-center">
-                                ❌ Not Notified
-                              </span>
-                            )}
-                          </p>
+                      ) : (
+                        // 📦 ORDERED TYPE UI
+                        <div className="w-full space-y-1">
+                          <div className="text-sm text-gray-700">
+                            {detail.orderStatus === "Pending" ? (
+                              <>
+                                <span>New order placed: </span>
+                                <span className="font-medium text-black whitespace-nowrap">{detail.orderNumber}</span>
+                              </>
+                            ) : detail.orderStatus === "Return Requested" ? (
+                              <>
+                                <span>Return requested for order: </span>
+                                <span className="font-medium text-black whitespace-nowrap">{detail.orderNumber}</span>
+                              </>
+                            ) : null}
+                          </div>
+                          <p className="text-sm text-gray-500">{getTimeAgo(detail.dateTime)}</p>
                         </div>
+                      )}
+
+                      {/* Red dot if unread */}
+                      <div>
+                        {detail?.isRead ? null : <span className='text-red-600'><GoDotFill size={20} /></span>}
                       </div>
                     </div>
                   </div>
                 ))
               )}
 
-              {flattenedTimeBasedNotifications.length > 5 && !showAll && (
+              {(filter === "all" ? notificationList : notificationList.filter(n => !n.isRead)).length > 5 && !showAll && (
                 <div className="text-center mt-4">
                   <button
                     onClick={() => setShowAll(true)}
@@ -188,6 +260,7 @@ const Notifications = () => {
                   </button>
                 </div>
               )}
+
             </div>
 
           </div>
