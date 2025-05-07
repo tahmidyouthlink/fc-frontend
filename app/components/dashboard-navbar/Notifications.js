@@ -4,9 +4,10 @@ import { Popover, PopoverTrigger, PopoverContent, useDisclosure, } from "@nextui
 import { RxCross2 } from 'react-icons/rx';
 import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
-import { PiChecksLight } from "react-icons/pi";
 import { GoDotFill } from "react-icons/go";
 import useNotifications from '@/app/hooks/useNotifications';
+import { getTimeAgo } from './GetTimeAgo';
+import { PiChecksLight } from "react-icons/pi";
 
 const Notifications = () => {
 
@@ -28,39 +29,6 @@ const Notifications = () => {
 
     return baseList;
   }, [showAll, notificationList, filter]);
-
-  const getTimeAgo = (dateTimeStr) => {
-    // Convert "May 5, 2025 | 5:50 PM" -> "May 5, 2025 5:50 PM"
-    const cleanedDateStr = dateTimeStr.replace('|', '').trim();
-    const past = new Date(cleanedDateStr);
-    const now = new Date();
-
-    const diffMs = now - past;
-    if (isNaN(past)) return 'Invalid date';
-
-    const seconds = Math.floor(diffMs / 1000);
-    const minutes = Math.floor(diffMs / (1000 * 60));
-    const hours = Math.floor(diffMs / (1000 * 60 * 60));
-    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const months = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 30));
-    const years = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 365));
-
-    if (seconds < 60) return `${seconds}s ago`;
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    if (days < 30) return `${days}d ago`;
-    if (months < 12) return `${months}mo ago`;
-    return `${years}y ago`;
-  };
-
-  // const handleMarkAllAsRead = async () => {
-  //   try {
-  //     await axiosPublic.post('/notifications/mark-all-read', { email: "user@example.com" }); // Replace with dynamic email
-  //     // Optionally: Refresh notifications
-  //   } catch (error) {
-  //     console.error("Failed to mark notifications as read:", error);
-  //   }
-  // };
 
   const handleNotificationClick = async (detail) => {
 
@@ -175,7 +143,7 @@ const Notifications = () => {
               {displayedNotifications?.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">No notifications to show.</div>
               ) : (
-                displayedNotifications.map((detail, idx) => (
+                displayedNotifications?.map((detail, idx) => (
                   <div
                     key={`${idx}`}
                     className="px-4 py-2 border-b last:border-none cursor-pointer hover:bg-gray-50 transition"
