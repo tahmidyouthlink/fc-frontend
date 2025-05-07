@@ -28,10 +28,11 @@ export default function CartButton({ productList }) {
   const { userData, setUserData } = useAuth();
   const { setIsPageLoading } = useLoading();
   const axiosPublic = useAxiosPublic();
-  const [cartItems, setCartItems] = useState(null);
   const [specialOffers, isSpecialOffersLoading, specialOffersRefetch] =
     useOffers();
   const [locationList, isLocationListLoading, locationRefetch] = useLocations();
+  const [cartItems, setCartItems] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -229,6 +230,8 @@ export default function CartButton({ productList }) {
 
   return (
     <Dropdown
+      isOpen={isDropdownOpen}
+      onOpenChange={setIsDropdownOpen}
       placement="bottom-end"
       className="mt-5 sm:mt-6 xl:mt-7"
       motionProps={{
@@ -294,9 +297,10 @@ export default function CartButton({ productList }) {
                   )?.locationName
                 }
                 setIsPageLoading={setIsPageLoading}
+                setIsDropdownOpen={setIsDropdownOpen}
               />
             ) : (
-              <EmptyCartContent />
+              <EmptyCartContent setIsDropdownOpen={setIsDropdownOpen} />
             )}
           </div>
           {!!cartItems?.length && (
@@ -306,6 +310,7 @@ export default function CartButton({ productList }) {
                 cartItems,
                 specialOffers,
               ).toLocaleString()}
+              setIsDropdownOpen={setIsDropdownOpen}
             />
           )}
         </DropdownItem>
