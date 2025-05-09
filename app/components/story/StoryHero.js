@@ -8,7 +8,6 @@ export default function StoryHero({
   departments,
 }) {
   const cardRotations = generateCardRotations(departments.length);
-  let storyTl;
 
   useGSAP(() => {
     const tl = gsap.timeline({
@@ -48,27 +47,6 @@ export default function StoryHero({
         "<0.25",
       )
       .from("#story-hero p", { y: 35 });
-
-    storyTl = gsap.timeline({
-      paused: true,
-      defaults: { duration: 0.5, ease: "power1.inOut", delay: 0 },
-    });
-
-    storyTl
-      .to("#story-hero h1, #story-hero p", {
-        y: -50,
-        autoAlpha: 0,
-        stagger: { amount: 0.5 },
-      })
-      .to(
-        ".hero-card",
-        {
-          x: 50,
-          autoAlpha: 0,
-          stagger: { amount: 0.5 },
-        },
-        "<",
-      );
   }, {});
 
   return (
@@ -92,11 +70,36 @@ export default function StoryHero({
             return (
               <div
                 key={dept._id}
+                // onClick={() => {
+                //   storyTl?.eventCallback("onComplete", () =>
+                //     setSelectedDept(dept),
+                //   );
+                //   storyTl?.play();
+                // }}
                 onClick={() => {
-                  storyTl?.eventCallback("onComplete", () =>
-                    setSelectedDept(dept),
-                  );
-                  storyTl?.play();
+                  gsap.to(window, {
+                    duration: 0.6,
+                    scrollTo: 0,
+                    ease: "power4.out",
+                    onComplete: () => {
+                      gsap.to("#story-hero h1, #story-hero p", {
+                        y: -50,
+                        autoAlpha: 0,
+                        stagger: { amount: 0.5 },
+                        duration: 0.5,
+                        ease: "power1.inOut",
+                      });
+
+                      gsap.to(".hero-card", {
+                        xPercent: 2,
+                        autoAlpha: 0,
+                        stagger: { amount: 0.5 },
+                        duration: 0.5,
+                        ease: "power1.inOut",
+                        onComplete: () => setSelectedDept(dept),
+                      });
+                    },
+                  });
                 }}
                 className="hero-card relative transition-[transform] delay-150 duration-500 ease-in-out [&:has(img:hover)>div]:delay-[500ms] [&:has(img:hover)>h4]:opacity-100 [&:has(img:hover)>h4]:delay-[500ms] [&:has(img:hover)>img]:w-80 [&:has(img:hover)]:z-[1] [&:has(img:hover)]:-translate-y-3 [&:has(img:hover)_div]:opacity-100"
               >
