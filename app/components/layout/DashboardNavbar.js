@@ -82,7 +82,7 @@ const DashboardNavbar = () => {
                   />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
-                  <DropdownItem showDivider key="profile" className="h-14 gap-2">
+                  <DropdownItem isReadOnly showDivider key="profile" className="h-14 gap-2">
                     <p className="font-semibold">Logged in as</p>
                     <p className="font-semibold">{existingUserData?.email}</p>
                   </DropdownItem>
@@ -145,7 +145,7 @@ const DashboardNavbar = () => {
                 />
               </DropdownTrigger>
               <DropdownMenu aria-label="Profile Actions" variant="flat">
-                <DropdownItem showDivider key="profile" className="h-14 gap-2">
+                <DropdownItem isReadOnly showDivider key="profile" className="h-14 gap-2">
                   <p className="font-semibold">Logged in as</p>
                   <p className="font-semibold">{existingUserData?.email}</p>
                 </DropdownItem>

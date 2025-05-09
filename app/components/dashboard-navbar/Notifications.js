@@ -1,18 +1,18 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { GrNotification } from 'react-icons/gr';
-import { Popover, PopoverTrigger, PopoverContent, useDisclosure, } from "@nextui-org/react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { RxCross2 } from 'react-icons/rx';
-import SmallHeightLoading from '../shared/Loading/SmallHeightLoading';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { GoDotFill } from "react-icons/go";
 import useNotifications from '@/app/hooks/useNotifications';
 import { getTimeAgo } from './GetTimeAgo';
+import NotificationLoading from '../shared/Loading/NotificationLoading';
 import { PiChecksLight } from "react-icons/pi";
 
 const Notifications = () => {
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const [notificationList, isNotificationPending, refetch] = useNotifications();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [productId, setProductId] = useState({}); // Store the fetched product names
   const axiosPublic = useAxiosPublic();
   const [showAll, setShowAll] = useState(false);
@@ -29,6 +29,10 @@ const Notifications = () => {
 
     return baseList;
   }, [showAll, notificationList, filter]);
+
+  const unreadCount = useMemo(() => {
+    return notificationList?.filter(n => !n.isRead)?.length || 0;
+  }, [notificationList]);
 
   const handleNotificationClick = async (detail) => {
 
@@ -95,148 +99,155 @@ const Notifications = () => {
     fetchProductNames();
   }, [notificationList, axiosPublic]);
 
-  if (isNotificationPending) return <SmallHeightLoading />;
+  if (isNotificationPending) return <NotificationLoading />;
 
   return (
-    <Popover isOpen={isOpen}
+    <Dropdown isOpen={isDropdownOpen} className='p-0' showArrow offset={10} placement="bottom-end"
       onOpenChange={(open) => {
+        setIsDropdownOpen(open);
         if (!open) {
-          setShowAll(false); // reset on close
+          setShowAll(false); // Reset state on close
           setFilter("all");
-          onClose();
-        } else {
-          onOpen();
         }
-      }} placement="bottom-end" showArrow offset={10}>
-      <PopoverTrigger>
-        <div className="cursor-pointer" role="button" onClick={onOpen}>
-          <GrNotification size={22} />
+      }}>
+      <DropdownTrigger>
+        <div className="relative">
+          <GrNotification className='text-neutral-500 border rounded-full p-1.5 hover:text-neutral-700 cursor-pointer hover:bg-gray-100' size={32} />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+              {unreadCount}
+            </span>
+          )}
         </div>
-      </PopoverTrigger>
+      </DropdownTrigger>
 
-      <PopoverContent className="w-[500px] max-h-[500px] p-0">
-        <div className='w-full py-4'>
-          <div className='flex justify-between px-4 pb-2 border-b'>
-            <div className="flex flex-col">
+      <DropdownMenu closeOnSelect={false} aria-label="Static Actions" className="p-0 md:w-[500px]">
+
+        <DropdownItem isReadOnly>
+          <div className='flex justify-between p-0 w-full'>
+            <div className="flex flex-col px-2">
               <h2 className="text-lg font-semibold">Notifications</h2>
               <h2 className="text-sm text-neutral-600">Stay updated with your latest notifications</h2>
             </div>
             <button onClick={() => {
-              onClose();         // Close the popover
-              setShowAll(false); // Reset showAll state
-              setFilter("all");
-            }} className="text-gray-500 hover:text-black">
+              setIsDropdownOpen(false);
+              setShowAll(false);
+            }} className="text-gray-500 hover:text-black hover:cursor-pointer">
               <RxCross2 size={24} />
             </button>
           </div>
-          <div className='flex items-center justify-between py-2 px-4 bg-gray-200'>
-            <div className='flex items-center gap-2'>
+        </DropdownItem>
+
+        <DropdownItem isReadOnly className='p-0'>
+          <div className='flex items-center justify-between w-full'>
+            <div className='flex items-center gap-2 bg-gray-200 w-full px-4 py-2'>
               <button onClick={() => setFilter("all")}
                 className={filter === "all" ? "font-bold text-green-800" : "text-gray-600"}>All</button>
               <button onClick={() => setFilter("unread")}
-                className={filter === "unread" ? "font-bold text-green-800" : "text-gray-600"}>Unread</button>
+                className={`${filter === "unread" ? "font-bold text-green-800" : "text-gray-600"}`}>
+                <span>Unread ({unreadCount})</span>
+              </button>
             </div>
             {/* <button onClick={handleMarkAllAsRead} className='flex items-center gap-1.5'><PiChecksLight size={20} />Mark all as read</button> */}
           </div>
-          <div className="space-y-4 max-h-[400px] overflow-y-auto">
-            <div>
+        </DropdownItem>
 
-              {displayedNotifications?.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">No notifications to show.</div>
-              ) : (
-                displayedNotifications?.map((detail, idx) => (
-                  <div
-                    key={`${idx}`}
-                    className="px-4 py-2 border-b last:border-none cursor-pointer hover:bg-gray-50 transition"
-                    onClick={() => handleNotificationClick(detail)}
-                  >
-                    <div className="flex justify-between items-center w-full">
-                      {detail.type === "Notified" ? (
-                        // 🔔 NOTIFIED TYPE UI
-                        <div className="w-full space-y-1">
-                          <div className="text-sm text-gray-700 flex flex-wrap items-center gap-x-1">
-                            <span>New request for</span>
-                            <span className="font-medium text-black whitespace-nowrap">
-                              {productId[detail.productId] || (
-                                <span className="text-gray-400">Loading product...</span>
-                              )}
+        <DropdownItem isReadOnly className='p-0'>
+          <div className="overflow-y-auto w-full max-h-[700px]">
+            {displayedNotifications?.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">No notifications to show.</div>
+            ) : (
+              displayedNotifications?.map((detail, idx) => (
+                <div
+                  key={`${idx}`}
+                  className={`px-4 py-2 border-b last:border-none hover:bg-gray-50 cursor-pointer ${detail?.isRead ? "" : "bg-gray-100"}  transition`}
+                  onClick={() => handleNotificationClick(detail)}>
+                  <div className="flex justify-between items-center w-full">
+                    {detail.type === "Notified" ? (
+                      // 🔔 NOTIFIED TYPE UI
+                      <div className="w-full space-y-1">
+                        <div className={`${detail?.isRead ? "" : "font-bold"} text-sm text-gray-700 flex flex-wrap items-center gap-x-1`}>
+                          <span>New request for</span>
+                          <span className={`${detail?.isRead ? "font-medium" : "font-bold"} text-neutral-700 whitespace-nowrap`}>
+                            {productId[detail.productId] || (
+                              <span className="text-gray-400">Loading product...</span>
+                            )}
+                          </span>
+                          <span>{`,`}</span>
+                          <div className="flex flex-wrap items-center text-sm text-gray-600 gap-x-1">
+                            <span>Size:</span>
+                            <span className={`${detail?.isRead ? "font-medium" : "font-bold"} whitespace-nowrap`}>{detail.size}</span>
+                            <span>|</span>
+                            <span className="flex items-center whitespace-nowrap">
+                              Color:
+                              <span
+                                className="w-4 h-4 ml-2 rounded-full border border-gray-300"
+                                style={{ backgroundColor: detail.colorCode }}
+                              ></span>
                             </span>
-                            <span>{`,`}</span>
-                            <div className="flex flex-wrap items-center text-sm text-gray-600 gap-x-1">
-                              <span>Size:</span>
-                              <span className="font-medium whitespace-nowrap">{detail.size}</span>
-                              <span>|</span>
-                              <span className="flex items-center whitespace-nowrap">
-                                Color:
-                                <span
-                                  className="w-4 h-4 ml-2 rounded-full border border-gray-300"
-                                  style={{ backgroundColor: detail.colorCode }}
-                                ></span>
-                              </span>
-                            </div>
-                          </div>
-                          <div className='flex items-center gap-32'>
-                            <p className="text-sm text-gray-500">{getTimeAgo(detail.dateTime)}</p>
-                            <p className="flex items-center gap-1">
-                              {detail.notified ? (
-                                <span className="text-green-600 text-xs font-medium flex items-center">
-                                  ✅ Notified
-                                </span>
-                              ) : (
-                                <span className="text-red-500 text-xs font-medium flex items-center">
-                                  ❌ Not Notified
-                                </span>
-                              )}
-                            </p>
                           </div>
                         </div>
-                      ) : (
-                        // 📦 ORDERED TYPE UI
-                        <div className="w-full space-y-1">
-                          <div className="text-sm text-gray-700">
-                            {detail.orderStatus === "Pending" ? (
-                              <>
-                                <span>New order placed: </span>
-                                <span className="font-medium text-black whitespace-nowrap">{detail.orderNumber}</span>
-                              </>
-                            ) : detail.orderStatus === "Return Requested" ? (
-                              <>
-                                <span>Return requested for order: </span>
-                                <span className="font-medium text-black whitespace-nowrap">{detail.orderNumber}</span>
-                              </>
-                            ) : null}
-                          </div>
+                        <div className='flex items-center gap-32'>
                           <p className="text-sm text-gray-500">{getTimeAgo(detail.dateTime)}</p>
+                          <p className="flex items-center gap-1">
+                            {detail.notified ? (
+                              <span className="text-green-600 text-xs font-medium flex items-center">
+                                ✅ Notified
+                              </span>
+                            ) : (
+                              <span className="text-red-500 text-xs font-medium flex items-center">
+                                ❌ Not Notified
+                              </span>
+                            )}
+                          </p>
                         </div>
-                      )}
-
-                      {/* Red dot if unread */}
-                      <div>
-                        {detail?.isRead ? null : <span className='text-red-600'><GoDotFill size={20} /></span>}
                       </div>
+                    ) : (
+                      // 📦 ORDERED TYPE UI
+                      <div className="w-full space-y-1">
+                        <div className="text-sm text-gray-700">
+                          {detail.orderStatus === "Pending" ? (
+                            <>
+                              <span className={`${detail?.isRead ? "font-medium" : "font-bold"}`}>New order placed: </span>
+                              <span className={`${detail?.isRead ? "font-medium" : "font-bold"} text-black whitespace-nowrap`}>{detail.orderNumber}</span>
+                            </>
+                          ) : detail.orderStatus === "Return Requested" ? (
+                            <>
+                              <span className={`${detail?.isRead ? "font-medium" : "font-bold"}`}>Return requested for order: </span>
+                              <span className={`${detail?.isRead ? "font-medium" : "font-bold"} text-black whitespace-nowrap`}>{detail.orderNumber}</span>
+                            </>
+                          ) : null}
+                        </div>
+                        <p className="text-sm text-gray-500">{getTimeAgo(detail.dateTime)}</p>
+                      </div>
+                    )}
+
+                    {/* Red dot if unread */}
+                    <div>
+                      {detail?.isRead ? null : <span className='text-blue-600'><GoDotFill size={20} /></span>}
                     </div>
                   </div>
-                ))
-              )}
-
-              {(filter === "all" ? notificationList : notificationList.filter(n => !n.isRead)).length > 5 && !showAll && (
-                <div className="text-center mt-4">
-                  <button
-                    onClick={() => setShowAll(true)}
-                    className="text-blue-600 hover:underline text-sm"
-                  >
-                    Show all notifications
-                  </button>
                 </div>
-              )}
+              ))
+            )}
 
-            </div>
+            {(filter === "all" ? notificationList : notificationList.filter(n => !n.isRead)).length > 5 && !showAll && (
+              <div className="text-center my-4">
+                <button
+                  onClick={() => setShowAll(true)}
+                  className="text-blue-600 hover:underline text-sm"
+                >
+                  Show all notifications
+                </button>
+              </div>
+            )}
 
           </div>
-        </div>
-      </PopoverContent>
+        </DropdownItem>
 
-    </Popover>
+      </DropdownMenu>
+
+    </Dropdown>
   );
 };
 
