@@ -38,7 +38,8 @@ const Notifications = () => {
         orderNumber: detail.orderNumber,
         productId: detail.productId,
         dateTime: detail.dateTime,
-        email: detail.email
+        email: detail.email,
+        orderStatus: detail.orderStatus
       };
 
       const response = await axiosPublic.post("/mark-notification-read", notificationDetails)
