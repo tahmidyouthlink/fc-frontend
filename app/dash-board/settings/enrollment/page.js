@@ -287,7 +287,7 @@ const EnrollmentPage = () => {
   if (isExistingUsersPending) return <Loading />;
 
   return (
-    <div className='bg-gray-50 min-h-screen relative px-6 md:px-10'>
+    <div className='bg-gray-50 min-h-[calc(100vh-60px)] relative px-6 md:px-10'>
 
       <div
         style={{

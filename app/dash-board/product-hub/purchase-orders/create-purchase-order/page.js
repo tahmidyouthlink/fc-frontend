@@ -10,7 +10,7 @@ import { Button, Checkbox, DatePicker, Modal, ModalBody, ModalContent, ModalFoot
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -37,6 +37,7 @@ const CreatePurchaseOrder = () => {
 	const [discount, setDiscount] = useState(0);  // Initial value for discount
 	const [purchaseOrderList, isPurchaseOrderPending] = usePurchaseOrders();
 	const [file, setFile] = useState(null);
+	const fileInputRef = useRef(null);
 	const { existingUserData, isUserLoading } = useAuth();
 	const permissions = existingUserData?.permissions || [];
 	const role = permissions?.find(
@@ -385,7 +386,10 @@ const CreatePurchaseOrder = () => {
 	};
 
 	const handleFileChange = (e) => {
-		setFile(e.target.files[0]);
+		const selectedFile = e.target.files[0];
+		if (selectedFile) {
+			setFile(selectedFile);
+		}
 	};
 
 	const uploadFile = async (file) => {
@@ -527,7 +531,7 @@ const CreatePurchaseOrder = () => {
 	}
 
 	return (
-		<div className='bg-gray-50 min-h-screen px-6'>
+		<div className='bg-gray-50 min-h-[calc(100vh-60px)] px-6'>
 
 			<div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
 				<div className='flex items-center justify-between w-full'>
@@ -754,13 +758,15 @@ const CreatePurchaseOrder = () => {
 									type="text"
 								/>
 							</div>
+
 							<div>
 								<label className='flex justify-start font-medium text-neutral-500 pb-2 pt-[6px]'>Attachment</label>
 
-								<div className="flex items-center w-full p-1 border border-gray-300 rounded-md bg-white shadow-sm cursor-pointer" onClick={() => document.getElementById("attachment").click()}>
+								<div className="flex items-center w-full p-1 border border-gray-300 rounded-md bg-white shadow-sm cursor-pointer" onClick={() => fileInputRef.current?.click()}>
 									<label
 										htmlFor="attachment"
 										className="px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-md cursor-pointer hover:bg-gray-950 transition duration-200"
+										onClick={(e) => e.stopPropagation()}
 									>
 										Choose File
 									</label>
@@ -769,7 +775,7 @@ const CreatePurchaseOrder = () => {
 									</span>
 									<input
 										id="attachment"
-										{...register("attachment")}
+										ref={fileInputRef}
 										className="hidden"
 										type="file"
 										accept=".jpg, .jpeg, .png, .gif, .pdf"
@@ -778,6 +784,7 @@ const CreatePurchaseOrder = () => {
 								</div>
 
 							</div>
+
 						</div>
 
 						<div className='w-full flex flex-col justify-between gap-4 bg-[#ffffff] drop-shadow p-5 md:p-7 rounded-lg'>

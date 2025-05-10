@@ -185,7 +185,7 @@ const PolicyPages = () => {
   };
 
   return (
-    <div className='w-full min-h-screen bg-gray-50 relative'>
+    <div className='w-full min-h-[calc(100vh-60px)] bg-gray-50 relative'>
 
       <div
         style={{

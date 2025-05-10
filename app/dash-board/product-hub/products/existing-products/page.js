@@ -76,7 +76,7 @@ const EditProduct = () => {
   }
 
   return (
-    <div className='relative w-full min-h-screen bg-gray-50'>
+    <div className='relative w-full min-h-[calc(100vh-60px)] bg-gray-50'>
       <div
         style={{
           backgroundImage: `url(${arrivals1.src})`,

@@ -112,7 +112,7 @@ const Notifications = () => {
       }}>
       <DropdownTrigger>
         <div className="relative">
-          <GrNotification className='text-neutral-500 border rounded-full p-1.5 hover:text-neutral-700 cursor-pointer hover:bg-gray-100' size={32} />
+          <GrNotification className='text-neutral-500 border rounded-full p-2 hover:text-neutral-700 cursor-pointer hover:bg-gray-100' size={36} />
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
               {unreadCount}

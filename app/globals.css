@@ -407,8 +407,8 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 /* Medium screens (tablets) */
 @media (min-width: 768px) {
   .custom-max-h {
-    min-height: calc(100vh - 140px);
-    max-height: calc(100vh - 140px);
+    min-height: calc(100vh - 200px);
+    max-height: calc(100vh - 200px);
   }
 }
 
@@ -441,16 +441,16 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 
 @media (min-width: 1440px) {
   .custom-max-h-orders {
-    min-height: calc(100vh - 200px);
-    max-height: calc(100vh - 200px);
+    min-height: calc(100vh - 260px);
+    max-height: calc(100vh - 260px);
     overflow-y: auto;
   }
 }
 
 @media (min-width: 1440px) {
   .custom-max-h-order {
-    min-height: calc(100vh - 190px);
-    max-height: calc(100vh - 190px);
+    min-height: calc(100vh - 250px);
+    max-height: calc(100vh - 250px);
     overflow-y: auto;
   }
 }
@@ -472,8 +472,8 @@ nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
 
 @media (min-width: 1024px) {
   .custom-max-h-inventory {
-    min-height: calc(100vh - 150px);
-    max-height: calc(100vh - 150px);
+    min-height: calc(100vh - 210px);
+    max-height: calc(100vh - 210px);
     overflow-y: auto;
   }
 }

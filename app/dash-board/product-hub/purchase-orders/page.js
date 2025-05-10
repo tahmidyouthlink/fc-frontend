@@ -225,7 +225,7 @@ const PurchaseOrders = () => {
   if (isPurchaseOrderPending || isUserLoading) return <Loading />;
 
   return (
-    <div className='relative w-full min-h-screen bg-gray-50 px-6'>
+    <div className='relative w-full min-h-[calc(100vh-60px)] bg-gray-50 px-6'>
 
       <div
         style={{
@@ -471,7 +471,7 @@ const PurchaseOrders = () => {
                                     </div>
                                   ) : (
                                     <div className="group relative">
-                                      <button>
+                                      <button className='hover:cursor-not-allowed'>
                                         <FaFileAlt size={20} />
                                       </button>
                                       <span className="absolute -top-14 left-[50%] -translate-x-[50%] z-20 origin-left scale-0 px-3 rounded-lg border border-gray-300 bg-white py-2 text-sm font-bold shadow-md transition-all duration-300 ease-in-out group-hover:scale-100">Unavailable</span>

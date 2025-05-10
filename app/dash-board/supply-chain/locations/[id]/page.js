@@ -101,7 +101,7 @@ const EditLocation = () => {
   };
 
   return (
-    <div className='bg-gray-50 min-h-screen'>
+    <div className='bg-gray-50 min-h-[calc(100vh-60px)]'>
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
         <div className='flex items-center justify-between'>

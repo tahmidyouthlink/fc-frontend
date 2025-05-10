@@ -113,7 +113,7 @@ const EditFAQPage = () => {
   };
 
   return (
-    <div className='bg-gray-50 min-h-screen relative px-6'>
+    <div className='bg-gray-50 min-h-[calc(100vh-60px)] relative px-6'>
 
       <div
         style={{

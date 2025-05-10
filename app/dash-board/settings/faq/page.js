@@ -13,7 +13,7 @@ const FAQPage = () => {
   const [faqList] = useFAQ();
 
   return (
-    <div className='bg-gray-50 min-h-screen'>
+    <div className='bg-gray-50 min-h-[calc(100vh-60px)]'>
 
       <div className='px-6 max-w-screen-md mx-auto pb-6'>
 

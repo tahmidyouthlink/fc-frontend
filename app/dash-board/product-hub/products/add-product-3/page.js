@@ -303,7 +303,7 @@ const ThirdStepOfAddProduct = () => {
   };
 
   return (
-    <div className='min-h-screen bg-gray-50 relative'>
+    <div className='min-h-[calc(100vh-60px)] bg-gray-50 relative'>
 
       <div
         style={{
@@ -383,7 +383,7 @@ ${activeTab === 'Outside Dhaka' ? 'after:w-full font-bold' : 'after:w-0 hover:af
 
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-2xl mx-auto min-h-[85vh] flex flex-col justify-between relative'>
+      <form onSubmit={handleSubmit(onSubmit)} className='max-w-screen-2xl mx-auto min-h-[80vh] flex flex-col justify-between relative'>
 
         <div className="overflow-x-auto">
           <table className="min-w-full table-auto bg-white">

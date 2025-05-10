@@ -79,7 +79,7 @@ const AddTag = () => {
   };
 
   return (
-    <div className='min-h-screen px-6 bg-gray-50'>
+    <div className='min-h-[calc(100vh-60px)] px-6 bg-gray-50'>
 
       <div className='max-w-screen-xl mx-auto pt-3 md:pt-6'>
         <div className='flex items-center justify-between'>

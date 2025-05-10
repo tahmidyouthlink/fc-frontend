@@ -239,7 +239,7 @@ const Customers = () => {
   };
 
   return (
-    <div className='relative w-full min-h-screen bg-gray-50'>
+    <div className='relative w-full min-h-[calc(100vh-60px)] bg-gray-50'>
 
       <div
         style={{
@@ -262,7 +262,7 @@ const Customers = () => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[35%] xl:left-[34%] 2xl:left-[39%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl px-6 2xl:px-0 mx-auto'>
+      <div className='max-w-screen-2xl px-6 mx-auto'>
 
         <div className='flex flex-wrap lg:flex-nowrap gap-2 lg:gap-0 justify-center md:justify-between py-2 md:py-5'>
           <h3 className='w-full font-semibold text-lg md:text-xl lg:text-2xl xl:text-3xl text-neutral-700'>CUSTOMER MANAGEMENT</h3>

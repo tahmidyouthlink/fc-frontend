@@ -49,7 +49,7 @@ const Marketing = () => {
   };
 
   return (
-    <div className='px-6 md:px-10 bg-gray-50 min-h-screen relative'>
+    <div className='px-6 md:px-10 bg-gray-50 min-h-[calc(100vh-60px)] relative'>
 
       <div
         style={{

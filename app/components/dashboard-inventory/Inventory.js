@@ -354,10 +354,8 @@ const Inventory = () => {
     return <Loading />
   };
 
-  console.log(locationList, "locationList");
-
   return (
-    <div className='relative w-full min-h-screen bg-gray-50'>
+    <div className='relative w-full min-h-[calc(100vh-60px)] bg-gray-50'>
 
       <div
         style={{
@@ -378,7 +376,8 @@ const Inventory = () => {
         className='absolute inset-0 z-0 top-2 md:top-0 bg-[length:60px_30px] md:bg-[length:100px_50px] left-[60%] lg:bg-[length:200px_100px] md:left-[38%] lg:left-[24%] xl:left-[19%] 2xl:left-[34%] bg-no-repeat'
       />
 
-      <div className='max-w-screen-2xl px-6 2xl:px-0 mx-auto'>
+      <div className='max-w-screen-2xl px-6 mx-auto'>
+
         <div className='flex flex-wrap lg:flex-nowrap items-center justify-between py-2 md:py-5 gap-2'>
 
           <div className='w-full flex flex-col xl:flex-row items-center justify-start gap-3'>
@@ -505,7 +504,7 @@ const Inventory = () => {
             </div>
 
             {/* Search Product Item */}
-            <div className='w-full md:min-w-[300px] lg:min-w-[400px] xl:min-w-[600px] 2xl:min-w-[700px]'>
+            <div className='w-full md:min-w-[300px] lg:min-w-[300px] xl:min-w-[400px] 2xl:min-w-600px]'>
               <li className="flex items-center relative group">
                 <svg className="absolute left-4 fill-[#9e9ea7] w-4 h-4 icon" aria-hidden="true" viewBox="0 0 24 24">
                   <g>

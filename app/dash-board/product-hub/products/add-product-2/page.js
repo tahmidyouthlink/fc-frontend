@@ -504,7 +504,7 @@ const SecondStepOfAddProduct = () => {
   }
 
   return (
-    <div className='bg-gray-50 min-h-screen px-6 relative'>
+    <div className='bg-gray-50 min-h-[calc(100vh-60px)] px-6 relative'>
 
       <div
         style={{
@@ -543,7 +543,7 @@ const SecondStepOfAddProduct = () => {
           </Link>
         </div>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)} className='min-h-[91vh] flex flex-col justify-between max-w-screen-2xl mx-auto relative'>
+      <form onSubmit={handleSubmit(onSubmit)} className='min-h-[86vh] flex flex-col justify-between max-w-screen-2xl mx-auto relative'>
         <div>
           <div className='grid grid-cols-1 xl:grid-cols-2 gap-8 pt-3 pb-12'>
             {productVariants?.map((variant, index) => (
