@@ -1,12 +1,28 @@
 import { useEffect, useState, useRef, useCallback } from "react";
+import Image from "next/image";
 import Shapes from "./Shapes";
 import ProductCard from "../../product-card/ProductCard";
 import AddToCartModal from "../cart/AddToCartModal";
 
-// Define column numbers for different breakpoints
-const MOBILE_COLS = 2;
-const TABLET_COLS = 4;
-const DESKTOP_COLS = 5;
+// Define allowed column options per breakpoint
+const MOBILE_OPTIONS = [1, 2];
+const TABLET_OPTIONS = [2, 3];
+const DESKTOP_OPTIONS = [3, 4, 5];
+
+// Column options used in buttons for user to click
+const colOptions = [
+  { number: 1, svg: "/shop/grid-cols-1.svg" },
+  { number: 2, svg: "/shop/grid-cols-2.svg" },
+  { number: 3, svg: "/shop/grid-cols-3.svg" },
+  { number: 4, svg: "/shop/grid-cols-4.svg" },
+  { number: 5, svg: "/shop/grid-cols-5.svg" },
+];
+
+const getAllowedColsByWidth = (width) => {
+  if (width < 640) return MOBILE_OPTIONS;
+  if (width < 1024) return TABLET_OPTIONS;
+  return DESKTOP_OPTIONS;
+};
 
 export default function ShopCards({
   filteredProducts,
@@ -23,6 +39,7 @@ export default function ShopCards({
   const [rows, setRows] = useState(null);
   const [cols, setCols] = useState(null);
   const [visibleCount, setVisibleCount] = useState(10);
+  const [userSelectedCols, setUserSelectedCols] = useState(null);
   const observerRef = useRef();
 
   const isProductWithinPriceRange = (product) =>
@@ -34,26 +51,21 @@ export default function ShopCards({
         calculateFinalPrice(product, specialOffers));
 
   useEffect(() => {
-    // Get columns count based on screen size
-    const getColsCount = () => {
-      if (typeof window !== "undefined") {
-        if (window.innerWidth < 640) {
-          return MOBILE_COLS;
-        } else if (window.innerWidth < 1024) {
-          return TABLET_COLS;
-        } else {
-          return DESKTOP_COLS;
-        }
-      }
-      return DESKTOP_COLS; // Default for SSR or unknown
-    };
-
     const handleResize = () => {
-      // Get columns count based on screen size
-      let cols = getColsCount();
-      setCols(cols);
-      // Calculate rows based on the total count for the Shapes component
-      setRows(Math.max(0, Math.ceil(filteredProductCount / cols)));
+      const allowedCols = getAllowedColsByWidth(window.innerWidth);
+
+      let updatedCols;
+
+      if (userSelectedCols && allowedCols.includes(userSelectedCols)) {
+        updatedCols = userSelectedCols;
+      } else {
+        // Default to max available for this screen if current selection is invalid
+        updatedCols = allowedCols[allowedCols.length - 1];
+        setUserSelectedCols(updatedCols);
+      }
+
+      setCols(updatedCols);
+      setRows(Math.max(0, Math.ceil(filteredProductCount / updatedCols)));
 
       setCardHeight(document.querySelector(".product-card")?.clientHeight);
     };
@@ -61,7 +73,7 @@ export default function ShopCards({
     handleResize(); // Call once on mount
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [filteredProductCount]);
+  }, [filteredProductCount, userSelectedCols]);
 
   const loadMoreRef = useCallback(
     (node) => {
@@ -85,52 +97,72 @@ export default function ShopCards({
   );
 
   return (
-    <section
-      className="relative grid gap-x-4 gap-y-12 pb-7"
-      style={{
-        gridTemplateColumns:
-          typeof window === "undefined"
-            ? `repeat(${DESKTOP_COLS}, minmax(0, 1fr))`
-            : window.innerWidth < 640
-              ? `repeat(${MOBILE_COLS}, minmax(0, 1fr))`
-              : window.innerWidth < 1024
-                ? `repeat(${TABLET_COLS}, minmax(0, 1fr))`
-                : `repeat(${DESKTOP_COLS}, minmax(0, 1fr))`,
-      }}
-    >
-      <Shapes cardHeight={cardHeight} rows={rows} />
-      {filteredProducts
-        ?.slice(0, visibleCount)
-        .map(
-          (filteredProduct) =>
-            isProductWithinPriceRange(filteredProduct) && (
-              <ProductCard
-                key={"filtered-product-" + filteredProduct._id}
-                product={filteredProduct}
-                isAddToCartModalOpen={isAddToCartModalOpen}
-                setIsAddToCartModalOpen={setIsAddToCartModalOpen}
-                setSelectedAddToCartProduct={setSelectedAddToCartProduct}
-                isAllowedToShowLimitedStock={true}
-              />
-            ),
+    <>
+      {/* Column selection buttons */}
+      <div className="flex justify-end gap-2">
+        {colOptions.map((option) => (
+          <button
+            key={"grid-layout-option-" + option.number}
+            onClick={() => {
+              setUserSelectedCols(option.number);
+              setCols(option.number);
+              setRows(
+                Math.max(0, Math.ceil(filteredProductCount / option.number)),
+              );
+            }}
+            className={`rounded-md border p-1.5 transition-[background-color] duration-300 ease-in-out hover:border-[#ffe4cd] hover:bg-[#ffead8] ${cols === option.number ? "border-[#ffd6b5] bg-[#ffddc2]" : "border-neutral-200 bg-neutral-100"} ${option.number === 1 ? "sm:hidden" : option.number === 2 ? "lg:hidden" : option.number === 3 ? "max-sm:hidden" : "max-lg:hidden"}`}
+          >
+            <Image
+              src={option.svg}
+              alt={"grid-layout-option-" + option.number}
+              height={0}
+              width={0}
+              className="size-4"
+            />
+          </button>
+        ))}
+      </div>
+
+      <section
+        className="relative grid gap-x-4 gap-y-12 pb-7"
+        style={{
+          gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+        }}
+      >
+        <Shapes cardHeight={cardHeight} rows={rows} />
+        {filteredProducts
+          ?.slice(0, visibleCount)
+          .map(
+            (filteredProduct) =>
+              isProductWithinPriceRange(filteredProduct) && (
+                <ProductCard
+                  key={"filtered-product-" + filteredProduct._id}
+                  product={filteredProduct}
+                  isAddToCartModalOpen={isAddToCartModalOpen}
+                  setIsAddToCartModalOpen={setIsAddToCartModalOpen}
+                  setSelectedAddToCartProduct={setSelectedAddToCartProduct}
+                  isAllowedToShowLimitedStock={true}
+                />
+              ),
+          )}
+        {/* Load More trigger if there are more items to load */}
+        {visibleCount < filteredProducts?.length && (
+          <div
+            ref={loadMoreRef}
+            className="col-span-full flex justify-center py-8"
+          >
+            <span className="animate-pulse text-gray-500">
+              Loading products...
+            </span>
+          </div>
         )}
-      {/* Load More trigger if there are more items to load */}
-      {visibleCount < filteredProducts?.length && (
-        <div
-          ref={loadMoreRef}
-          className="col-span-full flex justify-center py-8"
-        >
-          <span className="animate-pulse text-gray-500">
-            Loading products...
-          </span>
-        </div>
-      )}
-      <AddToCartModal
-        isAddToCartModalOpen={isAddToCartModalOpen}
-        setIsAddToCartModalOpen={setIsAddToCartModalOpen}
-        product={selectedAddToCartProduct}
-        primaryLocation={primaryLocation}
-      />
-    </section>
+        <AddToCartModal
+          isAddToCartModalOpen={isAddToCartModalOpen}
+          setIsAddToCartModalOpen={setIsAddToCartModalOpen}
+          product={selectedAddToCartProduct}
+          primaryLocation={primaryLocation}
+        />
+      </section>
+    </>
   );
 }
