@@ -84,14 +84,14 @@ export default function CartItems({
               "-color-" +
               cartItemInfo.selectedColor.label
             }
-            className="flex w-full items-stretch justify-between gap-x-2.5 rounded-lg bg-white shadow-[2px_2px_10px_0_rgba(0,0,0,0.025)]"
+            className="flex w-full items-stretch justify-between gap-x-2.5"
           >
             {/* Cart Item Image (with link to product page) */}
             <TransitionLink
               href={`/product/${cartItem?.productTitle?.split(" ")?.join("-")?.toLowerCase()}`}
               hasDrawer={true}
               setIsDrawerOpen={setIsDropdownOpen}
-              className="relative block min-h-full w-1/4 overflow-hidden rounded-md bg-[#F0F0F0] max-sm:w-20"
+              className="relative block min-h-full w-20 overflow-hidden rounded-md bg-[#F0F0F0] sm:w-1/4"
             >
               {!!cartItemImgUrl && (
                 <Image

@@ -282,7 +282,7 @@ export default function CartButton({ productList }) {
           key="cart-dropdown"
           isReadOnly
           textValue="Cart Dropdown"
-          className="flex min-h-full cursor-default flex-col justify-between p-0 text-sm text-neutral-500 md:text-base [&>span]:w-full sm:[&>span]:w-[425px] md:[&>span]:w-[450px]"
+          className="flex min-h-full cursor-default flex-col justify-between p-0 text-sm text-neutral-500 md:text-base max-sm:[&>span]:w-[calc(100dvw-20px*2)] sm:[&>span]:w-[425px] md:[&>span]:w-[450px]"
         >
           <div className="max-h-[50dvh] overflow-y-auto px-2 pt-2 font-semibold [&::-webkit-scrollbar]:[-webkit-appearance:scrollbarthumb-vertical]">
             <CartHeader totalItems={getTotalItemCount(cartItems) || 0} />
