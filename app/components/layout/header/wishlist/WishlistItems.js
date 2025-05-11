@@ -12,7 +12,7 @@ import TransitionLink from "@/app/components/ui/TransitionLink";
 export default function WishlistItems({
   wishlistItems,
   productList,
-  setIsWishlistDrawerOpen,
+  setIsDropdownOpen,
 }) {
   const axiosPublic = useAxiosPublic();
   const { user, userData, setUserData } = useAuth();
@@ -60,7 +60,7 @@ export default function WishlistItems({
   };
 
   return (
-    <ul className="mb-4 space-y-2.5">
+    <ul className="mb-4 space-y-[18px]">
       {wishlistItems.map((wishlistItemInfo) => {
         const wishlistItem = productList?.find(
           (product) => product._id === wishlistItemInfo._id,
@@ -69,14 +69,14 @@ export default function WishlistItems({
         return (
           <li
             key={"wishlist-item-" + wishlistItemInfo?._id}
-            className="flex w-full items-stretch justify-between gap-x-2.5 rounded-lg bg-white p-2.5 shadow-[2px_2px_10px_0_rgba(0,0,0,0.025)]"
+            className="flex w-full items-stretch justify-between gap-x-2.5"
           >
             {/* Wishlist Item Image (with link to product page) */}
             <TransitionLink
               href={`/product/${wishlistItem?.productTitle?.split(" ")?.join("-")?.toLowerCase()}`}
-              className="relative min-h-full overflow-hidden rounded-md bg-[#F0F0F0] max-sm:w-16 sm:aspect-[1.1/1] sm:h-14"
+              className="relative min-h-full w-16 overflow-hidden rounded-md bg-[#F0F0F0] sm:aspect-[1.1/1] sm:w-1/5"
               hasDrawer={true}
-              setIsDrawerOpen={setIsWishlistDrawerOpen}
+              setIsDrawerOpen={setIsDropdownOpen}
             >
               {!!wishlistItem?.productVariants[0]?.imageUrls[0] && (
                 <Image
@@ -95,7 +95,7 @@ export default function WishlistItems({
                   href={`/product/${wishlistItem?.productTitle?.split(" ")?.join("-")?.toLowerCase()}`}
                   className="block underline-offset-1 hover:underline"
                   hasDrawer={true}
-                  setIsDrawerOpen={setIsWishlistDrawerOpen}
+                  setIsDrawerOpen={setIsDropdownOpen}
                 >
                   <h4 className="text-neutral-600">
                     {wishlistItem?.productTitle}
