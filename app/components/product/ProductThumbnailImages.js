@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { Button } from "@nextui-org/react";
 import {
   CgChevronDown,
   CgChevronLeft,
@@ -7,9 +6,11 @@ import {
   CgChevronUp,
 } from "react-icons/cg";
 
+const MAX_THUMBNAILS_ALLOWED_TO_SHOW_DEFAULT = 4;
+const MAX_THUMBNAILS_ALLOWED_TO_SHOW_SMALL_TABLET = 3;
+const MAX_THUMBNAILS_ALLOWED_TO_SHOW_DESKTOP = 5;
+
 export default function ProductThumbnailImages({
-  placementOfThumbnails,
-  isMobileOnly,
   productTitle,
   selectedColorLabel,
   activeImageSet,
@@ -18,34 +19,48 @@ export default function ProductThumbnailImages({
   numOfTimesThumbnailsMoved,
   setNumOfTimesThumbnailsMoved,
 }) {
-  const MAX_NUM_OF_THUMBNAILS_VISIBLE_AT_A_TIME = 4;
-  const maxNumOfTimesThumbnailsAllowedToMove =
-    activeImageSet?.images?.length - MAX_NUM_OF_THUMBNAILS_VISIBLE_AT_A_TIME;
+  const totalImages = activeImageSet?.images?.length;
+  const maxThumbnailsAllowedToMoveDefault =
+    totalImages - MAX_THUMBNAILS_ALLOWED_TO_SHOW_DEFAULT;
+  const maxThumbnailsAllowedToMoveSmallTablet =
+    totalImages - MAX_THUMBNAILS_ALLOWED_TO_SHOW_SMALL_TABLET;
+  const maxThumbnailsAllowedToMoveDesktop =
+    totalImages - MAX_THUMBNAILS_ALLOWED_TO_SHOW_DESKTOP;
+  const thumbnailGap = "8px";
+  const thumbnailMoved = numOfTimesThumbnailsMoved * -1;
 
   return (
-    <div
-      className={`relative ${isMobileOnly ? "sm:hidden" : placementOfThumbnails === "horizontal" ? "max-md:hidden md:w-80 lg:w-[424px]" : "hidden h-[35vh] sm:max-md:block"}`}
-    >
+    <div className="relative sm:max-md:h-[35vh] md:w-80 lg:w-[424px] xl:w-auto xl:max-[1799px]:h-full min-[1800px]:w-[650px]">
       {/* Thumbnail Images */}
       <div
-        className={`relative flex w-full gap-2 ${placementOfThumbnails === "vertical" ? "h-full flex-col sm:overflow-hidden" : "max-sm:overflow-x-auto md:overflow-hidden"}`}
+        className="relative flex w-full max-sm:overflow-x-auto sm:overflow-hidden sm:max-md:h-full sm:max-md:flex-col xl:max-[1799px]:h-full xl:max-[1799px]:flex-col"
+        style={{
+          gap: thumbnailGap,
+        }}
       >
-        {activeImageSet?.images?.length &&
+        {totalImages &&
           activeImageSet?.images?.map((imageURL, imageURLIndex) => {
             return (
               /* Thumbnail Image Wrapper */
               <div
                 key={imageURL + "-thumbnail-" + imageURLIndex}
-                className={`relative shrink-0 cursor-pointer overflow-hidden rounded-md bg-[#F0F0F0] transition-[border-color,transform] duration-300 ease-in-out ${placementOfThumbnails === "vertical" ? "aspect-[1/1.1] xl:h-32" : "aspect-[1/1.2] md:h-32"} ${activeImageIndex === imageURLIndex ? "border-2 border-[#b96826]" : ""}`}
+                className={`relative shrink-0 cursor-pointer overflow-hidden rounded-md bg-[#F0F0F0] transition-[border-color,transform] duration-300 ease-in-out max-sm:aspect-[1/1.2] max-sm:w-[calc((100%-var(--thumbnail-gap)*var(--total-gaps-default))/var(--max-thumbnails-default))] max-sm:translate-x-[calc((100%+var(--thumbnail-gap))*var(--thumbnail-moved))] sm:max-md:aspect-[1/1.1] sm:max-md:h-[calc((100%-var(--thumbnail-gap)*var(--total-gaps-default))/var(--max-thumbnails-default))] sm:max-md:translate-y-[calc((100%+var(--thumbnail-gap))*var(--thumbnail-moved))] md:h-32 md:w-[calc((100%-var(--thumbnail-gap)*var(--total-gaps-small-tablet))/var(--max-thumbnails-small-tablet))] md:max-xl:translate-x-[calc((100%+var(--thumbnail-gap))*var(--thumbnail-moved))] lg:w-[calc((100%-var(--thumbnail-gap)*var(--total-gaps-default))/var(--max-thumbnails-default))] xl:max-[1799px]:aspect-[1/1.25] xl:max-[1799px]:h-[calc((100%-var(--thumbnail-gap)*var(--total-gaps-desktop))/var(--max-thumbnails-desktop))] xl:max-[1799px]:w-full xl:max-[1799px]:translate-y-[calc((100%+var(--thumbnail-gap))*var(--thumbnail-moved))] min-[1800px]:w-[calc((100%-var(--thumbnail-gap)*var(--total-gaps-desktop))/var(--max-thumbnails-desktop))] min-[1800px]:translate-x-[calc((100%+var(--thumbnail-gap))*var(--thumbnail-moved))] ${activeImageIndex === imageURLIndex ? "border-2 border-[#b96826]" : ""}`}
                 onClick={() => setActiveImageIndex(imageURLIndex)}
                 style={{
-                  [placementOfThumbnails === "vertical" ? "height" : "width"]:
-                    `calc(
-                      (100% - 8px * 3) / 4
-                    )`,
-                  transform: `${placementOfThumbnails === "vertical" ? "translateY" : "translateX"}(
-                    calc((100% + 8px) * ${numOfTimesThumbnailsMoved} * -1)
-                  )`,
+                  "--max-thumbnails-default":
+                    MAX_THUMBNAILS_ALLOWED_TO_SHOW_DEFAULT,
+                  "--max-thumbnails-small-tablet":
+                    MAX_THUMBNAILS_ALLOWED_TO_SHOW_SMALL_TABLET,
+                  "--max-thumbnails-desktop":
+                    MAX_THUMBNAILS_ALLOWED_TO_SHOW_DESKTOP,
+                  "--total-gaps-default":
+                    MAX_THUMBNAILS_ALLOWED_TO_SHOW_DEFAULT - 1,
+                  "--total-gaps-small-tablet":
+                    MAX_THUMBNAILS_ALLOWED_TO_SHOW_SMALL_TABLET - 1,
+                  "--total-gaps-desktop":
+                    MAX_THUMBNAILS_ALLOWED_TO_SHOW_DESKTOP - 1,
+                  "--thumbnail-gap": thumbnailGap,
+                  "--thumbnail-moved": thumbnailMoved,
                 }}
               >
                 {/* Thumbnail Image */}
@@ -62,44 +77,26 @@ export default function ProductThumbnailImages({
             );
           })}
       </div>
-      {/* Thumbnail Nav Buttons */}
-      {activeImageSet?.images?.length >
-        MAX_NUM_OF_THUMBNAILS_VISIBLE_AT_A_TIME && (
-        <>
-          {/* Previous Nav Button */}
-          <Button
-            className={`absolute size-10 rounded-md bg-white p-0 text-xl shadow-[0_0_12px_0_rgba(0,0,0,0.15)] transition-[background-color,opacity] duration-300 ease-in-out hover:bg-[#FBEDE2] [&>svg]:mx-auto ${placementOfThumbnails === "vertical" ? "left-1/2 top-0 -translate-x-1/2 translate-y-2" : "top-1/2 -translate-x-2 -translate-y-1/2 max-sm:hidden md:block md:-translate-x-1/2"} ${numOfTimesThumbnailsMoved === 0 ? "pointer-events-none !opacity-0" : "pointer-events-auto !opacity-100"}`}
-            isIconOnly
-            disableRipple
-            startContent={
-              placementOfThumbnails === "vertical" ? (
-                <CgChevronUp />
-              ) : (
-                <CgChevronLeft />
-              )
-            }
-            onClick={() =>
-              setNumOfTimesThumbnailsMoved((prevNumber) => prevNumber - 1)
-            }
-          ></Button>
-          {/* Next Nav Button */}
-          <Button
-            className={`absolute size-10 rounded-md bg-white p-0 text-xl shadow-[0_0_12px_0_rgba(0,0,0,0.15)] transition-[background-color,opacity] duration-300 ease-in-out hover:bg-[#FBEDE2] [&>svg]:mx-auto ${placementOfThumbnails === "vertical" ? "bottom-0 left-1/2 -translate-x-1/2 -translate-y-2" : "right-0 top-1/2 -translate-y-1/2 translate-x-2 max-sm:hidden md:translate-x-1/2"} ${numOfTimesThumbnailsMoved === maxNumOfTimesThumbnailsAllowedToMove ? "pointer-events-none !opacity-0" : "pointer-events-auto !opacity-100"}`}
-            isIconOnly
-            disableRipple
-            startContent={
-              placementOfThumbnails === "vertical" ? (
-                <CgChevronDown />
-              ) : (
-                <CgChevronRight />
-              )
-            }
-            onClick={() =>
-              setNumOfTimesThumbnailsMoved((prevNumber) => prevNumber + 1)
-            }
-          ></Button>
-        </>
-      )}
+      {/* Previous Nav Button */}
+      <button
+        className={`absolute flex size-10 items-center justify-center rounded-md bg-white p-0 text-xl shadow-[0_0_12px_0_rgba(0,0,0,0.15)] transition-[background-color,opacity] duration-300 ease-in-out hover:bg-[#FBEDE2] max-sm:top-1/2 max-sm:hidden max-sm:-translate-x-2 max-sm:-translate-y-1/2 sm:max-md:left-1/2 sm:max-md:top-0 sm:max-md:-translate-x-1/2 sm:max-md:translate-y-2 md:max-xl:top-1/2 md:max-xl:-translate-x-1/2 md:max-xl:-translate-y-1/2 xl:max-[1799px]:left-1/2 xl:max-[1799px]:top-0 xl:max-[1799px]:-translate-x-1/2 xl:max-[1799px]:translate-y-2 min-[1800px]:top-1/2 min-[1800px]:-translate-x-1/2 min-[1800px]:-translate-y-1/2 [&>svg]:mx-auto ${numOfTimesThumbnailsMoved === 0 ? "pointer-events-none opacity-0" : "pointer-events-auto opacity-100"}`}
+        onClick={() =>
+          setNumOfTimesThumbnailsMoved((prevNumber) => prevNumber - 1)
+        }
+      >
+        <CgChevronUp className="max-sm:hidden md:max-xl:hidden min-[1800px]:hidden" />
+        <CgChevronLeft className="sm:max-md:hidden xl:hidden min-[1800px]:block" />
+      </button>
+      {/* Next Nav Button */}
+      <button
+        className={`absolute flex size-10 items-center justify-center rounded-md bg-white p-0 text-xl shadow-[0_0_12px_0_rgba(0,0,0,0.15)] transition-[background-color,opacity] duration-300 ease-in-out hover:bg-[#FBEDE2] max-sm:right-0 max-sm:top-1/2 max-sm:hidden max-sm:-translate-y-1/2 max-sm:translate-x-2 sm:max-md:bottom-0 sm:max-md:left-1/2 sm:max-md:-translate-x-1/2 sm:max-md:-translate-y-2 md:max-xl:right-0 md:max-xl:top-1/2 md:max-xl:-translate-y-1/2 md:max-xl:translate-x-1/2 xl:max-[1799px]:bottom-0 xl:max-[1799px]:left-1/2 xl:max-[1799px]:-translate-x-1/2 xl:max-[1799px]:-translate-y-2 min-[1800px]:right-0 min-[1800px]:top-1/2 min-[1800px]:-translate-y-1/2 min-[1800px]:translate-x-2 [&>svg]:mx-auto ${numOfTimesThumbnailsMoved === maxThumbnailsAllowedToMoveDefault ? "pointer-events-none opacity-0 lg:pointer-events-none lg:opacity-0" : "pointer-events-auto opacity-100 lg:pointer-events-auto lg:opacity-100"} ${numOfTimesThumbnailsMoved === maxThumbnailsAllowedToMoveSmallTablet ? "md:pointer-events-none md:opacity-0" : "md:pointer-events-auto md:opacity-100"} ${numOfTimesThumbnailsMoved === maxThumbnailsAllowedToMoveDesktop ? "xl:pointer-events-none xl:opacity-0" : "xl:pointer-events-auto xl:opacity-100"}`}
+        onClick={() =>
+          setNumOfTimesThumbnailsMoved((prevNumber) => prevNumber + 1)
+        }
+      >
+        <CgChevronDown className="max-sm:hidden md:max-xl:hidden min-[1800px]:hidden" />
+        <CgChevronRight className="sm:max-md:hidden xl:hidden min-[1800px]:block" />
+      </button>
     </div>
   );
 }

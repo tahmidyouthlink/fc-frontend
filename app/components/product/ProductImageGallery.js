@@ -21,7 +21,7 @@ export default function ProductImageGallery({
   specialOffer,
 }) {
   return (
-    <section className="relative flex flex-col gap-2 sm:max-md:flex-row xl:sticky xl:top-[var(--section-padding)] xl:h-[calc(100dvh-(var(--header-height-lg)+var(--section-padding-double)))]">
+    <section className="relative flex max-h-[1000px] flex-col gap-2 sm:max-md:flex-row xl:h-[calc(100dvh-(var(--header-height-lg)+var(--section-padding-double)))] xl:max-[1799px]:flex-row">
       {/* Shape (curved dotted line) */}
       <div className="absolute -bottom-16 right-0 z-[-1] aspect-[3.5/1] w-[1150px] opacity-50 sm:-bottom-28 sm:w-[1050px] md:w-[1100px] lg:w-[1200px]">
         <Image
@@ -46,33 +46,9 @@ export default function ProductImageGallery({
         hasSpecialOffer={hasSpecialOffer}
         specialOffer={specialOffer}
       />
-      {/* Image Thumbnails Section (Horizontal) - for mobile devices */}
-      <ProductThumbnailImages
-        placementOfThumbnails="horizontal"
-        isMobileOnly={true}
-        productTitle={productTitle}
-        selectedColorLabel={selectedColorLabel}
-        activeImageSet={activeImageSet}
-        activeImageIndex={activeImageIndex}
-        setActiveImageIndex={setActiveImageIndex}
-        numOfTimesThumbnailsMoved={numOfTimesThumbnailsMoved}
-        setNumOfTimesThumbnailsMoved={setNumOfTimesThumbnailsMoved}
-      />
-      {/* Image Thumbnails Section (Vertical) - for small tablet devices */}
+      {/* Image Thumbnails Section */}
       <ProductThumbnailImages
         placementOfThumbnails="vertical"
-        isMobileOnly={false}
-        productTitle={productTitle}
-        selectedColorLabel={selectedColorLabel}
-        activeImageSet={activeImageSet}
-        activeImageIndex={activeImageIndex}
-        setActiveImageIndex={setActiveImageIndex}
-        numOfTimesThumbnailsMoved={numOfTimesThumbnailsMoved}
-        setNumOfTimesThumbnailsMoved={setNumOfTimesThumbnailsMoved}
-      />
-      {/* Image Thumbnails Section (Horizontal) - for large tablet and desktop devices */}
-      <ProductThumbnailImages
-        placementOfThumbnails="horizontal"
         isMobileOnly={false}
         productTitle={productTitle}
         selectedColorLabel={selectedColorLabel}

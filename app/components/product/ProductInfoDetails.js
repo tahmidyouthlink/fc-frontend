@@ -11,7 +11,7 @@ export default function ProductInfoDetails({ productInfoDetails }) {
   };
 
   return (
-    <section className="mb-10 w-full gap-x-12 sm:max-md:flex xl:flex xl:overflow-y-auto">
+    <section className="mb-10 w-full gap-x-7 sm:max-md:flex xl:flex xl:overflow-y-auto">
       <div>
         {/* Tabs */}
         <ul className="mx-auto mb-4 flex w-fit font-semibold text-neutral-600 max-sm:w-full max-sm:overflow-x-auto sm:max-md:mb-0 sm:max-md:block xl:mb-0 xl:block">

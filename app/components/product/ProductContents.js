@@ -43,7 +43,7 @@ export default function ProductContents({
 
   return (
     <div className="px-5 pb-[var(--section-padding)] sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0">
-      <div className="relative md:flex md:gap-x-10">
+      <div className="relative md:flex md:gap-x-7">
         <ProductImageGallery
           productTitle={product?.productTitle}
           activeImageSet={activeImageSet}
