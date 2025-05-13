@@ -39,7 +39,7 @@ module.exports = {
         },
       },
       animation: {
-        blob: "blob 3.5s infinite ease-in-out",
+        blob: "blob 5.5s infinite ease-in-out",
       },
       keyframes: {
         blob: {
