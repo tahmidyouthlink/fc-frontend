@@ -18,6 +18,9 @@ export default function OfferSlider({
   const [currentIndex, setCurrentIndex] = useState(1); // Start at index 1 (first actual offer)
   const [isTransitioning, setIsTransitioning] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
+  const highlightedColor = "#fde047";
+  const colorChangeDuration = 750;
+  const [currentTextColor, setCurrentTextColor] = useState(textColor);
 
   const nextSlide = () => {
     setCurrentIndex((prev) => prev + 1);
@@ -36,6 +39,16 @@ export default function OfferSlider({
       return () => clearInterval(interval);
     }
   }, [isAutoSlideEnabled, slides?.length, isPaused, slideDuration]);
+
+  // Auto-change text color to create highlighting effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTextColor((prevColor) =>
+        prevColor == highlightedColor ? textColor : highlightedColor,
+      );
+    }, colorChangeDuration);
+    return () => clearInterval(interval);
+  }, [textColor]);
 
   // Handle infinite loop logic
   useEffect(() => {
@@ -85,6 +98,7 @@ export default function OfferSlider({
             className={`flex ${isTransitioning ? "transition-transform duration-1000 ease-in-out" : ""}`}
             style={{
               transform: `translateX(-${currentIndex * 100}%)`,
+              color: currentTextColor,
             }}
           >
             {extendedSlides?.map((slide, index) =>
@@ -92,14 +106,20 @@ export default function OfferSlider({
                 <Link
                   key={slide.slideText + slide.optionalLink + index}
                   href={slide.optionalLink}
-                  className="min-w-full text-center underline underline-offset-2"
+                  className="min-w-full text-center underline underline-offset-2 transition-[color] ease-in-out"
+                  style={{
+                    transitionDuration: `${colorChangeDuration}ms`,
+                  }}
                 >
                   {slide.slideText}
                 </Link>
               ) : (
                 <p
                   key={slide.slideText + slide.optionalLink + index}
-                  className="min-w-full text-center"
+                  className="min-w-full text-center transition-[color] ease-in-out"
+                  style={{
+                    transitionDuration: `${colorChangeDuration}ms`,
+                  }}
                 >
                   {slide.slideText}
                 </p>
