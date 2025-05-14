@@ -107,64 +107,14 @@ const Transfers = () => {
   };
 
   // Function to calculate counts for each tab
-  const getOrderCounts = () => {
+  const getOrderCounts = (list) => {
     return {
-      'Pending': transferOrderList?.filter(order => order?.status === 'pending').length || 0,
-      'Received': transferOrderList?.filter(order => order?.status === 'received').length || 0,
-      'Canceled': transferOrderList?.filter(order => order?.status === 'canceled').length || 0,
-      'All': transferOrderList?.filter(order => order?.status).length || 0,
+      'Pending': list?.filter(order => order?.status === 'pending').length || 0,
+      'Received': list?.filter(order => order?.status === 'received').length || 0,
+      'Canceled': list?.filter(order => order?.status === 'canceled').length || 0,
+      'All': list?.filter(order => order?.status).length || 0,
     };
   };
-
-  // Memoize counts to prevent unnecessary recalculations
-  const counts = useMemo(getOrderCounts, [transferOrderList]);
-
-  // Append counts to tabs
-  const tabsWithCounts = useMemo(() => {
-    return transferStatusTabs?.map(tab => `${tab} (${counts[tab] || 0})`);
-  }, [counts]);
-
-  const filterPurchaseOrders = (transferOrderList, searchQuery) => {
-    const query = searchQuery.toLowerCase();
-    const isNumberQuery = !isNaN(query) && query.trim() !== '';
-
-    return transferOrderList?.filter(order => {
-      // Check if any product detail contains the search query
-      const productMatch = order?.transferOrderVariants?.some(product => {
-        const productTitle = (product.productTitle || '').toLowerCase();
-        const size = (typeof product.size === 'string' ? product.size : '').toLowerCase();
-        const colorCode = (product.colorCode || '').toLowerCase();
-        const colorName = (product.colorName || '').toLowerCase();
-        const quantity = (product.quantity || '').toString(); // Assuming quantity is a number
-
-        return (
-          productTitle.includes(query) ||
-          size.includes(query) ||
-          colorCode.includes(query) ||
-          colorName.includes(query) ||
-          (isNumberQuery && quantity === query)
-        );
-      });
-
-      // Check if order details match the search query
-      const orderMatch = (
-        (order.transferOrderNumber || '').toLowerCase().includes(query) || // Order number
-        (order.origin.locationName || '').toLowerCase().includes(query) ||  // Origin location name
-        (order.origin.contactPersonName || '').toLowerCase().includes(query) || // Origin contact person
-        (order.origin.cityName || '').toLowerCase().includes(query) || // Origin city name
-        (order.destination.locationName || '').toLowerCase().includes(query) ||  // Destination location name
-        (order.destination.contactPersonName || '').toLowerCase().includes(query) || // Destination contact person
-        (order.destination.cityName || '').toLowerCase().includes(query) || // Destination city name
-        (order.status || '').toLowerCase().includes(query) || // Order status
-        (order.estimatedArrival || '').toLowerCase().includes(query) // Estimated arrival date
-      );
-
-      // Combine all filters
-      return productMatch || orderMatch;
-    });
-  };
-
-  const searchedOrders = filterPurchaseOrders(transferOrderList, searchQuery);
 
   const getFilteredOrders = () => {
     let filtered = [];
@@ -186,6 +136,96 @@ const Transfers = () => {
     // Sort the filtered orders based on last status change, most recent first
     return filtered;
   };
+
+  // Memoize counts to prevent unnecessary recalculations
+  const counts = useMemo(() => {
+
+    const filteredBaseList = searchQuery
+      ? transferOrderList?.filter(order => {
+        const query = searchQuery.toLowerCase();
+        const isNumberQuery = !isNaN(query) && query.trim() !== '';
+
+        // Check if any product detail contains the search query
+        const productMatch = order?.transferOrderVariants?.some(product => {
+          const productTitle = (product.productTitle || '').toLowerCase();
+          const size = (typeof product.size === 'string' ? product.size : '').toLowerCase();
+          const colorCode = (product.colorCode || '').toLowerCase();
+          const colorName = (product.colorName || '').toLowerCase();
+          const quantity = (product.quantity || '').toString(); // Assuming quantity is a number
+
+          return (
+            productTitle.includes(query) ||
+            size.includes(query) ||
+            colorCode.includes(query) ||
+            colorName.includes(query) ||
+            (isNumberQuery && quantity === query)
+          );
+        });
+
+        // Check if order details match the search query
+        const orderMatch = (
+          (order.transferOrderNumber || '').toLowerCase().includes(query) || // Order number
+          (order.origin.locationName || '').toLowerCase().includes(query) ||  // Origin location name
+          (order.origin.contactPersonName || '').toLowerCase().includes(query) || // Origin contact person
+          (order.origin.cityName || '').toLowerCase().includes(query) || // Origin city name
+          (order.destination.locationName || '').toLowerCase().includes(query) ||  // Destination location name
+          (order.destination.contactPersonName || '').toLowerCase().includes(query) || // Destination contact person
+          (order.destination.cityName || '').toLowerCase().includes(query) || // Destination city name
+          (order.status || '').toLowerCase().includes(query) || // Order status
+          (order.estimatedArrival || '').toLowerCase().includes(query) // Estimated arrival date
+        );
+
+        // Combine all filters
+        return productMatch || orderMatch;
+      })
+      : transferOrderList
+
+    return getOrderCounts(filteredBaseList);
+  }, [searchQuery, transferOrderList]);
+
+  // Append counts to tabs
+  const tabsWithCounts = useMemo(() => {
+    return transferStatusTabs?.map(tab => `${tab} (${counts[tab] || 0})`);
+  }, [counts]);
+
+  const searchedOrders = getFilteredOrders()?.filter(order => {
+
+    const query = searchQuery.toLowerCase();
+    const isNumberQuery = !isNaN(query) && query.trim() !== '';
+
+    // Check if any product detail contains the search query
+    const productMatch = order?.transferOrderVariants?.some(product => {
+      const productTitle = (product.productTitle || '').toLowerCase();
+      const size = (typeof product.size === 'string' ? product.size : '').toLowerCase();
+      const colorCode = (product.colorCode || '').toLowerCase();
+      const colorName = (product.colorName || '').toLowerCase();
+      const quantity = (product.quantity || '').toString(); // Assuming quantity is a number
+
+      return (
+        productTitle.includes(query) ||
+        size.includes(query) ||
+        colorCode.includes(query) ||
+        colorName.includes(query) ||
+        (isNumberQuery && quantity === query)
+      );
+    });
+
+    // Check if order details match the search query
+    const orderMatch = (
+      (order.transferOrderNumber || '').toLowerCase().includes(query) || // Order number
+      (order.origin.locationName || '').toLowerCase().includes(query) ||  // Origin location name
+      (order.origin.contactPersonName || '').toLowerCase().includes(query) || // Origin contact person
+      (order.origin.cityName || '').toLowerCase().includes(query) || // Origin city name
+      (order.destination.locationName || '').toLowerCase().includes(query) ||  // Destination location name
+      (order.destination.contactPersonName || '').toLowerCase().includes(query) || // Destination contact person
+      (order.destination.cityName || '').toLowerCase().includes(query) || // Destination city name
+      (order.status || '').toLowerCase().includes(query) || // Order status
+      (order.estimatedArrival || '').toLowerCase().includes(query) // Estimated arrival date
+    );
+
+    // Combine all filters
+    return productMatch || orderMatch;
+  });
 
   const filteredOrders = searchQuery ? searchedOrders : getFilteredOrders();
 

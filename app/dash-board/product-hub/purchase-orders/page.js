@@ -108,59 +108,6 @@ const PurchaseOrders = () => {
     setPage(0); // Reset to first page when changing items per page
   };
 
-  const filterPurchaseOrders = (purchaseOrderList, searchQuery) => {
-    const query = searchQuery.toLowerCase();
-    const isNumberQuery = !isNaN(query) && query.trim() !== '';
-
-    return purchaseOrderList?.filter(order => {
-      // Check if any product detail contains the search query
-      const productMatch = order.purchaseOrderVariants.some(product => {
-        const productTitle = (product.productTitle || '').toLowerCase();
-        const size = (typeof product.size === 'string' ? product.size : '').toLowerCase();
-        const sku = (product.supplierSku || '').toString();
-
-        return (
-          productTitle.includes(query) ||
-          size.includes(query) ||
-          (isNumberQuery && sku === query)
-        );
-      });
-
-      // Check if order details match the search query
-      const orderMatch = (
-        (order.purchaseOrderNumber || '').toLowerCase().includes(query) ||
-        (order.supplier.value || '').toLowerCase().includes(query) ||  // Access supplier name
-        (order.destination.locationName || '').toLowerCase().includes(query) ||  // Access destination location name
-        (order.totalPrice || '').toString().includes(query) ||
-        (order.status || '').toLowerCase().includes(query)
-      );
-
-      // Combine all filters
-      return productMatch || orderMatch;
-    });
-  };
-
-  // Function to calculate counts for each tab
-  const getOrderCounts = () => {
-    return {
-      'Pending': purchaseOrderList?.filter(order => order?.status === 'pending').length || 0,
-      'Ordered': purchaseOrderList?.filter(order => order?.status === 'ordered').length || 0,
-      'Received': purchaseOrderList?.filter(order => order?.status === 'received').length || 0,
-      'Canceled': purchaseOrderList?.filter(order => order?.status === 'canceled').length || 0,
-      'All': purchaseOrderList?.filter(order => order?.status).length || 0,
-    };
-  };
-
-  // Memoize counts to prevent unnecessary recalculations
-  const counts = useMemo(getOrderCounts, [purchaseOrderList]);
-
-  // Append counts to tabs
-  const tabsWithCounts = useMemo(() => {
-    return orderStatusTabs?.map(tab => `${tab} (${counts[tab] || 0})`);
-  }, [counts]);
-
-  const searchedOrders = filterPurchaseOrders(purchaseOrderList, searchQuery);
-
   const getFilteredOrders = () => {
     let filtered = [];
 
@@ -184,6 +131,92 @@ const PurchaseOrders = () => {
     // Sort the filtered orders based on last status change, most recent first
     return filtered;
   };
+
+  const searchedOrders = getFilteredOrders()?.filter(order => {
+
+    const query = searchQuery.toLowerCase();
+    const isNumberQuery = !isNaN(query) && query.trim() !== '';
+
+    // Check if any product detail contains the search query
+    const productMatch = order.purchaseOrderVariants.some(product => {
+      const productTitle = (product.productTitle || '').toLowerCase();
+      const size = (typeof product.size === 'string' ? product.size : '').toLowerCase();
+      const sku = (product.supplierSku || '').toString();
+
+      return (
+        productTitle.includes(query) ||
+        size.includes(query) ||
+        (isNumberQuery && sku === query)
+      );
+    });
+
+    // Check if order details match the search query
+    const orderMatch = (
+      (order.purchaseOrderNumber || '').toLowerCase().includes(query) ||
+      (order.supplier.value || '').toLowerCase().includes(query) ||  // Access supplier name
+      (order.destination.locationName || '').toLowerCase().includes(query) ||  // Access destination location name
+      (order.totalPrice || '').toString().includes(query) ||
+      (order.status || '').toLowerCase().includes(query)
+    );
+
+    // Combine all filters
+    return productMatch || orderMatch;
+  });
+
+  // Function to calculate counts for each tab
+  const getOrderCounts = (list) => {
+    return {
+      'Pending': list?.filter(order => order?.status === 'pending').length || 0,
+      'Ordered': list?.filter(order => order?.status === 'ordered').length || 0,
+      'Received': list?.filter(order => order?.status === 'received').length || 0,
+      'Canceled': list?.filter(order => order?.status === 'canceled').length || 0,
+      'All': list?.filter(order => order?.status).length || 0,
+    };
+  };
+
+  // Memoize counts to prevent unnecessary recalculations
+  const counts = useMemo(() => {
+    const filteredBaseList = searchQuery
+      ? purchaseOrderList?.filter(order => {
+        const query = searchQuery.toLowerCase();
+        const isNumberQuery = !isNaN(query) && query.trim() !== '';
+
+        // Check if any product detail contains the search query
+        const productMatch = order.purchaseOrderVariants.some(product => {
+          const productTitle = (product.productTitle || '').toLowerCase();
+          const size = (typeof product.size === 'string' ? product.size : '').toLowerCase();
+          const sku = (product.supplierSku || '').toString();
+
+          return (
+            productTitle.includes(query) ||
+            size.includes(query) ||
+            (isNumberQuery && sku === query)
+          );
+        });
+
+        // Check if order details match the search query
+        const orderMatch = (
+          (order.purchaseOrderNumber || '').toLowerCase().includes(query) ||
+          (order.supplier.value || '').toLowerCase().includes(query) ||  // Access supplier name
+          (order.destination.locationName || '').toLowerCase().includes(query) ||  // Access destination location name
+          (order.totalPrice || '').toString().includes(query) ||
+          (order.status || '').toLowerCase().includes(query)
+        );
+
+        // Combine all filters
+        return productMatch || orderMatch;
+      })
+      : purchaseOrderList;
+
+    return getOrderCounts(filteredBaseList);
+  },
+    [purchaseOrderList, searchQuery]
+  );
+
+  // Append counts to tabs
+  const tabsWithCounts = useMemo(() => {
+    return orderStatusTabs?.map(tab => `${tab} (${counts[tab] || 0})`);
+  }, [counts]);
 
   const filteredOrders = searchQuery ? searchedOrders : getFilteredOrders();
 

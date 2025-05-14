@@ -228,10 +228,29 @@ const OrderContents = () => {
     return `${year}-${month}-${day}`;
   };
 
-  // Extract start and end dates from selectedDateRange
-  const startDate = selectedDateRange?.start ? new Date(selectedDateRange.start.year, selectedDateRange.start.month - 1, selectedDateRange.start.day) : null;
-  const endDate = selectedDateRange?.end ? new Date(selectedDateRange.end.year, selectedDateRange.end.month - 1, selectedDateRange.end.day) : null; // Adjust end date to include the entire end day
-  const adjustedEndDate = endDate ? new Date(endDate.getTime() + 24 * 60 * 60 * 1000 - 1) : null; // Add 1 day and subtract 1 ms
+  const { startDate, adjustedEndDate } = useMemo(() => {
+    const start = selectedDateRange?.start
+      ? new Date(
+        selectedDateRange.start.year,
+        selectedDateRange.start.month - 1,
+        selectedDateRange.start.day
+      )
+      : null;
+
+    const end = selectedDateRange?.end
+      ? new Date(
+        selectedDateRange.end.year,
+        selectedDateRange.end.month - 1,
+        selectedDateRange.end.day
+      )
+      : null;
+
+    const adjustedEnd = end
+      ? new Date(end.getTime() + 24 * 60 * 60 * 1000 - 1)
+      : null;
+
+    return { startDate: start, adjustedEndDate: adjustedEnd };
+  }, [selectedDateRange]);
 
   const currentDate = today(getLocalTimeZone());
 
@@ -338,7 +357,11 @@ const OrderContents = () => {
       (order?.shipmentInfo?.selectedShipmentHandlerName || '').toLowerCase().includes(query) ||
       (order?.deliveryInfo?.deliveryMethod || '').toLowerCase().includes(query) ||
       (order?.paymentInfo?.paymentStatus || '').toLowerCase().includes(query) ||
-      (order?.customerInfo?.customerId || '').toLowerCase().includes(query)
+      (order?.customerInfo?.customerId || '').toLowerCase().includes(query) ||
+      (order?.returnInfo?.reason || '').toLowerCase().includes(query) ||
+      (order?.returnInfo?.issue || '').toLowerCase().includes(query) ||
+      (order?.returnInfo?.description || '').toLowerCase().includes(query) ||
+      (order?.returnInfo?.refundAmount || '').toString().includes(query)
     );
 
     // Check if query matches date in specific format
@@ -352,24 +375,6 @@ const OrderContents = () => {
     return isDateInRange && (productMatch || orderMatch || dateMatch) && (!isPromoOrOffer || isPaidOrder);
   });
 
-  // Function to calculate counts for each tab
-  const getOrderCounts = () => {
-    return {
-      'New Orders': orderList?.filter(order => order?.orderStatus === 'Pending').length || 0,
-      'Active Orders': orderList?.filter(order => ['Processing', 'Shipped', 'On Hold'].includes(order?.orderStatus)).length || 0,
-      'Completed Orders': orderList?.filter(order => order?.orderStatus === 'Delivered').length || 0,
-      'Returns & Refunds': orderList?.filter(order => ['Return Requested', 'Request Accepted', 'Request Declined', 'Return Initiated', 'Refunded'].includes(order?.orderStatus)).length || 0,
-    };
-  };
-
-  // Memoize counts to prevent unnecessary recalculations
-  const counts = useMemo(getOrderCounts, [orderList]);
-
-  // Append counts to tabs
-  const tabsWithCounts = useMemo(() => {
-    return orderStatusTabs?.map(tab => `${tab} (${counts[tab] || 0})`);
-  }, [counts]);
-
   // Filtered orders based on the selected tab
   const filteredOrders = isFilterActive ? searchedOrders : getFilteredOrders();
 
@@ -378,6 +383,94 @@ const OrderContents = () => {
     const endIndex = startIndex + itemsPerPage;
     return filteredOrders?.slice(startIndex, endIndex);
   }, [filteredOrders, page, itemsPerPage]);
+
+  // Function to calculate counts for each tab
+  const getOrderCounts = (list) => {
+    return {
+      'New Orders': list?.filter(order => order?.orderStatus === 'Pending').length || 0,
+      'Active Orders': list?.filter(order => ['Processing', 'Shipped', 'On Hold'].includes(order?.orderStatus)).length || 0,
+      'Completed Orders': list?.filter(order => order?.orderStatus === 'Delivered').length || 0,
+      'Returns & Refunds': list?.filter(order => ['Return Requested', 'Request Accepted', 'Request Declined', 'Return Initiated', 'Refunded'].includes(order?.orderStatus)).length || 0,
+    };
+  };
+
+  // Memoize counts to prevent unnecessary recalculations
+  const counts = useMemo(() => {
+    const filteredBaseList = isFilterActive
+      ? orderList?.filter(order => {
+        const query = searchQuery.toLowerCase();
+        const isNumberQuery = !isNaN(query) && query.trim() !== '';
+
+        const orderDate = parseDate(order.dateTime);
+        const isDateInRange = startDate && adjustedEndDate
+          ? (orderDate >= startDate && orderDate <= adjustedEndDate)
+          : true;
+
+        const productMatch = order?.productInformation?.some(product => {
+          const productTitle = (product?.productTitle || '').toString().toLowerCase();
+          const productId = (product?.productId || '').toString().toLowerCase();
+          const size = (typeof product?.size === 'string' ? product.size : '').toLowerCase();
+          const color = (product?.color?.label || '').toString().toLowerCase();
+          const batchCode = (product?.batchCode || '').toString().toLowerCase();
+          const offerTitle = (product?.offerInfo?.offerTitle || '').toString().toLowerCase();
+          const offerDiscountValue = (product?.offerInfo?.offerDiscountValue || '').toString();
+          const sku = (product?.sku || '').toString();
+
+          return (
+            productTitle.includes(query) ||
+            productId.includes(query) ||
+            size.includes(query) ||
+            color.includes(query) ||
+            batchCode.includes(query) ||
+            offerTitle.includes(query) ||
+            offerDiscountValue.includes(query) ||
+            (isNumberQuery && sku === query)
+          );
+        });
+
+        const orderMatch = (
+          (order?.orderNumber || '').toLowerCase().includes(query) ||
+          (order?.dateTime || '').toLowerCase().includes(query) ||
+          (order?.customerInfo?.customerName || '').toLowerCase().includes(query) ||
+          (order?.customerInfo?.email || '').toLowerCase().includes(query) ||
+          (order?.customerInfo?.phoneNumber || '').toString().includes(query) ||
+          (order?.customerInfo?.phoneNumber2 || '').toString().includes(query) ||
+          (order?.deliveryInfo?.address1 || '').toLowerCase().includes(query) ||
+          (order?.deliveryInfo?.address2 || '').toLowerCase().includes(query) ||
+          (order?.deliveryInfo?.city || '').toLowerCase().includes(query) ||
+          (order?.deliveryInfo?.postalCode || '').toString().includes(query) ||
+          (order?.orderStatus || '').toLowerCase().includes(query) ||
+          (order?.total || '').toString().includes(query) ||
+          (order?.paymentInfo?.paymentMethod || '').toLowerCase().includes(query) ||
+          (order?.promoInfo?.promoDiscountValue || '').toString().includes(query) ||
+          (order?.promoInfo?.promoCode || '').toLowerCase().includes(query) ||
+          (order?.paymentInfo?.transactionId || '').toLowerCase().includes(query) ||
+          (order?.shipmentInfo?.trackingNumber || '').toLowerCase().includes(query) ||
+          (order?.shipmentInfo?.selectedShipmentHandlerName || '').toLowerCase().includes(query) ||
+          (order?.deliveryInfo?.deliveryMethod || '').toLowerCase().includes(query) ||
+          (order?.paymentInfo?.paymentStatus || '').toLowerCase().includes(query) ||
+          (order?.customerInfo?.customerId || '').toLowerCase().includes(query) ||
+          (order?.returnInfo?.reason || '').toLowerCase().includes(query) ||
+          (order?.returnInfo?.issue || '').toLowerCase().includes(query) ||
+          (order?.returnInfo?.description || '').toLowerCase().includes(query) ||
+          (order?.returnInfo?.refundAmount || '').toString().includes(query)
+        );
+
+        const dateMatch = (order?.dateTime || '').toLowerCase().includes(query);
+        const isPromoOrOffer = promo || offer;
+        const isPaidOrder = order?.paymentInfo?.paymentStatus === 'Paid';
+
+        return isDateInRange && (productMatch || orderMatch || dateMatch) && (!isPromoOrOffer || isPaidOrder);
+      })
+      : orderList;
+
+    return getOrderCounts(filteredBaseList);
+  }, [orderList, searchQuery, startDate, adjustedEndDate, isFilterActive, promo, offer]);
+
+  // Append counts to tabs
+  const tabsWithCounts = useMemo(() => {
+    return orderStatusTabs?.map(tab => `${tab} (${counts[tab] || 0})`);
+  }, [counts]);
 
   const totalPages = Math.ceil(filteredOrders?.length / itemsPerPage);
 

@@ -145,10 +145,29 @@ const SeasonPage = () => {
     return date; // Return the valid date object
   };
 
-  // Extract start and end dates from selectedDateRange
-  const startDate = selectedDateRange?.start ? new Date(selectedDateRange.start.year, selectedDateRange.start.month - 1, selectedDateRange.start.day) : null;
-  const endDate = selectedDateRange?.end ? new Date(selectedDateRange.end.year, selectedDateRange.end.month - 1, selectedDateRange.end.day) : null; // Adjust end date to include the entire end day
-  const adjustedEndDate = endDate ? new Date(endDate.getTime() + 24 * 60 * 60 * 1000 - 1) : null; // Add 1 day and subtract 1 ms
+  const { startDate, adjustedEndDate } = useMemo(() => {
+    const start = selectedDateRange?.start
+      ? new Date(
+        selectedDateRange.start.year,
+        selectedDateRange.start.month - 1,
+        selectedDateRange.start.day
+      )
+      : null;
+
+    const end = selectedDateRange?.end
+      ? new Date(
+        selectedDateRange.end.year,
+        selectedDateRange.end.month - 1,
+        selectedDateRange.end.day
+      )
+      : null;
+
+    const adjustedEnd = end
+      ? new Date(end.getTime() + 24 * 60 * 60 * 1000 - 1)
+      : null;
+
+    return { startDate: start, adjustedEndDate: adjustedEnd };
+  }, [selectedDateRange]);
 
   const currentDate = today(getLocalTimeZone());
 
@@ -170,8 +189,21 @@ const SeasonPage = () => {
     });
   };
 
+  const getFilteredProducts = () => {
+    switch (selectedTab) {
+      case 'Active':
+        return productDetails?.filter(product => product?.status === 'active');
+      case 'Archived':
+        return productDetails?.filter(product => product?.status === "archive");
+      case 'Draft':
+        return productDetails?.filter(product => product?.status === 'draft');
+      default:
+        return productDetails;
+    }
+  };
+
   // Filter products based on search and selected tab
-  const searchedProductDetails = productDetails?.filter((product) => {
+  const searchedProductDetails = getFilteredProducts()?.filter((product) => {
     const query = searchQuery.trim().toLowerCase();
     const isNumberQuery = !isNaN(query) && query !== '';
 
@@ -201,41 +233,63 @@ const SeasonPage = () => {
     return isDateInRange && matchesSearch;
   });
 
-  const getOrderCounts = () => {
+  const getOrderCounts = (list) => {
     return {
-      'All': productDetails?.filter(product => product?.status).length || 0,
-      'Active': productDetails?.filter(product => product?.status === 'active').length || 0,
-      'Draft': productDetails?.filter(product => product?.status === 'draft').length || 0,
-      'Archived': productDetails?.filter(product => product?.status === "archive").length || 0,
+      'All': list?.filter(product => product?.status).length || 0,
+      'Active': list?.filter(product => product?.status === 'active').length || 0,
+      'Draft': list?.filter(product => product?.status === 'draft').length || 0,
+      'Archived': list?.filter(product => product?.status === "archive").length || 0,
     };
   };
 
+  const isFilterActive = searchQuery || (selectedDateRange?.start && selectedDateRange?.end) || showLowStock || showOutOfStock;
+
   // Memoize counts to prevent unnecessary recalculations
-  const counts = useMemo(getOrderCounts, [productDetails]);
+  const counts = useMemo(() => {
+
+    const filteredBaseList = isFilterActive
+      ? productDetails?.filter(product => {
+        const query = searchQuery.trim().toLowerCase();
+        const isNumberQuery = !isNaN(query) && query !== '';
+
+        const publishDate = parseDate(product.publishDate);
+        const isDateInRange = startDate && adjustedEndDate
+          ? (publishDate >= startDate && publishDate <= adjustedEndDate)
+          : true;
+
+        // Calculate total SKU for all product variants
+        const totalSku = product?.productVariants?.reduce((acc, variant) => acc + variant?.sku, 0) || 0;
+
+        const matchesSearch =
+          product?.productTitle?.toLowerCase().includes(query) ||
+          product?.productId?.toLowerCase().includes(query) ||
+          product?.status?.toLowerCase().includes(query) ||
+          product?.productVariants?.some(variant => variant?.sku?.toString().includes(query)) ||
+          product?.category?.toLowerCase().includes(query) ||
+          product?.regularPrice?.toString().includes(query) || // Convert regularPrice to string for searching
+          product?.allSizes?.some(size => size.toString().toLowerCase().includes(query)) || // Convert sizes to string
+          product?.season?.some(season => season.toString().toLowerCase().includes(query)) || // Convert season to string
+          product?.availableColors?.some(color => color?.value?.toLowerCase().includes(query)) ||
+          product?.vendors?.some(vendor => vendor?.value?.toLowerCase().includes(query)) ||
+          product?.shippingDetails?.some(shipping => shipping?.shippingZone?.toLowerCase().includes(query)) ||
+          product?.shippingDetails?.some(shipping => shipping?.selectedShipmentHandler?.shipmentHandlerName?.toLowerCase().includes(query)) ||
+          totalSku.toString().includes(query); // Convert total SKU to string for searching
+
+        return isDateInRange && matchesSearch;
+      })
+      : productDetails;
+
+    return getOrderCounts(filteredBaseList)
+  }, [adjustedEndDate, isFilterActive, productDetails, searchQuery, startDate]);
 
   // Append counts to tabs
   const tabsWithCounts = useMemo(() => {
     return productStatusTab?.map(tab => `${tab} (${counts[tab] || 0})`);
   }, [counts]);
 
-  const getFilteredProducts = () => {
-    switch (selectedTab) {
-      case 'Active':
-        return productDetails?.filter(product => product?.status === 'active');
-      case 'Archived':
-        return productDetails?.filter(product => product?.status === "archive");
-      case 'Draft':
-        return productDetails?.filter(product => product?.status === 'draft');
-      default:
-        return productDetails;
-    }
-  };
-
   const handleReset = () => {
     setSelectedDateRange(null); // Reset the selected date range
   };
-
-  const isFilterActive = searchQuery || (selectedDateRange?.start && selectedDateRange?.end) || showLowStock || showOutOfStock;;
 
   const filteredProducts = isFilterActive ? searchedProductDetails?.filter(product => {
 
