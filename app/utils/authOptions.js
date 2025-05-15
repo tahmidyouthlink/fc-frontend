@@ -19,7 +19,7 @@ export const authOptions = {
       async authorize(credentials) {
         try {
           const { data } = await axios.post(
-            `http://localhost:5000/loginForDashboard`,
+            `https://fashion-commerce-backend.vercel.app/loginForDashboard`,
             credentials,
           );
 
