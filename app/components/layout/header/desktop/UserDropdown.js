@@ -60,7 +60,7 @@ export default function UserDropdown() {
     <>
       <Dropdown
         placement="bottom-end"
-        className="mt-5 sm:mt-6 xl:mt-7"
+        className="mt-5 pb-0 sm:mt-6 xl:mt-7"
         motionProps={{
           initial: { opacity: 0, scale: 0.95 },
           animate: {
@@ -101,8 +101,8 @@ export default function UserDropdown() {
               </DropdownItem>
             </DropdownSection>
           )}
-          <DropdownSection title="Order" showDivider>
-            {!!user && (
+          {!!user && (
+            <DropdownSection title="Order">
               <DropdownItem
                 key="orders"
                 textValue="orders"
@@ -115,8 +115,8 @@ export default function UserDropdown() {
                   href="/user/orders"
                 ></TransitionLink>
               </DropdownItem>
-            )}
-          </DropdownSection>
+            </DropdownSection>
+          )}
           <DropdownSection title="User">
             {!!user && (
               <DropdownItem
