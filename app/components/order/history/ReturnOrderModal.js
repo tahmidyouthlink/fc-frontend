@@ -272,11 +272,17 @@ export default function ReturnOrderModal({
                     isInvalid={!isPolicyChecked}
                   >
                     I have read and agree to the{" "}
-                    <Link target="_blank" href={legalPolicyPdfLinks?.return}>
+                    <Link
+                      target="_blank"
+                      href={legalPolicyPdfLinks?.return || "#"}
+                    >
                       Return Policy
                     </Link>
                     {" & "}
-                    <Link target="_blank" href={legalPolicyPdfLinks?.refund}>
+                    <Link
+                      target="_blank"
+                      href={legalPolicyPdfLinks?.refund || "#"}
+                    >
                       Refund Policy
                     </Link>
                     .

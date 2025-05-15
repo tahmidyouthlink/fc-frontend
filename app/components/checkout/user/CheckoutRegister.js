@@ -357,11 +357,17 @@ export default function CheckoutRegister({
                     isInvalid={!isPoliciesCheckboxSelected}
                   >
                     I agree to the{" "}
-                    <Link target="_blank" href={legalPolicyPdfLinks?.terms}>
+                    <Link
+                      target="_blank"
+                      href={legalPolicyPdfLinks?.terms || "#"}
+                    >
                       Terms & Conditions
                     </Link>
                     {" and "}
-                    <Link target="_blank" href={legalPolicyPdfLinks?.privacy}>
+                    <Link
+                      target="_blank"
+                      href={legalPolicyPdfLinks?.privacy || "#"}
+                    >
                       Privacy Policy
                     </Link>
                   </Checkbox>
