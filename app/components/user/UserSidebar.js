@@ -3,12 +3,7 @@
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
-import {
-  RiUser3Line,
-  RiBox3Line,
-  RiLockLine,
-  RiNotification3Line,
-} from "react-icons/ri";
+import { RiUser3Line, RiBox3Line, RiLockLine } from "react-icons/ri";
 import { useAuth } from "@/app/contexts/auth";
 import avatarImage from "/public/auth/user.webp";
 import TransitionLink from "@/app/components/ui/TransitionLink";
@@ -129,19 +124,6 @@ export default function UserSidebar() {
           >
             <RiLockLine />
             <p>Security</p>
-          </TransitionLink>
-        </li>
-        <li>
-          <TransitionLink
-            href="/user/notifications"
-            className={
-              pathname.includes("notifications")
-                ? "bg-green-100 font-semibold text-green-600"
-                : ""
-            }
-          >
-            <RiNotification3Line />
-            <p>Notifications</p>
           </TransitionLink>
         </li>
       </ul>

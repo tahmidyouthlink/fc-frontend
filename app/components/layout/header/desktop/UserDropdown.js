@@ -10,7 +10,6 @@ import {
   DropdownTrigger,
 } from "@nextui-org/react";
 import {
-  PiTruckLight,
   PiSignInLight,
   PiSignOutLight,
   PiPackageLight,
@@ -103,18 +102,6 @@ export default function UserDropdown() {
             </DropdownSection>
           )}
           <DropdownSection title="Order" showDivider>
-            <DropdownItem
-              key="order-tracking"
-              textValue="order-tracking"
-              startContent={<PiTruckLight />}
-              className="relative"
-            >
-              Order Tracking
-              <TransitionLink
-                className="absolute inset-0"
-                href="/order-tracking"
-              ></TransitionLink>
-            </DropdownItem>
             {!!user && (
               <DropdownItem
                 key="orders"
