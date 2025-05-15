@@ -101,7 +101,7 @@ const PasswordChangePage = () => {
   if (status === "loading") return <Loading />;
 
   return (
-    <div className='bg-gray-50 min-h-screen relative'>
+    <div className='bg-gray-50 min-h-[calc(100vh-60px)] relative'>
 
       <div
         style={{

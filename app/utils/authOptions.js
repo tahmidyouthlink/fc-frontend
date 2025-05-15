@@ -19,7 +19,7 @@ export const authOptions = {
       async authorize(credentials) {
         try {
           const { data } = await axios.post(
-            `https://fashion-commerce-backend.vercel.app/loginForDashboard`,
+            `http://localhost:5000/loginForDashboard`,
             credentials,
           );
 
@@ -29,6 +29,8 @@ export const authOptions = {
 
           return {
             _id: data._id,
+            email: data.email,
+            name: data.name
           };
         } catch (error) {
           // Return specific error messages from backend if available
