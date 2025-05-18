@@ -88,7 +88,6 @@ export default function GoogleSignInButton({
                     phoneNumber: "",
                     phoneNumber2: "",
                     hometown: "",
-                    dob: null,
                   },
                   deliveryAddresses: [],
                   savedDeliveryAddress: null,

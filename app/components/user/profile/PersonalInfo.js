@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { Autocomplete, AutocompleteItem, DatePicker } from "@nextui-org/react";
-import { parseDate } from "@internationalized/date";
+import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
 import { RiCloseLine, RiEditLine, RiSaveLine } from "react-icons/ri";
 import { useLoading } from "@/app/contexts/loading";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
-import calculateAge from "@/app/utils/calculateAge";
 import { cities } from "@/app/data/cities";
 
 export default function PersonalInfo({ userData, setUserData, personalInfo }) {
@@ -26,7 +24,6 @@ export default function PersonalInfo({ userData, setUserData, personalInfo }) {
       phoneNumber: personalInfo?.phoneNumber || "--",
       altPhoneNumber: personalInfo?.phoneNumber2 || "--",
       hometown: personalInfo?.hometown || "--",
-      dob: personalInfo?.dob ? parseDate(personalInfo.dob) : null,
     },
     mode: "onBlur",
   });
@@ -38,7 +35,6 @@ export default function PersonalInfo({ userData, setUserData, personalInfo }) {
       phoneNumber: personalInfo?.phoneNumber || (isEditingForm ? "" : "--"),
       altPhoneNumber: personalInfo?.phoneNumber2 || (isEditingForm ? "" : "--"),
       hometown: personalInfo?.hometown || (isEditingForm ? "" : "--"),
-      dob: personalInfo?.dob ? parseDate(personalInfo.dob) : null,
     });
   }, [userData, isEditingForm, reset, personalInfo]);
 
@@ -48,15 +44,11 @@ export default function PersonalInfo({ userData, setUserData, personalInfo }) {
     if (data.phoneNumber === "--") data.phoneNumber = "";
     if (data.altPhoneNumber === "--") data.altPhoneNumber = "";
     if (data.hometown === "--") data.hometown = "";
-    if (data.dob) {
-      data.dob = new Date(data.dob).toISOString().split("T")[0];
-    }
 
     if (
       personalInfo?.phoneNumber === data.phoneNumber &&
       personalInfo?.phoneNumber2 === data.altPhoneNumber &&
-      personalInfo?.hometown === data.hometown &&
-      personalInfo?.dob === data.dob
+      personalInfo?.hometown === data.hometown
     ) {
       toast.error("Not saved as no changes were made.");
       return setIsEditingForm(false);
@@ -71,7 +63,6 @@ export default function PersonalInfo({ userData, setUserData, personalInfo }) {
           phoneNumber: data.phoneNumber,
           phoneNumber2: data.altPhoneNumber,
           hometown: data.hometown,
-          dob: data.dob,
         },
       },
     };
@@ -257,95 +248,48 @@ export default function PersonalInfo({ userData, setUserData, personalInfo }) {
               )}
             </div>
           </div>
-          <div className="max-lg:space-y-4 lg:flex lg:gap-x-6 xl:gap-x-10">
-            {/* Hometown Field */}
-            <div className="relative w-full space-y-2 font-semibold">
-              <Controller
-                name="hometown"
-                control={control}
-                rules={{
-                  required: "Hometown is required.",
-                }}
-                render={({ field: { onChange, value } }) => (
-                  <Autocomplete
-                    isReadOnly={!!personalInfo?.hometown || !isEditingForm}
-                    isDisabled={!!personalInfo?.hometown || !isEditingForm}
-                    isRequired
-                    labelPlacement="outside"
-                    label="Hometown"
-                    placeholder="Select hometown"
-                    size="sm"
-                    variant="bordered"
-                    selectedKey={value}
-                    onSelectionChange={onChange}
-                    className={`select-with-search w-full [&:has(input:focus)_[data-slot='input-wrapper']]:border-[#F4D3BA] [&:has(input:focus)_[data-slot='input-wrapper']]:bg-white/75 [&_[data-disabled='true']]:opacity-100 [&_[data-disabled='true']_[data-slot='inner-wrapper']]:opacity-50 [&_[data-slot='input-wrapper']]:bg-white/20 [&_[data-slot='input-wrapper']]:shadow-none [&_[data-slot='input-wrapper']]:backdrop-blur-2xl [&_[data-slot='input-wrapper']]:backdrop-opacity-100 [&_[data-slot='input-wrapper']]:hover:border-[#F4D3BA] [&_label]:!text-neutral-500 ${isEditingForm || personalInfo?.hometown ? "[&_[data-slot='inner-wrapper']]:!opacity-100" : "[&_[data-slot='inner-wrapper']]:!opacity-0"}`}
-                  >
-                    {cities.map((hometown) => {
-                      return (
-                        <AutocompleteItem key={hometown}>
-                          {hometown}
-                        </AutocompleteItem>
-                      );
-                    })}
-                  </Autocomplete>
-                )}
-              />
-              <p
-                className={`absolute left-0 top-9 -translate-y-1/2 font-semibold text-neutral-700 transition-opacity duration-100 ease-in-out ${!isEditingForm && !personalInfo?.hometown ? "opacity-100" : "opacity-0"}`}
-              >
-                --
-              </p>
-              {errors.hometown && (
-                <p className="text-xs font-semibold text-red-500">
-                  {errors.hometown?.message}
-                </p>
+          {/* Hometown Field */}
+          <div className="relative w-full space-y-2 font-semibold lg:w-[calc(50%-1.5rem/2)] xl:w-[calc(50%-2.5rem/2)]">
+            <Controller
+              name="hometown"
+              control={control}
+              rules={{
+                required: "Hometown is required.",
+              }}
+              render={({ field: { onChange, value } }) => (
+                <Autocomplete
+                  isReadOnly={!!personalInfo?.hometown || !isEditingForm}
+                  isDisabled={!!personalInfo?.hometown || !isEditingForm}
+                  isRequired
+                  labelPlacement="outside"
+                  label="Hometown"
+                  placeholder="Select hometown"
+                  size="sm"
+                  variant="bordered"
+                  selectedKey={value}
+                  onSelectionChange={onChange}
+                  className={`select-with-search w-full [&:has(input:focus)_[data-slot='input-wrapper']]:border-[#F4D3BA] [&:has(input:focus)_[data-slot='input-wrapper']]:bg-white/75 [&_[data-disabled='true']]:opacity-100 [&_[data-disabled='true']_[data-slot='inner-wrapper']]:opacity-50 [&_[data-slot='input-wrapper']]:bg-white/20 [&_[data-slot='input-wrapper']]:shadow-none [&_[data-slot='input-wrapper']]:backdrop-blur-2xl [&_[data-slot='input-wrapper']]:backdrop-opacity-100 [&_[data-slot='input-wrapper']]:hover:border-[#F4D3BA] [&_label]:!text-neutral-500 ${isEditingForm || personalInfo?.hometown ? "[&_[data-slot='inner-wrapper']]:!opacity-100" : "[&_[data-slot='inner-wrapper']]:!opacity-0"}`}
+                >
+                  {cities.map((hometown) => {
+                    return (
+                      <AutocompleteItem key={hometown}>
+                        {hometown}
+                      </AutocompleteItem>
+                    );
+                  })}
+                </Autocomplete>
               )}
-            </div>
-            {/* Date of Birth Field */}
-            <div className="relative w-full space-y-2 font-semibold">
-              <Controller
-                name="dob"
-                control={control}
-                rules={{
-                  required: "Date of birth is required.",
-                  validate: (value) => {
-                    const age = calculateAge(value);
-                    if (age < 13) return "You must be at least 13 years old";
-                    if (age > 120)
-                      return "Age cannot be more than 120 years old";
-                    return true;
-                  },
-                }}
-                render={({ field: { onChange, value } }) => (
-                  <DatePicker
-                    isReadOnly={!!personalInfo?.dob || !isEditingForm}
-                    isDisabled={!!personalInfo?.dob || !isEditingForm}
-                    id="dob"
-                    labelPlacement="outside"
-                    label="Date of Birth"
-                    showMonthAndYearPickers
-                    variant="bordered"
-                    value={value}
-                    onChange={onChange}
-                    classNames={{
-                      calendarContent:
-                        "min-w-64 [&_td>span:hover]:bg-[#c2f3ba] [&_td>span:hover]:text-[#3f7136] [&_td>span[data-selected='true']]:bg-[#58944d] [&_td>span[data-selected='true']]:text-white [&_td>span[data-selected='true']:hover]:bg-[#58944d] [&_td>span[data-selected='true']:hover]:text-white",
-                    }}
-                    className={`date-picker mt-1 gap-1 transition-opacity duration-300 ease-in-out [&>div:focus-within:hover]:border-[#F4D3BA] [&>div:focus-within]:border-[#F4D3BA] [&>div:hover]:border-[#F4D3BA] [&>div]:bg-white/20 [&>span]:mb-1 [&[data-disabled='true']>div]:opacity-50 [&[data-disabled='true']]:opacity-100 [&_[data-slot='input-field']]:font-semibold [&_[data-slot='label']]:!text-sm [&_[data-slot='label']]:text-neutral-500 md:[&_[data-slot='label']]:!text-sm ${isEditingForm || personalInfo?.dob ? "[&>div]:!opacity-100" : "[&>div]:!opacity-0"}`}
-                  />
-                )}
-              />
-              <p
-                className={`absolute left-0 top-9 -translate-y-1/2 font-semibold text-neutral-700 transition-opacity duration-100 ease-in-out ${!isEditingForm && !personalInfo?.dob ? "opacity-100" : "opacity-0"}`}
-              >
-                --
+            />
+            <p
+              className={`absolute left-0 top-9 -translate-y-1/2 font-semibold text-neutral-700 transition-opacity duration-100 ease-in-out ${!isEditingForm && !personalInfo?.hometown ? "opacity-100" : "opacity-0"}`}
+            >
+              --
+            </p>
+            {errors.hometown && (
+              <p className="text-xs font-semibold text-red-500">
+                {errors.hometown?.message}
               </p>
-              {errors.dob && (
-                <p className="text-xs font-semibold text-red-500">
-                  {errors.dob?.message}
-                </p>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </form>
