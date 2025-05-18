@@ -98,7 +98,7 @@ export default function StoryDetails({
         />
       </div>
       <div className="story-texts relative col-span-3 min-h-dvh">
-        <div className="relative flex flex-col items-end justify-center gap-[45dvw] px-5 pb-[45dvw] pt-20 sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0 [&_p]:max-w-2xl [&_p]:pr-20 [&_p]:text-3xl [&_p]:font-semibold [&_p]:text-neutral-600 [&_span]:bg-[linear-gradient(to_right,theme(colors.green.600),theme(colors.emerald.400))] [&_span]:bg-clip-text [&_span]:text-transparent">
+        <div className="relative flex flex-col items-end justify-center gap-[45dvw] px-5 pb-[45dvw] pt-20 sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0 [&_p]:max-w-2xl [&_p]:pr-20 [&_p]:text-3xl [&_p]:font-semibold [&_p]:text-neutral-600 [&_span]:bg-[linear-gradient(to_right,#804D3A,#D86F4D,#F3A761)] [&_span]:bg-clip-text [&_span]:text-transparent">
           <div id="first-comment" className="relative">
             {/* First Comment */}
             <div
