@@ -30,7 +30,7 @@ export default function ProductThumbnailImages({
   const thumbnailMoved = numOfTimesThumbnailsMoved * -1;
 
   return (
-    <div className="relative sm:max-md:h-[35vh] md:w-80 lg:w-[424px] xl:w-auto xl:max-[1799px]:h-full min-[1800px]:w-[650px]">
+    <div className="relative sm:max-md:h-[40vh] md:w-80 lg:w-[424px] xl:w-auto xl:max-[1799px]:h-full min-[1800px]:w-[650px]">
       {/* Thumbnail Images */}
       <div
         className="relative flex w-full max-sm:overflow-x-auto sm:overflow-hidden sm:max-md:h-full sm:max-md:flex-col xl:max-[1799px]:h-full xl:max-[1799px]:flex-col"
