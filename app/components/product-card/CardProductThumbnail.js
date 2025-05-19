@@ -55,7 +55,7 @@ export default function CardProductThumbnail({
   }, []);
 
   return (
-    <div className="product-card relative aspect-[4/5] w-full overflow-hidden bg-[#F0F0F0]">
+    <div className="product-card relative aspect-[4/5] w-full overflow-hidden bg-[#F0F0F0] sm:min-h-[350px] lg:min-h-[400px] xl:min-h-[450px]">
       <TransitionLink
         href={`/product/${productTitle.split(" ").join("-").toLowerCase()}`}
       >
@@ -68,7 +68,7 @@ export default function CardProductThumbnail({
                 imgSet.color.label +
                 imgSetIndex
               }
-              className="img-container absolute aspect-[4/5] w-full transition-[opacity] duration-300 ease-in-out"
+              className="img-container absolute aspect-[4/5] w-full transition-[opacity] duration-300 ease-in-out sm:min-h-[350px] lg:min-h-[400px] xl:min-h-[450px]"
               style={{
                 opacity: imgSetIndex === 0 ? "1" : "0",
                 pointerEvents: imgSetIndex === 0 ? "auto" : "none",
