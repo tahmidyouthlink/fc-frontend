@@ -55,7 +55,7 @@ export default function CardProductThumbnail({
   }, []);
 
   return (
-    <div className="product-card relative aspect-[4/5] w-full overflow-hidden rounded-[20px] bg-[#F0F0F0]">
+    <div className="product-card relative aspect-[4/5] w-full overflow-hidden bg-[#F0F0F0]">
       <TransitionLink
         href={`/product/${productTitle.split(" ").join("-").toLowerCase()}`}
       >
