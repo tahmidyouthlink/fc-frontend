@@ -17,7 +17,7 @@ export default function MainLinks() {
             }
             href="/shop"
           >
-            Products
+            Shop
           </TransitionLink>
         </li>
         <li>
@@ -29,7 +29,7 @@ export default function MainLinks() {
             }
             href="/shop?filterBy=New+Arrivals"
           >
-            New Arrivals
+            Latest
           </TransitionLink>
         </li>
         <li>
@@ -41,7 +41,7 @@ export default function MainLinks() {
             }
             href="/our-story"
           >
-            Our Story
+            Story
           </TransitionLink>
         </li>
       </ul>

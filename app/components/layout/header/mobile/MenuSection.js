@@ -23,7 +23,7 @@ export default function MenuSection({ setIsNavMenuOpen }) {
             }
           >
             <PiBagSimple />
-            Products
+            Shop
           </TransitionLink>
         </li>
         <li>
@@ -36,7 +36,7 @@ export default function MenuSection({ setIsNavMenuOpen }) {
             }
           >
             <PiGift />
-            New Arrivals
+            Latest
           </TransitionLink>
         </li>
         <li>
@@ -47,7 +47,7 @@ export default function MenuSection({ setIsNavMenuOpen }) {
             className={pathname.startsWith("/our-story") ? "active" : undefined}
           >
             <PiUsersThree />
-            Our Story
+            Story
           </TransitionLink>
         </li>
       </ul>
