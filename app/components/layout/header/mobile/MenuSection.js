@@ -1,5 +1,5 @@
 import { usePathname, useSearchParams } from "next/navigation";
-import { PiBagSimple, PiGift, PiHouseLine, PiUsersThree } from "react-icons/pi";
+import { PiBagSimple, PiGift, PiUsersThree } from "react-icons/pi";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 
 export default function MenuSection({ setIsNavMenuOpen }) {
@@ -11,17 +11,6 @@ export default function MenuSection({ setIsNavMenuOpen }) {
       <h5 className="text-[10px] font-semibold text-neutral-500">MENU</h5>
       <hr className="my-2 h-0.5 w-full bg-neutral-100" />
       <ul className="space-y-1 text-xs md:text-[13px]">
-        <li>
-          <TransitionLink
-            href="/"
-            hasDrawer={true}
-            setIsDrawerOpen={setIsNavMenuOpen}
-            className={pathname === "/" ? "active" : ""}
-          >
-            <PiHouseLine />
-            Home
-          </TransitionLink>
-        </li>
         <li>
           <TransitionLink
             href="/shop"

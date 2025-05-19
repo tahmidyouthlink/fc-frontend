@@ -7,17 +7,7 @@ export default function MainLinks() {
 
   return (
     <div className="font-semibold text-neutral-400">
-      <ul className="flex items-center gap-x-3.5 xl:gap-x-7 [&_a]:transition-[color] [&_a]:duration-300 [&_a]:ease-in-out">
-        <li>
-          <TransitionLink
-            className={
-              pathname === "/" ? "text-neutral-800" : "hover:text-neutral-500"
-            }
-            href="/"
-          >
-            Home
-          </TransitionLink>
-        </li>
+      <ul className="flex items-center gap-x-3.5 xl:gap-x-9 [&_a]:transition-[color] [&_a]:duration-300 [&_a]:ease-in-out">
         <li>
           <TransitionLink
             className={
