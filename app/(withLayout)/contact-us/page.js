@@ -12,9 +12,10 @@ import ContactForm from "@/app/components/contact/ContactForm";
 export default function ContactUs() {
   return (
     <main className="pt-header-h-full-section-pb relative overflow-hidden bg-[#f0f0f0] pb-[var(--section-padding)] text-sm text-neutral-500 md:text-base xl:min-h-dvh [&_h2]:text-neutral-600">
-      <div className="absolute left-[5%] top-1/2 size-60 animate-blob rounded-full bg-[#d3f9ce] mix-blend-multiply blur-md" />
-      <div className="absolute left-[55%] top-[60%] size-60 animate-blob rounded-full bg-[#ebc6a6] mix-blend-multiply blur-md [animation-delay:1s]" />
-      <div className="absolute left-[80%] top-1/3 size-60 animate-blob rounded-full bg-[#d3f9ce] mix-blend-multiply blur-md [animation-delay:2s]" />
+      <div className="absolute left-[5%] top-[60%] animate-blob bg-[#d7f8d3] max-sm:hidden" />
+      <div className="absolute left-[5%] top-[15%] animate-blob bg-[#f8dfcb] [animation-delay:1.5s] sm:left-[30%] xl:top-[30%]" />
+      <div className="absolute left-[55%] top-[70%] animate-blob bg-[#d7f8d3] [animation-delay:0.5s] sm:bg-[#f8dfcb]" />
+      <div className="absolute left-[80%] top-1/3 animate-blob bg-[#d7f8d3] [animation-delay:2s] max-sm:hidden" />
       <div className="z-[1] mx-5 items-stretch gap-4 overflow-hidden rounded-xl border-2 border-neutral-50/20 bg-white/40 backdrop-blur-2xl max-md:space-y-4 sm:mx-8 md:mx-12 md:flex xl:mx-auto xl:min-h-[calc(100dvh-(var(--header-height-lg)+var(--section-padding-double)))] xl:max-w-[1200px]">
         <section className="flex grow flex-col gap-y-10 p-9 md:order-last">
           <div className="space-y-1.5">

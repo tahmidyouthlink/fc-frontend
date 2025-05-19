@@ -274,7 +274,7 @@
   }
 
   .animate-blob {
-    @apply pointer-events-none;
+    @apply pointer-events-none size-64 rounded-full mix-blend-multiply blur-[32px];
   }
 }
 

@@ -523,16 +523,23 @@ export default function Checkout() {
 
   return (
     <main
-      className={`relative -mt-[calc(240*3px)] pb-[var(--section-padding-double)] text-sm text-neutral-500 md:text-base lg:pb-[var(--section-padding)] [&_h2]:uppercase [&_h2]:text-neutral-700 ${!!cartItems?.length ? "bg-neutral-50" : "bg-white font-semibold"}`}
+      className={`relative -mt-[calc(256*4px)] pb-[var(--section-padding-double)] text-sm text-neutral-500 max-sm:-mt-[calc(256*2px)] md:text-base lg:pb-[var(--section-padding)] [&_h2]:uppercase [&_h2]:text-neutral-700 ${!!cartItems?.length ? "bg-neutral-50" : "bg-white font-semibold"}`}
     >
+      {/* Left Mesh Gradient */}
       <div
-        className={`sticky left-[5%] top-1/3 size-60 animate-blob rounded-full bg-[#ffecdc] mix-blend-multiply blur-md ${!cartItems?.length ? "opacity-0" : "opacity-100"}`}
+        className={`sticky left-[5%] top-[55%] animate-blob bg-[#f8dfcb] max-sm:hidden ${!cartItems?.length ? "opacity-0" : "opacity-100"}`}
       />
+      {/* Middle-Left Mesh Gradient */}
       <div
-        className={`sticky left-[45%] top-[40%] size-60 animate-blob rounded-full bg-[#ffecdc] mix-blend-multiply blur-md [animation-delay:1s] ${!cartItems?.length ? "opacity-0" : "opacity-100"}`}
+        className={`sticky left-[30%] top-[5%] animate-blob bg-[#d7f8d3] [animation-delay:1.5s] max-sm:left-[5%] ${!cartItems?.length ? "opacity-0" : "opacity-100"}`}
       />
+      {/* Middle-Right Mesh Gradient */}
       <div
-        className={`sticky left-[80%] top-1/2 size-60 animate-blob rounded-full bg-[#d3f9ce] mix-blend-multiply blur-md [animation-delay:2s] ${!cartItems?.length ? "opacity-0" : "opacity-100"}`}
+        className={`sticky left-[55%] top-[60%] animate-blob bg-[#f8dfcb] [animation-delay:0.5s] max-sm:left-3/4 ${!cartItems?.length ? "opacity-0" : "opacity-100"}`}
+      />
+      {/* Right Mesh Gradient */}
+      <div
+        className={`sticky left-[80%] top-1/3 animate-blob bg-[#d7f8d3] [animation-delay:2s] max-sm:hidden ${!cartItems?.length ? "opacity-0" : "opacity-100"}`}
       />
       {!!cartItems?.length ? (
         <div className="pt-header-h-full-section-pb relative min-h-dvh gap-4 px-5 sm:px-8 lg:flex lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0">
