@@ -3,12 +3,16 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+const colorChangeDuration = 750;
+
 export default function OfferSlider({
   slides,
   slideDuration,
   isAutoSlideEnabled,
   bgColor,
   textColor,
+  isHighlightedColorEnabled,
+  highlightedColor,
 }) {
   // Add duplicates for infinite scroll effect
   const extendedSlides = !slides?.length
@@ -17,8 +21,6 @@ export default function OfferSlider({
   const [currentIndex, setCurrentIndex] = useState(1); // Start at index 1 (first actual offer)
   const [isTransitioning, setIsTransitioning] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
-  const highlightedColor = "#fde047";
-  const colorChangeDuration = 750;
   const [currentTextColor, setCurrentTextColor] = useState(textColor);
 
   const nextSlide = () => {
@@ -36,13 +38,15 @@ export default function OfferSlider({
 
   // Auto-change text color to create highlighting effect
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTextColor((prevColor) =>
-        prevColor == highlightedColor ? textColor : highlightedColor,
-      );
-    }, colorChangeDuration);
-    return () => clearInterval(interval);
-  }, [textColor]);
+    if (isHighlightedColorEnabled) {
+      const interval = setInterval(() => {
+        setCurrentTextColor((prevColor) =>
+          prevColor == highlightedColor ? textColor : highlightedColor,
+        );
+      }, colorChangeDuration);
+      return () => clearInterval(interval);
+    }
+  }, [textColor, isHighlightedColorEnabled, highlightedColor]);
 
   // Handle infinite loop logic
   useEffect(() => {

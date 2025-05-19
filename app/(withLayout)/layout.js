@@ -43,6 +43,8 @@ export default async function RootLayout({ children }) {
           isAutoSlideEnabled={topHeaderData?.isAutoSlideEnabled}
           bgColor={topHeaderData?.topHeaderColor}
           textColor={topHeaderData?.textColor}
+          isHighlightedColorEnabled={topHeaderData?.isHighlightedColorEnabled}
+          highlightedColor={topHeaderData?.highlightedTextColor}
         />
         <LoaderFrontend />
         <ScrollTopButton />
