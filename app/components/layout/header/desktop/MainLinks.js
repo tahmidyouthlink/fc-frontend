@@ -11,13 +11,13 @@ export default function MainLinks() {
         <li>
           <TransitionLink
             className={
-              pathname.startsWith("/shop") && !searchParams.get("filterBy")
+              pathname.startsWith("/our-story")
                 ? "text-neutral-800"
                 : "hover:text-neutral-500"
             }
-            href="/shop"
+            href="/our-story"
           >
-            Shop
+            Souls
           </TransitionLink>
         </li>
         <li>
@@ -29,19 +29,19 @@ export default function MainLinks() {
             }
             href="/shop?filterBy=New+Arrivals"
           >
-            Latest
+            Buzz
           </TransitionLink>
         </li>
         <li>
           <TransitionLink
             className={
-              pathname.startsWith("/our-story")
+              pathname.startsWith("/shop") && !searchParams.get("filterBy")
                 ? "text-neutral-800"
                 : "hover:text-neutral-500"
             }
-            href="/our-story"
+            href="/shop"
           >
-            Story
+            Threadz
           </TransitionLink>
         </li>
       </ul>

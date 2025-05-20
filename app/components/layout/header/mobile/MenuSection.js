@@ -13,17 +13,13 @@ export default function MenuSection({ setIsNavMenuOpen }) {
       <ul className="space-y-1 text-xs md:text-[13px]">
         <li>
           <TransitionLink
-            href="/shop"
+            href="/our-story"
             hasDrawer={true}
             setIsDrawerOpen={setIsNavMenuOpen}
-            className={
-              pathname.startsWith("/shop") && !searchParams.get("filterBy")
-                ? "active"
-                : undefined
-            }
+            className={pathname.startsWith("/our-story") ? "active" : undefined}
           >
-            <PiBagSimple />
-            Shop
+            <PiUsersThree />
+            Souls
           </TransitionLink>
         </li>
         <li>
@@ -36,18 +32,22 @@ export default function MenuSection({ setIsNavMenuOpen }) {
             }
           >
             <PiGift />
-            Latest
+            Buzz
           </TransitionLink>
         </li>
         <li>
           <TransitionLink
-            href="/our-story"
+            href="/shop"
             hasDrawer={true}
             setIsDrawerOpen={setIsNavMenuOpen}
-            className={pathname.startsWith("/our-story") ? "active" : undefined}
+            className={
+              pathname.startsWith("/shop") && !searchParams.get("filterBy")
+                ? "active"
+                : undefined
+            }
           >
-            <PiUsersThree />
-            Story
+            <PiBagSimple />
+            Threadz
           </TransitionLink>
         </li>
       </ul>
