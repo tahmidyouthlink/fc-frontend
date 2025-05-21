@@ -269,7 +269,7 @@ const OurStoryNavbar = () => {
     <>
       <div className='flex justify-between items-center sticky top-0 z-10'>
         <h1 className="font-bold text-lg md:text-xl lg:text-3xl text-neutral-700 py-1 2xl:py-3">OUR STORY</h1>
-
+        <h1>Hi</h1>
         <button onClick={() => onOpen()} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
           <FaPlus size={15} className='text-neutral-700' /> Add
         </button>
