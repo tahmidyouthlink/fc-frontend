@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { CgChevronLeft, CgChevronRight } from "react-icons/cg";
+
+const colorChangeDuration = 750;
 
 export default function OfferSlider({
   slides,
@@ -10,6 +11,8 @@ export default function OfferSlider({
   isAutoSlideEnabled,
   bgColor,
   textColor,
+  isHighlightedColorEnabled,
+  highlightedColor,
 }) {
   // Add duplicates for infinite scroll effect
   const extendedSlides = !slides?.length
@@ -18,17 +21,10 @@ export default function OfferSlider({
   const [currentIndex, setCurrentIndex] = useState(1); // Start at index 1 (first actual offer)
   const [isTransitioning, setIsTransitioning] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
-  const highlightedColor = "#fde047";
-  const colorChangeDuration = 750;
   const [currentTextColor, setCurrentTextColor] = useState(textColor);
 
   const nextSlide = () => {
     setCurrentIndex((prev) => prev + 1);
-    setIsTransitioning(true);
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => prev - 1);
     setIsTransitioning(true);
   };
 
@@ -42,13 +38,15 @@ export default function OfferSlider({
 
   // Auto-change text color to create highlighting effect
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTextColor((prevColor) =>
-        prevColor == highlightedColor ? textColor : highlightedColor,
-      );
-    }, colorChangeDuration);
-    return () => clearInterval(interval);
-  }, [textColor]);
+    if (isHighlightedColorEnabled) {
+      const interval = setInterval(() => {
+        setCurrentTextColor((prevColor) =>
+          prevColor == highlightedColor ? textColor : highlightedColor,
+        );
+      }, colorChangeDuration);
+      return () => clearInterval(interval);
+    }
+  }, [textColor, isHighlightedColorEnabled, highlightedColor]);
 
   // Handle infinite loop logic
   useEffect(() => {
@@ -77,7 +75,7 @@ export default function OfferSlider({
 
   return (
     <div
-      className="relative text-center text-xs font-bold"
+      className="relative line-clamp-1 py-1.5 text-center text-xs font-bold"
       style={{
         backgroundColor: bgColor,
         color: textColor,
@@ -85,53 +83,36 @@ export default function OfferSlider({
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div className="mx-auto flex items-center justify-between px-5 sm:px-8 lg:px-12 xl:max-w-[1200px] xl:px-0">
-        {/* Previous Button */}
-        {slides?.length > 1 && (
-          <button onClick={prevSlide}>
-            <CgChevronLeft className="size-3.5" />
-          </button>
-        )}
-        {/* Offer Text */}
-        <div className="w-full overflow-hidden py-1.5">
-          <div
-            className={`flex ${isTransitioning ? "transition-transform duration-1000 ease-in-out" : ""}`}
-            style={{
-              transform: `translateX(-${currentIndex * 100}%)`,
-              color: currentTextColor,
-            }}
-          >
-            {extendedSlides?.map((slide, index) =>
-              slide.optionalLink ? (
-                <Link
-                  key={slide.slideText + slide.optionalLink + index}
-                  href={slide.optionalLink}
-                  className="min-w-full text-center underline underline-offset-2 transition-[color] ease-in-out"
-                  style={{
-                    transitionDuration: `${colorChangeDuration}ms`,
-                  }}
-                >
-                  {slide.slideText}
-                </Link>
-              ) : (
-                <p
-                  key={slide.slideText + slide.optionalLink + index}
-                  className="min-w-full text-center transition-[color] ease-in-out"
-                  style={{
-                    transitionDuration: `${colorChangeDuration}ms`,
-                  }}
-                >
-                  {slide.slideText}
-                </p>
-              ),
-            )}
-          </div>
-        </div>
-        {/* Next Button */}
-        {slides?.length > 1 && (
-          <button onClick={nextSlide}>
-            <CgChevronRight className="size-3.5" />
-          </button>
+      <div
+        className={`flex ${isTransitioning ? "transition-transform duration-1000 ease-in-out" : ""}`}
+        style={{
+          transform: `translateX(-${currentIndex * 100}%)`,
+          color: currentTextColor,
+        }}
+      >
+        {extendedSlides?.map((slide, index) =>
+          slide.optionalLink ? (
+            <Link
+              key={slide.slideText + slide.optionalLink + index}
+              href={slide.optionalLink}
+              className="min-w-full text-center underline underline-offset-2 transition-[color] ease-in-out"
+              style={{
+                transitionDuration: `${colorChangeDuration}ms`,
+              }}
+            >
+              {slide.slideText}
+            </Link>
+          ) : (
+            <p
+              key={slide.slideText + slide.optionalLink + index}
+              className="min-w-full text-center transition-[color] ease-in-out"
+              style={{
+                transitionDuration: `${colorChangeDuration}ms`,
+              }}
+            >
+              {slide.slideText}
+            </p>
+          ),
         )}
       </div>
     </div>

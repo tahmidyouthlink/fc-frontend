@@ -1,5 +1,5 @@
 import { usePathname, useSearchParams } from "next/navigation";
-import { PiBagSimple, PiGift, PiHouseLine, PiUsersThree } from "react-icons/pi";
+import { PiBagSimple, PiGift, PiUsersThree } from "react-icons/pi";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 
 export default function MenuSection({ setIsNavMenuOpen }) {
@@ -13,13 +13,26 @@ export default function MenuSection({ setIsNavMenuOpen }) {
       <ul className="space-y-1 text-xs md:text-[13px]">
         <li>
           <TransitionLink
-            href="/"
+            href="/our-story"
             hasDrawer={true}
             setIsDrawerOpen={setIsNavMenuOpen}
-            className={pathname === "/" ? "active" : ""}
+            className={pathname.startsWith("/our-story") ? "active" : undefined}
           >
-            <PiHouseLine />
-            Home
+            <PiUsersThree />
+            Souls
+          </TransitionLink>
+        </li>
+        <li>
+          <TransitionLink
+            href="/shop?filterBy=New+Arrivals"
+            hasDrawer={true}
+            setIsDrawerOpen={setIsNavMenuOpen}
+            className={
+              searchParams.get("filterBy") === "New Arrivals" ? "active" : ""
+            }
+          >
+            <PiGift />
+            Buzz
           </TransitionLink>
         </li>
         <li>
@@ -34,31 +47,7 @@ export default function MenuSection({ setIsNavMenuOpen }) {
             }
           >
             <PiBagSimple />
-            Products
-          </TransitionLink>
-        </li>
-        <li>
-          <TransitionLink
-            href="/shop?filterBy=New+Arrivals"
-            hasDrawer={true}
-            setIsDrawerOpen={setIsNavMenuOpen}
-            className={
-              searchParams.get("filterBy") === "New Arrivals" ? "active" : ""
-            }
-          >
-            <PiGift />
-            New Arrivals
-          </TransitionLink>
-        </li>
-        <li>
-          <TransitionLink
-            href="/our-story"
-            hasDrawer={true}
-            setIsDrawerOpen={setIsNavMenuOpen}
-            className={pathname.startsWith("/our-story") ? "active" : undefined}
-          >
-            <PiUsersThree />
-            Our Story
+            Threadz
           </TransitionLink>
         </li>
       </ul>

@@ -33,7 +33,7 @@ export default function MobileNavbar({ productList }) {
             alt="YouthLink logo with text"
           />
         </TransitionLink>
-        <ul className="flex gap-x-3.5">
+        <ul className="flex gap-x-4 sm:gap-x-6">
           {/* Search bar */}
           <li>
             <Suspense fallback={<LoadingSpinner />}>

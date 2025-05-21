@@ -7,7 +7,12 @@ import AddToCartModal from "../cart/AddToCartModal";
 // Define allowed column options per breakpoint
 const MOBILE_OPTIONS = [1, 2];
 const TABLET_OPTIONS = [2, 3];
-const DESKTOP_OPTIONS = [3, 4, 5];
+const DESKTOP_OPTIONS = [2, 3, 4];
+
+// Define column numbers per breakpoint
+const MOBILE_DEFAULT_COL = 1;
+const TABLET_DEFAULT_COL = 2;
+const DESKTOP_DEFAULT_COL = 3;
 
 // Column options used in buttons for user to click
 const colOptions = [
@@ -15,13 +20,18 @@ const colOptions = [
   { number: 2, svg: "/shop/grid-cols-2.svg" },
   { number: 3, svg: "/shop/grid-cols-3.svg" },
   { number: 4, svg: "/shop/grid-cols-4.svg" },
-  { number: 5, svg: "/shop/grid-cols-5.svg" },
 ];
 
 const getAllowedColsByWidth = (width) => {
   if (width < 640) return MOBILE_OPTIONS;
   if (width < 1024) return TABLET_OPTIONS;
   return DESKTOP_OPTIONS;
+};
+
+const getDefaultColByWidth = (width) => {
+  if (width < 640) return MOBILE_DEFAULT_COL;
+  if (width < 1024) return TABLET_DEFAULT_COL;
+  return DESKTOP_DEFAULT_COL;
 };
 
 export default function ShopCards({
@@ -59,8 +69,8 @@ export default function ShopCards({
       if (userSelectedCols && allowedCols.includes(userSelectedCols)) {
         updatedCols = userSelectedCols;
       } else {
-        // Default to max available for this screen if current selection is invalid
-        updatedCols = allowedCols[allowedCols.length - 1];
+        // Use the defined default number for this screen if current selection is invalid
+        updatedCols = getDefaultColByWidth(window.innerWidth);
         setUserSelectedCols(updatedCols);
       }
 
@@ -110,7 +120,7 @@ export default function ShopCards({
                 Math.max(0, Math.ceil(filteredProductCount / option.number)),
               );
             }}
-            className={`rounded-md border p-1.5 transition-[background-color] duration-300 ease-in-out hover:border-[#ffe4cd] hover:bg-[#ffead8] ${cols === option.number ? "border-[#ffd6b5] bg-[#ffddc2]" : "border-neutral-200 bg-neutral-100"} ${option.number === 1 ? "sm:hidden" : option.number === 2 ? "lg:hidden" : option.number === 3 ? "max-sm:hidden" : "max-lg:hidden"}`}
+            className={`rounded-md border p-1.5 transition-[background-color] duration-300 ease-in-out hover:border-[#ffe4cd] hover:bg-[#ffead8] ${cols === option.number ? "border-[#ffd6b5] bg-[#ffddc2]" : "border-neutral-200 bg-neutral-100"} ${option.number === 1 ? "sm:hidden" : option.number === 3 ? "max-sm:hidden" : option.number !== 2 ? "max-lg:hidden" : ""}`}
           >
             <Image
               src={option.svg}
@@ -122,7 +132,6 @@ export default function ShopCards({
           </button>
         ))}
       </div>
-
       <section
         className="relative grid gap-x-4 gap-y-12 pb-7"
         style={{

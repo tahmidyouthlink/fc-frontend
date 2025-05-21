@@ -121,9 +121,9 @@ export default function Product({ params: { slug } }) {
     <main className="relative overflow-hidden">
       {/* Mesh Gradient */}
       <div className="relative h-full w-full">
-        <div className="fixed left-[5%] top-2/3 size-60 animate-blob rounded-full bg-[#d3f9ce] mix-blend-multiply blur-md sm:top-1/2 sm:bg-[#ebc6a6]" />
-        <div className="fixed left-[30%] top-[5%] size-60 animate-blob rounded-full bg-[#ebc6a6] mix-blend-multiply blur-md [animation-delay:1s] sm:top-[20%] sm:bg-[#d3f9ce]" />
-        <div className="fixed left-[80%] top-1/3 size-60 animate-blob rounded-full bg-[#d3f9ce] mix-blend-multiply blur-md [animation-delay:2s] max-sm:hidden" />
+        <div className="fixed left-[2.5%] top-1/2 animate-blob bg-[#d7f8d3] sm:top-1/2 sm:bg-[#f8dfcb]" />
+        <div className="fixed left-[42.5%] top-[5%] animate-blob bg-[#f8dfcb] [animation-delay:1s] sm:top-2/3 sm:bg-[#d7f8d3]" />
+        <div className="fixed left-[80%] top-[15%] animate-blob bg-[#f8dfcb] [animation-delay:2s] max-sm:hidden" />
       </div>
       {/* Shape/SVG (circle with star) */}
       <div className="absolute right-3 top-36 z-[-1] aspect-square w-56 translate-x-1/2 opacity-85 max-[1200px]:hidden">

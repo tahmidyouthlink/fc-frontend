@@ -77,7 +77,6 @@ export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
             phoneNumber: "",
             phoneNumber2: "",
             hometown: "",
-            dob: null,
           },
           deliveryAddresses: [],
           savedDeliveryAddress: null,

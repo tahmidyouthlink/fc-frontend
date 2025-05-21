@@ -116,23 +116,23 @@ export default function ResetPassword({ searchParams }) {
 
   return (
     <main
-      className={`relative -mt-[calc(240*4px)] text-sm text-neutral-500 md:text-base [&_h2]:uppercase [&_h2]:text-neutral-700 ${tokenData.isTokenValid ? "bg-neutral-50" : "bg-white font-semibold"}`}
+      className={`relative -mt-[calc(256*4px)] text-sm text-neutral-500 max-sm:-mt-[calc(256*2px)] md:text-base [&_h2]:uppercase [&_h2]:text-neutral-700 ${tokenData.isTokenValid ? "bg-neutral-50" : "bg-white font-semibold"}`}
     >
       {/* Left Mesh Gradient */}
       <div
-        className={`sticky left-[5%] top-1/2 size-60 animate-blob rounded-full bg-[#ebc6a6] mix-blend-multiply blur-md ${!tokenData.isTokenValid ? "opacity-0" : "opacity-100"}`}
+        className={`sticky left-[5%] top-1/2 animate-blob bg-[#f8dfcb] max-sm:hidden ${!tokenData.isTokenValid ? "opacity-0" : "opacity-100"}`}
       />
       {/* Middle-Left Mesh Gradient */}
       <div
-        className={`sticky left-[30%] top-[20%] size-60 animate-blob rounded-full bg-[#d3f9ce] mix-blend-multiply blur-md [animation-delay:1.5s] ${!tokenData.isTokenValid ? "opacity-0" : "opacity-100"}`}
+        className={`sticky left-[30%] top-[20%] animate-blob bg-[#d7f8d3] [animation-delay:1.5s] max-sm:left-[5%] ${!tokenData.isTokenValid ? "opacity-0" : "opacity-100"}`}
       />
       {/* Middle-Right Mesh Gradient */}
       <div
-        className={`sticky left-[55%] top-[60%] size-60 animate-blob rounded-full bg-[#ebc6a6] mix-blend-multiply blur-md [animation-delay:0.5s] ${!tokenData.isTokenValid ? "opacity-0" : "opacity-100"}`}
+        className={`sticky left-[55%] top-[60%] animate-blob bg-[#f8dfcb] [animation-delay:0.5s] max-sm:left-3/4 ${!tokenData.isTokenValid ? "opacity-0" : "opacity-100"}`}
       />
       {/* Right Mesh Gradient */}
       <div
-        className={`sticky left-[80%] top-1/3 size-60 animate-blob rounded-full bg-[#d3f9ce] mix-blend-multiply blur-md [animation-delay:2s] ${!tokenData.isTokenValid ? "opacity-0" : "opacity-100"}`}
+        className={`sticky left-[80%] top-1/3 animate-blob bg-[#d7f8d3] [animation-delay:2s] max-sm:hidden ${!tokenData.isTokenValid ? "opacity-0" : "opacity-100"}`}
       />
       {tokenData.isTokenValid ? (
         <div className="pt-header-h-full-section-pb relative flex min-h-dvh w-full items-center justify-center px-5 pb-[var(--section-padding)] sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0">

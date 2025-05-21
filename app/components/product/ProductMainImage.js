@@ -33,7 +33,7 @@ export default function ProductMainImage({
 
   return (
     <div
-      className="relative h-[35vh] overflow-hidden rounded-lg bg-[#F0F0F0] p-5 max-xl:grow md:w-80 lg:w-[424px] xl:h-full xl:w-[525px] min-[1800px]:w-[650px]"
+      className="relative h-[50vh] overflow-hidden rounded-lg bg-[#F0F0F0] p-5 max-xl:grow sm:h-[40vh] md:w-80 lg:h-[35vh] lg:w-[424px] xl:h-full xl:w-[525px] min-[1800px]:w-[650px]"
       onMouseEnter={(event) => {
         event.currentTarget.querySelector("img").style.pointerEvents = "auto";
       }}

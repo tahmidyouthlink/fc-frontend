@@ -15,6 +15,8 @@ export default function Header({
   isAutoSlideEnabled,
   bgColor,
   textColor,
+  isHighlightedColorEnabled,
+  highlightedColor,
 }) {
   const { isUserLoading } = useAuth();
   const { setIsPageLoading } = useLoading();
@@ -40,6 +42,8 @@ export default function Header({
           isAutoSlideEnabled={isAutoSlideEnabled}
           bgColor={bgColor}
           textColor={textColor}
+          isHighlightedColorEnabled={isHighlightedColorEnabled}
+          highlightedColor={highlightedColor}
         />
       )}
       <div className="mx-auto flex items-center justify-between px-5 py-3 transition-[padding-bottom] duration-300 ease-in-out sm:px-8 sm:py-3.5 lg:px-12 lg:py-4 xl:max-w-[1200px] xl:px-0">

@@ -7,27 +7,17 @@ export default function MainLinks() {
 
   return (
     <div className="font-semibold text-neutral-400">
-      <ul className="flex items-center gap-x-3.5 xl:gap-x-7 [&_a]:transition-[color] [&_a]:duration-300 [&_a]:ease-in-out">
+      <ul className="flex items-center gap-x-3.5 xl:gap-x-9 [&_a]:transition-[color] [&_a]:duration-300 [&_a]:ease-in-out">
         <li>
           <TransitionLink
             className={
-              pathname === "/" ? "text-neutral-800" : "hover:text-neutral-500"
-            }
-            href="/"
-          >
-            Home
-          </TransitionLink>
-        </li>
-        <li>
-          <TransitionLink
-            className={
-              pathname.startsWith("/shop") && !searchParams.get("filterBy")
+              pathname.startsWith("/our-story")
                 ? "text-neutral-800"
                 : "hover:text-neutral-500"
             }
-            href="/shop"
+            href="/our-story"
           >
-            Products
+            Souls
           </TransitionLink>
         </li>
         <li>
@@ -39,19 +29,19 @@ export default function MainLinks() {
             }
             href="/shop?filterBy=New+Arrivals"
           >
-            New Arrivals
+            Buzz
           </TransitionLink>
         </li>
         <li>
           <TransitionLink
             className={
-              pathname.startsWith("/our-story")
+              pathname.startsWith("/shop") && !searchParams.get("filterBy")
                 ? "text-neutral-800"
                 : "hover:text-neutral-500"
             }
-            href="/our-story"
+            href="/shop"
           >
-            Our Story
+            Threadz
           </TransitionLink>
         </li>
       </ul>
