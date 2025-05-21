@@ -397,7 +397,7 @@ const CreatePurchaseOrder = () => {
 			const formData = new FormData();
 			formData.append('attachment', file); // Append the file to FormData
 
-			const response = await axiosPublic.post('/uploadFile', formData, {
+			const response = await axiosPublic.post('/upload-single-file', formData, {
 				headers: {
 					'Content-Type': 'multipart/form-data',
 				},

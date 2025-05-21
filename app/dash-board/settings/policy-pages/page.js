@@ -67,7 +67,7 @@ const PolicyPages = () => {
   const uploadFile = async (file, key) => {
     const formData = new FormData();
     formData.append(key, file);
-    const response = await axiosPublic.post('/upload-pdfs', formData, {
+    const response = await axiosPublic.post('/upload-multiple-files', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response?.data?.urls;

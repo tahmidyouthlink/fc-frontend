@@ -194,11 +194,6 @@ const SideNavbar = ({ onClose }) => {
           icon: <LuNewspaper />,
           links: [
             { label: "Policy Pages", link: "/dash-board/settings/policy-pages", icon: <MdOutlinePolicy /> },
-            // { label: "Terms & Conditions", link: "/dash-board/settings/terms-condition", icon: <RiContractLine /> },
-            // { label: "Privacy Policy", link: "/dash-board/settings/privacy-policy", icon: <MdOutlinePrivacyTip /> },
-            // { label: "Refund Policy", link: "/dash-board/settings/refund-policy", icon: <HiOutlineReceiptRefund /> },
-            // { label: "Shipping Policy", link: "/dash-board/settings/shipping-policy", icon: <MdOutlineLocalShipping /> },
-            // { label: "Return Policy", link: "/dash-board/settings/return-policy", icon: <IoIosReturnLeft /> },
             { label: "Our Story", link: "/dash-board/settings/our-story", icon: <PiBookOpen /> },
             { label: "FAQ", link: "/dash-board/settings/faq", icon: <TbMessageCircleQuestion /> },
           ],
