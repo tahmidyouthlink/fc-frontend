@@ -1,277 +1,52 @@
-"use client";
 import dynamic from 'next/dynamic';
-import { Button, DatePicker, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
-import React, { useState } from 'react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import { FaPlus } from 'react-icons/fa6';
-import toast from 'react-hot-toast';
-import FileUploadZone from './FileUploadZone';
-import { RxCheck, RxCross2 } from 'react-icons/rx';
-import useAxiosPublic from '@/app/hooks/useAxiosPublic';
-const OurStoryEditor = dynamic(() => import('@/app/utils/Editor/OurStoryEditor'), { ssr: false });
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@nextui-org/react";
+import { Controller } from "react-hook-form";
+import { FaPlus } from "react-icons/fa";
 import DOMPurify from "dompurify";
-import useOurStory from '@/app/hooks/useOurStory';
-import { formatDate } from '../shared/DateFormat';
-import CustomSwitch from '../layout/CustomSwitch';
+import FileUploadZone from "./FileUploadZone";
+import CustomSwitch from "../layout/CustomSwitch";
 
-const OurStoryNavbar = () => {
+const OurStoryEditor = dynamic(() => import('@/app/utils/Editor/OurStoryEditor'), { ssr: false });
 
-  const { register, handleSubmit, reset, setValue, control, formState: { errors } } = useForm({
-    defaultValues: {
-      items: [{ quote: "", hashtag: "" }],
-    },
-  });
-  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-  const axiosPublic = useAxiosPublic();
-  const [sizeError1, setSizeError1] = useState("");
-  const [sizeError2, setSizeError2] = useState("");
-  const [coverImgUrl, setCoverImgUrl] = useState(null);
-  const [staffImgUrl, setStaffImgUrl] = useState(null);
-  const [mediaUrls, setMediaUrls] = useState([]); // to store uploaded media URLs
-  const handleRemoveCoverImage = () => setCoverImgUrl(null);
-  const handleRemoveStaffImage = () => setStaffImgUrl(null);
-  const handleRemoveMedia = (indexToRemove) => {
-    setMediaUrls((prev) => prev.filter((_, i) => i !== indexToRemove));
-  };
-  const [requiredFileErrors, setRequiredFileErrors] = useState([]);
-  const [isUploading, setIsUploading] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [, , refetch] = useOurStory();
-  const [dateError, setDateError] = useState(false);
-  const [status, setStatus] = useState(false);
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "items",
-  });
+const StoryEditModal = ({
+  isEditOpen,
+  setIsEditOpen,
+  handleSubmit,
+  onSubmit,
+  register,
+  control,
+  errors,
+  fields,
+  append,
+  remove,
+  storyPublishDate,
+  setStoryPublishDate,
+  coverImgUrl,
+  handleCoverImgChange,
+  handleRemoveCoverImage,
+  staffImgUrl,
+  handleStaffImgChange,
+  handleRemoveStaffImage,
+  status,
+  handleStatusChange,
+  mediaUrls,
+  handleMediaSelect,
+  handleRemoveMedia,
+  setMediaUrls,
+  isUploading,
+  sizeError1,
+  sizeError2,
+  requiredFileErrors,
+  isLoading
+}) => {
 
   const handleCancel = () => {
-    reset();
-    setSizeError1("");
-    setSizeError2("");
-    setRequiredFileErrors([]);
-    setCoverImgUrl(null);
-    setStaffImgUrl(null);
-    setMediaUrls([]);
-    onClose();
-  };
-
-  const uploadSingleFileToGCS = async (file) => {
-    try {
-      const formData = new FormData();
-      formData.append('attachment', file);
-
-      const response = await axiosPublic.post('/upload-single-file', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        }
-      });
-
-      if (response?.data?.fileUrl) {
-        return response.data.fileUrl;
-      }
-    } catch (error) {
-      console.error('Error uploading file:', error);
-    }
-  };
-
-  const handleCoverImgChange = async (file) => {
-    if (!file) return; // guard
-
-    setIsUploading(true); // Start Uploading
-    if (file) setSizeError1(''); // ✅ clear error once file is selected
-
-    const url = await uploadSingleFileToGCS(file);
-    if (url) setCoverImgUrl(url); // store uploaded URL in state
-    setIsUploading(false); // Upload finished
-  };
-
-  const handleStaffImgChange = async (file) => {
-    if (!file) return;
-
-    setIsUploading(true); // Start Uploading
-    if (file) setSizeError2(''); // ✅ clear error once file is selected
-
-    const url = await uploadSingleFileToGCS(file);
-    if (url) setStaffImgUrl(url);
-    setIsUploading(false); // Upload finished
-  };
-
-  const handleMediaSelect = async (index, file) => {
-    if (!file) return;
-
-    setIsUploading(true); // Start upload
-
-    // Local preview using URL.createObjectURL
-    const tempUrl = URL.createObjectURL(file);
-
-    // Update preview immediately
-    const updatedUrls = [...mediaUrls];
-    updatedUrls[index] = tempUrl;
-    setMediaUrls(updatedUrls);
-
-    // Clear error
-    const updatedErrors = [...requiredFileErrors];
-    updatedErrors[index] = '';
-    setRequiredFileErrors(updatedErrors);
-
-    // Upload and replace preview with real URL
-    const uploadedUrl = await uploadSingleFileToGCS(file);
-    if (uploadedUrl) {
-      updatedUrls[index] = uploadedUrl;
-      setMediaUrls([...updatedUrls]);
-    }
-
-    setIsUploading(false); // Upload finished
-  };
-
-  const handleShowDateError = (date) => {
-    if (date) {
-      setDateError(false);
-      return;
-    }
-    setDateError(true);
-  };
-
-  const handleStatusChange = (e) => {
-    setStatus(e.target.checked); // true or false
-  };
-
-  const onSubmit = async (data) => {
-    setIsLoading(true); // Start loading
-
-    const { departmentName, workSummary, storyPublishDate, staffName } = data;
-
-    if (isUploading) {
-      toast.error('Please wait until all uploads are complete.');
-      return;
-    };
-
-    try {
-
-      let hasError = false;
-
-      if (!coverImgUrl) {
-        setSizeError1("Cover image is required.");
-        hasError = true;
-      }
-
-      if (!staffImgUrl) {
-        setSizeError2("Staff image is required.");
-        hasError = true;
-      }
-
-      // Check if expiryDate is selected
-      if (!storyPublishDate) {
-        setDateError(true);
-        hasError = true;  // Do not show toast here, just prevent submission
-      }
-
-      let errors = [];
-
-      if (!fields.length || !mediaUrls || mediaUrls.length === 0) {
-        hasError = true;
-        errors = fields.map(() => "This media upload is required.");
-      } else {
-        errors = fields.map((_, index) => {
-          const file = mediaUrls[index];
-          if (!file) {
-            hasError = true;
-            return "This media upload is required.";
-          }
-          return "";
-        });
-      }
-      setRequiredFileErrors(errors);
-
-      if (hasError) return;
-
-      // Merge and proceed
-      const mergedStoryInformation = data.items.map((item, index) => ({
-        ...item,
-        mediaSrc: mediaUrls[index] || null,
-      }));
-
-      const formattedStoryPublishDate = formatDate(storyPublishDate);
-
-      const storyInformation = {
-        departmentName,
-        coverImgUrl,
-        workSummary,
-        storyPublishDate: formattedStoryPublishDate,
-        status,
-        staff: {
-          staffName,
-          staffImgUrl
-        },
-        contents: mergedStoryInformation
-      };
-
-      const response = await axiosPublic.post('/add-our-story-information', storyInformation);
-
-      if (response.data.insertedId) {
-        toast.custom((t) => (
-          <div
-            className={`${t.visible ? 'animate-enter' : 'animate-leave'
-              } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex items-center ring-1 ring-black ring-opacity-5`}
-          >
-            <div className="pl-6">
-              <RxCheck className="h-6 w-6 bg-green-500 text-white rounded-full" />
-            </div>
-            <div className="flex-1 w-0 p-4">
-              <div className="flex items-start">
-                <div className="ml-3 flex-1">
-                  <p className="text-base font-bold text-gray-900">
-                    Story Added!
-                  </p>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Story has been added successfully!
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="flex border-l border-gray-200">
-              <button
-                onClick={() => toast.dismiss(t.id)}
-                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center font-medium text-red-500 hover:text-text-700 focus:outline-none text-2xl"
-              >
-                <RxCross2 />
-              </button>
-            </div>
-          </div>
-        ), {
-          position: "bottom-right",
-          duration: 5000
-        });
-        refetch();
-        reset();
-        setSizeError1("");
-        setSizeError2("");
-        setRequiredFileErrors([]);
-        setCoverImgUrl(null);
-        setStaffImgUrl(null);
-        setMediaUrls([]);
-        onClose();
-      }
-
-    } catch (err) {
-      toast.error("Failed to publish your work");
-    } finally {
-      setIsLoading(false); // End loading regardless of success/failure
-    }
+    setIsEditOpen(false);
   };
 
   return (
-    <>
-      <div className='flex justify-between items-center sticky top-0 z-10'>
-        <h1 className="font-bold text-lg md:text-xl lg:text-3xl text-neutral-700 py-1 2xl:py-3">OUR STORY</h1>
-
-        <button onClick={() => onOpen()} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
-          <FaPlus size={15} className='text-neutral-700' /> Add
-        </button>
-      </div>
-
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size='2xl'>
+    <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} size="2xl" scrollBehavior="inside">
+      <Modal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} size='2xl'>
         <ModalContent>
           {() => (
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -359,28 +134,23 @@ const OurStoryNavbar = () => {
                   </div>
 
                   <div className='flex flex-col gap-3'>
-                    <label htmlFor='storyPublishDate' className='font-semibold text-[#9F5216]'>Story Publish Date</label>
-                    <DatePicker
-                      id='storyPublishDate'
-                      placeholder="Select date"
-                      aria-label="Select publish date"
-                      onChange={(date) => {
-                        handleShowDateError(date);
-                        if (date instanceof Date && !isNaN(date)) {
-                          setValue('storyPublishDate', date.toISOString().split('T')[0]); // Ensure it's a valid Date object and format it as YYYY-MM-DD
-                        } else {
-                          setValue('storyPublishDate', date); // If DatePicker returns something else, handle it here
-                        }
-                      }}
-                      className="w-full outline-none focus:border-[#D2016E] transition-colors duration-1000 rounded-md"
+                    <label htmlFor='storyPublishDate' className='font-semibold text-[#9F5216] pt-2'>Story Publish Date <span className="text-red-600">*</span></label>
+                    <input
+                      type="date"
+                      id="storyPublishDate"
+                      {...register("storyPublishDate", { required: true })}
+                      value={storyPublishDate}
+                      onChange={(e) => setStoryPublishDate(e.target.value)} // Update state with the input value
+                      className="w-full p-3 border rounded-md border-gray-300 outline-none focus:border-[#D2016E] transition-colors duration-1000"
                     />
-                    {dateError && (
-                      <p className="text-red-600 text-left text-xs font-semibold pt-2">Please select story publish date.</p>
+                    {errors.storyPublishDate && (
+                      <p className='text-red-600 text-left text-xs font-semibold'>Please select story publish date.</p>
                     )}
+
                   </div>
 
                   <div className="flex flex-col gap-3">
-                    <label className='font-semibold text-[#9F5216]'>Status:</label>
+                    <label className='font-semibold text-[#9F5216]'>Status</label>
                     <div className='flex items-center gap-3'>
                       <CustomSwitch checked={status} onChange={handleStatusChange} />
                       <span className="text-sm text-gray-500">{status ? 'Active' : 'Inactive'}</span>
@@ -482,7 +252,7 @@ const OurStoryNavbar = () => {
                     append({ quote: "", hashtag: "" });
                     setMediaUrls(prev => [...prev, null]);
                   }}
-                  className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700"
+                  className="w-fit rounded-lg bg-[#0c76df] px-3 py-2 text-xs font-semibold text-white transition-[background-color] duration-300 hover:bg-[#0C67DF] md:text-sm relative z-[1] flex items-center justify-center gap-x-3 ease-in-out"
                 >
                   <FaPlus /> Add Media Content
                 </button>
@@ -499,7 +269,7 @@ const OurStoryNavbar = () => {
                     type="submit"
                     isLoading={isLoading}
                     isDisabled={isUploading}
-                    className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700"
+                    className="w-fit rounded-lg bg-[#0c76df] text-xs font-semibold text-white transition-[background-color] duration-300 hover:bg-[#0C67DF] md:text-sm relative z-[1] flex items-center justify-center gap-x-3 ease-in-out"
                   >
                     {isLoading ? 'Uploading...' : 'Upload'}
                   </Button>
@@ -511,9 +281,8 @@ const OurStoryNavbar = () => {
           )}
         </ModalContent>
       </Modal>
-
-    </>
+    </Modal>
   );
 };
 
-export default OurStoryNavbar;
+export default StoryEditModal;

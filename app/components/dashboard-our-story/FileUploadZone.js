@@ -1,12 +1,12 @@
 'use client';
 import { useState } from 'react';
 import { MdOutlineFileUpload } from 'react-icons/md';
-import { RxCross2 } from 'react-icons/rx';
+import { MdCancel } from "react-icons/md";
 import Image from 'next/image';
 
 export default function FileUploadZone({
   description = "Accepted formats: PNG, JPG",
-  accept = ['image/png', 'image/jpeg', 'image/jpg'],
+  accept = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'],
   multiple = false,
   onFileSelect,
   inputId = "fileUpload",
@@ -57,7 +57,7 @@ export default function FileUploadZone({
     const isVideo = file.type.startsWith('video/');
 
     if (!isAcceptedType) {
-      setError('Only accepted formats (PNG, JPG, JPEG, MP4) are allowed.');
+      setError('Only accepted formats (PNG, JPG, JPEG, WEBP, MP4) are allowed.');
       return;
     }
 
@@ -119,7 +119,7 @@ export default function FileUploadZone({
             ? previewUrl.map((url, idx) => {
               if (!url) return null; // <-- skip if url is empty or falsy
 
-              const isImage = url.startsWith('data:image') || url.match(/\.(jpeg|jpg|png|gif)$/i);
+              const isImage = url.startsWith('data:image') || url.match(/\.(jpeg|jpg|png|gif|webp)$/i);
               const isVideo = url.match(/\.(mp4)$/i);
 
               return (
@@ -128,24 +128,24 @@ export default function FileUploadZone({
                     <Image
                       src={url}
                       alt={`preview-${idx}`}
-                      width={300}
-                      height={200}
-                      className="w-full max-h-[200px] object-contain rounded-md duration-300 ease-in-out"
+                      width={3000}
+                      height={2000}
+                      sizes='400px'
+                      className="w-full max-h-[200px] object-cover rounded-md duration-300 ease-in-out"
                     />
                   ) : isVideo ? (
                     <video
                       src={url}
                       controls
-                      className="w-full max-h-[200px] object-contain rounded-md duration-300 ease-in-out"
+                      className="w-full max-h-[200px] object-cover rounded-md duration-300 ease-in-out"
                     />
                   ) : null}
                   {!isUploading && (
                     <button
                       type="button"
                       onClick={() => onRemove(idx)}
-                      className="absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white"
                     >
-                      <RxCross2 size={24} />
+                      <MdCancel className="absolute right-0 top-0 size-[22px] -translate-y-1/2 translate-x-1/2 cursor-pointer rounded-full bg-white text-red-500 transition-[color] duration-300 ease-in-out hover:text-red-600" size={18} />
                     </button>
                   )}
                 </div>
@@ -153,28 +153,28 @@ export default function FileUploadZone({
             })
             : (
               <div className="relative w-[300px] max-h-[200px]">
-                {(previewUrl.startsWith('data:image') || previewUrl.match(/\.(jpeg|jpg|png|gif)$/i)) ? (
+                {(previewUrl.startsWith('data:image') || previewUrl.match(/\.(jpeg|jpg|png|gif|webp)$/i)) ? (
                   <Image
                     src={previewUrl}
                     alt="preview"
-                    width={300}
-                    height={200}
-                    className="w-full max-h-[200px] object-contain rounded-md duration-300 ease-in-out"
+                    width={3000}
+                    height={2000}
+                    sizes='400px'
+                    className="w-full max-h-[200px] object-cover rounded-md duration-300 ease-in-out"
                   />
                 ) : (
                   <video
                     src={previewUrl}
                     controls
-                    className="w-full max-h-[200px] object-contain rounded-md duration-300 ease-in-out"
+                    className="w-full max-h-[200px] object-cover rounded-md duration-300 ease-in-out"
                   />
                 )}
                 {!isUploading && (
                   <button
                     type="button"
                     onClick={onRemove}
-                    className="absolute top-1 right-1 rounded-full p-1 bg-red-600 hover:bg-red-700 text-white"
                   >
-                    <RxCross2 size={24} />
+                    <MdCancel className="absolute right-0 top-0 size-[22px] -translate-y-1/2 translate-x-1/2 cursor-pointer rounded-full bg-white text-red-500 transition-[color] duration-300 ease-in-out hover:text-red-600" size={18} />
                   </button>
                 )}
               </div>

@@ -3,8 +3,7 @@ import { FaBullhorn, FaGlobeAsia } from "react-icons/fa";
 import { PiUsersThreeLight, PiBookOpen } from "react-icons/pi";
 import { BiCategory, BiPurchaseTagAlt, BiTransferAlt } from "react-icons/bi";
 import { RxDashboard } from "react-icons/rx";
-import { MdOutlineLocationOn, MdOutlineInventory2, MdOutlinePrivacyTip, MdOutlineLocalShipping, MdOutlinePolicy } from "react-icons/md";
-import { RiContractLine } from "react-icons/ri";
+import { MdOutlineLocationOn, MdOutlineInventory2, MdOutlinePolicy } from "react-icons/md";
 import { TbBrandGoogleAnalytics, TbMessageCircleQuestion, TbClipboardList, TbBuildingBank, TbHomeCog } from "react-icons/tb";
 import Image from "next/image";
 import logoWhiteImage from "/public/logos/logo.png";
@@ -18,11 +17,10 @@ import { LuWarehouse, LuNewspaper } from "react-icons/lu";
 import { BsTags } from "react-icons/bs";
 import { CiDeliveryTruck } from "react-icons/ci";
 import { FiShoppingBag, FiBox } from "react-icons/fi";
-import { HiOutlineReceiptRefund } from "react-icons/hi2";
-import { IoIosReturnLeft } from "react-icons/io";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useAuth } from "@/app/contexts/auth";
+import { SidebarLoading } from "../shared/Loading/SidebarLoading";
 
 const SideNavbar = ({ onClose }) => {
   const pathname = usePathname();
@@ -43,8 +41,8 @@ const SideNavbar = ({ onClose }) => {
 
   // Show loading state if data is not loaded yet
   if (isUserLoading || !existingUserData) {
-    return;
-  }
+    return <SidebarLoading />;
+  };
 
   const handleItemClick = (name) => {
     setActiveItem(activeItem === name ? null : name);
