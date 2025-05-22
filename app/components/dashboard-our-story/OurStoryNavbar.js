@@ -264,7 +264,7 @@ const OurStoryNavbar = () => {
   return (
     <>
       <div className='flex justify-between items-center sticky top-0 z-10'>
-        <h1 className="font-bold text-lg md:text-xl lg:text-3xl text-neutral-700 py-1 2xl:py-3">OUR STORY</h1>
+        <h1 className="font-bold text-lg md:text-xl lg:text-3xl text-neutral-700 py-1 2xl:py-3">STORY</h1>
 
         <button onClick={() => onOpen()} className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700">
           <FaPlus size={15} className='text-neutral-700' /> Add
@@ -279,7 +279,7 @@ const OurStoryNavbar = () => {
                 <h2 className="text-lg font-semibold px-2">Add New Story</h2>
               </ModalHeader>
               <ModalBody className="modal-body-scroll">
-                <div className="space-y-4 p-1">
+                <div className="space-y-6 px-3 py-6">
 
                   <div className='flex flex-col gap-2 font-semibold'>
                     <label htmlFor='departmentName' className='font-semibold text-[#9F5216] text-sm'>Department Name <span className='text-red-600'>*</span></label>
@@ -309,7 +309,7 @@ const OurStoryNavbar = () => {
                     />
                   </div>
 
-                  <div className="flex flex-col gap-3 font-semibold">
+                  <div className="flex flex-col gap-3 font-semibold pt-4">
                     <label htmlFor='workSummary' className='font-semibold text-[#9F5216] text-sm'>Work Summary <span className='text-red-600'>*</span></label>
                     <textarea
                       {...register("workSummary", {
@@ -379,7 +379,7 @@ const OurStoryNavbar = () => {
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-3 py-2">
                     <label className='font-semibold text-[#9F5216]'>Status:</label>
                     <div className='flex items-center gap-3'>
                       <CustomSwitch checked={status} onChange={handleStatusChange} />
@@ -482,7 +482,7 @@ const OurStoryNavbar = () => {
                     append({ quote: "", hashtag: "" });
                     setMediaUrls(prev => [...prev, null]);
                   }}
-                  className="relative z-[1] flex items-center gap-x-3 rounded-lg bg-[#ffddc2] px-[15px] py-2.5 transition-[background-color] duration-300 ease-in-out hover:bg-[#fbcfb0] font-bold text-[14px] text-neutral-700"
+                  className="w-fit rounded-lg bg-[#d4ffce] hover:bg-[#bdf6b4] px-3 py-2 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 md:text-sm relative z-[1] flex items-center justify-center gap-x-3 ease-in-out"
                 >
                   <FaPlus /> Add Media Content
                 </button>

@@ -123,7 +123,7 @@ export default function FileUploadZone({
               const isVideo = url.match(/\.(mp4)$/i);
 
               return (
-                <div key={idx} className="relative w-[300px] max-h-[200px]">
+                <div key={idx} className="relative w-[300px] max-h-[200px] mx-auto">
                   {isImage ? (
                     <Image
                       src={url}
@@ -152,7 +152,7 @@ export default function FileUploadZone({
               );
             })
             : (
-              <div className="relative w-[300px] max-h-[200px]">
+              <div className="relative w-[300px] max-h-[200px] mx-auto">
                 {(previewUrl.startsWith('data:image') || previewUrl.match(/\.(jpeg|jpg|png|gif|webp)$/i)) ? (
                   <Image
                     src={previewUrl}

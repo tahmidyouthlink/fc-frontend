@@ -192,7 +192,7 @@ const SideNavbar = ({ onClose }) => {
           icon: <LuNewspaper />,
           links: [
             { label: "Policy Pages", link: "/dash-board/settings/policy-pages", icon: <MdOutlinePolicy /> },
-            { label: "Our Story", link: "/dash-board/settings/our-story", icon: <PiBookOpen /> },
+            { label: "Story", link: "/dash-board/settings/our-story", icon: <PiBookOpen /> },
             { label: "FAQ", link: "/dash-board/settings/faq", icon: <TbMessageCircleQuestion /> },
           ],
         },

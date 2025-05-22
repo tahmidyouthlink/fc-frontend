@@ -37,7 +37,7 @@ export default function StoryGrid({
   // If not loading and no data
   if (!ourStoryList || ourStoryList.length === 0) {
     return (
-      <div className="text-center py-10 text-gray-500 font-medium">
+      <div className="text-center pb-20 text-gray-500 font-medium pt-44">
         No stories found. Please add a new story to get started.
       </div>
     );
