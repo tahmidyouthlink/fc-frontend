@@ -1,6 +1,7 @@
 "use client";
 import LocationSelect from '@/app/components/layout/LocationSelect';
 import VendorSelect from '@/app/components/layout/VendorSelect';
+import { formatDate } from '@/app/components/shared/DateFormat';
 import Loading from '@/app/components/shared/Loading/Loading';
 import { useAuth } from '@/app/contexts/auth';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
@@ -100,14 +101,6 @@ const CreatePurchaseOrder = () => {
 			return;
 		}
 		setDateError(true);
-	}
-
-	const formatDate = (dateStr) => {
-		const date = new Date(dateStr);
-		const month = (`0${date.getMonth() + 1}`).slice(-2); // Get month and pad with 0 if needed
-		const day = (`0${date.getDate()}`).slice(-2);       // Get day and pad with 0 if needed
-		const year = date.getFullYear();
-		return `${year}-${month}-${day}`;
 	};
 
 	// Function to calculate total SKU per size and SKU for selected location
@@ -397,7 +390,7 @@ const CreatePurchaseOrder = () => {
 			const formData = new FormData();
 			formData.append('attachment', file); // Append the file to FormData
 
-			const response = await axiosPublic.post('/uploadFile', formData, {
+			const response = await axiosPublic.post('/upload-single-file', formData, {
 				headers: {
 					'Content-Type': 'multipart/form-data',
 				},

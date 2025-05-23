@@ -19,9 +19,15 @@ const Notifications = () => {
   const [filter, setFilter] = useState("all"); // 'all' or 'unread'
 
   const displayedNotifications = useMemo(() => {
-    let baseList = filter === "unread"
-      ? notificationList?.filter(n => !n.isRead)
-      : notificationList;
+    let baseList;
+
+    if (filter === "unread") {
+      baseList = notificationList?.filter(n => !n.isRead);
+    } else if (filter === "done") {
+      baseList = notificationList?.filter(n => n.notified);
+    } else {
+      baseList = notificationList;
+    }
 
     if (!showAll) {
       baseList = baseList?.slice(0, 5);
@@ -32,6 +38,10 @@ const Notifications = () => {
 
   const unreadCount = useMemo(() => {
     return notificationList?.filter(n => !n.isRead)?.length || 0;
+  }, [notificationList]);
+
+  const notifiedCount = useMemo(() => {
+    return notificationList?.filter(n => n.notified)?.length || 0;
   }, [notificationList]);
 
   const handleNotificationClick = async (detail) => {
@@ -147,6 +157,10 @@ const Notifications = () => {
                 className={`${filter === "unread" ? "font-bold text-green-800" : "text-gray-600"}`}>
                 <span>Unread ({unreadCount})</span>
               </button>
+              <button onClick={() => setFilter("done")}
+                className={`${filter === "done" ? "font-bold text-green-800" : "text-gray-600"}`}>
+                <span>Done ({notifiedCount})</span>
+              </button>
             </div>
             {/* <button onClick={handleMarkAllAsRead} className='flex items-center gap-1.5'><PiChecksLight size={20} />Mark all as read</button> */}
           </div>
@@ -192,11 +206,11 @@ const Notifications = () => {
                           <p className="flex items-center gap-1">
                             {detail.notified ? (
                               <span className="text-green-600 text-xs font-medium flex items-center">
-                                ✅ Notified
+                                ✅ Updated
                               </span>
                             ) : (
                               <span className="text-red-500 text-xs font-medium flex items-center">
-                                ❌ Not Notified
+                                ❌ Updated
                               </span>
                             )}
                           </p>
@@ -231,16 +245,25 @@ const Notifications = () => {
               ))
             )}
 
-            {(filter === "all" ? notificationList : notificationList.filter(n => !n.isRead)).length > 5 && !showAll && (
-              <div className="text-center my-4">
-                <button
-                  onClick={() => setShowAll(true)}
-                  className="text-blue-600 hover:underline text-sm"
-                >
-                  Show all notifications
-                </button>
-              </div>
-            )}
+            {(() => {
+              const fullFilteredList =
+                filter === "unread"
+                  ? notificationList?.filter(n => !n.isRead)
+                  : filter === "done"
+                    ? notificationList?.filter(n => n.notified)
+                    : notificationList;
+
+              return fullFilteredList.length > 5 && !showAll && (
+                <div className="text-center my-4">
+                  <button
+                    onClick={() => setShowAll(true)}
+                    className="text-blue-600 hover:underline text-sm"
+                  >
+                    Show all notifications
+                  </button>
+                </div>
+              );
+            })()}
 
           </div>
         </DropdownItem>

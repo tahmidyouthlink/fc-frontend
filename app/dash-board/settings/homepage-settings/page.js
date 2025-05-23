@@ -24,6 +24,7 @@ const HomepageSettings = () => {
   const tabs = ["Top Header Settings", "Homepage Content"];
   const [slideEnabled, setSlideEnabled] = useState(false);
   const [autoSlideEnabled, setAutoSlideEnabled] = useState(false);
+  const [highlightedColorEnabled, setHighlightedColorEnabled] = useState(false);
   const [topHeaderList, isTopHeaderPending, refetch] = useTopHeader();
   const axiosPublic = useAxiosPublic();
 
@@ -49,8 +50,10 @@ const HomepageSettings = () => {
 
       setSlideEnabled(topHeaderList[0]?.isSlideEnabled);
       setAutoSlideEnabled(topHeaderList[0]?.isAutoSlideEnabled);
+      setHighlightedColorEnabled(topHeaderList[0]?.isHighlightedColorEnabled);
       setValue('topHeaderColor', topHeaderList[0]?.topHeaderColor);
       setValue('textColor', topHeaderList[0]?.textColor);
+      setValue('highlightedTextColor', topHeaderList[0]?.highlightedTextColor);
       setValue('slideDuration', topHeaderList[0]?.slideDuration);
 
       if (topHeaderList[0]?.slides?.length > 0) {
@@ -75,6 +78,8 @@ const HomepageSettings = () => {
         const topHeaderInformation = {
           isSlideEnabled: slideEnabled,
           isAutoSlideEnabled: autoSlideEnabled,
+          isHighlightedColorEnabled: highlightedColorEnabled,
+          highlightedTextColor: highlightedColorEnabled ? data.highlightedTextColor : "",
           topHeaderColor: slideEnabled ? data.topHeaderColor : "",
           textColor: slideEnabled ? data.textColor : "",
           slideDuration: slideEnabled ? parseFloat(data.slideDuration) : null,
@@ -244,6 +249,31 @@ const HomepageSettings = () => {
                       color="primary"
                     />
                   </div>
+
+                  {/* Highlighted Slide Enable/Disable */}
+                  <div className='w-full font-semibold flex items-center gap-4'>
+                    <label className='text-sm'>{highlightedColorEnabled ? "Disable Highlighted Color" : "Enable Highlighted Color"}</label>
+                    <CustomSwitch
+                      checked={highlightedColorEnabled}
+                      onChange={() => setHighlightedColorEnabled(prev => !prev)}
+                      size="md"
+                      color="primary"
+                    />
+                  </div>
+
+                  {highlightedColorEnabled &&
+                    /* Highlight Text Color Selection */
+                    <div className="w-full font-semibold flex items-center gap-4">
+                      <label htmlFor="highlightedTextColor" className='text-sm'>Highlighted Text Color</label>
+                      <input
+                        type="color"
+                        {...register(`highlightedTextColor`, {
+                          required: 'Color code is required',
+                        })}
+                        className=" p-0 border border-gray-300 rounded-md"
+                      />
+                    </div>
+                  }
 
                   {/* Slide background Color */}
                   <div className="w-full font-semibold flex items-center gap-4">
