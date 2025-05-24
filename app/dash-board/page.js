@@ -32,7 +32,7 @@ const DashboardMainPage = () => {
       <div className='relative max-w-screen-2xl mx-auto px-6'>
 
         <div className='w-full'>
-          <h3 className='text-center md:text-start font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>OVERVIEW</h3>
+          <h3 className='text-center md:text-start font-semibold text-lg md:text-xl lg:text-3xl text-neutral-700'>DASHBOARD OVERVIEW</h3>
         </div>
 
         <div className='flex flex-col md:flex-row justify-between items-center gap-6'>
