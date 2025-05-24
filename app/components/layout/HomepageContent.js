@@ -136,10 +136,6 @@ const HomepageContent = () => {
     }
   };
 
-  console.log(image, "image");
-  console.log(image2, "image2");
-  console.log(image3, "image3");
-
   if (isLoginRegisterHeroBannerImagePending || isUserLoading) {
     return <Loading />
   };
