@@ -28,8 +28,15 @@ export default function Home() {
   const featuredCategories = categoryList?.filter(
     (category) => category.isFeatured === true,
   );
-  const [heroImgs, isHeroImgsLoading, heroImgRefetch] = useHeroBannerImages();
-  const [{ leftImgUrl, centerImgUrl, rightImgUrl } = {}] = heroImgs || [];
+  const [sliderData, isSliderDataLoading, sliderDataRefetch] =
+    useHeroBannerImages();
+  const [
+    {
+      isEnabled,
+      slideInterval,
+      sliders: { leftSlides, centerSlides, rightSlides } = {},
+    } = {},
+  ] = sliderData || [];
   const [locationList, isLocationListLoading, locationRefetch] = useLocations();
   const primaryLocation = locationList?.find(
     (location) => location?.isPrimaryLocation == true,
@@ -59,8 +66,8 @@ export default function Home() {
         !categoryList?.length ||
         isLocationListLoading ||
         !locationList?.length ||
-        isHeroImgsLoading ||
-        !heroImgs?.length,
+        isSliderDataLoading ||
+        !sliderData?.length,
     );
 
     return () => setIsPageLoading(false);
@@ -71,17 +78,19 @@ export default function Home() {
     categoryList,
     isLocationListLoading,
     locationList,
-    isHeroImgsLoading,
-    heroImgs,
+    isSliderDataLoading,
+    sliderData,
     setIsPageLoading,
   ]);
 
   return (
     <main className="[&_img]:pointer-events-none">
       <HomeHero
-        leftImgUrl={leftImgUrl}
-        centerImgUrl={centerImgUrl}
-        rightImgUrl={rightImgUrl}
+        isEnabled={isEnabled}
+        slideInterval={slideInterval}
+        leftSlides={leftSlides}
+        centerSlides={centerSlides}
+        rightSlides={rightSlides}
       />
       <Suspense fallback={<LoadingSpinner />}>
         <HomeCategories featuredCategories={featuredCategories} />
