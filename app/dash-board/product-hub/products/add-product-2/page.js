@@ -19,9 +19,6 @@ import arrivals1 from "/public/card-images/arrivals1.svg";
 import arrivals2 from "/public/card-images/arrivals2.svg";
 import CustomSwitch from '@/app/components/layout/CustomSwitch';
 
-const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
-
 const SecondStepOfAddProduct = () => {
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm();
@@ -167,7 +164,7 @@ const SecondStepOfAddProduct = () => {
       file,
     }));
 
-    const imageUrls = await uploadImagesToImgbb(newImages);
+    const imageUrls = await uploadMultipleFilesToGCS(newImages);
 
     setProductVariants((prevVariants) => {
       const updatedVariants = [...prevVariants];
@@ -197,7 +194,7 @@ const SecondStepOfAddProduct = () => {
       file,
     }));
 
-    const imageUrls = await uploadImagesToImgbb(newImages);
+    const imageUrls = await uploadMultipleFilesToGCS(newImages);
     const updatedUrls = [...uploadedImageUrls, ...imageUrls];
 
     const limitedUrls = updatedUrls.slice(-6);
@@ -214,28 +211,28 @@ const SecondStepOfAddProduct = () => {
     return files.filter(file => validTypes.includes(file.type));
   };
 
-  const uploadImagesToImgbb = async (images) => {
-    const imageUrls = [];
-    for (const image of images) {
+  const uploadMultipleFilesToGCS = async (images) => {
+    try {
       const formData = new FormData();
-      formData.append('image', image.file);
-      formData.append('key', apiKey);
-      try {
-        const response = await axiosPublic.post(apiURL, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        if (response.data && response.data.data && response.data.data.url) {
-          imageUrls.push(response.data.data.url);
-        } else {
-          toast.error("Failed to get image URL from response.");
-        }
-      } catch (error) {
-        toast.error(`Upload failed: ${error.response?.data?.error?.message || error.message}`);
+
+      for (const image of images) {
+        formData.append('file', image.file); // ✅ correctly send the File object
       }
+      const response = await axiosPublic.post('/upload-multiple-files', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response?.data?.urls) {
+        return response.data.urls; // Expected to be an array of public URLs
+      } else {
+        throw new Error('Upload failed');
+      }
+    } catch (error) {
+      console.error('Error uploading files:', error);
+      return [];
     }
-    return imageUrls;
   };
 
   const handleDrop = async (event, variantIndex) => {
@@ -251,7 +248,7 @@ const SecondStepOfAddProduct = () => {
       file,
     }));
 
-    const imageUrls = await uploadImagesToImgbb(newImages);
+    const imageUrls = await uploadMultipleFilesToGCS(newImages);
 
     setProductVariants((prevVariants) => {
       const updatedVariants = [...prevVariants];

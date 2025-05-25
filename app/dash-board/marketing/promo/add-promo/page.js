@@ -1,4 +1,5 @@
 "use client";
+import { isValidImageFile } from '@/app/components/shared/upload/IsValidImageFile';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import { DatePicker, Tab, Tabs } from '@nextui-org/react';
 import dynamic from 'next/dynamic';
@@ -12,8 +13,6 @@ import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
-const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 
 const AddPromo = () => {
 
@@ -47,40 +46,42 @@ const AddPromo = () => {
     return `${year}-${month}-${day}`;
   };
 
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setImage({
-        src: URL.createObjectURL(file),
-        file
+  const uploadSingleFileToGCS = async (image) => {
+    try {
+      const formData = new FormData();
+      formData.append('attachment', image);
+
+      const response = await axiosPublic.post('/upload-single-file', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
       });
+
+      if (response?.data?.fileUrl) {
+        return response.data.fileUrl;
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
     }
+  };
+
+  const handleImageChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!isValidImageFile(file)) return;
+
+    // Immediately upload the selected image to Imgbb
+    const uploadedImageUrl = await uploadSingleFileToGCS(file);
+
+    if (uploadedImageUrl) {
+      // Update the state with the Imgbb URL instead of the local blob URL
+      setImage(uploadedImageUrl);
+    };
   };
 
   const handleImageRemove = () => {
     setImage(null);
-  };
-
-  const uploadImageToImgbb = async (image) => {
-    const formData = new FormData();
-    formData.append('image', image.file);
-    formData.append('key', apiKey);
-
-    try {
-      const response = await axiosPublic.post(apiURL, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      if (response.data && response.data.data && response.data.data.url) {
-        return response.data.data.url; // Return the single image URL
-      } else {
-        toast.error('Failed to get image URL from response.');
-      }
-    } catch (error) {
-      toast.error(`Upload failed: ${error.response?.data?.error?.message || error.message}`);
-    }
-    return null;
   };
 
   const handleGoBack = async () => {
@@ -113,14 +114,6 @@ const AddPromo = () => {
 
     const formattedExpiryDate = formatDate(expiryDate);
 
-    let imageUrl = '';
-    if (image) {
-      imageUrl = await uploadImageToImgbb(image);
-      if (!imageUrl) {
-        toast.error('Image upload failed, cannot proceed.');
-        return;
-      }
-    }
     setIsSubmitting(true);
 
     try {
@@ -132,7 +125,7 @@ const AddPromo = () => {
         maxAmount: maxAmount ? maxAmount : 0,
         minAmount: minAmount ? minAmount : 0,
         promoDescription,
-        imageUrl,
+        imageUrl: image === null ? "" : image,
         promoStatus: true
       };
 
@@ -313,7 +306,7 @@ const AddPromo = () => {
                   {image && (
                     <div className='relative'>
                       <Image
-                        src={image.src}
+                        src={image}
                         alt='Uploaded image'
                         height={3000}
                         width={3000}

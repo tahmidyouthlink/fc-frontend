@@ -39,10 +39,9 @@ import arrivals2 from "/public/card-images/arrivals2.svg";
 import CustomSwitch from '@/app/components/layout/CustomSwitch';
 import { useAuth } from '@/app/contexts/auth';
 import DOMPurify from "dompurify";
+import { isValidImageFile } from '../../shared/upload/IsValidImageFile';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
-const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 
 const dhakaSuburbs = ["Savar", "Nabinagar", "Ashulia", "Keraniganj", "Tongi", "Gazipur", "Narayanganj"];
 
@@ -418,40 +417,43 @@ const EditProductContents = () => {
     });
   };
 
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setImage({
-        src: URL.createObjectURL(file),
-        file
+  const uploadSingleFileToGCS = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('attachment', file);
+
+      const response = await axiosPublic.post('/upload-single-file', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
       });
+
+      if (response?.data?.fileUrl) {
+        return response.data.fileUrl;
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
+  };
+
+  const handleImageChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!isValidImageFile(file)) return;
+
+    // Immediately upload the selected image to Imgbb
+    const uploadedImageUrl = await uploadSingleFileToGCS(file);
+
+    if (uploadedImageUrl) {
+      // Update the state with the Imgbb URL instead of the local blob URL
+      setImage(uploadedImageUrl);
+      setSizeError(false);
     }
   };
 
   const handleImageRemove = () => {
     setImage(null);
-  };
-
-  const uploadImageToImgbb = async (image) => {
-    const formData = new FormData();
-    formData.append('image', image.file);
-    formData.append('key', apiKey);
-
-    try {
-      const response = await axiosPublic.post(apiURL, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      if (response.data && response.data.data && response.data.data.url) {
-        return response.data.data.url; // Return the single image URL
-      } else {
-        toast.error('Failed to get image URL from response.');
-      }
-    } catch (error) {
-      toast.error(`Upload failed: ${error.response?.data?.error?.message || error.message}`);
-    }
-    return null;
   };
 
   const handleDragOver = (event) => {
@@ -502,7 +504,7 @@ const EditProductContents = () => {
       file,
     }));
 
-    const imageUrls = await uploadImagesToImgbb(newImages);
+    const imageUrls = await uploadMultipleFilesToGCS(newImages);
 
     setProductVariants((prevVariants) => {
       const updatedVariants = [...prevVariants];
@@ -532,7 +534,7 @@ const EditProductContents = () => {
       file,
     }));
 
-    const imageUrls = await uploadImagesToImgbb(newImages);
+    const imageUrls = await uploadMultipleFilesToGCS(newImages);
     const updatedUrls = [...uploadedImageUrls, ...imageUrls];
 
     const limitedUrls = updatedUrls.slice(-6);
@@ -549,28 +551,28 @@ const EditProductContents = () => {
     return files.filter(file => validTypes.includes(file.type));
   };
 
-  const uploadImagesToImgbb = async (images) => {
-    const imageUrls = [];
-    for (const image of images) {
+  const uploadMultipleFilesToGCS = async (images) => {
+    try {
       const formData = new FormData();
-      formData.append('image', image.file);
-      formData.append('key', apiKey);
-      try {
-        const response = await axiosPublic.post(apiURL, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        if (response.data && response.data.data && response.data.data.url) {
-          imageUrls.push(response.data.data.url);
-        } else {
-          toast.error("Failed to get image URL from response.");
-        }
-      } catch (error) {
-        toast.error(`Upload failed: ${error.response?.data?.error?.message || error.message}`);
+
+      for (const image of images) {
+        formData.append('file', image.file); // ✅ correctly send the File object
       }
+      const response = await axiosPublic.post('/upload-multiple-files', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response?.data?.urls) {
+        return response.data.urls; // Expected to be an array of public URLs
+      } else {
+        throw new Error('Upload failed');
+      }
+    } catch (error) {
+      console.error('Error uploading files:', error);
+      return [];
     }
-    return imageUrls;
   };
 
   const handleDrops = async (event, variantIndex) => {
@@ -586,7 +588,7 @@ const EditProductContents = () => {
       file,
     }));
 
-    const imageUrls = await uploadImagesToImgbb(newImages);
+    const imageUrls = await uploadMultipleFilesToGCS(newImages);
 
     setProductVariants((prevVariants) => {
       const updatedVariants = [...prevVariants];
@@ -867,17 +869,6 @@ const EditProductContents = () => {
       }
       setSizeError(false);
 
-      let imageUrl = '';
-      if (image?.src && image?.file) {
-        imageUrl = await uploadImageToImgbb(image);
-        if (!imageUrl) {
-          toast.error('Image upload failed, cannot proceed.');
-          return;
-        }
-      } else {
-        imageUrl = image;
-      }
-
       if (groupSelected.length === 0) {
         setSizeError2(true);
         toast.error("Please select at least one size range.");
@@ -1036,7 +1027,7 @@ const EditProductContents = () => {
         regularPrice: data?.regularPrice,
         weight: data?.weight,
         batchCode: data?.batchCode,
-        thumbnailImageUrl: imageUrl,
+        thumbnailImageUrl: image,
         discountType: discountType,
         discountValue: data?.discountValue,
         productDetails: productDetails,
@@ -1659,7 +1650,7 @@ const EditProductContents = () => {
                         {image && (
                           <div className='relative'>
                             <Image
-                              src={image.src || image}
+                              src={image}
                               alt='Uploaded image'
                               height={3000}
                               width={3000}

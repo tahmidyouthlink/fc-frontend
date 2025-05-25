@@ -10,22 +10,19 @@ import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
-import defaultImage from "@/public/card-images/default-payment-image.jpg";
 import { FiSave } from 'react-icons/fi';
+import { isValidImageFile } from '@/app/components/shared/upload/IsValidImageFile';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
-const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 
 const EditPaymentMethod = () => {
 
   const { id } = useParams();
   const axiosPublic = useAxiosPublic();
   const [image, setImage] = useState(null);
-  const [fullPaymentDetails, setFullPaymentDetails] = useState([]);
   const [paymentDetails, setPaymentDetails] = useState([]);
   const router = useRouter();
-  const DEFAULT_IMAGE_URL = defaultImage;
+  const DEFAULT_IMAGE_URL = "https://storage.googleapis.com/fashion-commerce-pdf/1748164462517_default-payment-image.jpg";
 
   const {
     register, handleSubmit, setValue, control, formState: { errors, isSubmitting } } = useForm({
@@ -43,7 +40,6 @@ const EditPaymentMethod = () => {
         setValue('paymentMethodName', data?.paymentMethodName);
         setPaymentDetails(data?.paymentDetails);
         setImage(data?.imageUrl);
-        setFullPaymentDetails(data);
       } catch (error) {
         toast.error("Failed to load shipping zone details.");
       }
@@ -52,43 +48,37 @@ const EditPaymentMethod = () => {
     fetchShipmentHandler();
   }, [id, setValue, axiosPublic]);
 
-  const uploadToImgbb = async (imageFile) => {
-    const formData = new FormData();
-    formData.append('image', imageFile);
-
+  const uploadSingleFileToGCS = async (image) => {
     try {
-      const response = await fetch(apiURL, {
-        method: 'POST',
-        body: formData,
+      const formData = new FormData();
+      formData.append('attachment', image);
+
+      const response = await axiosPublic.post('/upload-single-file', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
       });
 
-      const data = await response.json();
-
-      if (data.data && data.data.url) {
-        return data.data.url; // Imgbb URL of the uploaded image
-      } else {
-        console.error('Error uploading image:', data);
-        return null;
+      if (response?.data?.fileUrl) {
+        return response.data.fileUrl;
       }
     } catch (error) {
-      console.error('Error:', error);
-      return null;
+      console.error('Error uploading file:', error);
     }
   };
 
   const handleImageChange = async (event) => {
     const file = event.target.files[0];
-    if (file) {
-      // Immediately upload the selected image to Imgbb
-      const uploadedImageUrl = await uploadToImgbb(file);
+    if (!file) return;
 
-      if (uploadedImageUrl) {
-        // Update the state with the Imgbb URL instead of the local blob URL
-        setImage({
-          src: uploadedImageUrl,
-          file: file,
-        });
-      }
+    if (!isValidImageFile(file)) return;
+
+    // Immediately upload the selected image to Imgbb
+    const uploadedImageUrl = await uploadSingleFileToGCS(file);
+
+    if (uploadedImageUrl) {
+      // Update the state with the Imgbb URL instead of the local blob URL
+      setImage(uploadedImageUrl);
     }
   };
 
@@ -100,26 +90,10 @@ const EditPaymentMethod = () => {
   const onSubmit = async (data) => {
     try {
 
-      // Initialize imageUrl with the existing one
-      let imageUrl = fullPaymentDetails?.imageUrl || '';
-
-      // If a new image is uploaded, upload it to Imgbb
-      if (image && image.file) {
-        imageUrl = await uploadToImgbb(image.file);
-        if (!imageUrl) {
-          toast.error('Image upload failed, cannot proceed.');
-          imageUrl = DEFAULT_IMAGE_URL;
-          hasError = true;
-        }
-      } else if (image === null) {
-        // If the image is removed, explicitly set imageUrl to an empty string
-        imageUrl = DEFAULT_IMAGE_URL;;
-      }
-
       const updatedPaymentMethod = {
         paymentMethodName: data?.paymentMethodName,
         paymentDetails,
-        imageUrl
+        imageUrl: image === null ? DEFAULT_IMAGE_URL : image,
       };
 
       const res = await axiosPublic.put(`/editPaymentMethod/${id}`, updatedPaymentMethod);
@@ -157,7 +131,7 @@ const EditPaymentMethod = () => {
           position: "bottom-right",
           duration: 5000
         })
-        router.push('/dash-board/finances/payment-methods');
+        router.push('/dash-board/finances');
       } else {
         toast.error('No changes detected.');
       }
@@ -262,6 +236,7 @@ const EditPaymentMethod = () => {
             </button>
           </div>
         </div>
+
       </form>
 
     </div>

@@ -9,9 +9,6 @@ import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Loading from '../shared/Loading/Loading';
 
-const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
-
 const MarketingBanner = () => {
 
   const { handleSubmit } = useForm();
@@ -30,41 +27,59 @@ const MarketingBanner = () => {
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    const maxSizeMB = 10;
 
-    if (file) {
-      setImage({
-        src: URL.createObjectURL(file),
-        file
-      });
-      setSizeError(false);  // Clear any existing error when a file is selected
-    } else {
-      setSizeError(true);   // Set error when no file is selected
+    if (!file) {
+      setSizeError(true);
+      toast.error("Please select a file.");
+      return;
     }
+
+    if (!allowedTypes.includes(file.type)) {
+      setSizeError(true);
+      toast.error("Only PNG, JPEG, JPG, and WEBP formats are allowed.");
+      return;
+    }
+
+    if (file.size > maxSizeMB * 1024 * 1024) {
+      setSizeError(true);
+      toast.error("Image size should not exceed 10MB.");
+      return;
+    }
+
+    setImage({
+      src: URL.createObjectURL(file),
+      file,
+    });
+    setSizeError(false);
   };
 
   const handleImageRemove = () => {
     setImage(null);
   };
 
-  const uploadImageToImgbb = async (image) => {
+  const uploadSingleFileToGCS = async (image) => {
     const formData = new FormData();
-    formData.append('image', image.file);
-    formData.append('key', apiKey);
+    formData.append('attachment', image.file);  // assuming image = { file: File }
 
     try {
-      const response = await axiosPublic.post(apiURL, formData, {
+      const response = await axiosPublic.post('/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-      if (response.data && response.data.data && response.data.data.url) {
-        return response.data.data.url; // Return the single image URL
+
+      if (response?.data?.fileUrl) {
+        return response.data.fileUrl;
       } else {
         toast.error('Failed to get image URL from response.');
       }
     } catch (error) {
-      toast.error(`Upload failed: ${error.response?.data?.error?.message || error.message}`);
+      toast.error(`Upload failed: ${error.response?.data?.message || error.message}`);
+      console.error("Upload error:", error);
     }
+
     return null;
   };
 
@@ -88,7 +103,7 @@ const MarketingBanner = () => {
     let imageUrl = '';
     // If the image is new, upload it
     if (image?.file) {
-      imageUrl = await uploadImageToImgbb(image);
+      imageUrl = await uploadSingleFileToGCS(image);
       if (!imageUrl) {
         toast.error('Image upload failed, cannot proceed.');
         return;

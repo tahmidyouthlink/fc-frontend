@@ -1,5 +1,6 @@
 "use client";
 import Loading from '@/app/components/shared/Loading/Loading';
+import { isValidImageFile } from '@/app/components/shared/upload/IsValidImageFile';
 import useAxiosPublic from '@/app/hooks/useAxiosPublic';
 import useCategories from '@/app/hooks/useCategories';
 import { Button } from '@nextui-org/react';
@@ -13,9 +14,6 @@ import { FaArrowLeft } from 'react-icons/fa6';
 import { FiSave } from 'react-icons/fi';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
-
-const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 
 export default function EditCategory() {
   const router = useRouter();
@@ -223,45 +221,40 @@ export default function EditCategory() {
     setSelectedSizes(prev => prev.filter((_, i) => i !== indexToRemove));
   };
 
-  const uploadToImgbb = async (image) => {
-    const formData = new FormData();
-
-    formData.append('image', image);  // Pass the file directly
-    formData.append('key', apiKey);   // Use your API key for Imgbb
-
+  const uploadSingleFileToGCS = async (image) => {
     try {
-      const response = await axiosPublic.post(apiURL, formData, {
+      const formData = new FormData();
+      formData.append('attachment', image);
+
+      const response = await axiosPublic.post('/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-        },
+        }
       });
 
-      if (response.data && response.data.data && response.data.data.url) {
-        return response.data.data.url; // Return the image URL
-      } else {
-        toast.error('Failed to get image URL from response.');
+      if (response?.data?.fileUrl) {
+        return response.data.fileUrl;
       }
     } catch (error) {
-      toast.error(`Upload failed: ${error.response?.data?.error?.message || error.message}`);
-      console.error("Upload error:", error);
+      console.error('Error uploading file:', error);
     }
-
-    return null;
   };
 
   const handleImageChange = async (event) => {
     const file = event.target.files[0];
-    if (file) {
-      // Immediately upload the selected image to Imgbb
-      const uploadedImageUrl = await uploadToImgbb(file);
+    if (!file) return;
 
-      if (uploadedImageUrl) {
-        // Update the state with the Imgbb URL instead of the local blob URL
-        setImage({
-          src: uploadedImageUrl,
-          file: file,
-        });
-      }
+    if (!isValidImageFile(file)) return;
+
+    // Immediately upload the selected image to Imgbb
+    const uploadedImageUrl = await uploadSingleFileToGCS(file);
+
+    if (uploadedImageUrl) {
+      // Update the state with the Imgbb URL instead of the local blob URL
+      setImage({
+        src: uploadedImageUrl,
+        file: file,
+      });
     }
   };
 
@@ -272,18 +265,20 @@ export default function EditCategory() {
 
   const handleImageChangeForSizeRange = (size, event) => {
     const file = event.target.files[0];
-    if (file) {
-      setSizeImages(prev => ({
-        ...prev,
-        [categoryKey]: {
-          ...prev[categoryKey],
-          [size]: {
-            src: URL.createObjectURL(file), // for preview
-            file, // for upload
-          },
+    if (!file) return;
+
+    if (!isValidImageFile(file)) return;
+
+    setSizeImages(prev => ({
+      ...prev,
+      [categoryKey]: {
+        ...prev[categoryKey],
+        [size]: {
+          src: URL.createObjectURL(file), // for preview
+          file, // for upload
         },
-      }));
-    }
+      },
+    }));
   };
 
   const handleImageRemoveForSizeRange = (size) => {
@@ -308,7 +303,7 @@ export default function EditCategory() {
 
       // If a new image is uploaded, upload it to Imgbb
       if (image && image.file) {
-        imageUrl = await uploadToImgbb(image.file);
+        imageUrl = await uploadSingleFileToGCS(image.file);
         if (!imageUrl) {
           toast.error('Image upload failed, cannot proceed.');
           hasError = true;
@@ -336,7 +331,7 @@ export default function EditCategory() {
         } else if (imageData?.file) {
           // Image is a new file, upload it
           try {
-            const uploadedImageUrl = await uploadToImgbb(imageData.file);
+            const uploadedImageUrl = await uploadSingleFileToGCS(imageData.file);
 
             if (!uploadedImageUrl) {
               toast.error(`Image upload failed for size ${size}.`);
