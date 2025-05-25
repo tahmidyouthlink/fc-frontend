@@ -10,11 +10,9 @@ import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
-import defaultImage from "@/public/card-images/default-payment-image.jpg";
+import { isValidImageFile } from '@/app/components/shared/upload/IsValidImageFile';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
-const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 
 const AddPaymentMethod = () => {
 
@@ -23,44 +21,43 @@ const AddPaymentMethod = () => {
   const [image, setImage] = useState(null);
   const router = useRouter();
   const [paymentDetails, setPaymentDetails] = useState("");
-  const DEFAULT_IMAGE_URL = defaultImage;
+  const DEFAULT_IMAGE_URL = "https://storage.googleapis.com/fashion-commerce-pdf/1748164462517_default-payment-image.jpg";
 
   const { register, handleSubmit, control, formState: { errors } } = useForm();
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
-    if (file) {
-      setImage({
-        src: URL.createObjectURL(file),
-        file
-      });
-    }
+    if (!file) return;
+
+    if (!isValidImageFile(file)) return;
+
+    setImage({
+      src: URL.createObjectURL(file),
+      file
+    });
   };
 
   const handleImageRemove = () => {
     setImage(null);
   };
 
-  const uploadImageToImgbb = async (image) => {
-    const formData = new FormData();
-    formData.append('image', image.file);
-    formData.append('key', apiKey);
-
+  const uploadSingleFileToGCS = async (image) => {
     try {
-      const response = await axiosPublic.post(apiURL, formData, {
+      const formData = new FormData();
+      formData.append('attachment', image.file);
+
+      const response = await axiosPublic.post('/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-        },
+        }
       });
-      if (response.data && response.data.data && response.data.data.url) {
-        return response.data.data.url; // Return the single image URL
-      } else {
-        toast.error('Failed to get image URL from response.');
+
+      if (response?.data?.fileUrl) {
+        return response.data.fileUrl;
       }
     } catch (error) {
-      toast.error(`Upload failed: ${error.response?.data?.error?.message || error.message}`);
+      console.error('Error uploading file:', error);
     }
-    return null;
   };
 
   const onSubmit = async (data) => {
@@ -71,7 +68,7 @@ const AddPaymentMethod = () => {
 
     let imageUrl = '';
     if (image) {
-      imageUrl = await uploadImageToImgbb(image);
+      imageUrl = await uploadSingleFileToGCS(image);
       if (!imageUrl) {
         toast.error('Image upload failed, cannot proceed.');
         imageUrl = DEFAULT_IMAGE_URL;
@@ -85,7 +82,7 @@ const AddPaymentMethod = () => {
       paymentMethodName,
       paymentDetails,
       status: true,
-      imageUrl
+      imageUrl,
     };
 
     try {
@@ -124,7 +121,7 @@ const AddPaymentMethod = () => {
           position: "bottom-right",
           duration: 5000
         })
-        router.push("/dash-board/finances/payment-methods");
+        router.push("/dash-board/finances");
       } else {
         throw new Error('Failed to add Payment Method');
       }

@@ -145,7 +145,7 @@ ${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                 {/* Image */}
                 <Image
                   className="object-cover rounded-lg"
-                  src={category?.imageUrl}
+                  src={category?.imageUrl === "" ? "https://storage.googleapis.com/fashion-commerce-pdf/1748156497021_shopping.png" : category?.imageUrl}
                   alt={`${category?.label} - Explore products in the ${category?.label} category`}
                   layout="fill"
                   objectFit="cover"

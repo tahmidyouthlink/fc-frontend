@@ -9,9 +9,8 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import { FaArrowLeft } from 'react-icons/fa6';
+import { isValidImageFile } from '@/app/components/shared/upload/IsValidImageFile';
 
-const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 const defaultImages = ["https://i.ibb.co.com/b7TyG4Y/8271908.png",
   "https://i.ibb.co.com/PgJc6zx/halloween.png",
   "https://i.ibb.co.com/Jdj0vxq/images-1.png",
@@ -31,15 +30,37 @@ const AddSeason = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDefaultImage, setSelectedDefaultImage] = useState(null);
 
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setImage({
-        src: URL.createObjectURL(file),
-        file
+  const uploadSingleFileToGCS = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('attachment', file);
+
+      const response = await axiosPublic.post('/upload-single-file', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
       });
-      setSelectedDefaultImage(null); // Clear the default image selection when a file is uploaded
+
+      if (response?.data?.fileUrl) {
+        return response.data.fileUrl;
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
     }
+  };
+
+  const handleImageChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!isValidImageFile(file)) return;
+
+    const uploadedImageUrl = await uploadSingleFileToGCS(file);
+    if (uploadedImageUrl) {
+      setImage(uploadedImageUrl);
+    }
+    setSelectedDefaultImage(null); // Clear the default image selection when a file is uploaded
+
   };
 
   const handleImageRemove = () => {
@@ -52,49 +73,12 @@ const AddSeason = () => {
     setImage(null); // Clear uploaded image if a default image is selected
   };
 
-  const uploadImageToImgbb = async (image) => {
-    const formData = new FormData();
-    formData.append('image', image.file);
-    formData.append('key', apiKey);
-
-    try {
-      const response = await axiosPublic.post(apiURL, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      if (response.data && response.data.data && response.data.data.url) {
-        return response.data.data.url; // Return the single image URL
-      } else {
-        toast.error('Failed to get image URL from response.');
-      }
-    } catch (error) {
-      toast.error(`Upload failed: ${error.response?.data?.error?.message || error.message}`);
-    }
-    return null;
-  };
-
   const onSubmit = async (data) => {
     setIsSubmitting(true);
 
-    let imageUrl = '';
-    if (image) {
-      imageUrl = await uploadImageToImgbb(image);
-      if (!imageUrl) {
-        toast.error('Image upload failed, cannot proceed.');
-        return;
-      }
-    } else if (selectedDefaultImage) {
-      imageUrl = selectedDefaultImage; // Use selected default image if no image is uploaded
-    } else {
-      toast.error('You must select or upload an image.');
-      setIsSubmitting(false);
-      return;
-    }
-
     const seasonData = {
       seasonName: data?.seasonName,
-      imageUrl
+      imageUrl: selectedDefaultImage === null ? image : selectedDefaultImage,
     };
 
     try {
@@ -202,7 +186,7 @@ const AddSeason = () => {
               {(image || selectedDefaultImage) && (
                 <div className='relative'>
                   <Image
-                    src={image?.src || selectedDefaultImage}
+                    src={image || selectedDefaultImage}
                     alt='Selected or uploaded image'
                     height={2000}
                     width={2000}

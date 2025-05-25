@@ -18,10 +18,9 @@ import { FiSave } from 'react-icons/fi';
 import useOffers from '@/app/hooks/useOffers';
 import ProductSearchSelect from '@/app/components/layout/ProductSearchSelect';
 import { HiCheckCircle } from 'react-icons/hi2';
+import { isValidImageFile } from '@/app/components/shared/upload/IsValidImageFile';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
-const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 
 const EditOffer = () => {
 
@@ -39,7 +38,6 @@ const EditOffer = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [categoryError, setCategoryError] = useState(false);
   const [dateError, setDateError] = useState(false)
-  const [offerDetails, setOfferDetails] = useState(null);
   const [selectedProductIds, setSelectedProductIds] = useState([]);
   const [productList, isProductPending] = useProductsInformation();
   const [productIdError, setProductIdError] = useState(false);
@@ -119,8 +117,6 @@ const EditOffer = () => {
         } else {
           setSelectedTab('Products'); // Default tab if both are empty
         }
-
-        setOfferDetails(offer);
         setIsLoading(false);
       } catch (err) {
         console.error(err); // Log error to the console for debugging
@@ -129,45 +125,39 @@ const EditOffer = () => {
     };
 
     fetchOfferData();
-  }, [id, axiosPublic, setValue, categoryList, setOfferDetails]);
+  }, [id, axiosPublic, setValue, categoryList]);
 
-  const uploadToImgbb = async (imageFile) => {
-    const formData = new FormData();
-    formData.append('image', imageFile);
-
+  const uploadSingleFileToGCS = async (image) => {
     try {
-      const response = await fetch(apiURL, {
-        method: 'POST',
-        body: formData,
+      const formData = new FormData();
+      formData.append('attachment', image);
+
+      const response = await axiosPublic.post('/upload-single-file', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
       });
 
-      const data = await response.json();
-
-      if (data.data && data.data.url) {
-        return data.data.url; // Imgbb URL of the uploaded image
-      } else {
-        console.error('Error uploading image:', data);
-        return null;
+      if (response?.data?.fileUrl) {
+        return response.data.fileUrl;
       }
     } catch (error) {
-      console.error('Error:', error);
-      return null;
+      console.error('Error uploading file:', error);
     }
   };
 
   const handleImageChange = async (event) => {
     const file = event.target.files[0];
-    if (file) {
-      // Immediately upload the selected image to Imgbb
-      const uploadedImageUrl = await uploadToImgbb(file);
+    if (!file) return;
 
-      if (uploadedImageUrl) {
-        // Update the state with the Imgbb URL instead of the local blob URL
-        setImage({
-          src: uploadedImageUrl,
-          file: file,
-        });
-      }
+    if (!isValidImageFile(file)) return;
+
+    // Immediately upload the selected image to Imgbb
+    const uploadedImageUrl = await uploadSingleFileToGCS(file);
+
+    if (uploadedImageUrl) {
+      // Update the state with the Imgbb URL instead of the local blob URL
+      setImage(uploadedImageUrl);
     }
   };
 
@@ -405,21 +395,6 @@ const EditOffer = () => {
 
     let hasError = false;
 
-    // Initialize imageUrl with the existing one
-    let imageUrl = offerDetails.imageUrl || '';
-
-    // If a new image is uploaded, upload it to Imgbb
-    if (image && image.file) {
-      imageUrl = await uploadToImgbb(image.file);
-      if (!imageUrl) {
-        toast.error('Image upload failed, cannot proceed.');
-        hasError = true;
-      }
-    } else if (image === null) {
-      // If the image is removed, explicitly set imageUrl to an empty string
-      imageUrl = '';
-    }
-
     if (!expiryDate) {
       setDateError(true);
       hasError = true;
@@ -463,7 +438,7 @@ const EditOffer = () => {
         minAmount: minAmount || 0,
         offerDescription,
         selectedCategories,
-        imageUrl,
+        imageUrl: image === null ? "" : image,
         selectedProductIds
       };
 

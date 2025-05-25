@@ -13,14 +13,12 @@ import { FaArrowLeft } from 'react-icons/fa6';
 import useCategories from '@/app/hooks/useCategories';
 import Loading from '@/app/components/shared/Loading/Loading';
 
-const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 const defaultImages = ["https://i.ibb.co.com/ZJ2Qy29/2892174.png",
   "https://i.ibb.co.com/dcRM6Fz/88768.png",
   "https://i.ibb.co.com/sm3xZHL/pngtree-shoes-icon-design-template-illustration-png-image-3177407-removebg-preview.png",
   "https://i.ibb.co.com/yFVrMHF/664466.png",
   "https://i.ibb.co.com/khrPqNc/3345358.png",
-  "https://i.ibb.co.com/F7qy9Gh/5258035.png",];
+  "https://i.ibb.co.com/F7qy9Gh/5258035.png"];
 
 const AddCategory = () => {
 
@@ -116,13 +114,26 @@ const AddCategory = () => {
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
-    if (file) {
-      setImage({
-        src: URL.createObjectURL(file),
-        file
-      });
-      setSelectedDefaultImage(null); // Clear the default image selection when a file is uploaded
+    if (!file) return;
+
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+    if (!validTypes.includes(file.type)) {
+      toast.error('Invalid file type. Please upload JPG, PNG, WEBP, or GIF.');
+      return;
     }
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error('Image must be smaller than 10MB.');
+      return;
+    }
+
+    setImage({
+      src: URL.createObjectURL(file),
+      file
+    });
+    setSelectedDefaultImage(null);
   };
 
   const handleImageRemove = () => {
@@ -135,51 +146,46 @@ const AddCategory = () => {
     setImage(null); // Clear uploaded image if a default image is selected
   };
 
-  const uploadImageToImgbb = async (image) => {
-    const formData = new FormData();
+  const uploadSingleFileToGCS = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('attachment', file);
 
-    formData.append('image', image);  // Pass the file directly
-    formData.append('key', apiKey);   // Use your API key for Imgbb
+      const response = await axiosPublic.post('/upload-single-file', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+
+      if (response?.data?.fileUrl) {
+        return response.data.fileUrl;
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
+  };
+
+  const uploadImageToGCS2 = async (image) => {
+    const formData = new FormData();
+    formData.append('attachment', image.file);  // assuming image = { file: File }
 
     try {
-      const response = await axiosPublic.post(apiURL, formData, {
+      const response = await axiosPublic.post('/upload-single-file', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      if (response.data && response.data.data && response.data.data.url) {
-        return response.data.data.url; // Return the image URL
+      if (response?.data?.fileUrl) {
+        return response.data.fileUrl;
       } else {
         toast.error('Failed to get image URL from response.');
       }
     } catch (error) {
-      toast.error(`Upload failed: ${error.response?.data?.error?.message || error.message}`);
+      toast.error(`Upload failed: ${error.response?.data?.message || error.message}`);
       console.error("Upload error:", error);
     }
 
-    return null;
-  };
-
-  const uploadImageToImgbb2 = async (image) => {
-    const formData = new FormData();
-    formData.append('image', image.file);
-    formData.append('key', apiKey);
-
-    try {
-      const response = await axiosPublic.post(apiURL, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      if (response.data && response.data.data && response.data.data.url) {
-        return response.data.data.url; // Return the single image URL
-      } else {
-        toast.error('Failed to get image URL from response.');
-      }
-    } catch (error) {
-      toast.error(`Upload failed: ${error.response?.data?.error?.message || error.message}`);
-    }
     return null;
   };
 
@@ -273,15 +279,28 @@ const AddCategory = () => {
 
   const handleImageChangeForSizeRange = (size, event) => {
     const file = event.target.files[0];
-    if (file) {
-      setSizeImages(prev => ({
-        ...prev,
-        [size]: {
-          src: URL.createObjectURL(file), // for preview
-          file, // for upload
-        }
-      }));
+    if (!file) return;
+
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+    if (!validTypes.includes(file.type)) {
+      toast.error('Invalid file type. Please upload JPG, PNG, WEBP, or GIF.');
+      return;
     }
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error('Image must be smaller than 10MB.');
+      return;
+    }
+
+    setSizeImages(prev => ({
+      ...prev,
+      [size]: {
+        src: URL.createObjectURL(file),
+        file,
+      }
+    }));
   };
 
   const handleImageRemoveForSizeRange = (size) => {
@@ -298,7 +317,7 @@ const AddCategory = () => {
 
     let imageUrl = '';
     if (image) {
-      imageUrl = await uploadImageToImgbb2(image);
+      imageUrl = await uploadImageToGCS2(image);
       if (!imageUrl) {
         toast.error('Image upload failed, cannot proceed.');
         setIsSubmitting(false); // Reset submit state
@@ -331,7 +350,7 @@ const AddCategory = () => {
       } else if (imageData?.file) {
         // Image is a new file, upload it
         try {
-          const uploadedImageUrl = await uploadImageToImgbb(imageData.file);
+          const uploadedImageUrl = await uploadSingleFileToGCS(imageData.file);
 
           if (!uploadedImageUrl) {
             toast.error(`Image upload failed for size ${size}.`);

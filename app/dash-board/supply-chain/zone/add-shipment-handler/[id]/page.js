@@ -11,21 +11,16 @@ import { MdOutlineFileUpload } from 'react-icons/md';
 import { RxCheck, RxCross2 } from 'react-icons/rx';
 import standardImage from "/public/logos/standard.png";
 import expressImage from "/public/logos/express.png";
-import defaultImage from "/public/logos/default-image.png";
 import { FiSave } from 'react-icons/fi';
-
-const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 
 const EditShipmentHandler = () => {
 
   const { id } = useParams();
   const axiosPublic = useAxiosPublic();
   const [image, setImage] = useState(null);
-  const [shipmentDetails, setShipmentDetails] = useState([]);
   const [deliveryType, setDeliveryType] = useState([]);
   const router = useRouter();
-  const DEFAULT_IMAGE_URL = defaultImage;
+  const DEFAULT_IMAGE_URL = "https://storage.googleapis.com/fashion-commerce-pdf/1748149508141_default-image.png";
 
   const { register, handleSubmit, setValue, trigger, formState: { errors, isSubmitting } } = useForm({
     defaultValues: {
@@ -51,7 +46,6 @@ const EditShipmentHandler = () => {
         setDeliveryType(data?.deliveryType || []);
         setValue('deliveryType', data?.deliveryType || []);
         setImage(data?.imageUrl);
-        setShipmentDetails(data);
       } catch (error) {
         toast.error("Failed to load shipping zone details.");
       }
@@ -72,27 +66,22 @@ const EditShipmentHandler = () => {
     trigger('deliveryType'); // Manually trigger validation
   };
 
-  const uploadToImgbb = async (imageFile) => {
-    const formData = new FormData();
-    formData.append('image', imageFile);
-
+  const uploadSingleFileToGCS = async (file) => {
     try {
-      const response = await fetch(apiURL, {
-        method: 'POST',
-        body: formData,
+      const formData = new FormData();
+      formData.append('attachment', file);
+
+      const response = await axiosPublic.post('/upload-single-file', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
       });
 
-      const data = await response.json();
-
-      if (data.data && data.data.url) {
-        return data.data.url; // Imgbb URL of the uploaded image
-      } else {
-        console.error('Error uploading image:', data);
-        return null;
+      if (response?.data?.fileUrl) {
+        return response.data.fileUrl;
       }
     } catch (error) {
-      console.error('Error:', error);
-      return null;
+      console.error('Error uploading file:', error);
     }
   };
 
@@ -100,14 +89,9 @@ const EditShipmentHandler = () => {
     const file = event.target.files[0];
     if (file) {
       // Immediately upload the selected image to Imgbb
-      const uploadedImageUrl = await uploadToImgbb(file);
-
+      const uploadedImageUrl = await uploadSingleFileToGCS(file);
       if (uploadedImageUrl) {
-        // Update the state with the Imgbb URL instead of the local blob URL
-        setImage({
-          src: uploadedImageUrl,
-          file: file,
-        });
+        setImage(uploadedImageUrl);
       }
     }
   };
@@ -120,29 +104,13 @@ const EditShipmentHandler = () => {
   const onSubmit = async (data) => {
     try {
 
-      // Initialize imageUrl with the existing one
-      let imageUrl = shipmentDetails?.imageUrl || '';
-
-      // If a new image is uploaded, upload it to Imgbb
-      if (image && image.file) {
-        imageUrl = await uploadToImgbb(image.file);
-        if (!imageUrl) {
-          toast.error('Image upload failed, cannot proceed.');
-          imageUrl = DEFAULT_IMAGE_URL;
-          hasError = true;
-        }
-      } else if (image === null) {
-        // If the image is removed, explicitly set imageUrl to an empty string
-        imageUrl = DEFAULT_IMAGE_URL;
-      }
-
       const updatedShipmentHandler = {
         shipmentHandlerName: data?.shipmentHandlerName,
         contactPersonName: data?.contactPersonName,
         contactPersonNumber: data?.contactPersonNumber,
         officeAddress: data?.officeAddress,
         trackingUrl: data?.trackingUrl ? data?.trackingUrl : "",
-        imageUrl,
+        imageUrl: image === null ? DEFAULT_IMAGE_URL : image,
         deliveryType
       };
 

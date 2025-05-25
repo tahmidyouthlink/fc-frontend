@@ -13,10 +13,9 @@ import { RxCheck, RxCross2 } from 'react-icons/rx';
 import Image from 'next/image';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import { FiSave } from 'react-icons/fi';
+import { isValidImageFile } from '@/app/components/shared/upload/IsValidImageFile';
 
 const Editor = dynamic(() => import('@/app/utils/Editor/Editor'), { ssr: false });
-const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
 
 const EditPromo = () => {
 
@@ -30,7 +29,6 @@ const EditPromo = () => {
   const [expiryDate, setExpiryDate] = useState(''); // Initial state set to an empty string
   const [promoDescription, setPromoDescription] = useState("");
   const [image, setImage] = useState(null);
-  const [promoDetails, setPromoDetails] = useState(null);
   const [dateError, setDateError] = useState(false);
 
   const handleTabChange = (key) => {
@@ -66,7 +64,6 @@ const EditPromo = () => {
         setPromoDiscountType(promo?.promoDiscountType);
         setPromoDescription(promo?.promoDescription || "");
         setImage(promo?.imageUrl || null);
-        setPromoDetails(promo);
         setIsLoading(false);
       } catch (err) {
         console.error(err); // Log error to the console for debugging
@@ -77,43 +74,37 @@ const EditPromo = () => {
     fetchPromoCode();
   }, [id, axiosPublic, setValue]);
 
-  const uploadToImgbb = async (imageFile) => {
-    const formData = new FormData();
-    formData.append('image', imageFile);
-
+  const uploadSingleFileToGCS = async (image) => {
     try {
-      const response = await fetch(apiURL, {
-        method: 'POST',
-        body: formData,
+      const formData = new FormData();
+      formData.append('attachment', image);
+
+      const response = await axiosPublic.post('/upload-single-file', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
       });
 
-      const data = await response.json();
-
-      if (data.data && data.data.url) {
-        return data.data.url; // Imgbb URL of the uploaded image
-      } else {
-        console.error('Error uploading image:', data);
-        return null;
+      if (response?.data?.fileUrl) {
+        return response.data.fileUrl;
       }
     } catch (error) {
-      console.error('Error:', error);
-      return null;
+      console.error('Error uploading file:', error);
     }
   };
 
   const handleImageChange = async (event) => {
     const file = event.target.files[0];
-    if (file) {
-      // Immediately upload the selected image to Imgbb
-      const uploadedImageUrl = await uploadToImgbb(file);
+    if (!file) return;
 
-      if (uploadedImageUrl) {
-        // Update the state with the Imgbb URL instead of the local blob URL
-        setImage({
-          src: uploadedImageUrl,
-          file: file,
-        });
-      }
+    if (!isValidImageFile(file)) return;
+
+    // Immediately upload the selected image to Imgbb
+    const uploadedImageUrl = await uploadSingleFileToGCS(file);
+
+    if (uploadedImageUrl) {
+      // Update the state with the Imgbb URL instead of the local blob URL
+      setImage(uploadedImageUrl);
     }
   };
 
@@ -126,21 +117,6 @@ const EditPromo = () => {
     const { promoCode, promoDiscountValue, maxAmount, minAmount } = data;
 
     let hasError = false;
-
-    // Initialize imageUrl with the existing one
-    let imageUrl = promoDetails?.imageUrl || '';
-
-    // If a new image is uploaded, upload it to Imgbb
-    if (image && image.file) {
-      imageUrl = await uploadToImgbb(image.file);
-      if (!imageUrl) {
-        toast.error('Image upload failed, cannot proceed.');
-        hasError = true;
-      }
-    } else if (image === null) {
-      // If the image is removed, explicitly set imageUrl to an empty string
-      imageUrl = '';
-    }
 
     if (!expiryDate) {
       setDateError(true);
@@ -173,7 +149,7 @@ const EditPromo = () => {
         maxAmount: maxAmount || 0,
         minAmount: minAmount || 0,
         promoDescription,
-        imageUrl
+        imageUrl: image === null ? "" : image,
       };
 
       const res = await axiosPublic.put(`/updatePromo/${id}`, updatedDiscount);
@@ -356,7 +332,7 @@ const EditPromo = () => {
                   {image && (
                     <div className='relative'>
                       <Image
-                        src={typeof image === 'string' ? image : image.src}
+                        src={image}
                         alt='Uploaded image'
                         height={3000}
                         width={3000}
