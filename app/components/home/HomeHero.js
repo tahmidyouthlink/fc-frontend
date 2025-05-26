@@ -82,10 +82,10 @@ export default function HomeHero({
     <div className="relative">
       {/* Mesh Gradients */}
       <div className="absolute inset-0 h-full overflow-hidden">
-        <div className="absolute left-[5%] top-[60%] animate-blob bg-[#f8dfcb] max-sm:hidden" />
-        <div className="absolute left-[30%] top-[30%] animate-blob bg-[#d7f8d3] [animation-delay:1.5s]" />
-        <div className="absolute left-[55%] top-[70%] animate-blob bg-[#f8dfcb] [animation-delay:0.5s] max-sm:left-[5%] sm:bg-[#d7f8d3]" />
-        <div className="absolute left-[80%] top-1/3 animate-blob bg-[#f8dfcb] [animation-delay:2s] max-sm:hidden" />
+        <div className="absolute left-[5%] top-[60%] animate-blob bg-[var(--color-moving-bubble-secondary)] max-sm:hidden" />
+        <div className="absolute left-[30%] top-[30%] animate-blob bg-[var(--color-moving-bubble-primary)] [animation-delay:1.5s]" />
+        <div className="absolute left-[55%] top-[70%] animate-blob bg-[var(--color-moving-bubble-secondary)] [animation-delay:0.5s] max-sm:left-[5%] sm:bg-[var(--color-moving-bubble-primary)]" />
+        <div className="absolute left-[80%] top-1/3 animate-blob bg-[var(--color-moving-bubble-secondary)] [animation-delay:2s] max-sm:hidden" />
       </div>
       <div className="relative flex h-dvh flex-col px-5 pb-6 pt-[106px] sm:h-[65dvh] sm:px-8 sm:pt-32 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0 2xl:pb-[6vh] 2xl:pt-[calc(88px+6vh)] portrait:md:h-[75dvh] portrait:lg:h-[60dvh] landscape:h-dvh">
         <div>

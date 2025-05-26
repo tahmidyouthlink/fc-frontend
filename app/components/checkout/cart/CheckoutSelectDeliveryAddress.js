@@ -20,7 +20,7 @@ export default function CheckoutSelectDeliveryAddress({
       {/* Button */}
       <button
         type="button"
-        className="flex items-center gap-1.5 text-nowrap rounded-md bg-[#d4ffce] p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-[#bdf6b4]"
+        className="flex items-center gap-1.5 text-nowrap rounded-md bg-[var(--color-primary-regular)] p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-[var(--color-primary-dark)]"
         onClick={() => setIsAddressModalOpen(true)}
       >
         <HiOutlineMapPin className="text-base" />

@@ -151,7 +151,7 @@ export default function ReturnImagesField({
             className="size-16 opacity-60 transition-opacity duration-300 ease-in-out"
           />
           <p className="text-[13px]">
-            <span className="text-[#57944e] underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-[#6cb461]">
+            <span className="text-[var(--color-primary-darkest)] underline underline-offset-2 transition-[color] duration-300 ease-in-out hover:text-[var(--color-primary-darker)]">
               Click to upload
             </span>{" "}
             or drag and drop

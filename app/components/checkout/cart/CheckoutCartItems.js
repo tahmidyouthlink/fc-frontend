@@ -112,7 +112,7 @@ export default function CheckoutCartItems({
               {/* Cart Item Image (with link to product page) */}
               <TransitionLink
                 href={`/product/${cartItem?.productTitle.split(" ").join("-").toLowerCase()}`}
-                className="relative block min-h-full w-1/4 overflow-hidden rounded-md bg-[#F0F0F0] max-sm:w-20"
+                className="relative block min-h-full w-1/4 overflow-hidden rounded-md bg-[var(--product-default)] max-sm:w-20"
               >
                 {!!cartItemImgUrl && (
                   <Image
@@ -184,7 +184,7 @@ export default function CheckoutCartItems({
                       ) && (
                         <>
                           <span
-                            className={`mt-[3px] flex cursor-default items-center gap-x-1 text-xs underline-offset-2 hover:underline xl:hidden ${isEligibleForSpecialOffer ? "text-[#57944e]" : "text-[#90623a]"}`}
+                            className={`mt-[3px] flex cursor-default items-center gap-x-1 text-xs underline-offset-2 hover:underline xl:hidden ${isEligibleForSpecialOffer ? "text-[#45963a]" : "text-[#90623a]"}`}
                             onClick={() => {
                               setActiveModalItem({
                                 ...specialOfferInfo,
@@ -238,7 +238,7 @@ export default function CheckoutCartItems({
                             )}
                           >
                             <span
-                              className={`mt-[3px] hidden cursor-default items-center gap-x-1 text-xs underline-offset-2 hover:underline xl:flex ${isEligibleForSpecialOffer ? "text-[#57944e]" : "text-[#90623a]"}`}
+                              className={`mt-[3px] hidden cursor-default items-center gap-x-1 text-xs underline-offset-2 hover:underline xl:flex ${isEligibleForSpecialOffer ? "text-[#45963a]" : "text-[#90623a]"}`}
                             >
                               <span>
                                 Special Offer* (
@@ -295,7 +295,7 @@ export default function CheckoutCartItems({
                     <div className="mt-auto flex gap-x-1.5 text-neutral-500 [&>*]:!m-0 [&>*]:grid [&>*]:size-8 [&>*]:place-content-center [&>*]:rounded-md [&>*]:border-2 [&>*]:border-neutral-200 [&>*]:bg-white/20 [&>*]:!p-0 [&>*]:text-center [&>*]:backdrop-blur-2xl [&>*]:transition-[background-color,border-color] [&>*]:duration-300 [&>*]:ease-in-out sm:[&>*]:rounded-lg">
                       {/* Quantity Decrease Button */}
                       <button
-                        className="transition-[background-color,border-color] hover:border-transparent hover:bg-[#FBEDE2]"
+                        className="transition-[background-color,border-color] hover:border-transparent hover:bg-[var(--color-secondary-regular)]"
                         type="button"
                         onClick={() =>
                           handleCartUpdate(
@@ -318,7 +318,7 @@ export default function CheckoutCartItems({
                       </button>
                       {/* Quantity Input Field */}
                       <input
-                        className="w-fit text-center font-semibold outline-none transition-[border-color] [-moz-appearance:textfield] focus:border-[#F4D3BA] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                        className="w-fit text-center font-semibold outline-none transition-[border-color] [-moz-appearance:textfield] focus:border-[var(--color-secondary-regular)] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                         type="number"
                         arial-label="Quantity"
                         min={1}
@@ -350,7 +350,7 @@ export default function CheckoutCartItems({
                       />
                       {/* Quantity Inccrease Button */}
                       <button
-                        className="transition-[background-color,border-color] hover:border-transparent hover:bg-[#FBEDE2]"
+                        className="transition-[background-color,border-color] hover:border-transparent hover:bg-[var(--color-secondary-regular)]"
                         type="button"
                         onClick={() =>
                           handleCartUpdate(

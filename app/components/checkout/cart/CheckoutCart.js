@@ -67,7 +67,7 @@ export default function CheckoutCart({
             />
             <button
               onClick={() => handleSubmit(onSubmit, onError)()}
-              className="relative z-[1] w-full rounded-lg bg-[#d4ffce] py-2.5 text-xs text-neutral-700 transition-[background-color] duration-300 hover:bg-[#bdf6b4] md:text-sm"
+              className="relative z-[1] w-full rounded-lg bg-[var(--color-primary-regular)] py-2.5 text-xs text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)] md:text-sm"
             >
               Proceed to Payment
             </button>

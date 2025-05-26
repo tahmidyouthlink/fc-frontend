@@ -75,7 +75,7 @@ export default function ForgotPasswordForm({ setIsAuthModalOpen }) {
               message: "Email is required.",
             },
           })}
-          className="h-11 w-full rounded-lg border-2 border-[#ededed] px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white md:text-[13px]"
+          className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white md:text-[13px]"
           required
         />
         {/* Email Error Message */}
@@ -88,7 +88,7 @@ export default function ForgotPasswordForm({ setIsAuthModalOpen }) {
       {/* Reset Password Button */}
       <button
         type="submit"
-        className="!mt-7 w-full rounded-lg bg-[#d4ffce] py-3 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[#bdf6b4] md:text-sm"
+        className="!mt-7 w-full rounded-lg bg-[var(--color-primary-regular)] py-3 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)] md:text-sm"
       >
         Send Email
       </button>

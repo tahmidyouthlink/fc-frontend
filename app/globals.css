@@ -21,6 +21,7 @@
   --header-height-lg: calc(
     var(--top-header-height) + var(--bottom-header-height-lg)
   );
+  --product-default: #f0f0f0;
 }
 
 @layer base {
@@ -206,7 +207,7 @@
   }
 
   .payment-methods input:not(:disabled)::before {
-    @apply cursor-pointer border-neutral-200 checked:border-neutral-400 checked:bg-[#e8ffe4] hover:border-neutral-400 hover:bg-white/75;
+    @apply cursor-pointer border-neutral-200 checked:border-neutral-300 checked:bg-[var(--color-primary-regular)] hover:border-neutral-300 [&:not(:checked):hover]:bg-[var(--color-primary-light)];
   }
 
   .payment-methods input:disabled::before {
@@ -219,7 +220,7 @@
   }
 
   .date-picker > div {
-    @apply h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 shadow-none outline-none backdrop-blur-2xl transition-[background-color,border-color,opacity] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white/75 md:text-[13px];
+    @apply h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 shadow-none outline-none backdrop-blur-2xl transition-[background-color,border-color,opacity] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-primary-regular)] focus:bg-white/75 md:text-[13px];
   }
 
   .select-with-search input,
@@ -238,7 +239,7 @@
   }
 
   .user-info input:not([data-slot]) {
-    @apply h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-neutral-700 outline-none backdrop-blur-2xl backdrop-opacity-100 transition-[border-color,padding-left,padding-right,height,backdrop-filter,background-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white/75;
+    @apply h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-neutral-700 outline-none backdrop-blur-2xl backdrop-opacity-100 transition-[border-color,padding-left,padding-right,height,backdrop-filter,background-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-primary-regular)] focus:bg-white/75;
   }
 
   .user-info input:not([data-slot]):is(:read-only):not(:disabled),
@@ -276,11 +277,6 @@
   .animate-blob {
     @apply pointer-events-none size-64 rounded-full mix-blend-multiply blur-[32px];
   }
-}
-
-/* For on hover and active mobile nav links */
-nav.mobile div:first-child :is(.active, a:not(:has(img)):hover) {
-  @apply bg-[#9f5116ef] text-white;
 }
 
 .custom-editor {

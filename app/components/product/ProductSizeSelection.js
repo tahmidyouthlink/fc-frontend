@@ -13,7 +13,7 @@ export default function ProductSizeSelection({
           return (
             <span
               key={"product-size-" + size}
-              className={`h-9 w-12 cursor-pointer content-center rounded-lg text-center text-sm font-semibold text-neutral-500 transition-[background-color] duration-300 ease-in-out ${selectedOptions?.size === size ? "bg-[#F4D3BA] text-neutral-700" : "bg-neutral-100 hover:bg-[#FBEDE2]"}`}
+              className={`h-9 w-12 cursor-pointer content-center rounded-lg text-center text-sm font-semibold text-neutral-500 transition-[background-color] duration-300 ease-in-out ${selectedOptions?.size === size ? "bg-[var(--color-secondary-regular)] text-neutral-700" : "bg-neutral-100 hover:bg-[var(--color-secondary-regular)]"}`}
               onClick={() =>
                 setSelectedOptions((prevOptions) => ({
                   ...prevOptions,

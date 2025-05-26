@@ -34,7 +34,45 @@ export default async function RootLayout({ children }) {
 
   return (
     <Suspense fallback={<LoadingSpinner />}>
-      <style>{`:root { --top-header-height: ${topHeaderHeight}; }`}</style>
+      <style>{`:root {
+          --top-header-height: ${topHeaderHeight};
+          --color-primary-lightest: #fafff9;
+          --color-primary-lighter: #d7ecd2;
+          --color-primary-light: #ebfeeb;
+          --color-primary-regular: #d4ffce;
+          --color-primary-dark: #bdf6b4;
+          --color-primary-darker: #6cb461;
+          --color-primary-darkest: #57944e;
+          --color-secondary-lightest: #fffaf4;
+          --color-secondary-lighter: #ffffff;
+          --color-secondary-light: #fbede2;
+          --color-secondary-regular: #ffddc2;
+          --color-secondary-dark: #fbcfb0;
+          --color-secondary-darker: #d39261;
+          --color-secondary-darkest: #b96826;
+          --color-tertiary-lightest: #ffffff;
+          --color-tertiary-lighter: #ffffff;
+          --color-tertiary-light: #ffffff;
+          --color-tertiary-regular: #ecdbef;
+          --color-tertiary-dark: #e7c5ed;
+          --color-tertiary-darker: #ffffff;
+          --color-tertiary-darkest: #ffffff;
+          --color-quaternary-lightest: #ffffff;
+          --color-quaternary-lighter: #ffffff;
+          --color-quaternary-light: #ffffff;
+          --color-quaternary-regular: #ffffff;
+          --color-quaternary-dark: #ffffff;
+          --color-quaternary-darker: #ffffff;
+          --color-quaternary-darkest: #ffffff;
+          --color-moving-bubble-primary: #d7f8d3;
+          --color-moving-bubble-secondary: #f8dfcb;
+          --color-moving-bubble-tertiary: #ffffff;
+          --color-moving-bubble-quaternary: #ffffff;
+          --color-static-bubble-primary: #e0fcdc;
+          --color-static-bubble-secondary: #fedcbf;
+          --color-static-bubble-tertiary: #ffffff;
+          --color-static-bubble-quaternary: #ffffff;
+        }`}</style>
       <div className="flex min-h-dvh flex-col [&>main]:grow">
         <Header
           isTopHeaderEnabled={topHeaderData?.isSlideEnabled}

@@ -49,7 +49,7 @@ export default function ReturnInfoModal({
             <ModalFooter>
               <TransitionLink
                 href="/contact-us"
-                className="flex w-fit items-center gap-2 rounded-lg bg-[#d4ffce] px-4 py-2.5 text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[#bdf6b4]"
+                className="flex w-fit items-center gap-2 rounded-lg bg-[var(--color-primary-regular)] px-4 py-2.5 text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)]"
               >
                 Contact Us
                 <LuMessagesSquare size={17} />

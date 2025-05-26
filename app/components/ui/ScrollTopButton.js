@@ -29,7 +29,7 @@ export default function ScrollTopButton() {
   return (
     <button
       id="scroll-top"
-      className="pointer-events-none fixed bottom-3 right-3 z-[3] rounded-md bg-[#fae3d2] p-2.5 opacity-0 transition-[opacity,background-color] duration-300 ease-in-out hover:bg-neutral-700 [&:hover>svg]:text-neutral-50"
+      className="pointer-events-none fixed bottom-3 right-3 z-[3] rounded-md bg-[var(--color-secondary-regular)] p-2.5 opacity-0 transition-[opacity,background-color] duration-300 ease-in-out hover:bg-[var(--color-secondary-dark)]"
       onClick={() => {
         window.scrollTo({
           top: 0,
@@ -37,7 +37,7 @@ export default function ScrollTopButton() {
         });
       }}
     >
-      <CgArrowUp className="size-5 text-neutral-800 transition-[color] duration-300 ease-in-out" />
+      <CgArrowUp className="size-5 text-neutral-800" />
     </button>
   );
 }

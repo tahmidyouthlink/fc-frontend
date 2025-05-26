@@ -49,9 +49,9 @@ export default function CheckoutConfirmation({
       />
       {/* Mesh Gradients */}
       <div>
-        <div className="absolute left-[10%] top-[40%] h-[150px] w-[150px] translate-x-[-50%] translate-y-[-50%] rounded-[100%] bg-[#FEDCBF] blur-[60px] md:left-[20%] md:blur-[40px] lg:top-[30%] xl:h-[187px] xl:w-[214px]" />
-        <div className="absolute left-[60%] top-[20%] h-[150px] w-[150px] translate-x-[-50%] translate-y-[-50%] rounded-[100%] bg-[#E0FCDC] blur-[60px] md:blur-[40px] xl:h-[187px] xl:w-[214px]" />
-        <div className="absolute -right-4 bottom-4 h-[150px] w-[150px] rounded-full bg-[#FEDCBF] blur-[60px] md:blur-[40px] xl:h-[187px] xl:w-[214px]" />
+        <div className="absolute left-[10%] top-[40%] h-[150px] w-[150px] translate-x-[-50%] translate-y-[-50%] rounded-[100%] bg-[var(--color-static-bubble-secondary)] blur-[60px] md:left-[20%] md:blur-[40px] lg:top-[30%] xl:h-[187px] xl:w-[214px]" />
+        <div className="absolute left-[60%] top-[20%] h-[150px] w-[150px] translate-x-[-50%] translate-y-[-50%] rounded-[100%] bg-[var(--color-static-bubble-primary)] blur-[60px] md:blur-[40px] xl:h-[187px] xl:w-[214px]" />
+        <div className="absolute -right-4 bottom-4 h-[150px] w-[150px] rounded-full bg-[var(--color-static-bubble-secondary)] blur-[60px] md:blur-[40px] xl:h-[187px] xl:w-[214px]" />
       </div>
       {/* Side Image 1 */}
       <div className="absolute -left-[30%] bottom-0 aspect-square h-[60vh] -translate-x-1/4 translate-y-[7.5%] opacity-60 max-lg:hidden xl:left-0 xl:-scale-x-100">
@@ -121,7 +121,7 @@ export default function CheckoutConfirmation({
         {/* Shop Page button */}
         <TransitionLink
           href="/shop"
-          className="mt-9 block rounded-lg bg-[#d4ffce] px-4 py-2.5 text-center text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[#bdf6b4]"
+          className="mt-9 block rounded-lg bg-[var(--color-primary-regular)] px-4 py-2.5 text-center text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)]"
         >
           Continue Shopping
         </TransitionLink>

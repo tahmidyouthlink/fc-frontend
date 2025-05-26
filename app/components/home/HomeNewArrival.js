@@ -18,7 +18,7 @@ export default function HomeNewArrival({
   if (!!newlyArrivedProducts?.length)
     return (
       <div
-        className={`relative w-full overflow-hidden ${isAnyTrendingProductAvailable ? "bg-[#FBEDE2]" : ""}`}
+        className={`relative w-full overflow-hidden ${isAnyTrendingProductAvailable ? "bg-[var(--color-secondary-light)]" : ""}`}
       >
         <div className="absolute inset-0 ml-auto bg-[url('/shapes/curved-dotted-line-new-arrival.svg')] bg-right-top bg-no-repeat opacity-50 max-lg:top-1/2 max-lg:-translate-y-7 max-lg:bg-contain lg:max-lg:w-2/3" />
         <div className="relative mx-auto px-5 py-8 md:py-10 lg:py-12 xl:max-w-[1200px] xl:px-0">

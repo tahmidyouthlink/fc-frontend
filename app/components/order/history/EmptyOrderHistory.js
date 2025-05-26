@@ -5,13 +5,13 @@ export default function EmptyOrderHistory() {
   return (
     <section className="bottom-[var(--section-padding)] top-[var(--section-padding)] grow auto-rows-max rounded-xl border-2 border-neutral-50/20 bg-white/60 p-3.5 shadow-[0_0_20px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl lg:sticky xl:p-5">
       <div className="flex min-h-full flex-col items-center justify-center font-semibold">
-        <HiOutlineArchiveBoxXMark className="size-24 text-[#F4D3BA]" />
+        <HiOutlineArchiveBoxXMark className="size-24 text-[var(--color-secondary-regular)]" />
         <p className="mt-2 text-neutral-400">
           You haven&apos;t placed any order yet.
         </p>
         <TransitionLink
           href="/shop"
-          className="mt-9 block rounded-lg bg-[#d4ffce] px-4 py-2.5 text-center text-sm text-neutral-600 transition-[background-color] duration-300 hover:bg-[#bdf6b4]"
+          className="mt-9 block rounded-lg bg-[var(--color-primary-regular)] px-4 py-2.5 text-center text-sm text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)]"
         >
           Return to Shop
         </TransitionLink>

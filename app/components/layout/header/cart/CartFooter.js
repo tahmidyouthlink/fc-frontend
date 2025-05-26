@@ -16,7 +16,7 @@ export default function CartFooter({ subtotal, setIsDropdownOpen }) {
           href="/shop"
           hasDrawer={true}
           setIsDrawerOpen={setIsDropdownOpen}
-          className="block w-full rounded-lg bg-[#d4ffce] py-2.5 text-center text-sm transition-[background-color] duration-300 hover:bg-[#bdf6b4]"
+          className="block w-full rounded-lg bg-[var(--color-primary-regular)] py-2.5 text-center text-sm transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)]"
         >
           Continue Shopping
         </TransitionLink>
@@ -25,7 +25,7 @@ export default function CartFooter({ subtotal, setIsDropdownOpen }) {
           href="/checkout"
           hasDrawer={true}
           setIsDrawerOpen={setIsDropdownOpen}
-          className="block w-full rounded-lg bg-[#ffddc2] py-2.5 text-center text-sm transition-[background-color] duration-300 hover:bg-[#fbcfb0]"
+          className="block w-full rounded-lg bg-[var(--color-secondary-regular)] py-2.5 text-center text-sm transition-[background-color] duration-300 hover:bg-[var(--color-secondary-dark)]"
         >
           Checkout
         </TransitionLink>

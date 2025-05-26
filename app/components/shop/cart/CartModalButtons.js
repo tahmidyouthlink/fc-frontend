@@ -127,7 +127,7 @@ export default function CartModalButtons({
     <div className="flex gap-x-2.5">
       <TransitionLink
         href={productPageLink}
-        className="ml-auto block rounded-lg bg-[#d4ffce] px-4 py-2.5 text-center text-sm text-neutral-600 transition-[background-color] duration-300 hover:bg-[#bdf6b4]"
+        className="ml-auto block rounded-lg bg-[var(--color-primary-regular)] px-4 py-2.5 text-center text-sm text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)]"
       >
         View Product Details
       </TransitionLink>
@@ -169,7 +169,7 @@ export default function CartModalButtons({
           >
             <button
               disabled={!!selectedOptions?.size && !productVariantSku}
-              className={`relative select-none whitespace-nowrap rounded-lg bg-[#ffddc2] px-4 py-2.5 text-sm text-neutral-600 transition-[background-color,opacity] duration-300 ease-in-out max-xl:hidden ${!selectedOptions?.size ? "cursor-default rounded-lg opacity-50" : "opacity-100 hover:bg-[#fbcfb0]"}`}
+              className={`relative select-none whitespace-nowrap rounded-lg bg-[var(--color-secondary-regular)] px-4 py-2.5 text-sm text-neutral-600 transition-[background-color,opacity] duration-300 ease-in-out max-xl:hidden ${!selectedOptions?.size ? "cursor-default rounded-lg opacity-50" : "opacity-100 hover:bg-[var(--color-secondary-dark)]"}`}
               onClick={() => {
                 if (!!selectedOptions?.size) {
                   handleAddToCart();
@@ -197,7 +197,7 @@ export default function CartModalButtons({
             <PopoverTrigger className="z-[0] outline-none xl:hidden">
               <button
                 disabled={!!selectedOptions?.size && !productVariantSku}
-                className={`relative select-none whitespace-nowrap rounded-lg bg-[#ffddc2] px-4 py-2.5 text-sm text-neutral-600 transition-[background-color,opacity] duration-300 ease-in-out ${!selectedOptions?.size ? "cursor-default rounded-lg opacity-50" : "opacity-100 hover:bg-[#fbcfb0]"}`}
+                className={`relative select-none whitespace-nowrap rounded-lg bg-[var(--color-secondary-regular)] px-4 py-2.5 text-sm text-neutral-600 transition-[background-color,opacity] duration-300 ease-in-out ${!selectedOptions?.size ? "cursor-default rounded-lg opacity-50" : "opacity-100 hover:bg-[var(--color-secondary-dark)]"}`}
                 onClick={() => {
                   if (!!selectedOptions?.size) {
                     handleAddToCart();
@@ -222,7 +222,7 @@ export default function CartModalButtons({
       ) : (
         <button
           disabled={!!selectedOptions?.size && !productVariantSku}
-          className={`relative select-none whitespace-nowrap rounded-lg bg-[#ffddc2] px-4 py-2.5 text-sm text-neutral-600 transition-[background-color,opacity] duration-300 ease-in-out ${!selectedOptions?.size || !productVariantSku ? "cursor-default rounded-lg opacity-50" : "opacity-100 hover:bg-[#fbcfb0]"}`}
+          className={`relative select-none whitespace-nowrap rounded-lg bg-[var(--color-secondary-regular)] px-4 py-2.5 text-sm text-neutral-600 transition-[background-color,opacity] duration-300 ease-in-out ${!selectedOptions?.size || !productVariantSku ? "cursor-default rounded-lg opacity-50" : "opacity-100 hover:bg-[var(--color-secondary-dark)]"}`}
           onClick={() => {
             if (!!selectedOptions?.size) {
               handleAddToCart();
