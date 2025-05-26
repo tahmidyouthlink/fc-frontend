@@ -130,7 +130,6 @@ const PolicyPages = () => {
       }
 
       setUploadedUrls(uploadResults); // Save URLs for preview
-      console.log(uploadResults, "uploadResults");
 
       try {
         const response = await axiosPublic.put(`/edit-policy-pdfs/${pdfId}`, uploadResults);

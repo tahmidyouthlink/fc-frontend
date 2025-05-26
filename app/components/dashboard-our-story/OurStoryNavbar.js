@@ -13,6 +13,7 @@ import DOMPurify from "dompurify";
 import useOurStory from '@/app/hooks/useOurStory';
 import { formatDate } from '../shared/DateFormat';
 import CustomSwitch from '../layout/CustomSwitch';
+import axios from 'axios';
 
 const OurStoryNavbar = () => {
 
@@ -75,6 +76,32 @@ const OurStoryNavbar = () => {
     }
   };
 
+  const uploadSingleFileToGCS2 = async (file) => {
+    try {
+      // Step 1: Ask your backend for a signed upload URL
+      const { data } = await axiosPublic.post('/generate-upload-url', {
+        fileName: file.name,
+        contentType: file.type,
+      });
+
+      const { uploadUrl, publicUrl } = data;
+
+      // Step 2: Upload the file directly to GCS using the signed URL
+      await axios.put(uploadUrl, file, {
+        headers: {
+          'Content-Type': file.type,
+        },
+      });
+
+      // Step 3: Return the public URL so you can display/use the uploaded file
+      return publicUrl;
+
+    } catch (error) {
+      console.error('Error uploading file to GCS:', error);
+      return null;
+    }
+  };
+
   const handleCoverImgChange = async (file) => {
     if (!file) return; // guard
 
@@ -116,7 +143,7 @@ const OurStoryNavbar = () => {
     setRequiredFileErrors(updatedErrors);
 
     // Upload and replace preview with real URL
-    const uploadedUrl = await uploadSingleFileToGCS(file);
+    const uploadedUrl = await uploadSingleFileToGCS2(file);
     if (uploadedUrl) {
       updatedUrls[index] = uploadedUrl;
       setMediaUrls([...updatedUrls]);
