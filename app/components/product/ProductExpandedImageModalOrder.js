@@ -50,7 +50,7 @@ export default function ProductExpandedImageModalOrder({
         alt={`${productTitle} ${selectedColorLabel} ${activeImageIndex + 1} Expanded`}
         height={0}
         width={0}
-        className="bg-[#F0F0F0] object-contain portrait:h-auto portrait:max-h-[calc(100dvh-20*4px-24*2px)] portrait:w-[calc(100dvw-10*4px-20px*2)] portrait:sm:w-[calc(100dvw-20*4px-24px*2)] landscape:h-[90vh] landscape:w-auto"
+        className="bg-[var(--product-default)] object-contain portrait:h-auto portrait:max-h-[calc(100dvh-20*4px-24*2px)] portrait:w-[calc(100dvw-10*4px-20px*2)] portrait:sm:w-[calc(100dvw-20*4px-24px*2)] landscape:h-[90vh] landscape:w-auto"
         sizes="90vh"
       />
     </div>

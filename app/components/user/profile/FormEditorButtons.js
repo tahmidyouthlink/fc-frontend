@@ -31,7 +31,7 @@ export default function FormEditorButtons({
     return isEditingForm ? (
       // Display canel and save buttons if form is being edited
       <div className="user-into-form-buttons">
-        <button className="bg-[#d4ffce] hover:bg-[#bdf6b4]">
+        <button className="bg-[var(--color-primary-regular)] hover:bg-[var(--color-primary-dark)]">
           <RiSaveLine />
           <p>Save</p>
         </button>
@@ -52,7 +52,7 @@ export default function FormEditorButtons({
           {!isPrimary && (
             <button
               type="button"
-              className="bg-[#d4ffce] hover:bg-[#bdf6b4]"
+              className="bg-[var(--color-primary-regular)] hover:bg-[var(--color-primary-dark)]"
               onClick={() => handlePrimarySelection()}
             >
               <RiStarLine />
@@ -88,7 +88,7 @@ export default function FormEditorButtons({
               <>
                 <ModalBody>
                   <div className="mx-auto mb-6 mt-10 max-w-lg [&>*]:mx-auto [&>*]:w-fit">
-                    <RiDeleteBin6Line className="size-24 text-[#F4D3BA]" />
+                    <RiDeleteBin6Line className="size-24 text-[var(--color-secondary-regular)]" />
                     <h4 className="mt-6 text-lg font-semibold text-neutral-600 hover:text-neutral-700">
                       Are your sure you want to delete this address?
                     </h4>
@@ -114,7 +114,7 @@ export default function FormEditorButtons({
                       setIsDeleteModalOpen(false);
                     }}
                     endContent={<RiDeleteBin6Line />}
-                    className="rounded-lg bg-[#d4ffce] px-5 py-3 font-semibold text-neutral-600 !opacity-100 transition-[background-color,color] duration-300 hover:bg-[#bdf6b4] hover:text-neutral-700 md:text-sm [&_p]:text-xs"
+                    className="rounded-lg bg-[var(--color-primary-regular)] px-5 py-3 font-semibold text-neutral-600 !opacity-100 transition-[background-color,color] duration-300 hover:bg-[var(--color-primary-dark)] hover:text-neutral-700 md:text-sm [&_p]:text-xs"
                   >
                     Delete
                   </Button>
@@ -129,7 +129,7 @@ export default function FormEditorButtons({
   else
     return (
       <div className="user-into-form-buttons">
-        <button className="bg-[#d4ffce] hover:bg-[#bdf6b4]">
+        <button className="bg-[var(--color-primary-regular)] hover:bg-[var(--color-primary-dark)]">
           <RiSaveLine />
           <p>Save</p>
         </button>

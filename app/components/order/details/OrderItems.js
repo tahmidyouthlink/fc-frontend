@@ -46,7 +46,7 @@ export default function OrderItems({ orderItems }) {
             >
               <TransitionLink
                 href={`/product/${item?.productTitle?.split(" ")?.join("-")?.toLowerCase()}`}
-                className="relative block min-h-full w-[72px] overflow-hidden rounded-md bg-[#F0F0F0] sm:w-20 xl:w-1/4"
+                className="relative block min-h-full w-[72px] overflow-hidden rounded-md bg-[var(--product-default)] sm:w-20 xl:w-1/4"
               >
                 {!!item?.thumbnailImgUrl && (
                   <Image
@@ -94,7 +94,7 @@ export default function OrderItems({ orderItems }) {
                       {!!item?.offerInfo && (
                         <>
                           <span
-                            className="mt-1 flex cursor-default items-center gap-x-1 text-xs text-[#57944e] underline-offset-2 hover:underline xl:hidden"
+                            className="mt-1 flex cursor-default items-center gap-x-1 text-xs text-[#45963a] underline-offset-2 hover:underline xl:hidden"
                             onClick={() => {
                               setActiveModalItem(item);
                               setIsSpecialOfferModalOpen(true);
@@ -125,7 +125,7 @@ export default function OrderItems({ orderItems }) {
                               item?.offerInfo?.appliedOfferDiscount,
                             )}
                           >
-                            <span className="mt-1 hidden cursor-default items-center gap-x-1 text-xs text-[#57944e] underline-offset-2 hover:underline xl:flex">
+                            <span className="mt-1 hidden cursor-default items-center gap-x-1 text-xs text-[#45963a] underline-offset-2 hover:underline xl:flex">
                               <span>
                                 Special Offer (
                                 {item?.offerInfo?.offerDiscountType ===

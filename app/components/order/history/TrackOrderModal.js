@@ -125,7 +125,7 @@ export default function TrackOrderModal({
                 <Link
                   href={shipmentInfo?.trackingUrl}
                   target="_blank"
-                  className="mx-auto !mt-3 mb-9 flex w-fit items-center gap-2 rounded-lg bg-[#d4ffce] px-4 py-2.5 text-center text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[#bdf6b4]"
+                  className="mx-auto !mt-3 mb-9 flex w-fit items-center gap-2 rounded-lg bg-[var(--color-primary-regular)] px-4 py-2.5 text-center text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)]"
                 >
                   Track Your Package
                   <LuBox size={17} />

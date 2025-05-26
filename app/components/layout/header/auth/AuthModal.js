@@ -59,7 +59,7 @@ export default function AuthModal({
                   Don`&apos;`t have an account?{" "}
                   <button
                     type="button"
-                    className="font-semibold text-[#57944e] transition-[color] duration-300 ease-in-out hover:text-[#6cb461]"
+                    className="font-semibold text-[var(--color-primary-darkest)] transition-[color] duration-300 ease-in-out hover:text-[var(--color-primary-darker)]"
                     onClick={() => setModalContent("register")}
                   >
                     Register

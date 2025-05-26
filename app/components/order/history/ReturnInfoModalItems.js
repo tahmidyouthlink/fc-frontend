@@ -36,7 +36,7 @@ export default function ReturnInfoModalItems({ returnProducts }) {
               >
                 <TransitionLink
                   href={`/product/${item?.productTitle?.split(" ")?.join("-")?.toLowerCase()}`}
-                  className="relative block min-h-full w-[72px] overflow-hidden rounded-md bg-[#F0F0F0] sm:w-20 xl:w-1/4"
+                  className="relative block min-h-full w-[72px] overflow-hidden rounded-md bg-[var(--product-default)] sm:w-20 xl:w-1/4"
                 >
                   {!!item?.thumbnailImgUrl && (
                     <Image

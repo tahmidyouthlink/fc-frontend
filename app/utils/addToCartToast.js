@@ -45,7 +45,7 @@ export default function addToCartToast(
       {/* Cart Item Information */}
       <div className="flex w-fit items-stretch justify-between gap-x-2.5">
         {/* Cart Item Image */}
-        <div className="relative min-h-full grow overflow-hidden rounded-md bg-[#F0F0F0] max-sm:w-16 sm:aspect-[1.1/1] sm:h-[52px]">
+        <div className="relative min-h-full grow overflow-hidden rounded-md bg-[var(--product-default)] max-sm:w-16 sm:aspect-[1.1/1] sm:h-[52px]">
           <Image
             className="h-full w-full object-contain"
             src={productImg}

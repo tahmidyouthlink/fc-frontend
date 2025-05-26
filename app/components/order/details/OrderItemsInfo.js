@@ -32,7 +32,7 @@ export default function OrderItemsInfo({
             onClick={() => setIsPromoModalOpen(true)}
           >
             Promo (
-            <span className="cursor-default text-[#57944e] underline underline-offset-2">
+            <span className="cursor-default text-[#45963a] underline underline-offset-2">
               {promoInfo?.promoCode}
             </span>
             )
@@ -61,7 +61,7 @@ export default function OrderItemsInfo({
               isEligibleForSpecialOffer={true}
               savedAmount={promoInfo?.appliedPromoDiscount}
             >
-              <span className="cursor-default text-[#57944e] underline underline-offset-2">
+              <span className="cursor-default text-[#45963a] underline underline-offset-2">
                 {promoInfo?.promoCode}
               </span>
             </DiscountTooptip>

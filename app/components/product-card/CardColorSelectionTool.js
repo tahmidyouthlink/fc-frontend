@@ -29,7 +29,7 @@ export default function CardColorSelectionTool({
   return (
     <div
       id="color-select"
-      className="absolute bottom-0 left-1/2 flex w-full -translate-x-1/2 translate-y-5 items-center gap-x-1.5 border border-[#F0F0F0] bg-white bg-opacity-75 px-3 py-3 opacity-0 transition-[transform,opacity] duration-300 ease-in-out sm:gap-x-2.5"
+      className="absolute bottom-0 left-1/2 flex w-full -translate-x-1/2 translate-y-5 items-center gap-x-1.5 border border-[var(--product-default)] bg-white bg-opacity-75 px-3 py-3 opacity-0 transition-[transform,opacity] duration-300 ease-in-out sm:gap-x-2.5"
     >
       <h5 className="text-[13px] font-semibold text-neutral-600">
         <span className="max-sm:hidden">Available </span>Colors:
@@ -39,7 +39,7 @@ export default function CardColorSelectionTool({
           return (
             <div
               key={productTitle + color._id}
-              className="grid size-[26px] cursor-pointer place-items-center rounded-full border-3 transition-[border-color] duration-300 ease-in-out hover:border-[#c18d6c]"
+              className="grid size-[26px] cursor-pointer place-items-center rounded-full border-3 transition-[border-color] duration-300 ease-in-out hover:border-[var(--color-secondary-darker)]"
               style={{
                 borderColor: colorIndex === 0 ? "#c18d6c" : "transparent",
               }}

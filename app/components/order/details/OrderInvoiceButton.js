@@ -40,7 +40,7 @@ const OrderInvoiceButton = ({ selectedOrder }) => {
 
   return (
     <button
-      className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#d4ffce] py-3 text-center text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[#bdf6b4]"
+      className="flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--color-primary-regular)] py-3 text-center text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)]"
       onClick={handlePreview}
     >
       View Invoice

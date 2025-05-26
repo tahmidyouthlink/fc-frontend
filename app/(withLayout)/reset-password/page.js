@@ -120,19 +120,19 @@ export default function ResetPassword({ searchParams }) {
     >
       {/* Left Mesh Gradient */}
       <div
-        className={`sticky left-[5%] top-1/2 animate-blob bg-[#f8dfcb] max-sm:hidden ${!tokenData.isTokenValid ? "opacity-0" : "opacity-100"}`}
+        className={`sticky left-[5%] top-1/2 animate-blob bg-[var(--color-moving-bubble-secondary)] max-sm:hidden ${!tokenData.isTokenValid ? "opacity-0" : "opacity-100"}`}
       />
       {/* Middle-Left Mesh Gradient */}
       <div
-        className={`sticky left-[30%] top-[20%] animate-blob bg-[#d7f8d3] [animation-delay:1.5s] max-sm:left-[5%] ${!tokenData.isTokenValid ? "opacity-0" : "opacity-100"}`}
+        className={`sticky left-[30%] top-[20%] animate-blob bg-[var(--color-moving-bubble-primary)] [animation-delay:1.5s] max-sm:left-[5%] ${!tokenData.isTokenValid ? "opacity-0" : "opacity-100"}`}
       />
       {/* Middle-Right Mesh Gradient */}
       <div
-        className={`sticky left-[55%] top-[60%] animate-blob bg-[#f8dfcb] [animation-delay:0.5s] max-sm:left-3/4 ${!tokenData.isTokenValid ? "opacity-0" : "opacity-100"}`}
+        className={`sticky left-[55%] top-[60%] animate-blob bg-[var(--color-moving-bubble-secondary)] [animation-delay:0.5s] max-sm:left-3/4 ${!tokenData.isTokenValid ? "opacity-0" : "opacity-100"}`}
       />
       {/* Right Mesh Gradient */}
       <div
-        className={`sticky left-[80%] top-1/3 animate-blob bg-[#d7f8d3] [animation-delay:2s] max-sm:hidden ${!tokenData.isTokenValid ? "opacity-0" : "opacity-100"}`}
+        className={`sticky left-[80%] top-1/3 animate-blob bg-[var(--color-moving-bubble-primary)] [animation-delay:2s] max-sm:hidden ${!tokenData.isTokenValid ? "opacity-0" : "opacity-100"}`}
       />
       {tokenData.isTokenValid ? (
         <div className="pt-header-h-full-section-pb relative flex min-h-dvh w-full items-center justify-center px-5 pb-[var(--section-padding)] sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0">
@@ -162,7 +162,7 @@ export default function ResetPassword({ searchParams }) {
                       message: "Email is required.",
                     },
                   })}
-                  className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white/75 md:text-[13px]"
+                  className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white/75 md:text-[13px]"
                   readOnly
                   required
                 />
@@ -202,7 +202,7 @@ export default function ResetPassword({ searchParams }) {
                         },
                       },
                     })}
-                    className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white/75 md:text-[13px]"
+                    className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white/75 md:text-[13px]"
                     required
                   />
                   <div
@@ -254,7 +254,7 @@ export default function ResetPassword({ searchParams }) {
                         },
                       },
                     })}
-                    className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[#F4D3BA] focus:bg-white/75 md:text-[13px]"
+                    className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white/75 md:text-[13px]"
                     required
                   />
                   <div
@@ -277,7 +277,7 @@ export default function ResetPassword({ searchParams }) {
                 )}
               </div>
               {/* Form Submission Button  */}
-              <button className="relative z-[1] !mt-8 w-full rounded-lg bg-[#d4ffce] py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[#bdf6b4] md:text-sm">
+              <button className="relative z-[1] !mt-8 w-full rounded-lg bg-[var(--color-primary-regular)] py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)] md:text-sm">
                 Reset Password
               </button>
             </form>
@@ -285,11 +285,11 @@ export default function ResetPassword({ searchParams }) {
         </div>
       ) : (
         <div className="pt-header-h-full-section-pb flex min-h-dvh flex-col items-center justify-center pb-[var(--section-padding)] [&>*]:w-fit">
-          <TbLockExclamation className="size-24 text-[#F4D3BA]" />
+          <TbLockExclamation className="size-24 text-[var(--color-secondary-regular)]" />
           <p className="mt-2 text-neutral-400">{tokenData.resMsg}</p>
           <TransitionLink
             href="/"
-            className="mt-9 block rounded-lg bg-[#d4ffce] px-4 py-2.5 text-center text-sm text-neutral-600 transition-[background-color] duration-300 hover:bg-[#bdf6b4]"
+            className="mt-9 block rounded-lg bg-[var(--color-primary-regular)] px-4 py-2.5 text-center text-sm text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)]"
           >
             Return to Home
           </TransitionLink>

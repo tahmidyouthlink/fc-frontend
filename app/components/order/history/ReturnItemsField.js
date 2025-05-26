@@ -36,7 +36,7 @@ export default function ReturnItemsField({
           return (
             <div
               key={"return-item-" + item?._id + item?.size + item?.color._id}
-              className={`flex w-full cursor-pointer items-stretch justify-between gap-x-2.5 rounded-lg border-2 p-2 transition-[border-color,background-color] duration-300 ease-in-out hover:border-[#d7ecd2] hover:bg-[#fafff9] ${returnItem.isRequested ? "border-[#d7ecd2] bg-[#fafff9]" : "border-neutral-100"}`}
+              className={`flex w-full cursor-pointer items-stretch justify-between gap-x-2.5 rounded-lg border-2 p-2 transition-[border-color,background-color] duration-300 ease-in-out hover:border-[var(--color-primary-lighter)] hover:bg-[var(--color-primary-lightest)] ${returnItem.isRequested ? "border-[var(--color-primary-lighter)] bg-[var(--color-primary-lightest)]" : "border-neutral-100"}`}
               onClick={(event) => {
                 const tagName = event.target.tagName.toLowerCase();
 
@@ -54,7 +54,7 @@ export default function ReturnItemsField({
                   );
               }}
             >
-              <div className="relative min-h-full w-1/4 overflow-hidden rounded-md bg-[#F0F0F0] max-sm:w-20">
+              <div className="relative min-h-full w-1/4 overflow-hidden rounded-md bg-[var(--product-default)] max-sm:w-20">
                 {!!item?.thumbnailImgUrl && (
                   <Image
                     className="h-full w-full object-contain"
@@ -100,7 +100,7 @@ export default function ReturnItemsField({
                     />
                     <div className="flex gap-x-1.5 text-neutral-500 [&>*]:!m-0 [&>*]:grid [&>*]:size-8 [&>*]:place-content-center [&>*]:rounded-md [&>*]:border-2 [&>*]:border-neutral-200 [&>*]:!p-0 [&>*]:text-center [&>*]:transition-[background-color,border-color] [&>*]:duration-300 [&>*]:ease-in-out sm:[&>*]:rounded-lg">
                       <button
-                        className="transition-[background-color,border-color] hover:border-transparent hover:bg-[#FBEDE2]"
+                        className="transition-[background-color,border-color] hover:border-transparent hover:bg-[var(--color-secondary-regular)]"
                         type="button"
                         onClick={() => {
                           setValue(
@@ -114,7 +114,7 @@ export default function ReturnItemsField({
                         <HiChevronLeft />
                       </button>
                       <input
-                        className="w-fit !bg-transparent text-center font-semibold outline-none transition-[border-color] [-moz-appearance:textfield] focus:border-[#F4D3BA] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                        className="w-fit !bg-transparent text-center font-semibold outline-none transition-[border-color] [-moz-appearance:textfield] focus:border-[var(--color-secondary-regular)] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                         type="number"
                         {...register(`items.${index}.quantity`, {
                           min: 0,
@@ -133,7 +133,7 @@ export default function ReturnItemsField({
                         })}
                       />
                       <button
-                        className="transition-[background-color,border-color] hover:border-transparent hover:bg-[#FBEDE2]"
+                        className="transition-[background-color,border-color] hover:border-transparent hover:bg-[var(--color-secondary-regular)]"
                         type="button"
                         onClick={() => {
                           setValue(

@@ -214,7 +214,7 @@ export default function ContactForm() {
           )}
         </div>
       </div>
-      <button className="w-fit rounded-lg bg-[#c2f5ba] px-5 py-3 text-xs font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[#b2edab] md:text-sm">
+      <button className="w-fit rounded-lg bg-[var(--color-primary-regular)] px-5 py-3 text-xs font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)] md:text-sm">
         Send Message
       </button>
     </form>

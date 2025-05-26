@@ -10,7 +10,7 @@ export default function HomeCategories({ featuredCategories }) {
 
   if (!!featuredCategories?.length)
     return (
-      <div className="relative w-full overflow-hidden bg-[#FBEDE2]">
+      <div className="relative w-full overflow-hidden bg-[var(--color-secondary-light)]">
         <div className="absolute -bottom-24 h-[90%] w-[350%] opacity-50 sm:bottom-0 sm:top-0 sm:w-[150%] md:w-[125%] lg:top-1/2 lg:w-[125%] lg:-translate-y-1/2 xl:w-full 2xl:-bottom-10 2xl:top-[unset] 2xl:h-[105%] 2xl:translate-y-0">
           <Image
             src={curvedDottedLineShape}
