@@ -87,7 +87,7 @@ export default function StoryDetails({
       gsap.from(element, {
         autoAlpha: 0,
         duration: 1,
-        xPercent: 0,
+        xPercent: element.classList.contains("left-0") ? -15 : 15,
         duration: 1,
         delay: 0.6,
         ease: "power2.out",

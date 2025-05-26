@@ -37,30 +37,37 @@ export default function ReturnImagesField({
     }
   };
 
-  const uploadImagesToImgbb = async (images) => {
+  const uploadImagesToGCS = async (images) => {
     const imageUrls = [];
 
-    for (const image of images) {
+    try {
       const formData = new FormData();
-      formData.append("image", image);
-      formData.append("key", apiKey);
-      try {
-        const response = await axiosPublic.post(apiURL, formData, {
+
+      for (const image of images) {
+        formData.append("file", image); // Use 'file' for each image
+      }
+
+      const response = await axiosPublic.post(
+        "/upload-multiple-files",
+        formData,
+        {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        });
-        if (response.data && response.data.data && response.data.data.url) {
-          imageUrls.push(response.data.data.url);
-        } else {
-          toast.error("Failed to get image URL from response.");
-        }
-      } catch (error) {
-        toast.error(
-          `Upload failed: ${error.response?.data?.error?.message || error.message}`,
-        );
+        },
+      );
+
+      if (response?.data?.urls && Array.isArray(response.data.urls)) {
+        imageUrls.push(...response.data.urls);
+      } else {
+        toast.error("Failed to get image URLs from response.");
       }
+    } catch (error) {
+      toast.error(
+        `Upload failed: ${error.response?.data?.error?.message || error.message}`,
+      );
     }
+
     return imageUrls;
   };
 
@@ -96,7 +103,7 @@ export default function ReturnImagesField({
 
     setIsPageLoading(true);
 
-    const newImgUrls = await uploadImagesToImgbb(uploadedFiles);
+    const newImgUrls = await uploadImagesToGCS(uploadedFiles);
 
     setReturnImgUrls((prevImgUrls) => [
       ...new Set([...prevImgUrls, ...newImgUrls]),
