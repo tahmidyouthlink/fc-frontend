@@ -147,8 +147,8 @@ ${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
                   className="object-cover rounded-lg"
                   src={category?.imageUrl === "" ? "https://storage.googleapis.com/fashion-commerce-pdf/1748156497021_shopping.png" : category?.imageUrl}
                   alt={`${category?.label} - Explore products in the ${category?.label} category`}
-                  layout="fill"
-                  objectFit="cover"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   quality={100}
                   priority={index < 6}
                 />
@@ -186,11 +186,11 @@ ${activeTab === 'collection' ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
 
                 {/* Image */}
                 <Image
-                  className="object-cover rounded-lg px-1.5"
-                  src={season?.imageUrl}
+                  className="object-contain rounded-lg px-1.5"
+                  src={season?.imageUrl === null ? "https://storage.googleapis.com/fashion-commerce-pdf/1748156497021_shopping.png" : season?.imageUrl}
                   alt={`${season?.seasonName} – Discover products for the ${season?.seasonName} season`}
-                  layout="fill"
-                  objectFit="contain"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   quality={100}
                   priority={index < 6}
                 />
