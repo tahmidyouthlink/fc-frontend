@@ -5,10 +5,18 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+import { Draggable } from "gsap/Draggable";
+import InertiaPlugin from "gsap/InertiaPlugin";
 import StoryHero from "@/app/components/story/StoryHero";
 import StoryDetails from "@/app/components/story/StoryDetails";
 
-gsap.registerPlugin(useGSAP, ScrollTrigger, ScrollToPlugin);
+gsap.registerPlugin(
+  useGSAP,
+  ScrollTrigger,
+  ScrollToPlugin,
+  Draggable,
+  InertiaPlugin,
+);
 
 const departments = [
   {
@@ -298,6 +306,7 @@ export default function OurStory() {
         <StoryHero
           gsap={gsap}
           useGSAP={useGSAP}
+          Draggable={Draggable}
           departments={departments}
           setSelectedDept={setSelectedDept}
         />
