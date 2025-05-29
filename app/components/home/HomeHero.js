@@ -1,82 +1,48 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { FaArrowRightLong } from "react-icons/fa6";
 import squigglyShape from "@/public/shapes/squiggly.png";
 import arrowShape from "@/public/shapes/arrow.png";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 
-const transitionDuration = 650;
-const transitionDelay = 150;
+const transitionDuration = 650; // Duration of the fade animation
+const transitionDelay = 150; // Base delay for staggering animations
 
 export default function HomeHero({
   isEnabled,
   slideInterval,
-  leftSlides,
-  centerSlides,
-  rightSlides,
+  leftSlides = [],
+  centerSlides = [],
+  rightSlides = [],
 }) {
-  // Add duplicates for infinite scroll effect
-  const extendedLeftSlides = !leftSlides?.length
-    ? []
-    : [leftSlides[leftSlides?.length - 1], ...leftSlides, leftSlides[0]];
-  const extendedCenterSlides = !centerSlides?.length
-    ? []
-    : [
-        centerSlides[centerSlides?.length - 1],
-        ...centerSlides,
-        centerSlides[0],
-      ];
-  const extendedRightSlides = !rightSlides?.length
-    ? []
-    : [rightSlides[rightSlides?.length - 1], ...rightSlides, rightSlides[0]];
-  const [currentIndex, setCurrentIndex] = useState(1); // Start at index 1 (first actual offer)
-  const [isTransitioning, setIsTransitioning] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  const nextSlide = () => {
-    setCurrentIndex((prev) => prev + 1);
-    setIsTransitioning(true);
-  };
+  const canSlide = centerSlides && centerSlides.length > 1;
 
-  // Auto-slide logic with pause on hover
+  const nextSlide = useCallback(() => {
+    if (canSlide) {
+      setCurrentIndex((prev) => (prev + 1) % centerSlides.length);
+    }
+  }, [canSlide, centerSlides?.length]);
+
+  // Auto-slide logic
   useEffect(() => {
-    if (isEnabled && centerSlides?.length > 1) {
-      const interval = setInterval(
+    if (isEnabled && canSlide) {
+      const intervalId = setInterval(
         nextSlide,
-        slideInterval * transitionDuration,
+        slideInterval * transitionDuration, // Interval between slide changes
       );
-      return () => clearInterval(interval);
+      return () => clearInterval(intervalId);
     }
-  }, [isEnabled, centerSlides?.length, slideInterval]);
+  }, [isEnabled, canSlide, slideInterval, nextSlide]);
 
-  // Handle infinite loop logic
-  useEffect(() => {
-    if (centerSlides?.length < 2) return;
-
-    const totalTransitionDuration = [1, 2, 3].reduce(
-      (accumulator, slideNo) => transitionDelay * (3 - slideNo) + accumulator,
-      0,
-    );
-
-    if (currentIndex === 0) {
-      setTimeout(
-        () => {
-          setIsTransitioning(false);
-          setCurrentIndex(centerSlides?.length); // Jump to last offer
-        },
-        transitionDuration + totalTransitionDuration, // Match transition duration
-      );
-    }
-
-    if (currentIndex === extendedCenterSlides?.length - 1) {
-      setTimeout(
-        () => {
-          setIsTransitioning(false);
-          setCurrentIndex(1); // Jump to first offer
-        },
-        transitionDuration + totalTransitionDuration, // Match transition duration
-      );
-    }
-  }, [currentIndex, extendedCenterSlides?.length, centerSlides?.length]);
+  const getImageStyle = (index, delayMultiplier = 0) => ({
+    opacity: index === currentIndex ? 1 : 0,
+    transitionProperty: "opacity",
+    transitionTimingFunction: "ease-in-out",
+    transitionDuration: `${transitionDuration}ms`,
+    transitionDelay: `${transitionDelay * delayMultiplier}ms`,
+  });
 
   return (
     <div className="relative">
@@ -88,6 +54,7 @@ export default function HomeHero({
         <div className="absolute left-[80%] top-1/3 animate-blob bg-[var(--color-moving-bubble-secondary)] [animation-delay:2s] max-sm:hidden" />
       </div>
       <div className="relative flex h-dvh flex-col px-5 pb-6 pt-[106px] sm:h-[65dvh] sm:px-8 sm:pt-32 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0 2xl:pb-[6vh] 2xl:pt-[calc(88px+6vh)] portrait:md:h-[75dvh] portrait:lg:h-[60dvh] landscape:h-dvh">
+        {/* Text Content and CTA */}
         <div>
           <div className="relative flex items-center justify-evenly">
             <div className="size-8 max-sm:absolute max-sm:left-0 max-sm:top-[30%] sm:size-12 sm:-translate-y-1/2 lg:size-14">
@@ -123,66 +90,47 @@ export default function HomeHero({
             </TransitionLink>
           </div>
         </div>
+        {/* Image Sections */}
         <div className="hero-images pointer-events-none flex grow justify-center gap-2 max-sm:mt-7 max-sm:flex-wrap md:-mt-2 md:gap-3 xl:-mt-3 xl:justify-between xl:gap-4 landscape:mt-auto landscape:max-h-[550px]">
+          {/* Left Images */}
           <div className="relative flex overflow-hidden">
-            {extendedLeftSlides.map((leftImgUrl, index) => (
+            {leftSlides?.map((leftImgUrl, index) => (
               <Image
-                key={leftImgUrl}
+                key={`left-hero-img-${leftImgUrl}-${index}`}
                 src={leftImgUrl}
                 alt={`Hero section left side image ${index + 1}`}
-                className={`${isTransitioning ? "transition-transform ease-in-out" : ""}`}
-                style={{
-                  transform: `translateX(${(currentIndex * -1 + index) * 100}%)`,
-                  ...(isTransitioning && {
-                    transitionDuration: `${transitionDuration}ms`,
-                  }),
-                }}
-                width={0}
-                height={0}
                 fill
-                sizes="50vw"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover"
+                style={getImageStyle(index, 0)} // No delay for left images
               />
             ))}
           </div>
+          {/* Center Images */}
           <div className="relative flex overflow-hidden">
-            {extendedCenterSlides.map((centerImgUrl, index) => (
+            {centerSlides?.map((centerImgUrl, index) => (
               <Image
-                key={centerImgUrl}
+                key={`center-hero-img-${centerImgUrl}-${index}`}
                 src={centerImgUrl}
-                alt={`Hero section main image ${index + 1}`}
-                className={`${isTransitioning ? "transition-transform ease-in-out" : ""}`}
-                style={{
-                  transform: `translateX(${(currentIndex * -1 + index) * 100}%)`,
-                  ...(isTransitioning && {
-                    transitionDuration: `${transitionDuration}ms`,
-                    transitionDelay: `${transitionDelay}ms`,
-                  }),
-                }}
-                width={0}
-                height={0}
+                alt={`Hero section center image ${index + 1}`}
                 fill
-                sizes="50vw"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover"
+                style={getImageStyle(index, 1)} // Base delay for center images
               />
             ))}
           </div>
+          {/* Right Images */}
           <div className="relative flex overflow-hidden">
-            {extendedRightSlides.map((rightImgUrl, index) => (
+            {rightSlides?.map((rightImgUrl, index) => (
               <Image
-                key={rightImgUrl}
+                key={`right-hero-img-${rightImgUrl}-${index}`}
                 src={rightImgUrl}
                 alt={`Hero section right side image ${index + 1}`}
-                className={`${isTransitioning ? "transition-transform ease-in-out" : ""}`}
-                style={{
-                  transform: `translateX(${(currentIndex * -1 + index) * 100}%)`,
-                  ...(isTransitioning && {
-                    transitionDuration: `${transitionDuration}ms`,
-                    transitionDelay: `${transitionDelay * 2}ms`,
-                  }),
-                }}
-                width={0}
-                height={0}
                 fill
-                sizes="50vw"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover"
+                style={getImageStyle(index, 2)} // Double delay for right images
               />
             ))}
           </div>
