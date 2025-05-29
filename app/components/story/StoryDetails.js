@@ -25,7 +25,7 @@ export default function StoryDetails({
     });
 
     // Animation for the circle with star shape near the staff image (appears once)
-    gsap.from("#staff-img .absolute", {
+    gsap.from("#staff-img img.absolute, #staff-img > div", {
       autoAlpha: 0,
       scale: 0.5,
       duration: 1,
@@ -134,7 +134,7 @@ export default function StoryDetails({
     >
       <div
         id="staff-img"
-        className="top-5 col-span-full mx-5 h-[calc(100dvh-(var(--header-height-xs)+var(--section-padding)))] sm:mx-8 md:mx-12 xl:sticky xl:col-span-2 xl:ml-auto xl:mr-0 xl:h-[calc(100dvh-var(--section-padding-double))] xl:w-full xl:max-w-[calc(1200px*2/5-64px/2)]"
+        className="relative top-5 col-span-full mx-5 h-[calc(100dvh-(var(--header-height-xs)+var(--section-padding)))] sm:mx-8 md:mx-12 xl:sticky xl:col-span-2 xl:ml-auto xl:mr-0 xl:h-[calc(100dvh-var(--section-padding-double))] xl:w-full xl:max-w-[calc(1200px*2/5-64px/2)]"
       >
         {/* Shape/SVG (circle with star) */}
         <Image
@@ -145,6 +145,13 @@ export default function StoryDetails({
           width={0}
           sizes="25vw"
         />
+        <div className="absolute -left-5 top-[7.5%] flex -rotate-[60deg] flex-col items-end justify-center rounded-xl bg-orange-100 p-2 text-center text-sm text-neutral-700 sm:left-1/4 sm:top-[15%] sm:-translate-x-full sm:-rotate-45 md:text-lg lg:text-xl xl:text-sm">
+          <span className="relative">
+            <p className="font-semibold">{selectedDept.staff.name}</p>
+            <p>@ {selectedDept.name}</p>
+            <div className="absolute -bottom-2 left-1/2 h-3 w-3 -translate-x-1/2 translate-y-1/2 rotate-45 bg-orange-100" />
+          </span>
+        </div>
         {/* Staff Image */}
         <Image
           src={selectedDept.staff.imgSrc}
@@ -156,7 +163,10 @@ export default function StoryDetails({
         />
       </div>
       <div className="relative col-span-full overflow-hidden xl:col-span-3">
-        <div className="relative mx-5 sm:mx-8 md:mx-12 xl:ml-0 xl:mr-auto xl:max-w-[calc(1200px*3/5-64px/2)]">
+        <div
+          id="dept-details"
+          className="relative mx-5 sm:mx-8 md:mx-12 xl:ml-0 xl:mr-auto xl:max-w-[calc(1200px*3/5-64px/2)]"
+        >
           {selectedDept.contents?.map((content, index) => (
             <div
               key={"content-" + content.quote + index}
@@ -253,7 +263,7 @@ export default function StoryDetails({
               ease: "power4.out",
               onComplete: () =>
                 gsap.to(
-                  "#story-details h4, #story-details p, #story-details video, #story-details .overlay, #story-details img",
+                  "#staff-img > *, #dept-details .quote > div, #dept-details .quote > img, #dept-details .media > img, #dept-details .media > video, #dept-details .media-overlay, #dept-details .media > h4, #dept-details .media > img, #go-back-to-hero",
                   {
                     yPercent: 10,
                     autoAlpha: 0,
