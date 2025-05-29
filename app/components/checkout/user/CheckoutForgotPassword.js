@@ -65,7 +65,7 @@ export default function CheckoutForgotPassword({ setIsPageLoading }) {
       <button
         type="button"
         onClick={() => setIsForgotPasswordModalOpen(true)}
-        className="text-xs font-semibold text-[var(--color-primary-darkest)] transition-[color] duration-300 ease-in-out hover:text-[var(--color-primary-darker)]"
+        className="text-xs font-semibold text-[var(--color-primary-900)] transition-[color] duration-300 ease-in-out hover:text-[var(--color-primary-800)]"
       >
         Forgot password?
       </button>
@@ -107,7 +107,7 @@ export default function CheckoutForgotPassword({ setIsPageLoading }) {
                           message: "Email is required.",
                         },
                       })}
-                      className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white md:text-[13px]"
+                      className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white md:text-[13px]"
                       required
                     />
                     {/* Email Error Message */}
@@ -127,7 +127,7 @@ export default function CheckoutForgotPassword({ setIsPageLoading }) {
                   onClick={() =>
                     handleSubmitForForgotPassword(onSubmit, onError)()
                   }
-                  className="rounded-lg bg-[var(--color-primary-regular)] px-5 py-3 text-xs font-semibold text-neutral-600 !opacity-100 transition-[background-color,color] duration-300 hover:bg-[var(--color-primary-dark)] hover:text-neutral-700 md:text-sm"
+                  className="rounded-lg bg-[var(--color-primary-500)] px-5 py-3 text-xs font-semibold text-neutral-600 !opacity-100 transition-[background-color,color] duration-300 hover:bg-[var(--color-primary-700)] hover:text-neutral-700 md:text-sm"
                 >
                   Send Email
                 </Button>

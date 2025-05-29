@@ -167,9 +167,9 @@ export default function StoryHero({
                     "--card-width": `${CARD_WIDTH}px`,
                   }}
                 />
-                <div className="absolute -top-5 left-1/2 h-3 w-3 -translate-x-1/2 -translate-y-full rotate-45 bg-orange-100 opacity-0 transition-opacity duration-300 ease-in-out"></div>
+                <div className="absolute -top-5 left-1/2 h-3 w-3 -translate-x-1/2 -translate-y-full rotate-45 bg-[var(--color-secondary-400)] opacity-0 transition-opacity duration-300 ease-in-out"></div>
                 <h4
-                  className="pointer-events-none absolute -top-6 left-0 -translate-y-full rounded-xl bg-orange-100 p-2 text-center text-neutral-700 opacity-0 transition-opacity duration-300 ease-in-out"
+                  className="pointer-events-none absolute -top-6 left-0 -translate-y-full rounded-xl bg-[var(--color-secondary-400)] p-2 text-center text-neutral-700 opacity-0 transition-opacity duration-300 ease-in-out"
                   style={{
                     width: `${CARD_WIDTH * 1.66667}px`,
                   }}

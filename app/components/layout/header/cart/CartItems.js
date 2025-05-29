@@ -193,7 +193,7 @@ export default function CartItems({
                     <p className="text-xs">Remove</p>
                   </div>
                   {/* Cart Item Quantity */}
-                  <div className="mt-auto flex gap-x-1.5 text-neutral-500 [&>*]:!m-0 [&>*]:grid [&>*]:size-8 [&>*]:place-content-center [&>*]:rounded-md [&>*]:bg-neutral-100 [&>*]:!p-0 [&>*]:text-center hover:[&>*]:bg-[var(--color-secondary-regular)] sm:[&>*]:rounded-lg">
+                  <div className="mt-auto flex gap-x-1.5 text-neutral-500 [&>*]:!m-0 [&>*]:grid [&>*]:size-8 [&>*]:place-content-center [&>*]:rounded-md [&>*]:bg-neutral-100 [&>*]:!p-0 [&>*]:text-center hover:[&>*]:bg-[var(--color-secondary-500)] sm:[&>*]:rounded-lg">
                     {/* Quantity Decrease Button */}
                     <button
                       onClick={() =>

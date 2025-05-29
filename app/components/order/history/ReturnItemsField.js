@@ -36,7 +36,7 @@ export default function ReturnItemsField({
           return (
             <div
               key={"return-item-" + item?._id + item?.size + item?.color._id}
-              className={`flex w-full cursor-pointer items-stretch justify-between gap-x-2.5 rounded-lg border-2 p-2 transition-[border-color,background-color] duration-300 ease-in-out hover:border-[var(--color-primary-lighter)] hover:bg-[var(--color-primary-lightest)] ${returnItem.isRequested ? "border-[var(--color-primary-lighter)] bg-[var(--color-primary-lightest)]" : "border-neutral-100"}`}
+              className={`flex w-full cursor-pointer items-stretch justify-between gap-x-2.5 rounded-lg border-2 p-2 transition-[border-color,background-color] duration-300 ease-in-out hover:border-[var(--color-primary-200)] hover:bg-[var(--color-primary-100)] ${returnItem.isRequested ? "border-[var(--color-primary-200)] bg-[var(--color-primary-100)]" : "border-neutral-100"}`}
               onClick={(event) => {
                 const tagName = event.target.tagName.toLowerCase();
 
@@ -100,7 +100,7 @@ export default function ReturnItemsField({
                     />
                     <div className="flex gap-x-1.5 text-neutral-500 [&>*]:!m-0 [&>*]:grid [&>*]:size-8 [&>*]:place-content-center [&>*]:rounded-md [&>*]:border-2 [&>*]:border-neutral-200 [&>*]:!p-0 [&>*]:text-center [&>*]:transition-[background-color,border-color] [&>*]:duration-300 [&>*]:ease-in-out sm:[&>*]:rounded-lg">
                       <button
-                        className="transition-[background-color,border-color] hover:border-transparent hover:bg-[var(--color-secondary-regular)]"
+                        className="transition-[background-color,border-color] hover:border-transparent hover:bg-[var(--color-secondary-500)]"
                         type="button"
                         onClick={() => {
                           setValue(
@@ -114,7 +114,7 @@ export default function ReturnItemsField({
                         <HiChevronLeft />
                       </button>
                       <input
-                        className="w-fit !bg-transparent text-center font-semibold outline-none transition-[border-color] [-moz-appearance:textfield] focus:border-[var(--color-secondary-regular)] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                        className="w-fit !bg-transparent text-center font-semibold outline-none transition-[border-color] [-moz-appearance:textfield] focus:border-[var(--color-secondary-500)] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                         type="number"
                         {...register(`items.${index}.quantity`, {
                           min: 0,
@@ -133,7 +133,7 @@ export default function ReturnItemsField({
                         })}
                       />
                       <button
-                        className="transition-[background-color,border-color] hover:border-transparent hover:bg-[var(--color-secondary-regular)]"
+                        className="transition-[background-color,border-color] hover:border-transparent hover:bg-[var(--color-secondary-500)]"
                         type="button"
                         onClick={() => {
                           setValue(

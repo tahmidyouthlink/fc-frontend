@@ -92,7 +92,7 @@ export default function TopFooter() {
 
   if (!pathname.includes("checkout"))
     return (
-      <div className="relative bg-[var(--color-primary-light)]">
+      <div className="relative bg-[var(--color-primary-300)]">
         <div
           className={`flex items-center justify-evenly overflow-hidden px-5 py-14 sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0 ${footerBanner?.position !== "center" ? "gap-5 py-[72px]" : "flex-col gap-12 py-14"}`}
         >
@@ -133,7 +133,7 @@ export default function TopFooter() {
                       /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+$/,
                   })}
                 />
-                <button className="block w-fit self-end text-nowrap rounded-lg bg-[var(--color-primary-dark)] px-5 py-2.5 text-center text-sm font-semibold text-neutral-800 transition-[background-color] duration-300 ease-in-out hover:bg-[var(--color-primary-regular)]">
+                <button className="block w-fit self-end text-nowrap rounded-lg bg-[var(--color-primary-700)] px-5 py-2.5 text-center text-sm font-semibold text-neutral-800 transition-[background-color] duration-300 ease-in-out hover:bg-[var(--color-primary-500)]">
                   Subscribe
                 </button>
               </div>

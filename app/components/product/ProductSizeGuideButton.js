@@ -19,7 +19,7 @@ export default function ProductSizeGuideButton({ sizeGuideImageUrl }) {
       <Button
         endContent={<CgRuler />}
         disableRipple
-        className="bg-[var(--color-primary-regular)] hover:bg-[var(--color-primary-dark)]"
+        className="bg-[var(--color-primary-500)] hover:bg-[var(--color-primary-700)]"
         onClick={() => setIsSizeGuideModalOpen(true)}
       >
         Size Guide

@@ -26,7 +26,7 @@ export default function DeliveryAddresses({
           Delivery Address
         </h2>
         <button
-          className="flex items-center gap-1.5 rounded-md bg-[var(--color-primary-regular)] p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-[var(--color-primary-dark)] max-md:[&_p]:hidden max-md:[&_svg]:size-4"
+          className="flex items-center gap-1.5 rounded-md bg-[var(--color-primary-500)] p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-[var(--color-primary-700)] max-md:[&_p]:hidden max-md:[&_svg]:size-4"
           onClick={() => setIsAddingNewAddress(true)}
         >
           <RiAddLine className="text-base" />
@@ -37,13 +37,13 @@ export default function DeliveryAddresses({
         <div
           className={`!mt-7 [&>*]:mx-auto [&>*]:w-fit ${isAddingNewAddress ? "hidden" : ""}`}
         >
-          <RiMapPinFill className="size-20 text-[var(--color-secondary-regular)]" />
+          <RiMapPinFill className="size-20 text-[var(--color-secondary-500)]" />
           <p className="mt-3 text-neutral-500">
             You have not given any address yet.
           </p>
           <button
             onClick={() => setIsAddingNewAddress(true)}
-            className="mt-5 block rounded-lg bg-[var(--color-primary-regular)] px-4 py-2.5 text-center text-sm font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)]"
+            className="mt-5 block rounded-lg bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
           >
             Add Your Address
           </button>

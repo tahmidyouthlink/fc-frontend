@@ -138,7 +138,7 @@ export default function Filter({
                   {filterOption.label}
                   {!!selectedFilterOptions[filterOption.arrayKey].length && (
                     <span
-                      className={`text-black ${filterOption.selectionMode === "multiple" ? "ml-2 rounded-md bg-[var(--color-secondary-darkest)] px-2 py-1 text-[10px] text-white" : ""}`}
+                      className={`text-black ${filterOption.selectionMode === "multiple" ? "ml-2 rounded-md bg-[var(--color-secondary-900)] px-2 py-1 text-[10px] text-white" : ""}`}
                     >
                       {filterOption.selectionMode === "single"
                         ? ": " +
@@ -167,7 +167,7 @@ export default function Filter({
               disabled={!filterOption.options.length}
               classNames={{
                 mainWrapper: [
-                  `z-[1] text-neutral-700 [&>button]:px-4 [&>button]:duration-300 ${!selectedFilterOptions[filterOption.arrayKey].length ? "[&>button]:bg-[var(--color-secondary-regular)] hover:[&>button]:bg-[var(--color-secondary-dark)]" : "[&>button]:bg-[var(--color-secondary-dark)] hover:[&>button]:bg-[var(--color-secondary-dark)]"} ${!filterOption.options.length ? (!selectedFilterOptions[filterOption.arrayKey].length ? "[&>button]:opacity-50 hover:[&>button]:bg-[var(--color-secondary-regular)]" : "[&>button]:opacity-40 hover:[&>button]:bg-[var(--color-secondary-dark)]") : ""}`,
+                  `z-[1] text-neutral-700 [&>button]:px-4 [&>button]:duration-300 ${!selectedFilterOptions[filterOption.arrayKey].length ? "[&>button]:bg-[var(--color-secondary-500)] hover:[&>button]:bg-[var(--color-secondary-600)]" : "[&>button]:bg-[var(--color-secondary-600)] hover:[&>button]:bg-[var(--color-secondary-600)]"} ${!filterOption.options.length ? (!selectedFilterOptions[filterOption.arrayKey].length ? "[&>button]:opacity-50 hover:[&>button]:bg-[var(--color-secondary-500)]" : "[&>button]:opacity-40 hover:[&>button]:bg-[var(--color-secondary-600)]") : ""}`,
                 ],
                 label: [
                   "text-neutral-700 static mr-4 group-data-[filled=true]:scale-100 group-data-[filled=true]:-translate-y-0",
@@ -175,7 +175,7 @@ export default function Filter({
                 innerWrapper: ["hidden"],
                 popoverContent: ["min-w-44 w-fit"],
                 listbox: [
-                  "[&_li:last-child]:mt-3.5 [&_li:last-child]:bg-[var(--color-secondary-dark)] [&_li:last-child]:p-2.5 [&_li:last-child]:text-center [&_li:last-child>span]:font-semibold [&_li:last-child>span:has(svg)]:hidden hover:[&_li:last-child]:bg-neutral-700 hover:[&_li:last-child]:text-neutral-100",
+                  "[&_li:last-child]:mt-3.5 [&_li:last-child]:bg-[var(--color-secondary-600)] [&_li:last-child]:p-2.5 [&_li:last-child]:text-center [&_li:last-child>span]:font-semibold [&_li:last-child>span:has(svg)]:hidden hover:[&_li:last-child]:bg-neutral-700 hover:[&_li:last-child]:text-neutral-100",
                 ],
               }}
             >
@@ -230,7 +230,7 @@ export default function Filter({
                 <Button
                   disableRipple
                   endContent={<HiChevronDown />}
-                  className={`popover-button z-[1] h-12 w-auto min-w-fit !scale-100 gap-0 rounded-lg bg-[var(--color-secondary-regular)] pl-4 pr-3 font-semibold text-neutral-700 !opacity-100 shadow-sm hover:bg-[var(--color-secondary-dark)] [&>svg]:ml-3 [&>svg]:h-[13px] [&>svg]:rotate-0 [&>svg]:transition-[transform] [&>svg]:duration-100 ${selectedFilterOptions.price.min || selectedFilterOptions.price.max ? "order-first bg-[var(--color-secondary-dark)]" : "order-last bg-[var(--color-secondary-regular)]"}`}
+                  className={`popover-button z-[1] h-12 w-auto min-w-fit !scale-100 gap-0 rounded-lg bg-[var(--color-secondary-500)] pl-4 pr-3 font-semibold text-neutral-700 !opacity-100 shadow-sm hover:bg-[var(--color-secondary-600)] [&>svg]:ml-3 [&>svg]:h-[13px] [&>svg]:rotate-0 [&>svg]:transition-[transform] [&>svg]:duration-100 ${selectedFilterOptions.price.min || selectedFilterOptions.price.max ? "order-first bg-[var(--color-secondary-600)]" : "order-last bg-[var(--color-secondary-500)]"}`}
                 >
                   {filterOption.label}
                   <span
@@ -344,9 +344,9 @@ export default function Filter({
                     minimumFractionDigits: 0,
                   }}
                   classNames={{
-                    filler: ["bg-[var(--color-secondary-dark)]"],
+                    filler: ["bg-[var(--color-secondary-600)]"],
                     thumb: [
-                      "bg-[var(--color-secondary-dark)] hover:bg-[var(--color-secondary-darker)] focus:bg-[var(--color-secondary-darker)]",
+                      "bg-[var(--color-secondary-600)] hover:bg-[var(--color-secondary-800)] focus:bg-[var(--color-secondary-800)]",
                     ],
                     label: ["hidden"],
                     value: [
@@ -356,7 +356,7 @@ export default function Filter({
                 />
                 <Button
                   disableRipple
-                  className="mt-3.5 w-full !scale-100 bg-[var(--color-secondary-regular)] p-2.5 font-semibold !opacity-100 hover:bg-neutral-700 hover:text-neutral-100"
+                  className="mt-3.5 w-full !scale-100 bg-[var(--color-secondary-500)] p-2.5 font-semibold !opacity-100 hover:bg-neutral-700 hover:text-neutral-100"
                   onClick={() =>
                     setSelectedFilterOptions((prevOptions) => ({
                       ...prevOptions,
@@ -376,7 +376,7 @@ export default function Filter({
         {!isNoFilterOptionSelected && (
           <Button
             disableRipple
-            className="z-[1] order-last h-12 w-auto min-w-fit !scale-100 rounded-lg bg-[var(--color-primary-regular)] px-4 font-semibold text-neutral-700 !opacity-100 shadow-sm hover:bg-[var(--color-primary-dark)]"
+            className="z-[1] order-last h-12 w-auto min-w-fit !scale-100 rounded-lg bg-[var(--color-primary-500)] px-4 font-semibold text-neutral-700 !opacity-100 shadow-sm hover:bg-[var(--color-primary-700)]"
             onClick={() =>
               setSelectedFilterOptions({
                 sortBy: new Set([]),

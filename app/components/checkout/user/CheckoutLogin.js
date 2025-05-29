@@ -82,7 +82,7 @@ export default function CheckoutLogin({
                   message: "Email is required.",
                 },
               })}
-              className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white/75 md:text-[13px]"
+              className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
               required
             />
             {errorsForLogin.loginEmail && (
@@ -108,7 +108,7 @@ export default function CheckoutLogin({
                     message: "Password is required.",
                   },
                 })}
-                className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white/75 md:text-[13px]"
+                className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
                 required
               />
               <div
@@ -133,7 +133,7 @@ export default function CheckoutLogin({
         <div className="max-sm:space-y-4 sm:flex sm:items-end sm:gap-x-4">
           <button
             type="submit"
-            className="block h-fit w-full self-end rounded-lg bg-[var(--color-primary-regular)] py-2.5 text-center text-sm font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)]"
+            className="block h-fit w-full self-end rounded-lg bg-[var(--color-primary-500)] py-2.5 text-center text-sm font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
           >
             Sign in
           </button>
@@ -145,7 +145,7 @@ export default function CheckoutLogin({
             Don&apos;t have an account?{" "}
             <button
               type="button"
-              className="font-semibold text-[var(--color-primary-darkest)] transition-[color] duration-300 ease-in-out hover:text-[var(--color-primary-darker)]"
+              className="font-semibold text-[var(--color-primary-900)] transition-[color] duration-300 ease-in-out hover:text-[var(--color-primary-800)]"
               onClick={() => setIsRegisterModalOpen(true)}
             >
               Sign up now!

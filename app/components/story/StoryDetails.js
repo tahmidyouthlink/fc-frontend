@@ -145,11 +145,11 @@ export default function StoryDetails({
           width={0}
           sizes="25vw"
         />
-        <div className="absolute -left-5 top-[7.5%] flex -rotate-[60deg] flex-col items-end justify-center rounded-xl bg-orange-100 p-2 text-center text-sm text-neutral-700 sm:left-1/4 sm:top-[15%] sm:-translate-x-full sm:-rotate-45 md:text-lg lg:text-xl xl:text-sm">
+        <div className="absolute -left-5 top-[7.5%] flex -rotate-[60deg] flex-col items-end justify-center rounded-xl bg-[var(--color-secondary-400)] p-2 text-center text-sm text-neutral-700 sm:left-1/4 sm:top-[15%] sm:-translate-x-full sm:-rotate-45 md:text-lg lg:text-xl xl:text-sm">
           <span className="relative">
             <p className="font-semibold">{selectedDept.staff.name}</p>
             <p>@ {selectedDept.name}</p>
-            <div className="absolute -bottom-2 left-1/2 h-3 w-3 -translate-x-1/2 translate-y-1/2 rotate-45 bg-orange-100" />
+            <div className="absolute -bottom-2 left-1/2 h-3 w-3 -translate-x-1/2 translate-y-1/2 rotate-45 bg-[var(--color-secondary-400)]" />
           </span>
         </div>
         {/* Staff Image */}

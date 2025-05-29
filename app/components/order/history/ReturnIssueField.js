@@ -33,7 +33,7 @@ export default function ReturnIssueField({
             labelPlacement="outside"
             label="Specific Issue"
             placeholder="Select a specific issue"
-            className={`select-without-search [&_button[data-focus='true']]:border-[var(--color-secondary-regular)] [&_button[data-hover='true']]:border-[var(--color-secondary-regular)] [&_button[data-open='true']]:border-[var(--color-secondary-regular)] [&_button]:!h-11 [&_button]:rounded-lg [&_label]:top-[calc(50%-4px)] [&_label]:!text-base [&_label]:!text-neutral-700 ${!selectedIssue ? "[&_span[data-slot='value']]:text-neutral-500" : "[&_span[data-slot='value']]:text-neutral-700"}`}
+            className={`select-without-search [&_button[data-focus='true']]:border-[var(--color-secondary-500)] [&_button[data-hover='true']]:border-[var(--color-secondary-500)] [&_button[data-open='true']]:border-[var(--color-secondary-500)] [&_button]:!h-11 [&_button]:rounded-lg [&_label]:top-[calc(50%-4px)] [&_label]:!text-base [&_label]:!text-neutral-700 ${!selectedIssue ? "[&_span[data-slot='value']]:text-neutral-500" : "[&_span[data-slot='value']]:text-neutral-700"}`}
             selectedKey={value}
             onSelectionChange={onChange}
           >

@@ -109,7 +109,7 @@ export default function Security() {
                         message: "Old password is required.",
                       },
                     })}
-                    className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white md:text-[13px]"
+                    className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white md:text-[13px]"
                     required
                   />
                   <div
@@ -161,7 +161,7 @@ export default function Security() {
                       },
                     },
                   })}
-                  className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white md:text-[13px]"
+                  className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white md:text-[13px]"
                   required
                 />
                 <div
@@ -212,7 +212,7 @@ export default function Security() {
                       },
                     },
                   })}
-                  className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white md:text-[13px]"
+                  className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white md:text-[13px]"
                   required
                 />
                 <div
@@ -234,7 +234,7 @@ export default function Security() {
                 </p>
               )}
             </div>
-            <button className="block h-fit w-full self-end rounded-lg bg-[var(--color-primary-regular)] px-5 py-2.5 text-center text-sm font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)]">
+            <button className="block h-fit w-full self-end rounded-lg bg-[var(--color-primary-500)] px-5 py-2.5 text-center text-sm font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]">
               {userData?.isLinkedWithCredentials ? "Update" : "Set"} Password
             </button>
           </div>

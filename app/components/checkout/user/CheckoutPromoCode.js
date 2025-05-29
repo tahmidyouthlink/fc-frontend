@@ -65,7 +65,7 @@ export default function CheckoutPromoCode({
               name="promoCode"
               type="text"
               autoComplete="off"
-              className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs uppercase text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white/75 md:text-[13px]"
+              className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs uppercase text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
               onChange={(event) => {
                 const promoCodeCloseButton = document.getElementById(
                   "promo-code-close-btn",
@@ -133,7 +133,7 @@ export default function CheckoutPromoCode({
         <button
           type="button"
           onClick={handlePromoCodeValidation}
-          className="block h-fit w-full self-end rounded-lg bg-[var(--color-primary-regular)] py-2.5 text-center text-sm font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)]"
+          className="block h-fit w-full self-end rounded-lg bg-[var(--color-primary-500)] py-2.5 text-center text-sm font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
         >
           Apply
         </button>

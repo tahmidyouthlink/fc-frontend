@@ -92,7 +92,7 @@ export default function UserSidebar() {
             href="/user/orders"
             className={
               pathname.includes("orders")
-                ? "bg-green-100 font-semibold text-green-600"
+                ? "bg-[var(--color-primary-400)] font-semibold text-[var(--color-primary-900)]"
                 : ""
             }
           >
@@ -105,7 +105,7 @@ export default function UserSidebar() {
             href="/user/profile"
             className={
               pathname.includes("profile")
-                ? "bg-green-100 font-semibold text-green-600"
+                ? "bg-[var(--color-primary-400)] font-semibold text-[var(--color-primary-900)]"
                 : ""
             }
           >
@@ -118,7 +118,7 @@ export default function UserSidebar() {
             href="/user/security"
             className={
               pathname.includes("security")
-                ? "bg-green-100 font-semibold text-green-600"
+                ? "bg-[var(--color-primary-400)] font-semibold text-[var(--color-primary-900)]"
                 : ""
             }
           >

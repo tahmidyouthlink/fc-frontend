@@ -88,7 +88,7 @@ export default function LoginForm({ setModalContent, setIsAuthModalOpen }) {
               message: "Email is required.",
             },
           })}
-          className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white md:text-[13px]"
+          className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white md:text-[13px]"
           required
         />
         {/* Email Error Message */}
@@ -105,7 +105,7 @@ export default function LoginForm({ setModalContent, setIsAuthModalOpen }) {
           <button
             type="button"
             onClick={() => setModalContent("forgotPassword")}
-            className="text-xs font-semibold text-[var(--color-primary-darkest)] transition-[color] duration-300 ease-in-out hover:text-[var(--color-primary-darker)]"
+            className="text-xs font-semibold text-[var(--color-primary-900)] transition-[color] duration-300 ease-in-out hover:text-[var(--color-primary-800)]"
           >
             Forgot password?
           </button>
@@ -121,7 +121,7 @@ export default function LoginForm({ setModalContent, setIsAuthModalOpen }) {
                 message: "Password is required.",
               },
             })}
-            className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white md:text-[13px]"
+            className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white md:text-[13px]"
             required
           />
           {/* Password Visibility Toggle Icon */}
@@ -146,7 +146,7 @@ export default function LoginForm({ setModalContent, setIsAuthModalOpen }) {
       {/* Sign In Button */}
       <button
         type="submit"
-        className="!mt-7 w-full rounded-lg bg-[var(--color-primary-regular)] py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)] md:text-sm"
+        className="!mt-7 w-full rounded-lg bg-[var(--color-primary-500)] py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)] md:text-sm"
       >
         Sign in
       </button>
@@ -155,7 +155,7 @@ export default function LoginForm({ setModalContent, setIsAuthModalOpen }) {
         Don`&apos;`t have an account?{" "}
         <button
           type="button"
-          className="font-semibold text-[var(--color-primary-darkest)] transition-[color] duration-300 ease-in-out hover:text-[var(--color-primary-darker)]"
+          className="font-semibold text-[var(--color-primary-900)] transition-[color] duration-300 ease-in-out hover:text-[var(--color-primary-800)]"
           onClick={() => setModalContent("register")}
         >
           Register

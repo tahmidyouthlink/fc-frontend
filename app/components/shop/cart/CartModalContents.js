@@ -79,7 +79,7 @@ export default function CartModalContents({
               return (
                 <span
                   key={"add-to-cart-size-" + size}
-                  className={`h-9 w-12 cursor-pointer content-center rounded-lg text-center text-sm font-semibold transition-[background-color,color] duration-300 ease-in-out ${selectedOptions?.size === size ? "bg-[var(--color-secondary-dark)] text-neutral-700" : "bg-neutral-100 text-neutral-500 hover:bg-[var(--color-secondary-regular)] hover:text-neutral-600"}`}
+                  className={`h-9 w-12 cursor-pointer content-center rounded-lg text-center text-sm font-semibold transition-[background-color,color] duration-300 ease-in-out ${selectedOptions?.size === size ? "bg-[var(--color-secondary-600)] text-neutral-700" : "bg-neutral-100 text-neutral-500 hover:bg-[var(--color-secondary-500)] hover:text-neutral-600"}`}
                   onClick={() =>
                     setSelectedOptions((prevOptions) => ({
                       ...prevOptions,
@@ -106,7 +106,7 @@ export default function CartModalContents({
               return (
                 <div
                   key={"add-to-cart-color-" + color._id}
-                  className={`grid size-8 cursor-pointer place-items-center rounded-full border-2 transition-[border-color] duration-300 ease-in-out hover:border-[var(--color-secondary-darkest)] ${selectedOptions?.color._id === color._id ? "border-[var(--color-secondary-darkest)]" : "border-transparent"}`}
+                  className={`grid size-8 cursor-pointer place-items-center rounded-full border-2 transition-[border-color] duration-300 ease-in-out hover:border-[var(--color-secondary-900)] ${selectedOptions?.color._id === color._id ? "border-[var(--color-secondary-900)]" : "border-transparent"}`}
                   onClick={() => {
                     setSelectedOptions((prevOptions) => ({
                       ...prevOptions,
@@ -130,7 +130,7 @@ export default function CartModalContents({
           className={`flex items-center gap-x-2.5 transition-[opacity] duration-300 ease-in-out ${!!selectedOptions?.size && !!productVariantSku ? /*"pointer-events-auto opacity-100" : "pointer-events-none opacity-40"*/ "" : "hidden"}`}
         >
           <h4 className="font-semibold text-neutral-600">Quantity:</h4>
-          <div className="flex gap-x-1.5 [&>*]:rounded-lg [&>button]:bg-neutral-100 hover:[&>button]:bg-[var(--color-secondary-regular)]">
+          <div className="flex gap-x-1.5 [&>*]:rounded-lg [&>button]:bg-neutral-100 hover:[&>button]:bg-[var(--color-secondary-500)]">
             <Button
               isIconOnly
               startContent={<HiChevronLeft />}

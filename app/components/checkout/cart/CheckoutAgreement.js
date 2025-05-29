@@ -11,10 +11,10 @@ export default function CheckoutAgreement({
 
   return (
     <div
-      className={`flex gap-x-2 [&_a]:underline [&_a]:underline-offset-2 [&_span]:text-xs lg:[&_span]:text-[13px] ${isAgreementCheckboxSelected ? "[&_a]:text-[var(--color-primary-darkest)]" : "[&_a]:text-[#f31260]"}`}
+      className={`flex gap-x-2 [&_a]:underline [&_a]:underline-offset-2 [&_span]:text-xs lg:[&_span]:text-[13px] ${isAgreementCheckboxSelected ? "[&_a]:text-[var(--color-primary-900)]" : "[&_a]:text-[#f31260]"}`}
     >
       <Checkbox
-        className="[&_span:has(svg):after]:bg-[var(--color-primary-regular)] [&_span:has(svg)]:text-neutral-700"
+        className="[&_span:has(svg):after]:bg-[var(--color-primary-500)] [&_span:has(svg)]:text-neutral-700"
         defaultSelected
         isRequired
         isSelected={isAgreementCheckboxSelected}
