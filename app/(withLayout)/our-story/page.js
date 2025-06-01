@@ -10,7 +10,6 @@ export default async function OurStory() {
     const response = await axios.get(
       "https://fashion-commerce-backend.vercel.app/get-all-story-collection-backend",
     );
-    departments = response.data || [];
     departments =
       response.data?.filter((department) => department.status === true) || [];
   } catch (error) {
