@@ -157,7 +157,7 @@ export default function StoryHero({
                 className="hero-card relative shrink-0 transition-[transform] delay-150 duration-500 ease-in-out [&:has(img:hover)>div]:delay-[500ms] [&:has(img:hover)>h4]:opacity-100 [&:has(img:hover)>h4]:delay-[500ms] [&:has(img:hover)>img]:w-[calc(var(--card-width)*1.66667)] [&:has(img:hover)]:z-[1] [&:has(img:hover)]:-translate-y-3 [&:has(img:hover)_div]:opacity-100"
               >
                 <Image
-                  src={dept.coverImgSrc}
+                  src={dept.coverImgUrl}
                   alt={`Image ${index + 1}`}
                   width={0}
                   height={0}

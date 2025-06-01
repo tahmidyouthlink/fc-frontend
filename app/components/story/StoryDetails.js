@@ -147,15 +147,15 @@ export default function StoryDetails({
         />
         <div className="absolute -left-5 top-[7.5%] flex -rotate-[60deg] flex-col items-end justify-center rounded-xl bg-[var(--color-secondary-400)] p-2 text-center text-sm text-neutral-700 sm:left-1/4 sm:top-[15%] sm:-translate-x-full sm:-rotate-45 md:text-lg lg:text-xl xl:text-sm">
           <span className="relative">
-            <p className="font-semibold">{selectedDept.staff.name}</p>
-            <p>@ {selectedDept.name}</p>
+            <p className="font-semibold">{selectedDept.staff.staffName}</p>
+            <p>@ {selectedDept.departmentName}</p>
             <div className="absolute -bottom-2 left-1/2 h-3 w-3 -translate-x-1/2 translate-y-1/2 rotate-45 bg-[var(--color-secondary-400)]" />
           </span>
         </div>
         {/* Staff Image */}
         <Image
-          src={selectedDept.staff.imgSrc}
-          alt={selectedDept.staff.name}
+          src={selectedDept.staff.staffImgUrl}
+          alt={selectedDept.staff.staffName}
           height={0}
           width={0}
           sizes="750px"
@@ -181,7 +181,7 @@ export default function StoryDetails({
                   dangerouslySetInnerHTML={{
                     __html: content.quote,
                   }}
-                  className="text-3xl font-semibold text-neutral-600 [&_span]:bg-[linear-gradient(to_right,#804D3A,#D86F4D,#F3A761)] [&_span]:bg-clip-text [&_span]:text-transparent"
+                  className="text-3xl font-semibold text-neutral-600 [&_strong]:bg-[linear-gradient(to_right,#804D3A,#D86F4D,#F3A761)] [&_strong]:bg-clip-text [&_strong]:text-transparent"
                 />
                 {/* Shape/SVG (swirly arrow) */}
                 <Image
