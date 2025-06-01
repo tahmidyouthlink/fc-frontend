@@ -32,6 +32,14 @@ export default function StoryDetails({
       ease: "elastic.out(1,0.5)",
     });
 
+    // Animation for the go back button (appears once)
+    gsap.from("#go-back-to-hero", {
+      autoAlpha: 0,
+      scale: 0.5,
+      duration: 1,
+      ease: "elastic.out(1,0.5)",
+    });
+
     // Animations for quote sections
     gsap.utils.toArray(".quote").forEach((element) => {
       gsap.from(element, {
@@ -99,28 +107,6 @@ export default function StoryDetails({
       });
     });
   }, {});
-
-  useEffect(() => {
-    const handleOnScroll = () => {
-      const scrollToTopButton = document.getElementById("go-back-to-hero");
-
-      if (scrollToTopButton) {
-        if (window.scrollY > 50) {
-          scrollToTopButton.style.pointerEvents = "auto";
-          scrollToTopButton.style.opacity = "1";
-        } else {
-          scrollToTopButton.style.pointerEvents = "none";
-          scrollToTopButton.style.opacity = "0";
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleOnScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleOnScroll);
-    };
-  }, []);
 
   const isSrcForVideo = (mediaSrc) => {
     const videoExtensions = [".mp4", ".webm", ".ogg"];
@@ -255,7 +241,7 @@ export default function StoryDetails({
         </div>
         <button
           id="go-back-to-hero"
-          className="pointer-events-none fixed bottom-3 left-3 z-[3] flex items-center justify-center gap-2 rounded-lg bg-neutral-50/20 p-2 font-semibold text-gray-700 opacity-0 backdrop-blur-lg transition-[opacity,color] duration-300 ease-in-out hover:text-black sm:left-6 md:left-10 xl:left-auto"
+          className="fixed bottom-3 left-3 z-[3] flex items-center justify-center gap-2 rounded-lg bg-neutral-50/20 p-2 font-semibold text-gray-700 backdrop-blur-lg transition-[color] duration-300 ease-in-out hover:text-black sm:left-6 md:left-10 xl:left-auto"
           onClick={() => {
             gsap.to(window, {
               duration: 0.6,
@@ -276,7 +262,7 @@ export default function StoryDetails({
             });
           }}
         >
-          View All Departments
+          Go Back
           <span className="rounded-full border-1.5 border-gray-700 p-1 transition-[border-color] duration-300 ease-in-out hover:border-black">
             <CgArrowUp className="text-lg" />
           </span>
