@@ -42,7 +42,7 @@ export default function CompleteOutfitProducts({
           </h2>
         </div>
         <div
-          className={`grid-cols-2 gap-x-4 gap-y-12 max-sm:grid ${completeOutfitProducts?.length < 6 ? "grid sm:grid-cols-4 lg:grid-cols-5" : "sm:flex sm:flex-nowrap sm:transition-transform sm:duration-300 sm:ease-in-out sm:[&>div]:min-w-[calc(25%-16px*3/4)] lg:[&>div]:min-w-[calc(20%-16px*4/5)]"} ${isCompleteOutfitProductsSlid ? "-translate-x-[calc(100%+16px)]" : "-translate-x-0"}`}
+          className={`grid-cols-2 gap-x-4 gap-y-12 max-sm:grid ${completeOutfitProducts?.length < 6 ? "grid sm:grid-cols-3 lg:grid-cols-4" : "sm:max-lg:[&>div:nth-last-child(2)] sm:flex sm:flex-nowrap sm:transition-transform sm:duration-300 sm:ease-in-out sm:max-lg:[&>div:last-child]:hidden sm:[&>div]:min-w-[calc(33.33%-16px*2/3)] lg:[&>div]:min-w-[calc(25%-16px*3/4)]"} ${isCompleteOutfitProductsSlid ? "-translate-x-[calc(100%+16px)]" : "-translate-x-0"}`}
         >
           {completeOutfitProducts.map((completeOutfitProduct, index) => (
             <ProductCard

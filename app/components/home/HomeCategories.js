@@ -56,7 +56,7 @@ export default function HomeCategories({ featuredCategories }) {
                 <TransitionLink
                   key={"featured-category-" + featuredCategory?._id}
                   href={`/shop?category=${featuredCategory?.label?.split(" ")?.join("+")}`}
-                  className="relative flex aspect-[4/5] items-center justify-center overflow-hidden rounded-2xl text-2xl font-semibold text-white"
+                  className="relative flex aspect-[4/5.5] w-full items-center justify-center overflow-hidden rounded-2xl text-2xl font-semibold text-white max-xl:aspect-[4/5] sm:max-lg:min-h-[250px]"
                 >
                   <div
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-300 ease-in-out after:absolute after:inset-0 after:h-full after:w-full after:bg-black after:bg-opacity-40 after:content-[''] hover:scale-[1.15]"

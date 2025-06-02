@@ -62,7 +62,7 @@ export default function HomeTrending({
                 </span>
               </TransitionLink>
             </div>
-            <section className="grid grid-cols-2 gap-x-4 gap-y-12 sm:grid-cols-4 lg:grid-cols-5 max-lg:[&>div:last-child]:hidden">
+            <section className="grid grid-cols-2 gap-x-4 gap-y-12 sm:grid-cols-3 lg:grid-cols-4 sm:max-lg:[&>div:last-child]:hidden">
               {trendingProducts.map((trendingProduct) => (
                 <ProductCard
                   key={"home-trending-product-" + trendingProduct._id}

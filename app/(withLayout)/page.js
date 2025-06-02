@@ -48,7 +48,7 @@ export default function Home() {
         product?.trending === "Yes" &&
         !CheckIfProductIsOutOfStock(product?.productVariants, primaryLocation),
     )
-    ?.slice(0, 5);
+    ?.slice(0, 4);
   const newlyArrivedProducts = productList
     ?.filter(
       (product) =>
@@ -56,7 +56,7 @@ export default function Home() {
         product?.newArrival === "Yes" &&
         !CheckIfProductIsOutOfStock(product?.productVariants, primaryLocation),
     )
-    ?.slice(0, 5);
+    ?.slice(0, 4);
 
   useEffect(() => {
     setIsPageLoading(
