@@ -64,7 +64,7 @@ export default function NotifyMeButton({
       {!isUserSubscribed ? (
         <button
           onClick={() => setIsNotifyMeModalOpen(true)}
-          className="flex items-center gap-1.5 rounded-lg bg-[var(--color-tertiary-regular)] px-3 py-2.5 text-[13px]/[1] font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-tertiary-dark)]"
+          className="flex items-center gap-1.5 rounded-lg bg-[var(--color-tertiary-500)] px-3 py-2.5 text-[13px]/[1] font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-tertiary-600)]"
           // alternative bg colors: normal:ededed, hover:neutral-200
         >
           Notify Me

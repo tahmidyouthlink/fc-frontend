@@ -39,7 +39,7 @@ export default function CardColorSelectionTool({
           return (
             <div
               key={productTitle + color._id}
-              className="grid size-[26px] cursor-pointer place-items-center rounded-full border-3 transition-[border-color] duration-300 ease-in-out hover:border-[var(--color-secondary-darker)]"
+              className="grid size-[26px] cursor-pointer place-items-center rounded-full border-3 transition-[border-color] duration-300 ease-in-out hover:border-[var(--color-secondary-800)]"
               style={{
                 borderColor: colorIndex === 0 ? "#c18d6c" : "transparent",
               }}

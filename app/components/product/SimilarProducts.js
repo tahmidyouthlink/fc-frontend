@@ -20,7 +20,7 @@ export default function SimilarProducts({
     <section
       className={`relative ${
         !hasCompleteOutfitSection
-          ? "mt-8 bg-[var(--color-secondary-lightest)] py-8"
+          ? "mt-8 bg-[var(--color-secondary-100)] py-8"
           : hasRecentlyViewedSection
             ? "pt-8"
             : "pb-10 pt-8"
@@ -30,14 +30,14 @@ export default function SimilarProducts({
         className={`absolute inset-0 flex h-full w-full items-center justify-between space-y-5 px-5 sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0 ${similarProducts?.length < 6 ? "hidden" : "flex"}`}
       >
         <Button
-          className={`z-[1] size-10 rounded-md bg-white p-0 text-xl shadow-[0_0_12px_0_rgba(0,0,0,0.15)] transition-[background-color,opacity] duration-300 ease-in-out hover:bg-[var(--color-secondary-regular)] max-sm:hidden md:block md:-translate-x-1/2 [&>svg]:mx-auto ${!isSimilarProductsSlid ? "pointer-events-none !opacity-0" : "pointer-events-auto !opacity-100"}`}
+          className={`z-[1] size-10 rounded-md bg-white p-0 text-xl shadow-[0_0_12px_0_rgba(0,0,0,0.15)] transition-[background-color,opacity] duration-300 ease-in-out hover:bg-[var(--color-secondary-500)] max-sm:hidden md:block md:-translate-x-1/2 [&>svg]:mx-auto ${!isSimilarProductsSlid ? "pointer-events-none !opacity-0" : "pointer-events-auto !opacity-100"}`}
           isIconOnly
           disableRipple
           startContent={<CgChevronLeft />}
           onClick={() => setIsSimilarProductsSlid(false)}
         ></Button>
         <Button
-          className={`z-[1] size-10 rounded-md bg-white p-0 text-xl shadow-[0_0_12px_0_rgba(0,0,0,0.15)] transition-[background-color,opacity] duration-300 ease-in-out hover:bg-[var(--color-secondary-regular)] max-sm:hidden md:translate-x-1/2 [&>svg]:mx-auto ${isSimilarProductsSlid ? "pointer-events-none !opacity-0" : "pointer-events-auto !opacity-100"}`}
+          className={`z-[1] size-10 rounded-md bg-white p-0 text-xl shadow-[0_0_12px_0_rgba(0,0,0,0.15)] transition-[background-color,opacity] duration-300 ease-in-out hover:bg-[var(--color-secondary-500)] max-sm:hidden md:translate-x-1/2 [&>svg]:mx-auto ${isSimilarProductsSlid ? "pointer-events-none !opacity-0" : "pointer-events-auto !opacity-100"}`}
           isIconOnly
           disableRipple
           startContent={<CgChevronRight />}

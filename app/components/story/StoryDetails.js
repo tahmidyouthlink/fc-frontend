@@ -25,7 +25,15 @@ export default function StoryDetails({
     });
 
     // Animation for the circle with star shape near the staff image (appears once)
-    gsap.from("#staff-img .absolute", {
+    gsap.from("#staff-img img.absolute, #staff-img > div", {
+      autoAlpha: 0,
+      scale: 0.5,
+      duration: 1,
+      ease: "elastic.out(1,0.5)",
+    });
+
+    // Animation for the go back button (appears once)
+    gsap.from("#go-back-to-hero", {
       autoAlpha: 0,
       scale: 0.5,
       duration: 1,
@@ -100,28 +108,6 @@ export default function StoryDetails({
     });
   }, {});
 
-  useEffect(() => {
-    const handleOnScroll = () => {
-      const scrollToTopButton = document.getElementById("go-back-to-hero");
-
-      if (scrollToTopButton) {
-        if (window.scrollY > 50) {
-          scrollToTopButton.style.pointerEvents = "auto";
-          scrollToTopButton.style.opacity = "1";
-        } else {
-          scrollToTopButton.style.pointerEvents = "none";
-          scrollToTopButton.style.opacity = "0";
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleOnScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleOnScroll);
-    };
-  }, []);
-
   const isSrcForVideo = (mediaSrc) => {
     const videoExtensions = [".mp4", ".webm", ".ogg"];
     return videoExtensions.some((ext) => mediaSrc.toLowerCase().endsWith(ext));
@@ -130,37 +116,47 @@ export default function StoryDetails({
   return (
     <div
       id="story-details"
-      className="invisible z-[1] grid grid-cols-5 justify-center space-x-16"
+      className="invisible z-[1] grid grid-cols-5 justify-center xl:space-x-16"
     >
       <div
         id="staff-img"
-        className="top-5 col-span-full ml-5 h-[calc(100dvh-var(--section-padding-double))] w-full sm:ml-8 md:ml-12 lg:sticky lg:col-span-2 xl:ml-auto xl:max-w-[calc(1200px*2/5-64px/2)]"
+        className="relative top-5 col-span-full mx-5 h-[calc(100dvh-(var(--header-height-xs)+var(--section-padding)))] sm:mx-8 md:mx-12 xl:sticky xl:col-span-2 xl:ml-auto xl:mr-0 xl:h-[calc(100dvh-var(--section-padding-double))] xl:w-full xl:max-w-[calc(1200px*2/5-64px/2)]"
       >
         {/* Shape/SVG (circle with star) */}
         <Image
           src={circleWithStarShape}
           alt="circle with star shape"
-          className="absolute bottom-8 left-1/2 aspect-square w-52 -translate-x-full object-contain opacity-90 sm:-right-10 sm:max-md:w-64 lg:-right-20"
+          className="absolute bottom-8 left-0 aspect-square w-52 object-contain opacity-90 sm:left-1/2 sm:w-64 sm:-translate-x-full md:w-72 lg:w-96 xl:w-56 min-[1800px]:w-64"
           height={0}
           width={0}
           sizes="25vw"
         />
+        <div className="absolute -left-5 top-[7.5%] flex -rotate-[60deg] flex-col items-end justify-center rounded-xl bg-[var(--color-secondary-400)] p-2 text-center text-sm text-neutral-700 sm:left-1/4 sm:top-[15%] sm:-translate-x-full sm:-rotate-45 md:text-lg lg:text-xl xl:text-sm">
+          <span className="relative">
+            <p className="font-semibold">{selectedDept.staff.staffName}</p>
+            <p>@ {selectedDept.departmentName}</p>
+            <div className="absolute -bottom-2 left-1/2 h-3 w-3 -translate-x-1/2 translate-y-1/2 rotate-45 bg-[var(--color-secondary-400)]" />
+          </span>
+        </div>
         {/* Staff Image */}
         <Image
-          src={selectedDept.staff.imgSrc}
-          alt={selectedDept.staff.name}
+          src={selectedDept.staff.staffImgUrl}
+          alt={selectedDept.staff.staffName}
           height={0}
           width={0}
           sizes="750px"
           className="relative h-full w-full rounded-xl object-cover"
         />
       </div>
-      <div className="relative col-span-full overflow-hidden lg:col-span-3">
-        <div className="relative mr-5 sm:mr-8 md:mr-12 xl:mr-auto xl:max-w-[calc(1200px*3/5-64px/2)]">
+      <div className="relative col-span-full overflow-hidden xl:col-span-3">
+        <div
+          id="dept-details"
+          className="relative mx-5 sm:mx-8 md:mx-12 xl:ml-0 xl:mr-auto xl:max-w-[calc(1200px*3/5-64px/2)]"
+        >
           {selectedDept.contents?.map((content, index) => (
             <div
               key={"content-" + content.quote + index}
-              className={`relative flex flex-col justify-center ${index !== 0 ? "min-h-dvh gap-y-44" : "h-[calc(100dvh-(var(--header-height-xs)+var(--section-padding-double)))] gap-y-32 sm:min-h-[calc(100dvh-(var(--header-height-sm)+var(--section-padding-double)))] lg:min-h-[calc(100dvh-(var(--header-height-lg)+var(--section-padding-double)))]"}`}
+              className={`relative flex flex-col justify-center ${index !== 0 ? "min-h-dvh gap-y-44" : "min-h-dvh gap-y-44 xl:min-h-[calc(100dvh-(var(--header-height-lg)+var(--section-padding-double)))] xl:gap-y-32"}`}
             >
               {/* Quote Section */}
               <div
@@ -171,7 +167,7 @@ export default function StoryDetails({
                   dangerouslySetInnerHTML={{
                     __html: content.quote,
                   }}
-                  className="text-3xl font-semibold text-neutral-600 [&_span]:bg-[linear-gradient(to_right,#804D3A,#D86F4D,#F3A761)] [&_span]:bg-clip-text [&_span]:text-transparent"
+                  className="text-3xl font-semibold text-neutral-600 [&_strong]:bg-[linear-gradient(to_right,#804D3A,#D86F4D,#F3A761)] [&_strong]:bg-clip-text [&_strong]:text-transparent"
                 />
                 {/* Shape/SVG (swirly arrow) */}
                 <Image
@@ -181,7 +177,7 @@ export default function StoryDetails({
                       : swirlyArrowShape
                   }
                   alt={`Swirly ${index % 2 === 0 ? "scribbled" : ""} arrow`}
-                  className={`swirly absolute aspect-square w-20 min-w-20 object-contain opacity-30 ${index % 2 === 0 ? "-bottom-8 left-0 translate-x-1/2 translate-y-full rotate-90" : "-bottom-1/3 right-0 translate-x-full translate-y-full -rotate-45"}`}
+                  className={`swirly absolute aspect-square w-20 min-w-20 object-contain opacity-30 ${index % 2 === 0 ? "-bottom-8 left-0 translate-x-1/2 translate-y-full rotate-90" : "-bottom-8 translate-x-1/2 translate-y-full max-sm:left-0 sm:-bottom-1/3 sm:right-0 sm:translate-x-1/4 sm:-rotate-45 xl:translate-x-full"}`}
                   height={0}
                   width={0}
                   sizes="25vw"
@@ -189,7 +185,7 @@ export default function StoryDetails({
               </div>
               {/* Media (Video/Image) Section */}
               <div
-                className={`media relative aspect-video w-2/3 ${index % 2 === 0 ? "ml-auto" : "mr-auto"}`}
+                className={`media relative aspect-video w-full sm:w-2/3 ${index % 2 === 0 ? "ml-auto" : "mr-auto"}`}
               >
                 {isSrcForVideo(content.mediaSrc) ? (
                   // Video Element
@@ -217,13 +213,13 @@ export default function StoryDetails({
                 {/* Text Outline Effect */}
                 {/* Solid Text (behind) */}
                 <h4
-                  className={`pointer-events-none absolute bottom-6 z-[0] select-none text-6xl font-bold text-neutral-700 ${index % 2 === 0 ? "left-0 -translate-x-1/3" : "right-0 translate-x-1/3"}`}
+                  className={`pointer-events-none absolute bottom-6 z-[0] select-none text-4xl font-bold text-neutral-700 sm:text-6xl ${index % 2 === 0 ? "translate-x-1/4 max-sm:right-0 sm:left-0 sm:-translate-x-1/3" : "right-0 translate-x-1/4 sm:translate-x-1/3"}`}
                 >
                   {content.hashtag}
                 </h4>
                 {/* Stroked Text (front) */}
                 <h4
-                  className={`pointer-events-none absolute bottom-6 z-[2] select-none text-6xl font-bold text-transparent opacity-50 ${index % 2 === 0 ? "left-0 -translate-x-1/3" : "right-0 translate-x-1/3"}`}
+                  className={`pointer-events-none absolute bottom-6 z-[2] select-none text-4xl font-bold text-transparent opacity-50 sm:text-6xl ${index % 2 === 0 ? "translate-x-1/4 max-sm:right-0 sm:left-0 sm:-translate-x-1/3" : "right-0 translate-x-1/4 sm:translate-x-1/3"}`}
                   style={{
                     WebkitTextStroke: "1px #e5e5e5",
                   }}
@@ -245,7 +241,7 @@ export default function StoryDetails({
         </div>
         <button
           id="go-back-to-hero"
-          className="pointer-events-none fixed bottom-3 z-[3] flex items-center justify-center gap-2 rounded-lg bg-neutral-50/20 p-2 font-semibold text-gray-700 opacity-0 backdrop-blur-lg transition-[opacity,color] duration-300 ease-in-out hover:text-black"
+          className="fixed bottom-3 left-3 z-[3] flex items-center justify-center gap-2 rounded-lg bg-neutral-50/20 p-2 font-semibold text-gray-700 backdrop-blur-lg transition-[color] duration-300 ease-in-out hover:text-black sm:left-6 md:left-10 xl:left-auto"
           onClick={() => {
             gsap.to(window, {
               duration: 0.6,
@@ -253,7 +249,7 @@ export default function StoryDetails({
               ease: "power4.out",
               onComplete: () =>
                 gsap.to(
-                  "#story-details h4, #story-details p, #story-details video, #story-details .overlay, #story-details img",
+                  "#staff-img > *, #dept-details .quote > div, #dept-details .quote > img, #dept-details .media > img, #dept-details .media > video, #dept-details .media-overlay, #dept-details .media > h4, #dept-details .media > img, #go-back-to-hero",
                   {
                     yPercent: 10,
                     autoAlpha: 0,
@@ -266,7 +262,7 @@ export default function StoryDetails({
             });
           }}
         >
-          View All Departments
+          Go Back
           <span className="rounded-full border-1.5 border-gray-700 p-1 transition-[border-color] duration-300 ease-in-out hover:border-black">
             <CgArrowUp className="text-lg" />
           </span>

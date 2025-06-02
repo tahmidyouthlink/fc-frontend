@@ -295,7 +295,7 @@ export default function CheckoutCartItems({
                     <div className="mt-auto flex gap-x-1.5 text-neutral-500 [&>*]:!m-0 [&>*]:grid [&>*]:size-8 [&>*]:place-content-center [&>*]:rounded-md [&>*]:border-2 [&>*]:border-neutral-200 [&>*]:bg-white/20 [&>*]:!p-0 [&>*]:text-center [&>*]:backdrop-blur-2xl [&>*]:transition-[background-color,border-color] [&>*]:duration-300 [&>*]:ease-in-out sm:[&>*]:rounded-lg">
                       {/* Quantity Decrease Button */}
                       <button
-                        className="transition-[background-color,border-color] hover:border-transparent hover:bg-[var(--color-secondary-regular)]"
+                        className="transition-[background-color,border-color] hover:border-transparent hover:bg-[var(--color-secondary-500)]"
                         type="button"
                         onClick={() =>
                           handleCartUpdate(
@@ -318,7 +318,7 @@ export default function CheckoutCartItems({
                       </button>
                       {/* Quantity Input Field */}
                       <input
-                        className="w-fit text-center font-semibold outline-none transition-[border-color] [-moz-appearance:textfield] focus:border-[var(--color-secondary-regular)] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                        className="w-fit text-center font-semibold outline-none transition-[border-color] [-moz-appearance:textfield] focus:border-[var(--color-secondary-500)] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                         type="number"
                         arial-label="Quantity"
                         min={1}
@@ -350,7 +350,7 @@ export default function CheckoutCartItems({
                       />
                       {/* Quantity Inccrease Button */}
                       <button
-                        className="transition-[background-color,border-color] hover:border-transparent hover:bg-[var(--color-secondary-regular)]"
+                        className="transition-[background-color,border-color] hover:border-transparent hover:bg-[var(--color-secondary-500)]"
                         type="button"
                         onClick={() =>
                           handleCartUpdate(

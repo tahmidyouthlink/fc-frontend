@@ -37,7 +37,7 @@ export default function CheckoutDeliveryAddress({
             <input
               id="address-one"
               type="text"
-              className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white/75 md:text-[13px]"
+              className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
               placeholder="House 123, Road 10, Block A"
               {...register("addressLineOne", {
                 required: {
@@ -59,7 +59,7 @@ export default function CheckoutDeliveryAddress({
               id="address-two"
               type="text"
               {...register("addressLineTwo")}
-              className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white/75 md:text-[13px]"
+              className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
               placeholder="Dhanmondi, Dhaka 1209"
             />
             {errors.addressLineTwo && (
@@ -87,7 +87,7 @@ export default function CheckoutDeliveryAddress({
                   variant="bordered"
                   selectedKey={value}
                   onSelectionChange={onChange}
-                  className="select-with-search [&:has(input:focus)_[data-slot='input-wrapper']]:border-[var(--color-secondary-regular)] [&_[data-slot='input-wrapper']]:bg-white/20 [&_[data-slot='input-wrapper']]:hover:border-[var(--color-secondary-regular)] [&_label]:!text-neutral-500"
+                  className="select-with-search [&:has(input:focus)_[data-slot='input-wrapper']]:border-[var(--color-secondary-500)] [&_[data-slot='input-wrapper']]:bg-white/20 [&_[data-slot='input-wrapper']]:hover:border-[var(--color-secondary-500)] [&_label]:!text-neutral-500"
                 >
                   {cities.map((city) => {
                     return (
@@ -118,7 +118,7 @@ export default function CheckoutDeliveryAddress({
                   message: "Postal code is required.",
                 },
               })}
-              className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white/75 md:text-[13px]"
+              className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
               placeholder="1230"
               required
             />
@@ -135,7 +135,7 @@ export default function CheckoutDeliveryAddress({
             id="note"
             {...register("note")}
             rows={1}
-            className="w-full resize-none rounded-lg border-2 border-neutral-200 bg-white/20 px-3 py-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white/75 md:text-[13px]"
+            className="w-full resize-none rounded-lg border-2 border-neutral-200 bg-white/20 px-3 py-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
           ></textarea>
           {errors.note && (
             <p className="text-xs font-semibold text-red-500">

@@ -162,7 +162,7 @@ export default function ResetPassword({ searchParams }) {
                       message: "Email is required.",
                     },
                   })}
-                  className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white/75 md:text-[13px]"
+                  className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
                   readOnly
                   required
                 />
@@ -202,7 +202,7 @@ export default function ResetPassword({ searchParams }) {
                         },
                       },
                     })}
-                    className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white/75 md:text-[13px]"
+                    className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
                     required
                   />
                   <div
@@ -254,7 +254,7 @@ export default function ResetPassword({ searchParams }) {
                         },
                       },
                     })}
-                    className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white/75 md:text-[13px]"
+                    className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
                     required
                   />
                   <div
@@ -277,7 +277,7 @@ export default function ResetPassword({ searchParams }) {
                 )}
               </div>
               {/* Form Submission Button  */}
-              <button className="relative z-[1] !mt-8 w-full rounded-lg bg-[var(--color-primary-regular)] py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)] md:text-sm">
+              <button className="relative z-[1] !mt-8 w-full rounded-lg bg-[var(--color-primary-500)] py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)] md:text-sm">
                 Reset Password
               </button>
             </form>
@@ -285,11 +285,11 @@ export default function ResetPassword({ searchParams }) {
         </div>
       ) : (
         <div className="pt-header-h-full-section-pb flex min-h-dvh flex-col items-center justify-center pb-[var(--section-padding)] [&>*]:w-fit">
-          <TbLockExclamation className="size-24 text-[var(--color-secondary-regular)]" />
+          <TbLockExclamation className="size-24 text-[var(--color-secondary-500)]" />
           <p className="mt-2 text-neutral-400">{tokenData.resMsg}</p>
           <TransitionLink
             href="/"
-            className="mt-9 block rounded-lg bg-[var(--color-primary-regular)] px-4 py-2.5 text-center text-sm text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)]"
+            className="mt-9 block rounded-lg bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
           >
             Return to Home
           </TransitionLink>

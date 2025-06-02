@@ -57,7 +57,7 @@ export default function ProductWishlistButton({ productId }) {
     <Button
       endContent={<CgHeart />}
       disableRipple
-      className="bg-[var(--color-primary-regular)] hover:bg-[var(--color-primary-dark)]"
+      className="bg-[var(--color-primary-500)] hover:bg-[var(--color-primary-700)]"
       onClick={() => handleAddToWishlist()}
     >
       Add to Wishlist

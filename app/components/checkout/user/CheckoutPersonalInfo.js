@@ -28,7 +28,7 @@ export default function CheckoutPersonalInfo({
                     message: "Name is required.",
                   },
                 })}
-                className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white/75 md:text-[13px]"
+                className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
                 readOnly
                 required
               />
@@ -51,7 +51,7 @@ export default function CheckoutPersonalInfo({
                     message: "Email is required.",
                   },
                 })}
-                className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white/75 md:text-[13px]"
+                className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
                 readOnly
                 required
               />
@@ -82,7 +82,7 @@ export default function CheckoutPersonalInfo({
               onInput={(event) =>
                 (event.target.value = event.target.value.replace(/\D/g, ""))
               }
-              className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white/75 md:text-[13px]"
+              className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
               placeholder="01XXXXXXXXX"
               required
             />
@@ -106,7 +106,7 @@ export default function CheckoutPersonalInfo({
               onInput={(event) =>
                 (event.target.value = event.target.value.replace(/\D/g, ""))
               }
-              className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white/75 md:text-[13px]"
+              className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
               placeholder="01XXXXXXXXX"
             />
             {errors.altPhoneNumber && (
@@ -135,7 +135,7 @@ export default function CheckoutPersonalInfo({
                   selectedKey={value}
                   onSelectionChange={onChange}
                   isDisabled={!!userHometown}
-                  className="select-with-search [&:has(input:disabled)_input]:px-4 [&:has(input:focus)_[data-slot='input-wrapper']]:border-[var(--color-secondary-regular)] [&_[data-disabled='true']]:opacity-100 [&_[data-disabled='true']_[data-slot='inner-wrapper']]:opacity-50 [&_[data-slot='inner-wrapper']]:transition-opacity [&_[data-slot='inner-wrapper']]:duration-300 [&_[data-slot='inner-wrapper']]:ease-in-out [&_[data-slot='input-wrapper']]:bg-white/20 [&_[data-slot='input-wrapper']]:hover:border-[var(--color-secondary-regular)] [&_label]:!text-neutral-500"
+                  className="select-with-search [&:has(input:disabled)_input]:px-4 [&:has(input:focus)_[data-slot='input-wrapper']]:border-[var(--color-secondary-500)] [&_[data-disabled='true']]:opacity-100 [&_[data-disabled='true']_[data-slot='inner-wrapper']]:opacity-50 [&_[data-slot='inner-wrapper']]:transition-opacity [&_[data-slot='inner-wrapper']]:duration-300 [&_[data-slot='inner-wrapper']]:ease-in-out [&_[data-slot='input-wrapper']]:bg-white/20 [&_[data-slot='input-wrapper']]:hover:border-[var(--color-secondary-500)] [&_label]:!text-neutral-500"
                 >
                   {cities.map((hometown) => {
                     return (

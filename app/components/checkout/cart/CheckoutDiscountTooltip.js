@@ -60,11 +60,11 @@ export default function CheckoutDiscountTooptip({
                 </g>
               </svg>
               <div>
-                <p className="text-lg/[1] font-bold text-[var(--color-primary-darkest)]">
+                <p className="text-lg/[1] font-bold text-[var(--color-primary-900)]">
                   Save {discountAmount}
                 </p>
                 {isEligibleForSpecialOffer && (
-                  <p className="text-[13px] font-semibold text-[var(--color-primary-darkest)]">
+                  <p className="text-[13px] font-semibold text-[var(--color-primary-900)]">
                     Kudos! You`&apos;`ve saved ৳ {savedAmount?.toLocaleString()}
                   </p>
                 )}

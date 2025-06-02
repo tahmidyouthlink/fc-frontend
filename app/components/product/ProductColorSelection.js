@@ -13,7 +13,7 @@ export default function ProductColorSelection({
           return (
             <div
               key={"product-color-" + color._id}
-              className={`grid size-8 cursor-pointer place-items-center rounded-full border-2 transition-[border-color] duration-300 ease-in-out hover:border-[var(--color-secondary-darkest)] ${selectedOptions?.color._id === color._id ? "border-[var(--color-secondary-darkest)]" : "border-transparent"}`}
+              className={`grid size-8 cursor-pointer place-items-center rounded-full border-2 transition-[border-color] duration-300 ease-in-out hover:border-[var(--color-secondary-900)] ${selectedOptions?.color._id === color._id ? "border-[var(--color-secondary-900)]" : "border-transparent"}`}
               onClick={() => {
                 setActiveImageIndex(0);
                 setNumOfTimesThumbnailsMoved(0);

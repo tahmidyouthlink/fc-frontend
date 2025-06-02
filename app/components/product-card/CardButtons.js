@@ -64,7 +64,7 @@ export default function CardButtons({
     >
       {!isProductOutOfStock && (
         <button
-          className="relative h-8 w-8 overflow-hidden bg-[var(--color-secondary-regular)] transition-[background-color,width] hover:w-[calc(32px+68px+6px)] hover:bg-[var(--color-secondary-dark)]"
+          className="relative h-8 w-8 overflow-hidden bg-[var(--color-secondary-500)] transition-[background-color,width] hover:w-[calc(32px+68px+6px)] hover:bg-[var(--color-secondary-600)]"
           onClick={() => {
             setSelectedAddToCartProduct(product);
             setIsAddToCartModalOpen(true);
@@ -77,7 +77,7 @@ export default function CardButtons({
         </button>
       )}
       <button
-        className="relative h-8 w-8 overflow-hidden bg-[var(--color-primary-regular)] transition-[background-color,width] hover:w-[calc(32px+90px+6px)] hover:bg-[var(--color-primary-dark)]"
+        className="relative h-8 w-8 overflow-hidden bg-[var(--color-primary-500)] transition-[background-color,width] hover:w-[calc(32px+90px+6px)] hover:bg-[var(--color-primary-700)]"
         onClick={() => handleAddToWishlist(product)}
       >
         <CgHeart className="mx-2 h-8 w-4 object-contain" />

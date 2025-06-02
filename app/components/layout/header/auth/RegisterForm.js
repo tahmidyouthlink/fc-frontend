@@ -187,7 +187,7 @@ export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
               message: "Full name is required.",
             },
           })}
-          className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white md:text-[13px]"
+          className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white md:text-[13px]"
           required
         />
         {/* Full Name Error Message */}
@@ -216,7 +216,7 @@ export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
               message: "Email is required.",
             },
           })}
-          className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white md:text-[13px]"
+          className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white md:text-[13px]"
           required
         />
         {/* Email Error Message */}
@@ -255,7 +255,7 @@ export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
                 },
               },
             })}
-            className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white md:text-[13px]"
+            className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white md:text-[13px]"
             required
           />
           {/* Password Visibility Toggle Icon */}
@@ -306,7 +306,7 @@ export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
                 },
               },
             })}
-            className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-regular)] focus:bg-white md:text-[13px]"
+            className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white md:text-[13px]"
             required
           />
           {/* Confirm Password Visibility Toggle Icon */}
@@ -331,10 +331,10 @@ export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
       <div className="!mt-7 space-y-4">
         {/* Terms & Conditions and Privacy Agreements */}
         <div
-          className={`flex gap-x-2 [&_a]:underline [&_a]:underline-offset-2 [&_a]:transition-[color] [&_a]:duration-300 [&_a]:ease-in-out [&_span]:text-xs lg:[&_span]:text-[13px] ${isPoliciesCheckboxSelected ? "[&_a]:text-[var(--color-primary-darkest)] hover:[&_a]:text-[var(--color-primary-darker)]" : "[&_a]:text-[#f31260]"}`}
+          className={`flex gap-x-2 [&_a]:underline [&_a]:underline-offset-2 [&_a]:transition-[color] [&_a]:duration-300 [&_a]:ease-in-out [&_span]:text-xs lg:[&_span]:text-[13px] ${isPoliciesCheckboxSelected ? "[&_a]:text-[var(--color-primary-900)] hover:[&_a]:text-[var(--color-primary-800)]" : "[&_a]:text-[#f31260]"}`}
         >
           <Checkbox
-            className="[&_span:has(svg):after]:bg-[var(--color-primary-regular)] [&_span:has(svg)]:text-neutral-700"
+            className="[&_span:has(svg):after]:bg-[var(--color-primary-500)] [&_span:has(svg)]:text-neutral-700"
             defaultSelected
             isRequired
             isSelected={isPoliciesCheckboxSelected}
@@ -354,7 +354,7 @@ export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
         {/* Newsletter Agreement */}
         <div className="flex gap-x-2 [&_span]:text-xs lg:[&_span]:text-[13px]">
           <Checkbox
-            className="[&_span:has(svg):after]:bg-[var(--color-primary-regular)] [&_span:has(svg)]:text-neutral-700"
+            className="[&_span:has(svg):after]:bg-[var(--color-primary-500)] [&_span:has(svg)]:text-neutral-700"
             isSelected={isNewsletterCheckboxSelected}
             onValueChange={setIsNewsletterCheckboxSelected}
           >
@@ -365,7 +365,7 @@ export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
         {/* Register Button */}
         <button
           type="submit"
-          className="w-full rounded-lg bg-[var(--color-primary-regular)] py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-dark)] md:text-sm"
+          className="w-full rounded-lg bg-[var(--color-primary-500)] py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)] md:text-sm"
         >
           Sign up
         </button>
@@ -374,7 +374,7 @@ export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
           Already have an account?{" "}
           <button
             type="button"
-            className="font-semibold text-[var(--color-primary-darkest)] transition-[color] duration-300 ease-in-out hover:text-[var(--color-primary-darker)]"
+            className="font-semibold text-[var(--color-primary-900)] transition-[color] duration-300 ease-in-out hover:text-[var(--color-primary-800)]"
             onClick={() => setModalContent("login")}
           >
             Login
