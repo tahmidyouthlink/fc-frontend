@@ -116,22 +116,22 @@ export default function StoryDetails({
   return (
     <div
       id="story-details"
-      className="invisible z-[1] grid grid-cols-5 justify-center xl:space-x-16"
+      className="invisible z-[1] grid grid-cols-5 justify-center md:space-x-5 md:max-xl:grid-cols-3 lg:space-x-12 xl:space-x-16"
     >
       <div
         id="staff-img"
-        className="relative top-5 col-span-full mx-5 h-[calc(100dvh-(var(--header-height-xs)+var(--section-padding)))] sm:mx-8 md:mx-12 xl:sticky xl:col-span-2 xl:ml-auto xl:mr-0 xl:h-[calc(100dvh-var(--section-padding-double))] xl:w-full xl:max-w-[calc(1200px*2/5-64px/2)]"
+        className="relative col-span-full mx-5 h-[calc(100dvh-(var(--header-height-xs)+var(--section-padding)))] sm:mx-8 md:sticky md:top-5 md:col-span-1 md:mx-12 md:h-[calc(100dvh-(var(--header-height-sm)+var(--section-padding)))] md:w-full md:max-w-[calc(1200px*2/5-64px/2)] lg:h-[calc(100dvh-var(--section-padding-double))] xl:col-span-2 xl:ml-auto xl:mr-0"
       >
         {/* Shape/SVG (circle with star) */}
         <Image
           src={circleWithStarShape}
           alt="circle with star shape"
-          className="absolute bottom-8 left-0 aspect-square w-52 object-contain opacity-90 sm:left-1/2 sm:w-64 sm:-translate-x-full md:w-72 lg:w-96 xl:w-56 min-[1800px]:w-64"
+          className="absolute top-1/4 aspect-square w-52 object-contain opacity-90 max-md:rotate-90 max-sm:right-0 sm:w-64 sm:max-md:right-1/3 sm:max-md:translate-x-1/2 md:-left-7 md:top-1/3 md:w-44 lg:w-56 xl:left-[10%] xl:w-48 min-[1800px]:left-0 min-[1800px]:w-64"
           height={0}
           width={0}
           sizes="25vw"
         />
-        <div className="absolute -left-5 top-[7.5%] flex -rotate-[60deg] flex-col items-end justify-center rounded-xl bg-[var(--color-secondary-400)] p-2 text-center text-sm text-neutral-700 sm:left-1/4 sm:top-[15%] sm:-translate-x-full sm:-rotate-45 md:text-lg lg:text-xl xl:text-sm">
+        <div className="absolute left-5 top-[15%] flex origin-left -rotate-[60deg] flex-col items-end justify-center rounded-xl bg-[var(--color-secondary-400)] p-2 text-center text-sm text-neutral-700 sm:left-1/3 sm:-rotate-45 sm:max-md:top-[9%] sm:max-md:-translate-x-full md:-left-4 md:top-[12%] md:text-lg lg:top-[15%] lg:text-xl xl:left-[30%] xl:top-[12.5%] xl:-translate-x-full xl:text-sm min-[1800px]:left-1/4 min-[1800px]:top-[10%]">
           <span className="relative">
             <p className="font-semibold">{selectedDept.staff.staffName}</p>
             <p>@ {selectedDept.departmentName}</p>
@@ -145,18 +145,18 @@ export default function StoryDetails({
           height={0}
           width={0}
           sizes="750px"
-          className="relative h-full w-full rounded-xl object-cover"
+          className="relative h-full w-full rounded-xl object-contain"
         />
       </div>
-      <div className="relative col-span-full overflow-hidden xl:col-span-3">
+      <div className="relative col-span-full overflow-hidden md:col-span-2 xl:col-span-3">
         <div
           id="dept-details"
-          className="relative mx-5 sm:mx-8 md:mx-12 xl:ml-0 xl:mr-auto xl:max-w-[calc(1200px*3/5-64px/2)]"
+          className="relative mx-5 sm:mx-8 md:mx-12 md:max-w-[calc(1200px*3/5-64px/2)] xl:ml-0 xl:mr-auto"
         >
           {selectedDept.contents?.map((content, index) => (
             <div
               key={"content-" + content.quote + index}
-              className={`relative flex flex-col justify-center ${index !== 0 ? "min-h-dvh gap-y-44" : "min-h-dvh gap-y-44 xl:min-h-[calc(100dvh-(var(--header-height-lg)+var(--section-padding-double)))] xl:gap-y-32"}`}
+              className={`relative flex flex-col justify-center ${index !== 0 ? "min-h-dvh gap-y-44" : "min-h-dvh gap-y-44 md:min-h-[calc(100dvh-(var(--header-height-sm)+var(--section-padding-double)))] md:gap-y-32 lg:min-h-[calc(100dvh-(var(--header-height-lg)+var(--section-padding-double)))]"}`}
             >
               {/* Quote Section */}
               <div
@@ -177,7 +177,7 @@ export default function StoryDetails({
                       : swirlyArrowShape
                   }
                   alt={`Swirly ${index % 2 === 0 ? "scribbled" : ""} arrow`}
-                  className={`swirly absolute aspect-square w-20 min-w-20 object-contain opacity-30 ${index % 2 === 0 ? "-bottom-8 left-0 translate-x-1/2 translate-y-full rotate-90" : "-bottom-8 translate-x-1/2 translate-y-full max-sm:left-0 sm:-bottom-1/3 sm:right-0 sm:translate-x-1/4 sm:-rotate-45 xl:translate-x-full"}`}
+                  className={`swirly absolute aspect-square w-20 min-w-20 object-contain opacity-30 ${index % 2 === 0 ? "-bottom-8 left-0 translate-x-1/2 translate-y-full rotate-90" : "-bottom-8 translate-x-1/2 translate-y-full max-sm:left-0 sm:-bottom-1/3 sm:right-0 sm:translate-x-1/4 sm:-rotate-45 md:translate-x-full"}`}
                   height={0}
                   width={0}
                   sizes="25vw"
@@ -185,7 +185,7 @@ export default function StoryDetails({
               </div>
               {/* Media (Video/Image) Section */}
               <div
-                className={`media relative aspect-video w-full sm:w-2/3 ${index % 2 === 0 ? "ml-auto" : "mr-auto"}`}
+                className={`media relative aspect-video w-full sm:w-2/3 md:max-lg:w-3/4 ${index % 2 === 0 ? "ml-auto" : "mr-auto"}`}
               >
                 {isSrcForVideo(content.mediaSrc) ? (
                   // Video Element
@@ -213,13 +213,13 @@ export default function StoryDetails({
                 {/* Text Outline Effect */}
                 {/* Solid Text (behind) */}
                 <h4
-                  className={`pointer-events-none absolute bottom-6 z-[0] select-none text-4xl font-bold text-neutral-700 sm:text-6xl ${index % 2 === 0 ? "translate-x-1/4 max-sm:right-0 sm:left-0 sm:-translate-x-1/3" : "right-0 translate-x-1/4 sm:translate-x-1/3"}`}
+                  className={`pointer-events-none absolute bottom-6 z-[0] select-none text-4xl font-bold text-neutral-700 sm:text-6xl md:text-4xl lg:text-5xl xl:text-6xl ${index % 2 === 0 ? "translate-x-1/4 max-sm:right-0 sm:left-0 sm:-translate-x-1/3" : "right-0 translate-x-1/4 sm:translate-x-1/3"}`}
                 >
                   {content.hashtag}
                 </h4>
                 {/* Stroked Text (front) */}
                 <h4
-                  className={`pointer-events-none absolute bottom-6 z-[2] select-none text-4xl font-bold text-transparent opacity-50 sm:text-6xl ${index % 2 === 0 ? "translate-x-1/4 max-sm:right-0 sm:left-0 sm:-translate-x-1/3" : "right-0 translate-x-1/4 sm:translate-x-1/3"}`}
+                  className={`pointer-events-none absolute bottom-6 z-[2] select-none text-4xl font-bold text-transparent opacity-50 sm:text-6xl md:text-4xl lg:text-5xl xl:text-6xl ${index % 2 === 0 ? "translate-x-1/4 max-sm:right-0 sm:left-0 sm:-translate-x-1/3" : "right-0 translate-x-1/4 sm:translate-x-1/3"}`}
                   style={{
                     WebkitTextStroke: "1px #e5e5e5",
                   }}
@@ -241,7 +241,7 @@ export default function StoryDetails({
         </div>
         <button
           id="go-back-to-hero"
-          className="fixed bottom-3 left-3 z-[3] flex items-center justify-center gap-2 rounded-lg bg-neutral-50/20 p-2 font-semibold text-gray-700 backdrop-blur-lg transition-[color] duration-300 ease-in-out hover:text-black sm:left-6 md:left-10 xl:left-auto"
+          className="fixed bottom-3 left-3 z-[3] flex items-center justify-center gap-2 rounded-lg bg-neutral-50/20 p-2 font-semibold text-gray-700 backdrop-blur-lg transition-[color] duration-300 ease-in-out hover:text-black sm:left-6 md:left-auto"
           onClick={() => {
             gsap.to(window, {
               duration: 0.6,
