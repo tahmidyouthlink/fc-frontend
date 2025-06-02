@@ -124,7 +124,7 @@ const ExistingZones = () => {
   }
 
   return (
-    <div className='px-5 bg-gray-50 min-h-screen'>
+    <div className='px-5 bg-gray-50 min-h-[calc(100vh-60px)]'>
 
       <div className='py-4 w-full flex justify-between max-w-screen-2xl mx-auto'>
 
@@ -185,7 +185,7 @@ const ExistingZones = () => {
               : "Nationwide Areas Only without Dhaka"}
         </p>
 
-        <div className="custom-max-h overflow-x-auto modal-body-scroll mt-3 drop-shadow rounded-lg">
+        <div className="custom-max-h-orders overflow-x-auto modal-body-scroll mt-3 drop-shadow rounded-lg">
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 z-[1] bg-white">
               <tr>

@@ -19,7 +19,7 @@ export const authOptions = {
       async authorize(credentials) {
         try {
           const { data } = await axios.post(
-            `https://fashion-commerce-backend.vercel.app/loginForDashboard`,
+            `https://fc-backend-664306765395.asia-south1.run.app/loginForDashboard`,
             credentials,
           );
 
@@ -51,7 +51,7 @@ export const authOptions = {
       async authorize(credentials) {
         try {
           const { data } = await axios.post(
-            `https://fashion-commerce-backend.vercel.app/customer-login`,
+            `https://fc-backend-664306765395.asia-south1.run.app/customer-login`,
             credentials,
           );
 

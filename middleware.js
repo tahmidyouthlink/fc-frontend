@@ -11,7 +11,7 @@ import { getToken } from "next-auth/jwt";
 const fetchUserPermissions = async (userId) => {
   try {
     const response = await fetch(
-      `https://fashion-commerce-backend.vercel.app/single-existing-user/${userId}`,
+      `https://fc-backend-664306765395.asia-south1.run.app/single-existing-user/${userId}`,
     );
 
     if (!response.ok) {

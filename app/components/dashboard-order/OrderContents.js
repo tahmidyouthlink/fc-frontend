@@ -1469,7 +1469,7 @@ const OrderContents = () => {
                     {columnOrder.map(
                       (column) =>
                         selectedColumns.includes(column) && (
-                          <>
+                          <React.Fragment key={`${order?._id || index}-${column}`}>
                             {column === 'Order Number' && (
                               <td key="orderNumber" className={`text-xs p-3 font-mono ${isAuthorized ? "cursor-pointer text-blue-600 hover:text-blue-800" : "text-neutral-800"}`} onClick={isAuthorized ? () => handleOrderClick(order) : undefined}>
                                 {order?.orderNumber}
@@ -1633,7 +1633,7 @@ const OrderContents = () => {
                             {column === 'Payment Method' && (
                               <td key="paymentMethod" className="text-xs p-3 text-gray-700 text-center">{order?.paymentInfo?.paymentMethod}</td>
                             )}
-                          </>
+                          </React.Fragment>
                         )
                     )}
                   </tr>
