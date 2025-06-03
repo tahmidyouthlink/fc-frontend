@@ -28,7 +28,7 @@ export default function addToCartToast(
           });
         }
       }}
-      className="z-[99] min-w-60 -translate-y-6 rounded-lg bg-white p-2.5 opacity-0 shadow-[4px_4px_16px_0_rgba(0,0,0,0.15)] transition-[opacity,transform] duration-400 ease-out"
+      className="z-[6] min-w-60 -translate-y-6 rounded-lg bg-white p-2.5 opacity-0 shadow-[4px_4px_16px_0_rgba(0,0,0,0.15)] transition-[opacity,transform] duration-400 ease-out"
       style={{
         marginTop: `${marginTopVal}px`,
       }}

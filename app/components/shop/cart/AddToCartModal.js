@@ -47,7 +47,7 @@ export default function AddToCartModal({
 
   return (
     <div
-      className={`fixed inset-0 z-[11] flex h-dvh w-dvw items-center justify-center overflow-y-auto overflow-x-hidden text-sm font-semibold transition-[opacity,background-color] duration-500 ease-in-out md:text-base [&::-webkit-scrollbar]:[-webkit-appearance:scrollbarthumb-vertical] [&_:is(h1,h2,h3,h4,h5)]:text-neutral-700 ${isAddToCartModalOpen ? "pointer-events-auto bg-neutral-700/60 opacity-100 delay-0" : "pointer-events-none bg-neutral-700/0 opacity-0 delay-100"}`}
+      className={`fixed inset-0 z-[6] flex h-dvh w-dvw items-center justify-center overflow-y-auto overflow-x-hidden text-sm font-semibold transition-[opacity,background-color] duration-500 ease-in-out md:text-base [&::-webkit-scrollbar]:[-webkit-appearance:scrollbarthumb-vertical] [&_:is(h1,h2,h3,h4,h5)]:text-neutral-700 ${isAddToCartModalOpen ? "pointer-events-auto bg-neutral-700/60 opacity-100 delay-0" : "pointer-events-none bg-neutral-700/0 opacity-0 delay-100"}`}
       id="add-to-cart-bg"
       onClick={(event) => {
         if (event.target.id === "add-to-cart-bg") {

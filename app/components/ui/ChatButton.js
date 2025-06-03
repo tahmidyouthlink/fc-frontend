@@ -19,7 +19,7 @@ export default function ChatButton() {
 
   return (
     <div
-      className="pointer-events-none fixed right-3 top-1/2 z-[3] -translate-y-1/2 rounded-full lg:right-5"
+      className="pointer-events-none fixed right-3 top-1/2 z-[4] -translate-y-1/2 rounded-full lg:right-5"
       style={{
         marginTop: `-${canvasOffset * 2}px`, // Adjust position (push upwards about twice the size of the offset) due to position adjustment of the big button
       }}
