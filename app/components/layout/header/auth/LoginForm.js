@@ -152,7 +152,7 @@ export default function LoginForm({ setModalContent, setIsAuthModalOpen }) {
       </button>
       {/* Register page link if user doesn't have an account */}
       <p className="mt-7 text-xs md:text-sm">
-        Don`&apos;`t have an account?{" "}
+        Don&apos;t have an account?{" "}
         <button
           type="button"
           className="font-semibold text-[var(--color-primary-900)] transition-[color] duration-300 ease-in-out hover:text-[var(--color-primary-800)]"
