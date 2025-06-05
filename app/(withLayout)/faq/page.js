@@ -4,10 +4,23 @@ import FAQs from "@/app/components/legal/faqs";
 export const dynamic = "force-dynamic";
 
 export default async function FAQ() {
-  const response = await axios.get(
-    `https://fc-backend-664306765395.asia-south1.run.app/all-faqs`,
-  );
-  const [data] = response.data || [];
+  let pageTitle, faqDescription, faqs;
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/all-faqs`,
+    );
+    const [data] = response.data || [];
+
+    pageTitle = data?.pageTitle;
+    faqDescription = data?.faqDescription;
+    faqs = data?.faqs;
+  } catch (error) {
+    console.error(
+      "Fetch error (faq):",
+      error.response?.data?.message || error.response?.data,
+    );
+  }
 
   return (
     <main className="relative -mt-[calc(256*4px)] bg-neutral-100 text-sm text-neutral-500 max-sm:-mt-[calc(256*2px)] md:text-base [&_h1]:font-semibold [&_h1]:uppercase [&_h1]:text-neutral-600">
@@ -22,7 +35,7 @@ export default async function FAQ() {
       <div className="pt-header-h-full-section-pb min-h-dvh pb-[var(--section-padding)]">
         {/* FAQ Title */}
         <h1 className="mb-7 pt-5 text-center text-xl/[1] sm:text-[32px]/[1]">
-          {data?.pageTitle}
+          {pageTitle}
         </h1>
         {/* FAQ Wrapper */}
         <div className="z-[1] mx-5 max-w-[900px] items-stretch overflow-hidden rounded-xl border-2 border-neutral-50/20 bg-white/40 backdrop-blur-2xl sm:mx-8 lg:mx-auto lg:flex">
@@ -31,11 +44,11 @@ export default async function FAQ() {
             {/* FAQ Description */}
             <div
               dangerouslySetInnerHTML={{
-                __html: data?.faqDescription,
+                __html: faqDescription,
               }}
             ></div>
             {/* Accordions/FAQs */}
-            <FAQs faqs={data?.faqs} />
+            <FAQs faqs={faqs} />
           </section>
         </div>
       </div>
