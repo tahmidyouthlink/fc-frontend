@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export default async function FAQ() {
   const response = await axios.get(
-    `https://fashion-commerce-backend.vercel.app/all-faqs`,
+    `https://fc-backend-664306765395.asia-south1.run.app/all-faqs`,
   );
   const [data] = response.data || [];
 

@@ -20,7 +20,7 @@ export default async function RootLayout({ children }) {
 
   try {
     const { data } = await axios.get(
-      "https://fashion-commerce-backend.vercel.app/get-all-header-collection",
+      "https://fc-backend-664306765395.asia-south1.run.app/get-all-header-collection",
     );
     topHeaderData = data[0];
   } catch (error) {
