@@ -29,6 +29,20 @@ export default async function RootLayout({ children }) {
     );
   }
 
+  let logoImgSrc;
+
+  try {
+    const { data } = await axios.get(
+      "https://fc-backend-664306765395.asia-south1.run.app/get-all-logo",
+    );
+    logoImgSrc = data[0]?.logoImgUrl;
+  } catch (error) {
+    console.error(
+      "Fetch error (logo - footer):",
+      error.response?.data?.message || error.response?.data,
+    );
+  }
+
   const topHeaderHeight = topHeaderData?.isSlideEnabled ? "28.5px" : "0px";
 
   return (
@@ -82,6 +96,7 @@ export default async function RootLayout({ children }) {
         }`}</style>
       <div className="flex min-h-dvh flex-col [&>main]:grow">
         <Header
+          logoImgSrc={logoImgSrc}
           isTopHeaderEnabled={topHeaderData?.isSlideEnabled}
           slides={topHeaderData?.slides}
           slideDuration={topHeaderData?.slideDuration}
@@ -95,7 +110,7 @@ export default async function RootLayout({ children }) {
         <ScrollTopButton />
         <ChatButton />
         {children}
-        <Footer />
+        <Footer logoImgSrc={logoImgSrc} />
       </div>
     </Suspense>
   );

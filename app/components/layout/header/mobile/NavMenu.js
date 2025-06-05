@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { Suspense } from "react";
 import { useAuth } from "@/app/contexts/auth";
-import logoImage from "/public/logos/logo.png";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import Drawer from "@/app/components/shared/Drawer";
 import MenuSection from "./MenuSection";
@@ -9,7 +8,11 @@ import OrderSection from "./OrderSection";
 import AccountSection from "./AccountSection";
 import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
 
-export default function NavMenu({ isNavMenuOpen, setIsNavMenuOpen }) {
+export default function NavMenu({
+  isNavMenuOpen,
+  setIsNavMenuOpen,
+  logoImgSrc,
+}) {
   const { user } = useAuth();
 
   return (
@@ -29,8 +32,11 @@ export default function NavMenu({ isNavMenuOpen, setIsNavMenuOpen }) {
         >
           <Image
             className="h-8 w-auto"
-            src={logoImage}
+            src={logoImgSrc}
             alt={`${process.env.WEBSITE_NAME} logo`}
+            height={0}
+            width={0}
+            sizes="150px"
           />
         </TransitionLink>
         <Suspense fallback={<LoadingSpinner />}>

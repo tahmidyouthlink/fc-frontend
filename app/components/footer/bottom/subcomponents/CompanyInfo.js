@@ -2,17 +2,19 @@ import Image from "next/image";
 import { LuFacebook } from "react-icons/lu";
 import { TbBrandTiktok } from "react-icons/tb";
 import { FaInstagram, FaXTwitter } from "react-icons/fa6";
-import logoImage from "/public/logos/logo.png";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 
-export default function CompanyInfo() {
+export default function CompanyInfo({ logoImgSrc }) {
   return (
     <div className="max-sm:col-span-full sm:col-span-1">
       <TransitionLink href="/">
         <Image
           className="h-12 w-auto"
-          src={logoImage}
-          alt="fashion-commerce logo with white text"
+          src={logoImgSrc}
+          alt={`${process.env.WEBSITE_NAME} logo`}
+          height={0}
+          width={0}
+          sizes="250px"
         />
       </TransitionLink>
       <p className="mb-7 mt-2 text-[13px]/[1.35] sm:max-w-64 lg:mb-9 lg:max-w-60 lg:text-sm xl:max-w-72">

@@ -9,6 +9,7 @@ import DesktopNavbar from "./desktop/DesktopNavbar";
 import TopHeader from "./TopHeader";
 
 export default function Header({
+  logoImgSrc,
   isTopHeaderEnabled,
   slides,
   slideDuration,
@@ -47,8 +48,8 @@ export default function Header({
         />
       )}
       <div className="mx-auto flex items-center justify-between px-5 py-3 transition-[padding-bottom] duration-300 ease-in-out sm:px-8 sm:py-3.5 lg:px-12 lg:py-4 xl:max-w-[1200px] xl:px-0">
-        <MobileNavbar productList={productList} />
-        <DesktopNavbar productList={productList} />
+        <MobileNavbar logoImgSrc={logoImgSrc} productList={productList} />
+        <DesktopNavbar logoImgSrc={logoImgSrc} productList={productList} />
       </div>
     </header>
   );
