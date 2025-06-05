@@ -11,7 +11,11 @@ export default function DesktopNavbar({ productList }) {
   return (
     <nav className="flex w-full items-center justify-between text-sm max-lg:hidden">
       <TransitionLink href="/">
-        <Image className="h-9 w-auto" src={logoImage} alt="F-commerce logo" />
+        <Image
+          className="h-9 w-auto"
+          src={logoImage}
+          alt={`${process.env.WEBSITE_NAME} logo`}
+        />
       </TransitionLink>
       <Suspense fallback={<LoadingSpinner />}>
         <MainLinks />

@@ -50,7 +50,10 @@ export default function GoogleSignInButton({
   const handleGoogleSignIn = () => {
     setIsPageLoading(true);
 
-    const popup = popupCenter("/login/google", "Fashion Commerce | " + ctaText);
+    const popup = popupCenter(
+      "/login/google",
+      `${process.env.WEBSITE_NAME} | ` + ctaText,
+    );
 
     const interval = setInterval(async () => {
       if (!popup || popup.closed) {

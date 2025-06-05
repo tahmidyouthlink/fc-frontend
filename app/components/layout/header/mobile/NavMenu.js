@@ -30,7 +30,7 @@ export default function NavMenu({ isNavMenuOpen, setIsNavMenuOpen }) {
           <Image
             className="h-8 w-auto"
             src={logoImage}
-            alt="YouthLink logo with white text"
+            alt={`${process.env.WEBSITE_NAME} logo`}
           />
         </TransitionLink>
         <Suspense fallback={<LoadingSpinner />}>

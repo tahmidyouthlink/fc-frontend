@@ -25,12 +25,12 @@ export default function MobileNavbar({ productList }) {
           <Image
             className="h-8 w-auto sm:hidden"
             src={logoOnlyImage}
-            alt="YouthLink logo"
+            alt={`${process.env.WEBSITE_NAME} logo (no text)`}
           />
           <Image
             className="h-8 w-auto max-sm:hidden lg:h-9"
             src={logoWithTextImage}
-            alt="YouthLink logo with text"
+            alt={`${process.env.WEBSITE_NAME} logo`}
           />
         </TransitionLink>
         <ul className="flex gap-x-4 sm:gap-x-6">
