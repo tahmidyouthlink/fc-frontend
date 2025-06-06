@@ -50,7 +50,7 @@ export default function WishlistButton({ productList }) {
       isOpen={isDropdownOpen}
       onOpenChange={setIsDropdownOpen}
       placement="bottom-end"
-      className="mt-5 sm:mt-6 xl:mt-7"
+      className="mt-5 rounded-md sm:mt-6 xl:mt-7"
       motionProps={{
         initial: { opacity: 0, scale: 0.95 },
         animate: {

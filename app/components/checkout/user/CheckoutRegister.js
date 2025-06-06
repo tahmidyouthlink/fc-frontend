@@ -159,6 +159,7 @@ export default function CheckoutRegister({
       onOpenChange={setIsRegisterModalOpen}
       size="2xl"
       scrollBehavior="inside"
+      className="rounded-md"
     >
       <ModalContent>
         {() => (
@@ -193,7 +194,7 @@ export default function CheckoutRegister({
                           message: "Full name is required.",
                         },
                       })}
-                      className="h-10 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] md:text-[13px]"
+                      className="h-10 w-full rounded-[4px] border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] md:text-[13px]"
                       required
                     />
                     {errorsForRegister.registerFullName && (
@@ -221,7 +222,7 @@ export default function CheckoutRegister({
                           message: "Email is required.",
                         },
                       })}
-                      className="h-10 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] md:text-[13px]"
+                      className="h-10 w-full rounded-[4px] border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] md:text-[13px]"
                       required
                     />
                     {errorsForRegister.registerEmail && (
@@ -265,7 +266,7 @@ export default function CheckoutRegister({
                             },
                           },
                         })}
-                        className="h-10 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] md:text-[13px]"
+                        className="h-10 w-full rounded-[4px] border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] md:text-[13px]"
                         required
                       />
                       <div
@@ -320,7 +321,7 @@ export default function CheckoutRegister({
                             },
                           },
                         })}
-                        className="h-10 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] md:text-[13px]"
+                        className="h-10 w-full rounded-[4px] border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] md:text-[13px]"
                         required
                       />
                       <div
@@ -348,7 +349,7 @@ export default function CheckoutRegister({
                   className={`!mt-7 flex gap-x-2 [&_a]:underline [&_a]:underline-offset-2 [&_a]:transition-[color] [&_a]:duration-300 [&_a]:ease-in-out [&_span]:text-xs lg:[&_span]:text-[13px] ${isPoliciesCheckboxSelected ? "[&_a]:text-[var(--color-primary-900)] hover:[&_a]:text-[var(--color-primary-800)]" : "[&_a]:text-[#f31260]"}`}
                 >
                   <Checkbox
-                    className="[&_span:has(svg):after]:bg-[var(--color-primary-500)] [&_span:has(svg)]:text-neutral-700"
+                    className="[&_span::after]:rounded-[3px] [&_span::before]:rounded-[3px] [&_span:has(svg):after]:bg-[var(--color-primary-500)] [&_span:has(svg)]:text-neutral-700 [&_span]:rounded-[3px]"
                     defaultSelected
                     isRequired
                     isSelected={isPoliciesCheckboxSelected}
@@ -374,7 +375,7 @@ export default function CheckoutRegister({
                 {/* Newsletter Agreement */}
                 <div className="flex gap-x-2 [&_span]:text-xs lg:[&_span]:text-[13px]">
                   <Checkbox
-                    className="[&_span:has(svg):after]:bg-[var(--color-primary-500)] [&_span:has(svg)]:text-neutral-700"
+                    className="[&_span::after]:rounded-[3px] [&_span::before]:rounded-[3px] [&_span:has(svg):after]:bg-[var(--color-primary-500)] [&_span:has(svg)]:text-neutral-700 [&_span]:rounded-[3px]"
                     isSelected={isNewsletterCheckboxSelected}
                     onValueChange={setIsNewsletterCheckboxSelected}
                   >
@@ -386,7 +387,7 @@ export default function CheckoutRegister({
                 <div className="!mb-4 !mt-8 max-sm:space-y-4 sm:flex sm:items-end sm:gap-x-4">
                   <button
                     type="submit"
-                    className="block h-fit w-full self-end rounded-lg bg-[var(--color-primary-500)] py-2.5 text-center text-sm font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
+                    className="block h-fit w-full self-end rounded-[4px] bg-[var(--color-primary-500)] py-2.5 text-center text-sm font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
                   >
                     Sign up
                   </button>

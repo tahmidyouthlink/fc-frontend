@@ -83,7 +83,7 @@ export default function ProductBadges({
     <div className="absolute left-3 top-3 z-[3] space-y-2">
       {isTrending && (
         <div
-          className="relative size-8 overflow-hidden rounded-lg bg-[#cd4747] font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[width] hover:w-[var(--expanded-width)]"
+          className="relative size-8 overflow-hidden rounded-[3px] bg-[#cd4747] font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[width] hover:w-[var(--expanded-width)]"
           style={{
             "--expanded-width": `${expandedTrendingWidth}px`,
           }}
@@ -99,7 +99,7 @@ export default function ProductBadges({
       )}
       {isNewArrival && (
         <div
-          className="relative size-8 overflow-hidden rounded-lg bg-[#5c49d9] font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[width] hover:w-[var(--expanded-width)]"
+          className="relative size-8 overflow-hidden rounded-[3px] bg-[#5c49d9] font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[width] hover:w-[var(--expanded-width)]"
           style={{
             "--expanded-width": `${expandedNewArrivalWidth}px`,
           }}
@@ -112,7 +112,7 @@ export default function ProductBadges({
       )}
       {hasSpecialOffer ? (
         <div
-          className="relative w-8 overflow-hidden rounded-lg bg-[#a138b1] font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[width] duration-300 hover:w-[var(--expanded-width)] [&:hover>div:last-child]:animate-[scroll_3s_linear_infinite]"
+          className="relative w-8 overflow-hidden rounded-[3px] bg-[#a138b1] font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[width] duration-300 hover:w-[var(--expanded-width)] [&:hover>div:last-child]:animate-[scroll_3s_linear_infinite]"
           style={{
             "--expanded-width": `${expandedSpecialOfferWidth}px`,
           }}
@@ -133,7 +133,7 @@ export default function ProductBadges({
       ) : (
         hasDiscount && (
           <div
-            className="relative h-8 w-8 overflow-hidden rounded-lg bg-[#32aa54] font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-all hover:w-[var(--expanded-width)]"
+            className="relative h-8 w-8 overflow-hidden rounded-[3px] bg-[#32aa54] font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-all hover:w-[var(--expanded-width)]"
             style={{
               "--expanded-width": `${expandedDiscountWidth}px`,
             }}

@@ -119,7 +119,7 @@ export default function ReturnImagesField({
     <div className="w-full space-y-3 font-semibold">
       <label htmlFor="description">Upload Images as Proof</label>
       <div
-        className="cursor-pointer rounded-lg border-3 border-dashed border-neutral-200 px-5 py-8 transition-[border-color,background-color] duration-300 ease-in-out"
+        className="cursor-pointer rounded-[4px] border-3 border-dashed border-neutral-200 px-5 py-8 transition-[border-color,background-color] duration-300 ease-in-out"
         onDrop={(event) => {
           event.preventDefault();
           if (isFormSubmissionRequested) setIsFormSubmissionRequested(false);
@@ -190,7 +190,7 @@ export default function ReturnImagesField({
                 <Image
                   src={returnImgUrl}
                   alt={`Image ${urlIndex + 1} as proof`}
-                  className="size-20 rounded-md border border-neutral-200 object-cover"
+                  className="size-20 rounded-[4px] border border-neutral-200 object-cover"
                   height={0}
                   width={0}
                   sizes="240px"

@@ -120,7 +120,7 @@ export default function ShopCards({
                 Math.max(0, Math.ceil(filteredProductCount / option.number)),
               );
             }}
-            className={`rounded-md border p-1.5 transition-[background-color,border-color] duration-300 ease-in-out hover:border-[var(--color-secondary-600)] hover:bg-[var(--color-secondary-500)] ${cols === option.number ? "border-[var(--color-secondary-600)] bg-[var(--color-secondary-500)]" : "border-neutral-200 bg-neutral-100"} ${option.number === 1 ? "sm:hidden" : option.number === 3 ? "max-sm:hidden" : option.number !== 2 ? "max-lg:hidden" : ""}`}
+            className={`rounded-[3px] border p-1.5 transition-[background-color,border-color] duration-300 ease-in-out hover:border-[var(--color-secondary-600)] hover:bg-[var(--color-secondary-500)] ${cols === option.number ? "border-[var(--color-secondary-600)] bg-[var(--color-secondary-500)]" : "border-neutral-200 bg-neutral-100"} ${option.number === 1 ? "sm:hidden" : option.number === 3 ? "max-sm:hidden" : option.number !== 2 ? "max-lg:hidden" : ""}`}
           >
             <Image
               src={option.svg}

@@ -33,14 +33,14 @@ export default function OrderCard({
     order?.orderStatus?.toLowerCase().includes("request");
 
   return (
-    <div className="h-fit w-full rounded-md border-2 border-neutral-300 p-3.5 text-sm xl:p-5">
+    <div className="h-fit w-full rounded-[4px] border-2 border-neutral-300 p-3.5 text-sm xl:p-5">
       <div className="mb-4 items-start justify-between gap-2 max-sm:space-y-2 sm:flex">
         <h2 className="text-sm font-semibold md:text-base">
           Order #{order?.orderNumber}
         </h2>
         {orderStatus?.text !== "Request Declined" ? (
           <div
-            className={`w-fit cursor-default text-nowrap rounded-md px-2 py-1.5 text-xs font-semibold max-sm:ml-auto ${orderStatus?.bgColor} ${orderStatus?.textColor}`}
+            className={`w-fit cursor-default text-nowrap rounded-[3px] px-2 py-1.5 text-xs font-semibold max-sm:ml-auto ${orderStatus?.bgColor} ${orderStatus?.textColor}`}
           >
             {orderStatus?.text}
           </div>
@@ -48,13 +48,13 @@ export default function OrderCard({
           <Popover
             classNames={{
               content: [
-                "p-3.5 max-w-[65dvw] sm:max-w-48 lg:max-w-60 shadow-[1px_1px_20px_0_rgba(0,0,0,0.15)] text-[13px]",
+                "p-3.5 max-w-[65dvw] rounded-[4px] sm:max-w-48 lg:max-w-60 shadow-[1px_1px_20px_0_rgba(0,0,0,0.15)] text-[13px]",
               ],
             }}
             placement="bottom-end"
           >
             <PopoverTrigger
-              className={`w-fit cursor-pointer text-nowrap rounded-md px-2 py-1.5 text-xs font-semibold max-sm:ml-auto ${orderStatus?.bgColor} ${orderStatus?.textColor}`}
+              className={`w-fit cursor-pointer text-nowrap rounded-[3px] px-2 py-1.5 text-xs font-semibold max-sm:ml-auto ${orderStatus?.bgColor} ${orderStatus?.textColor}`}
             >
               {orderStatus?.text}
             </PopoverTrigger>
@@ -85,14 +85,14 @@ export default function OrderCard({
       <div className="mt-8 flex flex-wrap gap-2.5">
         <TransitionLink
           href={`/user/orders/${order?.orderNumber?.toLowerCase()}`}
-          className="flex items-center gap-2 rounded-lg bg-[var(--color-secondary-500)] px-4 py-2.5 text-center text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-secondary-600)] max-sm:w-full max-sm:justify-center"
+          className="flex items-center gap-2 rounded-[4px] bg-[var(--color-secondary-500)] px-4 py-2.5 text-center text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-secondary-600)] max-sm:w-full max-sm:justify-center"
         >
           Order Details
           <LuFileText size={14} />
         </TransitionLink>
         {isOrderTrackable && (
           <button
-            className="flex items-center gap-2 rounded-lg bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)] max-sm:w-full max-sm:justify-center"
+            className="flex items-center gap-2 rounded-[4px] bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)] max-sm:w-full max-sm:justify-center"
             onClick={() => {
               setActiveTrackOrder(order);
               setIsTrackModalOpen(true);
@@ -108,7 +108,7 @@ export default function OrderCard({
         ) &&
           orderStatus?.text !== "Return Requested" && (
             <button
-              className="flex items-center gap-2 rounded-lg bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)] max-sm:w-full max-sm:justify-center"
+              className="flex items-center gap-2 rounded-[4px] bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)] max-sm:w-full max-sm:justify-center"
               onClick={() => {
                 setValue(
                   "items",
@@ -128,7 +128,7 @@ export default function OrderCard({
           )}
         {isReturnRequested && (
           <button
-            className="flex items-center gap-2 rounded-lg bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)] max-sm:w-full max-sm:justify-center"
+            className="flex items-center gap-2 rounded-[4px] bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)] max-sm:w-full max-sm:justify-center"
             onClick={() => {
               setActiveReturnOrder(order);
               setIsReturnInfoModalOpen(true);

@@ -17,7 +17,7 @@ export default function ReturnInfoModalInfo({
       <h2 className="text-sm font-semibold uppercase md:text-[15px]/[1]">
         Return Information
       </h2>
-      <div className="space-y-3 rounded-md border-2 border-neutral-200 p-3 text-sm sm:px-5 sm:py-4 [&>div]:flex [&>div]:justify-between [&>div]:gap-3 sm:[&>div]:gap-10 xl:[&>div]:gap-20 [&_h4]:font-semibold [&_h4]:text-neutral-600 sm:[&_h4]:text-nowrap">
+      <div className="space-y-3 rounded-[4px] border-2 border-neutral-200 p-3 text-sm sm:px-5 sm:py-4 [&>div]:flex [&>div]:justify-between [&>div]:gap-3 sm:[&>div]:gap-10 xl:[&>div]:gap-20 [&_h4]:font-semibold [&_h4]:text-neutral-600 sm:[&_h4]:text-nowrap">
         <div>
           <h4>Return Requested at</h4>
           <p className="text-right">

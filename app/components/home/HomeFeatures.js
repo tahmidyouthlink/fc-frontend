@@ -58,9 +58,9 @@ export default function HomeFeatures({
           />
         </div>
         <div className="absolute inset-0 [&_div]:z-[-1]">
-          <div className="absolute left-[75%] top-[85%] h-[150px] w-[150px] translate-x-[-50%] translate-y-[-50%] rounded-[100%] bg-[var(--color-static-bubble-secondary)] opacity-70 blur-[60px] md:left-[90%] md:blur-[40px] xl:h-[187px] xl:w-[214px] 2xl:left-[100%]" />
-          <div className="absolute top-[40%] h-[150px] w-[150px] translate-x-[-50%] translate-y-[-50%] rounded-[100%] bg-[var(--color-static-bubble-secondary)] opacity-70 blur-[60px] md:blur-[40px] lg:top-[35%] xl:h-[187px] xl:w-[214px]" />
-          <div className="absolute left-[60%] top-[20%] h-[150px] w-[150px] translate-x-[-50%] translate-y-[-50%] rounded-[100%] bg-[var(--color-static-bubble-primary)] opacity-70 blur-[60px] md:blur-[40px] xl:h-[187px] xl:w-[214px]" />
+          <div className="absolute left-[75%] top-[85%] h-[150px] w-[150px] translate-x-[-50%] translate-y-[-50%] rounded-full bg-[var(--color-static-bubble-secondary)] opacity-70 blur-[60px] md:left-[90%] md:blur-[40px] xl:h-[187px] xl:w-[214px] 2xl:left-full" />
+          <div className="absolute top-[40%] h-[150px] w-[150px] translate-x-[-50%] translate-y-[-50%] rounded-full bg-[var(--color-static-bubble-secondary)] opacity-70 blur-[60px] md:blur-[40px] lg:top-[35%] xl:h-[187px] xl:w-[214px]" />
+          <div className="absolute left-[60%] top-[20%] h-[150px] w-[150px] translate-x-[-50%] translate-y-[-50%] rounded-full bg-[var(--color-static-bubble-primary)] opacity-70 blur-[60px] md:blur-[40px] xl:h-[187px] xl:w-[214px]" />
         </div>
         <Image
           src={featureImg}
@@ -68,7 +68,7 @@ export default function HomeFeatures({
           width={0}
           height={0}
           sizes="50dvw"
-          className="min-h-full rounded-xl object-cover max-md:mb-10"
+          className="min-h-full rounded-md object-cover max-md:mb-10"
         />
         <div className="col-span-2 space-y-8 md:col-span-1">
           <h2 className="relative w-fit text-xl font-bold lg:text-3xl">

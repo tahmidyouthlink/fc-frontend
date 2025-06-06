@@ -136,7 +136,7 @@ export default function ResetPassword({ searchParams }) {
       />
       {tokenData.isTokenValid ? (
         <div className="pt-header-h-full-section-pb relative flex min-h-dvh w-full items-center justify-center px-5 pb-[var(--section-padding)] sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0">
-          <section className="w-full max-w-md rounded-xl border-2 border-neutral-50/20 bg-white/40 p-5 shadow-[0_0_20px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl transition-[height] duration-300 ease-in-out">
+          <section className="w-full max-w-md rounded-md border-2 border-neutral-50/20 bg-white/40 p-5 shadow-[0_0_20px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl transition-[height] duration-300 ease-in-out">
             <h2 className="text-base font-semibold md:text-lg">
               Reset Your Password
             </h2>
@@ -162,7 +162,7 @@ export default function ResetPassword({ searchParams }) {
                       message: "Email is required.",
                     },
                   })}
-                  className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
+                  className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
                   readOnly
                   required
                 />
@@ -202,7 +202,7 @@ export default function ResetPassword({ searchParams }) {
                         },
                       },
                     })}
-                    className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
+                    className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
                     required
                   />
                   <div
@@ -254,7 +254,7 @@ export default function ResetPassword({ searchParams }) {
                         },
                       },
                     })}
-                    className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
+                    className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
                     required
                   />
                   <div
@@ -277,7 +277,7 @@ export default function ResetPassword({ searchParams }) {
                 )}
               </div>
               {/* Form Submission Button  */}
-              <button className="relative z-[1] !mt-8 w-full rounded-lg bg-[var(--color-primary-500)] py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)] md:text-sm">
+              <button className="relative z-[1] !mt-8 w-full rounded-[4px] bg-[var(--color-primary-500)] py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)] md:text-sm">
                 Reset Password
               </button>
             </form>
@@ -289,7 +289,7 @@ export default function ResetPassword({ searchParams }) {
           <p className="mt-2 text-neutral-400">{tokenData.resMsg}</p>
           <TransitionLink
             href="/"
-            className="mt-9 block rounded-lg bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
+            className="mt-9 block rounded-[4px] bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
           >
             Return to Home
           </TransitionLink>

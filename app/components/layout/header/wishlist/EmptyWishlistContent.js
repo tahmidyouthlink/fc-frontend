@@ -10,7 +10,7 @@ export default function EmptyWishlistContent({ setIsDropdownOpen }) {
         hasDrawer={true}
         setIsDrawerOpen={setIsDropdownOpen}
         href="/shop"
-        className="mt-7 block rounded-lg bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
+        className="mt-7 block rounded-[4px] bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
       >
         Let&apos;s Shop
       </TransitionLink>

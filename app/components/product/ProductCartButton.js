@@ -127,7 +127,9 @@ export default function ProductCartButton({
         <>
           <Tooltip
             classNames={{
-              content: ["px-3 py-2 shadow-[1px_1px_20px_0_rgba(0,0,0,0.15)]"],
+              content: [
+                "px-3 rounded-[4px] py-2 shadow-[1px_1px_20px_0_rgba(0,0,0,0.15)]",
+              ],
               base:
                 !!selectedOptions?.size && !!productVariantSku
                   ? ["hidden"]
@@ -179,7 +181,9 @@ export default function ProductCartButton({
           </Tooltip>
           <Popover
             classNames={{
-              content: ["px-3 py-2 shadow-[1px_1px_20px_0_rgba(0,0,0,0.15)]"],
+              content: [
+                "px-3 py-2 rounded-[4px] shadow-[1px_1px_20px_0_rgba(0,0,0,0.15)]",
+              ],
               base:
                 !!selectedOptions?.size && !!productVariantSku
                   ? ["hidden"]

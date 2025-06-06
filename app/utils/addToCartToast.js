@@ -28,7 +28,7 @@ export default function addToCartToast(
           });
         }
       }}
-      className="z-[6] min-w-60 -translate-y-6 rounded-lg bg-white p-2.5 opacity-0 shadow-[4px_4px_16px_0_rgba(0,0,0,0.15)] transition-[opacity,transform] duration-400 ease-out"
+      className="z-[6] min-w-60 -translate-y-6 rounded-[4px] bg-white p-2.5 opacity-0 shadow-[4px_4px_16px_0_rgba(0,0,0,0.15)] transition-[opacity,transform] duration-400 ease-out"
       style={{
         marginTop: `${marginTopVal}px`,
       }}
@@ -45,7 +45,7 @@ export default function addToCartToast(
       {/* Cart Item Information */}
       <div className="flex w-fit items-stretch justify-between gap-x-2.5">
         {/* Cart Item Image */}
-        <div className="relative min-h-full grow overflow-hidden rounded-md bg-[var(--product-default)] max-sm:w-16 sm:aspect-[1.1/1] sm:h-[52px]">
+        <div className="relative min-h-full grow overflow-hidden rounded-[4px] bg-[var(--product-default)] max-sm:w-16 sm:aspect-[1.1/1] sm:h-[52px]">
           <Image
             className="h-full w-full object-contain"
             src={productImg}

@@ -41,7 +41,7 @@ export default function CartModalContents({
 
   return (
     <div className="relative h-fit md:flex md:gap-x-10">
-      <div className="relative min-h-full overflow-hidden rounded-lg bg-[var(--product-default)] p-5 max-md:h-[35vh] max-md:w-[60dvw] max-sm:w-[80dvw] md:w-60">
+      <div className="relative min-h-full overflow-hidden rounded-[4px] bg-[var(--product-default)] p-5 max-md:h-[35vh] max-md:w-[60dvw] max-sm:w-[80dvw] md:w-60">
         {!!imgUrl && (
           <Image
             src={imgUrl}
@@ -79,7 +79,7 @@ export default function CartModalContents({
               return (
                 <span
                   key={"add-to-cart-size-" + size}
-                  className={`h-9 w-12 cursor-pointer content-center rounded-lg text-center text-sm font-semibold transition-[background-color,color] duration-300 ease-in-out ${selectedOptions?.size === size ? "bg-[var(--color-secondary-600)] text-neutral-700" : "bg-neutral-100 text-neutral-500 hover:bg-[var(--color-secondary-500)] hover:text-neutral-600"}`}
+                  className={`h-9 w-12 cursor-pointer content-center rounded-[4px] text-center text-sm font-semibold transition-[background-color,color] duration-300 ease-in-out ${selectedOptions?.size === size ? "bg-[var(--color-secondary-600)] text-neutral-700" : "bg-neutral-100 text-neutral-500 hover:bg-[var(--color-secondary-500)] hover:text-neutral-600"}`}
                   onClick={() =>
                     setSelectedOptions((prevOptions) => ({
                       ...prevOptions,
@@ -130,7 +130,7 @@ export default function CartModalContents({
           className={`flex items-center gap-x-2.5 transition-[opacity] duration-300 ease-in-out ${!!selectedOptions?.size && !!productVariantSku ? /*"pointer-events-auto opacity-100" : "pointer-events-none opacity-40"*/ "" : "hidden"}`}
         >
           <h4 className="font-semibold text-neutral-600">Quantity:</h4>
-          <div className="flex gap-x-1.5 [&>*]:rounded-lg [&>button]:bg-neutral-100 hover:[&>button]:bg-[var(--color-secondary-500)]">
+          <div className="flex gap-x-1.5 [&>*]:rounded-[4px] [&>button]:bg-neutral-100 hover:[&>button]:bg-[var(--color-secondary-500)]">
             <Button
               isIconOnly
               startContent={<HiChevronLeft />}
@@ -145,7 +145,7 @@ export default function CartModalContents({
               }
             ></Button>
             <Input
-              className="w-fit font-semibold [&_input::-webkit-inner-spin-button]:appearance-none [&_input::-webkit-outer-spin-button]:appearance-none [&_input]:text-center [&_input]:[-moz-appearance:textfield]"
+              className="w-fit font-semibold [&_[data-slot='input-wrapper']]:rounded-[4px] hover:[&_[data-slot='input-wrapper']]:bg-[var(--color-secondary-500)] [&_input::-webkit-inner-spin-button]:appearance-none [&_input::-webkit-outer-spin-button]:appearance-none [&_input]:text-center [&_input]:[-moz-appearance:textfield]"
               type="number"
               arial-label="Quantity"
               min={1}

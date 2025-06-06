@@ -178,12 +178,23 @@ export default function ContactForm() {
                   selectedKeys={value}
                   onSelectionChange={onChange}
                   className="w-full [&_button]:border-b [&_button]:border-neutral-300 [&_button]:after:bg-neutral-400 hover:[&_button]:border-neutral-300 [&_label]:text-sm [&_label]:text-neutral-400 lg:[&_label]:text-base"
+                  classNames={{ popoverContent: ["rounded-md"] }}
                 >
-                  <SelectItem key="Refund Request">Refund Request</SelectItem>
-                  <SelectItem key="Cancel Order">Cancel Order</SelectItem>
-                  <SelectItem key="Payment Issue">Payment Issue</SelectItem>
-                  <SelectItem key="Suggestion</">Suggestion</SelectItem>
-                  <SelectItem key="Order Tracking">Order Tracking</SelectItem>
+                  <SelectItem className="rounded-[4px]" key="Refund Request">
+                    Refund Request
+                  </SelectItem>
+                  <SelectItem className="rounded-[4px]" key="Cancel Order">
+                    Cancel Order
+                  </SelectItem>
+                  <SelectItem className="rounded-[4px]" key="Payment Issue">
+                    Payment Issue
+                  </SelectItem>
+                  <SelectItem className="rounded-[4px]" key="Suggestion</">
+                    Suggestion
+                  </SelectItem>
+                  <SelectItem className="rounded-[4px]" key="Order Tracking">
+                    Order Tracking
+                  </SelectItem>
                 </Select>
               )}
             />
@@ -214,7 +225,7 @@ export default function ContactForm() {
           )}
         </div>
       </div>
-      <button className="w-fit rounded-lg bg-[var(--color-primary-500)] px-5 py-3 text-xs font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)] md:text-sm">
+      <button className="w-fit rounded-[4px] bg-[var(--color-primary-500)] px-5 py-3 text-xs font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)] md:text-sm">
         Send Message
       </button>
     </form>

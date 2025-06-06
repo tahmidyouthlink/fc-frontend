@@ -217,7 +217,7 @@ export default function ShopContents() {
           </p>
         )}
         <button
-          className={`relative z-[1] flex w-fit items-center gap-x-3 rounded-lg bg-[var(--color-secondary-500)] px-[18px] py-3 transition-colors duration-300 ease-in-out hover:bg-[var(--color-secondary-600)] ${isFilterButtonClicked ? "hidden" : "block"}`}
+          className={`relative z-[1] flex w-fit items-center gap-x-3 rounded-[4px] bg-[var(--color-secondary-500)] px-[18px] py-3 transition-colors duration-300 ease-in-out hover:bg-[var(--color-secondary-600)] ${isFilterButtonClicked ? "hidden" : "block"}`}
           onClick={() => setIsFilterButtonClicked(true)}
         >
           <p className="font-semibold">Filter</p>

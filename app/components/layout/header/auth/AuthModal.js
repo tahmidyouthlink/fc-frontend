@@ -18,6 +18,7 @@ export default function AuthModal({
       onOpenChange={setIsAuthModalOpen}
       size="md"
       scrollBehavior="inside"
+      className="rounded-md"
     >
       <ModalContent>
         {() => (

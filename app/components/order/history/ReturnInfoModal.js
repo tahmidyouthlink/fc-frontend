@@ -24,6 +24,7 @@ export default function ReturnInfoModal({
       onOpenChange={setIsReturnInfoModalOpen}
       size="xl"
       scrollBehavior="inside"
+      className="rounded-md"
     >
       <ModalContent>
         {() => (
@@ -49,7 +50,7 @@ export default function ReturnInfoModal({
             <ModalFooter>
               <TransitionLink
                 href="/contact-us"
-                className="flex w-fit items-center gap-2 rounded-lg bg-[var(--color-primary-500)] px-4 py-2.5 text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
+                className="flex w-fit items-center gap-2 rounded-[4px] bg-[var(--color-primary-500)] px-4 py-2.5 text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
               >
                 Contact Us
                 <LuMessagesSquare size={17} />

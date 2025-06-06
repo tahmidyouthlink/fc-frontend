@@ -38,7 +38,7 @@ export default function ProductDetails({ params }) {
   }, [orderList, order, router]);
 
   return (
-    <section className="grow auto-rows-max rounded-xl bg-white p-3.5 shadow-[2px_2px_20px_0_rgba(0,0,0,0.075)] xl:p-5">
+    <section className="grow auto-rows-max rounded-md bg-white p-3.5 shadow-[2px_2px_20px_0_rgba(0,0,0,0.075)] xl:p-5">
       {/* Go Back Button */}
       <TransitionLink
         href="/user/orders"
@@ -57,7 +57,7 @@ export default function ProductDetails({ params }) {
           />
           <OrderDeliveryDetails delivery={order?.deliveryInfo} />
         </div>
-        <div className="bottom-[var(--section-padding)] top-[var(--section-padding)] h-fit w-full rounded-md border-2 border-neutral-200 p-3.5 font-semibold xl:p-5">
+        <div className="bottom-[var(--section-padding)] top-[var(--section-padding)] h-fit w-full rounded-[4px] border-2 border-neutral-200 p-3.5 font-semibold xl:p-5">
           <div className="relative flex w-full flex-col">
             <OrderItems orderItems={order?.productInformation} />
             <div className="space-y-4 bg-white text-[13px] max-lg:order-last md:text-sm">

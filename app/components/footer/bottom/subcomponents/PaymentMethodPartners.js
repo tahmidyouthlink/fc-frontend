@@ -13,7 +13,7 @@ export default function PaymentMethodPartners() {
           return (
             <li
               key={paymentMethod.name + paymentMethod.websiteLink}
-              className="overflow-hidden rounded-md shadow-[2px_2px_8px_0_rgba(0,0,0,0.1)] transition-shadow duration-300 ease-in-out hover:shadow-[2px_2px_16px_0_rgba(0,0,0,0.175)]"
+              className="overflow-hidden rounded-[4px] shadow-[2px_2px_8px_0_rgba(0,0,0,0.1)] transition-shadow duration-300 ease-in-out hover:shadow-[2px_2px_16px_0_rgba(0,0,0,0.175)]"
             >
               <TransitionLink
                 href={paymentMethod.websiteLink}
@@ -33,7 +33,7 @@ export default function PaymentMethodPartners() {
             </li>
           );
         })}
-        <li className="flex min-h-full w-[68px] cursor-pointer items-center justify-center overflow-hidden rounded-md p-2.5 shadow-[2px_2px_8px_0_rgba(0,0,0,0.1)] transition-shadow duration-300 ease-in-out hover:shadow-[2px_2px_16px_0_rgba(0,0,0,0.175)]">
+        <li className="flex min-h-full w-[68px] cursor-pointer items-center justify-center overflow-hidden rounded-[4px] p-2.5 shadow-[2px_2px_8px_0_rgba(0,0,0,0.1)] transition-shadow duration-300 ease-in-out hover:shadow-[2px_2px_16px_0_rgba(0,0,0,0.175)]">
           <p className="text-center text-xs/[28px] font-bold text-neutral-600 lg:text-[13px]/[28px]">
             More...
           </p>

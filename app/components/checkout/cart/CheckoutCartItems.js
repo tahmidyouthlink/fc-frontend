@@ -112,7 +112,7 @@ export default function CheckoutCartItems({
               {/* Cart Item Image (with link to product page) */}
               <TransitionLink
                 href={`/product/${cartItem?.productTitle.split(" ").join("-").toLowerCase()}`}
-                className="relative block min-h-full w-1/4 overflow-hidden rounded-md bg-[var(--product-default)] max-sm:w-20"
+                className="relative block min-h-full w-1/4 overflow-hidden rounded-[4px] bg-[var(--product-default)] max-sm:w-20"
               >
                 {!!cartItemImgUrl && (
                   <Image
@@ -292,7 +292,7 @@ export default function CheckoutCartItems({
                       <p className="text-xs">Remove</p>
                     </div>
                     {/* Cart Item Quantity */}
-                    <div className="mt-auto flex gap-x-1.5 text-neutral-500 [&>*]:!m-0 [&>*]:grid [&>*]:size-8 [&>*]:place-content-center [&>*]:rounded-md [&>*]:border-2 [&>*]:border-neutral-200 [&>*]:bg-white/20 [&>*]:!p-0 [&>*]:text-center [&>*]:backdrop-blur-2xl [&>*]:transition-[background-color,border-color] [&>*]:duration-300 [&>*]:ease-in-out sm:[&>*]:rounded-lg">
+                    <div className="mt-auto flex gap-x-1.5 text-neutral-500 [&>*]:!m-0 [&>*]:grid [&>*]:size-8 [&>*]:place-content-center [&>*]:rounded-[4px] [&>*]:border-2 [&>*]:border-neutral-200 [&>*]:bg-white/20 [&>*]:!p-0 [&>*]:text-center [&>*]:backdrop-blur-2xl [&>*]:transition-[background-color,border-color] [&>*]:duration-300 [&>*]:ease-in-out">
                       {/* Quantity Decrease Button */}
                       <button
                         className="transition-[background-color,border-color] hover:border-transparent hover:bg-[var(--color-secondary-500)]"

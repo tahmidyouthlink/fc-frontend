@@ -30,6 +30,7 @@ export default function ProductSizeGuideButton({ sizeGuideImageUrl }) {
         onOpenChange={setIsSizeGuideModalOpen}
         size="3xl"
         scrollBehavior="inside"
+        className="rounded-md"
       >
         <ModalContent>
           {(onClose) => (
@@ -50,7 +51,12 @@ export default function ProductSizeGuideButton({ sizeGuideImageUrl }) {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button
+                  color="danger"
+                  variant="light"
+                  onPress={onClose}
+                  className="rounded-[4px]"
+                >
                   Close
                 </Button>
               </ModalFooter>

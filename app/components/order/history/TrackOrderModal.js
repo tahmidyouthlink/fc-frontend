@@ -30,6 +30,7 @@ export default function TrackOrderModal({
       isOpen={isTrackModalOpen}
       onOpenChange={setIsTrackModalOpen}
       size="xl"
+      className="rounded-md"
     >
       <ModalContent>
         {() => (
@@ -98,7 +99,7 @@ export default function TrackOrderModal({
                   <p className="text-xs font-semibold">Delivered</p>
                 </div>
               </div>
-              <div className="space-y-3 rounded-md border-2 border-neutral-200 p-3 text-sm sm:px-5 sm:py-4 [&>div]:flex [&>div]:justify-between [&>div]:gap-3 sm:[&>div]:gap-10 xl:[&>div]:gap-20 [&_h4]:font-semibold [&_h4]:text-neutral-600 sm:[&_h4]:text-nowrap">
+              <div className="space-y-3 rounded-[4px] border-2 border-neutral-200 p-3 text-sm sm:px-5 sm:py-4 [&>div]:flex [&>div]:justify-between [&>div]:gap-3 sm:[&>div]:gap-10 xl:[&>div]:gap-20 [&_h4]:font-semibold [&_h4]:text-neutral-600 sm:[&_h4]:text-nowrap">
                 <div>
                   <h4>Expected Delivery</h4>
                   <p className="text-right">
@@ -125,7 +126,7 @@ export default function TrackOrderModal({
                 <Link
                   href={shipmentInfo?.trackingUrl}
                   target="_blank"
-                  className="mx-auto !mt-3 mb-9 flex w-fit items-center gap-2 rounded-lg bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
+                  className="mx-auto !mt-3 mb-9 flex w-fit items-center gap-2 rounded-[4px] bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
                 >
                   Track Your Package
                   <LuBox size={17} />

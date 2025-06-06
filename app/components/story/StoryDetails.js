@@ -131,7 +131,7 @@ export default function StoryDetails({
           width={0}
           sizes="25vw"
         />
-        <div className="absolute left-5 top-[15%] flex origin-left -rotate-[60deg] flex-col items-end justify-center rounded-xl bg-[var(--color-secondary-400)] p-2 text-center text-sm text-neutral-700 sm:left-1/3 sm:-rotate-45 sm:max-md:top-[9%] sm:max-md:-translate-x-full md:-left-4 md:top-[12%] md:text-lg lg:top-[15%] lg:text-xl xl:left-[30%] xl:top-[12.5%] xl:-translate-x-full xl:text-sm min-[1800px]:left-1/4 min-[1800px]:top-[10%]">
+        <div className="absolute left-5 top-[15%] flex origin-left -rotate-[60deg] flex-col items-end justify-center rounded-[4px] bg-[var(--color-secondary-400)] p-2 text-center text-sm text-neutral-700 sm:left-1/3 sm:-rotate-45 sm:max-md:top-[9%] sm:max-md:-translate-x-full md:-left-4 md:top-[12%] md:text-lg lg:top-[15%] lg:text-xl xl:left-[30%] xl:top-[12.5%] xl:-translate-x-full xl:text-sm min-[1800px]:left-1/4 min-[1800px]:top-[10%]">
           <span className="relative">
             <p className="font-semibold">{selectedDept.staff.staffName}</p>
             <p>@ {selectedDept.departmentName}</p>
@@ -145,7 +145,7 @@ export default function StoryDetails({
           height={0}
           width={0}
           sizes="750px"
-          className="relative h-full w-full rounded-xl object-contain"
+          className="relative h-full w-full object-contain"
         />
       </div>
       <div className="relative col-span-full overflow-hidden md:col-span-2 xl:col-span-3">
@@ -190,7 +190,7 @@ export default function StoryDetails({
                 {isSrcForVideo(content.mediaSrc) ? (
                   // Video Element
                   <video
-                    className="media-video relative z-[1] h-full w-full rounded-xl object-cover"
+                    className="media-video relative z-[1] h-full w-full rounded-md object-cover"
                     autoPlay
                     muted
                     loop
@@ -202,14 +202,14 @@ export default function StoryDetails({
                   <Image
                     src={content.mediaSrc}
                     alt={`Department Image ${index + 1}`}
-                    className="media-image relative z-[1] aspect-video w-full rounded-xl object-cover"
+                    className="media-image relative z-[1] aspect-video w-full rounded-md object-cover"
                     height={0}
                     width={0}
                     sizes="25vw"
                   />
                 )}
                 {/* Gradient Overlay */}
-                <div className="media-overlay absolute bottom-0 left-0 right-0 z-[1] h-1/3 rounded-xl bg-gradient-to-t from-black/80 to-transparent" />
+                <div className="media-overlay absolute bottom-0 left-0 right-0 z-[1] h-1/3 rounded-md bg-gradient-to-t from-black/80 to-transparent" />
                 {/* Text Outline Effect */}
                 {/* Solid Text (behind) */}
                 <h4
@@ -241,7 +241,7 @@ export default function StoryDetails({
         </div>
         <button
           id="go-back-to-hero"
-          className="fixed bottom-3 left-3 z-[3] flex items-center justify-center gap-2 rounded-lg bg-neutral-50/20 p-2 font-semibold text-gray-700 backdrop-blur-lg transition-[color] duration-300 ease-in-out hover:text-black sm:left-6 md:left-auto"
+          className="fixed bottom-3 left-3 z-[3] flex items-center justify-center gap-2 rounded-[4px] bg-neutral-50/20 p-2 font-semibold text-gray-700 backdrop-blur-lg transition-[color] duration-300 ease-in-out hover:text-black sm:left-6 md:left-auto"
           onClick={() => {
             gsap.to(window, {
               duration: 0.6,

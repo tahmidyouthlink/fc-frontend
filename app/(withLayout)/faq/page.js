@@ -38,7 +38,7 @@ export default async function FAQ() {
           {pageTitle}
         </h1>
         {/* FAQ Wrapper */}
-        <div className="z-[1] mx-5 max-w-[900px] items-stretch overflow-hidden rounded-xl border-2 border-neutral-50/20 bg-white/40 backdrop-blur-2xl sm:mx-8 lg:mx-auto lg:flex">
+        <div className="z-[1] mx-5 max-w-[900px] items-stretch overflow-hidden rounded-md border-2 border-neutral-50/20 bg-white/40 backdrop-blur-2xl sm:mx-8 lg:mx-auto lg:flex">
           {/* Document */}
           <section className="p-5 sm:p-7 xl:p-9 [&_p]:-mt-2 [&_p]:pb-2">
             {/* FAQ Description */}

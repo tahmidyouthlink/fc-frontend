@@ -38,7 +38,7 @@ export default function OrderHistory({ orders, orderRefetch }) {
   });
 
   return (
-    <section className="grow auto-rows-max rounded-xl border-2 border-neutral-50/20 bg-white/60 p-3.5 shadow-[0_0_20px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl xl:p-5 [&_img]:pointer-events-none">
+    <section className="grow auto-rows-max rounded-md border-2 border-neutral-50/20 bg-white/60 p-3.5 shadow-[0_0_20px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl xl:p-5 [&_img]:pointer-events-none">
       <h1 className="mb-5 text-lg font-bold uppercase md:text-xl">
         Order History
       </h1>

@@ -17,7 +17,7 @@ export default function ProductSpecialOfferButton({
     <>
       {/* Special Offer Button */}
       <button
-        className="flex h-9 items-center gap-1.5 rounded-lg bg-[#a138b1] px-2 font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[background-color] duration-300 ease-in-out hover:bg-[#852c93] xl:hidden"
+        className="flex h-9 items-center gap-1.5 rounded-[4px] bg-[#a138b1] px-2 font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[background-color] duration-300 ease-in-out hover:bg-[#852c93] xl:hidden"
         onClick={() => setIsSpecialOfferModalOpen(true)}
       >
         <div className="relative h-9 w-6">

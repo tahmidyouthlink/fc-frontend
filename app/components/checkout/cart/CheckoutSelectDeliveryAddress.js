@@ -20,7 +20,7 @@ export default function CheckoutSelectDeliveryAddress({
       {/* Button */}
       <button
         type="button"
-        className="flex items-center gap-1.5 text-nowrap rounded-md bg-[var(--color-primary-500)] p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-[var(--color-primary-700)]"
+        className="flex items-center gap-1.5 text-nowrap rounded-[4px] bg-[var(--color-primary-500)] p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-[var(--color-primary-700)]"
         onClick={() => setIsAddressModalOpen(true)}
       >
         <HiOutlineMapPin className="text-base" />
@@ -32,6 +32,7 @@ export default function CheckoutSelectDeliveryAddress({
         onOpenChange={setIsAddressModalOpen}
         size="2xl"
         scrollBehavior="inside"
+        className="rounded-md"
       >
         <ModalContent>
           {(onClose) => (
@@ -42,7 +43,7 @@ export default function CheckoutSelectDeliveryAddress({
                   return (
                     <div
                       key={address.id}
-                      className="w-full cursor-pointer space-y-4 rounded-md border-2 border-neutral-100 p-4 text-neutral-500 transition-[border-color] duration-300 ease-in-out hover:border-green-600/50 [&_:is(h3,h4)]:text-neutral-700 [&_h3]:text-base [&_h4]:text-sm [&_p]:text-[13px]"
+                      className="w-full cursor-pointer space-y-4 rounded-[4px] border-2 border-neutral-100 p-4 text-neutral-500 transition-[border-color] duration-300 ease-in-out hover:border-green-600/50 [&_:is(h3,h4)]:text-neutral-700 [&_h3]:text-base [&_h4]:text-sm [&_p]:text-[13px]"
                       onClick={() => {
                         reset({
                           addressLineOne: address.address1,
@@ -86,7 +87,12 @@ export default function CheckoutSelectDeliveryAddress({
                 })}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button
+                  color="danger"
+                  variant="light"
+                  onPress={onClose}
+                  className="rounded-[4px]"
+                >
                   Close
                 </Button>
               </ModalFooter>

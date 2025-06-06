@@ -36,7 +36,7 @@ export default function ReturnItemsField({
           return (
             <div
               key={"return-item-" + item?._id + item?.size + item?.color._id}
-              className={`flex w-full cursor-pointer items-stretch justify-between gap-x-2.5 rounded-lg border-2 p-2 transition-[border-color,background-color] duration-300 ease-in-out hover:border-[var(--color-primary-200)] hover:bg-[var(--color-primary-100)] ${returnItem.isRequested ? "border-[var(--color-primary-200)] bg-[var(--color-primary-100)]" : "border-neutral-100"}`}
+              className={`flex w-full cursor-pointer items-stretch justify-between gap-x-2.5 rounded-[4px] border-2 p-2 transition-[border-color,background-color] duration-300 ease-in-out hover:border-[var(--color-primary-200)] hover:bg-[var(--color-primary-100)] ${returnItem.isRequested ? "border-[var(--color-primary-200)] bg-[var(--color-primary-100)]" : "border-neutral-100"}`}
               onClick={(event) => {
                 const tagName = event.target.tagName.toLowerCase();
 
@@ -54,7 +54,7 @@ export default function ReturnItemsField({
                   );
               }}
             >
-              <div className="relative min-h-full w-1/4 overflow-hidden rounded-md bg-[var(--product-default)] max-sm:w-20">
+              <div className="relative min-h-full w-1/4 overflow-hidden rounded-[4px] bg-[var(--product-default)] max-sm:w-20">
                 {!!item?.thumbnailImgUrl && (
                   <Image
                     className="h-full w-full object-contain"
@@ -98,7 +98,7 @@ export default function ReturnItemsField({
                     <HiCheckCircle
                       className={`pointer-events-none size-7 text-[#60d251] transition-opacity duration-300 ease-in-out ${returnItem.isRequested ? "opacity-100" : "opacity-0"}`}
                     />
-                    <div className="flex gap-x-1.5 text-neutral-500 [&>*]:!m-0 [&>*]:grid [&>*]:size-8 [&>*]:place-content-center [&>*]:rounded-md [&>*]:border-2 [&>*]:border-neutral-200 [&>*]:!p-0 [&>*]:text-center [&>*]:transition-[background-color,border-color] [&>*]:duration-300 [&>*]:ease-in-out sm:[&>*]:rounded-lg">
+                    <div className="flex gap-x-1.5 text-neutral-500 [&>*]:!m-0 [&>*]:grid [&>*]:size-8 [&>*]:place-content-center [&>*]:rounded-[4px] [&>*]:border-2 [&>*]:border-neutral-200 [&>*]:!p-0 [&>*]:text-center [&>*]:transition-[background-color,border-color] [&>*]:duration-300 [&>*]:ease-in-out">
                       <button
                         className="transition-[background-color,border-color] hover:border-transparent hover:bg-[var(--color-secondary-500)]"
                         type="button"

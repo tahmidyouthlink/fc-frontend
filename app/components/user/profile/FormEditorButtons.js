@@ -82,6 +82,7 @@ export default function FormEditorButtons({
           onOpenChange={setIsDeleteModalOpen}
           size="xl"
           scrollBehavior="inside"
+          className="rounded-md"
         >
           <ModalContent>
             {(onClose) => (
@@ -102,7 +103,7 @@ export default function FormEditorButtons({
                 <ModalFooter>
                   <Button
                     type="button"
-                    className="rounded-lg bg-neutral-50 px-5 py-3 font-semibold text-neutral-600 !opacity-100 transition-[background-color,color] duration-300 hover:bg-neutral-100 hover:text-neutral-700 md:text-sm [&_p]:text-xs"
+                    className="rounded-[4px] bg-neutral-50 px-5 py-3 font-semibold text-neutral-600 !opacity-100 transition-[background-color,color] duration-300 hover:bg-neutral-100 hover:text-neutral-700 md:text-sm [&_p]:text-xs"
                     onPress={onClose}
                   >
                     Close
@@ -114,7 +115,7 @@ export default function FormEditorButtons({
                       setIsDeleteModalOpen(false);
                     }}
                     endContent={<RiDeleteBin6Line />}
-                    className="rounded-lg bg-[var(--color-primary-500)] px-5 py-3 font-semibold text-neutral-600 !opacity-100 transition-[background-color,color] duration-300 hover:bg-[var(--color-primary-700)] hover:text-neutral-700 md:text-sm [&_p]:text-xs"
+                    className="rounded-[4px] bg-[var(--color-primary-500)] px-5 py-3 font-semibold text-neutral-600 !opacity-100 transition-[background-color,color] duration-300 hover:bg-[var(--color-primary-700)] hover:text-neutral-700 md:text-sm [&_p]:text-xs"
                   >
                     Delete
                   </Button>

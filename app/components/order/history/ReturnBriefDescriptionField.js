@@ -12,7 +12,7 @@ export default function ReturnBriefDescriptionField({ register, errors }) {
         })}
         rows={5}
         placeholder="Provide a brief description"
-        className="w-full resize-none rounded-lg border-2 border-neutral-200 px-3 py-3 text-xs text-neutral-700 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] md:text-sm"
+        className="w-full resize-none rounded-[4px] border-2 border-neutral-200 px-3 py-3 text-xs text-neutral-700 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] md:text-sm"
       ></textarea>
       {errors.description && (
         <p className="text-xs font-semibold text-red-500">

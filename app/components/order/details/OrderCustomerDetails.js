@@ -1,6 +1,6 @@
 export default function OrderCustomerDetails({ customer }) {
   return (
-    <div className="mb-4 h-fit w-full rounded-md border-2 border-neutral-200 p-3.5 text-sm xl:p-5">
+    <div className="mb-4 h-fit w-full rounded-[4px] border-2 border-neutral-200 p-3.5 text-sm xl:p-5">
       <h2 className="mb-3 text-sm font-semibold md:text-base">
         Customer Details
       </h2>

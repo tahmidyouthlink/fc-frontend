@@ -12,7 +12,7 @@ export default function DiscountTooptip({
   return (
     <Tooltip
       classNames={{
-        content: ["p-4 shadow-[1px_1px_20px_0_rgba(0,0,0,0.15)]"],
+        content: ["p-4 rounded-[4px] shadow-[1px_1px_20px_0_rgba(0,0,0,0.15)]"],
       }}
       motionProps={{
         variants: {

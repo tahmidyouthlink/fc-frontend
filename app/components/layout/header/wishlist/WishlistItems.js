@@ -74,7 +74,7 @@ export default function WishlistItems({
             {/* Wishlist Item Image (with link to product page) */}
             <TransitionLink
               href={`/product/${wishlistItem?.productTitle?.split(" ")?.join("-")?.toLowerCase()}`}
-              className="relative min-h-full w-16 overflow-hidden rounded-md bg-[var(--product-default)] sm:aspect-[1.1/1] sm:w-1/5"
+              className="relative min-h-full w-16 overflow-hidden rounded-[4px] bg-[var(--product-default)] sm:aspect-[1.1/1] sm:w-1/5"
               hasDrawer={true}
               setIsDrawerOpen={setIsDropdownOpen}
             >

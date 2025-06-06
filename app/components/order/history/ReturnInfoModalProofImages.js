@@ -25,7 +25,7 @@ export default function ReturnInfoModalProofImages({ returnProofImgUrls }) {
             <Image
               src={imgUrl}
               alt={`Provided image as proof ${index + 1}`}
-              className="size-28 rounded-md border border-neutral-200 object-cover"
+              className="size-28 rounded-[4px] border border-neutral-200 object-cover"
               height={0}
               width={0}
               sizes="240px"

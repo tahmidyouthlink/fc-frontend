@@ -17,13 +17,14 @@ export default function ReturnReasonField({ control, errors, selectedReason }) {
             labelPlacement="outside"
             label="Reason"
             placeholder="Select a reason"
-            className={`select-without-search [&_button[data-focus='true']]:border-[var(--color-secondary-500)] [&_button[data-hover='true']]:border-[var(--color-secondary-500)] [&_button[data-open='true']]:border-[var(--color-secondary-500)] [&_button]:!h-11 [&_button]:rounded-lg [&_label]:top-[calc(50%-4px)] [&_label]:!text-base [&_label]:!text-neutral-700 ${!selectedReason ? "[&_span[data-slot='value']]:text-neutral-500" : "[&_span[data-slot='value']]:text-neutral-700"}`}
+            className={`select-without-search [&_button[data-focus='true']]:border-[var(--color-secondary-500)] [&_button[data-hover='true']]:border-[var(--color-secondary-500)] [&_button[data-open='true']]:border-[var(--color-secondary-500)] [&_button]:!h-11 [&_button]:rounded-[4px] [&_label]:top-[calc(50%-4px)] [&_label]:!text-base [&_label]:!text-neutral-700 ${!selectedReason ? "[&_span[data-slot='value']]:text-neutral-500" : "[&_span[data-slot='value']]:text-neutral-700"}`}
+            classNames={{ popoverContent: ["rounded-md"] }}
             selectedKey={value}
             onSelectionChange={onChange}
           >
-            <SelectItem key="Faulty Product">Faulty Product</SelectItem>
-            <SelectItem key="Wrong Item">Wrong Item</SelectItem>
-            <SelectItem key="Others">Others</SelectItem>
+            <SelectItem className="rounded-[4px]" key="Faulty Product">Faulty Product</SelectItem>
+            <SelectItem className="rounded-[4px]" key="Wrong Item">Wrong Item</SelectItem>
+            <SelectItem className="rounded-[4px]" key="Others">Others</SelectItem>
           </Select>
         )}
       />

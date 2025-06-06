@@ -52,7 +52,7 @@ export default function CheckoutPromoCode({
   };
 
   return (
-    <section className="w-full space-y-4 rounded-xl border-2 border-neutral-50/20 bg-white/40 p-5 shadow-[0_0_20px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl transition-[padding-bottom] duration-300 ease-in-out">
+    <section className="w-full space-y-4 rounded-md border-2 border-neutral-50/20 bg-white/40 p-5 shadow-[0_0_20px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl transition-[padding-bottom] duration-300 ease-in-out">
       <h2 className="text-base font-semibold md:text-lg">Promo Code</h2>
       <div className="flex gap-x-4">
         <div className="relative w-full space-y-2">
@@ -65,7 +65,7 @@ export default function CheckoutPromoCode({
               name="promoCode"
               type="text"
               autoComplete="off"
-              className="h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs uppercase text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
+              className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs uppercase text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
               onChange={(event) => {
                 const promoCodeCloseButton = document.getElementById(
                   "promo-code-close-btn",
@@ -133,7 +133,7 @@ export default function CheckoutPromoCode({
         <button
           type="button"
           onClick={handlePromoCodeValidation}
-          className="block h-fit w-full self-end rounded-lg bg-[var(--color-primary-500)] py-2.5 text-center text-sm font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
+          className="block h-fit w-full self-end rounded-[4px] bg-[var(--color-primary-500)] py-2.5 text-center text-sm font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
         >
           Apply
         </button>

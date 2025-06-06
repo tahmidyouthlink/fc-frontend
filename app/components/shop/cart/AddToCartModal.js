@@ -62,7 +62,7 @@ export default function AddToCartModal({
       }}
     >
       <div
-        className={`rounded-xl bg-neutral-50 p-5 text-neutral-500 transition-[transform,opacity] duration-300 ease-in-out max-md:pt-14 ${isAddToCartModalOpen && !isNotifyMeModalOpen ? "translate-y-0 opacity-100 delay-200" : "translate-y-20 opacity-0 delay-0"}`}
+        className={`rounded-md bg-neutral-50 p-5 text-neutral-500 transition-[transform,opacity] duration-300 ease-in-out max-md:pt-14 ${isAddToCartModalOpen && !isNotifyMeModalOpen ? "translate-y-0 opacity-100 delay-200" : "translate-y-20 opacity-0 delay-0"}`}
       >
         <CartModalContents
           product={product}

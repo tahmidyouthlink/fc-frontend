@@ -29,7 +29,7 @@ export default function ScrollTopButton() {
   return (
     <button
       id="scroll-top"
-      className="pointer-events-none fixed bottom-3 right-3 z-[4] rounded-md bg-[var(--color-secondary-500)] p-2.5 opacity-0 transition-[opacity,background-color] duration-300 ease-in-out hover:bg-[var(--color-secondary-600)]"
+      className="pointer-events-none fixed bottom-3 right-3 z-[4] rounded-[4px] bg-[var(--color-secondary-500)] p-2.5 opacity-0 transition-[opacity,background-color] duration-300 ease-in-out hover:bg-[var(--color-secondary-600)]"
       onClick={() => {
         window.scrollTo({
           top: 0,

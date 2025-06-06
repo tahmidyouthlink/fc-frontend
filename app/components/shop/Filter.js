@@ -132,13 +132,13 @@ export default function Filter({
           filterOption.type === "select" ? (
             <Select
               key={"filter-option-" + filterOption.label + filterOptionIndex}
-              className={`w-fit ${selectedFilterOptions[filterOption.arrayKey].length ? "order-first" : "order-last"}`}
+              className={`w-fit [&_[data-slot="content"]]:rounded-[4px] ${selectedFilterOptions[filterOption.arrayKey].length ? "order-first" : "order-last"}`}
               label={
                 <>
                   {filterOption.label}
                   {!!selectedFilterOptions[filterOption.arrayKey].length && (
                     <span
-                      className={`text-black ${filterOption.selectionMode === "multiple" ? "ml-2 rounded-md bg-[var(--color-secondary-900)] px-2 py-1 text-[10px] text-white" : ""}`}
+                      className={`text-black ${filterOption.selectionMode === "multiple" ? "ml-2 rounded-[3px] bg-[var(--color-secondary-900)] px-2 py-1 text-[10px] text-white" : ""}`}
                     >
                       {filterOption.selectionMode === "single"
                         ? ": " +
@@ -167,13 +167,14 @@ export default function Filter({
               disabled={!filterOption.options.length}
               classNames={{
                 mainWrapper: [
-                  `z-[1] text-neutral-700 [&>button]:px-4 [&>button]:duration-300 ${!selectedFilterOptions[filterOption.arrayKey].length ? "[&>button]:bg-[var(--color-secondary-500)] hover:[&>button]:bg-[var(--color-secondary-600)]" : "[&>button]:bg-[var(--color-secondary-600)] hover:[&>button]:bg-[var(--color-secondary-600)]"} ${!filterOption.options.length ? (!selectedFilterOptions[filterOption.arrayKey].length ? "[&>button]:opacity-50 hover:[&>button]:bg-[var(--color-secondary-500)]" : "[&>button]:opacity-40 hover:[&>button]:bg-[var(--color-secondary-600)]") : ""}`,
+                  `z-[1] text-neutral-700 [&>button]:px-4 [&>button]:rounded-[4px] [&>button]:duration-300 ${!selectedFilterOptions[filterOption.arrayKey].length ? "[&>button]:bg-[var(--color-secondary-500)] hover:[&>button]:bg-[var(--color-secondary-600)]" : "[&>button]:bg-[var(--color-secondary-600)] hover:[&>button]:bg-[var(--color-secondary-600)]"} ${!filterOption.options.length ? (!selectedFilterOptions[filterOption.arrayKey].length ? "[&>button]:opacity-50 hover:[&>button]:bg-[var(--color-secondary-500)]" : "[&>button]:opacity-40 hover:[&>button]:bg-[var(--color-secondary-600)]") : ""}`,
                 ],
+                base: ["rounded-[4px]"],
                 label: [
                   "text-neutral-700 static mr-4 group-data-[filled=true]:scale-100 group-data-[filled=true]:-translate-y-0",
                 ],
                 innerWrapper: ["hidden"],
-                popoverContent: ["min-w-44 w-fit"],
+                popoverContent: ["min-w-44 w-fit rounded-md"],
                 listbox: [
                   "[&_li:last-child]:mt-3.5 [&_li:last-child]:bg-[var(--color-secondary-600)] [&_li:last-child]:p-2.5 [&_li:last-child]:text-center [&_li:last-child>span]:font-semibold [&_li:last-child>span:has(svg)]:hidden hover:[&_li:last-child]:bg-neutral-700 hover:[&_li:last-child]:text-neutral-100",
                 ],
@@ -181,6 +182,7 @@ export default function Filter({
             >
               {filterOption.options.map((option) => (
                 <SelectItem
+                  className="rounded-[4px]"
                   key={
                     filterOption.label === "Colors" && option !== "Clear"
                       ? option.label
@@ -195,7 +197,7 @@ export default function Filter({
                     filterOption.label === "Colors" &&
                     option !== "Clear" && (
                       <div
-                        className="pointer-events-none size-5 rounded-md ring-1 ring-neutral-300"
+                        className="pointer-events-none size-5 rounded-[3px] ring-1 ring-neutral-300"
                         style={{
                           background:
                             option.label !== "Multicolor"
@@ -214,6 +216,7 @@ export default function Filter({
             </Select>
           ) : (
             <Popover
+              classNames={{ content: ["rounded-md"] }}
               placement="bottom-start"
               key={"filter-option-" + filterOption.label + filterOptionIndex}
               offset={5}
@@ -230,7 +233,7 @@ export default function Filter({
                 <Button
                   disableRipple
                   endContent={<HiChevronDown />}
-                  className={`popover-button z-[1] h-12 w-auto min-w-fit !scale-100 gap-0 rounded-lg bg-[var(--color-secondary-500)] pl-4 pr-3 font-semibold text-neutral-700 !opacity-100 shadow-sm hover:bg-[var(--color-secondary-600)] [&>svg]:ml-3 [&>svg]:h-[13px] [&>svg]:rotate-0 [&>svg]:transition-[transform] [&>svg]:duration-100 ${selectedFilterOptions.price.min || selectedFilterOptions.price.max ? "order-first bg-[var(--color-secondary-600)]" : "order-last bg-[var(--color-secondary-500)]"}`}
+                  className={`popover-button z-[1] h-12 w-auto min-w-fit !scale-100 gap-0 rounded-[4px] bg-[var(--color-secondary-500)] pl-4 pr-3 font-semibold text-neutral-700 !opacity-100 shadow-sm hover:bg-[var(--color-secondary-600)] [&>svg]:ml-3 [&>svg]:h-[13px] [&>svg]:rotate-0 [&>svg]:transition-[transform] [&>svg]:duration-100 ${selectedFilterOptions.price.min || selectedFilterOptions.price.max ? "order-first bg-[var(--color-secondary-600)]" : "order-last bg-[var(--color-secondary-500)]"}`}
                 >
                   {filterOption.label}
                   <span
@@ -246,7 +249,7 @@ export default function Filter({
               <PopoverContent className="min-w-56 items-start gap-y-8 p-4">
                 <div className="flex w-full gap-x-2.5">
                   <Input
-                    className="font-semibold"
+                    className="font-semibold [&_[data-slot='input-wrapper']]:rounded-[4px]"
                     type="number"
                     label="Min price:"
                     labelPlacement="outside"
@@ -281,7 +284,7 @@ export default function Filter({
                     }}
                   />
                   <Input
-                    className="font-semibold"
+                    className="font-semibold [&_[data-slot='input-wrapper']]:rounded-[4px]"
                     type="number"
                     label="Max price:"
                     labelPlacement="outside"
@@ -356,7 +359,7 @@ export default function Filter({
                 />
                 <Button
                   disableRipple
-                  className="mt-3.5 w-full !scale-100 bg-[var(--color-secondary-500)] p-2.5 font-semibold !opacity-100 hover:bg-neutral-700 hover:text-neutral-100"
+                  className="mt-3.5 w-full !scale-100 rounded-[4px] bg-[var(--color-secondary-500)] p-2.5 font-semibold !opacity-100 hover:bg-neutral-700 hover:text-neutral-100"
                   onClick={() =>
                     setSelectedFilterOptions((prevOptions) => ({
                       ...prevOptions,
@@ -376,7 +379,7 @@ export default function Filter({
         {!isNoFilterOptionSelected && (
           <Button
             disableRipple
-            className="z-[1] order-last h-12 w-auto min-w-fit !scale-100 rounded-lg bg-[var(--color-primary-500)] px-4 font-semibold text-neutral-700 !opacity-100 shadow-sm hover:bg-[var(--color-primary-700)]"
+            className="z-[1] order-last h-12 w-auto min-w-fit !scale-100 rounded-[4px] bg-[var(--color-primary-500)] px-4 font-semibold text-neutral-700 !opacity-100 shadow-sm hover:bg-[var(--color-primary-700)]"
             onClick={() =>
               setSelectedFilterOptions({
                 sortBy: new Set([]),

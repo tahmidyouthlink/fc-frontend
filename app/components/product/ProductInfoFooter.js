@@ -77,7 +77,7 @@ export default function ProductInfoFooter({ productId, productTitle }) {
             </Link>
           </li>
           <li
-            className="flex size-[26px] cursor-pointer items-center justify-center rounded-md bg-neutral-200 text-neutral-500 transition-colors duration-[400ms] ease-out hover:bg-black hover:text-white"
+            className="flex size-[26px] cursor-pointer items-center justify-center rounded-[3px] bg-neutral-200 text-neutral-500 transition-colors duration-[400ms] ease-out hover:bg-black hover:text-white"
             onClick={handleCopyToClipboard}
           >
             <FaLink className="w-3.5" />

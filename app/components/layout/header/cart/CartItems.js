@@ -91,7 +91,7 @@ export default function CartItems({
               href={`/product/${cartItem?.productTitle?.split(" ")?.join("-")?.toLowerCase()}`}
               hasDrawer={true}
               setIsDrawerOpen={setIsDropdownOpen}
-              className="relative block min-h-full w-20 overflow-hidden rounded-md bg-[var(--product-default)] sm:w-1/4"
+              className="relative block min-h-full w-20 overflow-hidden rounded-[4px] bg-[var(--product-default)] sm:w-1/4"
             >
               {!!cartItemImgUrl && (
                 <Image
@@ -193,7 +193,7 @@ export default function CartItems({
                     <p className="text-xs">Remove</p>
                   </div>
                   {/* Cart Item Quantity */}
-                  <div className="mt-auto flex gap-x-1.5 text-neutral-500 [&>*]:!m-0 [&>*]:grid [&>*]:size-8 [&>*]:place-content-center [&>*]:rounded-md [&>*]:bg-neutral-100 [&>*]:!p-0 [&>*]:text-center hover:[&>*]:bg-[var(--color-secondary-500)] sm:[&>*]:rounded-lg">
+                  <div className="mt-auto flex gap-x-1.5 text-neutral-500 [&>*]:!m-0 [&>*]:grid [&>*]:size-8 [&>*]:place-content-center [&>*]:rounded-[4px] [&>*]:bg-neutral-100 [&>*]:!p-0 [&>*]:text-center hover:[&>*]:bg-[var(--color-secondary-500)]">
                     {/* Quantity Decrease Button */}
                     <button
                       onClick={() =>

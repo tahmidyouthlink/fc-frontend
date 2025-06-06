@@ -33,7 +33,7 @@ export default function ProductMainImage({
 
   return (
     <div
-      className="relative h-[50vh] overflow-hidden rounded-lg bg-[var(--product-default)] p-5 max-xl:grow sm:h-[40vh] md:w-80 lg:h-[35vh] lg:w-[424px] xl:h-full xl:w-[525px] min-[1800px]:w-[650px]"
+      className="relative h-[50vh] overflow-hidden rounded-[4px] bg-[var(--product-default)] p-5 max-xl:grow sm:h-[40vh] md:w-80 lg:h-[35vh] lg:w-[424px] xl:h-full xl:w-[525px] min-[1800px]:w-[650px]"
       onMouseEnter={(event) => {
         event.currentTarget.querySelector("img").style.pointerEvents = "auto";
       }}
@@ -48,7 +48,7 @@ export default function ProductMainImage({
       />
       {/* Expand Image Button */}
       <button
-        className="absolute right-3 top-3 z-[3] grid place-content-center rounded-md bg-white p-2 shadow-[2px_2px_16px_0_rgba(0,0,0,0.1)]"
+        className="absolute right-3 top-3 z-[3] grid place-content-center rounded-[3px] bg-white p-2 shadow-[2px_2px_16px_0_rgba(0,0,0,0.1)]"
         onClick={() => setIsImageExpanded(true)}
       >
         <CgArrowsExpandRight />

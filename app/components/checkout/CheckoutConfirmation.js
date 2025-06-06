@@ -49,8 +49,8 @@ export default function CheckoutConfirmation({
       />
       {/* Mesh Gradients */}
       <div>
-        <div className="absolute left-[10%] top-[40%] h-[150px] w-[150px] translate-x-[-50%] translate-y-[-50%] rounded-[100%] bg-[var(--color-static-bubble-secondary)] blur-[60px] md:left-[20%] md:blur-[40px] lg:top-[30%] xl:h-[187px] xl:w-[214px]" />
-        <div className="absolute left-[60%] top-[20%] h-[150px] w-[150px] translate-x-[-50%] translate-y-[-50%] rounded-[100%] bg-[var(--color-static-bubble-primary)] blur-[60px] md:blur-[40px] xl:h-[187px] xl:w-[214px]" />
+        <div className="absolute left-[10%] top-[40%] h-[150px] w-[150px] translate-x-[-50%] translate-y-[-50%] rounded-full bg-[var(--color-static-bubble-secondary)] blur-[60px] md:left-[20%] md:blur-[40px] lg:top-[30%] xl:h-[187px] xl:w-[214px]" />
+        <div className="absolute left-[60%] top-[20%] h-[150px] w-[150px] translate-x-[-50%] translate-y-[-50%] rounded-full bg-[var(--color-static-bubble-primary)] blur-[60px] md:blur-[40px] xl:h-[187px] xl:w-[214px]" />
         <div className="absolute -right-4 bottom-4 h-[150px] w-[150px] rounded-full bg-[var(--color-static-bubble-secondary)] blur-[60px] md:blur-[40px] xl:h-[187px] xl:w-[214px]" />
       </div>
       {/* Side Image 1 */}
@@ -95,7 +95,7 @@ export default function CheckoutConfirmation({
           ready to be shipped. We will notify you when it has been sent.
         </p>
         {/* Order Details Section */}
-        <section className="mt-10 max-w-[500px] space-y-3 rounded-md border-2 border-neutral-200 p-3 text-sm sm:px-7 sm:py-5 [&>div]:flex [&>div]:justify-between [&>div]:gap-3 sm:[&>div]:gap-10 xl:[&>div]:gap-20 [&_h4]:text-left [&_h4]:font-semibold [&_h4]:text-neutral-600 sm:[&_h4]:text-nowrap [&_p]:text-right">
+        <section className="mt-10 max-w-[500px] space-y-3 rounded-[4px] border-2 border-neutral-200 p-3 text-sm sm:px-7 sm:py-5 [&>div]:flex [&>div]:justify-between [&>div]:gap-3 sm:[&>div]:gap-10 xl:[&>div]:gap-20 [&_h4]:text-left [&_h4]:font-semibold [&_h4]:text-neutral-600 sm:[&_h4]:text-nowrap [&_p]:text-right">
           <h3 className="text-center text-lg font-semibold">Order Details</h3>
           {/* Order Number */}
           <div>
@@ -121,7 +121,7 @@ export default function CheckoutConfirmation({
         {/* Shop Page button */}
         <TransitionLink
           href="/shop"
-          className="mt-9 block rounded-lg bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
+          className="mt-9 block rounded-[4px] bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
         >
           Continue Shopping
         </TransitionLink>

@@ -101,7 +101,7 @@ export default function ProductInfoOverview({
                 discountMinAmount={Number(specialOffer?.minAmount)}
                 discountMaxAmount={Number(specialOffer?.maxAmount)}
               >
-                <div className="flex h-9 cursor-default items-center gap-1.5 rounded-lg bg-[#a138b1] px-2 font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[background-color] duration-300 ease-in-out">
+                <div className="flex h-9 cursor-default items-center gap-1.5 rounded-[4px] bg-[#a138b1] px-2 font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[background-color] duration-300 ease-in-out">
                   <div className="relative h-9 w-6">
                     <LuBadge className="h-full w-full object-contain" />
                     <TiStarOutline className="absolute left-1/2 top-1/2 h-full w-2/3 -translate-x-1/2 -translate-y-1/2 object-contain" />
@@ -137,7 +137,7 @@ export default function ProductInfoOverview({
         setSelectedOptions={setSelectedOptions}
       />
       {/* Call to Action Buttons */}
-      <div className="flex gap-2 max-lg:flex-wrap [&>button>svg]:text-lg [&>button]:rounded-lg [&>button]:px-5 [&>button]:py-6 [&>button]:text-sm [&>button]:font-semibold [&>button]:text-neutral-600 [&>button]:duration-300 hover:[&>button]:opacity-100">
+      <div className="flex gap-2 max-lg:flex-wrap [&>button>svg]:text-lg [&>button]:rounded-[4px] [&>button]:px-5 [&>button]:py-6 [&>button]:text-sm [&>button]:font-semibold [&>button]:text-neutral-600 [&>button]:duration-300 hover:[&>button]:opacity-100">
         <ProductCartButton
           productId={product?._id}
           productTitle={product?.productTitle}

@@ -12,7 +12,7 @@ export default function DiscountModal({
 }) {
   return (
     <Modal
-      className="xl:hidden"
+      className="rounded-md xl:hidden"
       isOpen={isDiscountModalOpen}
       onOpenChange={setIsDiscountModalOpen}
       size="md"

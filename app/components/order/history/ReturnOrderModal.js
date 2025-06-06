@@ -194,6 +194,7 @@ export default function ReturnOrderModal({
       onOpenChange={setIsReturnModalOpen}
       size="xl"
       scrollBehavior="inside"
+      className="rounded-md"
     >
       <ModalContent>
         {(onClose) => (
@@ -264,7 +265,7 @@ export default function ReturnOrderModal({
                   className={`flex gap-x-2 [&_a]:underline [&_a]:underline-offset-2 [&_a]:transition-[color] [&_a]:duration-300 [&_a]:ease-in-out [&_span]:text-xs lg:[&_span]:text-[13px] ${isPolicyChecked ? "[&_a]:text-[var(--color-primary-900)] hover:[&_a]:text-[var(--color-primary-800)]" : "[&_a]:text-[#f31260]"}`}
                 >
                   <Checkbox
-                    className="[&_span:has(svg):after]:bg-[var(--color-primary-500)] [&_span:has(svg)]:text-neutral-700"
+                    className="[&_span::after]:rounded-[3px] [&_span::before]:rounded-[3px] [&_span:has(svg):after]:bg-[var(--color-primary-500)] [&_span:has(svg)]:text-neutral-700 [&_span]:rounded-[3px]"
                     defaultSelected
                     isRequired
                     isSelected={isPolicyChecked}
@@ -306,6 +307,7 @@ export default function ReturnOrderModal({
                   color="danger"
                   variant="light"
                   onPress={onClose}
+                  className="rounded-[4px]"
                 >
                   Close
                 </Button>
@@ -318,7 +320,7 @@ export default function ReturnOrderModal({
                       setIsFormSubmissionRequested(true);
                     handleSubmit(onSubmit, onError)();
                   }}
-                  className="rounded-lg bg-[var(--color-primary-500)] px-5 py-3 text-xs font-semibold text-neutral-600 !opacity-100 transition-[background-color,color] duration-300 hover:bg-[var(--color-primary-700)] hover:text-neutral-700 md:text-sm"
+                  className="rounded-[4px] bg-[var(--color-primary-500)] px-5 py-3 text-xs font-semibold text-neutral-600 !opacity-100 transition-[background-color,color] duration-300 hover:bg-[var(--color-primary-700)] hover:text-neutral-700 md:text-sm"
                 >
                   Submit
                 </Button>

@@ -60,7 +60,7 @@ export default function UserDropdown() {
     <>
       <Dropdown
         placement="bottom-end"
-        className="mt-5 pb-0 sm:mt-6 xl:mt-7"
+        className="mt-5 rounded-md pb-0 sm:mt-6 xl:mt-7"
         motionProps={{
           initial: { opacity: 0, scale: 0.95 },
           animate: {
@@ -92,7 +92,7 @@ export default function UserDropdown() {
               <DropdownItem
                 key="profile"
                 isReadOnly
-                className="cursor-default [&_*]:w-fit [&_*]:cursor-text [&_*]:font-semibold"
+                className="cursor-default rounded-[4px] [&_*]:w-fit [&_*]:cursor-text [&_*]:font-semibold"
               >
                 <h5 className="text-sm text-neutral-600">{user.name}</h5>
                 <p className="-mt-0.5 text-[11px] text-neutral-500">
@@ -107,7 +107,7 @@ export default function UserDropdown() {
                 key="orders"
                 textValue="orders"
                 startContent={<PiPackageLight />}
-                className="relative"
+                className="relative rounded-[4px]"
               >
                 Order History
                 <TransitionLink
@@ -123,7 +123,7 @@ export default function UserDropdown() {
                 key="profile"
                 textValue="profile"
                 startContent={<PiUserLight />}
-                className="relative"
+                className="relative rounded-[4px]"
               >
                 User Profile
                 <TransitionLink
@@ -141,6 +141,7 @@ export default function UserDropdown() {
                   setModalContent("login");
                   setIsAuthModalOpen(true);
                 }}
+                className="rounded-[4px]"
               >
                 Sign In
               </DropdownItem>
@@ -154,6 +155,7 @@ export default function UserDropdown() {
                   setModalContent("register");
                   setIsAuthModalOpen(true);
                 }}
+                className="rounded-[4px]"
               >
                 Sign Up
               </DropdownItem>
@@ -165,6 +167,7 @@ export default function UserDropdown() {
                 textValue="logout"
                 color="danger"
                 onClick={handleSignOut}
+                className="rounded-[4px]"
               >
                 Sign Out
               </DropdownItem>

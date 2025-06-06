@@ -18,7 +18,7 @@ export default function EmptyShopProducts({
           : (!keyword ? " " : " and ") + "the selected filters"}
       </p>
       <button
-        className="mt-9 block rounded-lg bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
+        className="mt-9 block rounded-[4px] bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
         onClick={() => {
           setSelectedFilterOptions({
             sortBy: new Set([]),

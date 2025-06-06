@@ -97,7 +97,7 @@ export default function PersonalInfo({ userData, setUserData, personalInfo }) {
   };
 
   return (
-    <section className="w-full rounded-md border-2 border-[#eeeeee] p-3.5 sm:p-5">
+    <section className="w-full rounded-[4px] border-2 border-[#eeeeee] p-3.5 sm:p-5">
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit, onError)}
@@ -113,14 +113,14 @@ export default function PersonalInfo({ userData, setUserData, personalInfo }) {
             // If user is editing the form
             <div className="flex gap-2.5">
               {/* Save Button */}
-              <button className="flex items-center gap-1.5 rounded-md bg-[var(--color-primary-500)] p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-[var(--color-primary-700)] max-md:[&_p]:hidden max-md:[&_svg]:size-4">
+              <button className="flex items-center gap-1.5 rounded-[4px] bg-[var(--color-primary-500)] p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-[var(--color-primary-700)] max-md:[&_p]:hidden max-md:[&_svg]:size-4">
                 <RiSaveLine className="text-base" />
                 <p>Save</p>
               </button>
               {/* Cancel Button */}
               <button
                 type="button"
-                className="flex items-center gap-1.5 rounded-md bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4"
+                className="flex items-center gap-1.5 rounded-[4px] bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4"
                 onClick={() => setIsEditingForm(false)}
               >
                 <RiCloseLine className="text-base" />
@@ -132,7 +132,7 @@ export default function PersonalInfo({ userData, setUserData, personalInfo }) {
             /* Edit Button */
             <button
               type="button"
-              className="flex items-center gap-1.5 rounded-md bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4"
+              className="flex items-center gap-1.5 rounded-[4px] bg-neutral-100 p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-neutral-200 max-md:[&_p]:hidden max-md:[&_svg]:size-4"
               onClick={() => setIsEditingForm(true)}
             >
               <RiEditLine className="text-base" />
@@ -268,7 +268,7 @@ export default function PersonalInfo({ userData, setUserData, personalInfo }) {
                   variant="bordered"
                   selectedKey={value}
                   onSelectionChange={onChange}
-                  className={`select-with-search w-full [&:has(input:focus)_[data-slot='input-wrapper']]:border-[var(--color-secondary-500)] [&:has(input:focus)_[data-slot='input-wrapper']]:bg-white/75 [&_[data-disabled='true']]:opacity-100 [&_[data-disabled='true']_[data-slot='inner-wrapper']]:opacity-50 [&_[data-slot='input-wrapper']]:bg-white/20 [&_[data-slot='input-wrapper']]:shadow-none [&_[data-slot='input-wrapper']]:backdrop-blur-2xl [&_[data-slot='input-wrapper']]:backdrop-opacity-100 [&_[data-slot='input-wrapper']]:hover:border-[var(--color-secondary-500)] [&_label]:!text-neutral-500 ${isEditingForm || personalInfo?.hometown ? "[&_[data-slot='inner-wrapper']]:!opacity-100" : "[&_[data-slot='inner-wrapper']]:!opacity-0"}`}
+                  className={`select-with-search w-full [&:has(input:focus)_[data-slot='input-wrapper']]:border-[var(--color-secondary-500)] [&:has(input:focus)_[data-slot='input-wrapper']]:bg-white/75 [&_[data-disabled='true']]:opacity-100 [&_[data-disabled='true']_[data-slot='inner-wrapper']]:opacity-50 [&_[data-slot='input-wrapper']]:rounded-[4px] [&_[data-slot='input-wrapper']]:bg-white/20 [&_[data-slot='input-wrapper']]:shadow-none [&_[data-slot='input-wrapper']]:backdrop-blur-2xl [&_[data-slot='input-wrapper']]:backdrop-opacity-100 [&_[data-slot='input-wrapper']]:hover:border-[var(--color-secondary-500)] [&_label]:!text-neutral-500 ${isEditingForm || personalInfo?.hometown ? "[&_[data-slot='inner-wrapper']]:!opacity-100" : "[&_[data-slot='inner-wrapper']]:!opacity-0"}`}
                 >
                   {cities.map((hometown) => {
                     return (

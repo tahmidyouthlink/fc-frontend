@@ -25,7 +25,7 @@ export default function OrderDetailsHeader({ order }) {
       </div>
       {orderStatus?.text !== "Request Declined" ? (
         <div
-          className={`h-fit w-fit cursor-default text-nowrap rounded-md px-3 py-2 text-xs font-semibold max-sm:ml-auto ${orderStatus?.bgColor} ${orderStatus?.textColor}`}
+          className={`h-fit w-fit cursor-default text-nowrap rounded-[3px] px-3 py-2 text-xs font-semibold max-sm:ml-auto ${orderStatus?.bgColor} ${orderStatus?.textColor}`}
         >
           {orderStatus?.text}
         </div>
@@ -33,13 +33,13 @@ export default function OrderDetailsHeader({ order }) {
         <Popover
           classNames={{
             content: [
-              "p-3.5 max-w-[80dvw] sm:max-w-60 lg:max-w-80 shadow-[1px_1px_20px_0_rgba(0,0,0,0.15)] text-sm",
+              "p-3.5 max-w-[80dvw] rounded-[4px] sm:max-w-60 lg:max-w-80 shadow-[1px_1px_20px_0_rgba(0,0,0,0.15)] text-sm",
             ],
           }}
           placement="bottom-end"
         >
           <PopoverTrigger
-            className={`h-fit w-fit cursor-pointer text-nowrap rounded-md px-3 py-2 text-xs font-semibold max-sm:ml-auto ${orderStatus?.bgColor} ${orderStatus?.textColor}`}
+            className={`h-fit w-fit cursor-pointer text-nowrap rounded-[3px] px-3 py-2 text-xs font-semibold max-sm:ml-auto ${orderStatus?.bgColor} ${orderStatus?.textColor}`}
           >
             {orderStatus?.text}
           </PopoverTrigger>

@@ -19,7 +19,7 @@ export default function ReturnInfoModalItems({ returnProducts }) {
           {calculateTotalItems()}
         </span>
       </div>
-      <div className="rounded-md border-2 border-neutral-200 p-3 font-semibold sm:px-5 sm:py-4">
+      <div className="rounded-[4px] border-2 border-neutral-200 p-3 font-semibold sm:px-5 sm:py-4">
         <ul className="grid auto-rows-fr gap-5">
           {returnProducts?.map((item, index) => {
             return (
@@ -36,7 +36,7 @@ export default function ReturnInfoModalItems({ returnProducts }) {
               >
                 <TransitionLink
                   href={`/product/${item?.productTitle?.split(" ")?.join("-")?.toLowerCase()}`}
-                  className="relative block min-h-full w-[72px] overflow-hidden rounded-md bg-[var(--product-default)] sm:w-20 xl:w-1/4"
+                  className="relative block min-h-full w-[72px] overflow-hidden rounded-[4px] bg-[var(--product-default)] sm:w-20 xl:w-1/4"
                 >
                   {!!item?.thumbnailImgUrl && (
                     <Image

@@ -77,6 +77,7 @@ export default function NotifyMeModal({
       isOpen={isNotifyMeModalOpen}
       onOpenChange={setIsNotifyMeModalOpen}
       scrollBehavior="inside"
+      className="rounded-md"
     >
       <ModalContent>
         {() => (
@@ -112,7 +113,7 @@ export default function NotifyMeModal({
                         message: "Email is required.",
                       },
                     })}
-                    className="h-11 w-full rounded-lg border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white md:text-[13px]"
+                    className="h-11 w-full rounded-[4px] border-2 border-neutral-200 px-3 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white md:text-[13px]"
                     required
                   />
                   {errors.email && (
@@ -126,14 +127,14 @@ export default function NotifyMeModal({
             <ModalFooter>
               <button
                 onClick={() => setIsNotifyMeModalOpen(false)}
-                className="flex w-fit items-center gap-2 rounded-lg bg-neutral-100 px-4 py-2.5 text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-neutral-200"
+                className="flex w-fit items-center gap-2 rounded-[4px] bg-neutral-100 px-4 py-2.5 text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-neutral-200"
               >
                 <LuMoveLeft size={17} />
                 Go Back
               </button>
               <button
                 onClick={() => handleSubmit(onSubmit, onError)()}
-                className="flex w-fit items-center gap-2 rounded-lg bg-[var(--color-secondary-500)] px-4 py-2.5 text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-secondary-600)]"
+                className="flex w-fit items-center gap-2 rounded-[4px] bg-[var(--color-secondary-500)] px-4 py-2.5 text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-secondary-600)]"
               >
                 Submit
                 <LuSendHorizonal size={17} />

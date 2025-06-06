@@ -129,7 +129,7 @@ export default function GoogleSignInButton({
   return (
     <button
       type="button"
-      className="flex w-full items-center justify-center gap-2 rounded-lg bg-neutral-100 py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-neutral-200"
+      className="flex w-full items-center justify-center gap-2 rounded-[4px] bg-neutral-100 py-2.5 text-xs font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-neutral-200"
       onClick={() =>
         isLinkedWithGoogle
           ? toast.success("Already connected to a Google account.")

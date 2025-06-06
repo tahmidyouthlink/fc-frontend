@@ -7,7 +7,7 @@ export default function CheckoutPaymentMethod({
 
   return (
     <section
-      className="w-full space-y-4 rounded-xl border-2 border-neutral-50/20 bg-white/40 p-5 shadow-[0_0_20px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl"
+      className="w-full space-y-4 rounded-md border-2 border-neutral-50/20 bg-white/40 p-5 shadow-[0_0_20px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl"
       style={{
         paddingBottom: !isPromoCodeValid ? "20px" : "52px",
       }}

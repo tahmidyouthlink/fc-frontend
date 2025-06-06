@@ -11,7 +11,7 @@ export default function ProductQuantitySelection({
       className={`mb-6 flex items-center gap-x-2.5 ${!!selectedOptions?.size && !!productVariantSku ? /*"pointer-events-auto opacity-100" : "pointer-events-none opacity-40"*/ "" : "hidden"}`}
     >
       <h4 className="font-semibold text-neutral-600">Quantity:</h4>
-      <div className="flex gap-x-1.5 [&>*]:rounded-lg [&>button]:bg-neutral-100 hover:[&>button]:bg-[var(--color-secondary-500)]">
+      <div className="flex gap-x-1.5 [&>*]:rounded-[4px] [&>button]:bg-neutral-100 hover:[&>button]:bg-[var(--color-secondary-500)]">
         <Button
           isIconOnly
           startContent={<HiChevronLeft />}

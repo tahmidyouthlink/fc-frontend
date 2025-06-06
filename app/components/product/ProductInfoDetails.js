@@ -19,7 +19,7 @@ export default function ProductInfoDetails({ productInfoDetails }) {
             return (
               <li
                 key={"product-details-tab-" + backendKey + frontendLabel}
-                className={`-mt-0.5 shrink-0 cursor-pointer text-nowrap rounded-md px-4 py-2.5 transition-[background-color] duration-300 ease-in-out lg:px-5 ${activeTabKey === backendKey ? "bg-neutral-200" : "bg-transparent hover:bg-neutral-100"}`}
+                className={`-mt-0.5 shrink-0 cursor-pointer text-nowrap rounded-[4px] px-4 py-2.5 transition-[background-color] duration-300 ease-in-out lg:px-5 ${activeTabKey === backendKey ? "bg-neutral-200" : "bg-transparent hover:bg-neutral-100"}`}
                 onClick={() => setActiveTabKey(backendKey)}
               >
                 {frontendLabel}
@@ -31,7 +31,7 @@ export default function ProductInfoDetails({ productInfoDetails }) {
       {/* Tab Details Section */}
       <div className="custom-desktop-scrollbar mx-auto w-full space-y-3.5 overflow-y-auto md:max-xl:overflow-y-auto md:max-lg:h-60 lg:max-xl:h-72">
         <div
-          className="custom-desktop-scrollbar list-none overflow-y-auto text-neutral-500 [&_:is(h1,h2,h3,h4,h5,h6)]:mb-2 [&_:is(h1,h2,h3,h4,h5,h6)]:font-semibold [&_img]:rounded-lg"
+          className="custom-desktop-scrollbar list-none overflow-y-auto text-neutral-500 [&_:is(h1,h2,h3,h4,h5,h6)]:mb-2 [&_:is(h1,h2,h3,h4,h5,h6)]:font-semibold"
           dangerouslySetInnerHTML={{ __html: productInfoDetails[activeTabKey] }}
         ></div>
       </div>

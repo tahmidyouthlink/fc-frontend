@@ -165,12 +165,12 @@
 
   /* For social icon links */
   .social-icons a {
-    @apply flex size-6 items-center justify-center rounded-md bg-neutral-200 text-neutral-500 transition-colors duration-[400ms] ease-out min-[450px]:size-7 [&>svg]:h-auto [&>svg]:w-3.5 min-[450px]:[&>svg]:w-4;
+    @apply flex size-6 items-center justify-center rounded-[3px] bg-neutral-200 text-neutral-500 transition-colors duration-[400ms] ease-out min-[450px]:size-7 [&>svg]:h-auto [&>svg]:w-3.5 min-[450px]:[&>svg]:w-4;
   }
 
   /* For mobile nav links and their icons */
   nav.mobile :is(a:not(:has(img)), li:not(:has(a))) {
-    @apply flex items-center gap-x-2.5 rounded-md p-2.5 transition-all duration-100 ease-in-out [&>svg]:h-4 [&>svg]:w-auto;
+    @apply flex items-center gap-x-2.5 rounded-[3px] p-2.5 transition-all duration-100 ease-in-out [&>svg]:h-4 [&>svg]:w-auto;
   }
 
   /* For on hover and active mobile nav links */
@@ -187,15 +187,15 @@
   }
 
   .quick-filter-options button {
-    @apply flex items-center gap-x-1.5 rounded-lg px-2.5 py-0.5 font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[background-color] duration-300 ease-in-out [&_p]:text-[13px];
+    @apply flex items-center gap-x-1.5 rounded-[4px] px-2.5 py-0.5 font-semibold text-white shadow-[1px_1px_12px_0_rgba(0,0,0,0.1)] transition-[background-color] duration-300 ease-in-out [&_p]:text-[13px];
   }
 
   .hero-images > div:is(:first-child, :last-child) {
-    @apply relative mb-auto h-[calc(40%-8px)] w-[calc(50%-8px)] max-sm:order-last sm:h-[90%] sm:w-[25vw] xl:h-[94%] xl:w-[60vh] [&>img]:rounded-xl [&>img]:object-cover;
+    @apply relative mb-auto h-[calc(40%-8px)] w-[calc(50%-8px)] max-sm:order-last sm:h-[90%] sm:w-[25vw] xl:h-[94%] xl:w-[60vh] [&>img]:rounded-md [&>img]:object-cover;
   }
 
   .hero-images > div:not(:is(:first-child, :last-child)) {
-    @apply relative mt-auto h-[calc(60%-8px)] w-full sm:h-[86%] sm:grow xl:h-[88%] [&>img]:rounded-xl [&>img]:object-cover [&>img]:object-bottom;
+    @apply relative mt-auto h-[calc(60%-8px)] w-full sm:h-[86%] sm:grow xl:h-[88%] [&>img]:rounded-md [&>img]:object-cover [&>img]:object-bottom;
   }
 
   .payment-methods input {
@@ -203,7 +203,7 @@
   }
 
   .payment-methods input::before {
-    @apply absolute inset-0 h-full w-full rounded-lg border-2 bg-white/20 bg-contain bg-center bg-no-repeat bg-origin-content px-5 backdrop-blur-2xl transition-[border,background-color] duration-300 ease-in-out content-[''];
+    @apply absolute inset-0 h-full w-full rounded-[4px] border-2 bg-white/20 bg-contain bg-center bg-no-repeat bg-origin-content px-5 backdrop-blur-2xl transition-[border,background-color] duration-300 ease-in-out content-[''];
   }
 
   .payment-methods input:not(:disabled)::before {
@@ -216,11 +216,11 @@
 
   .select-with-search [data-slot="input-wrapper"],
   .select-without-search button {
-    @apply mt-2.5 h-10 min-h-10 px-4 transition-[padding-left,padding-right,height,border-color] duration-300 ease-in-out [&:has(input:disabled)]:mt-0 [&:has(input:disabled)_[data-slot='inner-wrapper']>div]:hidden [&:has(input:disabled)_input]:mt-5 [&:has(input:disabled)_input]:rounded-lg [&:has(input:disabled)_input]:text-neutral-700 [&>div>button]:bg-transparent;
+    @apply mt-2.5 h-10 min-h-10 px-4 transition-[padding-left,padding-right,height,border-color] duration-300 ease-in-out [&:has(input:disabled)]:mt-0 [&:has(input:disabled)_[data-slot='inner-wrapper']>div]:hidden [&:has(input:disabled)_input]:mt-5 [&:has(input:disabled)_input]:rounded-[4px] [&:has(input:disabled)_input]:text-neutral-700 [&>div>button]:bg-transparent;
   }
 
   .date-picker > div {
-    @apply h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 shadow-none outline-none backdrop-blur-2xl transition-[background-color,border-color,opacity] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-primary-500)] focus:bg-white/75 md:text-[13px];
+    @apply h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 shadow-none outline-none backdrop-blur-2xl transition-[background-color,border-color,opacity] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-primary-500)] focus:bg-white/75 md:text-[13px];
   }
 
   .select-with-search input,
@@ -239,7 +239,7 @@
   }
 
   .user-info input:not([data-slot]) {
-    @apply h-10 w-full rounded-lg border-2 border-neutral-200 bg-white/20 px-3 text-neutral-700 outline-none backdrop-blur-2xl backdrop-opacity-100 transition-[border-color,padding-left,padding-right,height,backdrop-filter,background-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-primary-500)] focus:bg-white/75;
+    @apply h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-neutral-700 outline-none backdrop-blur-2xl backdrop-opacity-100 transition-[border-color,padding-left,padding-right,height,backdrop-filter,background-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-primary-500)] focus:bg-white/75;
   }
 
   .user-info input:not([data-slot]):is(:read-only):not(:disabled),
@@ -263,11 +263,11 @@
   }
 
   .user-into-form-buttons button {
-    @apply flex items-center gap-1.5 rounded-md p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-lg:[&_p]:hidden max-lg:[&_svg]:size-4;
+    @apply flex items-center gap-1.5 rounded-[4px] p-1.5 font-semibold text-neutral-600 transition-[transform,color,background-color] duration-300 ease-in-out hover:text-neutral-700 sm:p-2.5 [&_p]:text-xs max-lg:[&_p]:hidden max-lg:[&_svg]:size-4;
   }
 
   .user-sidebar li a {
-    @apply flex w-full cursor-pointer items-center gap-2 rounded-md py-2 transition-[background-color] duration-300 ease-in-out hover:bg-[var(--color-primary-400)] hover:text-[var(--color-primary-900)] max-sm:px-3 sm:px-2.5 sm:py-2 lg:px-3 lg:py-2.5 [&>svg]:text-base;
+    @apply flex w-full cursor-pointer items-center gap-2 rounded-[4px] py-2 transition-[background-color] duration-300 ease-in-out hover:bg-[var(--color-primary-400)] hover:text-[var(--color-primary-900)] max-sm:px-3 sm:px-2.5 sm:py-2 lg:px-3 lg:py-2.5 [&>svg]:text-base;
   }
 
   .custom-desktop-scrollbar {
@@ -613,11 +613,11 @@
 }
 
 .hero-images > div:is(:first-child, :last-child) {
-  @apply relative mb-auto h-[calc(40%-8px)] w-[calc(50%-8px)] max-sm:order-last sm:h-[90%] sm:w-[25vw] xl:h-[94%] xl:w-[60vh] [&>img]:rounded-xl [&>img]:object-cover;
+  @apply relative mb-auto h-[calc(40%-8px)] w-[calc(50%-8px)] max-sm:order-last sm:h-[90%] sm:w-[25vw] xl:h-[94%] xl:w-[60vh] [&>img]:rounded-md [&>img]:object-cover;
 }
 
 .hero-images > div:not(:is(:first-child, :last-child)) {
-  @apply relative mt-auto h-[calc(60%-8px)] w-full sm:h-[86%] sm:grow xl:h-[88%] [&>img]:rounded-xl [&>img]:object-cover [&>img]:object-bottom;
+  @apply relative mt-auto h-[calc(60%-8px)] w-full sm:h-[86%] sm:grow xl:h-[88%] [&>img]:rounded-md [&>img]:object-cover [&>img]:object-bottom;
 }
 
 .custom-editor-legal-policies {

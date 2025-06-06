@@ -9,7 +9,7 @@ export default function WishlistFooter({ setIsDropdownOpen }) {
         href="/shop"
         hasDrawer={true}
         setIsDrawerOpen={setIsDropdownOpen}
-        className="block w-full rounded-lg bg-[var(--color-primary-500)] py-2.5 text-center text-sm text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
+        className="block w-full rounded-[4px] bg-[var(--color-primary-500)] py-2.5 text-center text-sm text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
       >
         Continue Shopping
       </TransitionLink>

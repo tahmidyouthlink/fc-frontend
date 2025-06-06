@@ -22,7 +22,7 @@ export default function Drawer({
       }
     >
       <div
-        className={`ml-auto flex min-h-full flex-col justify-between bg-neutral-50 px-5 pt-5 text-neutral-500 transition-[transform] delay-200 duration-300 ease-in-out sm:rounded-l-lg sm:px-6 sm:pt-6 ${drawerResponsiveWidths} ${isDrawerOpen ? "translate-x-0 delay-200" : "translate-x-full delay-0"}`}
+        className={`ml-auto flex min-h-full flex-col justify-between rounded-l-md bg-neutral-50 px-5 pt-5 text-neutral-500 transition-[transform] delay-200 duration-300 ease-in-out sm:px-6 sm:pt-6 ${drawerResponsiveWidths} ${isDrawerOpen ? "translate-x-0 delay-200" : "translate-x-full delay-0"}`}
       >
         {children}
       </div>

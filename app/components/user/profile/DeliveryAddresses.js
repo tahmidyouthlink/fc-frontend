@@ -20,13 +20,13 @@ export default function DeliveryAddresses({
   }, [isAddingNewAddress]);
 
   return (
-    <section className="w-full space-y-4 rounded-md border-2 border-[#eeeeee] p-3.5 sm:p-5">
+    <section className="w-full space-y-4 rounded-[4px] border-2 border-[#eeeeee] p-3.5 sm:p-5">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-[17px] font-semibold uppercase sm:text-lg md:text-xl">
           Delivery Address
         </h2>
         <button
-          className="flex items-center gap-1.5 rounded-md bg-[var(--color-primary-500)] p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-[var(--color-primary-700)] max-md:[&_p]:hidden max-md:[&_svg]:size-4"
+          className="flex items-center gap-1.5 rounded-[4px] bg-[var(--color-primary-500)] p-2.5 text-xs font-semibold text-neutral-700 transition-[transform,color,background-color] duration-300 ease-in-out hover:bg-[var(--color-primary-700)] max-md:[&_p]:hidden max-md:[&_svg]:size-4"
           onClick={() => setIsAddingNewAddress(true)}
         >
           <RiAddLine className="text-base" />
@@ -43,7 +43,7 @@ export default function DeliveryAddresses({
           </p>
           <button
             onClick={() => setIsAddingNewAddress(true)}
-            className="mt-5 block rounded-lg bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
+            className="mt-5 block rounded-[4px] bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm font-semibold text-neutral-700 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
           >
             Add Your Address
           </button>

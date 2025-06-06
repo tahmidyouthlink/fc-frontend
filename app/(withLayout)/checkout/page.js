@@ -634,7 +634,7 @@ export default function Checkout() {
           <p className="mt-2 text-neutral-400">The cart is empty.</p>
           <TransitionLink
             href="/shop"
-            className="mt-9 block rounded-lg bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
+            className="mt-9 block rounded-[4px] bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
           >
             Return to Shop
           </TransitionLink>
