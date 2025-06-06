@@ -52,7 +52,7 @@ export default function GoogleSignInButton({
 
     const popup = popupCenter(
       "/login/google",
-      `${process.env.WEBSITE_NAME} | ` + ctaText,
+      `${process.env.NEXT_PUBLIC_WEBSITE_NAME} | ` + ctaText,
     );
 
     const interval = setInterval(async () => {

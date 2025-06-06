@@ -8,8 +8,8 @@ import LoaderFrontend from "../components/shared/LoaderFrontend";
 import LoadingSpinner from "../components/shared/LoadingSpinner";
 
 export const metadata = {
-  title: process.env.WEBSITE_NAME,
-  description: `Discover the latest trends in men's fashion at ${process.env.WEBSITE_NAME}. Shop our extensive collection of stylish clothing, footwear, and accessories. Enjoy exclusive deals, fast shipping, and top-notch customer service. Elevate your wardrobe with our curated selection of high-quality men's products.`,
+  title: process.env.NEXT_PUBLIC_WEBSITE_NAME,
+  description: `Discover the latest trends in men's fashion at ${process.env.NEXT_PUBLIC_WEBSITE_NAME}. Shop our extensive collection of stylish clothing, footwear, and accessories. Enjoy exclusive deals, fast shipping, and top-notch customer service. Elevate your wardrobe with our curated selection of high-quality men's products.`,
 };
 
 export const dynamic = "force-dynamic";

@@ -24,12 +24,12 @@ export default function MobileNavbar({ logoImgSrc, productList }) {
           <Image
             className="h-8 w-auto sm:hidden"
             src={logoOnlyImage}
-            alt={`${process.env.WEBSITE_NAME} logo (no text)`}
+            alt={`${process.env.NEXT_PUBLIC_WEBSITE_NAME} logo (no text)`}
           />
           <Image
             className="h-8 w-auto max-sm:hidden lg:h-9"
             src={logoImgSrc}
-            alt={`${process.env.WEBSITE_NAME} logo`}
+            alt={`${process.env.NEXT_PUBLIC_WEBSITE_NAME} logo`}
             height={0}
             width={0}
             sizes="150px"

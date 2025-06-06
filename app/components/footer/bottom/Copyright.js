@@ -6,7 +6,7 @@ export default function Copyright() {
       <p className="text-center text-[13px] md:text-[14px]">
         Copyright ©{" "}
         <TransitionLink className="font-bold" href="/">
-          {process.env.WEBSITE_NAME}
+          {process.env.NEXT_PUBLIC_WEBSITE_NAME}
         </TransitionLink>{" "}
         - {new Date().getFullYear()}. All Rights Reserved.
       </p>
