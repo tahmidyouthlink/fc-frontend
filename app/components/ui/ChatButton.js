@@ -3,11 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
-import {
-  PiMessengerLogo,
-  PiTelegramLogo,
-  PiWhatsappLogo,
-} from "react-icons/pi";
+import { PiMessengerLogo, PiWhatsappLogo } from "react-icons/pi";
 
 const bigBtnWithCanvasSize = 80;
 const canvasOffset = 20;
@@ -45,27 +41,12 @@ export default function ChatButton() {
         </button>
         <Link
           target="_blank"
-          href="https://t.me/manchester_Utdfc"
-          rel="noopener noreferrer"
-          className={`chat-sub-btn bg-[#b8e6ff] delay-0 ${isButtonClicked ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
-          style={{
-            transform: `
-              translate(${isButtonClicked ? `-${(bigBtnSize * 2) / 3 + gapFromBigBtn}px, -${(bigBtnSize * 2) / 3 + gapFromBigBtn}px` : "0, 0"})
-              scale(${isButtonClicked ? "1" : "0"})
-              rotate(${isButtonClicked ? "720deg" : "0deg"})
-            `,
-          }}
-        >
-          <PiTelegramLogo />
-        </Link>
-        <Link
-          target="_blank"
           href="https://wa.me/8801611556355"
           rel="noopener noreferrer"
-          className={`chat-sub-btn bg-[#aeffbd] delay-75 ${isButtonClicked ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
+          className={`chat-sub-btn bg-[#aeffbd] delay-0 ${isButtonClicked ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
           style={{
             transform: `
-              translate(${isButtonClicked ? `-${bigBtnSize + gapFromBigBtn}px, 0` : "0, 0"})
+              translate(${isButtonClicked ? `-${bigBtnSize * 0.8 + gapFromBigBtn}px, -${bigBtnSize * 0.4 + gapFromBigBtn}px` : "0, 0"})
               scale(${isButtonClicked ? "1" : "0"})
               rotate(${isButtonClicked ? "720deg" : "0deg"})
             `,
@@ -77,10 +58,10 @@ export default function ChatButton() {
           target="_blank"
           href="https://m.me/manutd.heartbeatoffootball"
           rel="noopener noreferrer"
-          className={`chat-sub-btn bg-[#ced0ff] delay-150 ${isButtonClicked ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
+          className={`chat-sub-btn bg-[#ced0ff] delay-75 ${isButtonClicked ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
           style={{
             transform: `
-              translate(${isButtonClicked ? `-${(bigBtnSize * 2) / 3 + gapFromBigBtn}px, ${(bigBtnSize * 2) / 3 + gapFromBigBtn}px` : "0, 0"})
+              translate(${isButtonClicked ? `-${bigBtnSize * 0.8 + gapFromBigBtn}px, ${bigBtnSize * 0.4 + gapFromBigBtn}px` : "0, 0"})
               scale(${isButtonClicked ? "1" : "0"})
               rotate(${isButtonClicked ? "720deg" : "0deg"})
             `,
