@@ -2,7 +2,7 @@ import TransitionLink from "@/app/components/ui/TransitionLink";
 
 export default function WishlistFooter({ setIsDropdownOpen }) {
   return (
-    <div className="sticky bottom-0 space-y-4 font-semibold">
+    <div className="sticky bottom-0 space-y-4 bg-white pb-2 font-semibold">
       <hr className="h-0.5 w-full bg-neutral-100" />
       {/* Shop Page Button */}
       <TransitionLink
