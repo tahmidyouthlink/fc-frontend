@@ -8,7 +8,6 @@ import {
 import toast from "react-hot-toast";
 import { CgShoppingCart } from "react-icons/cg";
 import { useAuth } from "@/app/contexts/auth";
-import { useLoading } from "@/app/contexts/loading";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
 import addToCartToast from "@/app/utils/addToCartToast";
 
@@ -22,7 +21,6 @@ export default function ProductCartButton({
   setSelectedOptions,
 }) {
   const { user, userData, setUserData } = useAuth();
-  const { setIsPageLoading } = useLoading();
   const axiosPublic = useAxiosPublic();
 
   const isExistingItem = (item) =>
@@ -33,8 +31,6 @@ export default function ProductCartButton({
   const handleAddToCart = async () => {
     if (!selectedOptions?.size)
       return toast.error("Please select a size first.");
-
-    setIsPageLoading(true);
 
     const currentCart = JSON.parse(localStorage.getItem("cartItems")) || [];
     let updatedCart;
@@ -117,7 +113,6 @@ export default function ProductCartButton({
       );
     }
 
-    setIsPageLoading(false);
     window.dispatchEvent(new Event("storageCart")); // Dispatch event so that event listener is triggered
   };
 

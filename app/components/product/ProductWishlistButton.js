@@ -2,17 +2,13 @@ import { Button } from "@nextui-org/react";
 import toast from "react-hot-toast";
 import { CgHeart } from "react-icons/cg";
 import { useAuth } from "@/app/contexts/auth";
-import { useLoading } from "@/app/contexts/loading";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
 
 export default function ProductWishlistButton({ productId }) {
   const axiosPublic = useAxiosPublic();
   const { user, userData, setUserData } = useAuth();
-  const { setIsPageLoading } = useLoading();
 
   const handleAddToWishlist = async () => {
-    setIsPageLoading(true);
-
     const currentWishlist =
       JSON.parse(localStorage.getItem("wishlistItems")) || [];
 
@@ -50,7 +46,6 @@ export default function ProductWishlistButton({ productId }) {
     }
 
     window.dispatchEvent(new Event("storageWishlist"));
-    setIsPageLoading(false);
   };
 
   return (

@@ -17,15 +17,12 @@ export default function CartItems({
   productList,
   specialOffers,
   primaryLocation,
-  setIsPageLoading,
   setIsDropdownOpen,
 }) {
   const { user, userData, setUserData } = useAuth();
   const axiosPublic = useAxiosPublic();
 
   const handleCartUpdate = async (updatedCart) => {
-    setIsPageLoading(true);
-
     localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save item in local cart
 
     // Save item in server cart, if user is logged in
@@ -50,7 +47,6 @@ export default function CartItems({
     }
 
     window.dispatchEvent(new Event("storageCart")); // Dispatch event so that event listener is triggered
-    setIsPageLoading(false);
   };
 
   return (

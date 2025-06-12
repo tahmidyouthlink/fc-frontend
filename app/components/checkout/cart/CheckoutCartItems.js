@@ -6,7 +6,6 @@ import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { FaCircleCheck } from "react-icons/fa6";
 import { FaExclamationCircle } from "react-icons/fa";
 import { useAuth } from "@/app/contexts/auth";
-import { useLoading } from "@/app/contexts/loading";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
 import {
   calculateFinalPrice,
@@ -29,15 +28,12 @@ export default function CheckoutCartItems({
   primaryLocation,
 }) {
   const { user, userData, setUserData } = useAuth();
-  const { setIsPageLoading } = useLoading();
   const axiosPublic = useAxiosPublic();
   const cartSubtotal = calculateSubtotal(productList, cartItems, specialOffers);
   const [isSpecialOfferModalOpen, setIsSpecialOfferModalOpen] = useState(false);
   const [activeModalItem, setActiveModalItem] = useState(null);
 
   const handleCartUpdate = async (updatedCart) => {
-    setIsPageLoading(true);
-
     localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save item in local cart
 
     // Save item in server cart, if user is logged in
@@ -62,7 +58,6 @@ export default function CheckoutCartItems({
     }
 
     window.dispatchEvent(new Event("storageCart")); // Dispatch event so that event listener is triggered
-    setIsPageLoading(false);
   };
 
   return (

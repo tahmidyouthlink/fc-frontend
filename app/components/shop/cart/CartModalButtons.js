@@ -1,14 +1,13 @@
-import toast from "react-hot-toast";
-import { useAuth } from "@/app/contexts/auth";
-import { useLoading } from "@/app/contexts/loading";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
-import TransitionLink from "../../ui/TransitionLink";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
   Tooltip,
 } from "@nextui-org/react";
+import toast from "react-hot-toast";
+import { useAuth } from "@/app/contexts/auth";
+import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import TransitionLink from "../../ui/TransitionLink";
 import addToCartToast from "@/app/utils/addToCartToast";
 
 export default function CartModalButtons({
@@ -23,7 +22,6 @@ export default function CartModalButtons({
   setIsAddToCartModalOpen,
 }) {
   const { user, userData, setUserData } = useAuth();
-  const { setIsPageLoading } = useLoading();
   const axiosPublic = useAxiosPublic();
 
   const isExistingItem = (item) =>
@@ -34,8 +32,6 @@ export default function CartModalButtons({
   const handleAddToCart = async () => {
     if (!selectedOptions?.size)
       return toast.error("Please select a size first.");
-
-    setIsPageLoading(true);
 
     const currentCart = JSON.parse(localStorage.getItem("cartItems")) || [];
     let updatedCart;
@@ -118,7 +114,6 @@ export default function CartModalButtons({
       );
     }
 
-    setIsPageLoading(false);
     setIsAddToCartModalOpen(false);
     window.dispatchEvent(new Event("storageCart")); // Dispatch event so that event listener is triggered
   };

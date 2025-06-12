@@ -1,16 +1,12 @@
 import { CgTrash } from "react-icons/cg";
 import { useAuth } from "@/app/contexts/auth";
-import { useLoading } from "@/app/contexts/loading";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
 
 export default function WishlistHeader({ itemCount }) {
   const { user, userData, setUserData } = useAuth();
-  const { setIsPageLoading } = useLoading();
   const axiosPublic = useAxiosPublic();
 
   const removeAllItems = async () => {
-    setIsPageLoading(true);
-
     // Remove all items from local wishlist
     localStorage.removeItem("wishlistItems");
 
@@ -35,7 +31,6 @@ export default function WishlistHeader({ itemCount }) {
       }
     }
 
-    setIsPageLoading(false);
     window.dispatchEvent(new Event("storageWishlist"));
   };
 

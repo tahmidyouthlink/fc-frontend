@@ -1,8 +1,7 @@
-import { useAuth } from "@/app/contexts/auth";
-import { useLoading } from "@/app/contexts/loading";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
 import toast from "react-hot-toast";
 import { CgHeart, CgShoppingCart } from "react-icons/cg";
+import { useAuth } from "@/app/contexts/auth";
+import useAxiosPublic from "@/app/hooks/useAxiosPublic";
 
 export default function CardButtons({
   product,
@@ -12,11 +11,8 @@ export default function CardButtons({
 }) {
   const axiosPublic = useAxiosPublic();
   const { user, userData, setUserData } = useAuth();
-  const { setIsPageLoading } = useLoading();
 
   const handleAddToWishlist = async (product) => {
-    setIsPageLoading(true);
-
     const currentWishlist =
       JSON.parse(localStorage.getItem("wishlistItems")) || [];
 
@@ -54,7 +50,6 @@ export default function CardButtons({
     }
 
     window.dispatchEvent(new Event("storageWishlist"));
-    setIsPageLoading(false);
   };
 
   return (

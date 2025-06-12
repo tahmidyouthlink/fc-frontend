@@ -296,7 +296,6 @@ export default function CartButton({ productList }) {
                     (location) => location.isPrimaryLocation == true,
                   )?.locationName
                 }
-                setIsPageLoading={setIsPageLoading}
                 setIsDropdownOpen={setIsDropdownOpen}
               />
             ) : (

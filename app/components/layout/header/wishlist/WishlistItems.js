@@ -27,8 +27,6 @@ export default function WishlistItems({
   }, [isSpecialOffersLoading, setIsPageLoading, specialOffers]);
 
   const removeWishlistItem = async (wishlistItemId) => {
-    setIsPageLoading(true);
-
     const updatedWishlist = wishlistItems.filter(
       (item) => item._id !== wishlistItemId,
     );
@@ -56,7 +54,6 @@ export default function WishlistItems({
     }
 
     window.dispatchEvent(new Event("storageWishlist"));
-    setIsPageLoading(false);
   };
 
   return (

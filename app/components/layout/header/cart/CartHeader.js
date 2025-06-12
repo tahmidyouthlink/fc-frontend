@@ -1,16 +1,12 @@
-import { CgClose, CgTrash } from "react-icons/cg";
+import { CgTrash } from "react-icons/cg";
 import { useAuth } from "@/app/contexts/auth";
-import { useLoading } from "@/app/contexts/loading";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
 
 export default function CartHeader({ totalItems }) {
   const { user, userData, setUserData } = useAuth();
-  const { setIsPageLoading } = useLoading();
   const axiosPublic = useAxiosPublic();
 
   const removeAllItems = async () => {
-    setIsPageLoading(true);
-
     // Remove all items from local cart
     localStorage.removeItem("cartItems");
 
@@ -35,7 +31,6 @@ export default function CartHeader({ totalItems }) {
       }
     }
 
-    setIsPageLoading(false);
     window.dispatchEvent(new Event("storageCart"));
   };
 
