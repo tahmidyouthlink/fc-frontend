@@ -33,6 +33,8 @@ export default function CartModalButtons({
     if (!selectedOptions?.size)
       return toast.error("Please select a size first.");
 
+    setIsAddToCartModalOpen(false);
+
     const currentCart = JSON.parse(localStorage.getItem("cartItems")) || [];
     let updatedCart;
 
@@ -114,7 +116,6 @@ export default function CartModalButtons({
       );
     }
 
-    setIsAddToCartModalOpen(false);
     window.dispatchEvent(new Event("storageCart")); // Dispatch event so that event listener is triggered
   };
 
