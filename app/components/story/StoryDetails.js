@@ -167,7 +167,7 @@ export default function StoryDetails({
                   dangerouslySetInnerHTML={{
                     __html: content.quote,
                   }}
-                  className="text-3xl font-semibold text-neutral-600 [&_strong]:bg-[linear-gradient(to_right,#804D3A,#D86F4D,#F3A761)] [&_strong]:bg-clip-text [&_strong]:text-transparent"
+                  className="text-xl font-semibold text-neutral-600 sm:text-3xl [&_strong]:bg-[linear-gradient(to_right,#804D3A,#D86F4D,#F3A761)] [&_strong]:bg-clip-text [&_strong]:text-transparent"
                 />
                 {/* Shape/SVG (swirly arrow) */}
                 <Image
@@ -213,13 +213,13 @@ export default function StoryDetails({
                 {/* Text Outline Effect */}
                 {/* Solid Text (behind) */}
                 <h4
-                  className={`pointer-events-none absolute bottom-6 z-[0] select-none text-4xl font-bold text-neutral-700 sm:text-6xl md:text-4xl lg:text-5xl xl:text-6xl ${index % 2 === 0 ? "translate-x-1/4 max-sm:right-0 sm:left-0 sm:-translate-x-1/3" : "right-0 translate-x-1/4 sm:translate-x-1/3"}`}
+                  className={`pointer-events-none absolute bottom-6 z-[0] select-none text-2xl font-bold text-neutral-700 sm:text-6xl md:text-4xl lg:text-5xl xl:text-6xl ${index % 2 === 0 ? "translate-x-1/4 max-sm:right-0 sm:left-0 sm:-translate-x-1/3" : "right-0 translate-x-1/4 sm:translate-x-1/3"}`}
                 >
                   {content.hashtag}
                 </h4>
                 {/* Stroked Text (front) */}
                 <h4
-                  className={`pointer-events-none absolute bottom-6 z-[2] select-none text-4xl font-bold text-transparent opacity-50 sm:text-6xl md:text-4xl lg:text-5xl xl:text-6xl ${index % 2 === 0 ? "translate-x-1/4 max-sm:right-0 sm:left-0 sm:-translate-x-1/3" : "right-0 translate-x-1/4 sm:translate-x-1/3"}`}
+                  className={`pointer-events-none absolute bottom-6 z-[2] select-none text-2xl font-bold text-transparent opacity-50 sm:text-6xl md:text-4xl lg:text-5xl xl:text-6xl ${index % 2 === 0 ? "translate-x-1/4 max-sm:right-0 sm:left-0 sm:-translate-x-1/3" : "right-0 translate-x-1/4 sm:translate-x-1/3"}`}
                   style={{
                     WebkitTextStroke: "1px #e5e5e5",
                   }}
