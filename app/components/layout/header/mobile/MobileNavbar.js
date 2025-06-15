@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { Suspense, useEffect, useState } from "react";
 import { IoMenuOutline } from "react-icons/io5";
-import logoOnlyImage from "/public/logos/logo-mobile.png";
 import WishlistButton from "../wishlist/WishlistButton";
 import CartButton from "../cart/CartButton";
 import Search from "../Search";
@@ -9,7 +8,11 @@ import NavMenu from "./NavMenu";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
 
-export default function MobileNavbar({ logoImgSrc, productList }) {
+export default function MobileNavbar({
+  logoWithoutTextSrc,
+  logoWithTextSrc,
+  productList,
+}) {
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -23,12 +26,15 @@ export default function MobileNavbar({ logoImgSrc, productList }) {
         <TransitionLink href="/">
           <Image
             className="h-8 w-auto sm:hidden"
-            src={logoOnlyImage}
+            src={logoWithoutTextSrc}
             alt={`${process.env.NEXT_PUBLIC_WEBSITE_NAME} logo (no text)`}
+            height={0}
+            width={0}
+            sizes="75px"
           />
           <Image
-            className="h-8 w-auto max-sm:hidden lg:h-9"
-            src={logoImgSrc}
+            className="h-8 w-auto max-sm:hidden"
+            src={logoWithTextSrc}
             alt={`${process.env.NEXT_PUBLIC_WEBSITE_NAME} logo`}
             height={0}
             width={0}
@@ -58,7 +64,7 @@ export default function MobileNavbar({ logoImgSrc, productList }) {
       <NavMenu
         isNavMenuOpen={isNavMenuOpen}
         setIsNavMenuOpen={setIsNavMenuOpen}
-        logoImgSrc={logoImgSrc}
+        logoWithTextSrc={logoWithTextSrc}
       />
     </nav>
   );

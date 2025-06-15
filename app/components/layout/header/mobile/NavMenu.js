@@ -11,7 +11,7 @@ import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
 export default function NavMenu({
   isNavMenuOpen,
   setIsNavMenuOpen,
-  logoImgSrc,
+  logoWithTextSrc,
 }) {
   const { user } = useAuth();
 
@@ -32,7 +32,7 @@ export default function NavMenu({
         >
           <Image
             className="h-8 w-auto"
-            src={logoImgSrc}
+            src={logoWithTextSrc}
             alt={`${process.env.NEXT_PUBLIC_WEBSITE_NAME} logo`}
             height={0}
             width={0}

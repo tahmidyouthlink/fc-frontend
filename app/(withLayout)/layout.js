@@ -29,16 +29,17 @@ export default async function RootLayout({ children }) {
     );
   }
 
-  let logoImgSrc;
+  let logoWithoutTextSrc, logoWithTextSrc;
 
   try {
     const { data } = await axios.get(
       "https://fc-backend-664306765395.asia-south1.run.app/get-all-logo",
     );
-    logoImgSrc = data[0]?.logoImgUrl;
+    logoWithoutTextSrc = data[0]?.mobileLogoUrl;
+    logoWithTextSrc = data[0]?.desktopLogoUrl;
   } catch (error) {
     console.error(
-      "Fetch error (logo - footer):",
+      "Fetch error (logo):",
       error.response?.data?.message || error.response?.data,
     );
   }
@@ -96,7 +97,8 @@ export default async function RootLayout({ children }) {
         }`}</style>
       <div className="flex min-h-dvh flex-col [&>main]:grow">
         <Header
-          logoImgSrc={logoImgSrc}
+          logoWithoutTextSrc={logoWithoutTextSrc}
+          logoWithTextSrc={logoWithTextSrc}
           isTopHeaderEnabled={topHeaderData?.isSlideEnabled}
           slides={topHeaderData?.slides}
           slideDuration={topHeaderData?.slideDuration}
@@ -110,7 +112,7 @@ export default async function RootLayout({ children }) {
         <ScrollTopButton />
         <ChatButton />
         {children}
-        <Footer logoImgSrc={logoImgSrc} />
+        <Footer logoWithTextSrc={logoWithTextSrc} />
       </div>
     </Suspense>
   );
