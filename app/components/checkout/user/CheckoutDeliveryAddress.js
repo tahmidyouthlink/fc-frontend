@@ -38,7 +38,7 @@ export default function CheckoutDeliveryAddress({
               id="address-one"
               type="text"
               className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
-              placeholder="House 123, Road 10, Block A"
+              placeholder="House 123, Road 45, Block Z"
               {...register("addressLineOne", {
                 required: {
                   value: true,
@@ -60,7 +60,7 @@ export default function CheckoutDeliveryAddress({
               type="text"
               {...register("addressLineTwo")}
               className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
-              placeholder="Dhanmondi, Dhaka 1209"
+              placeholder="Sector 50, Gulshan"
             />
             {errors.addressLineTwo && (
               <p className="text-xs font-semibold text-red-500">
