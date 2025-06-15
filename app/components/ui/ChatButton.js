@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { PiMessengerLogo, PiWhatsappLogo } from "react-icons/pi";
@@ -12,6 +12,18 @@ const gapFromBigBtn = 6;
 
 export default function ChatButton() {
   const [isButtonClicked, setIsButtonClicked] = useState(false);
+  const inactivityTimer = useRef(null);
+
+  // Function to clear/reset the inactivity timer
+  const clearTimer = () => {
+    clearTimeout(inactivityTimer.current);
+  };
+
+  // Function to start the inactivity timer
+  const startTimer = () => {
+    clearTimer();
+    inactivityTimer.current = setTimeout(() => setIsButtonClicked(false), 5000);
+  };
 
   return (
     <div
@@ -20,7 +32,12 @@ export default function ChatButton() {
         marginTop: `-${canvasOffset * 2}px`, // Adjust position (push upwards about twice the size of the offset) due to position adjustment of the big button
       }}
     >
-      <div className="relative flex size-28 items-end justify-end">
+      <div
+        className="relative flex size-28 items-end justify-end"
+        onMouseEnter={() => isButtonClicked && clearTimer()}
+        onMouseLeave={() => isButtonClicked && startTimer()}
+        onClick={() => !isButtonClicked && startTimer()}
+      >
         <button
           style={{
             margin: `0 -${canvasOffset}px -${canvasOffset}px 0`, // Adjust position (move a bit to the right and bottom) due to canvas offset
