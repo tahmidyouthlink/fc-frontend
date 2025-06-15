@@ -70,7 +70,7 @@ export default function ProductMainImage({
       {/* Zoomed Image (on hover) */}
       <div
         id="img-zoomed"
-        className="pointer-events-none absolute inset-0 z-[2] hidden h-full w-full"
+        className="pointer-events-none absolute inset-0 z-[2] hidden h-full w-full bg-[var(--product-default)] bg-no-repeat"
         style={{
           backgroundImage: `url(${activeImageUrl})`,
           backgroundSize: "200%",
