@@ -1,28 +1,24 @@
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
 import { FaArrowRightLong } from "react-icons/fa6";
 import rightArrowShape from "@/public/shapes/custom-arrow-right.png";
 import TransitionLink from "@/app/components/ui/TransitionLink";
-import ProductCard from "../product-card/ProductCard";
+import HomeNewArrivalCards from "./HomeNewArrivalCards";
 
 export default function HomeNewArrival({
   isAnyTrendingProductAvailable,
   newlyArrivedProducts,
-  isAddToCartModalOpen,
-  setIsAddToCartModalOpen,
-  setSelectedAddToCartProduct,
-  getImageSetsBasedOnColors,
+  primaryLocation,
 }) {
-  const searchParams = useSearchParams();
-
   if (!!newlyArrivedProducts?.length)
     return (
-      <div
+      <section
         className={`relative w-full overflow-hidden ${isAnyTrendingProductAvailable ? "bg-[var(--color-secondary-300)]" : ""}`}
       >
+        {/* Shape (curved dotted line) */}
         <div className="absolute inset-0 ml-auto bg-[url('/shapes/curved-dotted-line-new-arrival.svg')] bg-right-top bg-no-repeat opacity-50 max-lg:top-1/2 max-lg:-translate-y-7 max-lg:bg-contain lg:max-lg:w-2/3" />
         <div className="relative mx-auto px-5 py-8 md:py-10 lg:py-12 xl:max-w-[1200px] xl:px-0">
           <div className="mb-10 flex items-center justify-between">
+            {/* Heading */}
             <h1 className="relative text-xl font-bold md:text-2xl lg:text-3xl">
               <span className="max-sm:hidden">Look at Our</span> New Arrivals
               <div className="absolute -right-3 top-0 aspect-[2.1/1] w-14 translate-x-full md:-right-7 md:w-20 lg:w-20">
@@ -37,6 +33,7 @@ export default function HomeNewArrival({
                 />
               </div>
             </h1>
+            {/* View All Button */}
             <TransitionLink
               className="flex items-center gap-2 text-[10px] transition-[gap] duration-300 ease-in-out hover:gap-3 md:text-base"
               href="/shop?filterBy=New+Arrivals"
@@ -47,19 +44,11 @@ export default function HomeNewArrival({
               </span>
             </TransitionLink>
           </div>
-          <section className="grid grid-cols-2 gap-x-4 gap-y-12 sm:grid-cols-3 lg:grid-cols-4 sm:max-lg:[&>div:last-child]:hidden">
-            {newlyArrivedProducts?.map((newlyArrivedProduct) => (
-              <ProductCard
-                key={"home-new-arrival-product-" + newlyArrivedProduct._id}
-                product={newlyArrivedProduct}
-                isAddToCartModalOpen={isAddToCartModalOpen}
-                setIsAddToCartModalOpen={setIsAddToCartModalOpen}
-                setSelectedAddToCartProduct={setSelectedAddToCartProduct}
-                getImageSetsBasedOnColors={getImageSetsBasedOnColors}
-              />
-            ))}
-          </section>
+          <HomeNewArrivalCards
+            newlyArrivedProducts={newlyArrivedProducts}
+            primaryLocation={primaryLocation}
+          />
         </div>
-      </div>
+      </section>
     );
 }

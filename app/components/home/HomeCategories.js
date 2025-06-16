@@ -1,12 +1,30 @@
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import axios from "axios";
 import { FaArrowRightLong } from "react-icons/fa6";
 import curvedDottedLineShape from "@/public/shapes/curved-dotted-line-categories.svg";
 import rightArrowShape from "@/public/shapes/custom-arrow-right.png";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 
-export default function HomeCategories({ featuredCategories }) {
-  const searchParams = useSearchParams();
+export const dynamic = "force-dynamic";
+
+export default async function HomeCategories() {
+  let categories;
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allCategories`,
+    );
+    categories = response.data || [];
+  } catch (error) {
+    console.error(
+      "Fetch error (home/categories):",
+      error.response?.data?.message || error.response?.data,
+    );
+  }
+
+  const featuredCategories = categories?.filter(
+    (category) => category.isFeatured === true,
+  );
 
   if (!!featuredCategories?.length)
     return (
