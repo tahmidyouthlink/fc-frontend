@@ -1,7 +1,7 @@
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { MdCancel } from "react-icons/md";
-import fileUploadSVG from "@/public/return-order/upload.svg";
+import fileUploadSVG from "@/public/shapes/upload.svg";
 import { useLoading } from "@/app/contexts/loading";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
 
