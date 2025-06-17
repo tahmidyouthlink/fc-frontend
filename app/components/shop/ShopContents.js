@@ -6,10 +6,6 @@ import { useSearchParams } from "next/navigation";
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
 import { FaRegEyeSlash } from "react-icons/fa6";
 import thunderShape from "@/public/shapes/thunder-with-stroke.svg";
-import { useLoading } from "@/app/contexts/loading";
-import useProductsInformation from "@/app/hooks/useProductsInformation";
-import useOffers from "@/app/hooks/useOffers";
-import useLocations from "@/app/hooks/useLocations";
 import {
   calculateFinalPrice,
   checkIfOnlyRegularDiscountIsAvailable,
@@ -20,7 +16,11 @@ import Filter from "@/app/components/shop/Filter";
 import EmptyShopProducts from "@/app/components/shop/EmptyShopProducts";
 import ShopCards from "@/app/components/shop/cards/ShopCards";
 
-export default function ShopContents() {
+export default function ShopContents({
+  products,
+  specialOffers,
+  primaryLocation,
+}) {
   const [isFilterButtonClicked, setIsFilterButtonClicked] = useState(false);
   const [selectedFilterOptions, setSelectedFilterOptions] = useState({
     sortBy: new Set([]),
@@ -36,15 +36,7 @@ export default function ShopContents() {
   const [filteredProducts, setFilteredProducts] = useState(null);
   const [keyword, setKeyword] = useState("");
   const searchParams = useSearchParams();
-  const [productList, isProductListLoading, productRefetch] =
-    useProductsInformation();
-  const [specialOffers, isSpecialOffersLoading, specialOffersRefetch] =
-    useOffers();
-  const [locationList, isLocationListLoading, locationRefetch] = useLocations();
-  const primaryLocation = locationList?.find(
-    (location) => location.isPrimaryLocation == true,
-  )?.locationName;
-  const { setIsPageLoading } = useLoading();
+  const isLoading = !products || !specialOffers || !primaryLocation;
 
   const isProductWithinPriceRange = (product) =>
     (!selectedFilterOptions.price.min ||
@@ -85,16 +77,9 @@ export default function ShopContents() {
   }, [searchParams]);
 
   useEffect(() => {
-    if (
-      !isProductListLoading &&
-      !!productList?.length &&
-      !isSpecialOffersLoading &&
-      !!specialOffers?.length &&
-      !isLocationListLoading &&
-      !!locationList?.length
-    )
+    if (!isLoading)
       setFilteredProducts(
-        productList
+        products
           .filter((product) => {
             return (
               product.status === "active" &&
@@ -158,44 +143,34 @@ export default function ShopContents() {
           }),
       );
   }, [
-    productList,
-    isProductListLoading,
+    isLoading,
     specialOffers,
-    isSpecialOffersLoading,
-    locationList,
-    isLocationListLoading,
-    selectedFilterOptions,
-    keyword,
+    products,
     primaryLocation,
+    keyword,
+    selectedFilterOptions.category,
+    selectedFilterOptions.colors,
+    selectedFilterOptions.filterBy,
+    selectedFilterOptions.sizes,
+    selectedFilterOptions.sortBy,
   ]);
 
-  const areContentsLoading =
-    isProductListLoading ||
-    !productList?.length ||
-    isSpecialOffersLoading ||
-    !specialOffers?.length ||
-    isLocationListLoading ||
-    !locationList?.length;
-
-  useEffect(() => {
-    setIsPageLoading(areContentsLoading);
-
-    return () => setIsPageLoading(false);
-  }, [areContentsLoading, setIsPageLoading, searchParams]);
-
-  if (!areContentsLoading)
+  if (!isLoading)
     return (
       <div className="flex min-h-full grow flex-col gap-y-7 px-5 sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0">
         <div className="flex items-center justify-between gap-1">
+          {/* Product Count Text */}
           {!keyword?.length &&
           Object.values(selectedFilterOptions).every(
             (selectedValue) => !selectedValue.length,
           ) ? (
+            /* No filters */
             <p>
               Displaying {filteredProductCount || "no"} item
               {filteredProductCount > 1 ? "s" : ""}
             </p>
           ) : (
+            /* With filters */
             <p className="relative w-fit">
               {filteredProductCount || "No"} item
               {filteredProductCount > 1 && "s"} found
@@ -205,6 +180,7 @@ export default function ShopContents() {
               {Object.values(selectedFilterOptions).some(
                 (selectedValue) => selectedValue.length,
               ) && " with these selected filters:"}
+              {/* Shape (Thunder) */}
               <span className="absolute -right-1 bottom-1/4 block aspect-square w-7 translate-x-full rotate-[26deg] max-sm:hidden">
                 <Image
                   src={thunderShape}
@@ -237,7 +213,7 @@ export default function ShopContents() {
         </button>
         <Filter
           isFilterButtonClicked={isFilterButtonClicked}
-          unfilteredProducts={productList}
+          unfilteredProducts={products}
           filteredProducts={filteredProducts}
           selectedFilterOptions={selectedFilterOptions}
           setSelectedFilterOptions={setSelectedFilterOptions}

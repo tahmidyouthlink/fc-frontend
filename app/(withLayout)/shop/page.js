@@ -1,8 +1,53 @@
+import axios from "axios";
 import { Suspense } from "react";
 import ShopContents from "@/app/components/shop/ShopContents";
 import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
 
-export default function Shop() {
+export const dynamic = "force-dynamic";
+
+export default async function Shop() {
+  let products, specialOffers, locations;
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allProducts`,
+    );
+    products = response.data || [];
+  } catch (error) {
+    console.error(
+      "Fetch error (shop/products):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allOffers`,
+    );
+    specialOffers = response.data || [];
+  } catch (error) {
+    console.error(
+      "Fetch error (shop/specialOffers):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allLocations`,
+    );
+    locations = response.data || [];
+  } catch (error) {
+    console.error(
+      "Fetch error (shop/locations):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
+  const primaryLocation = locations?.find(
+    (location) => location?.isPrimaryLocation == true,
+  )?.locationName;
+
   return (
     <main>
       <div className="relative h-full w-full">
@@ -13,7 +58,11 @@ export default function Shop() {
       </div>
       <div className="pt-header-h-full-section-pb relative flex min-h-dvh overflow-hidden pb-[var(--section-padding)] [&_img]:pointer-events-none">
         <Suspense fallback={<LoadingSpinner />}>
-          <ShopContents />
+          <ShopContents
+            products={products}
+            specialOffers={specialOffers}
+            primaryLocation={primaryLocation}
+          />
         </Suspense>
       </div>
     </main>
