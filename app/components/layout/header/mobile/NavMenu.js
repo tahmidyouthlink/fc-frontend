@@ -12,6 +12,7 @@ export default function NavMenu({
   isNavMenuOpen,
   setIsNavMenuOpen,
   logoWithTextSrc,
+  legalPolicyPdfLinks,
 }) {
   const { user } = useAuth();
 
@@ -43,7 +44,11 @@ export default function NavMenu({
           <MenuSection setIsNavMenuOpen={setIsNavMenuOpen} />
         </Suspense>
         <OrderSection user={user} setIsNavMenuOpen={setIsNavMenuOpen} />
-        <AccountSection user={user} setIsNavMenuOpen={setIsNavMenuOpen} />
+        <AccountSection
+          user={user}
+          setIsNavMenuOpen={setIsNavMenuOpen}
+          legalPolicyPdfLinks={legalPolicyPdfLinks}
+        />
       </nav>
     </Drawer>
   );

@@ -1,3 +1,5 @@
+"use client";
+
 import { useLoading } from "@/app/contexts/loading";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";

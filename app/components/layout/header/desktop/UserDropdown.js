@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -28,7 +30,7 @@ import {
 } from "@/app/data/authContents";
 import AuthModal from "../auth/AuthModal";
 
-export default function UserDropdown() {
+export default function UserDropdown({ legalPolicyPdfLinks }) {
   const { user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -185,6 +187,7 @@ export default function UserDropdown() {
         setIsAuthModalOpen={setIsAuthModalOpen}
         modalContent={modalContent}
         setModalContent={setModalContent}
+        legalPolicyPdfLinks={legalPolicyPdfLinks}
       />
     </>
   );

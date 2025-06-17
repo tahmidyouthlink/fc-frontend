@@ -1,23 +1,70 @@
+import { Suspense } from "react";
 import Image from "next/image";
-import { Suspense, useEffect, useState } from "react";
-import { IoMenuOutline } from "react-icons/io5";
-import WishlistButton from "../wishlist/WishlistButton";
-import CartButton from "../cart/CartButton";
-import Search from "../Search";
-import NavMenu from "./NavMenu";
+import axios from "axios";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
+import Search from "../Search";
+import WishlistButton from "../wishlist/WishlistButton";
+import CartButton from "../cart/CartButton";
+import NavButton from "./NavButton";
 
-export default function MobileNavbar({
+export default async function MobileNavbar({
   logoWithoutTextSrc,
   logoWithTextSrc,
-  productList,
 }) {
-  const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
+  let productList, specialOffers, locations, legalPolicyPdfLinks;
 
-  useEffect(() => {
-    document.body.style.overflow = isNavMenuOpen ? "hidden" : "unset";
-  }, [isNavMenuOpen]);
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allProducts`,
+    );
+    productList = response.data || [];
+  } catch (error) {
+    console.error(
+      "Fetch error (mobileNav/products):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allOffers`,
+    );
+    specialOffers = response.data || [];
+  } catch (error) {
+    console.error(
+      "Fetch error (mobileNav/specialOffers):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allLocations`,
+    );
+    locations = response.data || [];
+  } catch (error) {
+    console.error(
+      "Fetch error (mobileNav/locations):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
+  const primaryLocation = locations?.find(
+    (location) => location?.isPrimaryLocation == true,
+  )?.locationName;
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/get-all-policy-pdfs`,
+    );
+    legalPolicyPdfLinks = response.data[0] || {};
+  } catch (error) {
+    console.error(
+      "Fetch error (mobileNav/legalPolicyPdfLinks):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
 
   return (
     <nav className="relative h-full w-full text-sm lg:hidden">
@@ -48,24 +95,24 @@ export default function MobileNavbar({
               <Search />
             </Suspense>
           </li>
-          <WishlistButton productList={productList} />
+          <WishlistButton
+            productList={productList}
+            specialOffers={specialOffers}
+          />
           <Suspense fallback={<LoadingSpinner />}>
-            <CartButton productList={productList} />
+            <CartButton
+              productList={productList}
+              specialOffers={specialOffers}
+              primaryLocation={primaryLocation}
+            />
           </Suspense>
           {/* Navigation button */}
-          <li className="my-auto">
-            <IoMenuOutline
-              className="h-5 w-auto cursor-pointer sm:h-6 lg:hidden"
-              onClick={() => setIsNavMenuOpen(true)}
-            />
-          </li>
+          <NavButton
+            logoWithTextSrc={logoWithTextSrc}
+            legalPolicyPdfLinks={legalPolicyPdfLinks}
+          />
         </ul>
       </div>
-      <NavMenu
-        isNavMenuOpen={isNavMenuOpen}
-        setIsNavMenuOpen={setIsNavMenuOpen}
-        logoWithTextSrc={logoWithTextSrc}
-      />
     </nav>
   );
 }

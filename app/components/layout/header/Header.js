@@ -1,12 +1,6 @@
-"use client";
-
-import { useEffect } from "react";
-import { useAuth } from "@/app/contexts/auth";
-import { useLoading } from "@/app/contexts/loading";
-import useProductsInformation from "@/app/hooks/useProductsInformation";
+import TopHeader from "./TopHeader";
 import MobileNavbar from "./mobile/MobileNavbar";
 import DesktopNavbar from "./desktop/DesktopNavbar";
-import TopHeader from "./TopHeader";
 
 export default function Header({
   logoWithoutTextSrc,
@@ -20,18 +14,6 @@ export default function Header({
   isHighlightedColorEnabled,
   highlightedColor,
 }) {
-  const { isUserLoading } = useAuth();
-  const { setIsPageLoading } = useLoading();
-  const [productList, isProductListLoading, refetch] = useProductsInformation();
-
-  useEffect(() => {
-    setIsPageLoading(
-      isUserLoading || isProductListLoading || !productList?.length,
-    );
-
-    return () => setIsPageLoading(false);
-  }, [isUserLoading, isProductListLoading, productList, setIsPageLoading]);
-
   return (
     <header
       id="header"
@@ -52,12 +34,8 @@ export default function Header({
         <MobileNavbar
           logoWithoutTextSrc={logoWithoutTextSrc}
           logoWithTextSrc={logoWithTextSrc}
-          productList={productList}
         />
-        <DesktopNavbar
-          logoWithTextSrc={logoWithTextSrc}
-          productList={productList}
-        />
+        <DesktopNavbar logoWithTextSrc={logoWithTextSrc} />
       </div>
     </header>
   );

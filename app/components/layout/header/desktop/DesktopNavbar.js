@@ -6,7 +6,7 @@ import SideLinks from "./SideLinks";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
 
-export default function DesktopNavbar({ logoWithTextSrc, productList }) {
+export default function DesktopNavbar({ logoWithTextSrc }) {
   return (
     <nav className="flex w-full items-center justify-between text-sm max-lg:hidden">
       <TransitionLink href="/">
@@ -23,7 +23,7 @@ export default function DesktopNavbar({ logoWithTextSrc, productList }) {
         <MainLinks />
         <Search />
       </Suspense>
-      <SideLinks productList={productList} />
+      <SideLinks />
     </nav>
   );
 }

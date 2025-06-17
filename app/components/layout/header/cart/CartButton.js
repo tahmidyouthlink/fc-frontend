@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import {
@@ -11,8 +13,6 @@ import { IoCartOutline } from "react-icons/io5";
 import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
-import useOffers from "@/app/hooks/useOffers";
-import useLocations from "@/app/hooks/useLocations";
 import addToCartToast from "@/app/utils/addToCartToast";
 import getImageSetsBasedOnColors from "@/app/utils/getImageSetsBasedOnColors";
 import {
@@ -24,39 +24,22 @@ import CartItems from "./CartItems";
 import EmptyCartContent from "./EmptyCartContent";
 import CartFooter from "./CartFooter";
 
-export default function CartButton({ productList }) {
-  const { userData, setUserData } = useAuth();
-  const { setIsPageLoading } = useLoading();
-  const axiosPublic = useAxiosPublic();
-  const [specialOffers, isSpecialOffersLoading, specialOffersRefetch] =
-    useOffers();
-  const [locationList, isLocationListLoading, locationRefetch] = useLocations();
-  const [cartItems, setCartItems] = useState(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
+export default function CartButton({
+  productList,
+  specialOffers,
+  primaryLocation,
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { userData, setUserData } = useAuth();
+  const { setIsPageLoading } = useLoading();
+  const axiosPublic = useAxiosPublic();
+  const [cartItems, setCartItems] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const productId = searchParams.get("productId");
   const size = searchParams.get("size");
   const colorCode = searchParams.get("colorCode");
-
-  useEffect(() => {
-    setIsPageLoading(
-      isSpecialOffersLoading ||
-        !specialOffers?.length ||
-        isLocationListLoading ||
-        !locationList?.length,
-    );
-
-    return () => setIsPageLoading(false);
-  }, [
-    isSpecialOffersLoading,
-    specialOffers,
-    isLocationListLoading,
-    locationList,
-    setIsPageLoading,
-  ]);
 
   useEffect(() => {
     const handleStorageUpdate = () => {
@@ -291,11 +274,7 @@ export default function CartButton({ productList }) {
                 cartItems={cartItems}
                 productList={productList}
                 specialOffers={specialOffers}
-                primaryLocation={
-                  locationList?.find(
-                    (location) => location.isPrimaryLocation == true,
-                  )?.locationName
-                }
+                primaryLocation={primaryLocation}
                 setIsDropdownOpen={setIsDropdownOpen}
               />
             ) : (

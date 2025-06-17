@@ -13,7 +13,11 @@ import {
 } from "@/app/data/authContents";
 import AuthModal from "../auth/AuthModal";
 
-export default function AccountSection({ user, setIsNavMenuOpen }) {
+export default function AccountSection({
+  user,
+  setIsNavMenuOpen,
+  legalPolicyPdfLinks,
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const { setIsPageLoading } = useLoading();
@@ -74,6 +78,7 @@ export default function AccountSection({ user, setIsNavMenuOpen }) {
             setIsAuthModalOpen={setIsAuthModalOpen}
             modalContent={modalContent}
             setModalContent={setModalContent}
+            legalPolicyPdfLinks={legalPolicyPdfLinks}
           />
         </ul>
       ) : (

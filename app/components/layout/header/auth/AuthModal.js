@@ -11,6 +11,7 @@ export default function AuthModal({
   setIsAuthModalOpen,
   modalContent,
   setModalContent,
+  legalPolicyPdfLinks,
 }) {
   return (
     <Modal
@@ -31,6 +32,7 @@ export default function AuthModal({
                 <RegisterForm
                   setModalContent={setModalContent}
                   setIsAuthModalOpen={setIsAuthModalOpen}
+                  legalPolicyPdfLinks={legalPolicyPdfLinks}
                 />
               ) : modalContent === "forgotPassword" ? (
                 <ForgotPasswordForm setIsAuthModalOpen={setIsAuthModalOpen} />

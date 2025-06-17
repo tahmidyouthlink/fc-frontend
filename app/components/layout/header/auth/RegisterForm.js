@@ -10,15 +10,16 @@ import toast from "react-hot-toast";
 import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
-import usePolicyPages from "@/app/hooks/usePolicyPages";
 import generateCustomerId from "@/app/utils/generateCustomerId";
 
-export default function RegisterForm({ setModalContent, setIsAuthModalOpen }) {
+export default function RegisterForm({
+  setModalContent,
+  setIsAuthModalOpen,
+  legalPolicyPdfLinks,
+}) {
   const axiosPublic = useAxiosPublic();
   const { setUserData } = useAuth();
   const { setIsPageLoading } = useLoading();
-  const [[legalPolicyPdfLinks] = [], isLegalDataLoading, legalDataRefetch] =
-    usePolicyPages();
   const [isPasswordVisible, SetIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, SetIsConfirmPasswordVisible] =
     useState(false);

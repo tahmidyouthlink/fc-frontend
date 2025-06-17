@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { IoHeartOutline } from "react-icons/io5";
 import {
@@ -11,7 +13,7 @@ import WishlistItems from "./WishlistItems";
 import WishlistFooter from "./WishlistFooter";
 import EmptyWishlistContent from "./EmptyWishlistContent";
 
-export default function WishlistButton({ productList }) {
+export default function WishlistButton({ productList, specialOffers }) {
   const [wishlistItems, setWishlistItems] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -106,6 +108,7 @@ export default function WishlistButton({ productList }) {
                   wishlistItems={wishlistItems}
                   productList={productList}
                   setIsDropdownOpen={setIsDropdownOpen}
+                  specialOffers={specialOffers}
                 />
                 <WishlistFooter setIsDropdownOpen={setIsDropdownOpen} />
               </>

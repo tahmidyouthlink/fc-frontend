@@ -1,11 +1,8 @@
 import Image from "next/image";
-import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { CgTrash } from "react-icons/cg";
 import { useAuth } from "@/app/contexts/auth";
-import { useLoading } from "@/app/contexts/loading";
 import useAxiosPublic from "@/app/hooks/useAxiosPublic";
-import useOffers from "@/app/hooks/useOffers";
 import { calculateFinalPrice } from "@/app/utils/orderCalculations";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 
@@ -13,18 +10,10 @@ export default function WishlistItems({
   wishlistItems,
   productList,
   setIsDropdownOpen,
+  specialOffers,
 }) {
   const axiosPublic = useAxiosPublic();
   const { user, userData, setUserData } = useAuth();
-  const { setIsPageLoading } = useLoading();
-  const [specialOffers, isSpecialOffersLoading, specialOffersRefetch] =
-    useOffers();
-
-  useEffect(() => {
-    setIsPageLoading(isSpecialOffersLoading || !specialOffers?.length);
-
-    return () => setIsPageLoading(false);
-  }, [isSpecialOffersLoading, setIsPageLoading, specialOffers]);
 
   const removeWishlistItem = async (wishlistItemId) => {
     const updatedWishlist = wishlistItems.filter(
