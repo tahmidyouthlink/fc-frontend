@@ -1,11 +1,9 @@
-import { Suspense } from "react";
 import axios from "axios";
 import Header from "../components/layout/header/Header";
 import ScrollTopButton from "../components/ui/ScrollTopButton";
 import Footer from "../components/footer/Footer";
 import ChatButton from "../components/ui/ChatButton";
 import LoaderFrontend from "../components/shared/LoaderFrontend";
-import LoadingSpinner from "../components/shared/LoadingSpinner";
 
 export const metadata = {
   title: process.env.NEXT_PUBLIC_WEBSITE_NAME,
@@ -47,7 +45,7 @@ export default async function RootLayout({ children }) {
   const topHeaderHeight = topHeaderData?.isSlideEnabled ? "28.5px" : "0px";
 
   return (
-    <Suspense fallback={<LoadingSpinner />}>
+    <div className="flex min-h-dvh flex-col [&>main]:grow">
       <style>{`:root {
           --top-header-height: ${topHeaderHeight};
           --color-primary-100: #fafff9;
@@ -95,25 +93,23 @@ export default async function RootLayout({ children }) {
           --color-static-bubble-tertiary: #ffffff;
           --color-static-bubble-quaternary: #ffffff;
         }`}</style>
-      <div className="flex min-h-dvh flex-col [&>main]:grow">
-        <Header
-          logoWithoutTextSrc={logoWithoutTextSrc}
-          logoWithTextSrc={logoWithTextSrc}
-          isTopHeaderEnabled={topHeaderData?.isSlideEnabled}
-          slides={topHeaderData?.slides}
-          slideDuration={topHeaderData?.slideDuration}
-          isAutoSlideEnabled={topHeaderData?.isAutoSlideEnabled}
-          bgColor={topHeaderData?.topHeaderColor}
-          textColor={topHeaderData?.textColor}
-          isHighlightedColorEnabled={topHeaderData?.isHighlightedColorEnabled}
-          highlightedColor={topHeaderData?.highlightedTextColor}
-        />
-        <LoaderFrontend />
-        <ScrollTopButton />
-        <ChatButton />
-        {children}
-        <Footer logoWithTextSrc={logoWithTextSrc} />
-      </div>
-    </Suspense>
+      <Header
+        logoWithoutTextSrc={logoWithoutTextSrc}
+        logoWithTextSrc={logoWithTextSrc}
+        isTopHeaderEnabled={topHeaderData?.isSlideEnabled}
+        slides={topHeaderData?.slides}
+        slideDuration={topHeaderData?.slideDuration}
+        isAutoSlideEnabled={topHeaderData?.isAutoSlideEnabled}
+        bgColor={topHeaderData?.topHeaderColor}
+        textColor={topHeaderData?.textColor}
+        isHighlightedColorEnabled={topHeaderData?.isHighlightedColorEnabled}
+        highlightedColor={topHeaderData?.highlightedTextColor}
+      />
+      <LoaderFrontend />
+      <ScrollTopButton />
+      <ChatButton />
+      {children}
+      <Footer logoWithTextSrc={logoWithTextSrc} />
+    </div>
   );
 }
