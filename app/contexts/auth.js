@@ -3,7 +3,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import useAxiosPublic from "../hooks/useAxiosPublic";
-import useCustomers from "../hooks/useCustomers";
 
 // Create a new context for authentication and user data
 const AuthContext = createContext({
@@ -20,20 +19,12 @@ export const AuthProvider = ({ children }) => {
   const [isUserLoading, setIsUserLoading] = useState(true);
   const { data: session, status } = useSession();
   const axiosPublic = useAxiosPublic();
-  const [customerList, isCustomerListLoading, customerRefetch] = useCustomers();
 
   // Listen for changes to the user's authentication state
   // When the token changes, update the states accordingly
   useEffect(() => {
     const updateUserData = async (userEmail) => {
       try {
-        const { data } = await axiosPublic.get("/allCustomerDetails");
-        const doesUserHaveAccount = data.some(
-          (userData) => userData.email === userEmail,
-        );
-
-        if (!doesUserHaveAccount) return setUserData(null);
-
         const res = await axiosPublic.get(
           `/customerDetailsViaEmail/${userEmail}`,
         );
@@ -81,11 +72,7 @@ export const AuthProvider = ({ children }) => {
       setIsUserLoading(false);
     };
 
-    if (
-      status === "loading" ||
-      isCustomerListLoading ||
-      !customerList?.length
-    ) {
+    if (status === "loading") {
       return () => !isUserLoading && setIsUserLoading(true);
     }
 
@@ -103,15 +90,7 @@ export const AuthProvider = ({ children }) => {
         );
       setIsUserLoading(false);
     }
-  }, [
-    axiosPublic,
-    customerList,
-    isCustomerListLoading,
-    isUserLoading,
-    session,
-    status,
-    userData,
-  ]);
+  }, [axiosPublic, isUserLoading, session, status, userData]);
 
   // Provide the user state and loading state to child components through context
   return (
