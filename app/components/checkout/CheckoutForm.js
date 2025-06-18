@@ -379,49 +379,52 @@ export default function CheckoutForm({
 
   // Load draft from localStorage or update form on user session change
   useEffect(() => {
-    const draftData = (() => {
+    const draft = (() => {
       try {
-        const raw = localStorage.getItem("checkoutFormDraft");
-        return raw ? JSON.parse(raw) : {};
+        const rawDraft = localStorage.getItem("checkoutFormDraft");
+        return rawDraft ? JSON.parse(rawDraft) : {};
       } catch (e) {
         console.error("Failed to parse form draft from localStorage:", e);
         return {};
       }
     })();
 
+    const personalInfo = userData?.userInfo?.personalInfo || {};
+    const prevSavedAddress = userData?.userInfo?.savedDeliveryAddress || {};
+    const wasDeliveryEdited =
+      draft?.addressLineOne ||
+      draft?.addressLineTwo ||
+      draft?.city ||
+      draft?.postalCode;
+
     reset({
-      name:
-        userData?.userInfo?.personalInfo?.customerName ?? draftData.name ?? "",
-      email: userData?.email ?? draftData.email ?? "",
-      hometown:
-        draftData.hometown ?? userData?.userInfo?.personalInfo?.hometown ?? "",
-      phoneNumber:
-        draftData.phoneNumber ??
-        userData?.userInfo?.personalInfo?.phoneNumber ??
-        "",
-      altPhoneNumber:
-        draftData.altPhoneNumber ??
-        userData?.userInfo?.personalInfo?.phoneNumber2 ??
-        "",
+      name: personalInfo?.customerName || draft.name || "",
+      email: userData?.email || draft.email || "",
+      hometown: personalInfo?.hometown || draft.hometown || "",
+      phoneNumber: draft.phoneNumber || personalInfo?.phoneNumber || "",
+      altPhoneNumber: draft.altPhoneNumber || personalInfo?.phoneNumber2 || "",
       addressLineOne:
-        draftData.addressLineOne ??
-        userData?.userInfo?.savedDeliveryAddress?.address1 ??
-        "",
+        (wasDeliveryEdited
+          ? draft.addressLineOne
+          : prevSavedAddress?.address1) || "",
       addressLineTwo:
-        draftData.addressLineTwo ??
-        userData?.userInfo?.savedDeliveryAddress?.address2 ??
-        "",
-      city:
-        draftData.city ?? userData?.userInfo?.savedDeliveryAddress?.city ?? "",
+        (wasDeliveryEdited
+          ? draft.addressLineTwo
+          : prevSavedAddress?.address2) || "",
+      city: (wasDeliveryEdited ? draft.city : prevSavedAddress?.city) || "",
       postalCode:
-        draftData.postalCode ??
-        userData?.userInfo?.savedDeliveryAddress?.postalCode ??
+        (wasDeliveryEdited ? draft.postalCode : prevSavedAddress?.postalCode) ||
         "",
-      note: draftData.note ?? "",
-      deliveryType: draftData.deliveryType ?? "",
-      paymentMethod: draftData.paymentMethod ?? "",
+      note: draft.note || "",
+      deliveryType: draft.deliveryType || "",
+      paymentMethod: draft.paymentMethod || "",
     });
-  }, [reset, userData]);
+  }, [
+    reset,
+    userData?.email,
+    userData?.userInfo?.personalInfo,
+    userData?.userInfo?.savedDeliveryAddress,
+  ]);
 
   useEffect(() => {
     const autocompleteElements = document.querySelectorAll(
