@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { LuFileText } from "react-icons/lu";
 import { useLoading } from "@/app/contexts/loading";
-import PDFDocument from "../../layout/PDFDocument";
 
 const OrderInvoiceButton = ({ selectedOrder }) => {
   const { setIsPageLoading } = useLoading();
@@ -12,29 +11,30 @@ const OrderInvoiceButton = ({ selectedOrder }) => {
   useEffect(() => {
     // Dynamically import @react-pdf/renderer for client-side rendering only
     import("@react-pdf/renderer")
-      .then((module) => {
-        setPdfModule(module); // Store the pdf module for later use
-      })
-      .catch((error) => {
-        console.error("Failed to load @react-pdf/renderer:", error);
-      });
+      .then((module) => setPdfModule(module))
+      .catch((error) =>
+        console.error("Failed to load @react-pdf/renderer:", error),
+      );
   }, []);
 
   const handlePreview = async () => {
     if (!selectedOrder || !pdfModule) return;
 
-    setIsPageLoading(true); // Show loading state
+    setIsPageLoading(true);
 
     try {
-      const { pdf } = pdfModule; // Use the dynamically imported pdf function
+      // Dynamically import the PDFDocument only on client when needed
+      const PDFDocument = (await import("../../layout/PDFDocument")).default;
+
+      const { pdf } = pdfModule;
       const blob = await pdf(<PDFDocument order={selectedOrder} />).toBlob();
       const pdfURL = URL.createObjectURL(blob);
 
-      window.open(pdfURL, "_blank"); // Opens the PDF in a new tab
+      window.open(pdfURL, "_blank");
     } catch (error) {
       console.error("Error generating PDF:", error);
     } finally {
-      setIsPageLoading(false); // Hide loading state
+      setIsPageLoading(false);
     }
   };
 

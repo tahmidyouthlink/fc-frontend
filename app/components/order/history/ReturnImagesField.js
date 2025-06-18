@@ -3,10 +3,7 @@ import toast from "react-hot-toast";
 import { MdCancel } from "react-icons/md";
 import fileUploadSVG from "@/public/shapes/upload.svg";
 import { useLoading } from "@/app/contexts/loading";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
-
-const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-const apiURL = `https://api.imgbb.com/1/upload?key=${apiKey}`;
+import { axiosPublic } from "@/app/utils/axiosPublic";
 
 export default function ReturnImagesField({
   register,
@@ -20,7 +17,6 @@ export default function ReturnImagesField({
   setReturnImgUrls,
 }) {
   const { setIsPageLoading } = useLoading();
-  const axiosPublic = useAxiosPublic();
 
   const updateDropZoneStyles = (event, state) => {
     const dropZoneElement = event.currentTarget;

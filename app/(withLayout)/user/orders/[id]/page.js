@@ -1,11 +1,8 @@
-"use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import axios from "axios";
 import { HiArrowNarrowLeft } from "react-icons/hi";
-import { useAuth } from "@/app/contexts/auth";
-import { useLoading } from "@/app/contexts/loading";
-import useOrders from "@/app/hooks/useOrders";
+import { authOptions } from "@/app/utils/authOptions";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import OrderDetailsHeader from "@/app/components/order/details/OrderDetailsHeader";
 import OrderCustomerDetails from "@/app/components/order/details/OrderCustomerDetails";
@@ -15,27 +12,30 @@ import OrderItems from "@/app/components/order/details/OrderItems";
 import OrderItemsInfo from "@/app/components/order/details/OrderItemsInfo";
 import OrderInvoiceButton from "@/app/components/order/details/OrderInvoiceButton";
 
-export default function ProductDetails({ params }) {
-  const router = useRouter();
-  const { user } = useAuth();
-  const { setIsPageLoading } = useLoading();
-  const [orderList, isOrderListLoading, orderRefetch] = useOrders();
+export default async function ProductDetails({ params }) {
+  const session = await getServerSession(authOptions);
 
-  const order = orderList?.find(
-    (order) =>
-      order?.orderNumber === params.id.toUpperCase() &&
-      order?.customerInfo?.email === user?.email,
-  );
+  let order;
 
-  useEffect(() => {
-    setIsPageLoading(isOrderListLoading || !orderList?.length);
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allOrders`,
+    );
 
-    return () => setIsPageLoading(false);
-  }, [isOrderListLoading, orderList, setIsPageLoading]);
+    const orders = response.data || [];
+    order = orders?.find(
+      (order) =>
+        order?.orderNumber === params.id.toUpperCase() &&
+        order?.customerInfo?.email === session?.user?.email,
+    );
+  } catch (error) {
+    console.error(
+      "Fetch error (orderDetails/orders):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
 
-  useEffect(() => {
-    if (!!orderList?.length && !order) router.push("/user/orders");
-  }, [orderList, order, router]);
+  if (!order) redirect("/user/orders");
 
   return (
     <section className="grow auto-rows-max rounded-md bg-white p-3.5 shadow-[2px_2px_20px_0_rgba(0,0,0,0.075)] xl:p-5">

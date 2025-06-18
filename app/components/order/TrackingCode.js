@@ -1,3 +1,5 @@
+"use client";
+
 import toast from "react-hot-toast";
 import { LuCopy } from "react-icons/lu";
 
@@ -14,14 +16,11 @@ export default function TrackingCode({ trackingCode }) {
   return (
     <div>
       <h4 className="text-nowrap font-semibold">Tracking Code</h4>
-      <span className="flex items-center gap-1 sm:gap-2">
-        {trackingCode && (
-          <LuCopy
-            className="cursor-pointer transition-[color] duration-300 ease-in-out hover:text-neutral-800"
-            size={16}
-            onClick={handleCopyToClipboard}
-          />
-        )}
+      <span
+        className="flex cursor-pointer items-center gap-1 hover:text-neutral-800 sm:gap-2 [&>*]:transition-[color] [&>*]:duration-300 [&>*]:ease-in-out"
+        onClick={handleCopyToClipboard}
+      >
+        {trackingCode && <LuCopy className="" size={16} />}
         <p className="text-nowrap text-right">{trackingCode || "--"}</p>
       </span>
     </div>

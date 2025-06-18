@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import OrderCard from "./OrderCard";
@@ -5,7 +7,7 @@ import TrackOrderModal from "./TrackOrderModal";
 import ReturnOrderModal from "./ReturnOrderModal";
 import ReturnInfoModal from "./ReturnInfoModal";
 
-export default function OrderHistory({ orders, orderRefetch }) {
+export default function OrderHistory({ orders, legalPolicyPdfLinks }) {
   const [isTrackModalOpen, setIsTrackModalOpen] = useState(false);
   const [activeTrackOrder, setActiveTrackOrder] = useState(null);
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
@@ -66,6 +68,7 @@ export default function OrderHistory({ orders, orderRefetch }) {
           isReturnModalOpen={isReturnModalOpen}
           setIsReturnModalOpen={setIsReturnModalOpen}
           activeReturnOrder={activeReturnOrder}
+          legalPolicyPdfLinks={legalPolicyPdfLinks}
           register={register}
           watch={watch}
           control={control}
@@ -74,7 +77,6 @@ export default function OrderHistory({ orders, orderRefetch }) {
           reset={reset}
           trigger={trigger}
           errors={errors}
-          orderRefetch={orderRefetch}
         />
         <ReturnInfoModal
           isReturnInfoModalOpen={isReturnInfoModalOpen}

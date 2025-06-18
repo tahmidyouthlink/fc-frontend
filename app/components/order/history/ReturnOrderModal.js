@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Modal,
   ModalContent,
@@ -11,8 +12,7 @@ import {
 } from "@nextui-org/react";
 import toast from "react-hot-toast";
 import { useLoading } from "@/app/contexts/loading";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
-import usePolicyPages from "@/app/hooks/usePolicyPages";
+import { axiosPublic } from "@/app/utils/axiosPublic";
 import customCurrentDateTimeFormat from "@/app/utils/customCurrentDateTimeFormat";
 import ReturnReasonField from "./ReturnReasonField";
 import ReturnIssueField from "./ReturnIssueField";
@@ -24,6 +24,7 @@ export default function ReturnOrderModal({
   isReturnModalOpen,
   setIsReturnModalOpen,
   activeReturnOrder,
+  legalPolicyPdfLinks,
   register,
   watch,
   control,
@@ -32,12 +33,9 @@ export default function ReturnOrderModal({
   reset,
   trigger,
   errors,
-  orderRefetch,
 }) {
+  const router = useRouter();
   const { setIsPageLoading } = useLoading();
-  const axiosPublic = useAxiosPublic();
-  const [[legalPolicyPdfLinks] = [], isLegalDataLoading, legalDataRefetch] =
-    usePolicyPages();
   const selectedReason = Object.values(watch("reason") || {})[0];
   const selectedIssue = Object.values(watch("issue") || {})[0];
   const returnItems = watch("items");
@@ -141,7 +139,7 @@ export default function ReturnOrderModal({
 
       if (!!response?.data?.modifiedCount) {
         toast.success("Return request has been submitted.");
-        orderRefetch();
+        router.refresh();
         setIsReturnModalOpen(false);
       }
     } catch (error) {
