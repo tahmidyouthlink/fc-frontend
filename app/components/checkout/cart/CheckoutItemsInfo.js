@@ -1,12 +1,10 @@
-import { useEffect, useState } from "react";
-import { useLoading } from "@/app/contexts/loading";
+import { useState } from "react";
 import {
   calculatePromoDiscount,
   calculateShippingCharge,
   calculateSubtotal,
   calculateTotalSpecialOfferDiscount,
 } from "@/app/utils/orderCalculations";
-import useShippingZones from "@/app/hooks/useShippingZones";
 import DiscountTooptip from "../../ui/DiscountTooltip";
 import DiscountModal from "../../ui/DiscountModal";
 
@@ -14,14 +12,12 @@ export default function CheckoutItemsInfo({
   productList,
   cartItems,
   specialOffers,
+  shippingZones,
   userPromoCode,
   isPromoCodeValid,
   selectedCity,
   selectedDeliveryType,
 }) {
-  const { setIsPageLoading } = useLoading();
-  const [shippingZones, isShippingZonesLoading, shippingZonesRefetch] =
-    useShippingZones();
   const [isPromoModalOpen, setIsPromoModalOpen] = useState(false);
   const subtotal = calculateSubtotal(productList, cartItems, specialOffers);
   const totalSpecialOfferDiscount = calculateTotalSpecialOfferDiscount(
@@ -47,12 +43,6 @@ export default function CheckoutItemsInfo({
     (selectedCity === "Dhaka" && selectedDeliveryType === "STANDARD"
       ? 0
       : shippingCharge);
-
-  useEffect(() => {
-    setIsPageLoading(isShippingZonesLoading || !shippingZones?.length);
-
-    return () => setIsPageLoading(false);
-  }, [isShippingZonesLoading, setIsPageLoading, shippingZones]);
 
   return (
     <div className="space-y-2.5 [&>div>*]:z-[1] [&>div>span]:text-right [&>div]:flex [&>div]:justify-between">

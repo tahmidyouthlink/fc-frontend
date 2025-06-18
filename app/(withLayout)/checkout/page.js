@@ -1,645 +1,132 @@
-"use client";
+import axios from "axios";
+import CheckoutContents from "@/app/components/checkout/CheckoutContents";
 
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { TbShoppingCartExclamation } from "react-icons/tb";
-import toast from "react-hot-toast";
-import { useAuth } from "@/app/contexts/auth";
-import { useLoading } from "@/app/contexts/loading";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
-import useProductsInformation from "@/app/hooks/useProductsInformation";
-import useOffers from "@/app/hooks/useOffers";
-import generateOrderId from "@/app/utils/generateOrderId";
-import useOrders from "@/app/hooks/useOrders";
-import useCustomers from "@/app/hooks/useCustomers";
-import useLocations from "@/app/hooks/useLocations";
-import generateCustomerId from "@/app/utils/generateCustomerId";
-import customCurrentDateTimeFormat from "@/app/utils/customCurrentDateTimeFormat";
-import {
-  calculateFinalPrice,
-  calculateProductSpecialOfferDiscount,
-  calculatePromoDiscount,
-  calculateShippingCharge,
-  calculateSubtotal,
-  calculateTotalSpecialOfferDiscount,
-  checkIfOnlyRegularDiscountIsAvailable,
-  checkIfSpecialOfferIsAvailable,
-  getEstimatedDeliveryTime,
-  getExpectedDeliveryDate,
-  getProductSpecialOffer,
-} from "@/app/utils/orderCalculations";
-import useShippingZones from "@/app/hooks/useShippingZones";
-import getImageSetsBasedOnColors from "@/app/utils/getImageSetsBasedOnColors";
-import checkIfPromoCodeIsValid from "@/app/utils/isPromoCodeValid";
-import TransitionLink from "@/app/components/ui/TransitionLink";
-import CheckoutLogin from "@/app/components/checkout/user/CheckoutLogin";
-import CheckoutRegister from "@/app/components/checkout/user/CheckoutRegister";
-import CheckoutPersonalInfo from "@/app/components/checkout/user/CheckoutPersonalInfo";
-import CheckoutDeliveryAddress from "@/app/components/checkout/user/CheckoutDeliveryAddress";
-import CheckoutPromoCode from "@/app/components/checkout/user/CheckoutPromoCode";
-import CheckoutPaymentMethod from "@/app/components/checkout/user/CheckoutPaymentMethod";
-import CheckoutCart from "@/app/components/checkout/cart/CheckoutCart";
-import CheckoutConfirmation from "@/app/components/checkout/CheckoutConfirmation";
-
-export default function Checkout() {
-  const { user, userData, setUserData } = useAuth();
-  const { setIsPageLoading } = useLoading();
-  const axiosPublic = useAxiosPublic();
-  const [productList, isProductListLoading, productRefetch] =
-    useProductsInformation();
-  const [orderList, isOrderListLoading, orderRefetch] = useOrders();
-  const [customerList, isCustomerListLoading, customerRefetch] = useCustomers();
-  const [shippingZones, isShippingZonesLoading, shippingZonesRefetch] =
-    useShippingZones();
-  const [specialOffers, isSpecialOffersLoading, specialOffersRefetch] =
-    useOffers();
-  const [locationList, isLocationListLoading, locationRefetch] = useLocations();
-  const [cartItems, setCartItems] = useState(null);
-  const [userPromoCode, setUserPromoCode] = useState("");
-  const isPromoCodeValid = checkIfPromoCodeIsValid(
-    userPromoCode,
-    calculateSubtotal(productList, cartItems, specialOffers),
-  );
-  const [orderDetails, setOrderDetails] = useState(null);
-  const [isAgreementCheckboxSelected, setIsAgreementCheckboxSelected] =
-    useState(true);
-  const [isPaymentStepDone, setIsPaymentStepDone] = useState(false);
-  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
-
-  const {
-    register,
-    watch,
-    control,
-    setValue,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      name: userData?.userInfo?.personalInfo?.customerName || "",
-      email: userData?.email || "",
-      hometown: userData?.userInfo?.personalInfo?.hometown || "",
-      phoneNumber: userData?.userInfo?.personalInfo?.phoneNumber || "",
-      altPhoneNumber: userData?.userInfo?.personalInfo?.phoneNumber2 || "",
-      addressLineOne: userData?.userInfo?.savedDeliveryAddress?.address1 || "",
-      addressLineTwo: userData?.userInfo?.savedDeliveryAddress?.address2 || "",
-      city: userData?.userInfo?.savedDeliveryAddress?.city || "",
-      postalCode: userData?.userInfo?.savedDeliveryAddress?.postalCode || "",
-      note: "",
-      deliveryType: "",
-      paymentMethod: "",
-    },
-    mode: "onBlur",
-  });
-
-  const formData = watch();
-  const selectedCity = watch("city");
-  const selectedDeliveryType = watch("deliveryType");
-
-  const onSubmit = async (data) => {
-    if (isAgreementCheckboxSelected) {
-      setIsPageLoading(true);
-
-      const allOrderIds = orderList?.map((order) => order.orderNumber);
-      const allCustomerIds = customerList?.map(
-        (customer) => customer.userInfo?.customerId,
-      );
-      const subtotal = calculateSubtotal(productList, cartItems, specialOffers);
-      const totalSpecialOfferDiscount = calculateTotalSpecialOfferDiscount(
-        productList,
-        cartItems,
-        specialOffers,
-      );
-      const promoDiscount = calculatePromoDiscount(
-        productList,
-        cartItems,
-        userPromoCode,
-        specialOffers,
-      );
-      const shippingCharge =
-        selectedCity === "Dhaka" && selectedDeliveryType === "STANDARD"
-          ? 0
-          : calculateShippingCharge(
-              selectedCity,
-              selectedDeliveryType,
-              shippingZones,
-            );
-      const total =
-        subtotal - totalSpecialOfferDiscount - promoDiscount + shippingCharge;
-      const selectedProducts = cartItems?.map((cartItem) => {
-        const correspondingProduct = productList?.find(
-          (product) => product._id === cartItem._id,
-        );
-        const specialOffer = getProductSpecialOffer(
-          correspondingProduct,
-          specialOffers,
-          subtotal,
-        );
-
-        return {
-          _id: cartItem._id,
-          productTitle: correspondingProduct?.productTitle,
-          productId: correspondingProduct?.productId,
-          batchCode: correspondingProduct?.batchCode,
-          size: /^\d+$/.test(cartItem.selectedSize)
-            ? Number(cartItem.selectedSize)
-            : cartItem.selectedSize,
-          color: cartItem.selectedColor,
-          sku: cartItem.selectedQuantity,
-          vendors: correspondingProduct?.vendors?.map((vendor) => vendor.label),
-          thumbnailImgUrl: getImageSetsBasedOnColors(
-            correspondingProduct?.productVariants,
-          )?.find((imgSet) => imgSet.color._id === cartItem.selectedColor._id)
-            ?.images[0],
-          regularPrice: Number(correspondingProduct?.regularPrice),
-          discountInfo: checkIfOnlyRegularDiscountIsAvailable(
-            correspondingProduct,
-            specialOffers,
-          )
-            ? {
-                discountType: correspondingProduct?.discountType,
-                discountValue: correspondingProduct?.discountValue,
-                finalPriceAfterDiscount: calculateFinalPrice(
-                  correspondingProduct,
-                  specialOffers,
-                ),
-              }
-            : null,
-          offerInfo: !specialOffer
-            ? null
-            : {
-                offerTitle: specialOffer?.offerTitle,
-                offerDiscountType: specialOffer?.offerDiscountType,
-                offerDiscountValue: specialOffer?.offerDiscountValue,
-                appliedOfferDiscount: calculateProductSpecialOfferDiscount(
-                  correspondingProduct,
-                  cartItem,
-                  specialOffer,
-                ),
-              },
-        };
-      });
-
-      const dateTime = customCurrentDateTimeFormat();
-      const estimatedTime = getEstimatedDeliveryTime(
-        data.city,
-        data.deliveryType,
-        shippingZones,
-      );
-      const expectedDeliveryDate = getExpectedDeliveryDate(
-        dateTime,
-        data.deliveryType || "STANDARD",
-        estimatedTime,
-      );
-
-      const userAgent = navigator.userAgent.toLowerCase();
-      let userDevice;
-
-      if (/mobile|android|iphone|ipad|ipod|blackberry|phone/.test(userAgent)) {
-        userDevice = "Mobile";
-      } else if (/tablet|ipad/.test(userAgent)) {
-        userDevice = "Tablet";
-      } else {
-        userDevice = "Desktop";
-      }
-
-      const newOrderData = {
-        orderNumber: generateOrderId(allOrderIds, data.name, data.phoneNumber),
-        dateTime,
-        customerInfo: {
-          customerName: data.name,
-          customerId:
-            userData?.userInfo?.customerId ||
-            generateCustomerId(allCustomerIds),
-          email: data.email,
-          phoneNumber: data.phoneNumber,
-          phoneNumber2: data.altPhoneNumber,
-          hometown: data.hometown || userData?.userInfo?.personalInfo?.hometown,
-        },
-        deliveryInfo: {
-          address1: data.addressLineOne,
-          address2: data.addressLineTwo,
-          city: data.city,
-          postalCode: data.postalCode,
-          noteToSeller: data.note,
-          deliveryMethod: data.deliveryType || "STANDARD",
-          estimatedTime,
-          expectedDeliveryDate,
-        },
-        productInformation: selectedProducts,
-        subtotal,
-        promoInfo: !isPromoCodeValid
-          ? null
-          : {
-              _id: userPromoCode?._id,
-              promoCode: userPromoCode?.promoCode,
-              promoDiscountType: userPromoCode?.promoDiscountType,
-              promoDiscountValue: userPromoCode?.promoDiscountValue,
-              appliedPromoDiscount: promoDiscount,
-            },
-        totalSpecialOfferDiscount,
-        shippingCharge,
-        total,
-        paymentInfo: {
-          paymentMethod: data.paymentMethod === "bkash" ? "bKash" : "SSL",
-          paymentStatus: "Paid",
-          transactionId: `TXN${Math.random().toString().slice(2, 12)}`,
-        },
-        orderStatus: "Pending",
-        userDevice,
-      };
-
-      try {
-        const response = await axiosPublic.post("/addOrder", newOrderData);
-
-        if (response?.data?.insertedId) {
-          setOrderDetails({
-            orderNumber: generateOrderId(
-              allOrderIds,
-              data.name,
-              data.phoneNumber,
-            ),
-            phoneNumber: data.phoneNumber,
-            totalAmount: total,
-            address1: data.addressLineOne,
-            address2: data.addressLineTwo,
-            city: data.city,
-            postalCode: data.postalCode,
-          });
-          setIsPaymentStepDone(true);
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-          });
-        } else toast.error("Unable to store order data to server.");
-      } catch (error) {
-        toast.error("Failed store data in server."); // If server error occurs
-      }
-
-      const updatedPersonalInfo = {
-        ...userData.userInfo.personalInfo,
-        phoneNumber: data.phoneNumber,
-        phoneNumber2: data.altPhoneNumber,
-        hometown: userData?.userInfo?.personalInfo?.hometown || data.hometown,
-      };
-
-      const existingAddressId = userData?.userInfo?.deliveryAddresses?.find(
-        (address) =>
-          address?.address1 === data.addressLineOne &&
-          address?.address2 === data.addressLineTwo &&
-          address?.city === data.city &&
-          address?.postalCode === data.postalCode,
-      )?.id;
-
-      const updatedDeliveryAddresses = !existingAddressId
-        ? [
-            ...userData.userInfo.deliveryAddresses,
-            {
-              id: `${userData?.email}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-              nickname: undefined,
-              address1: data.addressLineOne,
-              address2: data.addressLineTwo,
-              city: data.city,
-              postalCode: data.postalCode,
-            },
-          ]
-        : userData?.userInfo?.deliveryAddresses?.map((availableAddress) =>
-            availableAddress.id == existingAddressId
-              ? {
-                  ...availableAddress,
-                  address1: data.addressLineOne,
-                  address2: data.addressLineTwo,
-                  city: data.city,
-                  postalCode: data.postalCode,
-                }
-              : availableAddress,
-          );
-
-      const currentWishlist = JSON.parse(localStorage.getItem("wishlistItems"));
-      const currentCart = JSON.parse(localStorage.getItem("cartItems"));
-
-      const updatedWishlist = currentWishlist.filter(
-        (wishlistItem) =>
-          !currentCart.some((cartItem) => wishlistItem._id === cartItem._id),
-      );
-
-      const updatedUserData = {
-        ...userData,
-        userInfo: {
-          ...userData.userInfo,
-          personalInfo: updatedPersonalInfo,
-          deliveryAddresses: updatedDeliveryAddresses,
-          savedDeliveryAddress: {
-            address1: data.addressLineOne,
-            address2: data.addressLineTwo,
-            city: data.city,
-            postalCode: data.postalCode,
-          },
-        },
-        cartItems: [],
-        wishlistItems: updatedWishlist,
-      };
-
-      setUserData(updatedUserData);
-
-      try {
-        await axiosPublic.put(
-          `/updateUserInformation/${userData?._id}`,
-          updatedUserData,
-        );
-
-        localStorage.removeItem("checkoutFormDraft");
-        localStorage.removeItem("cartItems");
-        window.dispatchEvent(new Event("storageCart"));
-        localStorage.setItem("wishlistItems", JSON.stringify(updatedWishlist));
-        window.dispatchEvent(new Event("storageWishlist"));
-      } catch (error) {
-        toast.error("Failed update data in server."); // If server error occurs
-      }
-
-      setIsPageLoading(false);
-    } else
-      toast.error("You must agree with the terms and conditions and policies.");
-  };
-
-  const onError = (errors) => {
-    const errorTypes = Object.values(errors).map((error) => error.type);
-
-    if (errorTypes.includes("required"))
-      toast.error("Please fill up the required fields.");
-    else if (errorTypes.includes("pattern") || errorTypes.includes("validate"))
-      toast.error("Please provide valid information.");
-    else if (
-      errorTypes.includes("notMatchingWithConfirm") ||
-      errorTypes.includes("notMatchingWithNew")
-    )
-      toast.error("Passwords do not match.");
-    else toast.error("Something went wrong. Please try again.");
-  };
-
-  useEffect(() => {
-    setValue("deliveryType", "");
-  }, [selectedCity, setValue]);
-
-  // Save form data to localStorage on input change
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      localStorage.setItem("checkoutFormDraft", JSON.stringify(formData));
-    }, 500); // debounce to prevent excessive writes
-
-    return () => clearTimeout(timeout);
-  }, [formData]);
-
-  // Load draft from localStorage or update form on user session change
-  useEffect(() => {
-    const draftData = (() => {
-      try {
-        const raw = localStorage.getItem("checkoutFormDraft");
-        return raw ? JSON.parse(raw) : {};
-      } catch (e) {
-        console.error("Failed to parse form draft from localStorage:", e);
-        return {};
-      }
-    })();
-
-    reset({
-      name:
-        userData?.userInfo?.personalInfo?.customerName ?? draftData.name ?? "",
-      email: userData?.email ?? draftData.email ?? "",
-      hometown:
-        draftData.hometown ?? userData?.userInfo?.personalInfo?.hometown ?? "",
-      phoneNumber:
-        draftData.phoneNumber ??
-        userData?.userInfo?.personalInfo?.phoneNumber ??
-        "",
-      altPhoneNumber:
-        draftData.altPhoneNumber ??
-        userData?.userInfo?.personalInfo?.phoneNumber2 ??
-        "",
-      addressLineOne:
-        draftData.addressLineOne ??
-        userData?.userInfo?.savedDeliveryAddress?.address1 ??
-        "",
-      addressLineTwo:
-        draftData.addressLineTwo ??
-        userData?.userInfo?.savedDeliveryAddress?.address2 ??
-        "",
-      city:
-        draftData.city ?? userData?.userInfo?.savedDeliveryAddress?.city ?? "",
-      postalCode:
-        draftData.postalCode ??
-        userData?.userInfo?.savedDeliveryAddress?.postalCode ??
-        "",
-      note: draftData.note ?? "",
-      deliveryType: draftData.deliveryType ?? "",
-      paymentMethod: draftData.paymentMethod ?? "",
-    });
-  }, [reset, userData]);
-
-  useEffect(() => {
-    const autocompleteElements = document.querySelectorAll(
-      "[aria-autocomplete]",
-    );
-
-    const handleAutocompleteClick = (event) =>
-      event.currentTarget.querySelector("input").focus();
-
-    autocompleteElements.forEach((element) => {
-      element
-        .closest('[data-slot="base"]')
-        .addEventListener("click", handleAutocompleteClick);
-    });
-
-    autocompleteElements.forEach((element) => {
-      return () =>
-        element
-          .closest('[data-slot="base"]')
-          .removeEventListener("click", handleAutocompleteClick);
-    });
-  }, []);
-
-  useEffect(() => {
-    setIsPageLoading(
-      isProductListLoading ||
-        !productList?.length ||
-        isSpecialOffersLoading ||
-        !specialOffers?.length ||
-        isLocationListLoading ||
-        !locationList?.length,
-    );
-
-    return () => setIsPageLoading(false);
-  }, [
-    isProductListLoading,
-    productList,
-    isSpecialOffersLoading,
+export default async function Checkout() {
+  let productList,
     specialOffers,
-    isLocationListLoading,
-    locationList,
-    setIsPageLoading,
-  ]);
+    shippingZones,
+    primaryLocation,
+    allOrderIds,
+    allCustomerIds,
+    legalPolicyPdfLinks,
+    promos;
 
-  useEffect(() => {
-    if (!user) {
-      setIsPaymentStepDone(false);
-      setOrderDetails(null);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (!!productList) {
-      const localCart = JSON.parse(localStorage.getItem("cartItems"));
-      const filteredLocalCart = localCart?.filter(
-        (localItem) =>
-          !!productList?.find(
-            (product) =>
-              product?._id === localItem._id && product?.status === "active",
-          ),
-      );
-
-      setCartItems(filteredLocalCart);
-      if (localCart?.length !== filteredLocalCart?.length) {
-        localStorage.setItem("cartItems", JSON.stringify(filteredLocalCart));
-      }
-    }
-
-    const handleStorageUpdate = () =>
-      setCartItems(JSON.parse(localStorage.getItem("cartItems")));
-
-    window.addEventListener("storageCart", handleStorageUpdate);
-
-    return () => {
-      window.removeEventListener("storageCart", handleStorageUpdate);
-    };
-  }, [productList]);
-
-  if (isPaymentStepDone)
-    return (
-      <CheckoutConfirmation
-        orderDetails={orderDetails}
-        isPaymentStepDone={isPaymentStepDone}
-      />
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allProducts`,
     );
+    productList = response.data || [];
+  } catch (error) {
+    console.error(
+      "Fetch error (checkout/products):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allOffers`,
+    );
+    specialOffers = response.data || [];
+  } catch (error) {
+    console.error(
+      "Fetch error (checkout/specialOffers):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allShippingZones`,
+    );
+    shippingZones = response.data || [];
+  } catch (error) {
+    console.error(
+      "Fetch error (checkout/shippingZones):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allLocations`,
+    );
+
+    const locations = response.data || [];
+    primaryLocation = locations?.find(
+      (location) => location?.isPrimaryLocation == true,
+    )?.locationName;
+  } catch (error) {
+    console.error(
+      "Fetch error (checkout/locations):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allOrders`,
+    );
+
+    const orders = response.data || [];
+    allOrderIds = orders?.map((order) => order.orderNumber);
+  } catch (error) {
+    console.error(
+      "Fetch error (checkout/orders):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allCustomerDetails`,
+    );
+
+    const customers = response.data || [];
+    allCustomerIds = customers?.map(
+      (customer) => customer.userInfo?.customerId,
+    );
+  } catch (error) {
+    console.error(
+      "Fetch error (checkout/customers):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/get-all-policy-pdfs`,
+    );
+    legalPolicyPdfLinks = response.data[0] || {};
+  } catch (error) {
+    console.error(
+      "Fetch error (checkout/legalPolicyPdfLinks):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allPromoCodes`,
+    );
+    promos = response.data || {};
+  } catch (error) {
+    console.error(
+      "Fetch error (checkout/promos):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
 
   return (
-    <main
-      className={`relative -mt-[calc(256*4px)] pb-[var(--section-padding-double)] text-sm text-neutral-500 max-sm:-mt-[calc(256*2px)] md:text-base lg:pb-[var(--section-padding)] [&_h2]:uppercase [&_h2]:text-neutral-700 ${!!cartItems?.length ? "bg-neutral-50" : "bg-white font-semibold"}`}
-    >
-      {/* Left Mesh Gradient */}
-      <div
-        className={`sticky left-[5%] top-[55%] animate-blob bg-[var(--color-moving-bubble-secondary)] max-sm:hidden ${!cartItems?.length ? "opacity-0" : "opacity-100"}`}
-      />
-      {/* Middle-Left Mesh Gradient */}
-      <div
-        className={`sticky left-[30%] top-[5%] animate-blob bg-[var(--color-moving-bubble-primary)] [animation-delay:1.5s] max-sm:left-[5%] ${!cartItems?.length ? "opacity-0" : "opacity-100"}`}
-      />
-      {/* Middle-Right Mesh Gradient */}
-      <div
-        className={`sticky left-[55%] top-[60%] animate-blob bg-[var(--color-moving-bubble-secondary)] [animation-delay:0.5s] max-sm:left-3/4 ${!cartItems?.length ? "opacity-0" : "opacity-100"}`}
-      />
-      {/* Right Mesh Gradient */}
-      <div
-        className={`sticky left-[80%] top-1/3 animate-blob bg-[var(--color-moving-bubble-primary)] [animation-delay:2s] max-sm:hidden ${!cartItems?.length ? "opacity-0" : "opacity-100"}`}
-      />
-      {!!cartItems?.length ? (
-        <div className="pt-header-h-full-section-pb relative min-h-dvh gap-4 px-5 sm:px-8 lg:flex lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0">
-          <div className="bottom-[var(--section-padding)] top-[var(--section-padding)] h-fit space-y-4 lg:sticky lg:w-[calc(55%-16px/2)]">
-            {!user && (
-              <CheckoutLogin
-                onError={onError}
-                setIsPageLoading={setIsPageLoading}
-                setIsRegisterModalOpen={setIsRegisterModalOpen}
-              />
-            )}
-            <CheckoutRegister
-              setUserData={setUserData}
-              onError={onError}
-              setIsPageLoading={setIsPageLoading}
-              isRegisterModalOpen={isRegisterModalOpen}
-              setIsRegisterModalOpen={setIsRegisterModalOpen}
-            />
-            <form
-              className="space-y-4"
-              noValidate
-              onSubmit={handleSubmit(onSubmit, onError)}
-            >
-              <CheckoutPersonalInfo
-                register={register}
-                control={control}
-                errors={errors}
-                isUserLoggedIn={!!userData}
-                userHometown={userData?.userInfo?.personalInfo?.hometown}
-              />
-              <CheckoutDeliveryAddress
-                register={register}
-                control={control}
-                reset={reset}
-                errors={errors}
-                deliveryAddresses={userData?.userInfo?.deliveryAddresses}
-                selectedCity={selectedCity}
-                selectedDeliveryType={selectedDeliveryType}
-                shippingZones={shippingZones}
-              />
-              {/* If none of the cart item has special offer, show promo code section */}
-              {cartItems?.every(
-                (cartItem) =>
-                  !checkIfSpecialOfferIsAvailable(
-                    productList?.find(
-                      (product) => product._id === cartItem._id,
-                    ),
-                    specialOffers,
-                  ),
-              ) && (
-                <CheckoutPromoCode
-                  userPromoCode={userPromoCode}
-                  setUserPromoCode={setUserPromoCode}
-                  cartItems={cartItems}
-                  cartSubtotal={calculateSubtotal(
-                    productList,
-                    cartItems,
-                    specialOffers,
-                  )}
-                />
-              )}
-              <CheckoutPaymentMethod
-                register={register}
-                errors={errors}
-                isPromoCodeValid={isPromoCodeValid}
-              />
-            </form>
-          </div>
-          <CheckoutCart
-            productList={productList}
-            cartItems={cartItems}
-            specialOffers={specialOffers}
-            primaryLocation={
-              locationList?.find(
-                (location) => location.isPrimaryLocation == true,
-              )?.locationName
-            }
-            userPromoCode={userPromoCode}
-            isPromoCodeValid={isPromoCodeValid}
-            selectedCity={selectedCity}
-            selectedDeliveryType={selectedDeliveryType}
-            isAgreementCheckboxSelected={isAgreementCheckboxSelected}
-            setIsAgreementCheckboxSelected={setIsAgreementCheckboxSelected}
-            handleSubmit={handleSubmit}
-            onSubmit={onSubmit}
-            onError={onError}
-          />
-        </div>
-      ) : (
-        <div className="pt-header-h-full-section-pb flex min-h-dvh flex-col items-center justify-center font-semibold [&>*]:w-fit">
-          <TbShoppingCartExclamation className="size-24 text-[var(--color-secondary-500)]" />
-          <p className="mt-2 text-neutral-400">The cart is empty.</p>
-          <TransitionLink
-            href="/shop"
-            className="mt-9 block rounded-[4px] bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
-          >
-            Return to Shop
-          </TransitionLink>
-        </div>
-      )}
-    </main>
+    <CheckoutContents
+      productList={productList}
+      specialOffers={specialOffers}
+      shippingZones={shippingZones}
+      primaryLocation={primaryLocation}
+      allOrderIds={allOrderIds}
+      allCustomerIds={allCustomerIds}
+      legalPolicyPdfLinks={legalPolicyPdfLinks}
+      promos={promos}
+    />
   );
 }

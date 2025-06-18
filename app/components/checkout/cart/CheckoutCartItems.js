@@ -6,7 +6,7 @@ import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { FaCircleCheck } from "react-icons/fa6";
 import { FaExclamationCircle } from "react-icons/fa";
 import { useAuth } from "@/app/contexts/auth";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import { axiosPublic } from "@/app/utils/axiosPublic";
 import {
   calculateFinalPrice,
   calculateProductSpecialOfferDiscount,
@@ -28,7 +28,6 @@ export default function CheckoutCartItems({
   primaryLocation,
 }) {
   const { user, userData, setUserData } = useAuth();
-  const axiosPublic = useAxiosPublic();
   const cartSubtotal = calculateSubtotal(productList, cartItems, specialOffers);
   const [isSpecialOfferModalOpen, setIsSpecialOfferModalOpen] = useState(false);
   const [activeModalItem, setActiveModalItem] = useState(null);

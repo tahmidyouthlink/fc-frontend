@@ -1,14 +1,11 @@
 import Link from "next/link";
 import { Checkbox } from "@nextui-org/react";
-import usePolicyPages from "@/app/hooks/usePolicyPages";
 
 export default function CheckoutAgreement({
   isAgreementCheckboxSelected,
   setIsAgreementCheckboxSelected,
+  legalPolicyPdfLinks,
 }) {
-  const [[legalPolicyPdfLinks] = [], isLegalDataLoading, legalDataRefetch] =
-    usePolicyPages();
-
   return (
     <div
       className={`flex gap-x-2 [&_a]:underline [&_a]:underline-offset-2 [&_span]:text-xs lg:[&_span]:text-[13px] ${isAgreementCheckboxSelected ? "[&_a]:text-[var(--color-primary-900)]" : "[&_a]:text-[#f31260]"}`}

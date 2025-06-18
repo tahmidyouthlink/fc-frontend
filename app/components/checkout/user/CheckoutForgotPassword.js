@@ -9,10 +9,9 @@ import {
   Button,
 } from "@nextui-org/react";
 import toast from "react-hot-toast";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import { axiosPublic } from "@/app/utils/axiosPublic";
 
 export default function CheckoutForgotPassword({ setIsPageLoading }) {
-  const axiosPublic = useAxiosPublic();
   const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] =
     useState(false);
 

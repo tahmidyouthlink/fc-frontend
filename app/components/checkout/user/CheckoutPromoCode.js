@@ -1,23 +1,14 @@
 import { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
-import { useLoading } from "@/app/contexts/loading";
-import usePromoCodes from "@/app/hooks/usePromoCodes";
 
 export default function CheckoutPromoCode({
+  promos,
   userPromoCode,
   setUserPromoCode,
   cartItems,
   cartSubtotal,
 }) {
-  const { setIsPageLoading } = useLoading();
-  const [promos, isPromosPending, promosRefetch] = usePromoCodes();
   const [promoMessage, setPromoMessage] = useState();
-
-  useEffect(() => {
-    setIsPageLoading(isPromosPending || !promos?.length);
-
-    return () => setIsPageLoading(false);
-  }, [promos, isPromosPending, setIsPageLoading]);
 
   useEffect(() => {
     const updatedPromoMessage = !userPromoCode

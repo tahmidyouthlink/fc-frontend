@@ -11,8 +11,7 @@ import {
 } from "@nextui-org/react";
 import toast from "react-hot-toast";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
-import usePolicyPages from "@/app/hooks/usePolicyPages";
+import { axiosPublic } from "@/app/utils/axiosPublic";
 import generateCustomerId from "@/app/utils/generateCustomerId";
 import GoogleSignInButton from "../../layout/header/auth/GoogleSignInButton";
 
@@ -22,10 +21,9 @@ export default function CheckoutRegister({
   setIsPageLoading,
   isRegisterModalOpen,
   setIsRegisterModalOpen,
+  legalPolicyPdfLinks,
+  allCustomerIds,
 }) {
-  const axiosPublic = useAxiosPublic();
-  const [[legalPolicyPdfLinks] = [], isLegalDataLoading, legalDataRefetch] =
-    usePolicyPages();
   const [isNewPasswordVisible, SetIsNewPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, SetIsConfirmPasswordVisible] =
     useState(false);
@@ -63,13 +61,6 @@ export default function CheckoutRegister({
     setIsPageLoading(true);
 
     try {
-      const { data: customerList } = await axiosPublic.get(
-        "/allCustomerDetails",
-      );
-      const allCustomerIds = customerList?.map(
-        (customer) => customer.userInfo?.customerId,
-      );
-
       const newUserData = {
         email: data.registerEmail,
         password: data.registerPassword,

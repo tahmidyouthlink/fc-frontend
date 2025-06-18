@@ -10,6 +10,7 @@ export default function CheckoutCart({
   productList,
   cartItems,
   specialOffers,
+  shippingZones,
   primaryLocation,
   userPromoCode,
   isPromoCodeValid,
@@ -20,6 +21,7 @@ export default function CheckoutCart({
   onError,
   isAgreementCheckboxSelected,
   setIsAgreementCheckboxSelected,
+  legalPolicyPdfLinks,
 }) {
   const isSpecialOfferApplied = cartItems.some((cartItem) => {
     const product = productList?.find(
@@ -55,6 +57,7 @@ export default function CheckoutCart({
               productList={productList}
               cartItems={cartItems}
               specialOffers={specialOffers}
+              shippingZones={shippingZones}
               isPromoCodeValid={isPromoCodeValid}
               userPromoCode={userPromoCode}
               selectedCity={selectedCity}
@@ -64,6 +67,7 @@ export default function CheckoutCart({
             <CheckoutAgreement
               isAgreementCheckboxSelected={isAgreementCheckboxSelected}
               setIsAgreementCheckboxSelected={setIsAgreementCheckboxSelected}
+              legalPolicyPdfLinks={legalPolicyPdfLinks}
             />
             <button
               onClick={() => handleSubmit(onSubmit, onError)()}
