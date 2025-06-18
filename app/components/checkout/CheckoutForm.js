@@ -85,265 +85,268 @@ export default function CheckoutForm({
   const selectedDeliveryType = watch("deliveryType");
 
   const onSubmit = async (data) => {
-    if (isAgreementCheckboxSelected) {
-      setIsPageLoading(true);
+    if (!isAgreementCheckboxSelected)
+      return toast.error(
+        "You must agree with the terms and conditions and policies.",
+      );
 
-      const subtotal = calculateSubtotal(productList, cartItems, specialOffers);
-      const totalSpecialOfferDiscount = calculateTotalSpecialOfferDiscount(
-        productList,
-        cartItems,
-        specialOffers,
+    if (!user) return toast.error("Please log in or register to continue.");
+
+    setIsPageLoading(true);
+
+    const subtotal = calculateSubtotal(productList, cartItems, specialOffers);
+    const totalSpecialOfferDiscount = calculateTotalSpecialOfferDiscount(
+      productList,
+      cartItems,
+      specialOffers,
+    );
+    const promoDiscount = calculatePromoDiscount(
+      productList,
+      cartItems,
+      userPromoCode,
+      specialOffers,
+    );
+    const shippingCharge =
+      selectedCity === "Dhaka" && selectedDeliveryType === "STANDARD"
+        ? 0
+        : calculateShippingCharge(
+            selectedCity,
+            selectedDeliveryType,
+            shippingZones,
+          );
+    const total =
+      subtotal - totalSpecialOfferDiscount - promoDiscount + shippingCharge;
+    const selectedProducts = cartItems?.map((cartItem) => {
+      const correspondingProduct = productList?.find(
+        (product) => product._id === cartItem._id,
       );
-      const promoDiscount = calculatePromoDiscount(
-        productList,
-        cartItems,
-        userPromoCode,
+      const specialOffer = getProductSpecialOffer(
+        correspondingProduct,
         specialOffers,
+        subtotal,
       );
-      const shippingCharge =
-        selectedCity === "Dhaka" && selectedDeliveryType === "STANDARD"
-          ? 0
-          : calculateShippingCharge(
-              selectedCity,
-              selectedDeliveryType,
-              shippingZones,
-            );
-      const total =
-        subtotal - totalSpecialOfferDiscount - promoDiscount + shippingCharge;
-      const selectedProducts = cartItems?.map((cartItem) => {
-        const correspondingProduct = productList?.find(
-          (product) => product._id === cartItem._id,
-        );
-        const specialOffer = getProductSpecialOffer(
+
+      return {
+        _id: cartItem._id,
+        productTitle: correspondingProduct?.productTitle,
+        productId: correspondingProduct?.productId,
+        batchCode: correspondingProduct?.batchCode,
+        size: /^\d+$/.test(cartItem.selectedSize)
+          ? Number(cartItem.selectedSize)
+          : cartItem.selectedSize,
+        color: cartItem.selectedColor,
+        sku: cartItem.selectedQuantity,
+        vendors: correspondingProduct?.vendors?.map((vendor) => vendor.label),
+        thumbnailImgUrl: getImageSetsBasedOnColors(
+          correspondingProduct?.productVariants,
+        )?.find((imgSet) => imgSet.color._id === cartItem.selectedColor._id)
+          ?.images[0],
+        regularPrice: Number(correspondingProduct?.regularPrice),
+        discountInfo: checkIfOnlyRegularDiscountIsAvailable(
           correspondingProduct,
           specialOffers,
-          subtotal,
-        );
+        )
+          ? {
+              discountType: correspondingProduct?.discountType,
+              discountValue: correspondingProduct?.discountValue,
+              finalPriceAfterDiscount: calculateFinalPrice(
+                correspondingProduct,
+                specialOffers,
+              ),
+            }
+          : null,
+        offerInfo: !specialOffer
+          ? null
+          : {
+              offerTitle: specialOffer?.offerTitle,
+              offerDiscountType: specialOffer?.offerDiscountType,
+              offerDiscountValue: specialOffer?.offerDiscountValue,
+              appliedOfferDiscount: calculateProductSpecialOfferDiscount(
+                correspondingProduct,
+                cartItem,
+                specialOffer,
+              ),
+            },
+      };
+    });
 
-        return {
-          _id: cartItem._id,
-          productTitle: correspondingProduct?.productTitle,
-          productId: correspondingProduct?.productId,
-          batchCode: correspondingProduct?.batchCode,
-          size: /^\d+$/.test(cartItem.selectedSize)
-            ? Number(cartItem.selectedSize)
-            : cartItem.selectedSize,
-          color: cartItem.selectedColor,
-          sku: cartItem.selectedQuantity,
-          vendors: correspondingProduct?.vendors?.map((vendor) => vendor.label),
-          thumbnailImgUrl: getImageSetsBasedOnColors(
-            correspondingProduct?.productVariants,
-          )?.find((imgSet) => imgSet.color._id === cartItem.selectedColor._id)
-            ?.images[0],
-          regularPrice: Number(correspondingProduct?.regularPrice),
-          discountInfo: checkIfOnlyRegularDiscountIsAvailable(
-            correspondingProduct,
-            specialOffers,
-          )
-            ? {
-                discountType: correspondingProduct?.discountType,
-                discountValue: correspondingProduct?.discountValue,
-                finalPriceAfterDiscount: calculateFinalPrice(
-                  correspondingProduct,
-                  specialOffers,
-                ),
-              }
-            : null,
-          offerInfo: !specialOffer
-            ? null
-            : {
-                offerTitle: specialOffer?.offerTitle,
-                offerDiscountType: specialOffer?.offerDiscountType,
-                offerDiscountValue: specialOffer?.offerDiscountValue,
-                appliedOfferDiscount: calculateProductSpecialOfferDiscount(
-                  correspondingProduct,
-                  cartItem,
-                  specialOffer,
-                ),
-              },
-        };
-      });
+    const dateTime = customCurrentDateTimeFormat();
+    const estimatedTime = getEstimatedDeliveryTime(
+      data.city,
+      data.deliveryType,
+      shippingZones,
+    );
+    const expectedDeliveryDate = getExpectedDeliveryDate(
+      dateTime,
+      data.deliveryType || "STANDARD",
+      estimatedTime,
+    );
 
-      const dateTime = customCurrentDateTimeFormat();
-      const estimatedTime = getEstimatedDeliveryTime(
-        data.city,
-        data.deliveryType,
-        shippingZones,
-      );
-      const expectedDeliveryDate = getExpectedDeliveryDate(
-        dateTime,
-        data.deliveryType || "STANDARD",
+    const userAgent = navigator.userAgent.toLowerCase();
+    let userDevice;
+
+    if (/mobile|android|iphone|ipad|ipod|blackberry|phone/.test(userAgent)) {
+      userDevice = "Mobile";
+    } else if (/tablet|ipad/.test(userAgent)) {
+      userDevice = "Tablet";
+    } else {
+      userDevice = "Desktop";
+    }
+
+    const newOrderData = {
+      orderNumber: generateOrderId(allOrderIds, data.name, data.phoneNumber),
+      dateTime,
+      customerInfo: {
+        customerName: data.name,
+        customerId:
+          userData?.userInfo?.customerId || generateCustomerId(allCustomerIds),
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        phoneNumber2: data.altPhoneNumber,
+        hometown: data.hometown || userData?.userInfo?.personalInfo?.hometown,
+      },
+      deliveryInfo: {
+        address1: data.addressLineOne,
+        address2: data.addressLineTwo,
+        city: data.city,
+        postalCode: data.postalCode,
+        noteToSeller: data.note,
+        deliveryMethod: data.deliveryType || "STANDARD",
         estimatedTime,
-      );
+        expectedDeliveryDate,
+      },
+      productInformation: selectedProducts,
+      subtotal,
+      promoInfo: !isPromoCodeValid
+        ? null
+        : {
+            _id: userPromoCode?._id,
+            promoCode: userPromoCode?.promoCode,
+            promoDiscountType: userPromoCode?.promoDiscountType,
+            promoDiscountValue: userPromoCode?.promoDiscountValue,
+            appliedPromoDiscount: promoDiscount,
+          },
+      totalSpecialOfferDiscount,
+      shippingCharge,
+      total,
+      paymentInfo: {
+        paymentMethod: data.paymentMethod === "bkash" ? "bKash" : "SSL",
+        paymentStatus: "Paid",
+        transactionId: `TXN${Math.random().toString().slice(2, 12)}`,
+      },
+      orderStatus: "Pending",
+      userDevice,
+    };
 
-      const userAgent = navigator.userAgent.toLowerCase();
-      let userDevice;
+    try {
+      const response = await axiosPublic.post("/addOrder", newOrderData);
 
-      if (/mobile|android|iphone|ipad|ipod|blackberry|phone/.test(userAgent)) {
-        userDevice = "Mobile";
-      } else if (/tablet|ipad/.test(userAgent)) {
-        userDevice = "Tablet";
-      } else {
-        userDevice = "Desktop";
-      }
-
-      const newOrderData = {
-        orderNumber: generateOrderId(allOrderIds, data.name, data.phoneNumber),
-        dateTime,
-        customerInfo: {
-          customerName: data.name,
-          customerId:
-            userData?.userInfo?.customerId ||
-            generateCustomerId(allCustomerIds),
-          email: data.email,
+      if (response?.data?.insertedId) {
+        setOrderDetails({
+          orderNumber: generateOrderId(
+            allOrderIds,
+            data.name,
+            data.phoneNumber,
+          ),
           phoneNumber: data.phoneNumber,
-          phoneNumber2: data.altPhoneNumber,
-          hometown: data.hometown || userData?.userInfo?.personalInfo?.hometown,
-        },
-        deliveryInfo: {
+          totalAmount: total,
           address1: data.addressLineOne,
           address2: data.addressLineTwo,
           city: data.city,
           postalCode: data.postalCode,
-          noteToSeller: data.note,
-          deliveryMethod: data.deliveryType || "STANDARD",
-          estimatedTime,
-          expectedDeliveryDate,
-        },
-        productInformation: selectedProducts,
-        subtotal,
-        promoInfo: !isPromoCodeValid
-          ? null
-          : {
-              _id: userPromoCode?._id,
-              promoCode: userPromoCode?.promoCode,
-              promoDiscountType: userPromoCode?.promoDiscountType,
-              promoDiscountValue: userPromoCode?.promoDiscountValue,
-              appliedPromoDiscount: promoDiscount,
-            },
-        totalSpecialOfferDiscount,
-        shippingCharge,
-        total,
-        paymentInfo: {
-          paymentMethod: data.paymentMethod === "bkash" ? "bKash" : "SSL",
-          paymentStatus: "Paid",
-          transactionId: `TXN${Math.random().toString().slice(2, 12)}`,
-        },
-        orderStatus: "Pending",
-        userDevice,
-      };
+        });
+        setIsPaymentStepDone(true);
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      } else toast.error("Unable to store order data to server.");
+    } catch (error) {
+      toast.error("Failed store data in server."); // If server error occurs
+    }
 
-      try {
-        const response = await axiosPublic.post("/addOrder", newOrderData);
+    const updatedPersonalInfo = {
+      ...userData.userInfo.personalInfo,
+      phoneNumber: data.phoneNumber,
+      phoneNumber2: data.altPhoneNumber,
+      hometown: userData?.userInfo?.personalInfo?.hometown || data.hometown,
+    };
 
-        if (response?.data?.insertedId) {
-          setOrderDetails({
-            orderNumber: generateOrderId(
-              allOrderIds,
-              data.name,
-              data.phoneNumber,
-            ),
-            phoneNumber: data.phoneNumber,
-            totalAmount: total,
-            address1: data.addressLineOne,
-            address2: data.addressLineTwo,
-            city: data.city,
-            postalCode: data.postalCode,
-          });
-          setIsPaymentStepDone(true);
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-          });
-        } else toast.error("Unable to store order data to server.");
-      } catch (error) {
-        toast.error("Failed store data in server."); // If server error occurs
-      }
+    const existingAddressId = userData?.userInfo?.deliveryAddresses?.find(
+      (address) =>
+        address?.address1 === data.addressLineOne &&
+        address?.address2 === data.addressLineTwo &&
+        address?.city === data.city &&
+        address?.postalCode === data.postalCode,
+    )?.id;
 
-      const updatedPersonalInfo = {
-        ...userData.userInfo.personalInfo,
-        phoneNumber: data.phoneNumber,
-        phoneNumber2: data.altPhoneNumber,
-        hometown: userData?.userInfo?.personalInfo?.hometown || data.hometown,
-      };
-
-      const existingAddressId = userData?.userInfo?.deliveryAddresses?.find(
-        (address) =>
-          address?.address1 === data.addressLineOne &&
-          address?.address2 === data.addressLineTwo &&
-          address?.city === data.city &&
-          address?.postalCode === data.postalCode,
-      )?.id;
-
-      const updatedDeliveryAddresses = !existingAddressId
-        ? [
-            ...userData.userInfo.deliveryAddresses,
-            {
-              id: `${userData?.email}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-              nickname: undefined,
-              address1: data.addressLineOne,
-              address2: data.addressLineTwo,
-              city: data.city,
-              postalCode: data.postalCode,
-            },
-          ]
-        : userData?.userInfo?.deliveryAddresses?.map((availableAddress) =>
-            availableAddress.id == existingAddressId
-              ? {
-                  ...availableAddress,
-                  address1: data.addressLineOne,
-                  address2: data.addressLineTwo,
-                  city: data.city,
-                  postalCode: data.postalCode,
-                }
-              : availableAddress,
-          );
-
-      const currentWishlist = JSON.parse(localStorage.getItem("wishlistItems"));
-      const currentCart = JSON.parse(localStorage.getItem("cartItems"));
-
-      const updatedWishlist = currentWishlist.filter(
-        (wishlistItem) =>
-          !currentCart.some((cartItem) => wishlistItem._id === cartItem._id),
-      );
-
-      const updatedUserData = {
-        ...userData,
-        userInfo: {
-          ...userData.userInfo,
-          personalInfo: updatedPersonalInfo,
-          deliveryAddresses: updatedDeliveryAddresses,
-          savedDeliveryAddress: {
+    const updatedDeliveryAddresses = !existingAddressId
+      ? [
+          ...userData.userInfo.deliveryAddresses,
+          {
+            id: `${userData?.email}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+            nickname: undefined,
             address1: data.addressLineOne,
             address2: data.addressLineTwo,
             city: data.city,
             postalCode: data.postalCode,
           },
-        },
-        cartItems: [],
-        wishlistItems: updatedWishlist,
-      };
-
-      setUserData(updatedUserData);
-
-      try {
-        await axiosPublic.put(
-          `/updateUserInformation/${userData?._id}`,
-          updatedUserData,
+        ]
+      : userData?.userInfo?.deliveryAddresses?.map((availableAddress) =>
+          availableAddress.id == existingAddressId
+            ? {
+                ...availableAddress,
+                address1: data.addressLineOne,
+                address2: data.addressLineTwo,
+                city: data.city,
+                postalCode: data.postalCode,
+              }
+            : availableAddress,
         );
 
-        localStorage.removeItem("checkoutFormDraft");
-        localStorage.removeItem("cartItems");
-        window.dispatchEvent(new Event("storageCart"));
-        localStorage.setItem("wishlistItems", JSON.stringify(updatedWishlist));
-        window.dispatchEvent(new Event("storageWishlist"));
-      } catch (error) {
-        toast.error("Failed update data in server."); // If server error occurs
-      }
+    const currentWishlist = JSON.parse(localStorage.getItem("wishlistItems"));
+    const currentCart = JSON.parse(localStorage.getItem("cartItems"));
 
-      setIsPageLoading(false);
-    } else
-      toast.error("You must agree with the terms and conditions and policies.");
+    const updatedWishlist = currentWishlist.filter(
+      (wishlistItem) =>
+        !currentCart.some((cartItem) => wishlistItem._id === cartItem._id),
+    );
+
+    const updatedUserData = {
+      ...userData,
+      userInfo: {
+        ...userData.userInfo,
+        personalInfo: updatedPersonalInfo,
+        deliveryAddresses: updatedDeliveryAddresses,
+        savedDeliveryAddress: {
+          address1: data.addressLineOne,
+          address2: data.addressLineTwo,
+          city: data.city,
+          postalCode: data.postalCode,
+        },
+      },
+      cartItems: [],
+      wishlistItems: updatedWishlist,
+    };
+
+    setUserData(updatedUserData);
+
+    try {
+      await axiosPublic.put(
+        `/updateUserInformation/${userData?._id}`,
+        updatedUserData,
+      );
+
+      localStorage.removeItem("checkoutFormDraft");
+      localStorage.removeItem("cartItems");
+      window.dispatchEvent(new Event("storageCart"));
+      localStorage.setItem("wishlistItems", JSON.stringify(updatedWishlist));
+      window.dispatchEvent(new Event("storageWishlist"));
+    } catch (error) {
+      toast.error("Failed update data in server."); // If server error occurs
+    }
+
+    setIsPageLoading(false);
   };
 
   const onError = (errors) => {
