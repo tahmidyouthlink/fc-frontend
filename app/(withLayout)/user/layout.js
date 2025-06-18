@@ -1,6 +1,4 @@
-"use client";
-
-import UserSidebar from "@/app/components/user/UserSidebar";
+import UserSidebar from "@/app/components/user/sidebar/UserSidebar";
 
 export default function UserLayout({ children }) {
   return (

@@ -25,6 +25,7 @@ export const authOptions = {
           return {
             email: data?.email,
             name: data?.userInfo?.personalInfo?.customerName,
+            score: data?.userInfo?.score,
           };
         } catch (error) {
           // Return specific error messages from backend if available
@@ -46,6 +47,7 @@ export const authOptions = {
       if (user) {
         token.email = user?.email;
         token.name = user?.name || profile?.name;
+        token.score = user?.score;
       }
 
       return token;
@@ -53,6 +55,7 @@ export const authOptions = {
     async session({ session, token }) {
       session.user.email = token.email;
       session.user.name = token.name;
+      session.user.score = token.score;
       return session;
     },
   },
