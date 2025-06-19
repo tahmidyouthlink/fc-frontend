@@ -25,6 +25,8 @@ export const authOptions = {
           return {
             email: data?.email,
             name: data?.userInfo?.personalInfo?.customerName,
+            isLinkedWithCredentials: data?.isLinkedWithCredentials,
+            isLinkedWithGoogle: data?.isLinkedWithGoogle,
             score: data?.userInfo?.score,
           };
         } catch (error) {
@@ -47,6 +49,8 @@ export const authOptions = {
       if (user) {
         token.email = user?.email;
         token.name = user?.name || profile?.name;
+        token.isLinkedWithCredentials = user?.isLinkedWithCredentials;
+        token.isLinkedWithGoogle = user?.isLinkedWithGoogle;
         token.score = user?.score;
       }
 
@@ -55,6 +59,8 @@ export const authOptions = {
     async session({ session, token }) {
       session.user.email = token.email;
       session.user.name = token.name;
+      session.user.isLinkedWithCredentials = token.isLinkedWithCredentials;
+      session.user.isLinkedWithGoogle = token.isLinkedWithGoogle;
       session.user.score = token.score;
       return session;
     },
