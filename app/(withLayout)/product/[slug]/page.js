@@ -1,121 +1,58 @@
-"use client";
-
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { redirect } from "next/navigation";
+import axios from "axios";
 import circleWithStarShape from "@/public/shapes/circle-with-star.svg";
-import { useLoading } from "@/app/contexts/loading";
-import useProductsInformation from "@/app/hooks/useProductsInformation";
-import useOffers from "@/app/hooks/useOffers";
-import useLocations from "@/app/hooks/useLocations";
 import ProductContents from "@/app/components/product/ProductContents";
-import SimilarProducts from "@/app/components/product/SimilarProducts";
-import CompleteOutfitProducts from "@/app/components/product/CompleteOutfitProducts";
-import RecentlyViewedProducts from "@/app/components/product/RecentlyViewedProducts";
+import ProductRelatedContents from "@/app/components/product/ProductRelatedContents";
 
-export default function Product({ params: { slug } }) {
-  const router = useRouter();
-  const { setIsPageLoading } = useLoading();
-  const [selectedOptions, setSelectedOptions] = useState(null);
-  const [productList, isProductListLoading, refetch] = useProductsInformation();
-  const [specialOffers, isSpecialOffersLoading, specialOffersRefetch] =
-    useOffers();
-  const [locationList, isLocationListLoading, locationRefetch] = useLocations();
-  const [recentlyViewedProducts, setRecentlyViewedProducts] = useState([]);
+export default async function Product({ params: { slug } }) {
+  let products, specialOffers, primaryLocation;
 
-  const product = productList?.find(
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allProducts`,
+    );
+    products = response.data || [];
+  } catch (error) {
+    console.error(
+      "Fetch error (productDetails/products):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allOffers`,
+    );
+    specialOffers = response.data || [];
+  } catch (error) {
+    console.error(
+      "Fetch error (productDetails/specialOffers):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allLocations`,
+    );
+    const locations = response.data || [];
+    primaryLocation = locations?.find(
+      (location) => location?.isPrimaryLocation == true,
+    )?.locationName;
+  } catch (error) {
+    console.error(
+      "Fetch error (productDetails/locations):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
+  const product = products?.find(
     (product) =>
       product?.productTitle?.split(" ")?.join("-")?.toLowerCase() === slug,
   );
-  const primaryLocation = locationList?.find(
-    (location) => location.isPrimaryLocation == true,
-  )?.locationName;
 
-  useEffect(() => {
-    if (
-      !isProductListLoading &&
-      !!productList?.length &&
-      (!product || product.status !== "active")
-    )
-      router.push("/shop");
-  }, [isProductListLoading, product, productList, router]);
-
-  // Load recently viewed products
-  useEffect(() => {
-    if (productList?.length && !!product) {
-      let recentlyViewedProductIds =
-        JSON.parse(localStorage.getItem("recentlyViewedProducts")) || [];
-
-      recentlyViewedProductIds = !recentlyViewedProductIds?.includes(
-        product?._id,
-      )
-        ? recentlyViewedProductIds
-        : recentlyViewedProductIds?.filter(
-            (recentlyViewedProductId) =>
-              recentlyViewedProductId !== product?._id,
-          );
-
-      setRecentlyViewedProducts(
-        productList
-          ?.filter(
-            (availableProduct) =>
-              availableProduct.status === "active" &&
-              recentlyViewedProductIds?.some(
-                (recentlyViewedProductId) =>
-                  availableProduct._id === recentlyViewedProductId,
-              ),
-          )
-          .slice(0, 8),
-      );
-      recentlyViewedProductIds?.unshift(product?._id);
-      if (recentlyViewedProductIds?.length === 10)
-        recentlyViewedProductIds?.pop();
-      localStorage.setItem(
-        "recentlyViewedProducts",
-        JSON.stringify(recentlyViewedProductIds),
-      );
-    }
-  }, [product, productList]);
-
-  const completeOutfitProducts = productList
-    ?.filter((availableProduct) =>
-      product?.restOfOutfit.some(
-        (linkedProduct) =>
-          availableProduct._id === linkedProduct.id &&
-          availableProduct.status === "active",
-      ),
-    )
-    .slice(0, 8);
-
-  const similarProducts = productList
-    ?.filter(
-      (availableProduct) =>
-        availableProduct.category === product?.category &&
-        availableProduct._id !== product?._id &&
-        availableProduct.status === "active",
-    )
-    .slice(0, 8);
-
-  useEffect(() => {
-    setIsPageLoading(
-      isProductListLoading ||
-        !productList?.length ||
-        isSpecialOffersLoading ||
-        !specialOffers?.length ||
-        isLocationListLoading ||
-        !locationList?.length,
-    );
-
-    return () => setIsPageLoading(false);
-  }, [
-    isProductListLoading,
-    productList,
-    isSpecialOffersLoading,
-    specialOffers,
-    isLocationListLoading,
-    locationList,
-    setIsPageLoading,
-  ]);
+  if (!product || product.status !== "active") redirect("/shop");
 
   return (
     <main className="relative overflow-hidden">
@@ -142,34 +79,9 @@ export default function Product({ params: { slug } }) {
           product={product}
           specialOffers={specialOffers}
           primaryLocation={primaryLocation}
-          selectedOptions={selectedOptions}
-          setSelectedOptions={setSelectedOptions}
         />
-        {/* Complete Your Outfit Section */}
-        {!!completeOutfitProducts?.length && (
-          <CompleteOutfitProducts
-            completeOutfitProducts={completeOutfitProducts}
-            primaryLocation={primaryLocation}
-          />
-        )}
-        {/* Similar Products Section */}
-        {!!similarProducts?.length && (
-          <SimilarProducts
-            similarProducts={similarProducts}
-            hasCompleteOutfitSection={!!completeOutfitProducts?.length}
-            hasRecentlyViewedSection={!!recentlyViewedProducts?.length}
-            primaryLocation={primaryLocation}
-          />
-        )}
-        {/* Recently Viewed Products Section */}
-        {!!recentlyViewedProducts?.length && (
-          <RecentlyViewedProducts
-            recentlyViewedProducts={recentlyViewedProducts}
-            hasCompleteOutfitSection={!!completeOutfitProducts?.length}
-            hasSimilarSection={!!similarProducts?.length}
-            primaryLocation={primaryLocation}
-          />
-        )}
+        {/* Product Related Contents */}
+        <ProductRelatedContents products={products} product={product} primaryLocation={primaryLocation} />
       </div>
     </main>
   );

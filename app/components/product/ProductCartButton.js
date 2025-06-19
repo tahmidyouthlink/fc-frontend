@@ -8,7 +8,7 @@ import {
 import toast from "react-hot-toast";
 import { CgShoppingCart } from "react-icons/cg";
 import { useAuth } from "@/app/contexts/auth";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import { axiosPublic } from "@/app/utils/axiosPublic";
 import addToCartToast from "@/app/utils/addToCartToast";
 
 export default function ProductCartButton({
@@ -21,7 +21,6 @@ export default function ProductCartButton({
   setSelectedOptions,
 }) {
   const { user, userData, setUserData } = useAuth();
-  const axiosPublic = useAxiosPublic();
 
   const isExistingItem = (item) =>
     item._id === productId &&

@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import {
   checkIfSpecialOfferIsAvailable,
@@ -12,9 +14,8 @@ export default function ProductContents({
   product,
   specialOffers,
   primaryLocation,
-  selectedOptions,
-  setSelectedOptions,
 }) {
+  const [selectedOptions, setSelectedOptions] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isImageExpanded, setIsImageExpanded] = useState(false);
   const [numOfTimesThumbnailsMoved, setNumOfTimesThumbnailsMoved] = useState(0);

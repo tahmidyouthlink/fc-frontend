@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import circleWithStarShape from "@/public/shapes/circle-with-star.svg";
 import ProductInfoOverview from "./ProductInfoOverview";
@@ -15,21 +16,30 @@ export default function ProductInfo({
   hasSpecialOffer,
   specialOffer,
 }) {
-  const splitSizeFitIntoColumns = (htmlString) => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlString, "text/html");
-    const items = Array.from(doc.querySelectorAll("li")).map(
-      (li) => li.outerHTML,
-    );
-    const midIndex = Math.ceil(items.length / 2);
+  const [parsedSizeFit, setParsedSizeFit] = useState(null);
 
-    return `
-      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div class="space-y-1.5">${items.slice(0, midIndex).join("")}</div>
-        <div class="space-y-1.5">${items.slice(midIndex).join("")}</div>
-      </div>
-    `;
-  };
+  useEffect(() => {
+    if (!product?.sizeFit) return;
+
+    const splitSizeFitIntoColumns = (htmlString) => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlString, "text/html");
+      const items = Array.from(doc.querySelectorAll("li")).map(
+        (li) => li.outerHTML,
+      );
+      const midIndex = Math.ceil(items.length / 2);
+
+      return `
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div class="space-y-1.5">${items.slice(0, midIndex).join("")}</div>
+          <div class="space-y-1.5">${items.slice(midIndex).join("")}</div>
+        </div>
+      `;
+    };
+
+    const result = splitSizeFitIntoColumns(product.sizeFit);
+    setParsedSizeFit(result);
+  }, [product?.sizeFit]);
 
   return (
     <div className="relative mt-4 flex max-h-[1000px] flex-col xl:mt-0 xl:h-[calc(100dvh-(var(--header-height-lg)+var(--section-padding-double)))] xl:grow">
@@ -62,9 +72,7 @@ export default function ProductInfo({
       <ProductInfoDetails
         productInfoDetails={{
           productDetails: product?.productDetails,
-          sizeFit: product?.sizeFit
-            ? splitSizeFitIntoColumns(product.sizeFit)
-            : null,
+          sizeFit: parsedSizeFit,
           materialCare: product?.materialCare,
         }}
       />

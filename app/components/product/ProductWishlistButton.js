@@ -2,10 +2,9 @@ import { Button } from "@nextui-org/react";
 import toast from "react-hot-toast";
 import { CgHeart } from "react-icons/cg";
 import { useAuth } from "@/app/contexts/auth";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import { axiosPublic } from "@/app/utils/axiosPublic";
 
 export default function ProductWishlistButton({ productId }) {
-  const axiosPublic = useAxiosPublic();
   const { user, userData, setUserData } = useAuth();
 
   const handleAddToWishlist = async () => {
