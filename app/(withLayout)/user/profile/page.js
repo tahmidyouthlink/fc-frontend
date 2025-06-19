@@ -1,29 +1,34 @@
-"use client";
-
-import { useEffect } from "react";
-import { useAuth } from "@/app/contexts/auth";
-import { useLoading } from "@/app/contexts/loading";
+import axios from "axios";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/utils/authOptions";
 import PersonalInfo from "@/app/components/user/profile/PersonalInfo";
 import DeliveryAddresses from "@/app/components/user/profile/DeliveryAddresses";
 
-export default function Profile() {
-  const { userData, setUserData } = useAuth();
-  const { setIsPageLoading } = useLoading();
+export default async function Profile() {
+  const session = await getServerSession(authOptions);
+  const userEmail = session?.user?.email;
 
-  useEffect(() => setIsPageLoading(!userData), [setIsPageLoading, userData]);
+  let userData, personalInfo, deliveryAddresses;
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/customerDetailsViaEmail/${session?.user?.email}`,
+    );
+
+    userData = response.data || {};
+    personalInfo = userData?.userInfo?.personalInfo || {};
+    deliveryAddresses = userData?.userInfo?.deliveryAddresses || [];
+  } catch (error) {
+    console.error(
+      "Fetch error (orderHistory/orders):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
 
   return (
     <div className="user-info min-h-full grow space-y-4 rounded-md border-2 border-neutral-50/20 bg-white/40 p-3.5 shadow-[0_0_20px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl lg:p-5 [&_input]:text-sm [&_label]:text-sm [&_label]:text-neutral-500">
-      <PersonalInfo
-        userData={userData}
-        setUserData={setUserData}
-        personalInfo={userData?.userInfo?.personalInfo}
-      />
-      <DeliveryAddresses
-        userData={userData}
-        setUserData={setUserData}
-        deliveryAddresses={userData?.userInfo?.deliveryAddresses}
-      />
+      <PersonalInfo serverUserData={userData} />
+      <DeliveryAddresses serverUserData={userData} userEmail={userEmail} />
     </div>
   );
 }

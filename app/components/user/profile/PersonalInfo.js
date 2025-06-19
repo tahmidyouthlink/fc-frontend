@@ -1,15 +1,18 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
 import { RiCloseLine, RiEditLine, RiSaveLine } from "react-icons/ri";
 import { useLoading } from "@/app/contexts/loading";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import { axiosPublic } from "@/app/utils/axiosPublic";
 import { cities } from "@/app/data/cities";
 
-export default function PersonalInfo({ userData, setUserData, personalInfo }) {
+export default function PersonalInfo({ serverUserData }) {
   const { setIsPageLoading } = useLoading();
-  const axiosPublic = useAxiosPublic();
+  const [userData, setUserData] = useState(serverUserData || {});
+  const personalInfo = userData?.userInfo?.personalInfo || {};
   const [isEditingForm, setIsEditingForm] = useState(false);
   const {
     register,
@@ -36,7 +39,15 @@ export default function PersonalInfo({ userData, setUserData, personalInfo }) {
       altPhoneNumber: personalInfo?.phoneNumber2 || (isEditingForm ? "" : "--"),
       hometown: personalInfo?.hometown || (isEditingForm ? "" : "--"),
     });
-  }, [userData, isEditingForm, reset, personalInfo]);
+  }, [
+    isEditingForm,
+    personalInfo?.customerName,
+    personalInfo?.email,
+    personalInfo?.hometown,
+    personalInfo?.phoneNumber,
+    personalInfo?.phoneNumber2,
+    reset,
+  ]);
 
   const onSubmit = async (data) => {
     setIsPageLoading(true);
@@ -51,6 +62,7 @@ export default function PersonalInfo({ userData, setUserData, personalInfo }) {
       personalInfo?.hometown === data.hometown
     ) {
       toast.error("Not saved as no changes were made.");
+      setIsPageLoading(false);
       return setIsEditingForm(false);
     }
 

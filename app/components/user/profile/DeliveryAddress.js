@@ -2,9 +2,8 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
 import toast from "react-hot-toast";
-import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import { axiosPublic } from "@/app/utils/axiosPublic";
 import FormEditorButtons from "./FormEditorButtons";
 import { cities } from "@/app/data/cities";
 
@@ -13,14 +12,12 @@ export default function DeliveryAddress({
   address,
   addressNumber,
   userData,
+  userEmail,
   setUserData,
-  isAddingNewAddress,
   setIsAddingNewAddress,
   isAddressListEmpty,
 }) {
-  const { user } = useAuth();
   const { setIsPageLoading } = useLoading();
-  const axiosPublic = useAxiosPublic();
   const [isEditingForm, setIsEditingForm] = useState(false);
   const {
     register,
@@ -53,7 +50,8 @@ export default function DeliveryAddress({
         nickname:
           (address?.nickname || "") +
           (address?.isPrimary
-            ? (!!address?.nickname ? " " : "") + "(Primary)"
+            ? (!isEditingForm && !!address?.nickname ? " " : "") +
+              (isEditingForm ? "" : "(Primary)")
             : ""),
         address1: address?.address1,
         address2: address?.address2 || (isEditingForm ? "" : "--"),
@@ -61,7 +59,17 @@ export default function DeliveryAddress({
         postalCode: address?.postalCode,
       });
     }
-  }, [type, userData, isEditingForm, isAddingNewAddress, reset, address]);
+  }, [
+    address?.address1,
+    address?.address2,
+    address?.city,
+    address?.isPrimary,
+    address?.nickname,
+    address?.postalCode,
+    isEditingForm,
+    reset,
+    type,
+  ]);
 
   useEffect(() => {
     if (!(type === "update" && !isEditingForm)) {
@@ -101,7 +109,7 @@ export default function DeliveryAddress({
           deliveryAddresses: [
             ...userData.userInfo.deliveryAddresses,
             {
-              id: `${user.email}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+              id: `${userEmail}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
               nickname: data.nickname,
               address1: data.address1,
               address2: data.address2,
@@ -227,24 +235,7 @@ export default function DeliveryAddress({
       },
     };
 
-    setUserData(
-      updatedUserData?.userInfo?.deliveryAddresses?.some(
-        (availableAddress) => availableAddress?.isPrimary === true,
-      )
-        ? updatedUserData
-        : {
-            ...updatedUserData,
-            userInfo: {
-              ...updatedUserData.userInfo,
-              deliveryAddresses: updatedUserData.userInfo.deliveryAddresses.map(
-                (availableAddress, availableAddressIndex) => ({
-                  ...availableAddress,
-                  isPrimary: availableAddressIndex === 0 ? true : false,
-                }),
-              ),
-            },
-          },
-    );
+    setUserData(updatedUserData);
 
     try {
       const response = await axiosPublic.put(

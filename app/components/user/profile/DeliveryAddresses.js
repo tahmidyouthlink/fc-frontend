@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import DeliveryAddress from "./DeliveryAddress";
-import { RiAddLine, RiMapPinFill } from "react-icons/ri";
+"use client";
 
-export default function DeliveryAddresses({
-  userData,
-  setUserData,
-  deliveryAddresses,
-}) {
+import { useEffect, useState } from "react";
+import { RiAddLine, RiMapPinFill } from "react-icons/ri";
+import DeliveryAddress from "./DeliveryAddress";
+
+export default function DeliveryAddresses({ serverUserData, userEmail }) {
+  const [userData, setUserData] = useState(serverUserData || {});
+  const deliveryAddresses = userData?.userInfo?.deliveryAddresses || [];
   const [isAddingNewAddress, setIsAddingNewAddress] = useState(false);
 
   useEffect(() => {
@@ -57,8 +57,8 @@ export default function DeliveryAddresses({
               address={address}
               addressNumber={addressIndex + 1}
               userData={userData}
+              userEmail={userEmail}
               setUserData={setUserData}
-              isAddingNewAddress={isAddingNewAddress}
               setIsAddingNewAddress={setIsAddingNewAddress}
             />
           );
@@ -69,8 +69,8 @@ export default function DeliveryAddresses({
           type="new"
           addressNumber={deliveryAddresses.length + 1}
           userData={userData}
+          userEmail={userEmail}
           setUserData={setUserData}
-          isAddingNewAddress={isAddingNewAddress}
           setIsAddingNewAddress={setIsAddingNewAddress}
           isAddressListEmpty={!deliveryAddresses?.length}
         />
