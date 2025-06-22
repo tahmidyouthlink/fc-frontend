@@ -19,6 +19,7 @@ export default function CartModalContents({
   setSelectedOptions,
   isNotifyMeModalOpen,
   setIsNotifyMeModalOpen,
+  notifyVariants,
 }) {
   const [isUserSubscribed, setIsUserSubscribed] = useState(false);
   const isOnlyRegularDiscountAvailable = checkIfOnlyRegularDiscountIsAvailable(
@@ -172,6 +173,7 @@ export default function CartModalContents({
           <div className="mt-1 flex items-center gap-4">
             <p className="text-sm font-semibold text-red-600">Out of Stock*</p>
             <NotifyMeButton
+              notifyVariants={notifyVariants}
               productId={product?._id}
               productVariantSku={productVariantSku}
               selectedOptions={selectedOptions}

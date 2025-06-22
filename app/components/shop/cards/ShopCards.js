@@ -41,6 +41,7 @@ export default function ShopCards({
   calculateFinalPrice,
   specialOffers,
   primaryLocation,
+  notifyVariants,
 }) {
   const [isAddToCartModalOpen, setIsAddToCartModalOpen] = useState(false);
   const [selectedAddToCartProduct, setSelectedAddToCartProduct] =
@@ -173,6 +174,7 @@ export default function ShopCards({
           product={selectedAddToCartProduct}
           specialOffers={specialOffers}
           primaryLocation={primaryLocation}
+          notifyVariants={notifyVariants}
         />
       </section>
     </>

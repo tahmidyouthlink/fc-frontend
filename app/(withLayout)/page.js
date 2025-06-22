@@ -9,7 +9,7 @@ import HomeFeatures from "../components/home/HomeFeatures";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  let products, locations, specialOffers;
+  let products, locations, specialOffers, notifyVariants;
 
   try {
     const response = await axios.get(
@@ -47,6 +47,18 @@ export default async function Home() {
     );
   }
 
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/get-all-availability-notifications`,
+    );
+    notifyVariants = response.data || [];
+  } catch (error) {
+    console.error(
+      "Fetch error (home/notifyVariants):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
   const primaryLocation = locations?.find(
     (location) => location?.isPrimaryLocation == true,
   )?.locationName;
@@ -75,12 +87,14 @@ export default async function Home() {
         trendingProducts={trendingProducts}
         specialOffers={specialOffers}
         primaryLocation={primaryLocation}
+        notifyVariants={notifyVariants}
       />
       <HomeNewArrival
         isAnyTrendingProductAvailable={trendingProducts?.length}
         newlyArrivedProducts={newlyArrivedProducts}
         specialOffers={specialOffers}
         primaryLocation={primaryLocation}
+        notifyVariants={notifyVariants}
       />
       <HomeFeatures
         isAnyTrendingProductAvailable={trendingProducts?.length}

@@ -6,7 +6,7 @@ import ProductContents from "@/app/components/product/ProductContents";
 import ProductRelatedContents from "@/app/components/product/ProductRelatedContents";
 
 export default async function Product({ params: { slug } }) {
-  let products, specialOffers, primaryLocation;
+  let products, specialOffers, primaryLocation, notifyVariants;
 
   try {
     const response = await axios.get(
@@ -47,6 +47,18 @@ export default async function Product({ params: { slug } }) {
     );
   }
 
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/get-all-availability-notifications`,
+    );
+    notifyVariants = response.data || [];
+  } catch (error) {
+    console.error(
+      "Fetch error (productDetails/notifyVariants):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
   const product = products?.find(
     (product) =>
       product?.productTitle?.split(" ")?.join("-")?.toLowerCase() === slug,
@@ -79,6 +91,7 @@ export default async function Product({ params: { slug } }) {
           product={product}
           specialOffers={specialOffers}
           primaryLocation={primaryLocation}
+          notifyVariants={notifyVariants}
         />
         {/* Product Related Contents */}
         <ProductRelatedContents
@@ -86,6 +99,7 @@ export default async function Product({ params: { slug } }) {
           product={product}
           specialOffers={specialOffers}
           primaryLocation={primaryLocation}
+          notifyVariants={notifyVariants}
         />
       </div>
     </main>

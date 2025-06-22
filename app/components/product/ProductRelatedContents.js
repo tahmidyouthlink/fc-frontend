@@ -10,6 +10,7 @@ export default function ProductRelatedContents({
   product,
   specialOffers,
   primaryLocation,
+  notifyVariants,
 }) {
   const [recentlyViewedProducts, setRecentlyViewedProducts] = useState([]);
 
@@ -77,6 +78,7 @@ export default function ProductRelatedContents({
           completeOutfitProducts={completeOutfitProducts}
           specialOffers={specialOffers}
           primaryLocation={primaryLocation}
+          notifyVariants={notifyVariants}
         />
       )}
       {/* Similar Products Section */}
@@ -87,6 +89,7 @@ export default function ProductRelatedContents({
           hasRecentlyViewedSection={!!recentlyViewedProducts?.length}
           specialOffers={specialOffers}
           primaryLocation={primaryLocation}
+          notifyVariants={notifyVariants}
         />
       )}
       {/* Recently Viewed Products Section */}
@@ -97,6 +100,7 @@ export default function ProductRelatedContents({
           hasSimilarSection={!!similarProducts?.length}
           specialOffers={specialOffers}
           primaryLocation={primaryLocation}
+          notifyVariants={notifyVariants}
         />
       )}
     </>

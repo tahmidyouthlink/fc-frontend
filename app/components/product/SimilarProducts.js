@@ -11,6 +11,7 @@ export default function SimilarProducts({
   hasRecentlyViewedSection,
   specialOffers,
   primaryLocation,
+  notifyVariants,
 }) {
   const [isSimilarProductsSlid, setIsSimilarProductsSlid] = useState(false);
   const [isAddToCartModalOpen, setIsAddToCartModalOpen] = useState(false);
@@ -75,6 +76,7 @@ export default function SimilarProducts({
         product={selectedAddToCartProduct}
         specialOffers={specialOffers}
         primaryLocation={primaryLocation}
+        notifyVariants={notifyVariants}
       />
     </section>
   );

@@ -10,6 +10,7 @@ export default function AddToCartModal({
   product,
   specialOffers,
   primaryLocation,
+  notifyVariants,
 }) {
   const [selectedOptions, setSelectedOptions] = useState(null);
   const [productVariantSku, setProductVariantSku] = useState(null);
@@ -73,6 +74,7 @@ export default function AddToCartModal({
           setIsAddToCartModalOpen={setIsAddToCartModalOpen}
           selectedOptions={selectedOptions}
           setSelectedOptions={setSelectedOptions}
+          notifyVariants={notifyVariants}
           isNotifyMeModalOpen={isNotifyMeModalOpen}
           setIsNotifyMeModalOpen={setIsNotifyMeModalOpen}
         />

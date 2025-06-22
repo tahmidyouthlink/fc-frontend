@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import {
   Modal,
@@ -14,11 +15,11 @@ import { useLoading } from "@/app/contexts/loading";
 export default function NotifyMeModal({
   userData,
   axiosPublic,
-  setIsUserSubscribed,
   isNotifyMeModalOpen,
   setIsNotifyMeModalOpen,
   notifyMeProduct,
 }) {
+  const router = useRouter();
   const { setIsPageLoading } = useLoading();
 
   const {
@@ -43,7 +44,7 @@ export default function NotifyMeModal({
       });
 
       toast.success("Request submitted successfully.");
-      setIsUserSubscribed(true);
+      router.refresh();
       setIsNotifyMeModalOpen(false);
     } catch (error) {
       const serverErrorMessage = error?.response?.data?.message;

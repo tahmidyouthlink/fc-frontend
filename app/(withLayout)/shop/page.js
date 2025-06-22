@@ -6,7 +6,7 @@ import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
 export const dynamic = "force-dynamic";
 
 export default async function Shop() {
-  let products, specialOffers, locations;
+  let products, specialOffers, locations, notifyVariants;
 
   try {
     const response = await axios.get(
@@ -44,6 +44,18 @@ export default async function Shop() {
     );
   }
 
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/get-all-availability-notifications`,
+    );
+    notifyVariants = response.data || [];
+  } catch (error) {
+    console.error(
+      "Fetch error (shop/notifyVariants):",
+      error.response?.data?.message || error.response?.data || error.message,
+    );
+  }
+
   const primaryLocation = locations?.find(
     (location) => location?.isPrimaryLocation == true,
   )?.locationName;
@@ -62,6 +74,7 @@ export default async function Shop() {
             products={products}
             specialOffers={specialOffers}
             primaryLocation={primaryLocation}
+            notifyVariants={notifyVariants}
           />
         </Suspense>
       </div>

@@ -14,6 +14,7 @@ export default function ProductContents({
   product,
   specialOffers,
   primaryLocation,
+  notifyVariants,
 }) {
   const [selectedOptions, setSelectedOptions] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -89,6 +90,7 @@ export default function ProductContents({
           setNumOfTimesThumbnailsMoved={setNumOfTimesThumbnailsMoved}
           hasSpecialOffer={isSpecialOfferIsAvailable}
           specialOffer={specialOffer}
+          notifyVariants={notifyVariants}
         />
       </div>
     </div>

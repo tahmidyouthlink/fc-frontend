@@ -15,6 +15,7 @@ export default function ProductInfo({
   setNumOfTimesThumbnailsMoved,
   hasSpecialOffer,
   specialOffer,
+  notifyVariants,
 }) {
   const [parsedSizeFit, setParsedSizeFit] = useState(null);
 
@@ -65,6 +66,7 @@ export default function ProductInfo({
         setNumOfTimesThumbnailsMoved={setNumOfTimesThumbnailsMoved}
         hasSpecialOffer={hasSpecialOffer}
         specialOffer={specialOffer}
+        notifyVariants={notifyVariants}
       />
       {/* Divider */}
       <hr className="mt-7 h-0.5 bg-neutral-100 sm:max-md:mb-4 xl:mb-4" />

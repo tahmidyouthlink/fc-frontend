@@ -9,6 +9,7 @@ export default function HomeTrendingCards({
   trendingProducts,
   specialOffers,
   primaryLocation,
+  notifyVariants,
 }) {
   const [isAddToCartModalOpen, setIsAddToCartModalOpen] = useState(false);
   const [selectedAddToCartProduct, setSelectedAddToCartProduct] =
@@ -34,6 +35,7 @@ export default function HomeTrendingCards({
         product={selectedAddToCartProduct}
         specialOffers={specialOffers}
         primaryLocation={primaryLocation}
+        notifyVariants={notifyVariants}
       />
     </div>
   );

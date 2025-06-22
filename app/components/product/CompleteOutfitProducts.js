@@ -9,6 +9,7 @@ export default function CompleteOutfitProducts({
   completeOutfitProducts,
   specialOffers,
   primaryLocation,
+  notifyVariants,
 }) {
   const [isCompleteOutfitProductsSlid, setIsCompleteOutfitProductsSlid] =
     useState(false);
@@ -66,6 +67,7 @@ export default function CompleteOutfitProducts({
         product={selectedAddToCartProduct}
         specialOffers={specialOffers}
         primaryLocation={primaryLocation}
+        notifyVariants={notifyVariants}
       />
     </section>
   );

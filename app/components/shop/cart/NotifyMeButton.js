@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { FaRegBell } from "react-icons/fa6";
 import { LuCheckCircle2 } from "react-icons/lu";
 import { useAuth } from "@/app/contexts/auth";
@@ -6,58 +5,32 @@ import useAxiosPublic from "@/app/hooks/useAxiosPublic";
 import NotifyMeModal from "./NotifyMeModal";
 
 export default function NotifyMeButton({
+  notifyVariants,
   productId,
   productVariantSku,
   selectedOptions,
   isNotifyMeModalOpen,
   setIsNotifyMeModalOpen,
-  isUserSubscribed,
-  setIsUserSubscribed,
 }) {
   const { userData } = useAuth();
   const axiosPublic = useAxiosPublic();
+  let isUserSubscribed;
 
-  useEffect(() => {
-    if (!selectedOptions?.size || productVariantSku !== 0) return;
-    if (!userData) return setIsUserSubscribed(false);
+  if (!selectedOptions?.size || productVariantSku !== 0) return;
+  if (!userData) {
+    isUserSubscribed = false;
+  } else {
+    const correspondingVariant = notifyVariants?.find(
+      (variant) =>
+        variant.productId === productId &&
+        variant.size === selectedOptions?.size &&
+        variant.colorCode === selectedOptions?.color.color,
+    );
 
-    const debounceTimeout = setTimeout(() => {
-      const checkIfUserIsSubscribed = async () => {
-        try {
-          const { data: allUsersNotifiedList } = await axiosPublic.get(
-            "/get-all-availability-notifications",
-          );
-
-          const correspondingVariant = allUsersNotifiedList.find(
-            (variant) =>
-              variant.productId === productId &&
-              variant.size === selectedOptions?.size &&
-              variant.colorCode === selectedOptions?.color.color,
-          );
-
-          const isInNotifiedList = correspondingVariant?.emails?.some(
-            (user) => user.email === userData.email && !user.notified,
-          );
-
-          setIsUserSubscribed(isInNotifiedList);
-        } catch (error) {
-          console.error(error?.response?.data?.message || error.message);
-        }
-      };
-
-      checkIfUserIsSubscribed();
-    }, 25);
-
-    return () => clearTimeout(debounceTimeout);
-  }, [
-    axiosPublic,
-    productId,
-    productVariantSku,
-    selectedOptions?.color.color,
-    selectedOptions?.size,
-    setIsUserSubscribed,
-    userData,
-  ]);
+    isUserSubscribed = correspondingVariant?.emails?.some(
+      (user) => user.email === userData.email && !user.notified,
+    );
+  }
 
   return (
     <>
@@ -79,7 +52,6 @@ export default function NotifyMeButton({
       <NotifyMeModal
         userData={userData}
         axiosPublic={axiosPublic}
-        setIsUserSubscribed={setIsUserSubscribed}
         isNotifyMeModalOpen={isNotifyMeModalOpen}
         setIsNotifyMeModalOpen={setIsNotifyMeModalOpen}
         notifyMeProduct={{

@@ -9,6 +9,7 @@ export default function HomeNewArrivalCards({
   newlyArrivedProducts,
   specialOffers,
   primaryLocation,
+  notifyVariants,
 }) {
   const [isAddToCartModalOpen, setIsAddToCartModalOpen] = useState(false);
   const [selectedAddToCartProduct, setSelectedAddToCartProduct] =
@@ -34,6 +35,7 @@ export default function HomeNewArrivalCards({
         product={selectedAddToCartProduct}
         specialOffers={specialOffers}
         primaryLocation={primaryLocation}
+        notifyVariants={notifyVariants}
       />
     </div>
   );

@@ -20,6 +20,7 @@ export default function ShopContents({
   products,
   specialOffers,
   primaryLocation,
+  notifyVariants,
 }) {
   const [isFilterButtonClicked, setIsFilterButtonClicked] = useState(false);
   const [selectedFilterOptions, setSelectedFilterOptions] = useState({
@@ -235,6 +236,7 @@ export default function ShopContents({
             calculateFinalPrice={calculateFinalPrice}
             specialOffers={specialOffers}
             primaryLocation={primaryLocation}
+            notifyVariants={notifyVariants}
           />
         )}
       </div>

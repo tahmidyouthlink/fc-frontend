@@ -11,6 +11,7 @@ export default function RecentlyViewedProducts({
   hasSimilarSection,
   specialOffers,
   primaryLocation,
+  notifyVariants,
 }) {
   const [isRecentlyViewedProductsSlid, setIsRecentlyViewedProductsSlid] =
     useState(false);
@@ -75,6 +76,7 @@ export default function RecentlyViewedProducts({
         product={selectedAddToCartProduct}
         specialOffers={specialOffers}
         primaryLocation={primaryLocation}
+        notifyVariants={notifyVariants}
       />
     </section>
   );

@@ -29,9 +29,9 @@ export default function ProductInfoOverview({
   setNumOfTimesThumbnailsMoved,
   hasSpecialOffer,
   specialOffer,
+  notifyVariants,
 }) {
   const [isNotifyMeModalOpen, setIsNotifyMeModalOpen] = useState(false);
-  const [isUserSubscribed, setIsUserSubscribed] = useState(false);
   const productVariantSku = getProductVariantSku(
     product?.productVariants,
     primaryLocation,
@@ -164,13 +164,12 @@ export default function ProductInfoOverview({
         <div className="mt-3.5 flex items-center gap-4">
           <p className="font-semibold text-red-600">Out of Stock*</p>
           <NotifyMeButton
+            notifyVariants={notifyVariants}
             productId={product?._id}
             productVariantSku={productVariantSku}
             selectedOptions={selectedOptions}
             isNotifyMeModalOpen={isNotifyMeModalOpen}
             setIsNotifyMeModalOpen={setIsNotifyMeModalOpen}
-            isUserSubscribed={isUserSubscribed}
-            setIsUserSubscribed={setIsUserSubscribed}
           />
         </div>
       )}
