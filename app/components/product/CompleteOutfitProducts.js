@@ -64,6 +64,7 @@ export default function CompleteOutfitProducts({
         isAddToCartModalOpen={isAddToCartModalOpen}
         setIsAddToCartModalOpen={setIsAddToCartModalOpen}
         product={selectedAddToCartProduct}
+        specialOffers={specialOffers}
         primaryLocation={primaryLocation}
       />
     </section>

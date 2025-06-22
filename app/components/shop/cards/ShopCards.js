@@ -171,6 +171,7 @@ export default function ShopCards({
           isAddToCartModalOpen={isAddToCartModalOpen}
           setIsAddToCartModalOpen={setIsAddToCartModalOpen}
           product={selectedAddToCartProduct}
+          specialOffers={specialOffers}
           primaryLocation={primaryLocation}
         />
       </section>

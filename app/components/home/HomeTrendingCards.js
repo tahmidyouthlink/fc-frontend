@@ -32,6 +32,7 @@ export default function HomeTrendingCards({
         isAddToCartModalOpen={isAddToCartModalOpen}
         setIsAddToCartModalOpen={setIsAddToCartModalOpen}
         product={selectedAddToCartProduct}
+        specialOffers={specialOffers}
         primaryLocation={primaryLocation}
       />
     </div>

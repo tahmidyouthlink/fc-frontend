@@ -73,6 +73,7 @@ export default function SimilarProducts({
         isAddToCartModalOpen={isAddToCartModalOpen}
         setIsAddToCartModalOpen={setIsAddToCartModalOpen}
         product={selectedAddToCartProduct}
+        specialOffers={specialOffers}
         primaryLocation={primaryLocation}
       />
     </section>

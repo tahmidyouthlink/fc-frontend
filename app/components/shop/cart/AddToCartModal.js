@@ -8,6 +8,7 @@ export default function AddToCartModal({
   isAddToCartModalOpen,
   setIsAddToCartModalOpen,
   product,
+  specialOffers,
   primaryLocation,
 }) {
   const [selectedOptions, setSelectedOptions] = useState(null);
@@ -66,6 +67,7 @@ export default function AddToCartModal({
       >
         <CartModalContents
           product={product}
+          specialOffers={specialOffers}
           productVariantSku={productVariantSku}
           imageSets={getImageSetsBasedOnColors(product?.productVariants)}
           setIsAddToCartModalOpen={setIsAddToCartModalOpen}

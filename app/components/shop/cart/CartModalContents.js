@@ -1,10 +1,8 @@
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Input } from "@nextui-org/react";
 import { CgClose } from "react-icons/cg";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
-import { useLoading } from "@/app/contexts/loading";
-import useOffers from "@/app/hooks/useOffers";
 import {
   calculateFinalPrice,
   checkIfOnlyRegularDiscountIsAvailable,
@@ -13,6 +11,7 @@ import NotifyMeButton from "./NotifyMeButton";
 
 export default function CartModalContents({
   product,
+  specialOffers,
   productVariantSku,
   imageSets,
   setIsAddToCartModalOpen,
@@ -21,10 +20,7 @@ export default function CartModalContents({
   isNotifyMeModalOpen,
   setIsNotifyMeModalOpen,
 }) {
-  const { setIsPageLoading } = useLoading();
   const [isUserSubscribed, setIsUserSubscribed] = useState(false);
-  const [specialOffers, isSpecialOffersLoading, specialOffersRefetch] =
-    useOffers();
   const isOnlyRegularDiscountAvailable = checkIfOnlyRegularDiscountIsAvailable(
     product,
     specialOffers,
@@ -32,12 +28,6 @@ export default function CartModalContents({
   const imgUrl = imageSets?.find(
     (imageSet) => imageSet?.color?.label === selectedOptions?.color?.label,
   )?.images[0];
-
-  useEffect(() => {
-    setIsPageLoading(isSpecialOffersLoading || !specialOffers?.length);
-
-    return () => setIsPageLoading(false);
-  }, [isSpecialOffersLoading, setIsPageLoading, specialOffers]);
 
   return (
     <div className="relative h-fit md:flex md:gap-x-10">
