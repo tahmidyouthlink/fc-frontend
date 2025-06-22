@@ -1,46 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
 import { axiosPublic } from "@/app/utils/axiosPublic";
 
-export default function TopFooterNewsletter() {
-  const { userData } = useAuth();
+export default function TopFooterNewsletter({
+  newsletterSubscriptions,
+  isSubscribedInitial,
+}) {
+  const router = useRouter();
+  const { data: session, status } = useSession();
   const { setIsPageLoading } = useLoading();
-  const [isUserSubscribed, setIsUserSubscribed] = useState(false);
   const { register, handleSubmit, reset, setValue } = useForm({
-    defaultValues: {
-      newsletterEmail: userData?.email || "",
-    },
     mode: "onSubmit",
   });
+  let isUserSubscribed;
 
-  useEffect(() => {
-    const checkIfSubscribed = async () => {
-      try {
-        const response = await axiosPublic.get(
-          `/getSingleNewsletter/${userData.email}`,
-        );
-        setIsUserSubscribed(!!response?.data);
-      } catch (error) {
-        setIsUserSubscribed(false);
-        if (error.status != 404)
-          console.log("Error fetching user newsletter subscription.");
-      }
-    };
-
-    if (!userData) {
-      setIsUserSubscribed(false);
-      setValue("newsletterEmail", "");
+  if (status === "loading") {
+    if (isUserSubscribed === undefined) isUserSubscribed = isSubscribedInitial;
+  } else {
+    if (status === "unauthenticated") {
+      isUserSubscribed = false;
     } else {
-      setValue("newsletterEmail", userData.email);
-
-      checkIfSubscribed();
+      isUserSubscribed = newsletterSubscriptions?.some(
+        (subscription) => subscription.email === session.user.email,
+      );
     }
-  }, [setValue, userData]);
+  }
+
+  setValue("newsletterEmail", session?.user?.email || "");
 
   const onSubmit = async (data) => {
     setIsPageLoading(true);
@@ -54,7 +45,7 @@ export default function TopFooterNewsletter() {
 
       if (response?.data?.insertedId) {
         toast.success("Subscribed to newsletter successfully.");
-        setIsUserSubscribed(true);
+        router.refresh();
         reset();
       } else {
         toast.error("Unable to subscribe to newsletter.");
@@ -88,7 +79,6 @@ export default function TopFooterNewsletter() {
             type="email"
             className="h-10 w-full rounded-[4px] border-2 border-neutral-200/50 bg-white/90 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-500 focus:border-white/50 md:text-sm"
             placeholder="Enter your email address"
-            readOnly={!!userData}
             {...register("newsletterEmail", {
               required: true,
               pattern:
