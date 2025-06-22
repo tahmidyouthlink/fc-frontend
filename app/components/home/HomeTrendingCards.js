@@ -7,6 +7,7 @@ import AddToCartModal from "../shop/cart/AddToCartModal";
 
 export default function HomeTrendingCards({
   trendingProducts,
+  specialOffers,
   primaryLocation,
 }) {
   const [isAddToCartModalOpen, setIsAddToCartModalOpen] = useState(false);
@@ -19,6 +20,8 @@ export default function HomeTrendingCards({
         <ProductCard
           key={"home-trending-product-" + trendingProduct._id}
           product={trendingProduct}
+          specialOffers={specialOffers}
+          primaryLocation={primaryLocation}
           isAddToCartModalOpen={isAddToCartModalOpen}
           setIsAddToCartModalOpen={setIsAddToCartModalOpen}
           setSelectedAddToCartProduct={setSelectedAddToCartProduct}

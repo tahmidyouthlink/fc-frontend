@@ -9,7 +9,7 @@ import HomeFeatures from "../components/home/HomeFeatures";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  let products, locations;
+  let products, locations, specialOffers;
 
   try {
     const response = await axios.get(
@@ -20,6 +20,18 @@ export default async function Home() {
     console.error(
       "Fetch error (home/products):",
       error.response?.data?.message || error.response?.data,
+    );
+  }
+
+  try {
+    const response = await axios.get(
+      `https://fc-backend-664306765395.asia-south1.run.app/allOffers`,
+    );
+    specialOffers = response.data || [];
+  } catch (error) {
+    console.error(
+      "Fetch error (home/specialOffers):",
+      error.response?.data?.message || error.response?.data || error.message,
     );
   }
 
@@ -61,11 +73,13 @@ export default async function Home() {
       <HomeCategories />
       <HomeTrending
         trendingProducts={trendingProducts}
+        specialOffers={specialOffers}
         primaryLocation={primaryLocation}
       />
       <HomeNewArrival
         isAnyTrendingProductAvailable={trendingProducts?.length}
         newlyArrivedProducts={newlyArrivedProducts}
+        specialOffers={specialOffers}
         primaryLocation={primaryLocation}
       />
       <HomeFeatures

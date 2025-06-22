@@ -7,6 +7,7 @@ import HomeNewArrivalCards from "./HomeNewArrivalCards";
 export default function HomeNewArrival({
   isAnyTrendingProductAvailable,
   newlyArrivedProducts,
+  specialOffers,
   primaryLocation,
 }) {
   if (!!newlyArrivedProducts?.length)
@@ -46,6 +47,7 @@ export default function HomeNewArrival({
           </div>
           <HomeNewArrivalCards
             newlyArrivedProducts={newlyArrivedProducts}
+            specialOffers={specialOffers}
             primaryLocation={primaryLocation}
           />
         </div>

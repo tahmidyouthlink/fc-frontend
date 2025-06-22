@@ -7,6 +7,7 @@ import AddToCartModal from "../shop/cart/AddToCartModal";
 
 export default function CompleteOutfitProducts({
   completeOutfitProducts,
+  specialOffers,
   primaryLocation,
 }) {
   const [isCompleteOutfitProductsSlid, setIsCompleteOutfitProductsSlid] =
@@ -48,6 +49,8 @@ export default function CompleteOutfitProducts({
             <ProductCard
               key={"product-complete-outfit-" + completeOutfitProduct._id}
               product={completeOutfitProduct}
+              specialOffers={specialOffers}
+              primaryLocation={primaryLocation}
               isAddToCartModalOpen={isAddToCartModalOpen}
               setIsAddToCartModalOpen={setIsAddToCartModalOpen}
               setSelectedAddToCartProduct={setSelectedAddToCartProduct}

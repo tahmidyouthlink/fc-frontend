@@ -9,6 +9,7 @@ export default function SimilarProducts({
   similarProducts,
   hasCompleteOutfitSection,
   hasRecentlyViewedSection,
+  specialOffers,
   primaryLocation,
 }) {
   const [isSimilarProductsSlid, setIsSimilarProductsSlid] = useState(false);
@@ -57,6 +58,8 @@ export default function SimilarProducts({
             <ProductCard
               key={"product-similar-" + similarProduct._id}
               product={similarProduct}
+              specialOffers={specialOffers}
+              primaryLocation={primaryLocation}
               isAddToCartModalOpen={isAddToCartModalOpen}
               setIsAddToCartModalOpen={setIsAddToCartModalOpen}
               setSelectedAddToCartProduct={setSelectedAddToCartProduct}

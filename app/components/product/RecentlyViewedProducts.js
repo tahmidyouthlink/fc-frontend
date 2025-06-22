@@ -9,6 +9,7 @@ export default function RecentlyViewedProducts({
   recentlyViewedProducts,
   hasCompleteOutfitSection,
   hasSimilarSection,
+  specialOffers,
   primaryLocation,
 }) {
   const [isRecentlyViewedProductsSlid, setIsRecentlyViewedProductsSlid] =
@@ -57,6 +58,8 @@ export default function RecentlyViewedProducts({
             <ProductCard
               key={"product-recently-viewed-" + recentlyViewedProduct._id}
               product={recentlyViewedProduct}
+              specialOffers={specialOffers}
+              primaryLocation={primaryLocation}
               isAddToCartModalOpen={isAddToCartModalOpen}
               setIsAddToCartModalOpen={setIsAddToCartModalOpen}
               setSelectedAddToCartProduct={setSelectedAddToCartProduct}

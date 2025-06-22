@@ -81,7 +81,12 @@ export default async function Product({ params: { slug } }) {
           primaryLocation={primaryLocation}
         />
         {/* Product Related Contents */}
-        <ProductRelatedContents products={products} product={product} primaryLocation={primaryLocation} />
+        <ProductRelatedContents
+          products={products}
+          product={product}
+          specialOffers={specialOffers}
+          primaryLocation={primaryLocation}
+        />
       </div>
     </main>
   );

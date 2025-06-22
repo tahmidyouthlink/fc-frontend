@@ -8,6 +8,7 @@ import RecentlyViewedProducts from "@/app/components/product/RecentlyViewedProdu
 export default function ProductRelatedContents({
   products,
   product,
+  specialOffers,
   primaryLocation,
 }) {
   const [recentlyViewedProducts, setRecentlyViewedProducts] = useState([]);
@@ -74,6 +75,7 @@ export default function ProductRelatedContents({
       {!!completeOutfitProducts?.length && (
         <CompleteOutfitProducts
           completeOutfitProducts={completeOutfitProducts}
+          specialOffers={specialOffers}
           primaryLocation={primaryLocation}
         />
       )}
@@ -83,6 +85,7 @@ export default function ProductRelatedContents({
           similarProducts={similarProducts}
           hasCompleteOutfitSection={!!completeOutfitProducts?.length}
           hasRecentlyViewedSection={!!recentlyViewedProducts?.length}
+          specialOffers={specialOffers}
           primaryLocation={primaryLocation}
         />
       )}
@@ -92,6 +95,7 @@ export default function ProductRelatedContents({
           recentlyViewedProducts={recentlyViewedProducts}
           hasCompleteOutfitSection={!!completeOutfitProducts?.length}
           hasSimilarSection={!!similarProducts?.length}
+          specialOffers={specialOffers}
           primaryLocation={primaryLocation}
         />
       )}

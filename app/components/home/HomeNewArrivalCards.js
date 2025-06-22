@@ -7,6 +7,7 @@ import AddToCartModal from "../shop/cart/AddToCartModal";
 
 export default function HomeNewArrivalCards({
   newlyArrivedProducts,
+  specialOffers,
   primaryLocation,
 }) {
   const [isAddToCartModalOpen, setIsAddToCartModalOpen] = useState(false);
@@ -19,6 +20,8 @@ export default function HomeNewArrivalCards({
         <ProductCard
           key={"home-new-arrival-product-" + newlyArrivedProduct._id}
           product={newlyArrivedProduct}
+          specialOffers={specialOffers}
+          primaryLocation={primaryLocation}
           isAddToCartModalOpen={isAddToCartModalOpen}
           setIsAddToCartModalOpen={setIsAddToCartModalOpen}
           setSelectedAddToCartProduct={setSelectedAddToCartProduct}

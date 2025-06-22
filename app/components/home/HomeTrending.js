@@ -5,7 +5,11 @@ import thunderShape from "@/public/shapes/thunder-without-stroke.svg";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import HomeTrendingCards from "./HomeTrendingCards";
 
-export default function HomeTrending({ trendingProducts, primaryLocation }) {
+export default function HomeTrending({
+  trendingProducts,
+  specialOffers,
+  primaryLocation,
+}) {
   if (!!trendingProducts?.length)
     return (
       <section className="relative w-full overflow-hidden">
@@ -59,6 +63,7 @@ export default function HomeTrending({ trendingProducts, primaryLocation }) {
             </div>
             <HomeTrendingCards
               trendingProducts={trendingProducts}
+              specialOffers={specialOffers}
               primaryLocation={primaryLocation}
             />
           </div>

@@ -1,7 +1,3 @@
-import { useEffect } from "react";
-import { useLoading } from "@/app/contexts/loading";
-import useOffers from "@/app/hooks/useOffers";
-import useLocations from "@/app/hooks/useLocations";
 import {
   checkIfProductIsLimitedStock,
   CheckIfProductIsOutOfStock,
@@ -18,19 +14,14 @@ import CardButtons from "./CardButtons";
 
 export default function ProductCard({
   product,
+  specialOffers,
+  primaryLocation,
   isAddToCartModalOpen,
   setIsAddToCartModalOpen,
   setSelectedAddToCartProduct,
   shouldBeHidden,
   isAllowedToShowLimitedStock,
 }) {
-  const { setIsPageLoading } = useLoading();
-  const [specialOffers, isSpecialOffersLoading, specialOffersRefetch] =
-    useOffers();
-  const [locationList, isLocationListLoading, locationRefetch] = useLocations();
-  const primaryLocation = locationList?.find(
-    (location) => location.isPrimaryLocation == true,
-  )?.locationName;
   const isProductOutOfStock = CheckIfProductIsOutOfStock(
     product?.productVariants,
     primaryLocation,
@@ -39,23 +30,6 @@ export default function ProductCard({
     product?.productVariants,
     primaryLocation,
   );
-
-  useEffect(() => {
-    setIsPageLoading(
-      isSpecialOffersLoading ||
-        !specialOffers?.length ||
-        isLocationListLoading ||
-        !locationList?.length,
-    );
-
-    return () => setIsPageLoading(false);
-  }, [
-    isSpecialOffersLoading,
-    specialOffers,
-    isLocationListLoading,
-    locationList,
-    setIsPageLoading,
-  ]);
 
   return (
     <div

@@ -147,6 +147,8 @@ export default function ShopCards({
                 <ProductCard
                   key={"filtered-product-" + filteredProduct._id}
                   product={filteredProduct}
+                  specialOffers={specialOffers}
+                  primaryLocation={primaryLocation}
                   isAddToCartModalOpen={isAddToCartModalOpen}
                   setIsAddToCartModalOpen={setIsAddToCartModalOpen}
                   setSelectedAddToCartProduct={setSelectedAddToCartProduct}
