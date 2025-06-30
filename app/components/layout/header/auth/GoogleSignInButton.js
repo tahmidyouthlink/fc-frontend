@@ -1,12 +1,9 @@
 "use client";
 
-import { getSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import { LuCheck } from "react-icons/lu";
 import { FcGoogle } from "react-icons/fc";
 import { useLoading } from "@/app/contexts/loading";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
-import generateCustomerId from "@/app/utils/generateCustomerId";
 
 export default function GoogleSignInButton({
   isLinkedWithGoogle,
@@ -15,7 +12,6 @@ export default function GoogleSignInButton({
   setIsAuthModalOpen,
 }) {
   const { setIsPageLoading } = useLoading();
-  const axiosPublic = useAxiosPublic();
 
   const popupCenter = (url, title) => {
     const dualScreenLeft = window.screenLeft ?? window.screenX;
@@ -50,6 +46,8 @@ export default function GoogleSignInButton({
   const handleGoogleSignIn = () => {
     setIsPageLoading(true);
 
+    window.isLoginSuccessful = null;
+
     const popup = popupCenter(
       "/login/google",
       `${process.env.NEXT_PUBLIC_WEBSITE_NAME} | ` + ctaText,
@@ -59,69 +57,15 @@ export default function GoogleSignInButton({
       if (!popup || popup.closed) {
         clearInterval(interval);
 
-        try {
-          const updatedSession = await getSession();
-
-          if (updatedSession) {
-            const { data: customerList } = await axiosPublic.get(
-              "/allCustomerDetails",
-            );
-            const doesUserHaveAccount = customerList.some(
-              (customer) => customer.email === updatedSession?.user?.email,
-            );
-
-            if (doesUserHaveAccount) {
-              if (isAuthModalOpen) setIsAuthModalOpen(false);
-              toast.success("Signed in successfully.");
-            } else {
-              const allCustomerIds = customerList?.map(
-                (customer) => customer.userInfo?.customerId,
-              );
-
-              const newUserData = {
-                email: updatedSession?.user?.email,
-                password: null,
-                isLinkedWithCredentials: false,
-                isLinkedWithGoogle: true,
-                userInfo: {
-                  customerId: generateCustomerId(allCustomerIds),
-                  personalInfo: {
-                    customerName: updatedSession?.user?.name,
-                    email: updatedSession?.user?.email,
-                    phoneNumber: "",
-                    phoneNumber2: "",
-                    hometown: "",
-                  },
-                  deliveryAddresses: [],
-                  savedDeliveryAddress: null,
-                  score: 0,
-                },
-                wishlistItems: [],
-                cartItems: [],
-              };
-
-              const response = await axiosPublic.post(
-                "/addCustomerDetails",
-                newUserData,
-              );
-
-              if (response?.data?.insertedId) {
-                if (isAuthModalOpen) setIsAuthModalOpen(false);
-                toast.success("Account created successfully.");
-              } else {
-                toast.error(response?.data?.message);
-              }
-            }
-          } else {
-            toast.error(
-              `Failed to ${ctaText.toLowerCase()}. Please try again.`,
-            );
-          }
-        } catch (error) {
-          console.log("Failed to sync user data.", error);
-        } finally {
-          setIsPageLoading(false);
+        if (window.isLoginSuccessful) {
+          toast.success("Successfully logged in.");
+          if (isAuthModalOpen) setIsAuthModalOpen(false);
+        } else {
+          toast.error(`Failed to ${ctaText.toLowerCase()}. Please try again.`);
         }
+
+        delete window.isLoginSuccessful;
+        setIsPageLoading(false);
       }
     }, 500);
   };

@@ -19,6 +19,7 @@ import {
   PiUserCirclePlusLight,
 } from "react-icons/pi";
 import { IoPersonOutline } from "react-icons/io5";
+import { removeRefreshToken } from "@/app/actions/auth";
 import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
 import TransitionLink from "@/app/components/ui/TransitionLink";
@@ -43,6 +44,7 @@ export default function UserDropdown({ legalPolicyPdfLinks }) {
 
     try {
       await signOut({ redirect: false });
+      await removeRefreshToken();
       if (pathname.includes("user") || pathname.includes("checkout"))
         router.push("/");
       localStorage.removeItem("checkoutFormDraft");

@@ -30,15 +30,15 @@ export default function LoginForm({ setModalContent, setIsAuthModalOpen }) {
     setIsPageLoading(true);
 
     try {
-      const result = await signIn("credentials-frontend", {
+      const result = await signIn("credentials", {
         redirect: false,
-        email: data.email,
-        password: data.password,
+        ...data,
       });
 
       if (result?.error) {
         resetFieldForLogin("password");
-        return toast.error(result?.error);
+        console.error("LoginError (header/loginForm/signIn):", result.error);
+        return toast.error(result.error || "Failed to login. Please try again");
       } else {
         toast.success("Successfully signed in.");
       }
@@ -46,7 +46,11 @@ export default function LoginForm({ setModalContent, setIsAuthModalOpen }) {
       resetForLogin(); // Reset form
       setIsAuthModalOpen(false);
     } catch (error) {
-      toast.error(error?.response?.data?.error);
+      console.error(
+        "LoginError (header/loginForm/catch):",
+        error.message || error,
+      );
+      toast.error("Failed to login. Please try again.");
     } finally {
       setIsPageLoading(false);
     }

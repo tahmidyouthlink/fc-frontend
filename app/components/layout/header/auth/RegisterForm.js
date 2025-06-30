@@ -7,18 +7,14 @@ import { useForm } from "react-hook-form";
 import { Checkbox } from "@nextui-org/react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import toast from "react-hot-toast";
-import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
-import generateCustomerId from "@/app/utils/generateCustomerId";
+import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 
 export default function RegisterForm({
   setModalContent,
   setIsAuthModalOpen,
   legalPolicyPdfLinks,
 }) {
-  const axiosPublic = useAxiosPublic();
-  const { setUserData } = useAuth();
   const { setIsPageLoading } = useLoading();
   const [isPasswordVisible, SetIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, SetIsConfirmPasswordVisible] =
@@ -58,52 +54,35 @@ export default function RegisterForm({
     setIsPageLoading(true);
 
     try {
-      const { data: customerList } = await axiosPublic.get(
-        "/allCustomerDetails",
-      );
-      const allCustomerIds = customerList?.map(
-        (customer) => customer.userInfo?.customerId,
-      );
+      // Register user to backend
+      const result = await rawFetch("/customer-signup", {
+        method: "POST",
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          password: data.password,
+          isNewsletterCheckboxSelected,
+        }),
+      });
 
-      const newUserData = {
-        email: data.email,
-        password: data.password,
-        isLinkedWithCredentials: true,
-        isLinkedWithGoogle: false,
-        userInfo: {
-          customerId: generateCustomerId(allCustomerIds),
-          personalInfo: {
-            customerName: data.name,
-            email: data.email,
-            phoneNumber: "",
-            phoneNumber2: "",
-            hometown: "",
-          },
-          deliveryAddresses: [],
-          savedDeliveryAddress: null,
-          score: 0,
-        },
-        wishlistItems: [],
-        cartItems: [],
-      };
-
-      // Register user
-      const response = await axiosPublic.post("/customer-signup", newUserData);
-
-      if (response?.data?.insertedId) {
+      if (result.ok) {
         toast.success("Account created successfully.");
 
-        setUserData(response?.data);
-
         // Login user with the credentials
-        const result = await signIn("credentials-frontend", {
+        const signInResult = await signIn("credentials", {
           redirect: false,
           email: data.email,
           password: data.password,
         });
 
-        if (result?.error) {
-          toast.error(result?.error);
+        if (signInResult?.error) {
+          console.error(
+            "LoginError (header/registerForm/signIn):",
+            signInResult.error,
+          );
+          toast.error(
+            signInResult.error || "Failed to login. Please try again.",
+          );
         }
       } else {
         resetForRegister(
@@ -113,36 +92,23 @@ export default function RegisterForm({
           },
           { keepValues: true },
         );
-        return toast.error(response?.data?.message);
-      }
-
-      const { data: subscribedUsers } =
-        await axiosPublic.get("/allNewsletters");
-      const isAlreadySubscribed = subscribedUsers?.some(
-        (subscribedUser) => subscribedUser.email === data.email,
-      );
-
-      if (isNewsletterCheckboxSelected && !isAlreadySubscribed) {
-        try {
-          const newsletterData = {
-            email: data.email,
-          };
-
-          const response = await axiosPublic.post(
-            "/addNewsletter",
-            newsletterData,
-          );
-          if (!response?.data?.insertedId)
-            toast.error("Unable to subscribe to newsletter.");
-        } catch (error) {
-          console.log("Unable to subscribe to newsletter.", error);
-        }
+        console.error(
+          "RegisterError (header/registerForm/signUpResult):",
+          result.message || "Failed to register. Please try again.",
+        );
+        return toast.error(
+          result.message || "Failed to register. Please try again.",
+        );
       }
 
       resetForRegister(); // Reset form
       setIsAuthModalOpen(false);
     } catch (error) {
-      toast.error(error?.response?.data?.error);
+      console.error(
+        "RegisterError (header/registerForm/catch):",
+        error.message || error,
+      );
+      toast.error("Failed to register. Please try again.");
     } finally {
       setIsPageLoading(false);
     }

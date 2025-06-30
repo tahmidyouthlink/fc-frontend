@@ -31,7 +31,7 @@ export default function CheckoutLogin({
     setIsPageLoading(true);
 
     try {
-      const result = await signIn("credentials-frontend", {
+      const result = await signIn("credentials", {
         redirect: false,
         email: data.loginEmail,
         password: data.loginPassword,
@@ -39,14 +39,19 @@ export default function CheckoutLogin({
 
       if (result?.error) {
         resetFieldForLogin("loginPassword");
-        return toast.error(result?.error);
+        console.error("LoginError (checkoutLogin/signIn):", result.error);
+        return toast.error(result.error || "Failed to login. Please try again");
       } else {
         toast.success("Successfully signed in.");
       }
 
       resetForLogin(); // Reset login fields
     } catch (error) {
-      toast.error(error?.response?.data?.error);
+      console.error(
+        "LoginError (checkoutLogin/catch):",
+        error.message || error,
+      );
+      toast.error("Failed to login. Please try again.");
     } finally {
       setIsPageLoading(false);
     }

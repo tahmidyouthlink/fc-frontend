@@ -11,18 +11,15 @@ import {
 } from "@nextui-org/react";
 import toast from "react-hot-toast";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { axiosPublic } from "@/app/utils/axiosPublic";
-import generateCustomerId from "@/app/utils/generateCustomerId";
 import GoogleSignInButton from "../../layout/header/auth/GoogleSignInButton";
+import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 
 export default function CheckoutRegister({
-  setUserData,
   onError,
   setIsPageLoading,
   isRegisterModalOpen,
   setIsRegisterModalOpen,
   legalPolicyPdfLinks,
-  allCustomerIds,
 }) {
   const [isNewPasswordVisible, SetIsNewPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, SetIsConfirmPasswordVisible] =
@@ -61,45 +58,35 @@ export default function CheckoutRegister({
     setIsPageLoading(true);
 
     try {
-      const newUserData = {
-        email: data.registerEmail,
-        password: data.registerPassword,
-        isLinkedWithCredentials: true,
-        isLinkedWithGoogle: false,
-        userInfo: {
-          customerId: generateCustomerId(allCustomerIds),
-          personalInfo: {
-            customerName: data.registerFullName,
-            email: data.registerEmail,
-            phoneNumber: "",
-            phoneNumber2: "",
-            hometown: "",
-          },
-          deliveryAddresses: [],
-          savedDeliveryAddress: null,
-          score: 0,
-        },
-        wishlistItems: [],
-        cartItems: [],
-      };
+      // Register user to backend
+      const result = await rawFetch("/customer-signup", {
+        method: "POST",
+        body: JSON.stringify({
+          name: data.registerFullName,
+          email: data.registerEmail,
+          password: data.registerPassword,
+          isNewsletterCheckboxSelected,
+        }),
+      });
 
-      // Register user
-      const response = await axiosPublic.post("/customer-signup", newUserData);
-
-      if (response?.data?.insertedId) {
+      if (result.ok) {
         toast.success("Account created successfully.");
 
-        setUserData(response?.data);
-
         // Login user with the credentials
-        const result = await signIn("credentials-frontend", {
+        const signInResult = await signIn("credentials", {
           redirect: false,
           email: data.registerEmail,
           password: data.registerPassword,
         });
 
-        if (result?.error) {
-          toast.error(result?.error);
+        if (signInResult?.error) {
+          console.error(
+            "LoginError (checkoutRegister/signIn):",
+            signInResult.error,
+          );
+          toast.error(
+            signInResult.error || "Failed to login. Please try again.",
+          );
         }
       } else {
         resetForRegister(
@@ -109,36 +96,23 @@ export default function CheckoutRegister({
           },
           { keepValues: true },
         );
-        return toast.error(response?.data?.message);
-      }
-
-      const { data: subscribedUsers } =
-        await axiosPublic.get("/allNewsletters");
-      const isAlreadySubscribed = subscribedUsers?.some(
-        (subscribedUser) => subscribedUser.email === data.registerEmail,
-      );
-
-      if (isNewsletterCheckboxSelected && !isAlreadySubscribed) {
-        try {
-          const newsletterData = {
-            email: data.registerEmail,
-          };
-
-          const response = await axiosPublic.post(
-            "/addNewsletter",
-            newsletterData,
-          );
-          if (!response?.data?.insertedId)
-            toast.error("Unable to subscribe to newsletter.");
-        } catch (error) {
-          console.log("Unable to subscribe to newsletter.", error);
-        }
+        console.error(
+          "RegisterError (checkoutRegister/signUpResult):",
+          result.message || "Failed to register. Please try again.",
+        );
+        return toast.error(
+          result.message || "Failed to register. Please try again.",
+        );
       }
 
       resetForRegister(); // reset register form
       setIsRegisterModalOpen(false);
     } catch (error) {
-      toast.error(error?.response?.data?.error);
+      console.error(
+        "RegisterError (checkoutRegister/catch):",
+        error.message || error,
+      );
+      toast.error("Failed to register. Please try again.");
     } finally {
       setIsPageLoading(false);
     }

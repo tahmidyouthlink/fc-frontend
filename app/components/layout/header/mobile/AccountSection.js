@@ -3,6 +3,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import toast from "react-hot-toast";
 import { PiSignIn, PiSignOut, PiUser, PiUserCirclePlus } from "react-icons/pi";
+import { removeRefreshToken } from "@/app/actions/auth";
 import { useLoading } from "@/app/contexts/loading";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import createErrorMessage from "@/app/utils/createErrorMessage";
@@ -28,6 +29,7 @@ export default function AccountSection({
     setIsPageLoading(true);
     try {
       await signOut({ redirect: false });
+      await removeRefreshToken();
       if (pathname.includes("user") || pathname.includes("checkout"))
         router.push("/");
       localStorage.removeItem("checkoutFormDraft");

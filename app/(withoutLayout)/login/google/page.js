@@ -7,8 +7,35 @@ export default function GoogleSignInWindow() {
   const { data: session, status } = useSession();
 
   useEffect(() => {
-    if (!(status === "loading") && !session) void signIn("google");
-    if (session) window.close();
+    const sendResult = (isSuccessful) => {
+      if (window.opener) {
+        window.opener.isLoginSuccessful = isSuccessful;
+        window.close();
+      }
+    };
+
+    const handleGoogleLogin = async () => {
+      try {
+        const result = await signIn("google", { redirect: false });
+
+        if (result?.error) {
+          console.error("LoginError (googleWindow/signIn):", result.error);
+          sendResult(false);
+        }
+      } catch (error) {
+        console.error(
+          "LoginError (googleWindow/catch):",
+          error.message || error,
+        );
+        sendResult(false);
+      }
+    };
+
+    if (status !== "loading" && !session) {
+      handleGoogleLogin();
+    } else if (session) {
+      sendResult(true);
+    }
   }, [session, status]);
 
   return <div></div>;
