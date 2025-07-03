@@ -12,8 +12,20 @@ export default async function handleResponse(res) {
     const text = await res.text();
 
     if (isJson && text) {
-      data = JSON.parse(text);
-      message = data?.message || data?.error || res.statusText;
+      const parsed = JSON.parse(text);
+
+      if (Array.isArray(parsed)) {
+        data = parsed;
+        message = res.statusText;
+      } else if (parsed && typeof parsed === "object") {
+        message = parsed.message || parsed.error || res.statusText;
+
+        const { message: _msg, error: _err, ...rest } = parsed;
+        data = Object.keys(rest).length > 0 ? rest : null;
+      } else {
+        message = res.statusText || "Unexpected response structure";
+        data = null;
+      }
     } else {
       message = res.statusText || "No content";
     }
