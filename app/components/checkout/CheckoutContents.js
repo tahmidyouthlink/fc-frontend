@@ -10,10 +10,7 @@ export default function CheckoutContents({
   specialOffers,
   shippingZones,
   primaryLocation,
-  allOrderIds,
-  allCustomerIds,
   legalPolicyPdfLinks,
-  promos,
 }) {
   const [cartItems, setCartItems] = useState(null);
   const [orderDetails, setOrderDetails] = useState(null);
@@ -70,13 +67,10 @@ export default function CheckoutContents({
           specialOffers={specialOffers}
           shippingZones={shippingZones}
           primaryLocation={primaryLocation}
-          allOrderIds={allOrderIds}
-          allCustomerIds={allCustomerIds}
           setIsPaymentStepDone={setIsPaymentStepDone}
           cartItems={cartItems}
           setOrderDetails={setOrderDetails}
           legalPolicyPdfLinks={legalPolicyPdfLinks}
-          promos={promos}
         />
       ) : (
         <CheckoutEmpty />

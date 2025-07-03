@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import axios from "axios";
+import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 import circleWithStarShape from "@/public/shapes/circle-with-star.svg";
 import ProductContents from "@/app/components/product/ProductContents";
 import ProductRelatedContents from "@/app/components/product/ProductRelatedContents";
@@ -9,54 +9,10 @@ export default async function Product({ params: { slug } }) {
   let products, specialOffers, primaryLocation, notifyVariants;
 
   try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/allProducts`,
-    );
-    products = response.data || [];
+    const result = await rawFetch("/allProducts");
+    products = result.data || [];
   } catch (error) {
-    console.error(
-      "Fetch error (productDetails/products):",
-      error.response?.data?.message || error.response?.data || error.message,
-    );
-  }
-
-  try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/allOffers`,
-    );
-    specialOffers = response.data || [];
-  } catch (error) {
-    console.error(
-      "Fetch error (productDetails/specialOffers):",
-      error.response?.data?.message || error.response?.data || error.message,
-    );
-  }
-
-  try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/allLocations`,
-    );
-    const locations = response.data || [];
-    primaryLocation = locations?.find(
-      (location) => location?.isPrimaryLocation == true,
-    )?.locationName;
-  } catch (error) {
-    console.error(
-      "Fetch error (productDetails/locations):",
-      error.response?.data?.message || error.response?.data || error.message,
-    );
-  }
-
-  try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/get-all-availability-notifications`,
-    );
-    notifyVariants = response.data || [];
-  } catch (error) {
-    console.error(
-      "Fetch error (productDetails/notifyVariants):",
-      error.response?.data?.message || error.response?.data || error.message,
-    );
+    console.error("FetchError (productDetails/products):", error.message);
   }
 
   const product = products?.find(
@@ -65,6 +21,30 @@ export default async function Product({ params: { slug } }) {
   );
 
   if (!product || product.status !== "active") redirect("/shop");
+
+  try {
+    const result = await rawFetch("/allOffers");
+    specialOffers = result.data || [];
+  } catch (error) {
+    console.error("FetchError (productDetails/specialOffers):", error.message);
+  }
+
+  try {
+    const result = await rawFetch("/primary-location");
+    primaryLocation = result.data?.primaryLocation || null;
+  } catch (error) {
+    console.error(
+      "FetchError (productDetails/primaryLocation):",
+      error.message,
+    );
+  }
+
+  try {
+    const result = await rawFetch("/get-all-availability-notifications");
+    notifyVariants = result.data || [];
+  } catch (error) {
+    console.error("FetchError (productDetails/notifyVariants):", error.message);
+  }
 
   return (
     <main className="relative overflow-hidden">
@@ -86,14 +66,12 @@ export default async function Product({ params: { slug } }) {
         />
       </div>
       <div className="pt-header-h-full-section-pb relative overflow-hidden text-sm [&_img]:pointer-events-none">
-        {/* Product Contents Section */}
         <ProductContents
           product={product}
           specialOffers={specialOffers}
           primaryLocation={primaryLocation}
           notifyVariants={notifyVariants}
         />
-        {/* Product Related Contents */}
         <ProductRelatedContents
           products={products}
           product={product}

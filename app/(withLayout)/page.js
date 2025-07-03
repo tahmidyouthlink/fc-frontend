@@ -1,4 +1,4 @@
-import axios from "axios";
+import { rawFetch } from "../lib/fetcher/rawFetch";
 import { CheckIfProductIsOutOfStock } from "@/app/utils/productSkuCalculation";
 import HomeHero from "../components/home/HomeHero";
 import HomeCategories from "../components/home/HomeCategories";
@@ -9,59 +9,36 @@ import HomeFeatures from "../components/home/HomeFeatures";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  let products, locations, specialOffers, notifyVariants;
+  let products, primaryLocation, specialOffers, notifyVariants;
 
   try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/allProducts`,
-    );
-    products = response.data || [];
+    const result = await rawFetch("/allProducts");
+    products = result.data || [];
   } catch (error) {
-    console.error(
-      "Fetch error (home/products):",
-      error.response?.data?.message || error.response?.data,
-    );
+    console.error("FetchError (home/products):", error.message);
   }
 
   try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/allOffers`,
-    );
-    specialOffers = response.data || [];
+    const result = await rawFetch("/allOffers");
+    specialOffers = result.data || [];
   } catch (error) {
-    console.error(
-      "Fetch error (home/specialOffers):",
-      error.response?.data?.message || error.response?.data || error.message,
-    );
+    console.error("FetchError (home/specialOffers):", error.message);
   }
 
   try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/allLocations`,
-    );
-    locations = response.data || [];
+    const result = await rawFetch("/primary-location");
+    primaryLocation = result.data?.primaryLocation || null;
   } catch (error) {
-    console.error(
-      "Fetch error (home/locations):",
-      error.response?.data?.message || error.response?.data,
-    );
+    console.error("FetchError (home/primaryLocation):", error.message);
   }
 
   try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/get-all-availability-notifications`,
-    );
-    notifyVariants = response.data || [];
+    const result = await rawFetch("/get-all-availability-notifications");
+    notifyVariants = result.data || [];
   } catch (error) {
-    console.error(
-      "Fetch error (home/notifyVariants):",
-      error.response?.data?.message || error.response?.data || error.message,
-    );
+    console.error("FetchError (home/notifyVariants):", error.message);
   }
 
-  const primaryLocation = locations?.find(
-    (location) => location?.isPrimaryLocation == true,
-  )?.locationName;
   const trendingProducts = products
     ?.filter(
       (product) =>

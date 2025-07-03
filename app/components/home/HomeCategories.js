@@ -1,6 +1,6 @@
 import Image from "next/image";
-import axios from "axios";
 import { FaArrowRightLong } from "react-icons/fa6";
+import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 import curvedDottedLineShape from "@/public/shapes/curved-dotted-line-categories.svg";
 import rightArrowShape from "@/public/shapes/custom-arrow-right.png";
 import TransitionLink from "@/app/components/ui/TransitionLink";
@@ -11,22 +11,17 @@ export default async function HomeCategories() {
   let categories;
 
   try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/allCategories`,
-    );
-    categories = response.data || [];
+    const result = await rawFetch("/allCategories");
+    categories = result.data || [];
   } catch (error) {
-    console.error(
-      "Fetch error (home/categories):",
-      error.response?.data?.message || error.response?.data,
-    );
+    console.error("FetchError (home/categories):", error.message);
   }
 
   const featuredCategories = categories?.filter(
     (category) => category.isFeatured === true,
   );
 
-  if (!!featuredCategories?.length)
+  if (featuredCategories?.length)
     return (
       <div className="relative w-full overflow-hidden bg-[var(--color-secondary-300)]">
         <div className="absolute -bottom-24 h-[90%] w-[350%] opacity-50 sm:bottom-0 sm:top-0 sm:w-[150%] md:w-[125%] lg:top-1/2 lg:w-[125%] lg:-translate-y-1/2 xl:w-full 2xl:-bottom-10 2xl:top-[unset] 2xl:h-[105%] 2xl:translate-y-0">

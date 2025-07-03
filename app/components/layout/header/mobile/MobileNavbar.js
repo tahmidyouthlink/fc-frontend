@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Image from "next/image";
-import axios from "axios";
+import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
 import Search from "../Search";
@@ -12,58 +12,34 @@ export default async function MobileNavbar({
   logoWithoutTextSrc,
   logoWithTextSrc,
 }) {
-  let productList, specialOffers, locations, legalPolicyPdfLinks;
+  let productList, specialOffers, primaryLocation, legalPolicyPdfLinks;
 
   try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/allProducts`,
-    );
-    productList = response.data || [];
+    const result = await rawFetch("/allProducts");
+    productList = result.data || [];
   } catch (error) {
-    console.error(
-      "Fetch error (mobileNav/products):",
-      error.response?.data?.message || error.response?.data || error.message,
-    );
+    console.error("FetchError (mobileNav/products):", error.message);
   }
 
   try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/allOffers`,
-    );
-    specialOffers = response.data || [];
+    const result = await rawFetch("/allOffers");
+    specialOffers = result.data || [];
   } catch (error) {
-    console.error(
-      "Fetch error (mobileNav/specialOffers):",
-      error.response?.data?.message || error.response?.data || error.message,
-    );
+    console.error("FetchError (mobileNav/specialOffers):", error.message);
   }
 
   try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/allLocations`,
-    );
-    locations = response.data || [];
+    const result = await rawFetch("/primary-location");
+    primaryLocation = result.data?.primaryLocation || null;
   } catch (error) {
-    console.error(
-      "Fetch error (mobileNav/locations):",
-      error.response?.data?.message || error.response?.data || error.message,
-    );
+    console.error("FetchError (mobileNav/primaryLocation):", error.message);
   }
 
-  const primaryLocation = locations?.find(
-    (location) => location?.isPrimaryLocation == true,
-  )?.locationName;
-
   try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/get-all-policy-pdfs`,
-    );
-    legalPolicyPdfLinks = response.data[0] || {};
+    const result = await rawFetch("/get-all-policy-pdfs");
+    [legalPolicyPdfLinks] = result.data || [];
   } catch (error) {
-    console.error(
-      "Fetch error (mobileNav/legalPolicyPdfLinks):",
-      error.response?.data?.message || error.response?.data || error.message,
-    );
+    console.error("FetchError (mobileNav/legalPdfLinks):", error.message);
   }
 
   return (

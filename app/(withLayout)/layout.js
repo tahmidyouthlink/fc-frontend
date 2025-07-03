@@ -1,4 +1,4 @@
-import axios from "axios";
+import { rawFetch } from "../lib/fetcher/rawFetch";
 import Header from "../components/layout/header/Header";
 import ScrollTopButton from "../components/ui/ScrollTopButton";
 import Footer from "../components/footer/Footer";
@@ -16,30 +16,21 @@ export default async function RootLayout({ children }) {
   let topHeaderData;
 
   try {
-    const { data } = await axios.get(
-      "https://fc-backend-664306765395.asia-south1.run.app/get-all-header-collection",
-    );
-    topHeaderData = data[0];
+    const result = await rawFetch("/get-all-header-collection");
+    [topHeaderData] = result.data || [];
   } catch (error) {
-    console.error(
-      "Fetch error (top header):",
-      error.response?.data?.message || error.response?.data,
-    );
+    console.error("FetchError (layout/topHeader):", error.message);
   }
 
   let logoWithoutTextSrc, logoWithTextSrc;
 
   try {
-    const { data } = await axios.get(
-      "https://fc-backend-664306765395.asia-south1.run.app/get-all-logo",
-    );
-    logoWithoutTextSrc = data[0]?.mobileLogoUrl;
-    logoWithTextSrc = data[0]?.desktopLogoUrl;
+    const result = await rawFetch("/get-all-logo");
+    const [logos] = result.data || [];
+    logoWithoutTextSrc = logos?.mobileLogoUrl;
+    logoWithTextSrc = logos?.desktopLogoUrl;
   } catch (error) {
-    console.error(
-      "Fetch error (logo):",
-      error.response?.data?.message || error.response?.data,
-    );
+    console.error("FetchError (layout/logo):", error.message);
   }
 
   const topHeaderHeight = topHeaderData?.isSlideEnabled ? "28.5px" : "0px";

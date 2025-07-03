@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
 import { FaRegEyeSlash } from "react-icons/fa6";
+import { useLoading } from "@/app/contexts/loading";
 import thunderShape from "@/public/shapes/thunder-with-stroke.svg";
 import {
   calculateFinalPrice,
@@ -22,6 +23,7 @@ export default function ShopContents({
   primaryLocation,
   notifyVariants,
 }) {
+  const { setIsPageLoading } = useLoading();
   const [isFilterButtonClicked, setIsFilterButtonClicked] = useState(false);
   const [selectedFilterOptions, setSelectedFilterOptions] = useState({
     sortBy: new Set([]),
@@ -75,7 +77,9 @@ export default function ShopContents({
         ? new Set([])
         : [searchParams.get("category")],
     }));
-  }, [searchParams]);
+
+    setIsPageLoading(false);
+  }, [searchParams, setIsPageLoading]);
 
   useEffect(() => {
     if (!isLoading)

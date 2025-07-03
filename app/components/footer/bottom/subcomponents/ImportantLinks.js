@@ -1,24 +1,17 @@
 import Link from "next/link";
-import axios from "axios";
+import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 
 export const dynamic = "force-dynamic";
 
 export default async function Importantlinks() {
-  let legalPolicyPdfLinks = null;
+  let legalPolicyPdfLinks;
 
   try {
-    const response = await axios.get(
-      "https://fc-backend-664306765395.asia-south1.run.app/get-all-policy-pdfs",
-    );
+    const response = await rawFetch("/get-all-policy-pdfs");
     [legalPolicyPdfLinks] = response.data || [];
   } catch (error) {
-    console.error(
-      "Failed to fetch policy PDF links:",
-      error.response?.data?.message || error.response?.data || error,
-    );
+    console.error("FetchError (importantLinks/legalPdfLinks):", error.message);
   }
-
-  if (!legalPolicyPdfLinks) return null;
 
   return (
     <div className="col-span-1 space-y-2.5">

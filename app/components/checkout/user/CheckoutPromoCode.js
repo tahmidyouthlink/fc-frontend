@@ -1,8 +1,8 @@
+import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 import { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 
 export default function CheckoutPromoCode({
-  promos,
   userPromoCode,
   setUserPromoCode,
   cartItems,
@@ -23,12 +23,18 @@ export default function CheckoutPromoCode({
     setPromoMessage(updatedPromoMessage);
   }, [userPromoCode, cartItems, cartSubtotal]);
 
-  const handlePromoCodeValidation = () => {
+  const handlePromoCodeValidation = async () => {
     const enteredPromoCode = document.querySelector("#promo-code").value;
-    const correspondingPromo = promos?.find(
-      (promo) =>
-        promo?.promoCode?.toUpperCase() === enteredPromoCode?.toUpperCase(),
-    );
+    let correspondingPromo;
+
+    try {
+      const result = await rawFetch(`/promo-by-code/${enteredPromoCode}`);
+
+      correspondingPromo = result.data;
+    } catch (error) {
+      console.error("FetchError (checkoutPromoCode):", error.message);
+    }
+
     const promoCodeMessageElement = document.querySelector(
       "#promo-code-message",
     );

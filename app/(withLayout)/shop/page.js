@@ -1,64 +1,40 @@
-import axios from "axios";
 import { Suspense } from "react";
+import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 import ShopContents from "@/app/components/shop/ShopContents";
 import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
 
 export const dynamic = "force-dynamic";
 
 export default async function Shop() {
-  let products, specialOffers, locations, notifyVariants;
+  let products, specialOffers, primaryLocation, notifyVariants;
 
   try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/allProducts`,
-    );
-    products = response.data || [];
+    const result = await rawFetch("/allProducts");
+    products = result.data || [];
   } catch (error) {
-    console.error(
-      "Fetch error (shop/products):",
-      error.response?.data?.message || error.response?.data || error.message,
-    );
+    console.error("FetchError (shop/products):", error.message);
   }
 
   try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/allOffers`,
-    );
-    specialOffers = response.data || [];
+    const result = await rawFetch("/allOffers");
+    specialOffers = result.data || [];
   } catch (error) {
-    console.error(
-      "Fetch error (shop/specialOffers):",
-      error.response?.data?.message || error.response?.data || error.message,
-    );
+    console.error("FetchError (shop/specialOffers):", error.message);
   }
 
   try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/allLocations`,
-    );
-    locations = response.data || [];
+    const result = await rawFetch("/primary-location");
+    primaryLocation = result.data?.primaryLocation || null;
   } catch (error) {
-    console.error(
-      "Fetch error (shop/locations):",
-      error.response?.data?.message || error.response?.data || error.message,
-    );
+    console.error("FetchError (shop/primaryLocation):", error.message);
   }
 
   try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/get-all-availability-notifications`,
-    );
-    notifyVariants = response.data || [];
+    const result = await rawFetch("/get-all-availability-notifications");
+    notifyVariants = result.data || [];
   } catch (error) {
-    console.error(
-      "Fetch error (shop/notifyVariants):",
-      error.response?.data?.message || error.response?.data || error.message,
-    );
+    console.error("FetchError (shop/notifyVariants):", error.message);
   }
-
-  const primaryLocation = locations?.find(
-    (location) => location?.isPrimaryLocation == true,
-  )?.locationName;
 
   return (
     <main>

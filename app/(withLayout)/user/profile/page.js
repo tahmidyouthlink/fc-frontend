@@ -1,5 +1,5 @@
-import axios from "axios";
 import { getServerSession } from "next-auth";
+import { tokenizedFetch } from "@/app/lib/fetcher/tokenizedFetch";
 import { authOptions } from "@/app/utils/authOptions";
 import PersonalInfo from "@/app/components/user/profile/PersonalInfo";
 import DeliveryAddresses from "@/app/components/user/profile/DeliveryAddresses";
@@ -11,18 +11,15 @@ export default async function Profile() {
   let userData, personalInfo, deliveryAddresses;
 
   try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/customerDetailsViaEmail/${session?.user?.email}`,
+    const result = await tokenizedFetch(
+      `/customerDetailsViaEmail/${userEmail}`,
     );
 
-    userData = response.data || {};
+    userData = result.data || {};
     personalInfo = userData?.userInfo?.personalInfo || {};
     deliveryAddresses = userData?.userInfo?.deliveryAddresses || [];
   } catch (error) {
-    console.error(
-      "Fetch error (orderHistory/orders):",
-      error.response?.data?.message || error.response?.data || error.message,
-    );
+    console.error("FetchError (profile):", error.message);
   }
 
   return (

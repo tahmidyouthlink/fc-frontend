@@ -1,4 +1,4 @@
-import axios from "axios";
+import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 import HomeHeroSlides from "./HomeHeroSlides";
 
 export const dynamic = "force-dynamic";
@@ -7,15 +7,10 @@ export default async function HomeHero() {
   let sliderData;
 
   try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/allHeroBannerImageUrls`,
-    );
-    sliderData = response.data || [];
+    const result = await rawFetch("/allHeroBannerImageUrls");
+    sliderData = result.data || [];
   } catch (error) {
-    console.error(
-      "Fetch error (home/sliderData):",
-      error.response?.data?.message || error.response?.data,
-    );
+    console.error("FetchError (home/sliderData):", error.message);
   }
 
   const [

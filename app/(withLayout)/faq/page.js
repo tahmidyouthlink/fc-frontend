@@ -1,4 +1,4 @@
-import axios from "axios";
+import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 import FAQs from "@/app/components/legal/faqs";
 
 export const dynamic = "force-dynamic";
@@ -7,19 +7,14 @@ export default async function FAQ() {
   let pageTitle, faqDescription, faqs;
 
   try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/all-faqs`,
-    );
-    const [data] = response.data || [];
+    const result = await rawFetch("/all-faqs");
+    const [faqData] = result.data || [];
 
-    pageTitle = data?.pageTitle;
-    faqDescription = data?.faqDescription;
-    faqs = data?.faqs;
+    pageTitle = faqData?.pageTitle;
+    faqDescription = faqData?.faqDescription;
+    faqs = faqData?.faqs || [];
   } catch (error) {
-    console.error(
-      "Fetch error (faq):",
-      error.response?.data?.message || error.response?.data,
-    );
+    console.error("FetchError (faq):", error.message);
   }
 
   return (

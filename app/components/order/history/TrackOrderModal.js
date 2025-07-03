@@ -124,7 +124,7 @@ export default function TrackOrderModal({
               )}
               {!!shipmentInfo?.trackingNumber && (
                 <Link
-                  href={shipmentInfo?.trackingUrl}
+                  href={shipmentInfo?.trackingUrl || "#"}
                   target="_blank"
                   className="mx-auto !mt-3 mb-9 flex w-fit items-center gap-2 rounded-[4px] bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
                 >

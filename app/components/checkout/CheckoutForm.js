@@ -3,9 +3,7 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
-import generateOrderId from "@/app/utils/generateOrderId";
 import { axiosPublic } from "@/app/utils/axiosPublic";
-import generateCustomerId from "@/app/utils/generateCustomerId";
 import customCurrentDateTimeFormat from "@/app/utils/customCurrentDateTimeFormat";
 import {
   calculateFinalPrice,
@@ -35,13 +33,10 @@ export default function CheckoutForm({
   specialOffers,
   shippingZones,
   primaryLocation,
-  allOrderIds,
-  allCustomerIds,
   setIsPaymentStepDone,
   cartItems,
   setOrderDetails,
   legalPolicyPdfLinks,
-  promos,
 }) {
   const { user, userData, setUserData } = useAuth();
   const { setIsPageLoading } = useLoading();
@@ -194,12 +189,11 @@ export default function CheckoutForm({
     }
 
     const newOrderData = {
-      orderNumber: generateOrderId(allOrderIds, data.name, data.phoneNumber),
+      orderNumber: "TEMP123ORDERNUMBER",
       dateTime,
       customerInfo: {
         customerName: data.name,
-        customerId:
-          userData?.userInfo?.customerId || generateCustomerId(allCustomerIds),
+        customerId: userData?.userInfo?.customerId,
         email: data.email,
         phoneNumber: data.phoneNumber,
         phoneNumber2: data.altPhoneNumber,
@@ -243,11 +237,7 @@ export default function CheckoutForm({
 
       if (response?.data?.insertedId) {
         setOrderDetails({
-          orderNumber: generateOrderId(
-            allOrderIds,
-            data.name,
-            data.phoneNumber,
-          ),
+          orderNumber: "TEMP123ORDERNUMBER",
           phoneNumber: data.phoneNumber,
           totalAmount: total,
           address1: data.addressLineOne,
@@ -466,13 +456,11 @@ export default function CheckoutForm({
           />
         )}
         <CheckoutRegister
-          setUserData={setUserData}
           onError={onError}
           setIsPageLoading={setIsPageLoading}
           isRegisterModalOpen={isRegisterModalOpen}
           setIsRegisterModalOpen={setIsRegisterModalOpen}
           legalPolicyPdfLinks={legalPolicyPdfLinks}
-          allCustomerIds={allCustomerIds}
         />
         <form
           className="space-y-4"
@@ -505,7 +493,6 @@ export default function CheckoutForm({
               ),
           ) && (
             <CheckoutPromoCode
-              promos={promos}
               userPromoCode={userPromoCode}
               setUserPromoCode={setUserPromoCode}
               cartItems={cartItems}

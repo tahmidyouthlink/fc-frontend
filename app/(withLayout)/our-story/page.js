@@ -1,22 +1,17 @@
-import axios from "axios";
+import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 import StoryContents from "@/app/components/story/StoryContents";
 
 export const dynamic = "force-dynamic";
 
 export default async function OurStory() {
-  let departments = null;
+  let departments;
 
   try {
-    const response = await axios.get(
-      "https://fc-backend-664306765395.asia-south1.run.app/get-all-story-collection-backend",
-    );
-    departments =
-      response.data?.filter((department) => department.status === true) || [];
+    const result = await rawFetch("/get-all-story-collection-frontend");
+
+    departments = result.data || [];
   } catch (error) {
-    console.error(
-      "Failed to fetch story contents:",
-      error.response?.data?.message || error.response?.data || error,
-    );
+    console.error("FetchError (story):", error.message);
   }
 
   if (!departments?.length) return null;

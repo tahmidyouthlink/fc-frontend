@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
-import axios from "axios";
 import { HiArrowNarrowLeft } from "react-icons/hi";
+import { tokenizedFetch } from "@/app/lib/fetcher/tokenizedFetch";
 import { authOptions } from "@/app/utils/authOptions";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import OrderDetailsHeader from "@/app/components/order/details/OrderDetailsHeader";
@@ -12,27 +12,19 @@ import OrderItems from "@/app/components/order/details/OrderItems";
 import OrderItemsInfo from "@/app/components/order/details/OrderItemsInfo";
 import OrderInvoiceButton from "@/app/components/order/details/OrderInvoiceButton";
 
-export default async function ProductDetails({ params }) {
+export default async function OrderDetails({ params }) {
   const session = await getServerSession(authOptions);
 
   let order;
 
   try {
-    const response = await axios.get(
-      `https://fc-backend-664306765395.asia-south1.run.app/allOrders`,
+    const result = await tokenizedFetch(
+      `/customer-orders/${params.id}?email=${session?.user?.email}`,
     );
 
-    const orders = response.data || [];
-    order = orders?.find(
-      (order) =>
-        order?.orderNumber === params.id.toUpperCase() &&
-        order?.customerInfo?.email === session?.user?.email,
-    );
+    order = result.data;
   } catch (error) {
-    console.error(
-      "Fetch error (orderDetails/orders):",
-      error.response?.data?.message || error.response?.data || error.message,
-    );
+    console.error("FetchError (orderDetails/order):", error.message);
   }
 
   if (!order) redirect("/user/orders");
