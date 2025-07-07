@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -8,6 +9,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useLoading } from "@/app/contexts/loading";
 
 export default function LoginForm({ setModalContent, setIsAuthModalOpen }) {
+  const router = useRouter();
   const { setIsPageLoading } = useLoading();
   const [isPasswordVisible, SetIsPasswordVisible] = useState(false);
 
@@ -41,6 +43,7 @@ export default function LoginForm({ setModalContent, setIsAuthModalOpen }) {
         return toast.error(result.error || "Failed to login. Please try again");
       } else {
         toast.success("Successfully signed in.");
+        router.refresh();
       }
 
       resetForLogin(); // Reset form

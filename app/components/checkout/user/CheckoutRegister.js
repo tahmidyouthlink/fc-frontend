@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import {
@@ -21,6 +22,7 @@ export default function CheckoutRegister({
   setIsRegisterModalOpen,
   legalPolicyPdfLinks,
 }) {
+  const router = useRouter();
   const [isNewPasswordVisible, SetIsNewPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, SetIsConfirmPasswordVisible] =
     useState(false);
@@ -87,6 +89,8 @@ export default function CheckoutRegister({
           toast.error(
             signInResult.error || "Failed to login. Please try again.",
           );
+        } else {
+          router.refresh();
         }
       } else {
         resetForRegister(

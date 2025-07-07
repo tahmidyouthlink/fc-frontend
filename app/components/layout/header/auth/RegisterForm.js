@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { Checkbox } from "@nextui-org/react";
@@ -15,6 +16,7 @@ export default function RegisterForm({
   setIsAuthModalOpen,
   legalPolicyPdfLinks,
 }) {
+  const router = useRouter();
   const { setIsPageLoading } = useLoading();
   const [isPasswordVisible, SetIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, SetIsConfirmPasswordVisible] =
@@ -83,6 +85,8 @@ export default function RegisterForm({
           toast.error(
             signInResult.error || "Failed to login. Please try again.",
           );
+        } else {
+          router.refresh();
         }
       } else {
         resetForRegister(

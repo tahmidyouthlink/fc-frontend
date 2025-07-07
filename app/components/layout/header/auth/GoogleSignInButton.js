@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { LuCheck } from "react-icons/lu";
 import { FcGoogle } from "react-icons/fc";
@@ -11,6 +12,7 @@ export default function GoogleSignInButton({
   isAuthModalOpen,
   setIsAuthModalOpen,
 }) {
+  const router = useRouter();
   const { setIsPageLoading } = useLoading();
 
   const popupCenter = (url, title) => {
@@ -60,6 +62,7 @@ export default function GoogleSignInButton({
         if (window.isLoginSuccessful) {
           toast.success("Successfully logged in.");
           if (isAuthModalOpen) setIsAuthModalOpen(false);
+          router.refresh();
         } else {
           toast.error(`Failed to ${ctaText.toLowerCase()}. Please try again.`);
         }

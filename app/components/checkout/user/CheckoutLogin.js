@@ -3,6 +3,7 @@ import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { useRouter } from "next/navigation";
 import CheckoutForgotPassword from "./CheckoutForgotPassword";
 import GoogleSignInButton from "../../layout/header/auth/GoogleSignInButton";
 
@@ -11,6 +12,7 @@ export default function CheckoutLogin({
   setIsPageLoading,
   setIsRegisterModalOpen,
 }) {
+  const router = useRouter();
   const [isPasswordVisible, SetIsPasswordVisible] = useState(false);
 
   const {
@@ -43,6 +45,7 @@ export default function CheckoutLogin({
         return toast.error(result.error || "Failed to login. Please try again");
       } else {
         toast.success("Successfully signed in.");
+        router.refresh();
       }
 
       resetForLogin(); // Reset login fields

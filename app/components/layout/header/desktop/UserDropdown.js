@@ -45,6 +45,7 @@ export default function UserDropdown({ legalPolicyPdfLinks }) {
     try {
       await signOut({ redirect: false });
       await removeRefreshToken();
+      router.refresh();
       if (pathname.includes("user") || pathname.includes("checkout"))
         router.push("/");
       localStorage.removeItem("checkoutFormDraft");
