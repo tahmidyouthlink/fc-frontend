@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useLoading } from "@/app/contexts/loading";
-import { axiosPublic } from "@/app/utils/axiosPublic";
+import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 
 export default function TopFooterNewsletter({
   newsletterSubscriptions,
@@ -37,21 +37,30 @@ export default function TopFooterNewsletter({
     setIsPageLoading(true);
 
     try {
-      const newsletterData = {
-        email: data.newsletterEmail,
-      };
+      const result = await rawFetch("/addNewsletter", {
+        method: "POST",
+        body: JSON.stringify({
+          email: data.newsletterEmail,
+        }),
+      });
 
-      const response = await axiosPublic.post("/addNewsletter", newsletterData);
-
-      if (response?.data?.insertedId) {
+      if (result.ok) {
         toast.success("Subscribed to newsletter successfully.");
         router.refresh();
         reset();
       } else {
-        toast.error("Unable to subscribe to newsletter.");
+        console.error(
+          "SubmissionError (footer/newsletter):",
+          result.message || "Failed to subscribe to newsletter.",
+        );
+        toast.error("Failed to subscribe to newsletter.");
       }
     } catch (error) {
-      toast.error("Something went wrong. Please try again.");
+      console.error(
+        "SubmissionError (footer/newsletter):",
+        error.message || error,
+      );
+      toast.error("Failed to subscribe to newsletter.");
     }
     setIsPageLoading(false);
   };

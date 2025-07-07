@@ -1,12 +1,29 @@
+import { getServerSession } from "next-auth";
+import { tokenizedFetch } from "@/app/lib/fetcher/tokenizedFetch";
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
+import { authOptions } from "@/app/utils/authOptions";
 import CheckoutContents from "@/app/components/checkout/CheckoutContents";
 
 export default async function Checkout() {
-  let productList,
+  const session = await getServerSession(authOptions);
+  const userEmail = session?.user?.email;
+
+  let userData,
+    productList,
     specialOffers,
     shippingZones,
     primaryLocation,
     legalPolicyPdfLinks;
+
+  try {
+    const result = await tokenizedFetch(
+      `/customerDetailsViaEmail/${userEmail}`,
+    );
+
+    userData = result.data || {};
+  } catch (error) {
+    console.error("FetchError (checkout/products):", error.message);
+  }
 
   try {
     const result = await rawFetch("/allProducts");
@@ -45,6 +62,7 @@ export default async function Checkout() {
 
   return (
     <CheckoutContents
+      userData={userData}
       productList={productList}
       specialOffers={specialOffers}
       shippingZones={shippingZones}

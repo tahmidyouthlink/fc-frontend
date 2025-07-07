@@ -1,7 +1,6 @@
 import { FaRegBell } from "react-icons/fa6";
 import { LuCheckCircle2 } from "react-icons/lu";
 import { useAuth } from "@/app/contexts/auth";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
 import NotifyMeModal from "./NotifyMeModal";
 
 export default function NotifyMeButton({
@@ -13,7 +12,6 @@ export default function NotifyMeButton({
   setIsNotifyMeModalOpen,
 }) {
   const { userData } = useAuth();
-  const axiosPublic = useAxiosPublic();
   let isUserSubscribed;
 
   if (!selectedOptions?.size || productVariantSku !== 0) return;
@@ -51,7 +49,6 @@ export default function NotifyMeButton({
       )}
       <NotifyMeModal
         userData={userData}
-        axiosPublic={axiosPublic}
         isNotifyMeModalOpen={isNotifyMeModalOpen}
         setIsNotifyMeModalOpen={setIsNotifyMeModalOpen}
         notifyMeProduct={{

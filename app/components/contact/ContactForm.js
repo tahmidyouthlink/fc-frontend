@@ -6,12 +6,11 @@ import { Select, SelectItem } from "@nextui-org/react";
 import toast from "react-hot-toast";
 import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 
 export default function ContactForm() {
   const { userData } = useAuth();
   const { setIsPageLoading } = useLoading();
-  const axiosPublic = useAxiosPublic();
 
   const {
     register,
@@ -45,18 +44,26 @@ export default function ContactForm() {
     setIsPageLoading(true);
 
     try {
-      const response = await axiosPublic.post("/contact", {
-        ...data,
-        topic: [...data.topic][0],
+      const result = await rawFetch("/contact", {
+        method: "POST",
+        body: JSON.stringify({
+          ...data,
+          topic: [...data.topic][0],
+        }),
       });
 
-      if (response.data.success) {
-        toast.success(response.data.message);
+      if (result.ok) {
+        toast.success(result.message);
       } else {
-        toast.error(response.data.message);
+        console.error(
+          "SubmissionError (contactForm):",
+          result.message || "Failed to submit contact form.",
+        );
+        toast.error(result.message || "Failed to submit contact form.");
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      console.error("SubmissionError (contactForm):", error.message || error);
+      toast.error("Failed to submit contact form.");
     } finally {
       reset({
         name: userData?.userInfo?.personalInfo?.customerName || "",

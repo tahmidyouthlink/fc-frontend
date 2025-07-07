@@ -11,10 +11,10 @@ import {
 import toast from "react-hot-toast";
 import { LuMoveLeft, LuSendHorizonal } from "react-icons/lu";
 import { useLoading } from "@/app/contexts/loading";
+import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 
 export default function NotifyMeModal({
   userData,
-  axiosPublic,
   isNotifyMeModalOpen,
   setIsNotifyMeModalOpen,
   notifyMeProduct,
@@ -38,19 +38,28 @@ export default function NotifyMeModal({
     setIsPageLoading(true);
 
     try {
-      await axiosPublic.post("/add-availability-notifications", {
-        ...data,
-        ...notifyMeProduct,
+      const result = await rawFetch("/add-availability-notifications", {
+        method: "POST",
+        body: JSON.stringify({
+          ...data,
+          ...notifyMeProduct,
+        }),
       });
 
-      toast.success("Request submitted successfully.");
-      router.refresh();
-      setIsNotifyMeModalOpen(false);
+      if (result.ok) {
+        toast.success("Request submitted successfully.");
+        router.refresh();
+        setIsNotifyMeModalOpen(false);
+      } else {
+        console.error(
+          "SubmissionError (notify/modal):",
+          result.message || "Failed to submit request.",
+        );
+        toast.error(result.message || "Failed to submit request.");
+      }
     } catch (error) {
-      const serverErrorMessage = error?.response?.data?.message;
-
-      if (serverErrorMessage) toast.error(serverErrorMessage);
-      else console.error(error.message);
+      console.error("SubmissionError (notify/modal):", error.message || error);
+      toast.error("Failed to submit request.");
     } finally {
       reset();
       setIsPageLoading(false);

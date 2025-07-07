@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { MdCancel } from "react-icons/md";
 import fileUploadSVG from "@/public/shapes/upload.svg";
 import { useLoading } from "@/app/contexts/loading";
-import { axiosPublic } from "@/app/utils/axiosPublic";
+import { routeFetch } from "@/app/lib/fetcher/routeFetch";
 
 export default function ReturnImagesField({
   register,
@@ -43,25 +43,35 @@ export default function ReturnImagesField({
         formData.append("file", image); // Use 'file' for each image
       }
 
-      const response = await axiosPublic.post(
-        "/upload-multiple-files",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
-      );
+      const result = await routeFetch("/api/upload-files", {
+        method: "POST",
+        body: formData,
+      });
 
-      if (response?.data?.urls && Array.isArray(response.data.urls)) {
-        imageUrls.push(...response.data.urls);
+      if (result.ok) {
+        const urls = result.data?.urls;
+
+        if (urls && Array.isArray(urls)) {
+          imageUrls.push(...urls);
+        } else {
+          console.error(
+            "UrlsError (orderDetails/returnImagesField): No image URLs or URLs in wrong data-type.",
+          );
+          toast.error("Failed to get the uploaded image URLs.");
+        }
       } else {
-        toast.error("Failed to get image URLs from response.");
+        console.error(
+          "UploadError (orderDetails/returnImagesField):",
+          result.message || "Failed to upload images.",
+        );
+        toast.error(result.message || "Failed to upload images.");
       }
     } catch (error) {
-      toast.error(
-        `Upload failed: ${error.response?.data?.error?.message || error.message}`,
+      console.error(
+        "UploadError (orderDetails/returnImagesField):",
+        error.message || error,
       );
+      toast.error("Failed to upload images.");
     }
 
     return imageUrls;

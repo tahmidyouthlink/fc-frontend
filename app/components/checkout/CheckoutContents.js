@@ -6,6 +6,7 @@ import CheckoutForm from "./CheckoutForm";
 import CheckoutEmpty from "./CheckoutEmpty";
 
 export default function CheckoutContents({
+  userData,
   productList,
   specialOffers,
   shippingZones,
@@ -63,6 +64,7 @@ export default function CheckoutContents({
       <div className="sticky left-[80%] top-1/3 animate-blob bg-[var(--color-moving-bubble-primary)] [animation-delay:2s] max-sm:hidden" />
       {!!cartItems?.length ? (
         <CheckoutForm
+          userData={userData}
           productList={productList}
           specialOffers={specialOffers}
           shippingZones={shippingZones}
