@@ -18,20 +18,28 @@ export const tokenizedFetch = async (path, options = {}) => {
   }
 
   const method = (options.method || "GET").toUpperCase();
-
   const isGetMethod = method === "GET";
   const hasCustomCache =
     options.cache === "force-cache" ||
     (options.next && "revalidate" in options.next);
 
-  let res = await fetch(`${process.env.BACKEND_URL}${path}`, {
+  const headers = {
+    ...(options.headers || {}),
+    Authorization: `Bearer ${session.accessToken}`,
+  };
+
+  const isFormData = options.body instanceof FormData;
+  const isContentTypeNotSet =
+    !headers["Content-Type"] && !headers["content-type"];
+
+  if (options.body && !isFormData && isContentTypeNotSet) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  const res = await fetch(`${process.env.BACKEND_URL}${path}`, {
     ...options,
     method,
-    headers: {
-      ...options.headers,
-      Authorization: `Bearer ${session?.accessToken}`,
-      "Content-Type": "application/json",
-    },
+    headers,
     ...(isGetMethod && !hasCustomCache && { cache: "no-store" }),
     credentials: "include", // ensure httpOnly cookie is sent
   });
