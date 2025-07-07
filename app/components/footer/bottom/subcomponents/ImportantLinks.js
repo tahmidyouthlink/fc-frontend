@@ -18,27 +18,27 @@ export default async function Importantlinks() {
       <h3 className="font-semibold uppercase">Important Links</h3>
       <ul>
         <li>
-          <Link target="_blank" href={legalPolicyPdfLinks?.terms}>
+          <Link target="_blank" href={legalPolicyPdfLinks?.terms || "#"}>
             Terms & Conditions
           </Link>
         </li>
         <li>
-          <Link target="_blank" href={legalPolicyPdfLinks?.privacy}>
+          <Link target="_blank" href={legalPolicyPdfLinks?.privacy || "#"}>
             Privacy Policy
           </Link>
         </li>
         <li>
-          <Link target="_blank" href={legalPolicyPdfLinks?.refund}>
+          <Link target="_blank" href={legalPolicyPdfLinks?.refund || "#"}>
             Refund Policy
           </Link>
         </li>
         <li>
-          <Link target="_blank" href={legalPolicyPdfLinks?.shipping}>
+          <Link target="_blank" href={legalPolicyPdfLinks?.shipping || "#"}>
             Shipping Policy
           </Link>
         </li>
         <li>
-          <Link target="_blank" href={legalPolicyPdfLinks?.return}>
+          <Link target="_blank" href={legalPolicyPdfLinks?.return || "#"}>
             Return Policy
           </Link>
         </li>
