@@ -6,7 +6,6 @@ import CheckoutContents from "@/app/components/checkout/CheckoutContents";
 
 export default async function Checkout() {
   const session = await getServerSession(authOptions);
-  const userEmail = session?.user?.email;
 
   let userData,
     productList,
@@ -17,12 +16,12 @@ export default async function Checkout() {
 
   try {
     const result = await tokenizedFetch(
-      `/customerDetailsViaEmail/${userEmail}`,
+      `/customerDetailsViaEmail/${session?.user?.email}`,
     );
 
     userData = result.data || {};
   } catch (error) {
-    console.error("FetchError (checkout/products):", error.message);
+    console.error("FetchError (checkout/userData):", error.message);
   }
 
   try {

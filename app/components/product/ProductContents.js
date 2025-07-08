@@ -11,6 +11,7 @@ import ExpandedImagesModal from "../shared/ExpandedImageModal";
 import ProductInfo from "./ProductInfo";
 
 export default function ProductContents({
+  userData,
   product,
   specialOffers,
   primaryLocation,
@@ -81,6 +82,7 @@ export default function ProductContents({
           setIsImageExpanded={setIsImageExpanded}
         />
         <ProductInfo
+          userData={userData}
           product={product}
           specialOffers={specialOffers}
           primaryLocation={primaryLocation}

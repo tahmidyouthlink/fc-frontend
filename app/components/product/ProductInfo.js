@@ -6,6 +6,7 @@ import ProductInfoDetails from "./ProductInfoDetails";
 import ProductInfoFooter from "./ProductInfoFooter";
 
 export default function ProductInfo({
+  userData,
   product,
   specialOffers,
   primaryLocation,
@@ -57,6 +58,7 @@ export default function ProductInfo({
       </div>
       {/* Overview Section */}
       <ProductInfoOverview
+        userData={userData}
         product={product}
         specialOffers={specialOffers}
         primaryLocation={primaryLocation}

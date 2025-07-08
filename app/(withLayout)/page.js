@@ -1,4 +1,7 @@
+import { getServerSession } from "next-auth";
+import { tokenizedFetch } from "../lib/fetcher/tokenizedFetch";
 import { rawFetch } from "../lib/fetcher/rawFetch";
+import { authOptions } from "../utils/authOptions";
 import { CheckIfProductIsOutOfStock } from "@/app/utils/productSkuCalculation";
 import HomeHero from "../components/home/HomeHero";
 import HomeCategories from "../components/home/HomeCategories";
@@ -9,7 +12,19 @@ import HomeFeatures from "../components/home/HomeFeatures";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  let products, primaryLocation, specialOffers, notifyVariants;
+  const session = await getServerSession(authOptions);
+
+  let userData, products, primaryLocation, specialOffers, notifyVariants;
+
+  try {
+    const result = await tokenizedFetch(
+      `/customerDetailsViaEmail/${session?.user?.email}`,
+    );
+
+    userData = result.data || {};
+  } catch (error) {
+    console.error("FetchError (home/userData):", error.message);
+  }
 
   try {
     const result = await rawFetch("/allProducts");
@@ -61,12 +76,14 @@ export default async function Home() {
       <HomeHero />
       <HomeCategories />
       <HomeTrending
+        userData={userData}
         trendingProducts={trendingProducts}
         specialOffers={specialOffers}
         primaryLocation={primaryLocation}
         notifyVariants={notifyVariants}
       />
       <HomeNewArrival
+        userData={userData}
         isAnyTrendingProductAvailable={trendingProducts?.length}
         newlyArrivedProducts={newlyArrivedProducts}
         specialOffers={specialOffers}

@@ -1,12 +1,27 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { tokenizedFetch } from "@/app/lib/fetcher/tokenizedFetch";
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
+import { authOptions } from "@/app/utils/authOptions";
 import circleWithStarShape from "@/public/shapes/circle-with-star.svg";
 import ProductContents from "@/app/components/product/ProductContents";
 import ProductRelatedContents from "@/app/components/product/ProductRelatedContents";
 
 export default async function Product({ params: { slug } }) {
-  let products, specialOffers, primaryLocation, notifyVariants;
+  const session = await getServerSession(authOptions);
+
+  let userData, products, specialOffers, primaryLocation, notifyVariants;
+
+  try {
+    const result = await tokenizedFetch(
+      `/customerDetailsViaEmail/${session?.user?.email}`,
+    );
+
+    userData = result.data || {};
+  } catch (error) {
+    console.error("FetchError (checkout/userData):", error.message);
+  }
 
   try {
     const result = await rawFetch("/allProducts");
@@ -67,12 +82,14 @@ export default async function Product({ params: { slug } }) {
       </div>
       <div className="pt-header-h-full-section-pb relative overflow-hidden text-sm [&_img]:pointer-events-none">
         <ProductContents
+          userData={userData}
           product={product}
           specialOffers={specialOffers}
           primaryLocation={primaryLocation}
           notifyVariants={notifyVariants}
         />
         <ProductRelatedContents
+          userData={userData}
           products={products}
           product={product}
           specialOffers={specialOffers}

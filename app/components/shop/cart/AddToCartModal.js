@@ -5,6 +5,7 @@ import CartModalContents from "./CartModalContents";
 import CartModalButtons from "./CartModalButtons";
 
 export default function AddToCartModal({
+  userData,
   isAddToCartModalOpen,
   setIsAddToCartModalOpen,
   product,
@@ -80,6 +81,7 @@ export default function AddToCartModal({
         />
         <hr className="mb-5 mt-10 h-0.5 bg-neutral-100 md:my-5" />
         <CartModalButtons
+          userData={userData}
           productId={product?._id}
           productTitle={product?.productTitle}
           productImg={

@@ -1,17 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
 import { RiCloseLine, RiEditLine, RiSaveLine } from "react-icons/ri";
 import { useLoading } from "@/app/contexts/loading";
-import { axiosPublic } from "@/app/utils/axiosPublic";
+import { routeFetch } from "@/app/lib/fetcher/routeFetch";
 import { cities } from "@/app/data/cities";
 
 export default function PersonalInfo({ serverUserData }) {
-  const { setIsPageLoading } = useLoading();
+  const router = useRouter();
   const [userData, setUserData] = useState(serverUserData || {});
+  const { setIsPageLoading } = useLoading();
   const personalInfo = userData?.userInfo?.personalInfo || {};
   const [isEditingForm, setIsEditingForm] = useState(false);
   const {
@@ -82,16 +84,27 @@ export default function PersonalInfo({ serverUserData }) {
     setUserData(updatedUserData);
 
     try {
-      const response = await axiosPublic.put(
-        `/updateUserInformation/${userData?._id}`,
-        updatedUserData,
-      );
+      const result = await routeFetch(`/api/user-data/${userData?._id}`, {
+        method: "PUT",
+        body: JSON.stringify(updatedUserData),
+      });
 
-      if (!!response?.data?.modifiedCount || !!response?.data?.matchedCount) {
+      if (result.ok) {
         toast.success("Personal information updated successfully.");
+        router.refresh();
+      } else {
+        console.error(
+          "UpdateError (personalInfo):",
+          result.message || "Failed to update data on server.",
+        );
+        toast.error(result.message || "Failed to update data on server.");
       }
     } catch (error) {
-      toast.error("Failed update data in server."); // If server error occurs
+      console.error(
+        "UpdateError (personalInfo):",
+        result.message || "Failed to update data on server.",
+      );
+      toast.error(result.message || "Failed to update data on server.");
     }
 
     setIsEditingForm(false);

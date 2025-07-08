@@ -1,11 +1,10 @@
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useLoading } from "@/app/contexts/loading";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 
 export default function ForgotPasswordForm({ setIsAuthModalOpen }) {
   const { setIsPageLoading } = useLoading();
-  const axiosPublic = useAxiosPublic();
   const {
     register: registerForForgotPassword,
     handleSubmit: handleSubmitForForgotPassword,
@@ -23,17 +22,28 @@ export default function ForgotPasswordForm({ setIsAuthModalOpen }) {
     setIsPageLoading(true);
 
     try {
-      const response = await axiosPublic.put("/request-password-reset", data);
+      const result = await rawFetch("/request-password-reset", {
+        method: "PUT",
+        body: JSON.stringify(data),
+      });
 
-      if (response.data.success) {
+      if (result.ok) {
         resetForForgotPassword(); // Reset form
-        toast.success(response.data.message);
+        toast.success(result.message);
         setIsAuthModalOpen(false);
       } else {
-        toast.error(response.data.message);
+        console.error(
+          "SubmissionError (forgotPasswordForm):",
+          result.message || "Failed to request for password reset.",
+        );
+        toast.error(result.message);
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      console.error(
+        "SubmissionError (forgotPasswordForm):",
+        error.message || error,
+      );
+      toast.error("Failed to request for password reset.");
     } finally {
       setIsPageLoading(false);
     }

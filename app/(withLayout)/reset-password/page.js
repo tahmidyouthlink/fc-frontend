@@ -1,5 +1,5 @@
-import axios from "axios";
 import { TbLockExclamation } from "react-icons/tb";
+import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import ResetPasswordForm from "@/app/components/reset/ResetPasswordForm";
 
@@ -8,25 +8,20 @@ export default async function ResetPassword({ searchParams }) {
   let isTokenValid, email, validationMessage;
 
   try {
-    const response = await axios.put(
-      "https://fc-backend-664306765395.asia-south1.run.app/validate-reset-token",
-      {
-        token,
-      },
-    );
+    const result = await rawFetch("/validate-reset-token", {
+      method: "PUT",
+      body: JSON.stringify({ token }),
+    });
 
-    isTokenValid = response.data.success;
-    email = response.data.email;
-    validationMessage = response.data.message;
+    isTokenValid = result.ok;
+    email = result.data.email;
+    validationMessage = result.message;
   } catch (error) {
-    console.error(
-      "Reset password error:",
-      error.response?.data?.message || error.response?.data || error.message,
-    );
+    console.error("ValidationError:", error.message || error);
 
     isTokenValid = false;
     email = null;
-    validationMessage = error.response.data.message;
+    validationMessage = error.message || "Unable to validate token.";
   }
 
   return (

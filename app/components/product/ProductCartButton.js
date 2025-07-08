@@ -1,17 +1,17 @@
+import { useRouter } from "next/navigation";
 import {
-  Button,
   Popover,
   PopoverContent,
   PopoverTrigger,
   Tooltip,
 } from "@nextui-org/react";
 import toast from "react-hot-toast";
+import { routeFetch } from "@/app/lib/fetcher/routeFetch";
 import { CgShoppingCart } from "react-icons/cg";
-import { useAuth } from "@/app/contexts/auth";
-import { axiosPublic } from "@/app/utils/axiosPublic";
 import addToCartToast from "@/app/utils/addToCartToast";
 
 export default function ProductCartButton({
+  userData,
   productId,
   productTitle,
   productImg,
@@ -20,7 +20,7 @@ export default function ProductCartButton({
   selectedOptions,
   setSelectedOptions,
 }) {
-  const { user, userData, setUserData } = useAuth();
+  const router = useRouter();
 
   const isExistingItem = (item) =>
     item._id === productId &&
@@ -62,21 +62,19 @@ export default function ProductCartButton({
     localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save item in local cart
 
     // Save item in server cart, if user is logged in
-    if (!!user) {
+    if (userData) {
       const updatedUserData = {
         ...userData,
         cartItems: updatedCart,
       };
 
       try {
-        const response = await axiosPublic.put(
-          `/updateUserInformation/${userData?._id}`,
-          updatedUserData,
-        );
+        const result = await routeFetch(`/api/user-data/${userData?._id}`, {
+          method: "PUT",
+          body: JSON.stringify(updatedUserData),
+        });
 
-        if (!!response?.data?.modifiedCount || !!response?.data?.matchedCount) {
-          setUserData(updatedUserData);
-
+        if (result.ok) {
           // Display custom success toast notification, if server cart is updated
           toast.custom(
             (t) =>
@@ -91,9 +89,20 @@ export default function ProductCartButton({
               position: "top-right",
             },
           );
+          router.refresh();
+        } else {
+          console.error(
+            "UpdateError (productCartButton):",
+            result.message || "Failed to update the cart on server.",
+          );
+          toast.error(result.message || "Failed to update the cart on server.");
         }
       } catch (error) {
-        toast.error("Failed to add item to cart."); // If server error occurs
+        console.error(
+          "UpdateError (productCartButton):",
+          error.message || error,
+        );
+        toast.error("Failed to update the cart on server.");
       }
     } else {
       // Display custom success toast notification, if saved only locally
@@ -112,7 +121,7 @@ export default function ProductCartButton({
       );
     }
 
-    window.dispatchEvent(new Event("storageCart")); // Dispatch event so that event listener is triggered
+    window.dispatchEvent(new Event("storageCart"));
   };
 
   return (

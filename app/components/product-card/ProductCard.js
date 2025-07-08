@@ -13,6 +13,7 @@ import CardProductInfo from "./CardProductInfo";
 import CardButtons from "./CardButtons";
 
 export default function ProductCard({
+  userData,
   product,
   specialOffers,
   primaryLocation,
@@ -62,6 +63,7 @@ export default function ProductCard({
         }}
       />
       <CardButtons
+        userData={userData}
         product={product}
         isProductOutOfStock={isProductOutOfStock}
         setIsAddToCartModalOpen={setIsAddToCartModalOpen}

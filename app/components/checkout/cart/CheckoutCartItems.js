@@ -1,12 +1,12 @@
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { CgTrash } from "react-icons/cg";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { FaCircleCheck } from "react-icons/fa6";
 import { FaExclamationCircle } from "react-icons/fa";
-import { useAuth } from "@/app/contexts/auth";
-import { axiosPublic } from "@/app/utils/axiosPublic";
+import { routeFetch } from "@/app/lib/fetcher/routeFetch";
 import {
   calculateFinalPrice,
   calculateProductSpecialOfferDiscount,
@@ -22,12 +22,13 @@ import DiscountModal from "../../ui/DiscountModal";
 import DiscountTooptip from "../../ui/DiscountTooltip";
 
 export default function CheckoutCartItems({
+  userData,
   productList,
   cartItems,
   specialOffers,
   primaryLocation,
 }) {
-  const { user, userData, setUserData } = useAuth();
+  const router = useRouter();
   const cartSubtotal = calculateSubtotal(productList, cartItems, specialOffers);
   const [isSpecialOfferModalOpen, setIsSpecialOfferModalOpen] = useState(false);
   const [activeModalItem, setActiveModalItem] = useState(null);
@@ -36,27 +37,37 @@ export default function CheckoutCartItems({
     localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save item in local cart
 
     // Save item in server cart, if user is logged in
-    if (!!user) {
+    if (userData) {
       const updatedUserData = {
         ...userData,
         cartItems: updatedCart,
       };
 
       try {
-        const response = await axiosPublic.put(
-          `/updateUserInformation/${userData?._id}`,
-          updatedUserData,
-        );
+        const result = await routeFetch(`/api/user-data/${userData?._id}`, {
+          method: "PUT",
+          body: JSON.stringify(updatedUserData),
+        });
 
-        if (!!response?.data?.modifiedCount || !!response?.data?.matchedCount) {
-          setUserData(updatedUserData);
+        if (!result.ok) {
+          console.error(
+            "UpdateError (checkoutCartItems):",
+            result.message || "Failed to update the cart on server.",
+          );
+          toast.error(result.message || "Failed to update the cart on server.");
+        } else {
+          router.refresh();
         }
       } catch (error) {
-        toast.error("Failed to update the cart on server."); // If server error occurs
+        console.error(
+          "UpdateError (checkoutCartItems):",
+          error.message || error,
+        );
+        toast.error("Failed to update the cart on server.");
       }
     }
 
-    window.dispatchEvent(new Event("storageCart")); // Dispatch event so that event listener is triggered
+    window.dispatchEvent(new Event("storageCart"));
   };
 
   return (

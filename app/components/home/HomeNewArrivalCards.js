@@ -6,6 +6,7 @@ import ProductCard from "../product-card/ProductCard";
 import AddToCartModal from "../shop/cart/AddToCartModal";
 
 export default function HomeNewArrivalCards({
+  userData,
   newlyArrivedProducts,
   specialOffers,
   primaryLocation,
@@ -20,6 +21,7 @@ export default function HomeNewArrivalCards({
       {newlyArrivedProducts.map((newlyArrivedProduct) => (
         <ProductCard
           key={"home-new-arrival-product-" + newlyArrivedProduct._id}
+          userData={userData}
           product={newlyArrivedProduct}
           specialOffers={specialOffers}
           primaryLocation={primaryLocation}
@@ -30,6 +32,7 @@ export default function HomeNewArrivalCards({
         />
       ))}
       <AddToCartModal
+        userData={userData}
         isAddToCartModalOpen={isAddToCartModalOpen}
         setIsAddToCartModalOpen={setIsAddToCartModalOpen}
         product={selectedAddToCartProduct}

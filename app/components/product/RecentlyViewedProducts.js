@@ -6,6 +6,7 @@ import ProductCard from "../product-card/ProductCard";
 import AddToCartModal from "../shop/cart/AddToCartModal";
 
 export default function RecentlyViewedProducts({
+  userData,
   recentlyViewedProducts,
   hasCompleteOutfitSection,
   hasSimilarSection,
@@ -58,6 +59,7 @@ export default function RecentlyViewedProducts({
           {recentlyViewedProducts.map((recentlyViewedProduct, index) => (
             <ProductCard
               key={"product-recently-viewed-" + recentlyViewedProduct._id}
+              userData={userData}
               product={recentlyViewedProduct}
               specialOffers={specialOffers}
               primaryLocation={primaryLocation}
@@ -71,6 +73,7 @@ export default function RecentlyViewedProducts({
         </div>
       </div>
       <AddToCartModal
+        userData={userData}
         isAddToCartModalOpen={isAddToCartModalOpen}
         setIsAddToCartModalOpen={setIsAddToCartModalOpen}
         product={selectedAddToCartProduct}

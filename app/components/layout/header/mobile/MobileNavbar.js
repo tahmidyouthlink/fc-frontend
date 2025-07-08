@@ -1,6 +1,9 @@
 import { Suspense } from "react";
 import Image from "next/image";
+import { getServerSession } from "next-auth";
+import { tokenizedFetch } from "@/app/lib/fetcher/tokenizedFetch";
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
+import { authOptions } from "@/app/utils/authOptions";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
 import Search from "../Search";
@@ -12,7 +15,23 @@ export default async function MobileNavbar({
   logoWithoutTextSrc,
   logoWithTextSrc,
 }) {
-  let productList, specialOffers, primaryLocation, legalPolicyPdfLinks;
+  const session = await getServerSession(authOptions);
+
+  let userData,
+    productList,
+    specialOffers,
+    primaryLocation,
+    legalPolicyPdfLinks;
+
+  try {
+    const result = await tokenizedFetch(
+      `/customerDetailsViaEmail/${session?.user?.email}`,
+    );
+
+    userData = result.data || {};
+  } catch (error) {
+    console.error("FetchError (mobileNav/userData):", error.message);
+  }
 
   try {
     const result = await rawFetch("/allProducts");
@@ -72,11 +91,13 @@ export default async function MobileNavbar({
             </Suspense>
           </li>
           <WishlistButton
+            userData={userData}
             productList={productList}
             specialOffers={specialOffers}
           />
           <Suspense fallback={<LoadingSpinner />}>
             <CartButton
+              userData={userData}
               productList={productList}
               specialOffers={specialOffers}
               primaryLocation={primaryLocation}

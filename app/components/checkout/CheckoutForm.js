@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useLoading } from "@/app/contexts/loading";
@@ -27,6 +28,7 @@ export default function CheckoutForm({
   setOrderDetails,
   legalPolicyPdfLinks,
 }) {
+  const router = useRouter();
   const { setIsPageLoading } = useLoading();
   const [userPromoCode, setUserPromoCode] = useState("");
   const isPromoCodeValid = checkIfPromoCodeIsValid(
@@ -212,6 +214,8 @@ export default function CheckoutForm({
           result.message || "Failed update user data.",
         );
         toast.error(result.message || "Failed update user data.");
+      } else {
+        router.refresh();
       }
     } catch (error) {
       console.error("UpdateError (checkoutForm):", error.message || error);
@@ -393,6 +397,7 @@ export default function CheckoutForm({
         </form>
       </div>
       <CheckoutCart
+        userData={userData}
         productList={productList}
         cartItems={cartItems}
         specialOffers={specialOffers}

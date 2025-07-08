@@ -20,7 +20,6 @@ import {
 } from "react-icons/pi";
 import { IoPersonOutline } from "react-icons/io5";
 import { removeRefreshToken } from "@/app/actions/auth";
-import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import createErrorMessage from "@/app/utils/createErrorMessage";
@@ -31,8 +30,12 @@ import {
 } from "@/app/data/authContents";
 import AuthModal from "../auth/AuthModal";
 
-export default function UserDropdown({ legalPolicyPdfLinks }) {
-  const { user } = useAuth();
+export default function UserDropdown({
+  isLoggedIn,
+  userEmail,
+  userName,
+  legalPolicyPdfLinks,
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const { setIsPageLoading } = useLoading();
@@ -92,21 +95,21 @@ export default function UserDropdown({ legalPolicyPdfLinks }) {
           </span>
         </DropdownTrigger>
         <DropdownMenu aria-label="Profile Actions" variant="flat">
-          {!!user && (
+          {isLoggedIn && (
             <DropdownSection title="You're signed in as" showDivider>
               <DropdownItem
                 key="profile"
                 isReadOnly
                 className="cursor-default rounded-[4px] [&_*]:w-fit [&_*]:cursor-text [&_*]:font-semibold"
               >
-                <h5 className="text-sm text-neutral-600">{user.name}</h5>
+                <h5 className="text-sm text-neutral-600">{userName}</h5>
                 <p className="-mt-0.5 text-[11px] text-neutral-500">
-                  {user.email}
+                  {userEmail}
                 </p>
               </DropdownItem>
             </DropdownSection>
           )}
-          {!!user && (
+          {isLoggedIn && (
             <DropdownSection title="Order">
               <DropdownItem
                 key="orders"
@@ -123,7 +126,7 @@ export default function UserDropdown({ legalPolicyPdfLinks }) {
             </DropdownSection>
           )}
           <DropdownSection title="User">
-            {!!user && (
+            {isLoggedIn && (
               <DropdownItem
                 key="profile"
                 textValue="profile"
@@ -137,7 +140,7 @@ export default function UserDropdown({ legalPolicyPdfLinks }) {
                 ></TransitionLink>
               </DropdownItem>
             )}
-            {!user && (
+            {!isLoggedIn && (
               <DropdownItem
                 key="login"
                 textValue="login"
@@ -151,7 +154,7 @@ export default function UserDropdown({ legalPolicyPdfLinks }) {
                 Sign In
               </DropdownItem>
             )}
-            {!user && (
+            {!isLoggedIn && (
               <DropdownItem
                 key="register"
                 textValue="register"
@@ -165,7 +168,7 @@ export default function UserDropdown({ legalPolicyPdfLinks }) {
                 Sign Up
               </DropdownItem>
             )}
-            {!!user && (
+            {isLoggedIn && (
               <DropdownItem
                 startContent={<PiSignOutLight />}
                 key="logout"

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
 import toast from "react-hot-toast";
 import { useLoading } from "@/app/contexts/loading";
-import { axiosPublic } from "@/app/utils/axiosPublic";
+import { routeFetch } from "@/app/lib/fetcher/routeFetch";
 import FormEditorButtons from "./FormEditorButtons";
 import { cities } from "@/app/data/cities";
 
@@ -17,6 +18,7 @@ export default function DeliveryAddress({
   setIsAddingNewAddress,
   isAddressListEmpty,
 }) {
+  const router = useRouter();
   const { setIsPageLoading } = useLoading();
   const [isEditingForm, setIsEditingForm] = useState(false);
   const {
@@ -157,20 +159,31 @@ export default function DeliveryAddress({
     setUserData(updatedUserData);
 
     try {
-      const response = await axiosPublic.put(
-        `/updateUserInformation/${userData?._id}`,
-        updatedUserData,
-      );
+      const result = await routeFetch(`/api/user-data/${userData?._id}`, {
+        method: "PUT",
+        body: JSON.stringify(updatedUserData),
+      });
 
-      if (!!response?.data?.modifiedCount || !!response?.data?.matchedCount) {
+      if (result.ok) {
         toast.success(
           type === "new"
             ? "New delivery address added successfully."
             : "Delivery address updated successfully.",
         );
+        router.refresh();
+      } else {
+        console.error(
+          "UpdateError (deliveryAddress/onSubmit):",
+          result.message || "Failed to update data on server.",
+        );
+        toast.error(result.message || "Failed to update data on server.");
       }
     } catch (error) {
-      toast.error("Failed to update data in server."); // If server error occurs
+      console.error(
+        "UpdateError (deliveryAddress/onSubmit):",
+        error.message || error,
+      );
+      toast.error("Failed to update data on server.");
     }
 
     if (type === "new") setIsAddingNewAddress(false);
@@ -207,16 +220,27 @@ export default function DeliveryAddress({
     setUserData(updatedUserData);
 
     try {
-      const response = await axiosPublic.put(
-        `/updateUserInformation/${userData?._id}`,
-        updatedUserData,
-      );
+      const result = await routeFetch(`/api/user-data/${userData?._id}`, {
+        method: "PUT",
+        body: JSON.stringify(updatedUserData),
+      });
 
-      if (!!response?.data?.modifiedCount || !!response?.data?.matchedCount) {
+      if (result.ok) {
         toast.success("Primary address updated.");
+        router.refresh();
+      } else {
+        console.error(
+          "UpdateError (deliveryAddress/primary):",
+          result.message || "Failed to update data on server.",
+        );
+        toast.error(result.message || "Failed to update data on server.");
       }
     } catch (error) {
-      toast.error("Failed to update data in server."); // If server error occurs
+      console.error(
+        "UpdateError (deliveryAddress/primary):",
+        result.message || "Failed to update data on server.",
+      );
+      toast.error(result.message || "Failed to update data on server.");
     }
 
     setIsPageLoading(false);
@@ -238,16 +262,27 @@ export default function DeliveryAddress({
     setUserData(updatedUserData);
 
     try {
-      const response = await axiosPublic.put(
-        `/updateUserInformation/${userData?._id}`,
-        updatedUserData,
-      );
+      const result = await routeFetch(`/api/user-data/${userData?._id}`, {
+        method: "PUT",
+        body: JSON.stringify(updatedUserData),
+      });
 
-      if (!!response?.data?.modifiedCount || !!response?.data?.matchedCount) {
+      if (result.ok) {
         toast.success("Delivery address deleted successfully.");
+        router.refresh();
+      } else {
+        console.error(
+          "UpdateError (deliveryAddress/delete):",
+          result.message || "Failed to update data on server.",
+        );
+        toast.error(result.message || "Failed to update data on server.");
       }
     } catch (error) {
-      toast.error("Failed to update data in server."); // If server error occurs
+      console.error(
+        "UpdateError (deliveryAddress/delete):",
+        result.message || "Failed to update data on server.",
+      );
+      toast.error(result.message || "Failed to update data on server.");
     }
 
     setIsPageLoading(false);

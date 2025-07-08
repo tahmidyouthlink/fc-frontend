@@ -18,6 +18,7 @@ import EmptyShopProducts from "@/app/components/shop/EmptyShopProducts";
 import ShopCards from "@/app/components/shop/cards/ShopCards";
 
 export default function ShopContents({
+  userData,
   products,
   specialOffers,
   primaryLocation,
@@ -234,6 +235,7 @@ export default function ShopContents({
           />
         ) : (
           <ShopCards
+            userData={userData}
             filteredProducts={filteredProducts}
             filteredProductCount={filteredProductCount}
             selectedFilterOptions={selectedFilterOptions}

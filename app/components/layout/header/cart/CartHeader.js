@@ -1,33 +1,39 @@
+import { useRouter } from "next/navigation";
 import { CgTrash } from "react-icons/cg";
-import { useAuth } from "@/app/contexts/auth";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import { routeFetch } from "@/app/lib/fetcher/routeFetch";
 
-export default function CartHeader({ totalItems }) {
-  const { user, userData, setUserData } = useAuth();
-  const axiosPublic = useAxiosPublic();
+export default function CartHeader({ userData, totalItems }) {
+  const router = useRouter();
 
   const removeAllItems = async () => {
     // Remove all items from local cart
     localStorage.removeItem("cartItems");
 
     // Remove all cart items from server cart, if user is logged in
-    if (!!user) {
+    if (userData) {
       const updatedUserData = {
         ...userData,
         cartItems: [],
       };
 
       try {
-        const response = await axiosPublic.put(
-          `/updateUserInformation/${userData?._id}`,
-          updatedUserData,
-        );
+        const result = await routeFetch(`/api/user-data/${userData?._id}`, {
+          method: "PUT",
+          body: JSON.stringify(updatedUserData),
+        });
 
-        if (!!response?.data?.modifiedCount || !!response?.data?.matchedCount) {
-          setUserData(updatedUserData);
+        if (!result.ok) {
+          console.error(
+            "UpdateError (cartHeader):",
+            result.message || "Failed to update the cart on server.",
+          );
+          toast.error(result.message || "Failed to update the cart on server.");
+        } else {
+          router.refresh();
         }
       } catch (error) {
-        toast.error("Failed to remove all items from cart."); // If server error occurs
+        console.error("UpdateError (cartHeader):", error.message || error);
+        toast.error("Failed to update the cart on server.");
       }
     }
 

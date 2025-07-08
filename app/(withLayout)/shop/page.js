@@ -1,12 +1,27 @@
 import { Suspense } from "react";
+import { getServerSession } from "next-auth";
+import { tokenizedFetch } from "@/app/lib/fetcher/tokenizedFetch";
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
+import { authOptions } from "@/app/utils/authOptions";
 import ShopContents from "@/app/components/shop/ShopContents";
 import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
 
 export const dynamic = "force-dynamic";
 
 export default async function Shop() {
-  let products, specialOffers, primaryLocation, notifyVariants;
+  const session = await getServerSession(authOptions);
+
+  let userData, products, specialOffers, primaryLocation, notifyVariants;
+
+  try {
+    const result = await tokenizedFetch(
+      `/customerDetailsViaEmail/${session?.user?.email}`,
+    );
+
+    userData = result.data || {};
+  } catch (error) {
+    console.error("FetchError (checkout/userData):", error.message);
+  }
 
   try {
     const result = await rawFetch("/allProducts");
@@ -47,6 +62,7 @@ export default async function Shop() {
       <div className="pt-header-h-full-section-pb relative flex min-h-dvh overflow-hidden pb-[var(--section-padding)] [&_img]:pointer-events-none">
         <Suspense fallback={<LoadingSpinner />}>
           <ShopContents
+            userData={userData}
             products={products}
             specialOffers={specialOffers}
             primaryLocation={primaryLocation}

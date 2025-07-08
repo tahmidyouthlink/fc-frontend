@@ -6,6 +6,7 @@ import CompleteOutfitProducts from "@/app/components/product/CompleteOutfitProdu
 import RecentlyViewedProducts from "@/app/components/product/RecentlyViewedProducts";
 
 export default function ProductRelatedContents({
+  userData,
   products,
   product,
   specialOffers,
@@ -75,6 +76,7 @@ export default function ProductRelatedContents({
       {/* Complete Your Outfit Section */}
       {!!completeOutfitProducts?.length && (
         <CompleteOutfitProducts
+          userData={userData}
           completeOutfitProducts={completeOutfitProducts}
           specialOffers={specialOffers}
           primaryLocation={primaryLocation}
@@ -84,6 +86,7 @@ export default function ProductRelatedContents({
       {/* Similar Products Section */}
       {!!similarProducts?.length && (
         <SimilarProducts
+          userData={userData}
           similarProducts={similarProducts}
           hasCompleteOutfitSection={!!completeOutfitProducts?.length}
           hasRecentlyViewedSection={!!recentlyViewedProducts?.length}
@@ -95,6 +98,7 @@ export default function ProductRelatedContents({
       {/* Recently Viewed Products Section */}
       {!!recentlyViewedProducts?.length && (
         <RecentlyViewedProducts
+          userData={userData}
           recentlyViewedProducts={recentlyViewedProducts}
           hasCompleteOutfitSection={!!completeOutfitProducts?.length}
           hasSimilarSection={!!similarProducts?.length}

@@ -13,7 +13,11 @@ import WishlistItems from "./WishlistItems";
 import WishlistFooter from "./WishlistFooter";
 import EmptyWishlistContent from "./EmptyWishlistContent";
 
-export default function WishlistButton({ productList, specialOffers }) {
+export default function WishlistButton({
+  userData,
+  productList,
+  specialOffers,
+}) {
   const [wishlistItems, setWishlistItems] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -100,11 +104,15 @@ export default function WishlistButton({ productList, specialOffers }) {
           className="flex min-h-full cursor-default flex-col justify-between p-0 text-sm text-neutral-500 md:text-base max-sm:[&>span]:min-w-[calc(100dvw-20px*2)] sm:[&>span]:w-[350px]"
         >
           <div className="max-h-[50dvh] overflow-y-auto px-2 pt-2 font-semibold [&::-webkit-scrollbar]:[-webkit-appearance:scrollbarthumb-vertical]">
-            <WishlistHeader itemCount={wishlistItems?.length || 0} />
+            <WishlistHeader
+              userData={userData}
+              itemCount={wishlistItems?.length || 0}
+            />
             {/* Drawer Body */}
             {!!wishlistItems?.length ? (
               <>
                 <WishlistItems
+                  userData={userData}
                   wishlistItems={wishlistItems}
                   productList={productList}
                   setIsDropdownOpen={setIsDropdownOpen}

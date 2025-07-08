@@ -5,6 +5,7 @@ import TransitionLink from "@/app/components/ui/TransitionLink";
 import HomeNewArrivalCards from "./HomeNewArrivalCards";
 
 export default function HomeNewArrival({
+  userData,
   isAnyTrendingProductAvailable,
   newlyArrivedProducts,
   specialOffers,
@@ -47,6 +48,7 @@ export default function HomeNewArrival({
             </TransitionLink>
           </div>
           <HomeNewArrivalCards
+            userData={userData}
             newlyArrivedProducts={newlyArrivedProducts}
             specialOffers={specialOffers}
             primaryLocation={primaryLocation}

@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import {
   Popover,
   PopoverContent,
@@ -5,12 +6,12 @@ import {
   Tooltip,
 } from "@nextui-org/react";
 import toast from "react-hot-toast";
-import { useAuth } from "@/app/contexts/auth";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import { routeFetch } from "@/app/lib/fetcher/routeFetch";
 import TransitionLink from "../../ui/TransitionLink";
 import addToCartToast from "@/app/utils/addToCartToast";
 
 export default function CartModalButtons({
+  userData,
   productId,
   productTitle,
   productImg,
@@ -21,8 +22,7 @@ export default function CartModalButtons({
   setSelectedOptions,
   setIsAddToCartModalOpen,
 }) {
-  const { user, userData, setUserData } = useAuth();
-  const axiosPublic = useAxiosPublic();
+  const router = useRouter();
 
   const isExistingItem = (item) =>
     item._id === productId &&
@@ -66,21 +66,19 @@ export default function CartModalButtons({
     localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save item in local cart
 
     // Save item in server cart, if user is logged in
-    if (!!user) {
+    if (userData) {
       const updatedUserData = {
         ...userData,
         cartItems: updatedCart,
       };
 
       try {
-        const response = await axiosPublic.put(
-          `/updateUserInformation/${userData?._id}`,
-          updatedUserData,
-        );
+        const result = await routeFetch(`/api/user-data/${userData?._id}`, {
+          method: "PUT",
+          body: JSON.stringify(updatedUserData),
+        });
 
-        if (!!response?.data?.modifiedCount || !!response?.data?.matchedCount) {
-          setUserData(updatedUserData);
-
+        if (result.ok) {
           // Display custom success toast notification, if server cart is updated
           toast.custom(
             (t) =>
@@ -95,9 +93,20 @@ export default function CartModalButtons({
               position: "top-right",
             },
           );
+          router.refresh();
+        } else {
+          console.error(
+            "UpdateError (cartModalButtons):",
+            result.message || "Failed to update the cart on server.",
+          );
+          toast.error(result.message || "Failed to update the cart on server.");
         }
       } catch (error) {
-        toast.error("Failed to add item to cart."); // If server error occurs
+        console.error(
+          "UpdateError (cartModalButtons):",
+          error.message || error,
+        );
+        toast.error("Failed to update the cart on server.");
       }
     } else {
       // Display custom success toast notification, if saved only locally

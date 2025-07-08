@@ -10,9 +10,8 @@ import {
 } from "@nextui-org/react";
 import toast from "react-hot-toast";
 import { IoCartOutline } from "react-icons/io5";
-import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import { routeFetch } from "@/app/lib/fetcher/routeFetch";
 import addToCartToast from "@/app/utils/addToCartToast";
 import getImageSetsBasedOnColors from "@/app/utils/getImageSetsBasedOnColors";
 import {
@@ -25,6 +24,7 @@ import EmptyCartContent from "./EmptyCartContent";
 import CartFooter from "./CartFooter";
 
 export default function CartButton({
+  userData,
   productList,
   specialOffers,
   primaryLocation,
@@ -32,9 +32,7 @@ export default function CartButton({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { userData, setUserData } = useAuth();
   const { setIsPageLoading } = useLoading();
-  const axiosPublic = useAxiosPublic();
   const [cartItems, setCartItems] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const productId = searchParams.get("productId");
@@ -129,24 +127,19 @@ export default function CartButton({
         localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save item in local cart
 
         // Save item in server cart, if user is logged in
-        if (!!userData) {
+        if (userData) {
           const updatedUserData = {
             ...userData,
             cartItems: updatedCart,
           };
 
           try {
-            const response = await axiosPublic.put(
-              `/updateUserInformation/${userData?._id}`,
-              updatedUserData,
-            );
+            const result = await routeFetch(`/api/user-data/${userData?._id}`, {
+              method: "PUT",
+              body: JSON.stringify(updatedUserData),
+            });
 
-            if (
-              !!response?.data?.modifiedCount ||
-              !!response?.data?.matchedCount
-            ) {
-              setUserData(updatedUserData);
-
+            if (result.ok) {
               // Display custom success toast notification, if server cart is updated
               toast.custom(
                 (t) =>
@@ -163,9 +156,20 @@ export default function CartButton({
                   position: "top-right",
                 },
               );
+
+              router.refresh();
+            } else {
+              console.error(
+                "UpdateError (cartButton):",
+                result.message || "Failed to update the cart on server.",
+              );
+              toast.error(
+                result.message || "Failed to update the cart on server.",
+              );
             }
           } catch (error) {
-            toast.error("Failed to add item to cart."); // If server error occurs
+            console.error("UpdateError (cartButton):", error.message || error);
+            toast.error("Failed to update the cart on server.");
           }
         } else {
           // Display custom success toast notification, if saved only locally
@@ -205,8 +209,6 @@ export default function CartButton({
     colorCode,
     setIsPageLoading,
     userData,
-    axiosPublic,
-    setUserData,
     router,
     pathname,
   ]);
@@ -268,9 +270,13 @@ export default function CartButton({
           className="flex min-h-full cursor-default flex-col justify-between p-0 text-sm text-neutral-500 md:text-base max-sm:[&>span]:w-[calc(100dvw-20px*2)] sm:[&>span]:w-[425px] md:[&>span]:w-[450px]"
         >
           <div className="max-h-[50dvh] overflow-y-auto px-2 pt-2 font-semibold [&::-webkit-scrollbar]:[-webkit-appearance:scrollbarthumb-vertical]">
-            <CartHeader totalItems={getTotalItemCount(cartItems) || 0} />
+            <CartHeader
+              userData={userData}
+              totalItems={getTotalItemCount(cartItems) || 0}
+            />
             {!!cartItems?.length ? (
               <CartItems
+                userData={userData}
                 cartItems={cartItems}
                 productList={productList}
                 specialOffers={specialOffers}

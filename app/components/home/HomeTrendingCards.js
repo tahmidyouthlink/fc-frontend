@@ -6,6 +6,7 @@ import ProductCard from "../product-card/ProductCard";
 import AddToCartModal from "../shop/cart/AddToCartModal";
 
 export default function HomeTrendingCards({
+  userData,
   trendingProducts,
   specialOffers,
   primaryLocation,
@@ -20,6 +21,7 @@ export default function HomeTrendingCards({
       {trendingProducts.map((trendingProduct) => (
         <ProductCard
           key={"home-trending-product-" + trendingProduct._id}
+          userData={userData}
           product={trendingProduct}
           specialOffers={specialOffers}
           primaryLocation={primaryLocation}
@@ -30,6 +32,7 @@ export default function HomeTrendingCards({
         />
       ))}
       <AddToCartModal
+        userData={userData}
         isAddToCartModalOpen={isAddToCartModalOpen}
         setIsAddToCartModalOpen={setIsAddToCartModalOpen}
         product={selectedAddToCartProduct}

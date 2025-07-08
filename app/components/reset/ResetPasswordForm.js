@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useLoading } from "@/app/contexts/loading";
-import { axiosPublic } from "@/app/utils/axiosPublic";
+import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 
 export default function ResetPasswordForm({ token, email }) {
   const router = useRouter();
@@ -38,19 +38,30 @@ export default function ResetPasswordForm({ token, email }) {
     setIsPageLoading(true);
 
     try {
-      const response = await axiosPublic.put("reset-password", {
-        token,
-        newPassword: data.newPassword,
+      const result = await rawFetch("/reset-password", {
+        method: "PUT",
+        body: JSON.stringify({
+          token,
+          newPassword: data.newPassword,
+        }),
       });
 
-      if (response.data.success) {
-        toast.success(response.data.message);
+      if (result.ok) {
+        toast.success(result.message);
         router.push("/");
       } else {
-        toast.error(response.data.message);
+        console.error(
+          "SubmissionError (resetPasswordForm):",
+          result.message || "Failed to reset password.",
+        );
+        toast.error(result.message);
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      console.error(
+        "SubmissionError (resetPasswordForm):",
+        error.message || error,
+      );
+      toast.error("Failed to reset password.");
     } finally {
       reset({ newPassword: "", confirmPassword: "" });
       setIsPageLoading(false);

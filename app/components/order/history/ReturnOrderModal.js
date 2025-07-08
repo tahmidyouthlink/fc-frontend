@@ -12,7 +12,7 @@ import {
 } from "@nextui-org/react";
 import toast from "react-hot-toast";
 import { useLoading } from "@/app/contexts/loading";
-import { axiosPublic } from "@/app/utils/axiosPublic";
+import { routeFetch } from "@/app/lib/fetcher/routeFetch";
 import customCurrentDateTimeFormat from "@/app/utils/customCurrentDateTimeFormat";
 import ReturnReasonField from "./ReturnReasonField";
 import ReturnIssueField from "./ReturnIssueField";
@@ -132,19 +132,28 @@ export default function ReturnOrderModal({
     };
 
     try {
-      const response = await axiosPublic.patch(
-        `/changeOrderStatus/${activeReturnOrder._id}`,
-        updatedActiveReturnOrder,
+      const result = await routeFetch(
+        `/api/order-status/${activeReturnOrder._id}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify(updatedActiveReturnOrder),
+        },
       );
 
-      if (!!response?.data?.modifiedCount) {
-        toast.success("Return request has been submitted.");
+      if (result.ok) {
+        toast.success("Return request submitted.");
         router.refresh();
         setIsReturnModalOpen(false);
+      } else {
+        console.error(
+          "UpdateError (returnOrderModal):",
+          result.message || "Failed to submit return request.",
+        );
+        toast.error(result.message);
       }
     } catch (error) {
-      toast.error("Faild to submit the request."); // If server error occurs
-      console.log("Faild to submit the request.", error);
+      console.error("UpdateError (returnOrderModal):", error.message || error);
+      toast.error("Failed to submit return request.");
     }
 
     setIsPageLoading(false);

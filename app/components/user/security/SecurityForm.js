@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useLoading } from "@/app/contexts/loading";
-import { axiosPublic } from "@/app/utils/axiosPublic";
+import { routeFetch } from "@/app/lib/fetcher/routeFetch";
 import GoogleSignInButton from "@/app/components/layout/header/auth/GoogleSignInButton";
 
 export default function SecurityForm({
@@ -14,6 +15,7 @@ export default function SecurityForm({
   isLinkedWithCredentials,
   isLinkedWithGoogle,
 }) {
+  const router = useRouter();
   const { setIsPageLoading } = useLoading();
   const [isOldPasswordVisible, SetIsOldPasswordVisible] = useState(false);
   const [isNewPasswordVisible, SetIsNewPasswordVisible] = useState(false);
@@ -43,10 +45,8 @@ export default function SecurityForm({
     setIsPageLoading(true);
 
     try {
-      const apiEndpoint = isLinkedWithCredentials
-        ? "/user-update-password"
-        : "/user-set-password";
-      const apiData = {
+      const method = isLinkedWithCredentials ? "PUT" : "POST";
+      const payload = {
         email,
         ...(isLinkedWithCredentials && {
           oldPassword: data.oldPassword,
@@ -54,15 +54,30 @@ export default function SecurityForm({
         newPassword: data.newPassword,
       };
 
-      const response = await axiosPublic.put(apiEndpoint, apiData);
+      const result = await routeFetch("/api/password", {
+        method,
+        body: JSON.stringify(payload),
+      });
 
-      if (response.data.success) {
-        toast.success(response.data.message);
+      if (result.ok) {
+        toast.success(result.message);
+        router.refresh();
       } else {
-        toast.error(response.data.message);
+        console.error(
+          `PasswordError (security/${isLinkedWithCredentials ? "update" : "set"}):`,
+          result.message ||
+            `Failed to ${isLinkedWithCredentials ? "update" : "set"} password.`,
+        );
+        toast.error(result.message);
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      console.error(
+        `PasswordError (security/${isLinkedWithCredentials ? "update" : "set"}):`,
+        error.message || error,
+      );
+      toast.error(
+        `Failed to ${isLinkedWithCredentials ? "update" : "set"} password.`,
+      );
     } finally {
       setIsPageLoading(false);
       reset();

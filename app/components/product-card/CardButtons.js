@@ -1,16 +1,16 @@
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { CgHeart, CgShoppingCart } from "react-icons/cg";
-import { useAuth } from "@/app/contexts/auth";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import { routeFetch } from "@/app/lib/fetcher/routeFetch";
 
 export default function CardButtons({
+  userData,
   product,
   isProductOutOfStock,
   setSelectedAddToCartProduct,
   setIsAddToCartModalOpen,
 }) {
-  const axiosPublic = useAxiosPublic();
-  const { user, userData, setUserData } = useAuth();
+  const router = useRouter();
 
   const handleAddToWishlist = async (product) => {
     const currentWishlist =
@@ -23,24 +23,36 @@ export default function CardButtons({
       localStorage.setItem("wishlistItems", JSON.stringify(updatedWishlist));
 
       // Save item in server wishlist, if user is logged in
-      if (!!user) {
+      if (userData) {
         const updatedUserData = {
           ...userData,
           wishlistItems: updatedWishlist,
         };
 
         try {
-          const response = await axiosPublic.put(
-            `/updateUserInformation/${userData?._id}`,
-            updatedUserData,
-          );
+          const result = await routeFetch(`/api/user-data/${userData?._id}`, {
+            method: "PUT",
+            body: JSON.stringify(updatedUserData),
+          });
 
-          if (!!response?.data?.modifiedCount) {
-            setUserData(updatedUserData);
+          if (result.ok) {
             toast.success("Item added to wishlist."); // If server wishlist is updated
+            router.refresh();
+          } else {
+            console.error(
+              "UpdateError (cardButtons):",
+              result.message || "Failed to update the wishlist on server.",
+            );
+            toast.error(
+              result.message || "Failed to update the wishlist on server.",
+            );
           }
         } catch (error) {
-          toast.error("Failed to add item to wishlist."); // If server error occurs
+          console.error(
+            "UpdateError (productWishlistButton):",
+            error.message || error,
+          );
+          toast.error("Failed to update the wishlist on server.");
         }
       } else {
         toast.success("Item added to wishlist."); // If saved only locally

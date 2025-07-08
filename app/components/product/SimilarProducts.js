@@ -6,6 +6,7 @@ import ProductCard from "../product-card/ProductCard";
 import AddToCartModal from "../shop/cart/AddToCartModal";
 
 export default function SimilarProducts({
+  userData,
   similarProducts,
   hasCompleteOutfitSection,
   hasRecentlyViewedSection,
@@ -58,6 +59,7 @@ export default function SimilarProducts({
           {similarProducts.map((similarProduct, index) => (
             <ProductCard
               key={"product-similar-" + similarProduct._id}
+              userData={userData}
               product={similarProduct}
               specialOffers={specialOffers}
               primaryLocation={primaryLocation}
@@ -71,6 +73,7 @@ export default function SimilarProducts({
         </div>
       </div>
       <AddToCartModal
+        userData={userData}
         isAddToCartModalOpen={isAddToCartModalOpen}
         setIsAddToCartModalOpen={setIsAddToCartModalOpen}
         product={selectedAddToCartProduct}

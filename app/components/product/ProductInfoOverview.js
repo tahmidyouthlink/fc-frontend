@@ -20,6 +20,7 @@ import DiscountTooptip from "../ui/DiscountTooltip";
 import NotifyMeButton from "../shop/cart/NotifyMeButton";
 
 export default function ProductInfoOverview({
+  userData,
   product,
   specialOffers,
   primaryLocation,
@@ -139,6 +140,7 @@ export default function ProductInfoOverview({
       {/* Call to Action Buttons */}
       <div className="flex gap-2 max-lg:flex-wrap [&>button>svg]:text-lg [&>button]:rounded-[4px] [&>button]:px-5 [&>button]:py-6 [&>button]:text-sm [&>button]:font-semibold [&>button]:text-neutral-600 [&>button]:duration-300 hover:[&>button]:opacity-100">
         <ProductCartButton
+          userData={userData}
           productId={product?._id}
           productTitle={product?.productTitle}
           productImg={
@@ -154,7 +156,7 @@ export default function ProductInfoOverview({
           selectedOptions={selectedOptions}
           setSelectedOptions={setSelectedOptions}
         />
-        <ProductWishlistButton productId={product?._id} />
+        <ProductWishlistButton userData={userData} productId={product?._id} />
         <ProductSizeGuideButton
           sizeGuideImageUrl={product?.sizeGuideImageUrl}
         />

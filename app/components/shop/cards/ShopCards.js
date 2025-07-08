@@ -35,6 +35,7 @@ const getDefaultColByWidth = (width) => {
 };
 
 export default function ShopCards({
+  userData,
   filteredProducts,
   filteredProductCount,
   selectedFilterOptions,
@@ -147,6 +148,7 @@ export default function ShopCards({
               isProductWithinPriceRange(filteredProduct) && (
                 <ProductCard
                   key={"filtered-product-" + filteredProduct._id}
+                  userData={userData}
                   product={filteredProduct}
                   specialOffers={specialOffers}
                   primaryLocation={primaryLocation}
@@ -169,6 +171,7 @@ export default function ShopCards({
           </div>
         )}
         <AddToCartModal
+          userData={userData}
           isAddToCartModalOpen={isAddToCartModalOpen}
           setIsAddToCartModalOpen={setIsAddToCartModalOpen}
           product={selectedAddToCartProduct}

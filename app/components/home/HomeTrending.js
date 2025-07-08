@@ -6,6 +6,7 @@ import TransitionLink from "@/app/components/ui/TransitionLink";
 import HomeTrendingCards from "./HomeTrendingCards";
 
 export default function HomeTrending({
+  userData,
   trendingProducts,
   specialOffers,
   primaryLocation,
@@ -63,6 +64,7 @@ export default function HomeTrending({
               </TransitionLink>
             </div>
             <HomeTrendingCards
+              userData={userData}
               trendingProducts={trendingProducts}
               specialOffers={specialOffers}
               primaryLocation={primaryLocation}

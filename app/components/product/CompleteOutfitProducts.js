@@ -6,6 +6,7 @@ import ProductCard from "../product-card/ProductCard";
 import AddToCartModal from "../shop/cart/AddToCartModal";
 
 export default function CompleteOutfitProducts({
+  userData,
   completeOutfitProducts,
   specialOffers,
   primaryLocation,
@@ -49,6 +50,7 @@ export default function CompleteOutfitProducts({
           {completeOutfitProducts.map((completeOutfitProduct, index) => (
             <ProductCard
               key={"product-complete-outfit-" + completeOutfitProduct._id}
+              userData={userData}
               product={completeOutfitProduct}
               specialOffers={specialOffers}
               primaryLocation={primaryLocation}
@@ -62,6 +64,7 @@ export default function CompleteOutfitProducts({
         </div>
       </div>
       <AddToCartModal
+        userData={userData}
         isAddToCartModalOpen={isAddToCartModalOpen}
         setIsAddToCartModalOpen={setIsAddToCartModalOpen}
         product={selectedAddToCartProduct}

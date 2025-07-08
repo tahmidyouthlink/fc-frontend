@@ -7,6 +7,7 @@ import CheckoutAgreement from "./CheckoutAgreement";
 import CheckoutCartItems from "./CheckoutCartItems";
 
 export default function CheckoutCart({
+  userData,
   productList,
   cartItems,
   specialOffers,
@@ -84,6 +85,7 @@ export default function CheckoutCart({
             Cart Overview
           </h2>
           <CheckoutCartItems
+            userData={userData}
             productList={productList}
             cartItems={cartItems}
             specialOffers={specialOffers}

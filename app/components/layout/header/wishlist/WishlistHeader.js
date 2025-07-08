@@ -1,33 +1,41 @@
+import { useRouter } from "next/navigation";
 import { CgTrash } from "react-icons/cg";
-import { useAuth } from "@/app/contexts/auth";
-import useAxiosPublic from "@/app/hooks/useAxiosPublic";
+import { routeFetch } from "@/app/lib/fetcher/routeFetch";
 
-export default function WishlistHeader({ itemCount }) {
-  const { user, userData, setUserData } = useAuth();
-  const axiosPublic = useAxiosPublic();
+export default function WishlistHeader({ userData, itemCount }) {
+  const router = useRouter();
 
   const removeAllItems = async () => {
     // Remove all items from local wishlist
     localStorage.removeItem("wishlistItems");
 
     // Remove all wishlist items from server wishlist, if user is logged in
-    if (!!user) {
+    if (userData) {
       const updatedUserData = {
         ...userData,
         wishlistItems: [],
       };
 
       try {
-        const response = await axiosPublic.put(
-          `/updateUserInformation/${userData?._id}`,
-          updatedUserData,
-        );
+        const result = await routeFetch(`/api/user-data/${userData?._id}`, {
+          method: "PUT",
+          body: JSON.stringify(updatedUserData),
+        });
 
-        if (!!response?.data?.modifiedCount || !!response?.data?.matchedCount) {
-          setUserData(updatedUserData);
+        if (!result.ok) {
+          console.error(
+            "UpdateError (wishlistHeader):",
+            result.message || "Failed to update the wishlist on server.",
+          );
+          toast.error(
+            result.message || "Failed to update the wishlist on server.",
+          );
+        } else {
+          router.refresh();
         }
       } catch (error) {
-        toast.error("Failed to remove all items from wishlist."); // If server error occurs
+        console.error("UpdateError (wishlistHeader):", error.message || error);
+        toast.error("Failed to update the wishlist on server.");
       }
     }
 
