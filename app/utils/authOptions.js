@@ -124,10 +124,6 @@ export const authOptions = {
 
           token._id = userData._id;
           token.email = userData.email;
-          token.name = userData.name;
-          token.isLinkedWithCredentials = userData.isLinkedWithCredentials;
-          token.isLinkedWithGoogle = userData.isLinkedWithGoogle;
-          token.score = userData.score;
           token.accessToken = userData.accessToken;
           token.accessTokenExpires = Date.now() + 5 * 60 * 1000; // 5 minutes
 
@@ -151,10 +147,6 @@ export const authOptions = {
     async session({ session, token }) {
       session.user._id = token._id;
       session.user.email = token.email;
-      session.user.name = token.name;
-      session.user.isLinkedWithCredentials = token.isLinkedWithCredentials;
-      session.user.isLinkedWithGoogle = token.isLinkedWithGoogle;
-      session.user.score = token.score;
       session.accessToken = token.accessToken;
       session.error = token.error;
 
