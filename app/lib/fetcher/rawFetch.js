@@ -25,6 +25,11 @@ export const rawFetch = async (path, options = {}) => {
     headers["Content-Type"] = "application/json";
   }
 
+  headers["x-client-origin"] =
+    typeof window === "undefined"
+      ? process.env.FRONTEND_URL
+      : process.env.NEXT_PUBLIC_FRONTEND_URL;
+
   const res = await fetch(`${backendUrl}${path}`, {
     ...options,
     method,

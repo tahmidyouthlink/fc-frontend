@@ -36,6 +36,8 @@ export const tokenizedFetch = async (path, options = {}) => {
     headers["Content-Type"] = "application/json";
   }
 
+  headers["x-client-origin"] = process.env.FRONTEND_URL;
+
   const res = await fetch(`${process.env.BACKEND_URL}${path}`, {
     ...options,
     method,
