@@ -14,7 +14,7 @@ import { useLoading } from "@/app/contexts/loading";
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 
 export default function NotifyMeModal({
-  userData,
+  userEmail,
   isNotifyMeModalOpen,
   setIsNotifyMeModalOpen,
   notifyMeProduct,
@@ -78,9 +78,9 @@ export default function NotifyMeModal({
 
   useEffect(() => {
     reset({
-      email: userData?.email || "",
+      email: userEmail || "",
     });
-  }, [reset, userData]);
+  }, [reset, userEmail]);
 
   return (
     <Modal

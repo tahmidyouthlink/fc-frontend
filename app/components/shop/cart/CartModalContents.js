@@ -10,6 +10,7 @@ import {
 import NotifyMeButton from "./NotifyMeButton";
 
 export default function CartModalContents({
+  userEmail,
   product,
   specialOffers,
   productVariantSku,
@@ -173,6 +174,7 @@ export default function CartModalContents({
           <div className="mt-1 flex items-center gap-4">
             <p className="text-sm font-semibold text-red-600">Out of Stock*</p>
             <NotifyMeButton
+              userEmail={userEmail}
               notifyVariants={notifyVariants}
               productId={product?._id}
               productVariantSku={productVariantSku}

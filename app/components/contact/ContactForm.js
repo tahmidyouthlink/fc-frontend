@@ -4,12 +4,10 @@ import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Select, SelectItem } from "@nextui-org/react";
 import toast from "react-hot-toast";
-import { useAuth } from "@/app/contexts/auth";
 import { useLoading } from "@/app/contexts/loading";
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 
-export default function ContactForm() {
-  const { userData } = useAuth();
+export default function ContactForm({ userData }) {
   const { setIsPageLoading } = useLoading();
 
   const {

@@ -2,10 +2,10 @@ import { usePathname } from "next/navigation";
 import { PiPackage } from "react-icons/pi";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 
-export default function OrderSection({ user, setIsNavMenuOpen }) {
+export default function OrderSection({ isLoggedIn, setIsNavMenuOpen }) {
   const pathname = usePathname();
 
-  if (!!user)
+  if (isLoggedIn)
     return (
       <div>
         <h5 className="text-[10px] font-semibold text-neutral-500">ORDER</h5>

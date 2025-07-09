@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { Suspense } from "react";
-import { useAuth } from "@/app/contexts/auth";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import Drawer from "@/app/components/shared/Drawer";
 import MenuSection from "./MenuSection";
@@ -9,13 +8,12 @@ import AccountSection from "./AccountSection";
 import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
 
 export default function NavMenu({
+  isLoggedIn,
   isNavMenuOpen,
   setIsNavMenuOpen,
   logoWithTextSrc,
   legalPolicyPdfLinks,
 }) {
-  const { user } = useAuth();
-
   return (
     <Drawer
       isDrawerOpen={isNavMenuOpen}
@@ -43,9 +41,12 @@ export default function NavMenu({
         <Suspense fallback={<LoadingSpinner />}>
           <MenuSection setIsNavMenuOpen={setIsNavMenuOpen} />
         </Suspense>
-        <OrderSection user={user} setIsNavMenuOpen={setIsNavMenuOpen} />
+        <OrderSection
+          isLoggedIn={isLoggedIn}
+          setIsNavMenuOpen={setIsNavMenuOpen}
+        />
         <AccountSection
-          user={user}
+          isLoggedIn={isLoggedIn}
           setIsNavMenuOpen={setIsNavMenuOpen}
           legalPolicyPdfLinks={legalPolicyPdfLinks}
         />

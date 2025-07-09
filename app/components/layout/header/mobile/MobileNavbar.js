@@ -105,6 +105,7 @@ export default async function MobileNavbar({
           </Suspense>
           {/* Navigation button */}
           <NavButton
+            isLoggedIn={!!userData}
             logoWithTextSrc={logoWithTextSrc}
             legalPolicyPdfLinks={legalPolicyPdfLinks}
           />

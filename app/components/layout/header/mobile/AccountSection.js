@@ -15,7 +15,7 @@ import {
 import AuthModal from "../auth/AuthModal";
 
 export default function AccountSection({
-  user,
+  isLoggedIn,
   setIsNavMenuOpen,
   legalPolicyPdfLinks,
 }) {
@@ -49,7 +49,7 @@ export default function AccountSection({
     <div>
       <h5 className="text-[10px] font-semibold text-neutral-500">ACCOUNT</h5>
       <hr className="my-2 h-0.5 w-full bg-neutral-100" />
-      {!user ? (
+      {!isLoggedIn ? (
         <ul className="space-y-2 text-xs md:text-[13px]">
           <li
             onClick={() => {

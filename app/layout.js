@@ -3,7 +3,6 @@ import { Toaster } from "react-hot-toast";
 import { NextUIProvider } from "@nextui-org/react";
 import ReactTanstackProvider from "./utils/Provider/ReactTanstackProvider";
 import { LoadingProvider } from "./contexts/loading";
-import { AuthProvider } from "./contexts/auth";
 import SessionWrapper from "./components/layout/SessionWrapper";
 import "./globals.css";
 
@@ -19,9 +18,7 @@ export default function RootLayout({ children }) {
         <SessionWrapper>
           <ReactTanstackProvider>
             <NextUIProvider>
-              <AuthProvider>
-                <LoadingProvider>{children}</LoadingProvider>
-              </AuthProvider>
+              <LoadingProvider>{children}</LoadingProvider>
             </NextUIProvider>
             <Toaster />
           </ReactTanstackProvider>

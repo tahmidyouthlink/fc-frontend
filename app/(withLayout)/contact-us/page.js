@@ -1,3 +1,4 @@
+import { getServerSession } from "next-auth";
 import {
   PiEnvelopeSimpleLight,
   PiMapPinLight,
@@ -6,10 +7,26 @@ import {
 import { FaInstagram, FaXTwitter } from "react-icons/fa6";
 import { LuFacebook } from "react-icons/lu";
 import { TbBrandTiktok } from "react-icons/tb";
+import { tokenizedFetch } from "@/app/lib/fetcher/tokenizedFetch";
+import { authOptions } from "@/app/utils/authOptions";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import ContactForm from "@/app/components/contact/ContactForm";
 
-export default function ContactUs() {
+export default async function ContactUs() {
+  const session = await getServerSession(authOptions);
+
+  let userData;
+
+  try {
+    const result = await tokenizedFetch(
+      `/customerDetailsViaEmail/${session?.user?.email}`,
+    );
+
+    userData = result.data || {};
+  } catch (error) {
+    console.error("FetchError (contact/userData):", error.message);
+  }
+
   return (
     <main className="pt-header-h-full-section-pb relative overflow-hidden bg-[var(--product-default)] pb-[var(--section-padding)] text-sm text-neutral-500 md:text-base xl:min-h-dvh [&_h2]:text-neutral-600">
       <div className="absolute left-[5%] top-[60%] animate-blob bg-[var(--color-moving-bubble-primary)] max-sm:hidden" />
@@ -22,7 +39,7 @@ export default function ContactUs() {
             <h2 className="text-xl font-semibold">SEND A MESSAGE</h2>
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
           </div>
-          <ContactForm />
+          <ContactForm userData={userData} />
         </section>
         <section className="flex flex-col gap-y-10 bg-white/5 p-9 backdrop-blur-xl lg:w-2/5">
           <div className="space-y-1.5">

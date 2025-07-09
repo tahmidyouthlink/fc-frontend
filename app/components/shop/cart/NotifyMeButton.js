@@ -1,9 +1,9 @@
 import { FaRegBell } from "react-icons/fa6";
 import { LuCheckCircle2 } from "react-icons/lu";
-import { useAuth } from "@/app/contexts/auth";
 import NotifyMeModal from "./NotifyMeModal";
 
 export default function NotifyMeButton({
+  userEmail,
   notifyVariants,
   productId,
   productVariantSku,
@@ -11,11 +11,10 @@ export default function NotifyMeButton({
   isNotifyMeModalOpen,
   setIsNotifyMeModalOpen,
 }) {
-  const { userData } = useAuth();
   let isUserSubscribed;
 
   if (!selectedOptions?.size || productVariantSku !== 0) return;
-  if (!userData) {
+  if (!userEmail) {
     isUserSubscribed = false;
   } else {
     const correspondingVariant = notifyVariants?.find(
@@ -26,7 +25,7 @@ export default function NotifyMeButton({
     );
 
     isUserSubscribed = correspondingVariant?.emails?.some(
-      (user) => user.email === userData.email && !user.notified,
+      (user) => user.email === userEmail && !user.notified,
     );
   }
 
@@ -48,7 +47,7 @@ export default function NotifyMeButton({
         </div>
       )}
       <NotifyMeModal
-        userData={userData}
+        userEmail={userEmail}
         isNotifyMeModalOpen={isNotifyMeModalOpen}
         setIsNotifyMeModalOpen={setIsNotifyMeModalOpen}
         notifyMeProduct={{

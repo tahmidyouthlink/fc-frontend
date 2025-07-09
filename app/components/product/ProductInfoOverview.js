@@ -166,6 +166,7 @@ export default function ProductInfoOverview({
         <div className="mt-3.5 flex items-center gap-4">
           <p className="font-semibold text-red-600">Out of Stock*</p>
           <NotifyMeButton
+            userEmail={userData?.email}
             notifyVariants={notifyVariants}
             productId={product?._id}
             productVariantSku={productVariantSku}

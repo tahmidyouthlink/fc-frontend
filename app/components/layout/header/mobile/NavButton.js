@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import { IoMenuOutline } from "react-icons/io5";
 import NavMenu from "./NavMenu";
 
-export default function NavButton({ logoWithTextSrc, legalPolicyPdfLinks }) {
+export default function NavButton({
+  isLoggedIn,
+  logoWithTextSrc,
+  legalPolicyPdfLinks,
+}) {
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -20,6 +24,7 @@ export default function NavButton({ logoWithTextSrc, legalPolicyPdfLinks }) {
         />
       </li>
       <NavMenu
+        isLoggedIn={isLoggedIn}
         isNavMenuOpen={isNavMenuOpen}
         setIsNavMenuOpen={setIsNavMenuOpen}
         logoWithTextSrc={logoWithTextSrc}
