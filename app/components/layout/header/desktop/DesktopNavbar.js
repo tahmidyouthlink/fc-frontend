@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Suspense } from "react";
+import { WEBSITE_NAME } from "@/app/config/site";
 import MainLinks from "./MainLinks";
 import Search from "../Search";
 import SideLinks from "./SideLinks";
@@ -13,7 +14,7 @@ export default function DesktopNavbar({ logoWithTextSrc }) {
         <Image
           className="h-9 w-auto"
           src={logoWithTextSrc}
-          alt={`${process.env.NEXT_PUBLIC_WEBSITE_NAME} logo`}
+          alt={`${WEBSITE_NAME} logo`}
           height={0}
           width={0}
           sizes="150px"

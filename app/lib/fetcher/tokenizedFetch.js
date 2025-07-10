@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../utils/authOptions";
+import { BACKEND_URL, FRONTEND_URL } from "@/app/config/site";
 import handleResponse from "./handleResponse";
 
 // Fetch for routes that require access token
@@ -25,6 +26,7 @@ export const tokenizedFetch = async (path, options = {}) => {
 
   const headers = {
     ...(options.headers || {}),
+    "x-client-origin": FRONTEND_URL,
     Authorization: `Bearer ${session.accessToken}`,
   };
 
@@ -36,9 +38,7 @@ export const tokenizedFetch = async (path, options = {}) => {
     headers["Content-Type"] = "application/json";
   }
 
-  headers["x-client-origin"] = process.env.FRONTEND_URL;
-
-  const res = await fetch(`${process.env.BACKEND_URL}${path}`, {
+  const res = await fetch(`${BACKEND_URL}${path}`, {
     ...options,
     method,
     headers,

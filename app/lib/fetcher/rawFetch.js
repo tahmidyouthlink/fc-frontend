@@ -1,12 +1,8 @@
+import { BACKEND_URL, FRONTEND_URL } from "@/app/config/site";
 import handleResponse from "./handleResponse";
 
 // Fetch for routes that do not require access token
 export const rawFetch = async (path, options = {}) => {
-  const backendUrl =
-    typeof window === "undefined"
-      ? process.env.BACKEND_URL
-      : process.env.NEXT_PUBLIC_BACKEND_URL;
-
   const method = (options.method || "GET").toUpperCase();
   const isGetMethod = method === "GET";
   const hasCustomCache =
@@ -15,6 +11,7 @@ export const rawFetch = async (path, options = {}) => {
 
   const headers = {
     ...(options.headers || {}),
+    "x-client-origin": FRONTEND_URL,
   };
 
   const isFormData = options.body instanceof FormData;
@@ -25,12 +22,7 @@ export const rawFetch = async (path, options = {}) => {
     headers["Content-Type"] = "application/json";
   }
 
-  headers["x-client-origin"] =
-    typeof window === "undefined"
-      ? process.env.FRONTEND_URL
-      : process.env.NEXT_PUBLIC_FRONTEND_URL;
-
-  const res = await fetch(`${backendUrl}${path}`, {
+  const res = await fetch(`${BACKEND_URL}${path}`, {
     ...options,
     method,
     headers,

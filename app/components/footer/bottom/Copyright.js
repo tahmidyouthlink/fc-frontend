@@ -1,3 +1,4 @@
+import { WEBSITE_NAME } from "@/app/config/site";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 
 export default function Copyright() {
@@ -6,7 +7,7 @@ export default function Copyright() {
       <p className="text-center text-[13px] md:text-[14px]">
         Copyright ©{" "}
         <TransitionLink className="font-bold" href="/">
-          {process.env.NEXT_PUBLIC_WEBSITE_NAME}
+          {WEBSITE_NAME}
         </TransitionLink>{" "}
         - {new Date().getFullYear()}. All Rights Reserved.
       </p>

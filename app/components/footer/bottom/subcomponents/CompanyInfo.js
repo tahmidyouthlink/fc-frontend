@@ -2,6 +2,7 @@ import Image from "next/image";
 import { LuFacebook } from "react-icons/lu";
 import { TbBrandTiktok } from "react-icons/tb";
 import { FaInstagram, FaXTwitter } from "react-icons/fa6";
+import { WEBSITE_NAME } from "@/app/config/site";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 
 export default function CompanyInfo({ logoWithTextSrc }) {
@@ -11,7 +12,7 @@ export default function CompanyInfo({ logoWithTextSrc }) {
         <Image
           className="h-12 w-auto"
           src={logoWithTextSrc}
-          alt={`${process.env.NEXT_PUBLIC_WEBSITE_NAME} logo`}
+          alt={`${WEBSITE_NAME} logo`}
           height={0}
           width={0}
           sizes="250px"

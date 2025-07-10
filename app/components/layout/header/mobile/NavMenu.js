@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Suspense } from "react";
+import { WEBSITE_NAME } from "@/app/config/site";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import Drawer from "@/app/components/shared/Drawer";
 import MenuSection from "./MenuSection";
@@ -32,7 +33,7 @@ export default function NavMenu({
           <Image
             className="h-8 w-auto"
             src={logoWithTextSrc}
-            alt={`${process.env.NEXT_PUBLIC_WEBSITE_NAME} logo`}
+            alt={`${WEBSITE_NAME} logo`}
             height={0}
             width={0}
             sizes="150px"
