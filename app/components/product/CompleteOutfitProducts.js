@@ -3,20 +3,18 @@ import { Button } from "@nextui-org/react";
 import { CgChevronRight, CgChevronLeft } from "react-icons/cg";
 import getImageSetsBasedOnColors from "@/app/utils/getImageSetsBasedOnColors";
 import ProductCard from "../product-card/ProductCard";
-import AddToCartModal from "../shop/cart/AddToCartModal";
 
 export default function CompleteOutfitProducts({
   userData,
   completeOutfitProducts,
   specialOffers,
   primaryLocation,
-  notifyVariants,
+  isAddToCartModalOpen,
+  setIsAddToCartModalOpen,
+  setSelectedAddToCartProduct,
 }) {
   const [isCompleteOutfitProductsSlid, setIsCompleteOutfitProductsSlid] =
     useState(false);
-  const [isAddToCartModalOpen, setIsAddToCartModalOpen] = useState(false);
-  const [selectedAddToCartProduct, setSelectedAddToCartProduct] =
-    useState(null);
 
   return (
     <section className="relative mt-8 bg-[var(--color-secondary-100)] py-8 md:mt-12">
@@ -63,15 +61,6 @@ export default function CompleteOutfitProducts({
           ))}
         </div>
       </div>
-      <AddToCartModal
-        userData={userData}
-        isAddToCartModalOpen={isAddToCartModalOpen}
-        setIsAddToCartModalOpen={setIsAddToCartModalOpen}
-        product={selectedAddToCartProduct}
-        specialOffers={specialOffers}
-        primaryLocation={primaryLocation}
-        notifyVariants={notifyVariants}
-      />
     </section>
   );
 }

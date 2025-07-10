@@ -3,7 +3,6 @@ import { Button } from "@nextui-org/react";
 import { CgChevronRight, CgChevronLeft } from "react-icons/cg";
 import getImageSetsBasedOnColors from "@/app/utils/getImageSetsBasedOnColors";
 import ProductCard from "../product-card/ProductCard";
-import AddToCartModal from "../shop/cart/AddToCartModal";
 
 export default function RecentlyViewedProducts({
   userData,
@@ -12,13 +11,12 @@ export default function RecentlyViewedProducts({
   hasSimilarSection,
   specialOffers,
   primaryLocation,
-  notifyVariants,
+  isAddToCartModalOpen,
+  setIsAddToCartModalOpen,
+  setSelectedAddToCartProduct,
 }) {
   const [isRecentlyViewedProductsSlid, setIsRecentlyViewedProductsSlid] =
     useState(false);
-  const [isAddToCartModalOpen, setIsAddToCartModalOpen] = useState(false);
-  const [selectedAddToCartProduct, setSelectedAddToCartProduct] =
-    useState(null);
 
   return (
     <section
@@ -72,15 +70,6 @@ export default function RecentlyViewedProducts({
           ))}
         </div>
       </div>
-      <AddToCartModal
-        userData={userData}
-        isAddToCartModalOpen={isAddToCartModalOpen}
-        setIsAddToCartModalOpen={setIsAddToCartModalOpen}
-        product={selectedAddToCartProduct}
-        specialOffers={specialOffers}
-        primaryLocation={primaryLocation}
-        notifyVariants={notifyVariants}
-      />
     </section>
   );
 }

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import SimilarProducts from "@/app/components/product/SimilarProducts";
 import CompleteOutfitProducts from "@/app/components/product/CompleteOutfitProducts";
 import RecentlyViewedProducts from "@/app/components/product/RecentlyViewedProducts";
+import AddToCartModal from "../shop/cart/AddToCartModal";
 
 export default function ProductRelatedContents({
   userData,
@@ -13,6 +14,9 @@ export default function ProductRelatedContents({
   primaryLocation,
   notifyVariants,
 }) {
+  const [isAddToCartModalOpen, setIsAddToCartModalOpen] = useState(false);
+  const [selectedAddToCartProduct, setSelectedAddToCartProduct] =
+    useState(null);
   const [recentlyViewedProducts, setRecentlyViewedProducts] = useState([]);
 
   // Load recently viewed products
@@ -80,7 +84,9 @@ export default function ProductRelatedContents({
           completeOutfitProducts={completeOutfitProducts}
           specialOffers={specialOffers}
           primaryLocation={primaryLocation}
-          notifyVariants={notifyVariants}
+          isAddToCartModalOpen={isAddToCartModalOpen}
+          setIsAddToCartModalOpen={setIsAddToCartModalOpen}
+          setSelectedAddToCartProduct={setSelectedAddToCartProduct}
         />
       )}
       {/* Similar Products Section */}
@@ -92,7 +98,9 @@ export default function ProductRelatedContents({
           hasRecentlyViewedSection={!!recentlyViewedProducts?.length}
           specialOffers={specialOffers}
           primaryLocation={primaryLocation}
-          notifyVariants={notifyVariants}
+          isAddToCartModalOpen={isAddToCartModalOpen}
+          setIsAddToCartModalOpen={setIsAddToCartModalOpen}
+          setSelectedAddToCartProduct={setSelectedAddToCartProduct}
         />
       )}
       {/* Recently Viewed Products Section */}
@@ -104,9 +112,20 @@ export default function ProductRelatedContents({
           hasSimilarSection={!!similarProducts?.length}
           specialOffers={specialOffers}
           primaryLocation={primaryLocation}
-          notifyVariants={notifyVariants}
+          isAddToCartModalOpen={isAddToCartModalOpen}
+          setIsAddToCartModalOpen={setIsAddToCartModalOpen}
+          setSelectedAddToCartProduct={setSelectedAddToCartProduct}
         />
       )}
+      <AddToCartModal
+        userData={userData}
+        isAddToCartModalOpen={isAddToCartModalOpen}
+        setIsAddToCartModalOpen={setIsAddToCartModalOpen}
+        product={selectedAddToCartProduct}
+        specialOffers={specialOffers}
+        primaryLocation={primaryLocation}
+        notifyVariants={notifyVariants}
+      />
     </>
   );
 }
