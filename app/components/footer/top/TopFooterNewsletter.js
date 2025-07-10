@@ -1,37 +1,20 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useLoading } from "@/app/contexts/loading";
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 
-export default function TopFooterNewsletter({
-  newsletterSubscriptions,
-  isSubscribedInitial,
-}) {
+export default function TopFooterNewsletter({ userEmail, isUserSubscribed }) {
   const router = useRouter();
-  const { data: session, status } = useSession();
   const { setIsPageLoading } = useLoading();
-  const { register, handleSubmit, reset, setValue } = useForm({
+  const { register, handleSubmit, reset } = useForm({
+    defaultValues: {
+      newsletterEmail: userEmail || "",
+    },
     mode: "onSubmit",
   });
-  let isUserSubscribed;
-
-  if (status === "loading") {
-    if (isUserSubscribed === undefined) isUserSubscribed = isSubscribedInitial;
-  } else {
-    if (status === "unauthenticated") {
-      isUserSubscribed = false;
-    } else {
-      isUserSubscribed = newsletterSubscriptions?.some(
-        (subscription) => subscription.email === session.user.email,
-      );
-    }
-  }
-
-  setValue("newsletterEmail", session?.user?.email || "");
 
   const onSubmit = async (data) => {
     setIsPageLoading(true);

@@ -9,23 +9,13 @@ import TopFooterNewsletter from "./TopFooterNewsletter";
 export default async function TopFooter() {
   const session = await getServerSession(authOptions);
 
-  let bannerImg, newsletterSubscriptions, isUserSubscribed;
+  let bannerImg, isUserSubscribed;
 
   try {
     const result = await rawFetch("/allMarketingBanners");
     [bannerImg] = result.data || [];
   } catch (error) {
     console.error("FetchError (footer/marketingBanner):", error.message);
-  }
-
-  try {
-    const result = await rawFetch("/allNewsletters");
-    newsletterSubscriptions = result.data || [];
-  } catch (error) {
-    console.error(
-      "FetchError (footer/newsletterSubscriptions):",
-      error.message,
-    );
   }
 
   if (session?.user?.email) {
@@ -43,8 +33,8 @@ export default async function TopFooter() {
     <TopFooterWrapper bannerImgPosition={bannerImg?.position}>
       <TopFooterBanner bannerImg={bannerImg} />
       <TopFooterNewsletter
-        newsletterSubscriptions={newsletterSubscriptions}
-        isSubscribedInitial={isUserSubscribed}
+        userEmail={session?.user?.email}
+        isUserSubscribed={isUserSubscribed}
       />
     </TopFooterWrapper>
   );
