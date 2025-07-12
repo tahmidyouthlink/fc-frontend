@@ -9,8 +9,6 @@ import HomeTrending from "../components/home/HomeTrending";
 import HomeNewArrival from "../components/home/HomeNewArrival";
 import HomeFeatures from "../components/home/HomeFeatures";
 
-export const dynamic = "force-dynamic";
-
 export default async function Home() {
   const session = await getServerSession(authOptions);
 

@@ -1,8 +1,6 @@
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 import HomeHeroSlides from "./HomeHeroSlides";
 
-export const dynamic = "force-dynamic";
-
 export default async function HomeHero() {
   let sliderData;
 

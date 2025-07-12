@@ -1,8 +1,6 @@
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 import FAQs from "@/app/components/legal/faqs";
 
-export const dynamic = "force-dynamic";
-
 export default async function FAQ() {
   let pageTitle, faqDescription, faqs;
 

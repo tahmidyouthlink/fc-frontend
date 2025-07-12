@@ -6,8 +6,6 @@ import { authOptions } from "@/app/utils/authOptions";
 import ShopContents from "@/app/components/shop/ShopContents";
 import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
 
-export const dynamic = "force-dynamic";
-
 export default async function Shop() {
   const session = await getServerSession(authOptions);
 

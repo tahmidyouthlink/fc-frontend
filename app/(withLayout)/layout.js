@@ -11,8 +11,6 @@ export const metadata = {
   description: `Discover the latest trends in men's fashion at ${WEBSITE_NAME}. Shop our extensive collection of stylish clothing, footwear, and accessories. Enjoy exclusive deals, fast shipping, and top-notch customer service. Elevate your wardrobe with our curated selection of high-quality men's products.`,
 };
 
-export const dynamic = "force-dynamic";
-
 export default async function RootLayout({ children }) {
   let topHeaderData;
 

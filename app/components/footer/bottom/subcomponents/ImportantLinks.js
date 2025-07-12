@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 
-export const dynamic = "force-dynamic";
-
 export default async function Importantlinks() {
   let legalPolicyPdfLinks;
 

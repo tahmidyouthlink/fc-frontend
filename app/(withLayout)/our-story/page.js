@@ -1,8 +1,6 @@
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 import StoryContents from "@/app/components/story/StoryContents";
 
-export const dynamic = "force-dynamic";
-
 export default async function OurStory() {
   let departments;
 

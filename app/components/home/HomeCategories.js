@@ -5,8 +5,6 @@ import curvedDottedLineShape from "@/public/shapes/curved-dotted-line-categories
 import rightArrowShape from "@/public/shapes/custom-arrow-right.png";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 
-export const dynamic = "force-dynamic";
-
 export default async function HomeCategories() {
   let categories;
 
