@@ -17,14 +17,16 @@ export default async function OrderDetails({ params }) {
 
   let order;
 
-  try {
-    const result = await tokenizedFetch(
-      `/customer-orders/${params.id}?email=${session?.user?.email}`,
-    );
+  if (session?.user?.email) {
+    try {
+      const result = await tokenizedFetch(
+        `/customer-orders/${params.id}?email=${session?.user?.email}`,
+      );
 
-    order = result.data;
-  } catch (error) {
-    console.error("FetchError (orderDetails/order):", error.message);
+      order = result.data;
+    } catch (error) {
+      console.error("FetchError (orderDetails/order):", error.message);
+    }
   }
 
   if (!order) redirect("/user/orders");

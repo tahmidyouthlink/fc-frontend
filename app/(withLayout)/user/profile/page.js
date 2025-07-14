@@ -8,18 +8,18 @@ export default async function Profile() {
   const session = await getServerSession(authOptions);
   const userEmail = session?.user?.email;
 
-  let userData, personalInfo, deliveryAddresses;
+  let userData;
 
-  try {
-    const result = await tokenizedFetch(
-      `/customerDetailsViaEmail/${userEmail}`,
-    );
+  if (userEmail) {
+    try {
+      const result = await tokenizedFetch(
+        `/customerDetailsViaEmail/${userEmail}`,
+      );
 
-    userData = result.data || {};
-    personalInfo = userData?.userInfo?.personalInfo || {};
-    deliveryAddresses = userData?.userInfo?.deliveryAddresses || [];
-  } catch (error) {
-    console.error("FetchError (profile):", error.message);
+      userData = result.data || {};
+    } catch (error) {
+      console.error("FetchError (profile):", error.message);
+    }
   }
 
   return (

@@ -17,14 +17,16 @@ export default async function ContactUs() {
 
   let userData;
 
-  try {
-    const result = await tokenizedFetch(
-      `/customerDetailsViaEmail/${session?.user?.email}`,
-    );
+  if (session?.user?.email) {
+    try {
+      const result = await tokenizedFetch(
+        `/customerDetailsViaEmail/${session?.user?.email}`,
+      );
 
-    userData = result.data || {};
-  } catch (error) {
-    console.error("FetchError (contact/userData):", error.message);
+      userData = result.data || {};
+    } catch (error) {
+      console.error("FetchError (contact/userData):", error.message);
+    }
   }
 
   return (

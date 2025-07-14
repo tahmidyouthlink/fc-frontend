@@ -10,14 +10,16 @@ export default async function Orders() {
 
   let userOrders, legalPolicyPdfLinks;
 
-  try {
-    const result = await tokenizedFetch(
-      `/customer-orders?email=${session?.user?.email}`,
-    );
+  if (session?.user?.email) {
+    try {
+      const result = await tokenizedFetch(
+        `/customer-orders?email=${session?.user?.email}`,
+      );
 
-    userOrders = result.data || [];
-  } catch (error) {
-    console.error("FetchError (orderHistory/userOrders):", error.message);
+      userOrders = result.data || [];
+    } catch (error) {
+      console.error("FetchError (orderHistory/userOrders):", error.message);
+    }
   }
 
   try {
