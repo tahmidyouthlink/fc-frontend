@@ -188,17 +188,20 @@ export default function ContactForm({ userData }) {
                   <SelectItem className="rounded-[4px]" key="Refund Request">
                     Refund Request
                   </SelectItem>
-                  <SelectItem className="rounded-[4px]" key="Cancel Order">
-                    Cancel Order
-                  </SelectItem>
                   <SelectItem className="rounded-[4px]" key="Payment Issue">
                     Payment Issue
                   </SelectItem>
-                  <SelectItem className="rounded-[4px]" key="Suggestion</">
-                    Suggestion
-                  </SelectItem>
                   <SelectItem className="rounded-[4px]" key="Order Tracking">
                     Order Tracking
+                  </SelectItem>
+                  <SelectItem className="rounded-[4px]" key="Suggestion">
+                    Suggestion
+                  </SelectItem>
+                  <SelectItem className="rounded-[4px]" key="Collaboration">
+                    Collaboration
+                  </SelectItem>
+                  <SelectItem className="rounded-[4px]" key="Others">
+                    Others
                   </SelectItem>
                 </Select>
               )}
