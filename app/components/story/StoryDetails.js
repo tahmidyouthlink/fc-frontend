@@ -95,7 +95,7 @@ export default function StoryDetails({
       gsap.from(element, {
         autoAlpha: 0,
         duration: 1,
-        xPercent: element.classList.contains("left-0") ? -15 : 15,
+        xPercent: element.classList.contains("left-0") ? 15 : -15,
         duration: 1,
         delay: 0.6,
         ease: "power2.out",
@@ -178,7 +178,7 @@ export default function StoryDetails({
               </div>
               {/* Media (Video/Image) Section */}
               <div
-                className={`media relative aspect-video w-full sm:w-2/3 md:max-lg:w-3/4 ${index % 2 === 0 ? "ml-auto" : "mr-auto"}`}
+                className={`media relative mb-[calc(12px+1.875rem*1.25)] aspect-video w-full sm:mb-[calc(12px+3.75rem*1.25)] sm:w-2/3 md:mb-[calc(12px+2.25rem*1.25)] md:max-lg:w-3/4 lg:mb-[calc(12px+3rem*1.25)] ${index % 2 === 0 ? "ml-auto" : "mr-auto"}`}
               >
                 {isSrcForVideo(content.mediaSrc) ? (
                   // Video Element
@@ -204,18 +204,8 @@ export default function StoryDetails({
                 {/* Gradient Overlay */}
                 <div className="media-overlay absolute bottom-0 left-0 right-0 z-[1] h-1/3 rounded-md bg-gradient-to-t from-black/80 to-transparent" />
                 {/* Text Outline Effect */}
-                {/* Solid Text (behind) */}
                 <h4
-                  className={`pointer-events-none absolute bottom-6 z-[0] select-none text-2xl font-bold text-neutral-700 sm:text-6xl md:text-4xl lg:text-5xl xl:text-6xl ${index % 2 === 0 ? "translate-x-1/4 max-sm:right-0 sm:left-0 sm:-translate-x-1/3" : "right-0 translate-x-1/4 sm:translate-x-1/3"}`}
-                >
-                  {content.hashtag}
-                </h4>
-                {/* Stroked Text (front) */}
-                <h4
-                  className={`pointer-events-none absolute bottom-6 z-[2] select-none text-2xl font-bold text-transparent opacity-50 sm:text-6xl md:text-4xl lg:text-5xl xl:text-6xl ${index % 2 === 0 ? "translate-x-1/4 max-sm:right-0 sm:left-0 sm:-translate-x-1/3" : "right-0 translate-x-1/4 sm:translate-x-1/3"}`}
-                  style={{
-                    WebkitTextStroke: "1px #e5e5e5",
-                  }}
+                  className={`pointer-events-none absolute -bottom-3 z-[0] translate-y-full select-none bg-[linear-gradient(to_right,#804D3A,#D86F4D,#F3A761)] bg-clip-text text-3xl/[1.25] font-bold text-transparent sm:text-6xl/[1.25] md:text-4xl/[1.25] lg:text-5xl/[1.25] ${index % 2 === 0 ? "right-0" : "left-0"}`}
                 >
                   {content.hashtag}
                 </h4>
@@ -242,7 +232,7 @@ export default function StoryDetails({
               ease: "power4.out",
               onComplete: () =>
                 gsap.to(
-                  "#staff-img > img, #dept-details .quote > div, #dept-details .quote > img, #dept-details .media > img, #dept-details .media > video, #dept-details .media-overlay, #dept-details .media > h4, #dept-details .media > img, #go-back-to-hero",
+                  "#staff-img > img, #dept-details .quote > div, #dept-details .quote > img, #dept-details .media, #go-back-to-hero",
                   {
                     yPercent: 10,
                     autoAlpha: 0,
