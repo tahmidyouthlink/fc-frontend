@@ -16,6 +16,7 @@ import { TiStarOutline } from "react-icons/ti";
 
 export default function Filter({
   isFilterButtonClicked,
+  setIsFilterButtonClicked,
   unfilteredProducts,
   filteredProducts,
   selectedFilterOptions,
@@ -373,7 +374,7 @@ export default function Filter({
         <Button
           disableRipple
           className="z-[1] order-last h-12 w-auto min-w-fit !scale-100 rounded-[4px] bg-[var(--color-primary-500)] px-4 font-semibold text-neutral-700 !opacity-100 shadow-sm hover:bg-[var(--color-primary-700)]"
-          onClick={() =>
+          onClick={() => {
             setSelectedFilterOptions({
               sortBy: new Set([]),
               filterBy: new Set([]),
@@ -384,8 +385,9 @@ export default function Filter({
                 min: undefined,
                 max: undefined,
               },
-            })
-          }
+            });
+            setIsFilterButtonClicked(false);
+          }}
         >
           Clear All
         </Button>

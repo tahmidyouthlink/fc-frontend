@@ -162,16 +162,6 @@ export default function ShopContents({
   if (!isLoading)
     return (
       <div className="flex min-h-full grow flex-col gap-y-7 px-5 sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0">
-        <div>
-          {/* Hide Filters Button */}
-          <button
-            className={`relative z-[1] flex w-fit items-center gap-x-3 rounded-[4px] bg-[var(--color-secondary-500)] px-[18px] py-3 text-sm transition-colors duration-300 ease-in-out hover:bg-[var(--color-secondary-600)] ${!isFilterButtonClicked ? "hidden" : "block"}`}
-            onClick={() => setIsFilterButtonClicked(false)}
-          >
-            <p className="text-nowrap font-semibold">Hide Filters</p>
-            <FaRegEyeSlash size={18} />
-          </button>
-        </div>
         {/* Filter Button */}
         <button
           className={`relative z-[1] flex w-fit items-center gap-x-3 rounded-[4px] bg-[var(--color-secondary-500)] px-[18px] py-3 transition-colors duration-300 ease-in-out hover:bg-[var(--color-secondary-600)] ${isFilterButtonClicked ? "hidden" : "block"}`}
@@ -182,6 +172,7 @@ export default function ShopContents({
         </button>
         <Filter
           isFilterButtonClicked={isFilterButtonClicked}
+          setIsFilterButtonClicked={setIsFilterButtonClicked}
           unfilteredProducts={products}
           filteredProducts={filteredProducts}
           selectedFilterOptions={selectedFilterOptions}
