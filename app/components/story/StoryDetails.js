@@ -25,7 +25,7 @@ export default function StoryDetails({
     });
 
     // Animation for the circle with star shape near the staff image (appears once)
-    gsap.from("#staff-img img.absolute, #staff-img > div", {
+    gsap.from("#staff-img img.absolute", {
       autoAlpha: 0,
       scale: 0.5,
       duration: 1,
@@ -131,13 +131,6 @@ export default function StoryDetails({
           width={0}
           sizes="25vw"
         />
-        <div className="absolute left-5 top-[15%] flex origin-left -rotate-[60deg] flex-col items-end justify-center rounded-[4px] bg-[var(--color-secondary-400)] p-2 text-center text-sm text-neutral-700 sm:left-1/3 sm:-rotate-45 sm:max-md:top-[9%] sm:max-md:-translate-x-full md:-left-4 md:top-[12%] md:text-lg lg:top-[15%] lg:text-xl xl:left-[30%] xl:top-[12.5%] xl:-translate-x-full xl:text-sm min-[1800px]:left-1/4 min-[1800px]:top-[10%]">
-          <span className="relative">
-            <p className="font-semibold">{selectedDept.staff.staffName}</p>
-            <p>@ {selectedDept.departmentName}</p>
-            <div className="absolute -bottom-2 left-1/2 h-3 w-3 -translate-x-1/2 translate-y-1/2 rotate-45 bg-[var(--color-secondary-400)]" />
-          </span>
-        </div>
         {/* Staff Image */}
         <Image
           src={selectedDept.staff.staffImgUrl}
@@ -249,7 +242,7 @@ export default function StoryDetails({
               ease: "power4.out",
               onComplete: () =>
                 gsap.to(
-                  "#staff-img > *, #dept-details .quote > div, #dept-details .quote > img, #dept-details .media > img, #dept-details .media > video, #dept-details .media-overlay, #dept-details .media > h4, #dept-details .media > img, #go-back-to-hero",
+                  "#staff-img > img, #dept-details .quote > div, #dept-details .quote > img, #dept-details .media > img, #dept-details .media > video, #dept-details .media-overlay, #dept-details .media > h4, #dept-details .media > img, #go-back-to-hero",
                   {
                     yPercent: 10,
                     autoAlpha: 0,
