@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import Image from "next/image";
+import thunderShape from "@/public/shapes/thunder-with-stroke.svg";
 import Shapes from "./Shapes";
 import ProductCard from "../../product-card/ProductCard";
 import AddToCartModal from "../cart/AddToCartModal";
@@ -36,6 +37,7 @@ const getDefaultColByWidth = (width) => {
 
 export default function ShopCards({
   userData,
+  isSearchedOrFiltered,
   filteredProducts,
   filteredProductCount,
   selectedFilterOptions,
@@ -110,29 +112,50 @@ export default function ShopCards({
 
   return (
     <>
-      {/* Column selection buttons */}
-      <div className="flex justify-end gap-2">
-        {colOptions.map((option) => (
-          <button
-            key={"grid-layout-option-" + option.number}
-            onClick={() => {
-              setUserSelectedCols(option.number);
-              setCols(option.number);
-              setRows(
-                Math.max(0, Math.ceil(filteredProductCount / option.number)),
-              );
-            }}
-            className={`rounded-[3px] border p-1.5 transition-[background-color,border-color] duration-300 ease-in-out hover:border-[var(--color-secondary-600)] hover:bg-[var(--color-secondary-500)] ${cols === option.number ? "border-[var(--color-secondary-600)] bg-[var(--color-secondary-500)]" : "border-neutral-200 bg-neutral-100"} ${option.number === 1 ? "sm:hidden" : option.number === 3 ? "max-sm:hidden" : option.number !== 2 ? "max-lg:hidden" : ""}`}
-          >
-            <Image
-              src={option.svg}
-              alt={"grid-layout-option-" + option.number}
-              height={0}
-              width={0}
-              className="size-4"
-            />
-          </button>
-        ))}
+      <div className="flex">
+        {/* Product Count Text */}
+        {isSearchedOrFiltered && (
+          <p className="relative w-fit">
+            {filteredProductCount || "No"} item
+            {filteredProductCount > 1 && "s"} found
+            {/* Shape (Thunder) */}
+            <span className="absolute -right-1 bottom-1/4 block aspect-square w-7 translate-x-full rotate-[26deg] max-sm:hidden">
+              <Image
+                src={thunderShape}
+                alt="Thunder shape"
+                className="object-contain"
+                height={0}
+                width={0}
+                sizes="25vw"
+                fill
+              />
+            </span>
+          </p>
+        )}
+        {/* Column selection buttons */}
+        <div className="ml-auto flex gap-2">
+          {colOptions.map((option) => (
+            <button
+              key={"grid-layout-option-" + option.number}
+              onClick={() => {
+                setUserSelectedCols(option.number);
+                setCols(option.number);
+                setRows(
+                  Math.max(0, Math.ceil(filteredProductCount / option.number)),
+                );
+              }}
+              className={`rounded-[3px] border p-1.5 transition-[background-color,border-color] duration-300 ease-in-out hover:border-[var(--color-secondary-600)] hover:bg-[var(--color-secondary-500)] ${cols === option.number ? "border-[var(--color-secondary-600)] bg-[var(--color-secondary-500)]" : "border-neutral-200 bg-neutral-100"} ${option.number === 1 ? "sm:hidden" : option.number === 3 ? "max-sm:hidden" : option.number !== 2 ? "max-lg:hidden" : ""}`}
+            >
+              <Image
+                src={option.svg}
+                alt={"grid-layout-option-" + option.number}
+                height={0}
+                width={0}
+                className="size-4"
+              />
+            </button>
+          ))}
+        </div>
       </div>
       <section
         className="relative grid gap-x-4 gap-y-12 pb-7"

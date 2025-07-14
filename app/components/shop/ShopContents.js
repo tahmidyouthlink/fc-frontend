@@ -1,12 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
 import { FaRegEyeSlash } from "react-icons/fa6";
 import { useLoading } from "@/app/contexts/loading";
-import thunderShape from "@/public/shapes/thunder-with-stroke.svg";
 import {
   calculateFinalPrice,
   checkIfOnlyRegularDiscountIsAvailable,
@@ -164,42 +162,7 @@ export default function ShopContents({
   if (!isLoading)
     return (
       <div className="flex min-h-full grow flex-col gap-y-7 px-5 sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0">
-        <div className="flex items-center justify-between gap-1">
-          {/* Product Count Text */}
-          {!keyword?.length &&
-          Object.values(selectedFilterOptions).every(
-            (selectedValue) => !selectedValue.length,
-          ) ? (
-            /* No filters */
-            <p>
-              Displaying {filteredProductCount || "no"} item
-              {filteredProductCount > 1 ? "s" : ""}
-            </p>
-          ) : (
-            /* With filters */
-            <p className="relative w-fit">
-              {filteredProductCount || "No"} item
-              {filteredProductCount > 1 && "s"} found
-              {!!keyword && "for" && (
-                <span className="font-semibold"> &quot;{keyword}&quot;</span>
-              )}
-              {Object.values(selectedFilterOptions).some(
-                (selectedValue) => selectedValue.length,
-              ) && " with these selected filters:"}
-              {/* Shape (Thunder) */}
-              <span className="absolute -right-1 bottom-1/4 block aspect-square w-7 translate-x-full rotate-[26deg] max-sm:hidden">
-                <Image
-                  src={thunderShape}
-                  alt="Thunder shape"
-                  className="object-contain"
-                  height={0}
-                  width={0}
-                  sizes="25vw"
-                  fill
-                />
-              </span>
-            </p>
-          )}
+        <div>
           {/* Hide Filters Button */}
           <button
             className={`relative z-[1] flex w-fit items-center gap-x-3 rounded-[4px] bg-[var(--color-secondary-500)] px-[18px] py-3 text-sm transition-colors duration-300 ease-in-out hover:bg-[var(--color-secondary-600)] ${!isFilterButtonClicked ? "hidden" : "block"}`}
@@ -236,6 +199,12 @@ export default function ShopContents({
         ) : (
           <ShopCards
             userData={userData}
+            isSearchedOrFiltered={
+              keyword?.length ||
+              Object.values(selectedFilterOptions).some(
+                (selectedValue) => selectedValue.length,
+              )
+            }
             filteredProducts={filteredProducts}
             filteredProductCount={filteredProductCount}
             selectedFilterOptions={selectedFilterOptions}
