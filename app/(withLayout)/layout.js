@@ -35,7 +35,7 @@ export default async function RootLayout({ children }) {
   const topHeaderHeight = topHeaderData?.isSlideEnabled ? "28.5px" : "0px";
 
   return (
-    <div className="flex min-h-dvh flex-col [&>main]:grow">
+    <div>
       <style>{`:root {
           --top-header-height: ${topHeaderHeight};
           --color-primary-100: #fafff9;
@@ -83,22 +83,24 @@ export default async function RootLayout({ children }) {
           --color-static-bubble-tertiary: #ffffff;
           --color-static-bubble-quaternary: #ffffff;
         }`}</style>
-      <Header
-        logoWithoutTextSrc={logoWithoutTextSrc}
-        logoWithTextSrc={logoWithTextSrc}
-        isTopHeaderEnabled={topHeaderData?.isSlideEnabled}
-        slides={topHeaderData?.slides}
-        slideDuration={topHeaderData?.slideDuration}
-        isAutoSlideEnabled={topHeaderData?.isAutoSlideEnabled}
-        bgColor={topHeaderData?.topHeaderColor}
-        textColor={topHeaderData?.textColor}
-        isHighlightedColorEnabled={topHeaderData?.isHighlightedColorEnabled}
-        highlightedColor={topHeaderData?.highlightedTextColor}
-      />
+      <div className="flex min-h-dvh flex-col">
+        <Header
+          logoWithoutTextSrc={logoWithoutTextSrc}
+          logoWithTextSrc={logoWithTextSrc}
+          isTopHeaderEnabled={topHeaderData?.isSlideEnabled}
+          slides={topHeaderData?.slides}
+          slideDuration={topHeaderData?.slideDuration}
+          isAutoSlideEnabled={topHeaderData?.isAutoSlideEnabled}
+          bgColor={topHeaderData?.topHeaderColor}
+          textColor={topHeaderData?.textColor}
+          isHighlightedColorEnabled={topHeaderData?.isHighlightedColorEnabled}
+          highlightedColor={topHeaderData?.highlightedTextColor}
+        />
+        <div className="flex-1 [&_main]:min-h-dvh">{children}</div>
+      </div>
       <LoaderFrontend />
       <ScrollTopButton />
       <ChatButton />
-      {children}
       <Footer logoWithTextSrc={logoWithTextSrc} />
     </div>
   );
