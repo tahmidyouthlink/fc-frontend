@@ -41,6 +41,7 @@ export default function CheckoutCartItems({
       const updatedUserData = {
         ...userData,
         cartItems: updatedCart,
+        cartLastModifiedAt: new Date().toISOString(),
       };
 
       try {

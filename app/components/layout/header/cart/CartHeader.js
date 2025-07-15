@@ -14,6 +14,7 @@ export default function CartHeader({ userData, totalItems }) {
       const updatedUserData = {
         ...userData,
         cartItems: [],
+        cartLastModifiedAt: new Date().toISOString(),
       };
 
       try {

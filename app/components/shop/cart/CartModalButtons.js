@@ -70,6 +70,7 @@ export default function CartModalButtons({
       const updatedUserData = {
         ...userData,
         cartItems: updatedCart,
+        cartLastModifiedAt: new Date().toISOString(),
       };
 
       try {

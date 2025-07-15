@@ -193,6 +193,7 @@ export default function CheckoutForm({
         },
       },
       cartItems: [],
+      cartLastModifiedAt: new Date().toISOString(),
       wishlistItems: updatedWishlist,
     };
 

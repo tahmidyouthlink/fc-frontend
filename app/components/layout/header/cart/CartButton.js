@@ -131,6 +131,7 @@ export default function CartButton({
           const updatedUserData = {
             ...userData,
             cartItems: updatedCart,
+            cartLastModifiedAt: new Date().toISOString(),
           };
 
           try {
