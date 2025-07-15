@@ -12,8 +12,13 @@ export async function middleware(req) {
 
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-  // If the user is not logged in and tries to access any of the user pages, redirect to homepage
-  if (!token && pathname.includes("user")) {
+  // Redirect to homepage, if the user is:
+  //   1. not logged in and trying to access any of the user pages, or
+  //   2. logged in and trying to access the reset password page
+  if (
+    (!token && pathname.includes("user")) ||
+    (token && pathname.includes("reset-password"))
+  ) {
     return NextResponse.redirect(new URL("/", pathname));
   }
 
