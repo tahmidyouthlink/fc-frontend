@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect } from "react";
+import { useState } from "react";
+import { Skeleton } from "@nextui-org/react";
 import { CgArrowUp } from "react-icons/cg";
 import circleWithStarShape from "@/public/shapes/circle-with-star.svg";
 import swirlyArrowShape from "@/public/shapes/swirly-arrow.svg";
@@ -13,6 +14,8 @@ export default function StoryDetails({
   selectedDept,
   setSelectedDept,
 }) {
+  const [videoLoaded, setVideoLoaded] = useState({});
+
   useGSAP(() => {
     gsap.set("#story-details", { autoAlpha: 1 });
 
@@ -181,15 +184,26 @@ export default function StoryDetails({
                 className={`media relative mb-[calc(12px+1.875rem*1.25)] aspect-video w-full sm:mb-[calc(12px+3.75rem*1.25)] sm:w-2/3 md:mb-[calc(12px+2.25rem*1.25)] md:max-lg:w-3/4 lg:mb-[calc(12px+3rem*1.25)] ${index % 2 === 0 ? "ml-auto" : "mr-auto"}`}
               >
                 {isSrcForVideo(content.mediaSrc) ? (
-                  // Video Element
-                  <video
-                    className="media-video relative z-[1] h-full w-full rounded-md object-cover"
-                    autoPlay
-                    muted
-                    loop
-                  >
-                    <source src={content.mediaSrc} type="video/mp4" />
-                  </video>
+                  <div className="relative z-[1] h-full w-full">
+                    {/* Skeleton Placeholder */}
+                    {!videoLoaded[index] && (
+                      <Skeleton className="absolute inset-0 h-full w-full rounded-md" />
+                    )}
+                    {/* Video Element */}
+                    <video
+                      className={`media-video relative h-full w-full rounded-md object-cover transition-opacity duration-300 ease-in-out ${
+                        videoLoaded[index] ? "opacity-100" : "opacity-0"
+                      }`}
+                      autoPlay
+                      muted
+                      loop
+                      onCanPlayThrough={() =>
+                        setVideoLoaded((prev) => ({ ...prev, [index]: true }))
+                      }
+                    >
+                      <source src={content.mediaSrc} type="video/mp4" />
+                    </video>
+                  </div>
                 ) : (
                   // Image Element
                   <Image
