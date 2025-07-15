@@ -201,8 +201,6 @@ export default function StoryDetails({
                     sizes="25vw"
                   />
                 )}
-                {/* Gradient Overlay */}
-                <div className="media-overlay absolute bottom-0 left-0 right-0 z-[1] h-1/3 rounded-md bg-gradient-to-t from-black/80 to-transparent" />
                 {/* Text Outline Effect */}
                 <h4
                   className={`pointer-events-none absolute -bottom-3 z-[0] translate-y-full select-none bg-[linear-gradient(to_right,#804D3A,#D86F4D,#F3A761)] bg-clip-text text-3xl/[1.25] font-bold text-transparent sm:text-6xl/[1.25] md:text-4xl/[1.25] lg:text-5xl/[1.25] ${index % 2 === 0 ? "right-0" : "left-0"}`}
