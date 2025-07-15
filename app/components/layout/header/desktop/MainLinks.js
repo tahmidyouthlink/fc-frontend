@@ -13,11 +13,11 @@ export default function MainLinks() {
         <li>
           <TransitionLink
             className={
-              pathname.startsWith("/our-story")
+              pathname.startsWith("/story")
                 ? "text-neutral-800"
                 : "hover:text-neutral-500"
             }
-            href="/our-story"
+            href="/story"
           >
             Souls
           </TransitionLink>

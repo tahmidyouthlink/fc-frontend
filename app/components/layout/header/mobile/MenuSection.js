@@ -10,10 +10,10 @@ export default function MenuSection({ setIsNavMenuOpen }) {
     <ul className="space-y-1 text-xs md:text-[13px]">
       <li>
         <TransitionLink
-          href="/our-story"
+          href="/story"
           hasDrawer={true}
           setIsDrawerOpen={setIsNavMenuOpen}
-          className={pathname.startsWith("/our-story") ? "active" : undefined}
+          className={pathname.startsWith("/story") ? "active" : undefined}
         >
           <PiUsersThree />
           Souls
