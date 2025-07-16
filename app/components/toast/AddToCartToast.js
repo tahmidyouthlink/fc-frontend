@@ -1,37 +1,53 @@
+"use client";
+
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { HiCheckCircle } from "react-icons/hi2";
 
-export default function addToCartToast(
+export default function AddToCartToast({
   defaultToast,
   productImg,
   productTitle,
   variantSize,
   variantColor,
-) {
-  if (document == undefined) return null;
+}) {
+  const [marginTop, setMarginTop] = useState(0);
+  const toastRef = useRef(null);
 
-  const headerHeight = document.querySelector("#header")?.offsetHeight;
+  // Scroll listener to update marginTop
+  useEffect(() => {
+    const updateMargin = () => {
+      const header = document.querySelector("#header");
+      if (!header) return;
 
-  if (!headerHeight) return null;
+      const headerHeight = header.offsetHeight;
+      const offset = headerHeight - window.scrollY;
+      const isHeaderOutOfViewport = offset < 0;
+      const marginTopVal = isHeaderOutOfViewport ? 0 : offset;
 
-  const offset = headerHeight - window.scrollY;
-  const isHeaderOutOfViewport = offset < 0;
-  const marginTopVal = isHeaderOutOfViewport ? 0 : offset;
+      setMarginTop(marginTopVal);
+    };
+
+    updateMargin();
+    window.addEventListener("scroll", updateMargin);
+    return () => window.removeEventListener("scroll", updateMargin);
+  }, []);
+
+  // Animate visibility
+  useEffect(() => {
+    const el = toastRef.current;
+    if (!el) return;
+    requestAnimationFrame(() => {
+      el.style.transform = `translateY(${defaultToast.visible ? "0px" : "-24px"})`;
+      el.style.opacity = defaultToast.visible ? "1" : "0";
+    });
+  }, [defaultToast.visible]);
 
   return (
     <div
-      ref={(el) => {
-        if (el) {
-          requestAnimationFrame(() => {
-            el.style.transform = `translateY(${defaultToast.visible ? "0px" : "-24px"})`;
-            el.style.opacity = defaultToast.visible ? "1" : "0";
-          });
-        }
-      }}
+      ref={toastRef}
       className="z-[6] min-w-60 -translate-y-6 rounded-[4px] bg-white p-2.5 opacity-0 shadow-[4px_4px_16px_0_rgba(0,0,0,0.15)] transition-[opacity,transform] duration-400 ease-out"
-      style={{
-        marginTop: `${marginTopVal}px`,
-      }}
+      style={{ marginTop }}
     >
       {/* Confirmation of Addition to Cart */}
       <div className="flex items-center gap-1.5">

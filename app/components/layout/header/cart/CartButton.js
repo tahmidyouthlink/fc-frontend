@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 import { IoCartOutline } from "react-icons/io5";
 import { useLoading } from "@/app/contexts/loading";
 import { routeFetch } from "@/app/lib/fetcher/routeFetch";
-import addToCartToast from "@/app/utils/addToCartToast";
+import AddToCartToast from "@/app/components/toast/AddToCartToast";
 import getImageSetsBasedOnColors from "@/app/utils/getImageSetsBasedOnColors";
 import {
   calculateSubtotal,
@@ -143,16 +143,19 @@ export default function CartButton({
             if (result.ok) {
               // Display custom success toast notification, if server cart is updated
               toast.custom(
-                (t) =>
-                  addToCartToast(
-                    t,
-                    getImageSetsBasedOnColors(product?.productVariants)?.find(
-                      (imgSet) => imgSet?.color?.color === colorCode,
-                    )?.images[0],
-                    product?.productTitle,
-                    productVariant?.size,
-                    productVariant?.color,
-                  ),
+                (t) => (
+                  <AddToCartToast
+                    defaultToast={t}
+                    productImg={
+                      getImageSetsBasedOnColors(product?.productVariants)?.find(
+                        (imgSet) => imgSet?.color?.color === colorCode,
+                      )?.images[0]
+                    }
+                    productTitle={product?.productTitle}
+                    variantSize={productVariant?.size}
+                    variantColor={productVariant?.color}
+                  />
+                ),
                 {
                   position: "top-right",
                 },
@@ -175,16 +178,19 @@ export default function CartButton({
         } else {
           // Display custom success toast notification, if saved only locally
           toast.custom(
-            (t) =>
-              addToCartToast(
-                t,
-                getImageSetsBasedOnColors(product?.productVariants)?.find(
-                  (imgSet) => imgSet?.color?.color === colorCode,
-                )?.images[0],
-                product?.productTitle,
-                productVariant?.size,
-                productVariant?.color,
-              ),
+            (t) => (
+              <AddToCartToast
+                defaultToast={t}
+                productImg={
+                  getImageSetsBasedOnColors(product?.productVariants)?.find(
+                    (imgSet) => imgSet?.color?.color === colorCode,
+                  )?.images[0]
+                }
+                productTitle={product?.productTitle}
+                variantSize={productVariant?.size}
+                variantColor={productVariant?.color}
+              />
+            ),
             {
               position: "top-right",
             },
