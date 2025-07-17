@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { tokenizedFetch } from "@/app/lib/fetcher/tokenizedFetch";
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 import { authOptions } from "@/app/utils/authOptions";
-import { WEBSITE_NAME } from "@/app/config/site";
+import { COMPANY_NAME } from "@/app/config/company";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
 import Search from "../Search";
@@ -72,7 +72,7 @@ export default async function MobileNavbar({
           <Image
             className="h-8 w-auto sm:hidden"
             src={logoWithoutTextSrc}
-            alt={`${WEBSITE_NAME} logo (no text)`}
+            alt={`${COMPANY_NAME} logo (no text)`}
             height={0}
             width={0}
             sizes="75px"
@@ -80,7 +80,7 @@ export default async function MobileNavbar({
           <Image
             className="h-8 w-auto max-sm:hidden"
             src={logoWithTextSrc}
-            alt={`${WEBSITE_NAME} logo`}
+            alt={`${COMPANY_NAME} logo`}
             height={0}
             width={0}
             sizes="150px"

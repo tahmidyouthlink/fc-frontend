@@ -11,6 +11,11 @@ import { tokenizedFetch } from "@/app/lib/fetcher/tokenizedFetch";
 import { authOptions } from "@/app/utils/authOptions";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import ContactForm from "@/app/components/contact/ContactForm";
+import {
+  COMPANY_ADDRESS,
+  COMPANY_EMAIL,
+  COMPANY_PHONE,
+} from "@/app/config/company";
 
 export default async function ContactUs() {
   const session = await getServerSession(authOptions);
@@ -52,17 +57,22 @@ export default async function ContactUs() {
             <div className="space-y-5">
               <div className="flex items-center gap-2.5">
                 <PiMapPinLight size={24} />
-                <p className="text-[13px]">
-                  Maples Road, New York, United States
-                </p>
+                <p className="text-[13px]">{COMPANY_ADDRESS}</p>
               </div>
               <div className="flex items-center gap-2.5">
                 <PiPhoneLight size={24} />
-                <p className="text-[13px]">+880 1752-859362</p>
+                <a
+                  className="text-[13px]"
+                  href={`tel:+88${COMPANY_PHONE.replace(/-/g, "")}`}
+                >
+                  {COMPANY_PHONE}
+                </a>
               </div>
               <div className="flex items-center gap-2.5">
                 <PiEnvelopeSimpleLight size={24} />
-                <p className="text-[13px]">f-commerce-ltd@gmail.com</p>
+                <a className="text-[13px]" href={`mailto:${COMPANY_EMAIL}`}>
+                  {COMPANY_EMAIL}
+                </a>
               </div>
             </div>
             <div className="space-y-4">

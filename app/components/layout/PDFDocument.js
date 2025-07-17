@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   Font,
+  Link,
 } from "@react-pdf/renderer";
 import sidebarImageBase64 from "./sidebarImageBase64";
 import JsBarcode from "jsbarcode";
@@ -16,7 +17,13 @@ import { montserratBold } from "./MontserratBold";
 import { montserratBlack } from "./MontserratBlack";
 import { montserratMedium } from "./MontserratMedium";
 import { lilitaOne } from "./LilitaOne";
-import { WEBSITE_NAME } from "@/app/config/site";
+import { FRONTEND_URL } from "@/app/config/site";
+import {
+  COMPANY_ADDRESS,
+  COMPANY_EMAIL,
+  COMPANY_NAME,
+  COMPANY_PHONE,
+} from "@/app/config/company";
 
 // Generate Barcode as PNG Data URL
 const generateBarcodeData = (order) => {
@@ -192,6 +199,10 @@ const styles = StyleSheet.create({
     fontWeight: 400,
     fontFamily: "Lilita One",
   },
+  link: {
+    color: "inherit",
+    textDecoration: "none",
+  },
 });
 
 const PDFDocument = ({ order }) => {
@@ -285,7 +296,7 @@ const PDFDocument = ({ order }) => {
 
         {/* Main content with padding */}
         <View style={styles.contentContainer}>
-          <Text style={styles.header}>{WEBSITE_NAME}</Text>
+          <Text style={styles.header}>{COMPANY_NAME}</Text>
 
           <View style={styles.orderInfo}>
             {/* Order Information */}
@@ -469,11 +480,21 @@ const PDFDocument = ({ order }) => {
           {/* Footer */}
           <View style={styles.footerAlign}>
             <View style={styles.footerDetails}>
-              <Text>{WEBSITE_NAME}</Text>
-              <Text>Mirpur, Dhaka, 1100</Text>
-              <Text>Email: fashion@commerce.com</Text>
-              <Text>Phone: +88 019 999 99999</Text>
-              <Text>www.fashioncommerce.com</Text>
+              <Text>{COMPANY_NAME}</Text>
+              <Text>{COMPANY_ADDRESS}</Text>
+              <Text>Email: {COMPANY_EMAIL}</Text>
+              <Text>
+                Phone:{" "}
+                <Link
+                  src={`tel:+88${COMPANY_PHONE.replace(/-/g, "")}`}
+                  style={styles.link}
+                >
+                  {COMPANY_PHONE}
+                </Link>
+              </Text>
+              <Link src={FRONTEND_URL} style={styles.link}>
+                {FRONTEND_URL}
+              </Link>
             </View>
             <View>
               <Text style={styles.footer}>THANK YOU</Text>

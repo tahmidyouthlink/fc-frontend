@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { LuCheck } from "react-icons/lu";
 import { FcGoogle } from "react-icons/fc";
 import { useLoading } from "@/app/contexts/loading";
-import { WEBSITE_NAME } from "@/app/config/site";
+import { COMPANY_NAME } from "@/app/config/company";
 
 export default function GoogleSignInButton({
   isLinkedWithGoogle,
@@ -51,7 +51,7 @@ export default function GoogleSignInButton({
 
     window.isLoginSuccessful = null;
 
-    const popup = popupCenter("/login/google", `${WEBSITE_NAME} | ` + ctaText);
+    const popup = popupCenter("/login/google", `${COMPANY_NAME} | ` + ctaText);
 
     const interval = setInterval(async () => {
       if (!popup || popup.closed) {
