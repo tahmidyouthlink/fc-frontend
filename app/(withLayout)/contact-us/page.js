@@ -11,11 +11,7 @@ import { tokenizedFetch } from "@/app/lib/fetcher/tokenizedFetch";
 import { authOptions } from "@/app/utils/authOptions";
 import TransitionLink from "@/app/components/ui/TransitionLink";
 import ContactForm from "@/app/components/contact/ContactForm";
-import {
-  COMPANY_ADDRESS,
-  COMPANY_EMAIL,
-  COMPANY_PHONE,
-} from "@/app/config/company";
+import { COMPANY_EMAIL, COMPANY_PHONE } from "@/app/config/company";
 
 export default async function ContactUs() {
   const session = await getServerSession(authOptions);
@@ -56,14 +52,10 @@ export default async function ContactUs() {
           <div className="grow justify-between max-sm:space-y-10 sm:flex md:flex-col">
             <div className="space-y-5">
               <div className="flex items-center gap-2.5">
-                <PiMapPinLight size={24} />
-                <p className="text-[13px]">{COMPANY_ADDRESS}</p>
-              </div>
-              <div className="flex items-center gap-2.5">
                 <PiPhoneLight size={24} />
                 <a
                   className="text-[13px]"
-                  href={`tel:+88${COMPANY_PHONE.replace(/-/g, "")}`}
+                  href={`tel:+88${COMPANY_PHONE.replace(/\s/g, "")}`}
                 >
                   {COMPANY_PHONE}
                 </a>

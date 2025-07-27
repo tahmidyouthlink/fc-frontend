@@ -19,7 +19,6 @@ import { montserratMedium } from "./MontserratMedium";
 import { lilitaOne } from "./LilitaOne";
 import { FRONTEND_URL } from "@/app/config/site";
 import {
-  COMPANY_ADDRESS,
   COMPANY_EMAIL,
   COMPANY_NAME,
   COMPANY_PHONE,
@@ -481,12 +480,11 @@ const PDFDocument = ({ order }) => {
           <View style={styles.footerAlign}>
             <View style={styles.footerDetails}>
               <Text>{COMPANY_NAME}</Text>
-              <Text>{COMPANY_ADDRESS}</Text>
               <Text>Email: {COMPANY_EMAIL}</Text>
               <Text>
                 Phone:{" "}
                 <Link
-                  src={`tel:+88${COMPANY_PHONE.replace(/-/g, "")}`}
+                  src={`tel:+88${COMPANY_PHONE.replace(/\s/g, "")}`}
                   style={styles.link}
                 >
                   {COMPANY_PHONE}
