@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { generateCardRotations } from "@/app/utils/generateCardRotations";
 
-const SMALL_CARD_WIDTH = 136;
+const SMALL_CARD_WIDTH = 100;
 const SMALL_CARD_OFFSET = SMALL_CARD_WIDTH / 2;
 const LARGE_CARD_WIDTH = 192;
 const LARGE_CARD_OFFSET = LARGE_CARD_WIDTH / 2;
