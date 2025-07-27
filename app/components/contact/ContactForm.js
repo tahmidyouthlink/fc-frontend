@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { Select, SelectItem } from "@nextui-org/react";
+import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useLoading } from "@/app/contexts/loading";
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
@@ -13,7 +12,6 @@ export default function ContactForm({ userData }) {
   const {
     register,
     handleSubmit,
-    control,
     reset,
     getValues,
     formState: { errors },
@@ -22,7 +20,7 @@ export default function ContactForm({ userData }) {
       name: "",
       email: "",
       phone: "",
-      topic: new Set([]),
+      topic: "",
       message: "",
     },
     mode: "onBlur",
@@ -33,7 +31,7 @@ export default function ContactForm({ userData }) {
       name: userData?.userInfo?.personalInfo?.customerName || "",
       email: userData?.email || "",
       phone: userData?.userInfo?.personalInfo?.phoneNumber || "",
-      topic: getValues("topic") || new Set([]),
+      topic: getValues("topic") || "",
       message: getValues("message") || "",
     });
   }, [getValues, reset, userData]);
@@ -44,10 +42,7 @@ export default function ContactForm({ userData }) {
     try {
       const result = await rawFetch("/contact", {
         method: "POST",
-        body: JSON.stringify({
-          ...data,
-          topic: [...data.topic][0],
-        }),
+        body: JSON.stringify(data),
       });
 
       if (result.ok) {
@@ -67,7 +62,7 @@ export default function ContactForm({ userData }) {
         name: userData?.userInfo?.personalInfo?.customerName || "",
         email: userData?.email || "",
         phone: userData?.userInfo?.personalInfo?.phoneNumber || "",
-        topic: new Set([]),
+        topic: "",
         message: "",
       });
       setIsPageLoading(false);
@@ -167,44 +162,20 @@ export default function ContactForm({ userData }) {
             )}
           </div>
           <div className="relative w-full">
-            <Controller
-              name="topic"
-              control={control}
-              rules={{
-                validate: {
-                  required: (selectedKeys) =>
-                    selectedKeys.size > 0 || "Topic is required.",
+            <input
+              type="text"
+              className="w-full border-b-2 border-neutral-300 bg-transparent py-2 text-neutral-800 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-neutral-400"
+              placeholder="Subject"
+              {...register("topic", {
+                required: {
+                  value: true,
+                  message: "Subject is required.",
                 },
-              }}
-              render={({ field: { onChange, value } }) => (
-                <Select
-                  label="Select a topic"
-                  variant="underlined"
-                  selectedKeys={value}
-                  onSelectionChange={onChange}
-                  className="w-full [&_button]:border-b [&_button]:border-neutral-300 [&_button]:after:bg-neutral-400 hover:[&_button]:border-neutral-300 [&_label]:text-sm [&_label]:text-neutral-400 lg:[&_label]:text-base"
-                  classNames={{ popoverContent: ["rounded-md"] }}
-                >
-                  <SelectItem className="rounded-[4px]" key="Refund Request">
-                    Refund Request
-                  </SelectItem>
-                  <SelectItem className="rounded-[4px]" key="Payment Issue">
-                    Payment Issue
-                  </SelectItem>
-                  <SelectItem className="rounded-[4px]" key="Order Tracking">
-                    Order Tracking
-                  </SelectItem>
-                  <SelectItem className="rounded-[4px]" key="Suggestion">
-                    Suggestion
-                  </SelectItem>
-                  <SelectItem className="rounded-[4px]" key="Collaboration">
-                    Collaboration
-                  </SelectItem>
-                  <SelectItem className="rounded-[4px]" key="Others">
-                    Others
-                  </SelectItem>
-                </Select>
-              )}
+                minLength: {
+                  value: 5,
+                  message: "Subject must have at least 5 characters.",
+                },
+              })}
             />
             {errors.topic && (
               <p className="absolute -bottom-5 left-0 text-xs font-semibold text-red-500">
