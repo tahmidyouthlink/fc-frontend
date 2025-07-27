@@ -6,7 +6,6 @@ import {
   ModalFooter,
 } from "@nextui-org/react";
 import { LuMessagesSquare } from "react-icons/lu";
-import TransitionLink from "../../ui/TransitionLink";
 import ReturnInfoModalInfo from "./ReturnInfoModalInfo";
 import ReturnInfoModalItems from "./ReturnInfoModalItems";
 import ReturnInfoModalProofImages from "./ReturnInfoModalProofImages";
@@ -16,7 +15,8 @@ export default function ReturnInfoModal({
   setIsReturnInfoModalOpen,
   activeReturnOrder,
 }) {
-  const { orderStatus, returnInfo, declinedReason } = activeReturnOrder || {};
+  const { orderNumber, orderStatus, returnInfo, declinedReason } =
+    activeReturnOrder || {};
 
   return (
     <Modal
@@ -48,13 +48,17 @@ export default function ReturnInfoModal({
               />
             </ModalBody>
             <ModalFooter>
-              <TransitionLink
-                href="/contact-us"
-                className="flex w-fit items-center gap-2 rounded-[4px] bg-[var(--color-primary-500)] px-4 py-2.5 text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
-              >
-                Contact Us
-                <LuMessagesSquare size={17} />
-              </TransitionLink>
+              {orderStatus === "Request Declined" && (
+                <a
+                  href={`/contact-us?orderNumber=${orderNumber}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex w-fit items-center gap-2 rounded-[4px] bg-[var(--color-primary-500)] px-4 py-2.5 text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
+                >
+                  Contact Us
+                  <LuMessagesSquare size={17} />
+                </a>
+              )}
             </ModalFooter>
           </>
         )}
