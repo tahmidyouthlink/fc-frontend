@@ -1,5 +1,7 @@
+import { getServerSession } from "next-auth";
 import { rawFetch } from "../lib/fetcher/rawFetch";
 import { COMPANY_NAME } from "../config/company";
+import { authOptions } from "../utils/authOptions";
 import Header from "../components/layout/header/Header";
 import ScrollTopButton from "../components/ui/ScrollTopButton";
 import Footer from "../components/footer/Footer";
@@ -12,6 +14,8 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
+  const session = await getServerSession(authOptions);
+
   let topHeaderData;
 
   try {
@@ -100,7 +104,7 @@ export default async function RootLayout({ children }) {
       </div>
       <LoaderFrontend />
       <ScrollTopButton />
-      <ChatButton />
+      {session && <ChatButton />}
       <Footer logoWithTextSrc={logoWithTextSrc} />
     </div>
   );
