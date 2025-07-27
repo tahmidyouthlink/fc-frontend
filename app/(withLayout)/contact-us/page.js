@@ -13,10 +13,12 @@ import TransitionLink from "@/app/components/ui/TransitionLink";
 import ContactForm from "@/app/components/contact/ContactForm";
 import { COMPANY_EMAIL, COMPANY_PHONE } from "@/app/config/company";
 
-export default async function ContactUs() {
+export default async function ContactUs({ searchParams }) {
+  const paramOrderNumber = searchParams.orderNumber;
+
   const session = await getServerSession(authOptions);
 
-  let userData;
+  let userData, isParamOrderNumberLegit;
 
   if (session?.user?.email) {
     try {
@@ -27,6 +29,22 @@ export default async function ContactUs() {
       userData = result.data || {};
     } catch (error) {
       console.error("FetchError (contact/userData):", error.message);
+    }
+
+    try {
+      const result = await tokenizedFetch(
+        `/customer-orders?email=${session?.user?.email}`,
+      );
+
+      const userOrders = result.data || [];
+
+      isParamOrderNumberLegit = userOrders.some(
+        (order) =>
+          order.orderNumber == paramOrderNumber &&
+          order.orderStatus == "Request Declined",
+      );
+    } catch (error) {
+      console.error("FetchError (contact/userOrders):", error.message);
     }
   }
 
@@ -42,7 +60,11 @@ export default async function ContactUs() {
             <h2 className="text-xl font-semibold">SEND A MESSAGE</h2>
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
           </div>
-          <ContactForm userData={userData} />
+          <ContactForm
+            userData={userData}
+            orderId={paramOrderNumber}
+            isOrderNumberLegit={isParamOrderNumberLegit}
+          />
         </section>
         <section className="flex flex-col gap-y-10 bg-white/5 p-9 backdrop-blur-xl lg:w-2/5">
           <div className="space-y-1.5">

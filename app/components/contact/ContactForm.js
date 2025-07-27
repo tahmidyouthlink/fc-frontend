@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useLoading } from "@/app/contexts/loading";
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 
-export default function ContactForm({ userData }) {
+export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
+  const router = useRouter();
   const { setIsPageLoading } = useLoading();
 
   const {
@@ -20,11 +22,18 @@ export default function ContactForm({ userData }) {
       name: "",
       email: "",
       phone: "",
-      topic: "",
+      topic: isOrderNumberLegit ? `Refund Rejected (Order #${orderId})` : "",
       message: "",
     },
     mode: "onBlur",
   });
+
+  useEffect(() => {
+    router.replace("/contact-us", undefined, {
+      shallow: true,
+      scroll: false,
+    });
+  }, [router]);
 
   useEffect(() => {
     reset({
