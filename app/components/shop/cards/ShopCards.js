@@ -116,8 +116,8 @@ export default function ShopCards({
         {/* Product Count Text */}
         {isSearchedOrFiltered && (
           <p className="relative w-fit">
-            {filteredProductCount || "No"} item
-            {filteredProductCount > 1 && "s"} found
+            {filteredProductCount || "No"} thread
+            {filteredProductCount > 1 && "z"} found
             {/* Shape (Thunder) */}
             <span className="absolute -right-1 bottom-1/4 block aspect-square w-7 translate-x-full rotate-[26deg] max-sm:hidden">
               <Image
