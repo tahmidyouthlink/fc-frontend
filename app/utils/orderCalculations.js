@@ -1,15 +1,31 @@
 import checkIfPromoCodeIsValid from "./isPromoCodeValid";
 
 export const checkIfAnyDiscountIsAvailable = (product, specialOffers) => {
+  const now = new Date(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Dhaka",
+      hour12: false,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date()),
+  );
+
   return (
     !!Number(product?.discountValue) ||
-    specialOffers?.some(
-      (offer) =>
+    specialOffers?.some((offer) => {
+      const expiryDate = new Date(`${offer?.expiryDate}T23:59:59+06:00`);
+
+      return (
         offer.offerStatus === true &&
         (offer.selectedProductIds?.includes(product?.productId) ||
           offer.selectedCategories?.includes(product?.category)) &&
-        new Date() <= new Date(offer?.expiryDate),
-    )
+        now <= expiryDate
+      );
+    })
   );
 };
 
@@ -24,13 +40,29 @@ export const checkIfOnlyRegularDiscountIsAvailable = (
 };
 
 export const checkIfSpecialOfferIsAvailable = (product, specialOffers) => {
-  return specialOffers?.some(
-    (offer) =>
-      offer.offerStatus === true &&
-      new Date() <= new Date(offer?.expiryDate) &&
-      (offer.selectedProductIds?.includes(product?.productId) ||
-        offer.selectedCategories?.includes(product?.category)),
+  const now = new Date(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Dhaka",
+      hour12: false,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date()),
   );
+
+  return specialOffers?.some((offer) => {
+    const expiryDate = new Date(`${offer?.expiryDate}T23:59:59+06:00`);
+
+    return (
+      offer.offerStatus === true &&
+      now <= expiryDate &&
+      (offer.selectedProductIds?.includes(product?.productId) ||
+        offer.selectedCategories?.includes(product?.category))
+    );
+  });
 };
 
 export const getProductSpecialOffer = (
@@ -38,14 +70,30 @@ export const getProductSpecialOffer = (
   specialOffers,
   cartSubtotal,
 ) => {
-  return specialOffers?.find(
-    (offer) =>
+  const now = new Date(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Dhaka",
+      hour12: false,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date()),
+  );
+
+  return specialOffers?.find((offer) => {
+    const expiryDate = new Date(`${offer?.expiryDate}T23:59:59+06:00`);
+
+    return (
       offer.offerStatus === true &&
       (offer.selectedProductIds?.includes(product?.productId) ||
         offer.selectedCategories?.includes(product?.category)) &&
-      new Date() <= new Date(offer?.expiryDate) &&
-      (cartSubtotal === "NA" || cartSubtotal >= parseFloat(offer.minAmount)),
-  );
+      now <= expiryDate &&
+      (cartSubtotal === "NA" || cartSubtotal >= parseFloat(offer.minAmount))
+    );
+  });
 };
 
 export const calculateFinalPrice = (product, specialOffers) => {

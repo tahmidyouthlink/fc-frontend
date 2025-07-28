@@ -11,10 +11,24 @@ export default function CheckoutPromoCode({
   const [promoMessage, setPromoMessage] = useState();
 
   useEffect(() => {
+    const now = new Date(
+      new Intl.DateTimeFormat("en-US", {
+        timeZone: "Asia/Dhaka",
+        hour12: false,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }).format(new Date()),
+    );
+
+    const expiryDate = new Date(`${userPromoCode?.expiryDate}T23:59:59+06:00`);
+
     const updatedPromoMessage = !userPromoCode
       ? "Invalid promo code."
-      : userPromoCode?.promoStatus != true ||
-          new Date() > new Date(userPromoCode?.expiryDate)
+      : userPromoCode?.promoStatus != true || now > expiryDate
         ? "This promo code has expired."
         : cartSubtotal < parseFloat(userPromoCode?.minAmount)
           ? `Valid for a minimum order of ৳ ${parseFloat(userPromoCode?.minAmount).toLocaleString()}.`
