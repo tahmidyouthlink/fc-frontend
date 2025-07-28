@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { paymentMethods } from "@/app/data/paymentMethods";
 import TransitionLink from "@/app/components/ui/TransitionLink";
+import MorePaymentMethods from "./MorePaymentMethods";
 
 export default function PaymentMethodPartners() {
   return (
@@ -34,9 +35,7 @@ export default function PaymentMethodPartners() {
           );
         })}
         <li className="flex min-h-full w-[68px] cursor-pointer items-center justify-center overflow-hidden rounded-[4px] p-2.5 shadow-[2px_2px_8px_0_rgba(0,0,0,0.1)] transition-shadow duration-300 ease-in-out hover:shadow-[2px_2px_16px_0_rgba(0,0,0,0.175)]">
-          <p className="text-center text-xs/[28px] font-bold text-neutral-600 lg:text-[13px]/[28px]">
-            More...
-          </p>
+          <MorePaymentMethods />
         </li>
       </ul>
     </div>
