@@ -1,15 +1,16 @@
 import Image from "next/image";
 import { paymentMethods } from "@/app/data/paymentMethods";
 import TransitionLink from "@/app/components/ui/TransitionLink";
+import verifiedBySslczImg from "@/public/payment-methods/verified-by-sslcz.webp";
 import MorePaymentMethods from "./MorePaymentMethods";
 
 export default function PaymentMethodPartners() {
   return (
-    <div className="space-y-2.5 max-lg:col-span-full lg:max-w-60 lg:text-sm xl:max-w-80">
+    <div className="max-lg:col-span-full lg:max-w-60 lg:text-sm xl:max-w-80">
       <h3 className="font-semibold uppercase max-lg:text-center">
         OUR SECURED PAYMENT METHODS
       </h3>
-      <ul className="payment-method-partners flex flex-wrap gap-2.5 max-lg:items-stretch max-lg:justify-center">
+      <ul className="payment-method-partners mb-8 mt-2.5 flex flex-wrap gap-2.5 max-lg:items-stretch max-lg:justify-center">
         {paymentMethods.map((paymentMethod) => {
           return (
             <li
@@ -38,6 +39,11 @@ export default function PaymentMethodPartners() {
           <MorePaymentMethods />
         </li>
       </ul>
+      <Image
+        className="mx-auto h-6 max-w-full object-contain pr-5 sm:h-7 lg:h-6 xl:h-6"
+        src={verifiedBySslczImg}
+        alt="Payment methods verified by SSLCommerz"
+      />
     </div>
   );
 }
