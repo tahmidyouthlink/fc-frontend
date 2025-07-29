@@ -116,9 +116,7 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
               })}
             />
             {errors.name && (
-              <p className="absolute -bottom-5 left-0 text-xs font-semibold text-red-500">
-                {errors.name?.message}
-              </p>
+              <p className="text-xs text-red-500">{errors.name?.message}</p>
             )}
           </div>
           <div className="relative w-full space-y-2">
@@ -142,9 +140,7 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
               })}
             />
             {errors.email && (
-              <p className="absolute -bottom-5 left-0 text-xs font-semibold text-red-500">
-                {errors.email?.message}
-              </p>
+              <p className="text-xs text-red-500">{errors.email?.message}</p>
             )}
           </div>
         </div>
@@ -171,9 +167,7 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
               }
             />
             {errors.phone && (
-              <p className="absolute -bottom-5 left-0 text-xs font-semibold text-red-500">
-                {errors.phone?.message}
-              </p>
+              <p className="text-xs text-red-500">{errors.phone?.message}</p>
             )}
           </div>
           <div className="relative w-full space-y-2">
@@ -195,9 +189,7 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
               })}
             />
             {errors.topic && (
-              <p className="absolute -bottom-5 left-0 text-xs font-semibold text-red-500">
-                {errors.topic?.message}
-              </p>
+              <p className="text-xs text-red-500">{errors.topic?.message}</p>
             )}
           </div>
         </div>
@@ -206,7 +198,7 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
           <textarea
             id="message"
             rows={7}
-            className="w-full resize-none rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 py-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
+            className="h-40 w-full resize-none rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 py-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 sm:h-72 md:text-[13px] lg:h-80 xl:h-36 min-[1800px]:h-64"
             placeholder="Help me figure out how to place an order."
             {...register("message", {
               required: "Message is required.",
@@ -217,9 +209,7 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
             })}
           />
           {errors.message && (
-            <p className="absolute -bottom-5 left-0 text-xs font-semibold text-red-500">
-              {errors.message?.message}
-            </p>
+            <p className="text-xs text-red-500">{errors.message?.message}</p>
           )}
         </div>
       </div>
