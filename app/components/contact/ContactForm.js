@@ -92,15 +92,17 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
     <form
       noValidate
       onSubmit={handleSubmit(onSubmit, onError)}
-      className="flex grow flex-col justify-between gap-y-10"
+      className="flex grow flex-col justify-between gap-y-5"
     >
-      <div className="space-y-7">
-        <div className="items-end gap-9 space-y-7 sm:max-md:flex sm:max-md:space-y-0 lg:flex lg:space-y-0">
-          <div className="relative w-full">
+      <div className="space-y-5 font-semibold">
+        <div className="max-sm:space-y-4 sm:flex sm:gap-x-4">
+          <div className="relative w-full space-y-2">
+            <label htmlFor="name">Full Name</label>
             <input
+              id="name"
               type="text"
-              className="w-full border-b-2 border-neutral-300 bg-transparent py-2 text-neutral-800 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-neutral-400"
-              placeholder="Full name"
+              className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
+              placeholder="John Doe"
               readOnly={!!userData}
               {...register("name", {
                 pattern: {
@@ -119,11 +121,13 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
               </p>
             )}
           </div>
-          <div className="relative w-full">
+          <div className="relative w-full space-y-2">
+            <label htmlFor="email">Email</label>
             <input
+              id="email"
               type="email"
-              className="w-full border-b-2 border-neutral-300 bg-transparent py-2 text-neutral-800 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-neutral-400"
-              placeholder="Email address"
+              className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
+              placeholder="john.doe@gmail.com"
               readOnly={!!userData}
               {...register("email", {
                 pattern: {
@@ -144,12 +148,14 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
             )}
           </div>
         </div>
-        <div className="items-end gap-9 space-y-7 sm:max-md:flex sm:max-md:space-y-0 lg:flex lg:space-y-0">
-          <div className="relative w-full">
+        <div className="max-sm:space-y-4 sm:flex sm:gap-x-4">
+          <div className="relative w-full space-y-2">
+            <label htmlFor="mobile-number">Mobile Number</label>
             <input
+              id="mobile-number"
               type="tel"
-              className="w-full border-b-2 border-neutral-300 bg-transparent py-2 text-neutral-800 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-neutral-400"
-              placeholder="Mobile number"
+              className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
+              placeholder="01XXXXXXXXX"
               {...register("phone", {
                 pattern: {
                   value: /^01\d{9}$/,
@@ -170,11 +176,13 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
               </p>
             )}
           </div>
-          <div className="relative w-full">
+          <div className="relative w-full space-y-2">
+            <label htmlFor="subject">Subject</label>
             <input
+              id="subject"
               type="text"
-              className="w-full border-b-2 border-neutral-300 bg-transparent py-2 text-neutral-800 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-neutral-400"
-              placeholder="Subject"
+              className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
+              placeholder="Issue with Placing Order"
               {...register("topic", {
                 required: {
                   value: true,
@@ -193,11 +201,13 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
             )}
           </div>
         </div>
-        <div className="relative w-full">
+        <div className="relative w-full space-y-2">
+          <label htmlFor="message">Message</label>
           <textarea
+            id="message"
             rows={7}
-            className="w-full resize-none border-b-2 border-neutral-300 bg-transparent py-2 text-neutral-800 outline-none transition-[border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-neutral-400"
-            placeholder="Message"
+            className="w-full resize-none rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 py-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
+            placeholder="Help me figure out how to place an order."
             {...register("message", {
               required: "Message is required.",
               minLength: {
