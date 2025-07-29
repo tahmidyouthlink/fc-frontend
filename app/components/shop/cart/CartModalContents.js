@@ -8,6 +8,7 @@ import {
   checkIfOnlyRegularDiscountIsAvailable,
 } from "@/app/utils/orderCalculations";
 import NotifyMeButton from "./NotifyMeButton";
+import ColorButtonWithTooltip from "../../ui/ColorButtonWithTooltip";
 
 export default function CartModalContents({
   userEmail,
@@ -96,24 +97,13 @@ export default function CartModalContents({
           <div className="flex flex-wrap gap-x-1.5">
             {product?.availableColors.map((color) => {
               return (
-                <div
+                <ColorButtonWithTooltip
                   key={"add-to-cart-color-" + color._id}
-                  className={`grid size-8 cursor-pointer place-items-center rounded-full border-2 transition-[border-color] duration-300 ease-in-out hover:border-[var(--color-secondary-900)] ${selectedOptions?.color._id === color._id ? "border-[var(--color-secondary-900)]" : "border-transparent"}`}
-                  onClick={() => {
-                    setSelectedOptions((prevOptions) => ({
-                      ...prevOptions,
-                      color: color,
-                      quantity: 1,
-                    }));
-                  }}
-                >
-                  <div
-                    className="size-[22px] rounded-full ring-1 ring-neutral-300"
-                    style={{
-                      backgroundColor: color.color,
-                    }}
-                  />
-                </div>
+                  color={color}
+                  toolLocation="modal"
+                  selectedOptions={selectedOptions}
+                  setSelectedOptions={setSelectedOptions}
+                />
               );
             })}
           </div>
