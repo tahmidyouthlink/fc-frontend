@@ -3,7 +3,23 @@ export default function CheckoutPaymentMethod({
   errors,
   isPromoCodeValid,
 }) {
-  const isBkashCashbackAvailable = true;
+  const paymentMethods = [
+    {
+      id: "mobile-bank",
+      value: "mobilebank",
+      imgUrl: "/payment-methods/sslcz-mobile-banking.webp",
+    },
+    {
+      id: "cards",
+      value: "visacard,mastercard,amexcard,othercard",
+      imgUrl: "/payment-methods/sslcz-cards.webp",
+    },
+    {
+      id: "internet-bank",
+      value: "internetbank",
+      imgUrl: "/payment-methods/sslcz-internet-banking.webp",
+    },
+  ];
 
   return (
     <section
@@ -15,14 +31,10 @@ export default function CheckoutPaymentMethod({
       <h2 className="text-base font-semibold transition-[padding-bottom] duration-300 ease-in-out md:text-lg">
         Select Payment Method
       </h2>
-      <div className="payment-methods relative grid gap-2.5 sm:grid-cols-2">
-        <div>
+      <div className="payment-methods relative grid gap-2.5">
+        {paymentMethods.map((paymentMethod) => (
           <input
-            className={
-              isBkashCashbackAvailable
-                ? "before:bg-[url('/payment-methods/bkash-cashback-10.webp')]"
-                : "before:bg-[url('/payment-methods/bkash.webp')]"
-            }
+            key={paymentMethod.id}
             type="radio"
             {...register("paymentMethod", {
               required: {
@@ -30,58 +42,14 @@ export default function CheckoutPaymentMethod({
                 message: "Select one of the payment methods.",
               },
             })}
-            id="bkash"
-            value="bkash"
+            id={paymentMethod.id}
+            value={paymentMethod.value}
+            style={{
+              "--img-url": `url('${paymentMethod.imgUrl}')`,
+            }}
             required
-            disabled={isBkashCashbackAvailable && isPromoCodeValid}
           />
-        </div>
-        <input
-          className="before:bg-[url('/payment-methods/mobile-banking.webp')]"
-          type="radio"
-          {...register("paymentMethod", {
-            required: {
-              value: true,
-              message: "Select one of the payment methods.",
-            },
-          })}
-          id="mobile-banking"
-          value="mobile-banking"
-          required
-        />
-        <input
-          className="before:bg-[url('/payment-methods/cards.webp')]"
-          type="radio"
-          {...register("paymentMethod", {
-            required: {
-              value: true,
-              message: "Select one of the payment methods.",
-            },
-          })}
-          id="debit-credit-card"
-          value="debit-credit-card"
-          required
-        />
-        <input
-          className="before:bg-[url('/payment-methods/online-banking.webp')]"
-          type="radio"
-          {...register("paymentMethod", {
-            required: {
-              value: true,
-              message: "Select one of the payment methods.",
-            },
-          })}
-          id="online-banking"
-          value="online-banking"
-          required
-        />
-        {isBkashCashbackAvailable && (
-          <p
-            className={`pointer-events-none absolute left-0 text-xs transition-[transform,opacity] sm:text-[13px] ${!isPromoCodeValid ? "scale-0 opacity-0" : "scale-100 opacity-100"} ${errors.paymentMethod ? "-bottom-[60px]" : "-bottom-7"}`}
-          >
-            Note: bKash is not applicable when promo code is applied.
-          </p>
-        )}
+        ))}
       </div>
       {errors.paymentMethod && (
         <p className="text-xs font-semibold text-red-500">

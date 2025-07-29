@@ -201,10 +201,11 @@
 
   .payment-methods input::before {
     @apply absolute inset-0 h-full w-full rounded-[4px] border-2 bg-white/20 bg-contain bg-center bg-no-repeat bg-origin-content px-5 backdrop-blur-2xl transition-[border,background-color] duration-300 ease-in-out content-[''];
+    background-image: var(--img-url);
   }
 
   .payment-methods input:not(:disabled)::before {
-    @apply cursor-pointer border-neutral-200 checked:border-neutral-300 checked:bg-[var(--color-primary-500)] hover:border-neutral-300 [&:not(:checked):hover]:bg-[var(--color-primary-300)];
+    @apply cursor-pointer border-neutral-200 checked:border-neutral-300 checked:bg-neutral-100 hover:border-neutral-300 [&:not(:checked):hover]:bg-neutral-50;
   }
 
   .payment-methods input:disabled::before {
