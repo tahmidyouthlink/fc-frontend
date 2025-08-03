@@ -205,7 +205,7 @@
   }
 
   .payment-methods input:not(:disabled)::before {
-    @apply cursor-pointer border-neutral-200 checked:border-neutral-300 checked:bg-neutral-100 hover:border-neutral-300 [&:not(:checked):hover]:bg-neutral-50;
+    @apply cursor-pointer border-neutral-200 checked:border-[var(--color-primary-700)] checked:bg-[var(--color-primary-300)] [&:not(:checked):hover]:border-[var(--color-primary-700)] [&:not(:checked):hover]:bg-[var(--color-primary-300)];
   }
 
   .payment-methods input:disabled::before {

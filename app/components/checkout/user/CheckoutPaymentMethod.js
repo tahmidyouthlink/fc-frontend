@@ -5,19 +5,24 @@ export default function CheckoutPaymentMethod({
 }) {
   const paymentMethods = [
     {
-      id: "mobile-bank",
-      value: "mobilebank",
-      imgUrl: "/payment-methods/sslcz-mobile-banking.webp",
-    },
-    {
       id: "cards",
       value: "visacard,mastercard,amexcard,othercard",
-      imgUrl: "/payment-methods/sslcz-cards.webp",
+      imgUrl: "/payment-methods/cards.webp",
+    },
+    {
+      id: "bkash",
+      value: "bkash",
+      imgUrl: "/payment-methods/bkash.webp",
+    },
+    {
+      id: "mobile-bank",
+      value: "mobilebank",
+      imgUrl: "/payment-methods/mobile-banking.webp",
     },
     {
       id: "internet-bank",
       value: "internetbank",
-      imgUrl: "/payment-methods/sslcz-internet-banking.webp",
+      imgUrl: "/payment-methods/internet-banking.webp",
     },
   ];
 
@@ -31,7 +36,7 @@ export default function CheckoutPaymentMethod({
       <h2 className="text-base font-semibold transition-[padding-bottom] duration-300 ease-in-out md:text-lg">
         Select Payment Method
       </h2>
-      <div className="payment-methods relative grid gap-2.5">
+      <div className="payment-methods relative grid gap-2.5 sm:grid-cols-2">
         {paymentMethods.map((paymentMethod) => (
           <input
             key={paymentMethod.id}
