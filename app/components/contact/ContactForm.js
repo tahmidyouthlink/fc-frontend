@@ -102,7 +102,7 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
               id="name"
               type="text"
               className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
-              placeholder="John Doe"
+              placeholder="Enter your full name"
               readOnly={!!userData}
               {...register("name", {
                 pattern: {
@@ -125,7 +125,7 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
               id="email"
               type="email"
               className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
-              placeholder="john.doe@gmail.com"
+              placeholder="Enter your email"
               readOnly={!!userData}
               {...register("email", {
                 pattern: {
@@ -151,7 +151,7 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
               id="mobile-number"
               type="tel"
               className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
-              placeholder="01XXXXXXXXX"
+              placeholder="Enter your mobile number"
               {...register("phone", {
                 pattern: {
                   value: /^01\d{9}$/,
@@ -176,7 +176,7 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
               id="subject"
               type="text"
               className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
-              placeholder="Issue with Placing Order"
+              placeholder="Enter the subject"
               {...register("topic", {
                 required: {
                   value: true,
@@ -199,7 +199,7 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
             id="message"
             rows={7}
             className="h-40 w-full resize-none rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 py-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 sm:h-72 md:text-[13px] lg:h-80 xl:h-36 min-[1800px]:h-64"
-            placeholder="Help me figure out how to place an order."
+            placeholder="Describe what you want to talk about"
             {...register("message", {
               required: "Message is required.",
               minLength: {
