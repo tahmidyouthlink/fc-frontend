@@ -101,14 +101,14 @@ export default function TrackOrderModal({
               </div>
               <div className="space-y-3 rounded-[4px] border-2 border-neutral-200 p-3 text-sm sm:px-5 sm:py-4 [&>div]:flex [&>div]:justify-between [&>div]:gap-3 sm:[&>div]:gap-10 xl:[&>div]:gap-20 [&_h4]:font-semibold [&_h4]:text-neutral-600 sm:[&_h4]:text-nowrap">
                 <div>
+                  <h4>Current Status</h4>
+                  <p className="text-right">{getUpdatedOrderStatus()}</p>
+                </div>
+                <div>
                   <h4>Expected Delivery</h4>
                   <p className="text-right">
                     {deliveryInfo?.expectedDeliveryDate || "--"}
                   </p>
-                </div>
-                <div>
-                  <h4>Current Status</h4>
-                  <p className="text-right">{getUpdatedOrderStatus()}</p>
                 </div>
                 <TrackingCode trackingCode={shipmentInfo?.trackingNumber} />
               </div>
