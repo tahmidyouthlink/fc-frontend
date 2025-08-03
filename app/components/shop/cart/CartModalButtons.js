@@ -70,7 +70,7 @@ export default function CartModalButtons({
       const updatedUserData = {
         ...userData,
         cartItems: updatedCart,
-        cartLastModifiedAt: new Date().toISOString(),
+        isCartLastModified: true,
         abandonedEmailStage: 0, // 0 = no email, 1 = first sent, 2 = second sent
       };
 
