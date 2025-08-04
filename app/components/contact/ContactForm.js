@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -10,6 +10,7 @@ import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
   const router = useRouter();
   const { setIsPageLoading } = useLoading();
+  const isFromOrderHistoryPage = useRef(false);
 
   const {
     register,
@@ -29,11 +30,13 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
   });
 
   useEffect(() => {
+    if (isOrderNumberLegit) isFromOrderHistoryPage.current = true;
+
     router.replace("/contact-us", undefined, {
       shallow: true,
       scroll: false,
     });
-  }, [router]);
+  }, [isOrderNumberLegit, router]);
 
   useEffect(() => {
     reset({
@@ -101,7 +104,7 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
             <input
               id="name"
               type="text"
-              className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
+              className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 md:text-[13px] [&:not(:read-only):focus]:border-[var(--color-secondary-500)] [&:not(:read-only):focus]:bg-white/75"
               placeholder="Enter your full name"
               readOnly={!!userData}
               {...register("name", {
@@ -124,7 +127,7 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
             <input
               id="email"
               type="email"
-              className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
+              className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 md:text-[13px] [&:not(:read-only):focus]:border-[var(--color-secondary-500)] [&:not(:read-only):focus]:bg-white/75"
               placeholder="Enter your email"
               readOnly={!!userData}
               {...register("email", {
@@ -150,7 +153,7 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
             <input
               id="mobile-number"
               type="tel"
-              className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
+              className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 md:text-[13px] [&:not(:read-only):focus]:border-[var(--color-secondary-500)] [&:not(:read-only):focus]:bg-white/75"
               placeholder="Enter your mobile number"
               {...register("phone", {
                 pattern: {
@@ -175,7 +178,7 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
             <input
               id="subject"
               type="text"
-              className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 md:text-[13px]"
+              className="h-10 w-full rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 [&:not(:read-only):focus]:border-[var(--color-secondary-500)] [&:not(:read-only):focus]:bg-white/75"
               placeholder="Enter the subject"
               {...register("topic", {
                 required: {
@@ -187,6 +190,7 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
                   message: "Subject must have at least 5 characters.",
                 },
               })}
+              readOnly={isFromOrderHistoryPage.current}
             />
             {errors.topic && (
               <p className="text-xs text-red-500">{errors.topic?.message}</p>
@@ -198,7 +202,7 @@ export default function ContactForm({ userData, orderId, isOrderNumberLegit }) {
           <textarea
             id="message"
             rows={7}
-            className="h-40 w-full resize-none rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 py-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 focus:border-[var(--color-secondary-500)] focus:bg-white/75 sm:h-72 md:text-[13px] lg:h-80 xl:h-36 min-[1800px]:h-64"
+            className="h-40 w-full resize-none rounded-[4px] border-2 border-neutral-200 bg-white/20 px-3 py-3 text-xs text-neutral-700 outline-none backdrop-blur-2xl transition-[background-color,border-color] duration-300 ease-in-out placeholder:text-neutral-400 sm:h-72 md:text-[13px] lg:h-80 xl:h-36 min-[1800px]:h-64 [&:not(:read-only):focus]:border-[var(--color-secondary-500)] [&:not(:read-only):focus]:bg-white/75"
             placeholder="Describe what you want to talk about"
             {...register("message", {
               required: "Message is required.",
