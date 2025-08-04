@@ -71,7 +71,6 @@ export default function CartModalButtons({
         ...userData,
         cartItems: updatedCart,
         isCartLastModified: true,
-        abandonedEmailStage: 0, // 0 = no email, 1 = first sent, 2 = second sent
       };
 
       try {

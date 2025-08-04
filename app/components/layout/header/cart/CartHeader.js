@@ -15,7 +15,6 @@ export default function CartHeader({ userData, totalItems }) {
         ...userData,
         cartItems: [],
         isCartLastModified: true,
-        abandonedEmailStage: 0, // 0 = no email, 1 = first sent, 2 = second sent
       };
 
       try {
