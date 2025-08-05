@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { IoHeartOutline } from "react-icons/io5";
 import {
   Dropdown,
@@ -8,6 +9,7 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@nextui-org/react";
+import { routeFetch } from "@/app/lib/fetcher/routeFetch";
 import WishlistHeader from "./WishlistHeader";
 import WishlistItems from "./WishlistItems";
 import WishlistFooter from "./WishlistFooter";
@@ -18,29 +20,11 @@ export default function WishlistButton({
   productList,
   specialOffers,
 }) {
+  const router = useRouter();
   const [wishlistItems, setWishlistItems] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
-    if (!!productList) {
-      const localWishlist = JSON.parse(localStorage.getItem("wishlistItems"));
-      const filteredLocalWishlist = localWishlist?.filter(
-        (localItem) =>
-          !!productList?.find(
-            (product) =>
-              product?._id === localItem._id && product?.status === "active",
-          ),
-      );
-
-      setWishlistItems(filteredLocalWishlist);
-      if (localWishlist?.length !== filteredLocalWishlist?.length) {
-        localStorage.setItem(
-          "wishlistItems",
-          JSON.stringify(filteredLocalWishlist),
-        );
-      }
-    }
-
     const handleStorageUpdate = () =>
       setWishlistItems(JSON.parse(localStorage.getItem("wishlistItems")));
 
@@ -49,7 +33,67 @@ export default function WishlistButton({
     return () => {
       window.removeEventListener("storageWishlist", handleStorageUpdate);
     };
-  }, [productList]);
+  }, []);
+
+  useEffect(() => {
+    if (productList?.length) {
+      const localWishlist = JSON.parse(localStorage.getItem("wishlistItems"));
+      const storedWishlistItems = localWishlist?.length
+        ? localWishlist
+        : userData?.wishlistItems?.length
+          ? userData.wishlistItems
+          : [];
+      const activeItemsInWishlist = storedWishlistItems.filter((storedItem) =>
+        productList?.some(
+          (product) =>
+            product?._id === storedItem?._id && product?.status === "active",
+        ),
+      );
+
+      const updateServerWishlist = async () => {
+        const updatedUserData = {
+          ...userData,
+          wishlistItems: activeItemsInWishlist,
+        };
+
+        try {
+          const result = await routeFetch(`/api/user-data/${userData?._id}`, {
+            method: "PUT",
+            body: JSON.stringify(updatedUserData),
+          });
+
+          if (!result.ok) {
+            console.error(
+              "UpdateError (wishlistButton):",
+              result.message || "Failed to update the wishlist on server.",
+            );
+            toast.error(
+              result.message || "Failed to update the wishlist on server.",
+            );
+          } else {
+            router.refresh();
+          }
+        } catch (error) {
+          console.error(
+            "UpdateError (wishlistButton):",
+            error.message || error,
+          );
+          toast.error("Failed to update the wishlist on server.");
+        }
+      };
+
+      // If there are wishlist items in local storage and user just logged in,
+      // update the server wishlist with the newly added items
+      if (localWishlist?.length && userData) updateServerWishlist();
+
+      setWishlistItems(activeItemsInWishlist);
+      localStorage.setItem(
+        "wishlistItems",
+        JSON.stringify(activeItemsInWishlist),
+      );
+      window.dispatchEvent(new Event("storageWishlist"));
+    }
+  }, [productList, router, userData]);
 
   return (
     <Dropdown
