@@ -1,8 +1,4 @@
-export default function CheckoutPaymentMethod({
-  register,
-  errors,
-  isPromoCodeValid,
-}) {
+export default function CheckoutPaymentMethod({ register, errors }) {
   const paymentMethods = [
     {
       id: "cards",
@@ -27,13 +23,8 @@ export default function CheckoutPaymentMethod({
   ];
 
   return (
-    <section
-      className="w-full space-y-4 rounded-md border-2 border-neutral-50/20 bg-white/40 p-5 shadow-[0_0_20px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl"
-      style={{
-        paddingBottom: !isPromoCodeValid ? "20px" : "52px",
-      }}
-    >
-      <h2 className="text-base font-semibold transition-[padding-bottom] duration-300 ease-in-out md:text-lg">
+    <section className="w-full space-y-4 rounded-md border-2 border-neutral-50/20 bg-white/40 p-5 shadow-[0_0_20px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl">
+      <h2 className="text-base font-semibold md:text-lg">
         Select Payment Method
       </h2>
       <div className="payment-methods relative grid gap-2.5 sm:grid-cols-2">

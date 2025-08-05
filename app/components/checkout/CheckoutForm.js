@@ -390,11 +390,7 @@ export default function CheckoutForm({
               )}
             />
           )}
-          <CheckoutPaymentMethod
-            register={register}
-            errors={errors}
-            isPromoCodeValid={isPromoCodeValid}
-          />
+          <CheckoutPaymentMethod register={register} errors={errors} />
         </form>
       </div>
       <CheckoutCart
