@@ -3,7 +3,7 @@ import TransitionLink from "@/app/components/ui/TransitionLink";
 
 export default function EmptyWishlistContent({ setIsDropdownOpen }) {
   return (
-    <div className="[&>*]:mx-auto [&>*]:w-fit">
+    <div className="mb-2 [&>*]:mx-auto [&>*]:w-fit">
       <TbHeartExclamation className="size-24 text-[var(--color-secondary-500)]" />
       <p className="mt-2 text-neutral-400">The wishlist is empty.</p>
       <TransitionLink
