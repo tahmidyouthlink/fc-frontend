@@ -61,17 +61,51 @@ export default function CartButton({
         : userData?.cartItems?.length
           ? userData.cartItems
           : [];
-      const activeItemsInCart = storedCartItems.filter((localItem) =>
+      const activeItemsInCart = storedCartItems.filter((storedItem) =>
         productList?.some(
           (product) =>
-            product?._id === localItem?._id && product?.status === "active",
+            product?._id === storedItem?._id && product?.status === "active",
         ),
       );
+
+      const updateServerCart = async () => {
+        const updatedUserData = {
+          ...userData,
+          cartItems: activeItemsInCart,
+          isCartLastModified: true,
+        };
+
+        try {
+          const result = await routeFetch(`/api/user-data/${userData?._id}`, {
+            method: "PUT",
+            body: JSON.stringify(updatedUserData),
+          });
+
+          if (!result.ok) {
+            console.error(
+              "UpdateError (cartButton):",
+              result.message || "Failed to update the cart on server.",
+            );
+            toast.error(
+              result.message || "Failed to update the cart on server.",
+            );
+          } else {
+            router.refresh();
+          }
+        } catch (error) {
+          console.error("UpdateError (cartButton):", error.message || error);
+          toast.error("Failed to update the cart on server.");
+        }
+      };
+
+      // If there are cart items in local storage and user just logged in,
+      // update the server cart with the newly added items
+      if (localCart?.length && userData) updateServerCart();
 
       setCartItems(activeItemsInCart);
       localStorage.setItem("cartItems", JSON.stringify(activeItemsInCart));
     }
-  }, [productList, userData?.cartItems]);
+  }, [productList, router, userData]);
 
   useEffect(() => {
     if (!productList || !productId || !size || !colorCode) return;
