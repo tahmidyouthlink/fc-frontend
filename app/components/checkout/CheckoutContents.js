@@ -22,6 +22,7 @@ export default function CheckoutContents({
       setCartItems(JSON.parse(localStorage.getItem("cartItems")));
 
     window.addEventListener("storageCart", handleStorageUpdate);
+    handleStorageUpdate();
 
     return () => {
       window.removeEventListener("storageCart", handleStorageUpdate);

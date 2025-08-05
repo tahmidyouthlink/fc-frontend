@@ -29,6 +29,7 @@ export default function WishlistButton({
       setWishlistItems(JSON.parse(localStorage.getItem("wishlistItems")));
 
     window.addEventListener("storageWishlist", handleStorageUpdate);
+    handleStorageUpdate();
 
     return () => {
       window.removeEventListener("storageWishlist", handleStorageUpdate);
