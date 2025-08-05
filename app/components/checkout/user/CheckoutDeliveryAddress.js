@@ -179,7 +179,11 @@ export default function CheckoutDeliveryAddress({
                 content={`After confirmation, you will get the delivery within ${getEstimatedDeliveryTime("Dhaka", "STANDARD", shippingZones)} days with FREE of charge.`}
               >
                 <input
-                  className="!h-12 before:border-2 before:!border-neutral-900 before:!bg-[#020202] before:bg-[url('/delivery-partners/standard-delivery.webp')] before:grayscale before:invert before:backdrop-blur-2xl before:transition-all before:duration-300 before:ease-in-out checked:before:!bg-[#383804] checked:before:grayscale-0 hover:before:!border-transparent hover:before:!bg-[#383804] hover:before:grayscale-0"
+                  className="!h-12 before:border-2 before:!border-neutral-900 before:!bg-[#020202] before:grayscale before:invert before:backdrop-blur-2xl before:transition-all before:duration-300 before:ease-in-out checked:before:!bg-[#383804] checked:before:grayscale-0 hover:before:!border-transparent hover:before:!bg-[#383804] hover:before:grayscale-0"
+                  style={{
+                    "--img-url":
+                      "url('/delivery-partners/standard-delivery.webp')",
+                  }}
                   type="radio"
                   {...register("deliveryType", {
                     required: {
@@ -224,7 +228,11 @@ export default function CheckoutDeliveryAddress({
                 content={`After confirmation, you will get the delivery within ${getEstimatedDeliveryTime("Dhaka", "EXPRESS", shippingZones)} hours.`}
               >
                 <input
-                  className="!h-12 before:border-2 before:!border-neutral-900 before:!bg-[#020202] before:bg-[url('/delivery-partners/express-delivery.webp')] before:grayscale before:invert before:backdrop-blur-2xl before:transition-[background-color,filter] before:duration-300 before:ease-in-out checked:before:!bg-[#383804] checked:before:grayscale-0 hover:before:!border-transparent hover:before:!bg-[#383804] hover:before:grayscale-0"
+                  className="!h-12 before:border-2 before:!border-neutral-900 before:!bg-[#020202] before:grayscale before:invert before:backdrop-blur-2xl before:transition-[background-color,filter] before:duration-300 before:ease-in-out checked:before:!bg-[#383804] checked:before:grayscale-0 hover:before:!border-transparent hover:before:!bg-[#383804] hover:before:grayscale-0"
+                  style={{
+                    "--img-url":
+                      "url('/delivery-partners/express-delivery.webp')",
+                  }}
                   type="radio"
                   {...register("deliveryType", {
                     required: {
