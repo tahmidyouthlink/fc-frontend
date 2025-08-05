@@ -104,6 +104,7 @@ export default function CartButton({
 
       setCartItems(activeItemsInCart);
       localStorage.setItem("cartItems", JSON.stringify(activeItemsInCart));
+      window.dispatchEvent(new Event("storageCart"));
     }
   }, [productList, router, userData]);
 

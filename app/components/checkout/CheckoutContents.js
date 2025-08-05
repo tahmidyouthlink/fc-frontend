@@ -18,24 +18,6 @@ export default function CheckoutContents({
   const [isPaymentStepDone, setIsPaymentStepDone] = useState(false);
 
   useEffect(() => {
-    if (productList?.length) {
-      const localCart = JSON.parse(localStorage.getItem("cartItems"));
-      const storedCartItems = localCart?.length
-        ? localCart
-        : userData?.cartItems?.length
-          ? userData.cartItems
-          : [];
-      const activeItemsInCart = storedCartItems.filter((localItem) =>
-        productList?.some(
-          (product) =>
-            product?._id === localItem?._id && product?.status === "active",
-        ),
-      );
-
-      setCartItems(activeItemsInCart);
-      localStorage.setItem("cartItems", JSON.stringify(activeItemsInCart));
-    }
-
     const handleStorageUpdate = () =>
       setCartItems(JSON.parse(localStorage.getItem("cartItems")));
 
@@ -44,7 +26,7 @@ export default function CheckoutContents({
     return () => {
       window.removeEventListener("storageCart", handleStorageUpdate);
     };
-  }, [productList, userData?.cartItems]);
+  }, []);
 
   if (isPaymentStepDone)
     return (
