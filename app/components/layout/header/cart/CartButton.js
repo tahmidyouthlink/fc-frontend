@@ -54,22 +54,24 @@ export default function CartButton({
   }, []);
 
   useEffect(() => {
-    if (!!productList) {
+    if (productList?.length) {
       const localCart = JSON.parse(localStorage.getItem("cartItems"));
-      const filteredLocalCart = localCart?.filter(
-        (localItem) =>
-          !!productList?.find(
-            (product) =>
-              product?._id === localItem._id && product?.status === "active",
-          ),
+      const storedCartItems = localCart?.length
+        ? localCart
+        : userData?.cartItems?.length
+          ? userData.cartItems
+          : [];
+      const activeItemsInCart = storedCartItems.filter((localItem) =>
+        productList?.some(
+          (product) =>
+            product?._id === localItem?._id && product?.status === "active",
+        ),
       );
 
-      setCartItems(filteredLocalCart);
-      if (localCart?.length !== filteredLocalCart?.length) {
-        localStorage.setItem("cartItems", JSON.stringify(filteredLocalCart));
-      }
+      setCartItems(activeItemsInCart);
+      localStorage.setItem("cartItems", JSON.stringify(activeItemsInCart));
     }
-  }, [productList]);
+  }, [productList, userData?.cartItems]);
 
   useEffect(() => {
     if (!productList || !productId || !size || !colorCode) return;
