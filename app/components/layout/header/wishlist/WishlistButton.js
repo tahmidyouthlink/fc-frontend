@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { IoHeartOutline } from "react-icons/io5";
 import {
   Dropdown,
@@ -20,7 +19,6 @@ export default function WishlistButton({
   productList,
   specialOffers,
 }) {
-  const router = useRouter();
   const [wishlistItems, setWishlistItems] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -71,8 +69,6 @@ export default function WishlistButton({
             toast.error(
               result.message || "Failed to update the wishlist on server.",
             );
-          } else {
-            router.refresh();
           }
         } catch (error) {
           console.error(
@@ -94,7 +90,7 @@ export default function WishlistButton({
       );
       window.dispatchEvent(new Event("storageWishlist"));
     }
-  }, [productList, router, userData]);
+  }, [productList, userData]);
 
   return (
     <Dropdown

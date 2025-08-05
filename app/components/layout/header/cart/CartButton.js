@@ -89,8 +89,6 @@ export default function CartButton({
             toast.error(
               result.message || "Failed to update the cart on server.",
             );
-          } else {
-            router.refresh();
           }
         } catch (error) {
           console.error("UpdateError (cartButton):", error.message || error);
@@ -106,7 +104,7 @@ export default function CartButton({
       localStorage.setItem("cartItems", JSON.stringify(activeItemsInCart));
       window.dispatchEvent(new Event("storageCart"));
     }
-  }, [productList, router, userData]);
+  }, [productList, userData]);
 
   useEffect(() => {
     if (!productList || !productId || !size || !colorCode) return;
