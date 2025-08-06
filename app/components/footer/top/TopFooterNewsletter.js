@@ -9,12 +9,11 @@ import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 export default function TopFooterNewsletter({ userEmail, isUserSubscribed }) {
   const router = useRouter();
   const { setIsPageLoading } = useLoading();
-  const { register, handleSubmit, reset } = useForm({
-    defaultValues: {
-      newsletterEmail: userEmail || "",
-    },
+  const { register, handleSubmit, reset, setValue } = useForm({
     mode: "onSubmit",
   });
+
+  setValue("newsletterEmail", userEmail || "");
 
   const onSubmit = async (data) => {
     setIsPageLoading(true);
