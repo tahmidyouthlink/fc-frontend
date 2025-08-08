@@ -80,7 +80,7 @@ export default function TrackOrderModal({
                       <div className="size-4 rounded-full ring-2 ring-neutral-400" />
                     )}
                   </div>
-                  <p className="text-xs font-semibold">Shipped</p>
+                  <p className="text-xs font-semibold">In Transit</p>
                 </div>
                 <div className="flex flex-col items-center [&>div]:mt-3 [&>p]:mt-1.5">
                   <Image
