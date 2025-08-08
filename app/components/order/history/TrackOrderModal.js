@@ -48,11 +48,12 @@ export default function TrackOrderModal({
                     height={52}
                   />
                   <div
-                    className={`relative flex size-full items-center justify-center text-[#60d251] after:absolute after:right-[2px] after:top-1/2 after:h-0.5 after:w-[calc(50%-24px/2)] after:-translate-y-1/2 after:border-t-[2px] after:border-dotted after:content-[''] ${orderStatus === "Shipped" ? "after:border-[#60d251]" : "after:border-neutral-400"}`}
+                    className={`relative flex size-full items-center justify-center text-[#60d251] after:absolute after:right-[2px] after:top-1/2 after:h-0.5 after:w-[calc(50%-24px/2)] after:-translate-y-1/2 after:border-t-[2px] after:border-dotted after:content-[''] ${orderStatus === "Shipped" || orderStatus === "On Hold" ? "after:border-[#60d251]" : "after:border-neutral-400"}`}
                   >
                     {orderStatus === "Pending" ||
                     orderStatus === "Processing" ||
                     orderStatus === "Shipped" ||
+                    orderStatus === "On Hold" ||
                     orderStatus === "Delivered" ? (
                       <IoCheckmarkCircle className="size-6" />
                     ) : (
@@ -69,9 +70,10 @@ export default function TrackOrderModal({
                     height={52}
                   />
                   <div
-                    className={`relative flex size-full items-center justify-center text-[#60d251] before:absolute before:left-0 before:top-1/2 before:h-0.5 before:w-[calc(50%-24px/2)] before:-translate-y-1/2 before:border-t-[2px] before:border-dotted before:border-[#60d251] before:content-[''] after:absolute after:right-[2px] after:top-1/2 after:h-0.5 after:w-[calc(50%-24px/2)] after:-translate-y-1/2 after:border-t-[2px] after:border-dotted after:border-[#60d251] after:content-[''] ${orderStatus === "Shipped" ? "before:border-[#60d251]" : "before:border-neutral-400"} ${orderStatus === "Delivered" ? "after:border-[#60d251]" : "after:border-neutral-400"}`}
+                    className={`relative flex size-full items-center justify-center text-[#60d251] before:absolute before:left-0 before:top-1/2 before:h-0.5 before:w-[calc(50%-24px/2)] before:-translate-y-1/2 before:border-t-[2px] before:border-dotted before:border-[#60d251] before:content-[''] after:absolute after:right-[2px] after:top-1/2 after:h-0.5 after:w-[calc(50%-24px/2)] after:-translate-y-1/2 after:border-t-[2px] after:border-dotted after:border-[#60d251] after:content-[''] ${orderStatus === "Shipped" || orderStatus === "On Hold" ? "before:border-[#60d251]" : "before:border-neutral-400"} ${orderStatus === "Delivered" ? "after:border-[#60d251]" : "after:border-neutral-400"}`}
                   >
                     {orderStatus === "Shipped" ||
+                    orderStatus === "On Hold" ||
                     orderStatus === "Delivered" ? (
                       <IoCheckmarkCircle className="size-6" />
                     ) : (
