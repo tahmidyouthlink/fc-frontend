@@ -3,8 +3,16 @@ import { Button } from "@nextui-org/react";
 import toast from "react-hot-toast";
 import { CgHeart } from "react-icons/cg";
 import { routeFetch } from "@/app/lib/fetcher/routeFetch";
+import ProductToast from "../toast/ProductToast";
 
-export default function ProductWishlistButton({ userData, productId }) {
+export default function ProductWishlistButton({
+  userData,
+  productId,
+  productTitle,
+  productImg,
+  variantSizes,
+  variantColors,
+}) {
   const router = useRouter();
 
   const handleAddToWishlist = async () => {
@@ -31,7 +39,23 @@ export default function ProductWishlistButton({ userData, productId }) {
           });
 
           if (result.ok) {
-            toast.success("Item added to wishlist."); // If server wishlist is updated
+            // If server wishlist is updated
+            toast.custom(
+              (t) => (
+                <ProductToast
+                  defaultToast={t}
+                  isSuccess={true}
+                  message="Item added to wishlist"
+                  productImg={productImg}
+                  productTitle={productTitle}
+                  variantSizes={variantSizes}
+                  variantColors={variantColors}
+                />
+              ),
+              {
+                position: "top-right",
+              },
+            );
             router.refresh();
           } else {
             console.error(
@@ -50,7 +74,23 @@ export default function ProductWishlistButton({ userData, productId }) {
           toast.error("Failed to update the wishlist on server.");
         }
       } else {
-        toast.success("Item added to wishlist."); // If saved only locally
+        // If saved only locally
+        toast.custom(
+          (t) => (
+            <ProductToast
+              defaultToast={t}
+              isSuccess={true}
+              message="Item added to wishlist"
+              productImg={productImg}
+              productTitle={productTitle}
+              variantSizes={variantSizes}
+              variantColors={variantColors}
+            />
+          ),
+          {
+            position: "top-right",
+          },
+        );
       }
     } else {
       toast.error("Item is already in the wishlist."); // if item already exists

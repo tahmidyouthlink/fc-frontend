@@ -156,7 +156,16 @@ export default function ProductInfoOverview({
           selectedOptions={selectedOptions}
           setSelectedOptions={setSelectedOptions}
         />
-        <ProductWishlistButton userData={userData} productId={product?._id} />
+        <ProductWishlistButton
+          userData={userData}
+          productId={product?._id}
+          productTitle={product?.productTitle}
+          productImg={product?.productVariants[0]?.imageUrls[0]}
+          variantSizes={[
+            ...new Set(product.productVariants.map((variant) => variant.size)),
+          ]}
+          variantColors={product.availableColors}
+        />
         <ProductSizeGuideButton
           sizeGuideImageUrl={product?.sizeGuideImageUrl}
         />

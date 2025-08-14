@@ -2,6 +2,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { CgHeart, CgShoppingCart } from "react-icons/cg";
 import { routeFetch } from "@/app/lib/fetcher/routeFetch";
+import ProductToast from "../toast/ProductToast";
 
 export default function CardButtons({
   userData,
@@ -36,7 +37,27 @@ export default function CardButtons({
           });
 
           if (result.ok) {
-            toast.success("Item added to wishlist."); // If server wishlist is updated
+            // If server wishlist is updated
+            toast.custom(
+              (t) => (
+                <ProductToast
+                  defaultToast={t}
+                  isSuccess={true}
+                  message="Item added to wishlist"
+                  productTitle={product?.productTitle}
+                  productImg={product?.productVariants[0]?.imageUrls[0]}
+                  variantSizes={[
+                    ...new Set(
+                      product.productVariants.map((variant) => variant.size),
+                    ),
+                  ]}
+                  variantColors={product.availableColors}
+                />
+              ),
+              {
+                position: "top-right",
+              },
+            );
             router.refresh();
           } else {
             console.error(
@@ -55,7 +76,27 @@ export default function CardButtons({
           toast.error("Failed to update the wishlist on server.");
         }
       } else {
-        toast.success("Item added to wishlist."); // If saved only locally
+        // If saved only locally
+        toast.custom(
+          (t) => (
+            <ProductToast
+              defaultToast={t}
+              isSuccess={true}
+              message="Item added to wishlist"
+              productTitle={product?.productTitle}
+              productImg={product?.productVariants[0]?.imageUrls[0]}
+              variantSizes={[
+                ...new Set(
+                  product.productVariants.map((variant) => variant.size),
+                ),
+              ]}
+              variantColors={product.availableColors}
+            />
+          ),
+          {
+            position: "top-right",
+          },
+        );
       }
     } else {
       toast.error("Item is already in the wishlist."); // if item already exists
