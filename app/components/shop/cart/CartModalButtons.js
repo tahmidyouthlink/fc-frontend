@@ -8,7 +8,7 @@ import {
 import toast from "react-hot-toast";
 import { routeFetch } from "@/app/lib/fetcher/routeFetch";
 import TransitionLink from "../../ui/TransitionLink";
-import AddToCartToast from "@/app/components/toast/AddToCartToast";
+import ProductToast from "@/app/components/toast/ProductToast";
 
 export default function CartModalButtons({
   userData,
@@ -83,8 +83,10 @@ export default function CartModalButtons({
           // Display custom success toast notification, if server cart is updated
           toast.custom(
             (t) => (
-              <AddToCartToast
+              <ProductToast
                 defaultToast={t}
+                isSuccess={true}
+                message="Item added to cart"
                 productImg={productImg}
                 productTitle={productTitle}
                 variantSize={selectedOptions?.size}
@@ -114,8 +116,10 @@ export default function CartModalButtons({
       // Display custom success toast notification, if saved only locally
       toast.custom(
         (t) => (
-          <AddToCartToast
+          <ProductToast
             defaultToast={t}
+            isSuccess={true}
+            message="Item added to cart"
             productImg={productImg}
             productTitle={productTitle}
             variantSize={selectedOptions?.size}
