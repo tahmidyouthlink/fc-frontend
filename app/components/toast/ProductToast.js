@@ -2,17 +2,23 @@
 
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
-import { HiCheckCircle } from "react-icons/hi2";
+import { HiCheckCircle, HiXCircle } from "react-icons/hi2";
 
-export default function AddToCartToast({
+export default function ProductToast({
   defaultToast,
+  isSuccess,
+  message,
   productImg,
   productTitle,
   variantSize,
+  variantSizes,
   variantColor,
+  variantColors,
 }) {
   const [marginTop, setMarginTop] = useState(0);
   const toastRef = useRef(null);
+
+  console.log("variantColors", variantColors);
 
   // Scroll listener to update marginTop
   useEffect(() => {
@@ -51,9 +57,13 @@ export default function AddToCartToast({
     >
       {/* Confirmation of Addition to Cart */}
       <div className="flex items-center gap-1.5">
-        <HiCheckCircle className="size-5 text-green-500" />
+        {isSuccess ? (
+          <HiCheckCircle className="size-5 text-green-500" />
+        ) : (
+          <HiXCircle className="size-5 text-red-500" />
+        )}
         <p className="text-[15px]/[1] font-semibold text-neutral-600">
-          Item added to cart
+          {message}
         </p>
       </div>
       {/* Divider */}
@@ -75,24 +85,41 @@ export default function AddToCartToast({
           <h4 className="text-sm/[1] text-neutral-500">{productTitle}</h4>
           {/* Cart Item Size */}
           <div className="flex gap-x-1.5 text-[11px]/[1] sm:text-xs/[1]">
-            <h5>Size:</h5>
-            <span>{variantSize}</span>
+            <h5>{variantSize ? "Size" : "Sizes"}:</h5>
+            <span>{variantSize || variantSizes.join(", ")}</span>
           </div>
           {/* Cart Item Color */}
           <div className="flex gap-x-1.5 text-[11px]/[1] sm:text-xs/[1]">
-            <h5>Color:</h5>
-            <div className="flex items-center gap-x-1">
-              <div
-                style={{
-                  background:
-                    variantColor?.label !== "Multicolor"
-                      ? variantColor?.color
-                      : "linear-gradient(90deg, blue 0%, red 40%, green 80%)",
-                }}
-                className="size-2.5 rounded-full ring-1 ring-neutral-300"
-              />
-              {variantColor?.label}
-            </div>
+            <h5>{variantColor ? "Color" : "Colors"}:</h5>
+            {variantColor ? (
+              <div className="flex items-center gap-x-1">
+                <div
+                  style={{
+                    background:
+                      variantColor?.label !== "Multicolor"
+                        ? variantColor?.color
+                        : "linear-gradient(90deg, blue 0%, red 40%, green 80%)",
+                  }}
+                  className="size-2.5 rounded-full ring-1 ring-neutral-300"
+                />
+                {variantColor?.label}
+              </div>
+            ) : (
+              <div className="flex items-center gap-1">
+                {variantColors.map((variantColor) => (
+                  <div
+                    key={`wishlist-toast-color-${variantColor}`}
+                    style={{
+                      background:
+                        variantColor?.label !== "Multicolor"
+                          ? variantColor?.color
+                          : "linear-gradient(90deg, blue 0%, red 40%, green 80%)",
+                    }}
+                    className="size-2.5 rounded-full ring-1 ring-neutral-300"
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
