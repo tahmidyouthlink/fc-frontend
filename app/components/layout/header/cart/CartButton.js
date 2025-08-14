@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 import { IoCartOutline } from "react-icons/io5";
 import { useLoading } from "@/app/contexts/loading";
 import { routeFetch } from "@/app/lib/fetcher/routeFetch";
-import AddToCartToast from "@/app/components/toast/AddToCartToast";
+import ProductToast from "@/app/components/toast/ProductToast";
 import getImageSetsBasedOnColors from "@/app/utils/getImageSetsBasedOnColors";
 import {
   calculateSubtotal,
@@ -54,7 +54,7 @@ export default function CartButton({
   }, []);
 
   useEffect(() => {
-    if (productList?.length) {
+    if (pathname !== "/checkout" && productList?.length) {
       const localCart = JSON.parse(localStorage.getItem("cartItems"));
       const storedCartItems = localCart?.length
         ? localCart
@@ -104,7 +104,7 @@ export default function CartButton({
       localStorage.setItem("cartItems", JSON.stringify(activeItemsInCart));
       window.dispatchEvent(new Event("storageCart"));
     }
-  }, [productList, userData]);
+  }, [pathname, productList, userData]);
 
   useEffect(() => {
     if (!productList || !productId || !size || !colorCode) return;
@@ -179,8 +179,10 @@ export default function CartButton({
               // Display custom success toast notification, if server cart is updated
               toast.custom(
                 (t) => (
-                  <AddToCartToast
+                  <ProductToast
                     defaultToast={t}
+                    isSuccess={true}
+                    message="Item added to cart"
                     productImg={
                       getImageSetsBasedOnColors(product?.productVariants)?.find(
                         (imgSet) => imgSet?.color?.color === colorCode,
@@ -214,8 +216,10 @@ export default function CartButton({
           // Display custom success toast notification, if saved only locally
           toast.custom(
             (t) => (
-              <AddToCartToast
+              <ProductToast
                 defaultToast={t}
+                isSuccess={true}
+                message="Item added to cart"
                 productImg={
                   getImageSetsBasedOnColors(product?.productVariants)?.find(
                     (imgSet) => imgSet?.color?.color === colorCode,

@@ -1,6 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
+import { routeFetch } from "@/app/lib/fetcher/routeFetch";
+import getImageSetsBasedOnColors from "@/app/utils/getImageSetsBasedOnColors";
+import ProductToast from "../toast/ProductToast";
 import CheckoutConfirmation from "@/app/components/checkout/CheckoutConfirmation";
 import CheckoutForm from "./CheckoutForm";
 import CheckoutEmpty from "./CheckoutEmpty";
@@ -28,6 +32,100 @@ export default function CheckoutContents({
       window.removeEventListener("storageCart", handleStorageUpdate);
     };
   }, []);
+
+  useEffect(() => {
+    if (productList?.length) {
+      const localCart = JSON.parse(localStorage.getItem("cartItems"));
+      const storedCartItems = localCart?.length
+        ? localCart
+        : userData?.cartItems?.length
+          ? userData.cartItems
+          : [];
+      const activeItemsInCart = storedCartItems.filter((storedItem) =>
+        productList?.some((product) => {
+          if (
+            product?._id === storedItem?._id &&
+            product?.status === "active"
+          ) {
+            const productVariant = product.productVariants.find(
+              (variant) =>
+                variant.location === primaryLocation &&
+                variant.size === storedItem.selectedSize &&
+                variant.color._id === storedItem.selectedColor._id,
+            );
+
+            const isOutOfStock = productVariant?.sku < 1;
+
+            if (isOutOfStock) {
+              toast.custom(
+                (t) => (
+                  <ProductToast
+                    defaultToast={t}
+                    isSuccess={false}
+                    message="Item out of stock"
+                    productImg={
+                      getImageSetsBasedOnColors(product?.productVariants)?.find(
+                        (imgSet) =>
+                          imgSet?.color?.color === productVariant?.color?.color,
+                      )?.images[0]
+                    }
+                    productTitle={product?.productTitle}
+                    variantSize={productVariant?.size}
+                    variantColor={productVariant?.color}
+                  />
+                ),
+                {
+                  position: "top-right",
+                },
+              );
+
+              return false;
+            }
+
+            return true;
+          } else {
+            return false;
+          }
+        }),
+      );
+
+      const updateServerCart = async () => {
+        const updatedUserData = {
+          ...userData,
+          cartItems: activeItemsInCart,
+          isCartLastModified: true,
+        };
+
+        try {
+          const result = await routeFetch(`/api/user-data/${userData?._id}`, {
+            method: "PUT",
+            body: JSON.stringify(updatedUserData),
+          });
+
+          if (!result.ok) {
+            console.error(
+              "UpdateError (cartButton):",
+              result.message || "Failed to update the cart on server.",
+            );
+            toast.error(
+              result.message || "Failed to update the cart on server.",
+            );
+          }
+        } catch (error) {
+          console.error("UpdateError (cartButton):", error.message || error);
+          toast.error("Failed to update the cart on server.");
+        }
+      };
+
+      // If there are cart items in local storage and user just logged in,
+      // update the server cart with the newly added items
+      if (localCart?.length && userData) updateServerCart();
+
+      setCartItems(activeItemsInCart);
+      localStorage.setItem("cartItems", JSON.stringify(activeItemsInCart));
+      window.dispatchEvent(new Event("storageCart"));
+    }
+  }, [primaryLocation, productList, userData]);
 
   if (isPaymentStepDone)
     return (
