@@ -41,53 +41,66 @@ export default function CheckoutContents({
         : userData?.cartItems?.length
           ? userData.cartItems
           : [];
-      const activeItemsInCart = storedCartItems.filter((storedItem) =>
-        productList?.some((product) => {
-          if (
-            product?._id === storedItem?._id &&
-            product?.status === "active"
-          ) {
-            const productVariant = product.productVariants.find(
-              (variant) =>
-                variant.location === primaryLocation &&
-                variant.size === storedItem.selectedSize &&
-                variant.color._id === storedItem.selectedColor._id,
-            );
+      const activeItemsInCart = storedCartItems
+        .map((storedItem) => {
+          const product = productList?.find((p) => p?._id === storedItem?._id);
+          if (!product) return null;
 
-            const isOutOfStock = productVariant?.sku < 1;
+          const productVariant = product.productVariants.find(
+            (variant) =>
+              variant.location === primaryLocation &&
+              variant.size === storedItem.selectedSize &&
+              variant.color._id === storedItem.selectedColor._id,
+          );
 
-            if (isOutOfStock) {
-              toast.custom(
-                (t) => (
-                  <ProductToast
-                    defaultToast={t}
-                    isSuccess={false}
-                    message="Item out of stock"
-                    productImg={
-                      getImageSetsBasedOnColors(product?.productVariants)?.find(
-                        (imgSet) =>
-                          imgSet?.color?.color === productVariant?.color?.color,
-                      )?.images[0]
-                    }
-                    productTitle={product?.productTitle}
-                    variantSize={productVariant?.size}
-                    variantColor={productVariant?.color}
-                  />
-                ),
-                {
-                  position: "top-right",
-                },
-              );
+          if (!productVariant) return null;
 
-              return false;
-            }
+          const isInactive = product.status !== "active";
+          const isOutOfStock = productVariant?.sku < 1;
+          const isInsufficientStock =
+            !isOutOfStock && productVariant?.sku < storedItem?.selectedQuantity;
 
-            return true;
+          if (!isInactive && !isOutOfStock && !isInsufficientStock)
+            return storedItem;
+
+          toast.custom(
+            (t) => (
+              <ProductToast
+                defaultToast={t}
+                isSuccess={false}
+                message={
+                  isInactive
+                    ? "Item inactive"
+                    : isOutOfStock
+                      ? "Item out of stock"
+                      : "Item with insufficient stock"
+                }
+                productImg={
+                  getImageSetsBasedOnColors(product.productVariants)?.find(
+                    (imgSet) =>
+                      imgSet?.color?.color === productVariant?.color?.color,
+                  )?.images[0]
+                }
+                productTitle={product.productTitle}
+                variantSize={productVariant?.size}
+                variantColor={productVariant?.color}
+              />
+            ),
+            {
+              position: "top-right",
+            },
+          );
+
+          if (isInsufficientStock) {
+            return {
+              ...storedItem,
+              selectedQuantity: productVariant?.sku,
+            };
           } else {
-            return false;
+            return null;
           }
-        }),
-      );
+        })
+        .filter(Boolean);
 
       const updateServerCart = async () => {
         const updatedUserData = {

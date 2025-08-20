@@ -118,109 +118,121 @@ export default function CheckoutForm({
           top: 0,
           behavior: "smooth",
         });
-      } else {
-        console.error(
-          "SubmissionError (checkoutForm):",
-          result.message || "Unable to place order.",
-        );
-        toast.error(result.message || "Unable to place order.");
-      }
-    } catch (error) {
-      console.error("SubmissionError (checkoutForm):", error.message || error);
-      toast.error("Something went wrong while placing your order.");
-    }
 
-    const updatedPersonalInfo = {
-      ...userData.userInfo.personalInfo,
-      phoneNumber: data.phoneNumber,
-      phoneNumber2: data.altPhoneNumber,
-      hometown: userData?.userInfo?.personalInfo?.hometown || data.hometown,
-    };
+        const updatedPersonalInfo = {
+          ...userData.userInfo.personalInfo,
+          phoneNumber: data.phoneNumber,
+          phoneNumber2: data.altPhoneNumber,
+          hometown: userData?.userInfo?.personalInfo?.hometown || data.hometown,
+        };
 
-    const existingAddressId = userData?.userInfo?.deliveryAddresses?.find(
-      (address) =>
-        address?.address1 === data.addressLineOne &&
-        address?.address2 === data.addressLineTwo &&
-        address?.city === data.city &&
-        address?.postalCode === data.postalCode,
-    )?.id;
+        const existingAddressId = userData?.userInfo?.deliveryAddresses?.find(
+          (address) =>
+            address?.address1 === data.addressLineOne &&
+            address?.address2 === data.addressLineTwo &&
+            address?.city === data.city &&
+            address?.postalCode === data.postalCode,
+        )?.id;
 
-    const updatedDeliveryAddresses = !existingAddressId
-      ? [
-          ...userData.userInfo.deliveryAddresses,
-          {
-            id: `${userData?.email}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-            nickname: undefined,
-            address1: data.addressLineOne,
-            address2: data.addressLineTwo,
-            city: data.city,
-            postalCode: data.postalCode,
-          },
-        ]
-      : userData?.userInfo?.deliveryAddresses?.map((availableAddress) =>
-          availableAddress.id == existingAddressId
-            ? {
-                ...availableAddress,
+        const updatedDeliveryAddresses = !existingAddressId
+          ? [
+              ...userData.userInfo.deliveryAddresses,
+              {
+                id: `${userData?.email}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                nickname: undefined,
                 address1: data.addressLineOne,
                 address2: data.addressLineTwo,
                 city: data.city,
                 postalCode: data.postalCode,
-              }
-            : availableAddress,
+              },
+            ]
+          : userData?.userInfo?.deliveryAddresses?.map((availableAddress) =>
+              availableAddress.id == existingAddressId
+                ? {
+                    ...availableAddress,
+                    address1: data.addressLineOne,
+                    address2: data.addressLineTwo,
+                    city: data.city,
+                    postalCode: data.postalCode,
+                  }
+                : availableAddress,
+            );
+
+        const currentWishlist = JSON.parse(
+          localStorage.getItem("wishlistItems"),
         );
+        const currentCart = JSON.parse(localStorage.getItem("cartItems"));
 
-    const currentWishlist = JSON.parse(localStorage.getItem("wishlistItems"));
-    const currentCart = JSON.parse(localStorage.getItem("cartItems"));
+        const updatedWishlist = !currentWishlist?.length
+          ? []
+          : currentWishlist.filter(
+              (wishlistItem) =>
+                !currentCart.some(
+                  (cartItem) => wishlistItem._id === cartItem._id,
+                ),
+            );
 
-    const updatedWishlist = !currentWishlist?.length
-      ? []
-      : currentWishlist.filter(
-          (wishlistItem) =>
-            !currentCart.some((cartItem) => wishlistItem._id === cartItem._id),
-        );
+        const updatedUserData = {
+          ...userData,
+          userInfo: {
+            ...userData.userInfo,
+            personalInfo: updatedPersonalInfo,
+            deliveryAddresses: updatedDeliveryAddresses,
+            savedDeliveryAddress: {
+              address1: data.addressLineOne,
+              address2: data.addressLineTwo,
+              city: data.city,
+              postalCode: data.postalCode,
+            },
+          },
+          cartItems: [],
+          isCartLastModified: true,
+          wishlistItems: updatedWishlist,
+        };
 
-    const updatedUserData = {
-      ...userData,
-      userInfo: {
-        ...userData.userInfo,
-        personalInfo: updatedPersonalInfo,
-        deliveryAddresses: updatedDeliveryAddresses,
-        savedDeliveryAddress: {
-          address1: data.addressLineOne,
-          address2: data.addressLineTwo,
-          city: data.city,
-          postalCode: data.postalCode,
-        },
-      },
-      cartItems: [],
-      isCartLastModified: true,
-      wishlistItems: updatedWishlist,
-    };
+        try {
+          localStorage.removeItem("checkoutFormDraft");
+          localStorage.removeItem("cartItems");
+          window.dispatchEvent(new Event("storageCart"));
+          localStorage.setItem(
+            "wishlistItems",
+            JSON.stringify(updatedWishlist),
+          );
+          window.dispatchEvent(new Event("storageWishlist"));
 
-    try {
-      localStorage.removeItem("checkoutFormDraft");
-      localStorage.removeItem("cartItems");
-      window.dispatchEvent(new Event("storageCart"));
-      localStorage.setItem("wishlistItems", JSON.stringify(updatedWishlist));
-      window.dispatchEvent(new Event("storageWishlist"));
+          const result = await routeFetch(`/api/user-data/${userData?._id}`, {
+            method: "PUT",
+            body: JSON.stringify(updatedUserData),
+          });
 
-      const result = await routeFetch(`/api/user-data/${userData?._id}`, {
-        method: "PUT",
-        body: JSON.stringify(updatedUserData),
-      });
-
-      if (!result.ok) {
-        console.error(
-          "UpdateError (checkoutForm):",
-          result.message || "Failed update user data.",
-        );
-        toast.error(result.message || "Failed update user data.");
+          if (!result.ok) {
+            console.error(
+              "UpdateError (checkoutForm):",
+              result.message || "Failed update user data.",
+            );
+            toast.error(result.message || "Failed update user data.");
+          } else {
+            router.refresh();
+          }
+        } catch (error) {
+          console.error("UpdateError (checkoutForm):", error.message || error);
+          toast.error("Failed update user data.");
+        }
       } else {
-        router.refresh();
+        if (result.data.hasFaultyItems) {
+          toast.error("Unable to place order. Please try again.");
+          router.refresh();
+        } else {
+          console.error(
+            "SubmissionError (checkoutForm):",
+            result.message || "Unable to place order.",
+          );
+          toast.error(result.message || "Unable to place order.");
+        }
       }
     } catch (error) {
-      console.error("UpdateError (checkoutForm):", error.message || error);
-      toast.error("Failed update user data.");
+      console.error("SubmissionError (checkoutForm):", error.message || error);
+      toast.error("Something went wrong while placing your order.");
     }
 
     setIsPageLoading(false);
