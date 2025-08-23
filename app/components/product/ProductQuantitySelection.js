@@ -26,7 +26,7 @@ export default function ProductQuantitySelection({
           }
         ></Button>
         <Input
-          className="w-fit font-semibold [&_input::-webkit-inner-spin-button]:appearance-none [&_input::-webkit-outer-spin-button]:appearance-none [&_input]:text-center [&_input]:[-moz-appearance:textfield]"
+          className="w-[54px] font-semibold [&_[data-slot='input-wrapper']]:rounded-[4px] [&_input::-webkit-inner-spin-button]:appearance-none [&_input::-webkit-outer-spin-button]:appearance-none [&_input]:text-center [&_input]:[-moz-appearance:textfield]"
           type="number"
           arial-label="Quantity"
           min={1}

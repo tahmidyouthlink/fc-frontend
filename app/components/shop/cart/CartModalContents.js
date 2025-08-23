@@ -127,7 +127,7 @@ export default function CartModalContents({
               }
             ></Button>
             <Input
-              className="w-fit font-semibold [&_[data-slot='input-wrapper']]:rounded-[4px] hover:[&_[data-slot='input-wrapper']]:bg-[var(--color-secondary-500)] [&_input::-webkit-inner-spin-button]:appearance-none [&_input::-webkit-outer-spin-button]:appearance-none [&_input]:text-center [&_input]:[-moz-appearance:textfield]"
+              className="w-[54px] font-semibold [&_[data-slot='input-wrapper']]:rounded-[4px] hover:[&_[data-slot='input-wrapper']]:bg-[var(--color-secondary-500)] [&_input::-webkit-inner-spin-button]:appearance-none [&_input::-webkit-outer-spin-button]:appearance-none [&_input]:text-center [&_input]:[-moz-appearance:textfield]"
               type="number"
               arial-label="Quantity"
               min={1}
