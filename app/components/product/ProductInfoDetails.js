@@ -3,7 +3,7 @@ import { useState } from "react";
 export default function ProductInfoDetails({ productInfoDetails }) {
   const [activeTabKey, setActiveTabKey] = useState("productDetails");
   const predefinedTabs = {
-    productDetails: "Description",
+    productDetails: "Item Details",
     ...(productInfoDetails?.sizeFit && { sizeFit: "Size & Fit" }),
     ...(productInfoDetails?.materialCare && {
       materialCare: "Material & Care",
