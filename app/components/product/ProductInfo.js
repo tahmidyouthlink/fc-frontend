@@ -17,6 +17,7 @@ export default function ProductInfo({
   hasSpecialOffer,
   specialOffer,
   notifyVariants,
+  randomViewers,
 }) {
   const [parsedSizeFit, setParsedSizeFit] = useState(null);
 
@@ -69,6 +70,7 @@ export default function ProductInfo({
         hasSpecialOffer={hasSpecialOffer}
         specialOffer={specialOffer}
         notifyVariants={notifyVariants}
+        randomViewers={randomViewers}
       />
       {/* Divider */}
       <hr className="mt-7 h-0.5 bg-neutral-100 sm:max-md:mb-4 xl:mb-4" />

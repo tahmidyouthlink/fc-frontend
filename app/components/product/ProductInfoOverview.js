@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { LuBadge } from "react-icons/lu";
 import { TiStarOutline } from "react-icons/ti";
+import { MdOutlineRemoveRedEye } from "react-icons/md";
 import {
   calculateFinalPrice,
   checkIfOnlyRegularDiscountIsAvailable,
@@ -31,6 +32,7 @@ export default function ProductInfoOverview({
   hasSpecialOffer,
   specialOffer,
   notifyVariants,
+  randomViewers,
 }) {
   const [isNotifyMeModalOpen, setIsNotifyMeModalOpen] = useState(false);
   const productVariantSku = getProductVariantSku(
@@ -137,6 +139,16 @@ export default function ProductInfoOverview({
         selectedOptions={selectedOptions}
         setSelectedOptions={setSelectedOptions}
       />
+      {/* Random Viewer Count */}
+      <div className="mb-6 flex items-center gap-1">
+        <MdOutlineRemoveRedEye className="size-[18px] text-[var(--color-primary-900)]" />
+        <p className="text-[13px]/[1] text-neutral-600">
+          <span className="font-semibold text-[var(--color-primary-900)]">
+            {randomViewers}
+          </span>{" "}
+          people viewing this product now
+        </p>
+      </div>
       {/* Call to Action Buttons */}
       <div className="flex gap-2 max-lg:flex-wrap [&>button>svg]:text-lg [&>button]:rounded-[4px] [&>button]:px-5 [&>button]:py-6 [&>button]:text-sm [&>button]:font-semibold [&>button]:text-neutral-600 [&>button]:duration-300 hover:[&>button]:opacity-100">
         <ProductCartButton

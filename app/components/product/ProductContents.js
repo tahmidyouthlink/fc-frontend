@@ -16,6 +16,7 @@ export default function ProductContents({
   specialOffers,
   primaryLocation,
   notifyVariants,
+  randomViewers,
 }) {
   const [selectedOptions, setSelectedOptions] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -93,6 +94,7 @@ export default function ProductContents({
           hasSpecialOffer={isSpecialOfferIsAvailable}
           specialOffer={specialOffer}
           notifyVariants={notifyVariants}
+          randomViewers={randomViewers}
         />
       </div>
     </div>

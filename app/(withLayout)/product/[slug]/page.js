@@ -63,6 +63,8 @@ export default async function Product({ params: { slug } }) {
     console.error("FetchError (productDetails/notifyVariants):", error.message);
   }
 
+  const randomViewers = Math.floor(Math.random() * (99 - 10 + 1)) + 10;
+
   return (
     <main className="relative overflow-hidden">
       {/* Mesh Gradient */}
@@ -89,6 +91,7 @@ export default async function Product({ params: { slug } }) {
           specialOffers={specialOffers}
           primaryLocation={primaryLocation}
           notifyVariants={notifyVariants}
+          randomViewers={randomViewers}
         />
         <ProductRelatedContents
           userData={userData}
