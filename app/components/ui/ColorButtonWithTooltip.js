@@ -11,11 +11,12 @@ export default function ColorButtonWithTooltip({
   setSelectedOptions,
   setActiveImageIndex,
   setNumOfTimesThumbnailsMoved,
-  changeActiveColorAndImage,
+  activeColorIndex,
+  setActiveColorIndex,
 }) {
   const isActiveColor =
     toolLocation === "card"
-      ? colorIndex === 0
+      ? activeColorIndex === colorIndex
       : selectedOptions?.color._id === color._id;
 
   const [openTooltipId, setOpenTooltipId] = useState(null);
@@ -31,7 +32,7 @@ export default function ColorButtonWithTooltip({
       setActiveImageIndex(0);
       setNumOfTimesThumbnailsMoved(0);
     } else if (toolLocation === "card") {
-      changeActiveColorAndImage(event, colorIndex);
+      setActiveColorIndex(colorIndex);
     }
 
     if (toolLocation !== "card") {

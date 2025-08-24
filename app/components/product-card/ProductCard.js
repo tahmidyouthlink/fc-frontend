@@ -40,6 +40,7 @@ export default function ProductCard({
         productTitle={product.productTitle}
         productColors={product.availableColors}
         isProductOutOfStock={isProductOutOfStock}
+        thumbnailImageUrl={product.thumbnailImageUrl}
         imageSets={getImageSetsBasedOnColors(product.productVariants)}
       />
       <CardProductInfo

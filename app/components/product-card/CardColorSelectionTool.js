@@ -3,31 +3,9 @@ import ColorButtonWithTooltip from "../ui/ColorButtonWithTooltip";
 export default function CardColorSelectionTool({
   productTitle,
   productColors,
+  activeColorIndex,
+  setActiveColorIndex,
 }) {
-  const changeActiveColorAndImage = (event, colorIndex) => {
-    const selectedColorElement = event.currentTarget,
-      colorElements = selectedColorElement.parentElement.children,
-      imageContainerElements =
-        selectedColorElement.parentElement.parentElement.parentElement.querySelectorAll(
-          ".img-container",
-        );
-
-    Object.values(colorElements).forEach(
-      (colorElement) => (colorElement.style.borderColor = "transparent"),
-    );
-
-    selectedColorElement.style.borderColor = "#c18d6c";
-
-    Object.values(imageContainerElements).forEach((imageElement) => {
-      imageElement.style.opacity = "0";
-      imageElement.style.pointerEvents = "none";
-    });
-
-    Object.values(imageContainerElements)[colorIndex].style.opacity = "1";
-    Object.values(imageContainerElements)[colorIndex].style.pointerEvents =
-      "auto";
-  };
-
   return (
     <div
       id="color-select"
@@ -44,7 +22,8 @@ export default function CardColorSelectionTool({
               color={color}
               colorIndex={colorIndex}
               toolLocation="card"
-              changeActiveColorAndImage={changeActiveColorAndImage}
+              activeColorIndex={activeColorIndex}
+              setActiveColorIndex={setActiveColorIndex}
             />
           );
         })}

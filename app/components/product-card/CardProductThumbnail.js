@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
 import TransitionLink from "../ui/TransitionLink";
 import CardOutOfStockBanner from "./CardOutOfStockBanner";
 import CardColorSelectionTool from "./CardColorSelectionTool";
@@ -8,10 +8,20 @@ export default function CardProductThumbnail({
   productTitle,
   productColors,
   isProductOutOfStock,
+  thumbnailImageUrl,
   imageSets,
 }) {
+  const [activeColorIndex, setActiveColorIndex] = useState(null);
+
+  const allImages = useMemo(() => {
+    if (!thumbnailImageUrl || !imageSets) return [];
+    return [thumbnailImageUrl, ...imageSets.flatMap((set) => set.images)];
+  }, [thumbnailImageUrl, imageSets]);
+
   useEffect(() => {
-    const imageContainers = document.querySelectorAll(".img-container");
+    const imageContainers = document.querySelectorAll(
+      `.img-container[data-product-title="${productTitle}"]`,
+    );
     let hoverTimer;
 
     const onMouseEnter = (event) => {
@@ -19,24 +29,23 @@ export default function CardProductThumbnail({
         prevCount = 0;
       const images = event.currentTarget.querySelectorAll("img");
 
-      if (!!images[prevCount] && !!images[counter])
+      if (images.length > 1) {
         hoverTimer = setInterval(() => {
-          images[prevCount].style.opacity = "0";
-          images[counter].style.opacity = "1";
-
+          if (!!images[prevCount] && !!images[counter]) {
+            images[prevCount].style.opacity = "0";
+            images[counter].style.opacity = "1";
+          }
           prevCount = counter;
-          counter = counter === images.length - 1 ? 0 : ++counter;
+          counter = (counter + 1) % images.length;
         }, 1000);
+      }
     };
 
     const onMouseLeave = (event) => {
       clearInterval(hoverTimer);
-
       const images = event.currentTarget.querySelectorAll("img");
-
       images.forEach((image, imageIndex) => {
-        if (imageIndex === 0) image.style.opacity = "1";
-        else image.style.opacity = "0";
+        image.style.opacity = imageIndex === 0 ? "1" : "0";
       });
     };
 
@@ -45,67 +54,79 @@ export default function CardProductThumbnail({
       imageContainer.addEventListener("mouseleave", onMouseLeave);
     });
 
-    imageContainers.forEach((imageContainer) => {
-      return () => {
+    return () => {
+      imageContainers.forEach((imageContainer) => {
         imageContainer.removeEventListener("mouseenter", onMouseEnter);
         imageContainer.removeEventListener("mouseleave", onMouseLeave);
-        if (hoverTimer) clearTimeout(hoverTimer);
-      };
-    });
-  }, []);
+      });
+      if (hoverTimer) clearInterval(hoverTimer);
+    };
+  }, [activeColorIndex, productTitle]);
 
   return (
     <div className="product-card relative aspect-[4/5.5] w-full overflow-hidden rounded-md bg-[var(--product-default)] max-xl:aspect-[4/5] sm:min-h-[350px] lg:min-h-[400px] xl:min-h-[450px]">
       <TransitionLink
         href={`/product/${productTitle.split(" ").join("-").toLowerCase()}`}
       >
-        {imageSets.map((imgSet, imgSetIndex) => {
-          return (
+        {activeColorIndex === null ? (
+          // RENDER STATE 1: No color selected.
+          // Shows the main thumbnail and cycles through all images on hover.
+          <div
+            data-product-title={productTitle} // Unique identifier for the useEffect selector
+            className="img-container absolute aspect-[4/5.5] w-full rounded-md transition-opacity duration-300 ease-in-out max-xl:aspect-[4/5] sm:min-h-[350px] lg:min-h-[400px] xl:min-h-[450px]"
+          >
+            {allImages.map((imgUrl, imgIndex) => (
+              <Image
+                key={`card-thumbnail-all-img-${productTitle}-${imgIndex}`}
+                className={`absolute h-full w-full object-contain transition-[transform,opacity] duration-300 ease-in-out ${
+                  imgIndex === 0 ? "opacity-100" : "opacity-0"
+                }`}
+                src={imgUrl}
+                alt={`${productTitle} showcase image ${imgIndex + 1}`}
+                sizes="50vw"
+                fill
+              />
+            ))}
+          </div>
+        ) : (
+          // RENDER STATE 2: A color has been selected.
+          // Doesn't show the main thumbnail and cycles through only the images of selected color on hover.
+          imageSets.map((imgSet, imgSetIndex) => (
             <div
-              key={
-                "card-thumbnail-img-" +
-                productTitle +
-                imgSet.color.label +
-                imgSetIndex
-              }
-              className="img-container absolute aspect-[4/5.5] w-full rounded-md transition-[opacity] duration-300 ease-in-out max-xl:aspect-[4/5] sm:min-h-[350px] lg:min-h-[400px] xl:min-h-[450px]"
+              key={`card-thumbnail-img-${productTitle}-${imgSet.color.label}-${imgSetIndex}`}
+              data-product-title={productTitle}
+              className="img-container absolute aspect-[4/5.5] w-full rounded-md transition-opacity duration-300 ease-in-out max-xl:aspect-[4/5] sm:min-h-[350px] lg:min-h-[400px] xl:min-h-[450px]"
               style={{
-                opacity: imgSetIndex === 0 ? "1" : "0",
-                pointerEvents: imgSetIndex === 0 ? "auto" : "none",
+                opacity: activeColorIndex === imgSetIndex ? "1" : "0",
+                pointerEvents:
+                  activeColorIndex === imgSetIndex ? "auto" : "none",
               }}
             >
-              {!!imgSet &&
-                imgSet.images.map((imgUrl, imgIndex) => {
-                  return (
-                    <Image
-                      key={
-                        "card-thumbnail-sub-img-" +
-                        productTitle +
-                        imgSet.color.label +
-                        imgUrl +
-                        imgIndex
-                      }
-                      className={`h-full w-full object-contain transition-[transform,opacity] duration-300 ease-in-out ${imgIndex === 0 ? "opacity-100" : "opacity-0"}`}
-                      src={imgUrl}
-                      alt={
-                        productTitle +
-                        imgSet.color.label +
-                        (Number(imgIndex) + 1)
-                      }
-                      sizes="50vw"
-                      fill
-                    />
-                  );
-                })}
+              {imgSet.images.map((imgUrl, imgIndex) => (
+                <Image
+                  key={`card-thumbnail-sub-img-${productTitle}-${imgSet.color.label}-${imgUrl}-${imgIndex}`}
+                  className={`h-full w-full object-contain transition-[transform,opacity] duration-300 ease-in-out ${
+                    imgIndex === 0 ? "opacity-100" : "opacity-0"
+                  }`}
+                  src={imgUrl}
+                  alt={`${productTitle} ${imgSet.color.label} image ${
+                    imgIndex + 1
+                  }`}
+                  sizes="50vw"
+                  fill
+                />
+              ))}
             </div>
-          );
-        })}
+          ))
+        )}
         {isProductOutOfStock && <CardOutOfStockBanner />}
       </TransitionLink>
       {!isProductOutOfStock && (
         <CardColorSelectionTool
           productTitle={productTitle}
           productColors={productColors}
+          activeColorIndex={activeColorIndex}
+          setActiveColorIndex={setActiveColorIndex}
         />
       )}
     </div>
