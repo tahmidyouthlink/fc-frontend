@@ -118,13 +118,21 @@ export default function CheckoutConfirmation({
             <p>{fullAddress}</p>
           </div>
         </section>
-        {/* Shop Page button */}
-        <TransitionLink
-          href="/shop"
-          className="mt-9 block rounded-[4px] bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
-        >
-          Continue Shopping
-        </TransitionLink>
+        {/* CTA buttons */}
+        <div className="mt-9 flex gap-x-2.5">
+          <TransitionLink
+            href="/shop"
+            className="block rounded-[4px] bg-[var(--color-primary-500)] px-4 py-2.5 text-center text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-primary-700)]"
+          >
+            Continue Shopping
+          </TransitionLink>
+          <TransitionLink
+            href={`/user/orders?order=${orderDetails.orderNumber}`}
+            className="block rounded-[4px] bg-[var(--color-secondary-500)] px-4 py-2.5 text-center text-sm font-semibold text-neutral-600 transition-[background-color] duration-300 hover:bg-[var(--color-secondary-600)]"
+          >
+            Track Order
+          </TransitionLink>
+        </div>
       </div>
     </main>
   );

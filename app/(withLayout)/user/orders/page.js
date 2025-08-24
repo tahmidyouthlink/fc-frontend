@@ -5,10 +5,12 @@ import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 import EmptyOrderHistory from "@/app/components/order/history/EmptyOrderHistory";
 import OrderHistory from "@/app/components/order/history/OrderHistory";
 
-export default async function Orders() {
+export default async function Orders({ searchParams }) {
+  const paramOrderNumber = searchParams.order;
+
   const session = await getServerSession(authOptions);
 
-  let userOrders, legalPolicyPdfLinks;
+  let userOrders, orderToTrack, legalPolicyPdfLinks;
 
   if (session?.user?.email) {
     try {
@@ -17,6 +19,10 @@ export default async function Orders() {
       );
 
       userOrders = result.data || [];
+
+      orderToTrack =
+        userOrders.find((order) => order.orderNumber == paramOrderNumber) ||
+        null;
     } catch (error) {
       console.error("FetchError (orderHistory/userOrders):", error.message);
     }
@@ -34,6 +40,7 @@ export default async function Orders() {
     return (
       <OrderHistory
         orders={userOrders}
+        orderToTrack={orderToTrack}
         legalPolicyPdfLinks={legalPolicyPdfLinks}
       />
     );

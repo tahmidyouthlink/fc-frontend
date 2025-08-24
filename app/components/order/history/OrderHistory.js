@@ -1,15 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useFieldArray, useForm } from "react-hook-form";
 import OrderCard from "./OrderCard";
 import TrackOrderModal from "./TrackOrderModal";
 import ReturnOrderModal from "./ReturnOrderModal";
 import ReturnInfoModal from "./ReturnInfoModal";
 
-export default function OrderHistory({ orders, legalPolicyPdfLinks }) {
-  const [isTrackModalOpen, setIsTrackModalOpen] = useState(false);
-  const [activeTrackOrder, setActiveTrackOrder] = useState(null);
+export default function OrderHistory({
+  orders,
+  orderToTrack,
+  legalPolicyPdfLinks,
+}) {
+  const router = useRouter();
+  const [isTrackModalOpen, setIsTrackModalOpen] = useState(!!orderToTrack);
+  const [activeTrackOrder, setActiveTrackOrder] = useState(orderToTrack);
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
   const [isReturnInfoModalOpen, setIsReturnInfoModalOpen] = useState(false);
   const [activeReturnOrder, setActiveReturnOrder] = useState(null);
@@ -38,6 +44,13 @@ export default function OrderHistory({ orders, legalPolicyPdfLinks }) {
     control,
     name: "items",
   });
+
+  useEffect(() => {
+    router.replace("/user/orders", undefined, {
+      shallow: true,
+      scroll: false,
+    });
+  }, [router]);
 
   return (
     <section className="grow auto-rows-max rounded-md border-2 border-neutral-50/20 bg-white/60 p-3.5 shadow-[0_0_20px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl xl:p-5 [&_img]:pointer-events-none">
