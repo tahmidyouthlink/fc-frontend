@@ -6,11 +6,6 @@ export default function CheckoutPaymentMethod({ register, errors }) {
       imgUrl: "/payment-methods/cards.webp",
     },
     {
-      id: "bkash",
-      value: "bkash",
-      imgUrl: "/payment-methods/bkash.webp",
-    },
-    {
       id: "mobile-bank",
       value: "mobilebank",
       imgUrl: "/payment-methods/mobile-banking.webp",
@@ -27,8 +22,8 @@ export default function CheckoutPaymentMethod({ register, errors }) {
       <h2 className="text-base font-semibold md:text-lg">
         Select Payment Method
       </h2>
-      <div className="payment-methods relative grid gap-2.5 sm:grid-cols-2">
-        {paymentMethods.map((paymentMethod) => (
+      <div className="payment-methods relative grid gap-2.5 sm:grid-cols-3 lg:grid-cols-2">
+        {paymentMethods.map((paymentMethod, index) => (
           <input
             key={paymentMethod.id}
             type="radio"
@@ -40,6 +35,11 @@ export default function CheckoutPaymentMethod({ register, errors }) {
             })}
             id={paymentMethod.id}
             value={paymentMethod.value}
+            className={
+              index === paymentMethods.length - 1
+                ? "lg:col-span-2"
+                : "lg:col-span-1"
+            }
             style={{
               "--img-url": `url('${paymentMethod.imgUrl}')`,
             }}
