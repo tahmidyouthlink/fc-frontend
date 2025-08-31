@@ -11,15 +11,15 @@ export default function ProductInfoDetails({ productInfoDetails }) {
   };
 
   return (
-    <section className="mb-10 w-full gap-x-7 sm:max-md:flex xl:flex xl:overflow-y-auto">
+    <section className="my-4 flex min-h-0 grow flex-col">
       <div>
         {/* Tabs */}
-        <ul className="mx-auto mb-4 flex w-fit font-semibold text-neutral-600 max-sm:w-full max-sm:overflow-x-auto sm:max-md:mb-0 sm:max-md:block xl:mb-0 xl:block">
+        <ul className="mb-4 flex gap-1.5 font-semibold text-neutral-600 max-xl:overflow-x-auto">
           {Object.entries(predefinedTabs).map(([backendKey, frontendLabel]) => {
             return (
               <li
                 key={"product-details-tab-" + backendKey + frontendLabel}
-                className={`-mt-0.5 shrink-0 cursor-pointer text-nowrap rounded-[4px] px-4 py-2.5 transition-[background-color] duration-300 ease-in-out lg:px-5 ${activeTabKey === backendKey ? "bg-neutral-200" : "bg-transparent hover:bg-neutral-100"}`}
+                className={`shrink-0 cursor-pointer text-nowrap rounded-[4px] border-2 border-neutral-200 px-3.5 py-2.5 text-sm/[1] transition-[background-color] duration-300 ease-in-out ${activeTabKey === backendKey ? "bg-neutral-200" : "bg-transparent hover:bg-neutral-100"}`}
                 onClick={() => setActiveTabKey(backendKey)}
               >
                 {frontendLabel}
@@ -29,7 +29,7 @@ export default function ProductInfoDetails({ productInfoDetails }) {
         </ul>
       </div>
       {/* Tab Details Section */}
-      <div className="custom-desktop-scrollbar mx-auto w-full space-y-3.5 overflow-y-auto md:max-xl:overflow-y-auto md:max-lg:h-60 lg:max-xl:h-72">
+      <div className="custom-desktop-scrollbar mx-auto min-h-0 w-full flex-1 space-y-3.5 overflow-y-auto">
         <div
           className="custom-desktop-scrollbar list-none overflow-y-auto text-neutral-500 [&_:is(h1,h2,h3,h4,h5,h6)]:mb-2 [&_:is(h1,h2,h3,h4,h5,h6)]:font-semibold"
           dangerouslySetInnerHTML={{ __html: productInfoDetails[activeTabKey] }}

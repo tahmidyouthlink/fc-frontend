@@ -73,7 +73,7 @@ export default function ProductInfo({
         randomViewers={randomViewers}
       />
       {/* Divider */}
-      <hr className="mt-7 h-0.5 bg-neutral-100 sm:max-md:mb-4 xl:mb-4" />
+      <hr className="mt-7 h-0.5 bg-neutral-100" />
       {/* Details Section */}
       <ProductInfoDetails
         productInfoDetails={{
