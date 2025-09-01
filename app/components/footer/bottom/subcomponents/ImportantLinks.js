@@ -1,44 +1,24 @@
 import Link from "next/link";
-import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 
 export default async function Importantlinks() {
-  let legalPolicyPdfLinks;
-
-  try {
-    const response = await rawFetch("/get-all-policy-pdfs");
-    [legalPolicyPdfLinks] = response.data || [];
-  } catch (error) {
-    console.error("FetchError (importantLinks/legalPdfLinks):", error.message);
-  }
-
   return (
     <div className="col-span-1 space-y-2.5">
       <h3 className="font-semibold uppercase">Important Links</h3>
       <ul>
         <li>
-          <Link target="_blank" href={legalPolicyPdfLinks?.terms || "#"}>
-            Terms & Conditions
-          </Link>
+          <Link href="/terms-and-conditions">Terms & Conditions</Link>
         </li>
         <li>
-          <Link target="_blank" href={legalPolicyPdfLinks?.privacy || "#"}>
-            Privacy Policy
-          </Link>
+          <Link href="/privacy-policy">Privacy Policy</Link>
         </li>
         <li>
-          <Link target="_blank" href={legalPolicyPdfLinks?.refund || "#"}>
-            Refund Policy
-          </Link>
+          <Link href="/refund-policy">Refund Policy</Link>
         </li>
         <li>
-          <Link target="_blank" href={legalPolicyPdfLinks?.shipping || "#"}>
-            Shipping Policy
-          </Link>
+          <Link href="/shipping-policy">Shipping Policy</Link>
         </li>
         <li>
-          <Link target="_blank" href={legalPolicyPdfLinks?.return || "#"}>
-            Return Policy
-          </Link>
+          <Link href="/return-policy">Return Policy</Link>
         </li>
       </ul>
     </div>
