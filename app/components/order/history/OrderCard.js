@@ -1,4 +1,3 @@
-import { Popover, PopoverTrigger, PopoverContent } from "@nextui-org/react";
 import { LuFileText, LuTruck } from "react-icons/lu";
 import { IoReturnDownBack } from "react-icons/io5";
 import getOrderStatusWithColor from "@/app/utils/getOrderStatusColor";
@@ -38,31 +37,11 @@ export default function OrderCard({
         <h2 className="text-sm font-semibold md:text-base">
           Order #{order?.orderNumber}
         </h2>
-        {orderStatus?.text !== "Request Declined" ? (
-          <div
-            className={`w-fit cursor-default text-nowrap rounded-[3px] px-2 py-1.5 text-xs font-semibold max-sm:ml-auto ${orderStatus?.bgColor} ${orderStatus?.textColor}`}
-          >
-            {orderStatus?.text}
-          </div>
-        ) : (
-          <Popover
-            classNames={{
-              content: [
-                "p-3.5 max-w-[65dvw] rounded-[4px] sm:max-w-48 lg:max-w-60 shadow-[1px_1px_20px_0_rgba(0,0,0,0.15)] text-[13px]",
-              ],
-            }}
-            placement="bottom-end"
-          >
-            <PopoverTrigger
-              className={`w-fit cursor-pointer text-nowrap rounded-[3px] px-2 py-1.5 text-xs font-semibold max-sm:ml-auto ${orderStatus?.bgColor} ${orderStatus?.textColor}`}
-            >
-              {orderStatus?.text}
-            </PopoverTrigger>
-            <PopoverContent>
-              <p>{order?.declinedReason}</p>
-            </PopoverContent>
-          </Popover>
-        )}
+        <div
+          className={`w-fit cursor-default text-nowrap rounded-[3px] px-2 py-1.5 text-xs font-semibold max-sm:ml-auto ${orderStatus?.bgColor} ${orderStatus?.textColor}`}
+        >
+          {orderStatus?.text}
+        </div>
       </div>
       <div className="space-y-2 [&>div]:flex [&>div]:justify-between [&>div]:gap-4 sm:[&>div]:gap-10 xl:[&>div]:gap-20 [&_h4]:font-semibold sm:[&_h4]:text-nowrap">
         <div>
@@ -115,6 +94,7 @@ export default function OrderCard({
                   Array.from(order?.productInformation, () => ({
                     isRequested: false,
                     quantity: 0,
+                    issues: [],
                   })),
                 );
 

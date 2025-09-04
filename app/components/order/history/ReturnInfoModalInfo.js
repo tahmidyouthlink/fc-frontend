@@ -1,10 +1,6 @@
 import formatOrderDateTime from "@/app/utils/formatOrderDateTime";
 
-export default function ReturnInfoModalInfo({
-  orderStatus,
-  returnInfo,
-  declinedReason,
-}) {
+export default function ReturnInfoModalInfo({ orderStatus, returnInfo }) {
   const {
     orderMonthFirstThreeLetters,
     orderMonthRestOfLetters,
@@ -38,18 +34,10 @@ export default function ReturnInfoModalInfo({
             ৳ {returnInfo?.refundAmount?.toLocaleString()}
           </p>
         </div>
-        <div>
-          <h4>Provided Reason</h4>
-          <p className="text-right">
-            {!returnInfo?.description
-              ? `${returnInfo?.reason} (${returnInfo?.issue})`
-              : `"${returnInfo?.description}"`}
-          </p>
-        </div>
-        {declinedReason && (
+        {returnInfo?.description && (
           <div>
-            <h4>Reason of Decline</h4>
-            <p className="text-right">{declinedReason}</p>
+            <h4>Additional Note</h4>
+            <p className="text-right">{returnInfo.description}</p>
           </div>
         )}
       </div>

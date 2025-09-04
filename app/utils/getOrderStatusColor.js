@@ -9,15 +9,15 @@ export default function getOrderStatusWithColor(orderStatus) {
       };
     case "Shipped":
     case "On Hold":
-    case "Request Accepted":
     case "Return Initiated":
+    case "Processed":
       return {
         text: orderStatus === "Shipped" ? "On Its Way" : orderStatus,
         bgColor: "bg-blue-100",
         textColor: "text-blue-600",
       };
     case "Return Requested":
-    case "Request Declined":
+    case "Declined":
       return {
         text: orderStatus,
         bgColor: "bg-red-100",

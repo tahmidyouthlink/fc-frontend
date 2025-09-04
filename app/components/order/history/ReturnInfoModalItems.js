@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
 import TransitionLink from "../../ui/TransitionLink";
 
 export default function ReturnInfoModalItems({ returnProducts }) {
@@ -36,7 +37,7 @@ export default function ReturnInfoModalItems({ returnProducts }) {
               >
                 <TransitionLink
                   href={`/product/${item?.productTitle?.split(" ")?.join("-")?.toLowerCase()}`}
-                  className="relative block min-h-full w-[72px] overflow-hidden rounded-[4px] bg-[var(--product-default)] sm:w-20 xl:w-1/4"
+                  className="relative block min-h-full w-[72px] shrink-0 overflow-hidden rounded-[4px] bg-[var(--product-default)] sm:w-20 md:w-28 xl:w-1/4"
                 >
                   {!!item?.thumbnailImgUrl && (
                     <Image
@@ -49,7 +50,7 @@ export default function ReturnInfoModalItems({ returnProducts }) {
                   )}
                 </TransitionLink>
                 <div className="grow text-xs text-neutral-400 lg:text-sm">
-                  <div className="flex h-full flex-col justify-between">
+                  <div className="h-full">
                     <div className="flex justify-between gap-x-2 sm:gap-x-5">
                       <div>
                         <TransitionLink
@@ -98,6 +99,37 @@ export default function ReturnInfoModalItems({ returnProducts }) {
                           </div>
                         </div>
                       </div>
+                    </div>
+                    <div className="mt-1 text-xs md:text-[13px]">
+                      <h5 className="mr-1.5 inline text-nowrap">
+                        Provided Issue{item?.issues?.length > 1 ? "s" : ""}:
+                      </h5>
+                      <span>{item?.issues?.join(", ")}</span>
+                    </div>
+                    <div className="mt-1 flex items-center gap-x-1.5">
+                      <h5 className="text-xs md:text-[13px]">Status:</h5>
+                      <div
+                        className={`h-fit w-fit cursor-default text-nowrap rounded-[3px] px-1.5 py-1 text-[10px]/[1] font-semibold md:text-[11px]/[1] ${item?.status === "Pending" ? "bg-yellow-100 text-yellow-600" : item?.status === "Approved" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}`}
+                      >
+                        {item?.status}
+                      </div>
+                      {!!item.declinedReason && (
+                        <Popover
+                          classNames={{
+                            content: [
+                              "p-3.5 max-w-[80dvw] rounded-[4px] sm:max-w-60 lg:max-w-80 shadow-[1px_1px_20px_0_rgba(0,0,0,0.15)] text-sm",
+                            ],
+                          }}
+                          placement="bottom-start"
+                        >
+                          <PopoverTrigger className="h-fit w-fit cursor-pointer text-[11px] font-semibold text-[var(--color-primary-900)] underline underline-offset-1 md:text-xs/[1]">
+                            Why?
+                          </PopoverTrigger>
+                          <PopoverContent>
+                            <p>{item.declinedReason}</p>
+                          </PopoverContent>
+                        </Popover>
+                      )}
                     </div>
                   </div>
                 </div>

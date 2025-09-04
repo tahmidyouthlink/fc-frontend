@@ -31,8 +31,6 @@ export default function OrderHistory({
     formState: { errors },
   } = useForm({
     defaultValues: {
-      reason: "",
-      issue: "",
       description: "",
       items: [],
       images: "",

@@ -15,8 +15,7 @@ export default function ReturnInfoModal({
   setIsReturnInfoModalOpen,
   activeReturnOrder,
 }) {
-  const { orderNumber, orderStatus, returnInfo, declinedReason } =
-    activeReturnOrder || {};
+  const { orderNumber, orderStatus, returnInfo } = activeReturnOrder || {};
 
   return (
     <Modal
@@ -40,7 +39,6 @@ export default function ReturnInfoModal({
               <ReturnInfoModalInfo
                 orderStatus={orderStatus}
                 returnInfo={returnInfo}
-                declinedReason={declinedReason}
               />
               <ReturnInfoModalItems returnProducts={returnInfo?.products} />
               <ReturnInfoModalProofImages

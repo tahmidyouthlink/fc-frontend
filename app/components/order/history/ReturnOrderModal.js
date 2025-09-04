@@ -14,8 +14,6 @@ import toast from "react-hot-toast";
 import { useLoading } from "@/app/contexts/loading";
 import { routeFetch } from "@/app/lib/fetcher/routeFetch";
 import customCurrentDateTimeFormat from "@/app/utils/customCurrentDateTimeFormat";
-import ReturnReasonField from "./ReturnReasonField";
-import ReturnIssueField from "./ReturnIssueField";
 import ReturnBriefDescriptionField from "./ReturnBriefDescriptionField";
 import ReturnItemsField from "./ReturnItemsField";
 import ReturnImagesField from "./ReturnImagesField";
@@ -36,8 +34,6 @@ export default function ReturnOrderModal({
 }) {
   const router = useRouter();
   const { setIsPageLoading } = useLoading();
-  const selectedReason = Object.values(watch("reason") || {})[0];
-  const selectedIssue = Object.values(watch("issue") || {})[0];
   const returnItems = watch("items");
   const [imgFiles, setImgFiles] = useState([]);
   const [returnImgUrls, setReturnImgUrls] = useState([]);
@@ -104,8 +100,6 @@ export default function ReturnOrderModal({
 
     const returnInfo = {
       dateTime: customCurrentDateTimeFormat(),
-      reason: data.reason.values()?.next()?.value,
-      issue: !data.issue ? null : data.issue.values()?.next()?.value,
       description: data.description || null,
       products: activeReturnOrder.productInformation
         .map((product, index) =>
@@ -114,6 +108,8 @@ export default function ReturnOrderModal({
             : {
                 ...product,
                 sku: data.items[index].quantity,
+                issues: data.items[index].issues,
+                status: "Pending",
                 finalUnitPrice: calculateFinalPrice(product),
               },
         )
@@ -185,8 +181,6 @@ export default function ReturnOrderModal({
     else toast.error("Please fill up the form properly.");
   };
 
-  useEffect(() => setValue("issue", ""), [selectedReason, setValue]);
-
   useEffect(() => {
     if (!isReturnModalOpen) {
       reset();
@@ -227,30 +221,14 @@ export default function ReturnOrderModal({
                   handleSubmit(onSubmit, onError)();
                 }}
               >
-                <div className="max-sm:space-y-9 sm:flex sm:gap-x-4">
-                  <ReturnReasonField
-                    control={control}
-                    errors={errors}
-                    selectedReason={selectedReason}
-                  />
-                  {!!selectedReason && selectedReason !== "Others" && (
-                    <ReturnIssueField
-                      control={control}
-                      errors={errors}
-                      selectedReason={selectedReason}
-                      selectedIssue={selectedIssue}
-                    />
-                  )}
-                </div>
-                {selectedReason === "Others" && (
-                  <ReturnBriefDescriptionField
-                    register={register}
-                    errors={errors}
-                  />
-                )}
+                <ReturnBriefDescriptionField
+                  register={register}
+                  errors={errors}
+                />
                 <ReturnItemsField
                   activeReturnOrder={activeReturnOrder}
                   register={register}
+                  control={control}
                   setValue={setValue}
                   errors={errors}
                   returnItems={returnItems}
