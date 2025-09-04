@@ -27,6 +27,7 @@ export default function OrderCard({
     orderStatus?.text == "On Its Way" ||
     orderStatus?.text == "On Hold";
   const isReturnRequested =
+    order?.orderStatus === "Processed" ||
     order?.orderStatus?.toLowerCase().includes("return") ||
     order?.orderStatus?.toLowerCase().includes("refund") ||
     order?.orderStatus?.toLowerCase().includes("request");

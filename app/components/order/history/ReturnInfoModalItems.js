@@ -109,11 +109,11 @@ export default function ReturnInfoModalItems({ returnProducts }) {
                     <div className="mt-1 flex items-center gap-x-1.5">
                       <h5 className="text-xs md:text-[13px]">Status:</h5>
                       <div
-                        className={`h-fit w-fit cursor-default text-nowrap rounded-[3px] px-1.5 py-1 text-[10px]/[1] font-semibold md:text-[11px]/[1] ${item?.status === "Pending" ? "bg-yellow-100 text-yellow-600" : item?.status === "Approved" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}`}
+                        className={`h-fit w-fit cursor-default text-nowrap rounded-[3px] px-1.5 py-1 text-[10px]/[1] font-semibold md:text-[11px]/[1] ${item?.status === "Pending" ? "bg-yellow-100 text-yellow-600" : item?.status === "Accepted" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}`}
                       >
                         {item?.status}
                       </div>
-                      {!!item.declinedReason && (
+                      {!!item.declineReason && (
                         <Popover
                           classNames={{
                             content: [
@@ -126,7 +126,7 @@ export default function ReturnInfoModalItems({ returnProducts }) {
                             Why?
                           </PopoverTrigger>
                           <PopoverContent>
-                            <p>{item.declinedReason}</p>
+                            <p>{item.declineReason}</p>
                           </PopoverContent>
                         </Popover>
                       )}

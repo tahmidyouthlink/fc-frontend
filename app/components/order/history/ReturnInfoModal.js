@@ -46,7 +46,7 @@ export default function ReturnInfoModal({
               />
             </ModalBody>
             <ModalFooter>
-              {orderStatus === "Request Declined" && (
+              {(orderStatus === "Processed" || orderStatus === "Declined") && (
                 <a
                   href={`/contact-us?orderNumber=${orderNumber}`}
                   target="_blank"

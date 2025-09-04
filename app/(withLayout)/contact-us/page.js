@@ -33,7 +33,7 @@ export default async function ContactUs({ searchParams }) {
       isParamOrderNumberLegit = userOrders.some(
         (order) =>
           order.orderNumber == paramOrderNumber &&
-          order.orderStatus == "Request Declined",
+          (order.orderStatus == "Processed" || order.orderStatus == "Declined"),
       );
     } catch (error) {
       console.error("FetchError (contact/userOrders):", error.message);
