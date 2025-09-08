@@ -221,10 +221,6 @@ export default function ReturnOrderModal({
                   handleSubmit(onSubmit, onError)();
                 }}
               >
-                <ReturnBriefDescriptionField
-                  register={register}
-                  errors={errors}
-                />
                 <ReturnItemsField
                   activeReturnOrder={activeReturnOrder}
                   register={register}
@@ -234,6 +230,10 @@ export default function ReturnOrderModal({
                   returnItems={returnItems}
                   orderAmount={orderAmount}
                   calculateFinalPrice={calculateFinalPrice}
+                />
+                <ReturnBriefDescriptionField
+                  register={register}
+                  errors={errors}
                 />
                 <ReturnImagesField
                   register={register}
