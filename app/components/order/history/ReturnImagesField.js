@@ -11,6 +11,7 @@ export default function ReturnImagesField({
   errors,
   isFormSubmissionRequested,
   setIsFormSubmissionRequested,
+  isUploadingRef,
   imgFiles,
   setImgFiles,
   returnImgUrls,
@@ -78,47 +79,63 @@ export default function ReturnImagesField({
   };
 
   const validateFiles = async (uploadedFiles) => {
-    // At least one file must be uploaded
-    if (!uploadedFiles.length) {
-      return "At least one image is required!";
+    // Exit if another upload is already in progress.
+    if (isUploadingRef.current) {
+      return true;
     }
 
-    for (let uploadedFile of uploadedFiles) {
-      // Only image formats are allowed
-      if (!uploadedFile.type.startsWith("image/")) {
-        return "Only image formats are allowed.";
+    try {
+      isUploadingRef.current = true;
+
+      // At least one file must be uploaded
+      if (!uploadedFiles.length) {
+        return "At least one image is required!";
       }
 
-      // Duplicate images are not allowed (by name)
-      if (
-        imgFiles.some((proofImage) => proofImage.name === uploadedFile.name)
-      ) {
-        return "Duplicate images are not allowed.";
+      for (let uploadedFile of uploadedFiles) {
+        // Only image formats are allowed
+        if (!uploadedFile.type.startsWith("image/")) {
+          return "Only image formats are allowed.";
+        }
+
+        // Duplicate images are not allowed (by name)
+        if (
+          imgFiles.some((proofImage) => proofImage.name === uploadedFile.name)
+        ) {
+          return "Duplicate images are not allowed.";
+        }
+
+        // Max file size for each image is 10 MB
+        if (uploadedFile.size > 10 * 1024 * 1024 /* 10 MB */) {
+          return `The file ${uploadedFile.name} exceeds the 10MB size limit.`;
+        }
       }
 
-      // Max file size for each image is 10 MB
-      if (uploadedFile.size > 10 * 1024 * 1024 /* 10 MB */) {
-        return `The file ${uploadedFile.name} exceeds the 10MB size limit.`;
+      // Maximum 5 files
+      if (imgFiles.length + uploadedFiles.length > 5) {
+        return "You can upload up to 5 images.";
       }
+
+      setIsPageLoading(true);
+
+      const newImgUrls = await uploadImagesToGCS(uploadedFiles);
+
+      setReturnImgUrls((prevImgUrls) => [
+        ...new Set([...prevImgUrls, ...newImgUrls]),
+      ]);
+      setImgFiles((prevFiles) => [
+        ...new Set([...prevFiles, ...uploadedFiles]),
+      ]);
+
+      setIsPageLoading(false);
+
+      return true;
+    } catch (error) {
+      toast.error("Error while uploading images.");
+      console.error("UploadError: Error uploading images to GCS.", error);
+    } finally {
+      isUploadingRef.current = false;
     }
-
-    // Maximum 5 files
-    if (imgFiles.length + uploadedFiles.length > 5) {
-      return "You can upload up to 5 images.";
-    }
-
-    setIsPageLoading(true);
-
-    const newImgUrls = await uploadImagesToGCS(uploadedFiles);
-
-    setReturnImgUrls((prevImgUrls) => [
-      ...new Set([...prevImgUrls, ...newImgUrls]),
-    ]);
-    setImgFiles((prevFiles) => [...new Set([...prevFiles, ...uploadedFiles])]);
-
-    setIsPageLoading(false);
-
-    return true;
   };
 
   return (

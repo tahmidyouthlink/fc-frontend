@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -40,6 +40,7 @@ export default function ReturnOrderModal({
   const [isPolicyChecked, setIsPolicyChecked] = useState(true);
   const [isFormSubmissionRequested, setIsFormSubmissionRequested] =
     useState(false);
+  const isUploadingRef = useRef(false);
 
   const isAnyProductSelected = returnItems?.some(
     (returnItem) => returnItem?.isRequested,
@@ -241,6 +242,7 @@ export default function ReturnOrderModal({
                   errors={errors}
                   isFormSubmissionRequested={isFormSubmissionRequested}
                   setIsFormSubmissionRequested={setIsFormSubmissionRequested}
+                  isUploadingRef={isUploadingRef}
                   imgFiles={imgFiles}
                   setImgFiles={setImgFiles}
                   returnImgUrls={returnImgUrls}
