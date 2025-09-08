@@ -19,7 +19,7 @@ export default function ReturnItemsField({
     "Loose Threads/Stitching",
     "Damaged Zipper/Buttons",
     "Misalignment/Uneven Parts",
-    "Wrong Size/Color/Product",
+    "Wrong Product",
   ];
 
   return (
