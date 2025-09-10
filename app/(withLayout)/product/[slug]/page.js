@@ -3,28 +3,14 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { tokenizedFetch } from "@/app/lib/fetcher/tokenizedFetch";
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
+import { extractData } from "@/app/lib/extractData";
 import { authOptions } from "@/app/utils/authOptions";
 import circleWithStarShape from "@/public/shapes/circle-with-star.svg";
 import ProductContents from "@/app/components/product/ProductContents";
 import ProductRelatedContents from "@/app/components/product/ProductRelatedContents";
 
 export default async function Product({ params: { slug } }) {
-  const session = await getServerSession(authOptions);
-
-  let userData, products, specialOffers, primaryLocation, notifyVariants;
-
-  if (session?.user?.email) {
-    try {
-      const result = await tokenizedFetch(
-        `/customerDetailsViaEmail/${session?.user?.email}`,
-      );
-
-      userData = result.data || {};
-    } catch (error) {
-      console.error("FetchError (checkout/userData):", error.message);
-    }
-  }
-
+  let products = [];
   try {
     const result = await rawFetch("/allProducts");
     products = result.data || [];
@@ -33,35 +19,36 @@ export default async function Product({ params: { slug } }) {
   }
 
   const product = products?.find(
-    (product) =>
-      product?.productTitle?.split(" ")?.join("-")?.toLowerCase() === slug,
+    (p) => p?.productTitle?.split(" ")?.join("-")?.toLowerCase() === slug,
   );
 
   if (!product || product.status !== "active") redirect("/shop");
 
-  try {
-    const result = await rawFetch("/allOffers");
-    specialOffers = result.data || [];
-  } catch (error) {
-    console.error("FetchError (productDetails/specialOffers):", error.message);
-  }
+  const session = await getServerSession(authOptions);
 
-  try {
-    const result = await rawFetch("/primary-location");
-    primaryLocation = result.data?.primaryLocation || null;
-  } catch (error) {
-    console.error(
-      "FetchError (productDetails/primaryLocation):",
-      error.message,
-    );
-  }
+  const promises = [
+    session?.user?.email
+      ? tokenizedFetch(`/customerDetailsViaEmail/${session?.user?.email}`)
+      : Promise.resolve(null),
+    rawFetch("/allOffers"),
+    rawFetch("/primary-location"),
+    rawFetch("/get-all-availability-notifications"),
+  ];
 
-  try {
-    const result = await rawFetch("/get-all-availability-notifications");
-    notifyVariants = result.data || [];
-  } catch (error) {
-    console.error("FetchError (productDetails/notifyVariants):", error.message);
-  }
+  const [userDataRes, offersRes, primaryLocationRes, notifyVariantsRes] =
+    await Promise.allSettled(promises);
+
+  const [userData, specialOffers, primaryLocation, notifyVariants] = [
+    extractData(userDataRes, null, "productDetails/userData"),
+    extractData(offersRes, [], "productDetails/specialOffers"),
+    extractData(
+      primaryLocationRes,
+      null,
+      "productDetails/primaryLocation",
+      "primaryLocation",
+    ),
+    extractData(notifyVariantsRes, [], "productDetails/notifyVariants"),
+  ];
 
   const randomViewers = Math.floor(Math.random() * (99 - 10 + 1)) + 10;
 

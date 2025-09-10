@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { getServerSession } from "next-auth";
 import { tokenizedFetch } from "@/app/lib/fetcher/tokenizedFetch";
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
+import { extractData } from "@/app/lib/extractData";
 import { authOptions } from "@/app/utils/authOptions";
 import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
 import WishlistButton from "../wishlist/WishlistButton";
@@ -11,51 +12,42 @@ import UserDropdown from "./UserDropdown";
 export default async function SideLinks() {
   const session = await getServerSession(authOptions);
 
-  let userData,
+  const promises = [
+    session?.user?.email
+      ? tokenizedFetch(`/customerDetailsViaEmail/${session?.user?.email}`)
+      : Promise.resolve(null),
+    rawFetch("/allProducts"),
+    rawFetch("/allOffers"),
+    rawFetch("/primary-location"),
+    rawFetch("/get-all-policy-pdfs"),
+  ];
+
+  const [
+    userDataRes,
+    productsRes,
+    offersRes,
+    primaryLocationRes,
+    legalPolicyPdfLinksRes,
+  ] = await Promise.allSettled(promises);
+
+  const [
+    userData,
     productList,
     specialOffers,
     primaryLocation,
-    legalPolicyPdfLinks;
-
-  if (session?.user?.email) {
-    try {
-      const result = await tokenizedFetch(
-        `/customerDetailsViaEmail/${session?.user?.email}`,
-      );
-
-      userData = result.data || {};
-    } catch (error) {
-      console.error("FetchError (desktopNav/userData):", error.message);
-    }
-  }
-
-  try {
-    const result = await rawFetch("/allProducts");
-    productList = result.data || [];
-  } catch (error) {
-    console.error("FetchError (desktopNav/productList):", error.message);
-  }
-
-  try {
-    const result = await rawFetch("/allOffers");
-    specialOffers = result.data || [];
-  } catch (error) {
-    console.error("FetchError (desktopNav/specialOffers):", error.message);
-  }
-
-  try {
-    const result = await rawFetch("/primary-location");
-    primaryLocation = result.data?.primaryLocation || null;
-  } catch (error) {
-    console.error("FetchError (desktopNav/primaryLocation):", error.message);
-  }
-
-  try {
-    const result = await rawFetch("/get-all-policy-pdfs");
-    [legalPolicyPdfLinks] = result.data || [];
-  } catch (error) {
-    console.error("FetchError (desktopNav/legalPdfLinks):", error.message);
-  }
+    [legalPolicyPdfLinks],
+  ] = [
+    extractData(userDataRes, null, "desktopNav/userData"),
+    extractData(productsRes, [], "desktopNav/productList"),
+    extractData(offersRes, [], "desktopNav/specialOffers"),
+    extractData(
+      primaryLocationRes,
+      null,
+      "desktopNav/primaryLocation",
+      "primaryLocation",
+    ),
+    extractData(legalPolicyPdfLinksRes, null, "desktopNav/legalPdfLinks"),
+  ];
 
   return (
     <div className="text-neutral-600">

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { getServerSession } from "next-auth";
 import { tokenizedFetch } from "@/app/lib/fetcher/tokenizedFetch";
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
+import { extractData } from "@/app/lib/extractData";
 import { authOptions } from "@/app/utils/authOptions";
 import ShopContents from "@/app/components/shop/ShopContents";
 import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
@@ -9,47 +10,36 @@ import LoadingSpinner from "@/app/components/shared/LoadingSpinner";
 export default async function Shop() {
   const session = await getServerSession(authOptions);
 
-  let userData, products, specialOffers, primaryLocation, notifyVariants;
+  const promises = [
+    session?.user?.email
+      ? tokenizedFetch(`/customerDetailsViaEmail/${session?.user?.email}`)
+      : Promise.resolve(null),
+    rawFetch("/allProducts"),
+    rawFetch("/allOffers"),
+    rawFetch("/primary-location"),
+    rawFetch("/get-all-availability-notifications"),
+  ];
 
-  if (session?.user?.email) {
-    try {
-      const result = await tokenizedFetch(
-        `/customerDetailsViaEmail/${session?.user?.email}`,
-      );
+  const [
+    userDataRes,
+    productsRes,
+    offersRes,
+    primaryLocationRes,
+    notifyVariantsRes,
+  ] = await Promise.allSettled(promises);
 
-      userData = result.data || {};
-    } catch (error) {
-      console.error("FetchError (checkout/userData):", error.message);
-    }
-  }
-
-  try {
-    const result = await rawFetch("/allProducts");
-    products = result.data || [];
-  } catch (error) {
-    console.error("FetchError (shop/products):", error.message);
-  }
-
-  try {
-    const result = await rawFetch("/allOffers");
-    specialOffers = result.data || [];
-  } catch (error) {
-    console.error("FetchError (shop/specialOffers):", error.message);
-  }
-
-  try {
-    const result = await rawFetch("/primary-location");
-    primaryLocation = result.data?.primaryLocation || null;
-  } catch (error) {
-    console.error("FetchError (shop/primaryLocation):", error.message);
-  }
-
-  try {
-    const result = await rawFetch("/get-all-availability-notifications");
-    notifyVariants = result.data || [];
-  } catch (error) {
-    console.error("FetchError (shop/notifyVariants):", error.message);
-  }
+  const [userData, products, specialOffers, primaryLocation, notifyVariants] = [
+    extractData(userDataRes, null, "checkout/userData"),
+    extractData(productsRes, [], "shop/products"),
+    extractData(offersRes, [], "shop/specialOffers"),
+    extractData(
+      primaryLocationRes,
+      null,
+      "shop/primaryLocation",
+      "primaryLocation",
+    ),
+    extractData(notifyVariantsRes, [], "shop/notifyVariants"),
+  ];
 
   return (
     <main>

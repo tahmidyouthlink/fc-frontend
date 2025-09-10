@@ -3,6 +3,7 @@ import Image from "next/image";
 import { getServerSession } from "next-auth";
 import { tokenizedFetch } from "@/app/lib/fetcher/tokenizedFetch";
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
+import { extractData } from "@/app/lib/extractData";
 import { authOptions } from "@/app/utils/authOptions";
 import { COMPANY_NAME } from "@/app/config/company";
 import TransitionLink from "@/app/components/ui/TransitionLink";
@@ -18,51 +19,33 @@ export default async function MobileNavbar({
 }) {
   const session = await getServerSession(authOptions);
 
-  let userData,
-    productList,
-    specialOffers,
-    primaryLocation,
-    legalPolicyPdfLinks;
+  const promises = [
+    session?.user?.email
+      ? tokenizedFetch(`/customerDetailsViaEmail/${session.user.email}`)
+      : Promise.resolve(null),
+    rawFetch("/allProducts"),
+    rawFetch("/allOffers"),
+    rawFetch("/primary-location"),
+    rawFetch("/get-all-policy-pdfs"),
+  ];
 
-  if (session?.user?.email) {
-    try {
-      const result = await tokenizedFetch(
-        `/customerDetailsViaEmail/${session?.user?.email}`,
-      );
+  const [userDataRes, productsRes, offersRes, primaryLocationRes, legalPdfRes] =
+    await Promise.allSettled(promises);
 
-      userData = result.data || {};
-    } catch (error) {
-      console.error("FetchError (mobileNav/userData):", error.message);
-    }
-  }
-
-  try {
-    const result = await rawFetch("/allProducts");
-    productList = result.data || [];
-  } catch (error) {
-    console.error("FetchError (mobileNav/products):", error.message);
-  }
-
-  try {
-    const result = await rawFetch("/allOffers");
-    specialOffers = result.data || [];
-  } catch (error) {
-    console.error("FetchError (mobileNav/specialOffers):", error.message);
-  }
-
-  try {
-    const result = await rawFetch("/primary-location");
-    primaryLocation = result.data?.primaryLocation || null;
-  } catch (error) {
-    console.error("FetchError (mobileNav/primaryLocation):", error.message);
-  }
-
-  try {
-    const result = await rawFetch("/get-all-policy-pdfs");
-    [legalPolicyPdfLinks] = result.data || [];
-  } catch (error) {
-    console.error("FetchError (mobileNav/legalPdfLinks):", error.message);
-  }
+  const userData = extractData(userDataRes, null, "mobileNav/userData");
+  const productList = extractData(productsRes, [], "mobileNav/products");
+  const specialOffers = extractData(offersRes, [], "mobileNav/specialOffers");
+  const primaryLocation = extractData(
+    primaryLocationRes,
+    null,
+    "mobileNav/primaryLocation",
+    "primaryLocation",
+  );
+  const [legalPolicyPdfLinks] = extractData(
+    legalPdfRes,
+    [],
+    "mobileNav/legalPdfLinks",
+  );
 
   return (
     <nav className="relative h-full w-full text-sm lg:hidden">

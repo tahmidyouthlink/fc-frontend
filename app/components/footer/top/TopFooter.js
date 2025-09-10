@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { tokenizedFetch } from "@/app/lib/fetcher/tokenizedFetch";
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
+import { extractData } from "@/app/lib/extractData";
 import { authOptions } from "@/app/utils/authOptions";
 import TopFooterWrapper from "./TopFooterWrapper";
 import TopFooterBanner from "./TopFooterBanner";
@@ -9,25 +10,21 @@ import TopFooterNewsletter from "./TopFooterNewsletter";
 export default async function TopFooter() {
   const session = await getServerSession(authOptions);
 
-  let bannerImg, isUserSubscribed;
+  const promises = [
+    rawFetch("/allMarketingBanners"),
+    session?.user?.email
+      ? tokenizedFetch(`/getSingleNewsletter/${session.user.email}`)
+      : Promise.resolve(null),
+  ];
 
-  try {
-    const result = await rawFetch("/allMarketingBanners");
-    [bannerImg] = result.data || [];
-  } catch (error) {
-    console.error("FetchError (footer/marketingBanner):", error.message);
-  }
+  const [bannerRes, newsletterRes] = await Promise.allSettled(promises);
 
-  if (session?.user?.email) {
-    try {
-      const result = await tokenizedFetch(
-        `/getSingleNewsletter/${session.user.email}`,
-      );
-      isUserSubscribed = !!result.data;
-    } catch (error) {
-      console.error("FetchError (footer/newsletterByEmail):", error.message);
-    }
-  }
+  const [bannerImg] = extractData(bannerRes, [], "footer/marketingBanner");
+  const isUserSubscribed = !!extractData(
+    newsletterRes,
+    null,
+    "footer/newsletterByEmail",
+  );
 
   return (
     <TopFooterWrapper bannerImgPosition={bannerImg?.position}>

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { getServerSession } from "next-auth";
 import { tokenizedFetch } from "@/app/lib/fetcher/tokenizedFetch";
+import { extractData } from "@/app/lib/extractData";
 import { authOptions } from "@/app/utils/authOptions";
 import callingImg from "@/public/contact/calling.svg";
 import ContactForm from "@/app/components/contact/ContactForm";
@@ -10,34 +11,26 @@ export default async function ContactUs({ searchParams }) {
 
   const session = await getServerSession(authOptions);
 
-  let userData, isParamOrderNumberLegit;
+  let userData = {};
+  let isParamOrderNumberLegit = false;
 
   if (session?.user?.email) {
-    try {
-      const result = await tokenizedFetch(
-        `/customerDetailsViaEmail/${session?.user?.email}`,
-      );
+    const promises = [
+      tokenizedFetch(`/customerDetailsViaEmail/${session?.user?.email}`),
+      tokenizedFetch(`/customer-orders?email=${session?.user?.email}`),
+    ];
 
-      userData = result.data || {};
-    } catch (error) {
-      console.error("FetchError (contact/userData):", error.message);
-    }
+    const [userDataRes, userOrdersRes] = await Promise.allSettled(promises);
 
-    try {
-      const result = await tokenizedFetch(
-        `/customer-orders?email=${session?.user?.email}`,
-      );
+    userData = extractData(userDataRes, null, "contact/userData");
 
-      const userOrders = result.data || [];
+    const userOrders = extractData(userOrdersRes, [], "contact/userOrders");
 
-      isParamOrderNumberLegit = userOrders.some(
-        (order) =>
-          order.orderNumber == paramOrderNumber &&
-          (order.orderStatus == "Processed" || order.orderStatus == "Declined"),
-      );
-    } catch (error) {
-      console.error("FetchError (contact/userOrders):", error.message);
-    }
+    isParamOrderNumberLegit = userOrders.some(
+      (order) =>
+        order.orderNumber == paramOrderNumber &&
+        (order.orderStatus == "Processed" || order.orderStatus == "Declined"),
+    );
   }
 
   return (

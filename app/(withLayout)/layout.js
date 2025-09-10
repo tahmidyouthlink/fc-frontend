@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { rawFetch } from "../lib/fetcher/rawFetch";
+import { extractData } from "../lib/extractData";
 import { COMPANY_NAME } from "../config/company";
 import { authOptions } from "../utils/authOptions";
 import Header from "../components/layout/header/Header";
@@ -16,25 +17,18 @@ export const metadata = {
 export default async function RootLayout({ children }) {
   const session = await getServerSession(authOptions);
 
-  let topHeaderData;
+  const promises = [
+    rawFetch("/get-all-header-collection"),
+    rawFetch("/get-all-logo"),
+  ];
 
-  try {
-    const result = await rawFetch("/get-all-header-collection");
-    [topHeaderData] = result.data || [];
-  } catch (error) {
-    console.error("FetchError (layout/topHeader):", error.message);
-  }
+  const [topHeaderRes, logoRes] = await Promise.allSettled(promises);
 
-  let logoWithoutTextSrc, logoWithTextSrc;
+  const [topHeaderData] = extractData(topHeaderRes, {}, "layout/topHeader");
+  const logos = extractData(logoRes, [{}], "layout/logo")[0];
 
-  try {
-    const result = await rawFetch("/get-all-logo");
-    const [logos] = result.data || [];
-    logoWithoutTextSrc = logos?.mobileLogoUrl;
-    logoWithTextSrc = logos?.desktopLogoUrl;
-  } catch (error) {
-    console.error("FetchError (layout/logo):", error.message);
-  }
+  const logoWithoutTextSrc = logos?.mobileLogoUrl;
+  const logoWithTextSrc = logos?.desktopLogoUrl;
 
   const topHeaderHeight = topHeaderData?.isSlideEnabled ? "28.5px" : "0px";
 
