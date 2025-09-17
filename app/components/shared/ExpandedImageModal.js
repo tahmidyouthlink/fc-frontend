@@ -51,6 +51,37 @@ export default function ExpandedImagesModal({
     setZoomLevel(0);
   }, [activeImageIndex]);
 
+  // Keyboard navigation and close
+  useEffect(() => {
+    if (!isImageExpanded) return;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setIsImageExpanded(false);
+      } else if (event.key === "ArrowLeft") {
+        if (activeImageIndex > 0) {
+          setActiveImageIndex(activeImageIndex - 1);
+        }
+      } else if (event.key === "ArrowRight") {
+        if (activeImageIndex < totalImages - 1) {
+          setActiveImageIndex(activeImageIndex + 1);
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [
+    activeImageIndex,
+    isImageExpanded,
+    setActiveImageIndex,
+    setIsImageExpanded,
+    totalImages,
+  ]);
+
   return (
     <div
       className={`fixed inset-0 z-[6] flex h-dvh w-dvw items-center justify-center bg-black bg-opacity-80 text-neutral-300 backdrop-blur ${isImageExpanded ? "" : "hidden"}`}
