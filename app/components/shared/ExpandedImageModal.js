@@ -64,11 +64,9 @@ export default function ExpandedImagesModal({
         {activeImageIndex + 1}/{totalImages}
       </p>
       {/* Modal Close Button */}
-      <CgClose
-        className="absolute right-5 top-5 cursor-pointer transition-[color] duration-300 ease-in-out hover:text-white"
-        size={24}
-        onClick={() => setIsImageExpanded(false)}
-      />
+      <button className="absolute right-0 top-0 p-5 transition-[color] duration-300 ease-in-out hover:text-white">
+        <CgClose size={24} onClick={() => setIsImageExpanded(false)} />
+      </button>
       {/* Zoom Controls - Only on mobile and tablet */}
       <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 gap-2 xl:hidden">
         {/* Zoom Out Button */}
@@ -97,16 +95,24 @@ export default function ExpandedImagesModal({
         </button>
       </div>
       {/* Left Nav Button */}
-      <CgArrowLeft
-        className={`absolute left-2.5 top-1/2 size-5 -translate-y-1/2 cursor-pointer transition-[opacity,color] duration-300 ease-in-out sm:left-5 sm:size-6 ${activeImageIndex === 0 ? "pointer-events-none opacity-0" : "pointer-events-auto hover:text-white hover:opacity-100"}`}
-        onClick={() => setActiveImageIndex(activeImageIndex - 1)}
-      />
+      <button
+        className={`absolute bottom-0 left-0 top-14 flex items-center justify-center px-2.5 transition-[opacity,color] duration-300 ease-in-out sm:px-5 ${activeImageIndex === 0 ? "opacity-30" : "hover:text-white"}`}
+        onClick={() =>
+          activeImageIndex !== 0 && setActiveImageIndex(activeImageIndex - 1)
+        }
+      >
+        <CgArrowLeft className="size-5 sm:size-6" />
+      </button>
       {/* Right Nav Button */}
-      <CgArrowRight
-        className={`absolute right-2.5 top-1/2 size-5 -translate-y-1/2 cursor-pointer transition-[opacity,color] duration-300 ease-in-out sm:right-5 sm:size-6 ${activeImageIndex === totalImages - 1 ? "pointer-events-none opacity-0" : "pointer-events-auto hover:text-white hover:opacity-100"}`}
-        size={24}
-        onClick={() => setActiveImageIndex(activeImageIndex + 1)}
-      />
+      <button
+        className={`absolute bottom-0 right-0 top-14 flex items-center justify-center px-2.5 transition-[opacity,color] duration-300 ease-in-out sm:px-5 ${activeImageIndex === totalImages - 1 ? "opacity-30" : "hover:text-white"}`}
+        onClick={() =>
+          activeImageIndex !== totalImages - 1 &&
+          setActiveImageIndex(activeImageIndex + 1)
+        }
+      >
+        <CgArrowRight className="size-5 sm:size-6" />
+      </button>
       {/* Image Container with Zoom */}
       <div className="overflow-hidden">
         {!!expandedImgUrl && (
