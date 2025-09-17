@@ -7,6 +7,7 @@ import {
   ModalBody,
   ModalFooter,
   Button,
+  Skeleton,
 } from "@nextui-org/react";
 import { CgRuler } from "react-icons/cg";
 
@@ -41,14 +42,17 @@ export default function ProductSizeGuideButton({ sizeGuideImageUrl }) {
                   Lorem ipsum dolor, sit amet consectetur adipisicing elit. Enim
                   ullam aliquid consequatur.
                 </p>
-                <Image
-                  src={sizeGuideImageUrl}
-                  alt="Size guide"
-                  className="h-auto w-full object-contain"
-                  width={0}
-                  height={0}
-                  sizes="50vw"
-                />
+                <div className="relative h-auto min-h-[20dvh] w-full sm:min-h-[25dvh] xl:min-h-[33.33dvh]">
+                  <Skeleton className="absolute inset-0 z-[0] h-full w-full rounded-md" />
+                  <Image
+                    src={sizeGuideImageUrl}
+                    alt="Size guide"
+                    className="relative h-auto w-full object-contain"
+                    width={0}
+                    height={0}
+                    sizes="(max-width: 1280px) 100dvh, 100dvw"
+                  />
+                </div>
               </ModalBody>
               <ModalFooter>
                 <Button
