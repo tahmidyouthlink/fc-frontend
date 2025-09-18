@@ -31,9 +31,10 @@ export default function OrderHistory({
     formState: { errors },
   } = useForm({
     defaultValues: {
-      description: "",
       items: [],
-      images: "",
+      type: "",
+      description: "",
+      images: [],
     },
     mode: "onBlur",
   });

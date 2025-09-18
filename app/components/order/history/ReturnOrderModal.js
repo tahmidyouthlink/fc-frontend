@@ -14,8 +14,9 @@ import toast from "react-hot-toast";
 import { useLoading } from "@/app/contexts/loading";
 import { routeFetch } from "@/app/lib/fetcher/routeFetch";
 import customCurrentDateTimeFormat from "@/app/utils/customCurrentDateTimeFormat";
-import ReturnBriefDescriptionField from "./ReturnBriefDescriptionField";
+import ReturnReturnTypeField from "./ReturnReturnTypeField";
 import ReturnItemsField from "./ReturnItemsField";
+import ReturnBriefDescriptionField from "./ReturnBriefDescriptionField";
 import ReturnImagesField from "./ReturnImagesField";
 
 export default function ReturnOrderModal({
@@ -35,6 +36,7 @@ export default function ReturnOrderModal({
   const router = useRouter();
   const { setIsPageLoading } = useLoading();
   const returnItems = watch("items");
+  const selectedType = watch("type");
   const [imgFiles, setImgFiles] = useState([]);
   const [returnImgUrls, setReturnImgUrls] = useState([]);
   const [isPolicyChecked, setIsPolicyChecked] = useState(true);
@@ -231,6 +233,11 @@ export default function ReturnOrderModal({
                   returnItems={returnItems}
                   orderAmount={orderAmount}
                   calculateFinalPrice={calculateFinalPrice}
+                />
+                <ReturnReturnTypeField
+                  register={register}
+                  errors={errors}
+                  selectedType={selectedType}
                 />
                 <ReturnBriefDescriptionField
                   register={register}
