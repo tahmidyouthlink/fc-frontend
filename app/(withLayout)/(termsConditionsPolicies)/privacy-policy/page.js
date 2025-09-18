@@ -1,10 +1,14 @@
-import { COMPANY_EMAIL, COMPANY_PHONE } from "@/app/config/company";
+import {
+  COMPANY_EMAIL,
+  COMPANY_NAME,
+  COMPANY_PHONE,
+} from "@/app/config/company";
 import LegalDoc from "@/app/components/legal/LegalDoc";
 
 export default async function PrivacyPolicy() {
   const docContent = `
     <h2>Introduction</h2>
-    <p>POSHAX (“we,” “our,” “us”) operates this website and online store (the “Services”) to provide a curated shopping experience to our customers. This Privacy Policy describes how we collect, use, disclose, and safeguard your personal information when you visit or use the Services, make a purchase, or communicate with us.</p>
+    <p>${COMPANY_NAME.toUpperCase()} (“we,” “our,” “us”) operates this website and online store (the “Services”) to provide a curated shopping experience to our customers. This Privacy Policy describes how we collect, use, disclose, and safeguard your personal information when you visit or use the Services, make a purchase, or communicate with us.</p>
     <p>By using our Services, you acknowledge and agree to the terms of this Privacy Policy. If there is any conflict between our Terms &amp; Conditions and this Privacy Policy, this Privacy Policy governs the collection, processing, and disclosure of your personal information.</p>
     <h2>Personal Information We Collect</h2>
     <p>“Personal information” refers to information that identifies or can reasonably be linked to you. This excludes anonymized or de-identified data. We may collect the following categories of personal information:</p>
