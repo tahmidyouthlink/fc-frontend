@@ -12,13 +12,12 @@ export default async function Importantlinks() {
           <Link href="/privacy-policy">Privacy Policy</Link>
         </li>
         <li>
-          <Link href="/refund-policy">Refund Policy</Link>
+          <Link href="/return-refund-cancellation-policy">
+            Return & Refund Policy
+          </Link>
         </li>
         <li>
           <Link href="/shipping-policy">Shipping Policy</Link>
-        </li>
-        <li>
-          <Link href="/return-policy">Return Policy</Link>
         </li>
       </ul>
     </div>
