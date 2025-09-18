@@ -104,6 +104,7 @@ export default function ReturnOrderModal({
     const returnInfo = {
       dateTime: customCurrentDateTimeFormat(),
       description: data.description || null,
+      type: data.type,
       products: activeReturnOrder.productInformation
         .map((product, index) =>
           !data.items[index].isRequested
