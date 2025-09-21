@@ -1,19 +1,15 @@
-import { getServerSession } from "next-auth";
 import { tokenizedFetch } from "@/app/lib/fetcher/tokenizedFetch";
 import { rawFetch } from "@/app/lib/fetcher/rawFetch";
 import { extractData } from "@/app/lib/extractData";
-import { authOptions } from "@/app/utils/authOptions";
 import TopFooterWrapper from "./TopFooterWrapper";
 import TopFooterBanner from "./TopFooterBanner";
 import TopFooterNewsletter from "./TopFooterNewsletter";
 
-export default async function TopFooter() {
-  const session = await getServerSession(authOptions);
-
+export default async function TopFooter({ userEmail }) {
   const promises = [
     rawFetch("/allMarketingBanners"),
-    session?.user?.email
-      ? tokenizedFetch(`/getSingleNewsletter/${session.user.email}`)
+    userEmail
+      ? tokenizedFetch(`/getSingleNewsletter/${userEmail}`)
       : Promise.resolve(null),
   ];
 
@@ -30,7 +26,7 @@ export default async function TopFooter() {
     <TopFooterWrapper bannerImgPosition={bannerImg?.position}>
       <TopFooterBanner bannerImg={bannerImg} />
       <TopFooterNewsletter
-        userEmail={session?.user?.email}
+        userEmail={userEmail}
         isUserSubscribed={isUserSubscribed}
       />
     </TopFooterWrapper>

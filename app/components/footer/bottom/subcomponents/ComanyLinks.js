@@ -1,6 +1,6 @@
 import TransitionLink from "@/app/components/ui/TransitionLink";
 
-export default function CompanyLinks() {
+export default function CompanyLinks({ isLoggedIn }) {
   return (
     <div className="col-span-1 space-y-2.5">
       <h3 className="font-semibold uppercase">Company Links</h3>
@@ -12,11 +12,13 @@ export default function CompanyLinks() {
           <TransitionLink href="/shop">Threadz</TransitionLink>
         </li>
         <li>
-          <TransitionLink href="/faq">FAQ</TransitionLink>
+          <TransitionLink href="/help">Help Center</TransitionLink>
         </li>
-        <li>
-          <TransitionLink href="/contact-us">Contact Us</TransitionLink>
-        </li>
+        {isLoggedIn && (
+          <li>
+            <TransitionLink href="/contact-us">Contact Us</TransitionLink>
+          </li>
+        )}
       </ul>
     </div>
   );
