@@ -53,7 +53,7 @@ export default async function Product({ params: { slug } }) {
   const randomViewers = Math.floor(Math.random() * (99 - 10 + 1)) + 10;
 
   return (
-    <main className="relative overflow-hidden">
+    <main className="relative overflow-hidden [&_img]:select-none">
       {/* Mesh Gradient */}
       <div className="relative h-full w-full">
         <div className="fixed left-[2.5%] top-1/2 animate-blob bg-[var(--color-moving-bubble-primary)] sm:top-1/2 sm:bg-[var(--color-moving-bubble-secondary)]" />
