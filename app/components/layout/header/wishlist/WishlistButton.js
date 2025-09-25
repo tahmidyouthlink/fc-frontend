@@ -8,6 +8,7 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@nextui-org/react";
+import toast from "react-hot-toast";
 import { routeFetch } from "@/app/lib/fetcher/routeFetch";
 import WishlistHeader from "./WishlistHeader";
 import WishlistItems from "./WishlistItems";
