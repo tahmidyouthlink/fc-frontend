@@ -8,8 +8,6 @@ export default async function ReturnPolicy() {
     <p><strong>How to Start a Return:</strong> To start a return, simply log in to your user account on our website. Navigate to your order history and select the item you wish to return, then follow the on-screen instructions to initiate the process.</p>
     <p><strong>Damages and Issues:</strong> Please inspect your order upon reception and contact us immediately if the item is defective, damaged, or if you receive the wrong item. This allows us to evaluate the issue and make it right for you.</p>
     <p><strong>Exceptions / Non-Returnable Items:</strong> Unfortunately, we cannot accept returns on <strong>sale items</strong> or <strong>gift cards</strong>.</p>
-    <h2><strong>Exchanges</strong></h2>
-    <p>If you wish to exchange an item, please follow our return process. The replacement of an item is <strong>subject to stock availability</strong>. If the item you want is not in stock, a refund will be issued instead.</p>
     <h2><strong>Refunds</strong></h2>
     <p>Refunds are processed after the returned product has been inspected and approved. Refunds typically take <strong>10-14 working days</strong> to be credited to your original payment method.</p>
     <p><strong>Please note:</strong></p>

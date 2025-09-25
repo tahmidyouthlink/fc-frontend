@@ -16,7 +16,7 @@ export default async function PrivacyPolicy() {
       <li><strong>Contact details</strong> — name, billing address, shipping address, phone number, email address.</li>
       <li><strong>Financial information</strong> — payment method, transaction details, payment confirmation.</li>
       <li><strong>Account information</strong> — username, password, preferences, and settings.</li>
-      <li><strong>Transaction history</strong> — items viewed, purchased, returned, or exchanged.</li>
+      <li><strong>Transaction history</strong> — items viewed, purchased, or returned.</li>
       <li><strong>Communications</strong> — content of your inquiries or correspondence with us.</li>
       <li><strong>Device information</strong> — IP address, browser type, device identifiers.</li>
       <li><strong>Usage information</strong> — browsing activity and interaction with the Services.</li>
