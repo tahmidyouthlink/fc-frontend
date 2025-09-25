@@ -32,7 +32,6 @@ export default function OrderHistory({
   } = useForm({
     defaultValues: {
       items: [],
-      type: "",
       description: "",
       images: [],
     },
