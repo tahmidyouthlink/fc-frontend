@@ -145,7 +145,7 @@ export default function WishlistButton({
           textValue="Cart Dropdown"
           className="flex min-h-full cursor-default flex-col justify-between p-0 text-sm text-neutral-500 md:text-base max-sm:[&>span]:min-w-[calc(100dvw-20px*2)] sm:[&>span]:w-[350px]"
         >
-          <div className="max-h-[50dvh] overflow-y-auto px-2 pt-2 font-semibold [&::-webkit-scrollbar]:[-webkit-appearance:scrollbarthumb-vertical]">
+          <div className="max-h-[50svh] overflow-y-auto px-2 pt-2 font-semibold [&::-webkit-scrollbar]:[-webkit-appearance:scrollbarthumb-vertical]">
             <WishlistHeader
               userData={userData}
               itemCount={wishlistItems?.length || 0}

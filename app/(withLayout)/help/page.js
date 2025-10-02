@@ -30,7 +30,7 @@ export default async function HelpCenter() {
       <div className="sticky left-[55%] top-[60%] animate-blob bg-[var(--color-moving-bubble-secondary)] [animation-delay:0.5s] max-sm:left-3/4" />
       {/* Right Mesh Gradient */}
       <div className="sticky left-[80%] top-1/3 animate-blob bg-[var(--color-moving-bubble-primary)] [animation-delay:2s] max-sm:hidden" />
-      <div className="pt-header-h-full-section-pb min-h-dvh space-y-7 pb-[var(--section-padding)]">
+      <div className="pt-header-h-full-section-pb min-h-svh space-y-7 pb-[var(--section-padding)]">
         {/* Help Center Wrapper */}
         <div className="z-[1] mx-5 max-w-[900px] items-stretch overflow-hidden rounded-md border-2 border-neutral-50/20 bg-white/40 backdrop-blur-2xl sm:mx-8 lg:mx-auto lg:flex lg:flex-col">
           {/* Title Section */}

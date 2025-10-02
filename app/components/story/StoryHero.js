@@ -47,7 +47,7 @@ export default function StoryHero({
             .from("#story-hero h1", { y: 35 })
             .from(
               "#cards-container",
-              { y: "50dvh", rotate: 60, duration: 0.75 },
+              { y: "50svh", rotate: 60, duration: 0.75 },
               "<",
             )
             .fromTo(
@@ -139,7 +139,7 @@ export default function StoryHero({
   return (
     <div
       id="story-hero"
-      className="invisible relative flex h-[calc(100dvh-(var(--header-height-xs)+var(--section-padding-double)))] w-full items-center justify-center overflow-hidden sm:h-[calc(100dvh-(var(--header-height-sm)+var(--section-padding-double)))] lg:h-[calc(100dvh-(var(--header-height-lg)+var(--section-padding-double)))]"
+      className="invisible relative flex h-[calc(100svh-(var(--header-height-xs)+var(--section-padding-double)))] w-full items-center justify-center overflow-hidden sm:h-[calc(100svh-(var(--header-height-sm)+var(--section-padding-double)))] lg:h-[calc(100svh-(var(--header-height-lg)+var(--section-padding-double)))]"
     >
       <div className="z-[1] mx-5 sm:mx-8 md:mx-12 xl:mx-auto xl:max-w-[1200px]">
         <h1 className="mx-auto mb-14 max-w-2xl text-center text-3xl font-semibold text-neutral-700 [clip-path:polygon(0_0,100%_0,100%_100%,0_100%)] sm:text-6xl">

@@ -2,7 +2,7 @@ export default function LoadingSpinner() {
   const colors = ["#d4ffce", "#ffddc2", "#fffac9"];
 
   return (
-    <div className="fixed inset-0 z-[100] flex h-dvh w-dvw items-center justify-center bg-neutral-500/50 backdrop-blur-md">
+    <div className="fixed inset-0 z-[100] flex h-svh w-dvw items-center justify-center bg-neutral-500/50 backdrop-blur-md">
       <svg
         className="h-24 w-24"
         viewBox="0 0 64 64"

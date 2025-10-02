@@ -84,7 +84,7 @@ export default function ExpandedImagesModal({
 
   return (
     <div
-      className={`fixed inset-0 z-[6] flex h-dvh w-dvw items-center justify-center bg-black bg-opacity-80 text-neutral-300 backdrop-blur ${isImageExpanded ? "" : "hidden"}`}
+      className={`fixed inset-0 z-[6] flex h-svh w-dvw items-center justify-center bg-black bg-opacity-80 text-neutral-300 backdrop-blur ${isImageExpanded ? "" : "hidden"}`}
       id="expanded-img-bg"
       onClick={(event) =>
         event.target.id === "expanded-img-bg" && setIsImageExpanded(false)
@@ -156,7 +156,7 @@ export default function ExpandedImagesModal({
             }
             height={0}
             width={0}
-            className="bg-[var(--product-default)] object-contain transition-transform duration-300 ease-in-out portrait:h-auto portrait:max-h-[calc(100dvh-20*2*2px-40*2px)] portrait:w-[calc(100dvw-10*4px-20px*2)] portrait:sm:w-[calc(100dvw-20*4px-24px*2)] portrait:md:max-h-[calc(100dvh-20*2*2px-40*2px-60px)] landscape:h-[90vh] landscape:w-auto"
+            className="bg-[var(--product-default)] object-contain transition-transform duration-300 ease-in-out portrait:h-auto portrait:max-h-[calc(100svh-20*2*2px-40*2px)] portrait:w-[calc(100dvw-10*4px-20px*2)] portrait:sm:w-[calc(100dvw-20*4px-24px*2)] portrait:md:max-h-[calc(100svh-20*2*2px-40*2px-60px)] landscape:h-[90vh] landscape:w-auto"
             sizes="90vh"
             style={{
               transform: `scale(${zoomScales[zoomLevel] / 100})`,

@@ -24,7 +24,7 @@ export default function StoryContents({ departments }) {
   return (
     <main
       id="story-main"
-      className="pt-header-h-full-section-pb relative bg-neutral-50 pb-[var(--section-padding)] text-sm text-neutral-500 md:text-base xl:min-h-dvh [&_h2]:text-neutral-600"
+      className="pt-header-h-full-section-pb relative bg-neutral-50 pb-[var(--section-padding)] text-sm text-neutral-500 md:text-base xl:min-h-svh [&_h2]:text-neutral-600"
     >
       <div className="absolute inset-0 overflow-hidden">
         <div className="fixed left-[5%] top-[25%] animate-blob bg-[var(--color-moving-bubble-secondary)] max-sm:hidden" />

@@ -42,7 +42,7 @@ export default function ProductSizeGuideButton({ sizeGuideImageUrl }) {
                   Lorem ipsum dolor, sit amet consectetur adipisicing elit. Enim
                   ullam aliquid consequatur.
                 </p>
-                <div className="relative h-auto min-h-[20dvh] w-full sm:min-h-[25dvh] xl:min-h-[33.33dvh]">
+                <div className="relative h-auto min-h-[20svh] w-full sm:min-h-[25svh] xl:min-h-[33.33svh]">
                   <Skeleton className="absolute inset-0 z-[0] h-full w-full rounded-md" />
                   <Image
                     src={sizeGuideImageUrl}
@@ -50,7 +50,7 @@ export default function ProductSizeGuideButton({ sizeGuideImageUrl }) {
                     className="relative h-auto w-full object-contain"
                     width={0}
                     height={0}
-                    sizes="(max-width: 1280px) 100dvh, 100dvw"
+                    sizes="(max-width: 1280px) 100svh, 100dvw"
                   />
                 </div>
               </ModalBody>

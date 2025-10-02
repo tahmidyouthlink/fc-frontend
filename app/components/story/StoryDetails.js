@@ -123,7 +123,7 @@ export default function StoryDetails({
     >
       <div
         id="staff-img"
-        className="relative col-span-full mx-5 h-[calc(100dvh-(var(--header-height-xs)+var(--section-padding)))] sm:mx-8 md:sticky md:top-5 md:col-span-1 md:mx-12 md:h-[calc(100dvh-(var(--header-height-sm)+var(--section-padding)))] md:w-full md:max-w-[calc(1200px*2/5-64px/2)] lg:h-[calc(100dvh-var(--section-padding-double))] xl:col-span-2 xl:ml-auto xl:mr-0"
+        className="relative col-span-full mx-5 h-[calc(100svh-(var(--header-height-xs)+var(--section-padding)))] sm:mx-8 md:sticky md:top-5 md:col-span-1 md:mx-12 md:h-[calc(100svh-(var(--header-height-sm)+var(--section-padding)))] md:w-full md:max-w-[calc(1200px*2/5-64px/2)] lg:h-[calc(100svh-var(--section-padding-double))] xl:col-span-2 xl:ml-auto xl:mr-0"
       >
         {/* Shape/SVG (circle with star) */}
         <Image
@@ -152,7 +152,7 @@ export default function StoryDetails({
           {selectedDept.contents?.map((content, index) => (
             <div
               key={"content-" + content.quote + index}
-              className={`relative flex flex-col justify-center ${index !== 0 ? "min-h-dvh gap-y-44" : "min-h-dvh gap-y-44 md:min-h-[calc(100dvh-(var(--header-height-sm)+var(--section-padding-double)))] md:gap-y-32 lg:min-h-[calc(100dvh-(var(--header-height-lg)+var(--section-padding-double)))]"}`}
+              className={`relative flex flex-col justify-center ${index !== 0 ? "min-h-svh gap-y-44" : "min-h-svh gap-y-44 md:min-h-[calc(100svh-(var(--header-height-sm)+var(--section-padding-double)))] md:gap-y-32 lg:min-h-[calc(100svh-(var(--header-height-lg)+var(--section-padding-double)))]"}`}
             >
               {/* Quote Section */}
               <div

@@ -7,7 +7,7 @@ export default function UserLayout({ children }) {
       <div className="sticky left-[5%] top-[15%] animate-blob bg-[var(--color-moving-bubble-primary)] [animation-delay:1.5s] sm:left-[30%] xl:top-[30%]" />
       <div className="sticky left-[55%] top-[70%] animate-blob bg-[var(--color-moving-bubble-secondary)] [animation-delay:0.5s] sm:bg-[var(--color-moving-bubble-primary)]" />
       <div className="sticky left-[80%] top-1/3 animate-blob bg-[var(--color-moving-bubble-secondary)] [animation-delay:2s] max-sm:hidden" />
-      <div className="pt-header-h-full-section-pb relative flex w-full flex-col gap-x-2 gap-y-3 px-5 pb-[var(--section-padding)] sm:flex-row sm:gap-3 sm:px-8 lg:gap-4 lg:px-12 xl:mx-auto xl:min-h-dvh xl:max-w-[1200px] xl:px-0">
+      <div className="pt-header-h-full-section-pb relative flex w-full flex-col gap-x-2 gap-y-3 px-5 pb-[var(--section-padding)] sm:flex-row sm:gap-3 sm:px-8 lg:gap-4 lg:px-12 xl:mx-auto xl:min-h-svh xl:max-w-[1200px] xl:px-0">
         <UserSidebar />
         {children}
       </div>

@@ -40,7 +40,7 @@ export default function CheckoutConfirmation({
   }, [isPaymentStepDone]);
 
   return (
-    <main className="pt-header-h-full-section-pb relative flex min-w-full items-center justify-center overflow-hidden bg-white px-5 pb-[var(--section-padding)] text-sm text-neutral-500 sm:px-8 md:text-base lg:px-12 xl:mx-auto xl:min-h-dvh xl:max-w-[1200px] xl:px-0 [&_:is(h2,h3)]:text-neutral-800">
+    <main className="pt-header-h-full-section-pb relative flex min-w-full items-center justify-center overflow-hidden bg-white px-5 pb-[var(--section-padding)] text-sm text-neutral-500 sm:px-8 md:text-base lg:px-12 xl:mx-auto xl:min-h-svh xl:max-w-[1200px] xl:px-0 [&_:is(h2,h3)]:text-neutral-800">
       {/* Confetti */}
       <Confetti
         className="absolute inset-0 h-full w-full"

@@ -32,7 +32,7 @@ export default async function UserSidebar() {
     : getUserStatusInfo(userData?.userInfo?.score);
 
   return (
-    <section className="user-sidebar sticky top-[var(--section-padding)] z-[1] gap-3.5 rounded-md border-2 border-neutral-50/20 bg-white/60 p-3.5 py-4 shadow-[0_0_20px_0_rgba(0,0,0,0.1)] backdrop-blur-2xl max-sm:flex sm:max-h-[calc(100dvh-var(--header-height-sm)-var(--section-padding))] sm:min-w-[275px] sm:p-5 sm:shadow-[0_0_20px_0_rgba(0,0,0,0.05)] lg:max-h-[calc(100dvh-var(--header-height-lg)-var(--section-padding))] lg:min-w-[300px]">
+    <section className="user-sidebar sticky top-[var(--section-padding)] z-[1] gap-3.5 rounded-md border-2 border-neutral-50/20 bg-white/60 p-3.5 py-4 shadow-[0_0_20px_0_rgba(0,0,0,0.1)] backdrop-blur-2xl max-sm:flex sm:max-h-[calc(100svh-var(--header-height-sm)-var(--section-padding))] sm:min-w-[275px] sm:p-5 sm:shadow-[0_0_20px_0_rgba(0,0,0,0.05)] lg:max-h-[calc(100svh-var(--header-height-lg)-var(--section-padding))] lg:min-w-[300px]">
       <Popover
         className="sm:hidden"
         classNames={{ content: ["rounded-[4px]"] }}

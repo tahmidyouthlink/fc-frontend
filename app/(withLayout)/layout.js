@@ -81,7 +81,7 @@ export default async function RootLayout({ children }) {
           --color-static-bubble-tertiary: #ffffff;
           --color-static-bubble-quaternary: #ffffff;
         }`}</style>
-      <div className="flex min-h-dvh flex-col">
+      <div className="flex min-h-svh flex-col">
         <Header
           logoWithoutTextSrc={logoWithoutTextSrc}
           logoWithTextSrc={logoWithTextSrc}
@@ -94,7 +94,7 @@ export default async function RootLayout({ children }) {
           isHighlightedColorEnabled={topHeaderData?.isHighlightedColorEnabled}
           highlightedColor={topHeaderData?.highlightedTextColor}
         />
-        <div className="flex-1 [&_main]:min-h-dvh">{children}</div>
+        <div className="flex-1 [&_main]:min-h-svh">{children}</div>
       </div>
       <LoaderFrontend />
       <ScrollTopButton />

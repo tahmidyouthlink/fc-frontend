@@ -345,7 +345,7 @@ export default function CheckoutForm({
   }, [userData, setIsPaymentStepDone, setOrderDetails]);
 
   return (
-    <div className="pt-header-h-full-section-pb relative min-h-dvh gap-4 px-5 sm:px-8 lg:flex lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0">
+    <div className="pt-header-h-full-section-pb relative min-h-svh gap-4 px-5 sm:px-8 lg:flex lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0">
       <div className="bottom-[var(--section-padding)] top-[var(--section-padding)] h-fit space-y-4 lg:sticky lg:w-[calc(55%-16px/2)]">
         {!userData && (
           <CheckoutLogin

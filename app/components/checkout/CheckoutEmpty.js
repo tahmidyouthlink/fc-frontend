@@ -3,7 +3,7 @@ import TransitionLink from "@/app/components/ui/TransitionLink";
 
 export default function CheckoutEmpty() {
   return (
-    <div className="pt-header-h-full-section-pb flex min-h-dvh flex-col items-center justify-center font-semibold [&>*]:w-fit">
+    <div className="pt-header-h-full-section-pb flex min-h-svh flex-col items-center justify-center font-semibold [&>*]:w-fit">
       <TbShoppingCartExclamation className="size-24 text-[var(--color-secondary-500)]" />
       <p className="mt-2 text-neutral-400">The cart is empty.</p>
       <TransitionLink

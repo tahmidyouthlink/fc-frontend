@@ -15,7 +15,7 @@ export default function Drawer({
 
   return (
     <div
-      className={`fixed inset-0 z-[1] h-dvh w-dvw overflow-y-auto overflow-x-hidden text-sm transition-[background-color] duration-500 ease-in-out md:text-base [&::-webkit-scrollbar]:[-webkit-appearance:scrollbarthumb-vertical] ${isDrawerOpen ? "pointer-events-auto bg-neutral-700/60 delay-0" : "pointer-events-none bg-neutral-700/0 delay-100"}`}
+      className={`fixed inset-0 z-[1] h-svh w-dvw overflow-y-auto overflow-x-hidden text-sm transition-[background-color] duration-500 ease-in-out md:text-base [&::-webkit-scrollbar]:[-webkit-appearance:scrollbarthumb-vertical] ${isDrawerOpen ? "pointer-events-auto bg-neutral-700/60 delay-0" : "pointer-events-none bg-neutral-700/0 delay-100"}`}
       id={drawerBgId}
       onClick={(event) =>
         event.target.id === drawerBgId && setIsDrawerOpen(false)

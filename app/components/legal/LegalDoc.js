@@ -2,7 +2,7 @@ import FAQs from "./faqs";
 
 export default function LegalDoc({ pageTitle, docContent, faqs }) {
   return (
-    <div className="pt-header-h-full-section-pb min-h-dvh pb-[var(--section-padding)]">
+    <div className="pt-header-h-full-section-pb min-h-svh pb-[var(--section-padding)]">
       {/* Document Title */}
       <h1 className="my-5 text-center text-[32px]/[35px]">{pageTitle}</h1>
       {/* Document Wrapper */}

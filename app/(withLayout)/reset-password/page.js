@@ -45,7 +45,7 @@ export default async function ResetPassword({ searchParams }) {
         className={`sticky left-[80%] top-1/3 animate-blob bg-[var(--color-moving-bubble-primary)] [animation-delay:2s] max-sm:hidden ${!isTokenValid ? "opacity-0" : "opacity-100"}`}
       />
       {isTokenValid ? (
-        <div className="pt-header-h-full-section-pb relative flex min-h-dvh w-full items-center justify-center px-5 pb-[var(--section-padding)] sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0">
+        <div className="pt-header-h-full-section-pb relative flex min-h-svh w-full items-center justify-center px-5 pb-[var(--section-padding)] sm:px-8 lg:px-12 xl:mx-auto xl:max-w-[1200px] xl:px-0">
           <section className="w-full max-w-md rounded-md border-2 border-neutral-50/20 bg-white/40 p-5 shadow-[0_0_20px_0_rgba(0,0,0,0.05)] backdrop-blur-2xl transition-[height] duration-300 ease-in-out">
             <h2 className="text-base font-semibold md:text-lg">
               Reset Your Password
@@ -57,7 +57,7 @@ export default async function ResetPassword({ searchParams }) {
           </section>
         </div>
       ) : (
-        <div className="pt-header-h-full-section-pb flex min-h-dvh flex-col items-center justify-center pb-[var(--section-padding)] [&>*]:w-fit">
+        <div className="pt-header-h-full-section-pb flex min-h-svh flex-col items-center justify-center pb-[var(--section-padding)] [&>*]:w-fit">
           <TbLockExclamation className="size-24 text-[var(--color-secondary-500)]" />
           <p className="mt-2 text-neutral-400">{validationMessage}</p>
           <TransitionLink

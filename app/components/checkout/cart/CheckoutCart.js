@@ -51,7 +51,7 @@ export default function CheckoutCart({
       <div className="relative flex h-full min-h-full w-full flex-col justify-between">
         {!!cartItems?.length && (
           <div
-            className={`relative z-[1] space-y-4 px-5 pb-5 text-[13px] before:pointer-events-none before:absolute before:left-0 before:h-full before:w-full before:rounded-b-md before:border-2 before:border-neutral-50/20 before:bg-white/50 before:backdrop-blur-2xl before:content-[''] max-lg:order-last md:text-sm lg:sticky ${isAnyDiscountApplied && isDeliverySectionFilledUp ? "lg:top-[calc(100dvh-274px)]" : !isAnyDiscountApplied && !isDeliverySectionFilledUp ? "lg:top-[calc(100dvh-180px)]" : !isAnyDiscountApplied ? "lg:top-[calc(100dvh-244px)]" : "lg:top-[calc(100dvh-210px)]"} `}
+            className={`relative z-[1] space-y-4 px-5 pb-5 text-[13px] before:pointer-events-none before:absolute before:left-0 before:h-full before:w-full before:rounded-b-md before:border-2 before:border-neutral-50/20 before:bg-white/50 before:backdrop-blur-2xl before:content-[''] max-lg:order-last md:text-sm lg:sticky ${isAnyDiscountApplied && isDeliverySectionFilledUp ? "lg:top-[calc(100svh-274px)]" : !isAnyDiscountApplied && !isDeliverySectionFilledUp ? "lg:top-[calc(100svh-180px)]" : !isAnyDiscountApplied ? "lg:top-[calc(100svh-244px)]" : "lg:top-[calc(100svh-210px)]"} `}
           >
             <hr className="relative z-[1] h-0.5 w-full bg-[#f1f1f1]" />
             <CheckoutItemsInfo
