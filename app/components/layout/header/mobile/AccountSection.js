@@ -6,7 +6,6 @@ import { PiSignIn, PiSignOut, PiUser, PiUserCirclePlus } from "react-icons/pi";
 import { removeRefreshToken } from "@/app/actions/auth";
 import { useLoading } from "@/app/contexts/loading";
 import TransitionLink from "@/app/components/ui/TransitionLink";
-import createErrorMessage from "@/app/utils/createErrorMessage";
 import {
   forgotPasswordContent,
   loginContent,
@@ -40,7 +39,7 @@ export default function AccountSection({
       window.dispatchEvent(new Event("storageWishlist"));
       toast.success("Successfully logged out.");
     } catch (error) {
-      toast.error(createErrorMessage(error));
+      toast.error("SignOutError:", error.message);
     }
     setIsPageLoading(false);
   };
